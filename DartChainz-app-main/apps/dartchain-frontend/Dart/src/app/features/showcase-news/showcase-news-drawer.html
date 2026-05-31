@@ -1,0 +1,92 @@
+@if (item(); as news) {
+  <div
+    class="showcase-news-drawer-backdrop"
+    (click)="dismiss()"
+    aria-hidden="true"
+  >
+    <aside
+      #drawerPanel
+      class="showcase-news-drawer"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      [attr.aria-labelledby]="'newsDrawerTitle-' + news.id"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="showcase-news-drawer__head">
+        <div class="showcase-news-drawer__nav">
+          <button
+            type="button"
+            class="showcase-news-drawer__nav-btn"
+            [disabled]="!canPrev()"
+            aria-label="Article précédent"
+            (click)="navigatePrev.emit()"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            class="showcase-news-drawer__nav-btn"
+            [disabled]="!canNext()"
+            aria-label="Article suivant"
+            (click)="navigateNext.emit()"
+          >
+            ›
+          </button>
+        </div>
+
+        <div class="showcase-news-drawer__head-copy">
+          <p class="showcase-news-drawer__eyebrow">{{ categoryLabel(news.category) }} · {{ news.source }}</p>
+          <h3 class="showcase-news-drawer__title" [id]="'newsDrawerTitle-' + news.id">
+            {{ news.title }}
+          </h3>
+          <p class="showcase-news-drawer__meta">
+            {{ news.relativeTime }} · {{ formatPublishedAt(news.publishedAt) }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="showcase-news-drawer__close"
+          aria-label="Fermer l'article"
+          (click)="dismiss()"
+        >
+          ✕
+        </button>
+      </header>
+
+      <div class="showcase-news-drawer__body">
+        @if (loading()) {
+          <div class="showcase-news-drawer__skeleton" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        } @else {
+          <p class="showcase-news-drawer__summary">
+            {{ news.body || news.summary || 'Aucun résumé disponible.' }}
+          </p>
+        }
+
+        <div class="showcase-news-drawer__actions">
+          @if (actionLabel(news); as label) {
+            <button
+              type="button"
+              class="showcase-news-drawer__action showcase-news-drawer__action--primary"
+              (click)="runAction.emit(news)"
+            >
+              {{ label }}
+            </button>
+          }
+          <button
+            type="button"
+            class="showcase-news-drawer__action"
+            (click)="copySummary.emit(news)"
+          >
+            Copier
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+}

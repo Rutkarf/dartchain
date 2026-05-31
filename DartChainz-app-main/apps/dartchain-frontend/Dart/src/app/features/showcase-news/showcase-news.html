@@ -1,0 +1,167 @@
+<div
+  class="showcase-view showcase-view--news"
+  role="region"
+  aria-label="Fil d'actualités"
+>
+  @if (isExpanded) {
+    <header class="showcase-news__head">
+      <div class="showcase-meta showcase-news__meta-bar">
+        <p class="showcase-meta__live" aria-live="polite">
+          <span class="showcase-meta__live-dot" aria-hidden="true"></span>
+          <span class="showcase-meta__live-text">{{ liveActivity() }}</span>
+          @if (liveAgeLabel()) {
+            <span class="showcase-meta__live-age">· {{ liveAgeLabel() }}</span>
+          }
+        </p>
+
+        @if (newsState.unreadCount() > 0) {
+          <span
+            class="unread-badge showcase-meta__unread"
+            [attr.aria-label]="newsState.unreadCount() + ' non lues'"
+          >
+            {{ newsState.unreadCount() > 99 ? '99+' : newsState.unreadCount() }}
+          </span>
+        }
+
+        <label class="showcase-meta__search">
+          <span class="sr-only">Rechercher dans les actualités</span>
+          <input
+            #searchInput
+            type="search"
+            class="showcase-meta__search-input"
+            placeholder="Rechercher…"
+            [value]="searchQuery()"
+            (input)="onSearchInput($any($event.target).value)"
+          />
+        </label>
+
+        <button
+          type="button"
+          class="showcase-meta__refresh"
+          (click)="refresh()"
+          [attr.aria-busy]="loading()"
+          aria-label="Actualiser les actualités"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+            <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+            <path d="M17 4v4h-4" />
+            <path d="M7 20v-4h4" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="showcase-news__filters-row">
+        <div class="showcase-news__filters" role="tablist" aria-label="Filtrer les news">
+          @for (cat of categories(); track cat) {
+            <button
+              type="button"
+              class="showcase-news__filter"
+              [attr.data-filter]="cat"
+              [class.showcase-news__filter--active]="activeCategory() === cat"
+              (click)="selectCategory(cat)"
+            >
+              {{ categoryLabel(cat) }}
+            </button>
+          }
+        </div>
+      </div>
+    </header>
+
+    @if (newItemsToast()) {
+      <div class="showcase-news__toast" role="status">
+        <span>Nouvelles actualités</span>
+        <button type="button" (click)="dismissNewToast()">OK</button>
+      </div>
+    }
+
+    <div class="showcase-news__content">
+      @if (loading()) {
+        <ul class="showcase-news__list showcase-news__list--skeleton" aria-hidden="true">
+          @for (row of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track row) {
+            <li class="showcase-news__skeleton-item">
+              <span class="showcase-news__skeleton-tag"></span>
+              <span class="showcase-news__skeleton-lines">
+                <span></span>
+                <span></span>
+              </span>
+            </li>
+          }
+        </ul>
+      } @else if (error()) {
+        <div class="showcase-news__status showcase-news__status--error">
+          <p>Impossible de charger les news.</p>
+          <button type="button" class="showcase-news__retry" (click)="retry()">Réessayer</button>
+        </div>
+      } @else if (filteredItems().length === 0) {
+        <div class="showcase-news__status">
+          <p>Aucune actualité pour ce filtre.</p>
+          @if (activeCategory() !== 'all') {
+            <button type="button" class="showcase-news__retry" (click)="goToAllCategory()">
+              Voir toutes
+            </button>
+          }
+        </div>
+      } @else {
+        <ul
+          class="showcase-news__list"
+          [class.showcase-news__list--compact]="density() === 'compact'"
+        >
+          @for (item of filteredItems(); track item.id) {
+            <li
+              class="showcase-news__item"
+              [class.showcase-news__item--featured]="isFeatured(item)"
+              [class.showcase-news__item--selected]="selectedItem()?.id === item.id"
+              [class.showcase-news__item--unread]="isUnread(item)"
+            >
+              <button
+                type="button"
+                class="showcase-news__item-btn"
+                (click)="openItem(item)"
+                [attr.aria-expanded]="selectedItem()?.id === item.id"
+              >
+                <span class="showcase-news__tag" [attr.data-category]="item.category">
+                  <span class="showcase-news__tag-icon" aria-hidden="true">{{
+                    categoryIcon(item.category)
+                  }}</span>
+                  <span class="showcase-news__tag-label">{{ categoryLabel(item.category) }}</span>
+                </span>
+                <span class="showcase-news__item-title">{{ item.title }}</span>
+                <span class="showcase-news__time">{{ item.relativeTime }}</span>
+                <span
+                  class="showcase-news__unread-dot"
+                  [class.showcase-news__unread-dot--placeholder]="!isUnread(item)"
+                  [attr.aria-hidden]="!isUnread(item)"
+                  [attr.aria-label]="isUnread(item) ? 'Non lu' : null"
+                ></span>
+              </button>
+            </li>
+          }
+        </ul>
+
+        @if (hasMore()) {
+          <button
+            type="button"
+            class="showcase-news__load-more"
+            [disabled]="loadingMore()"
+            (click)="loadMore()"
+          >
+            {{ loadingMore() ? 'Chargement…' : 'Charger plus' }}
+          </button>
+        }
+      }
+    </div>
+
+    <app-showcase-news-drawer
+      [item]="detailItem() ?? selectedItem()"
+      [loading]="detailLoading()"
+      [canPrev]="canNavigatePrev()"
+      [canNext]="canNavigateNext()"
+      (closeDrawer)="closeItem()"
+      (navigatePrev)="navigatePrev()"
+      (navigateNext)="navigateNext()"
+      (runAction)="runAction($event)"
+      (copySummary)="copySummary($event)"
+    />
+  }
+</div>

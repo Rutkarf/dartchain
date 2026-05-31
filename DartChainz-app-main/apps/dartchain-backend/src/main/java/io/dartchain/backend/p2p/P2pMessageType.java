@@ -1,0 +1,9 @@
+package io.dartchain.backend.p2p;
+
+public enum P2pMessageType {
+    QUERY_LATEST,
+    QUERY_ALL,
+    RESPONSE_BLOCKCHAIN,
+    QUERY_TRANSACTION_POOL,
+    RESPONSE_TRANSACTION_POOL
+}

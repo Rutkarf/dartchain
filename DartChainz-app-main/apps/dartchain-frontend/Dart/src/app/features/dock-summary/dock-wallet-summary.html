@@ -1,0 +1,52 @@
+<div class="dock-summary-bar" role="status" aria-live="polite" aria-label="Résumé wallet">
+  <div class="dock-summary-main">
+    <span class="dock-summary-main__rail" aria-hidden="true"></span>
+    <span
+      class="dock-summary-status"
+      [ngClass]="statusClass(phase())"
+      [attr.aria-label]="'État : ' + statusLabel()"
+    >
+      {{ statusLabel() }}
+    </span>
+  </div>
+
+  <div class="dock-summary-progress">
+    <p class="dock-summary-progress__text">
+      <span>{{ headline() }}</span>
+      @if (progressLabel()) {
+        <span class="dock-summary-progress__text--muted"> · {{ progressLabel() }}</span>
+      }
+    </p>
+  </div>
+
+  <div class="dock-summary-meta">
+    @if (updatedAgeLabel()) {
+      <span class="dock-summary-meta__time">{{ updatedAgeLabel() }}</span>
+    }
+  </div>
+
+  <div class="dock-summary-actions">
+    <button
+      type="button"
+      class="dock-summary-actions__btn dock-summary-actions__refresh"
+      (click)="onRefresh($event)"
+      [attr.aria-busy]="loading()"
+      aria-label="Actualiser le solde"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+        <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+        <path d="M17 4v4h-4" />
+        <path d="M7 20v-4h4" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="dock-summary-actions__btn dock-summary-actions__primary"
+      (click)="onOpen($event)"
+      aria-label="Ouvrir le panneau Wallet"
+    >
+      Wallet
+    </button>
+  </div>
+</div>

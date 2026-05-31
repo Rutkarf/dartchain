@@ -1,0 +1,70 @@
+<form class="explorer-search" (submit)="onSubmit($event)" role="search">
+  <label class="explorer-search__label explorer-search__label--sr-only" for="explorer-search-input">
+    Explorer
+  </label>
+
+  <div
+    class="explorer-search__field-wrap"
+    [class.explorer-search__field-wrap--open]="menuOpen()"
+    [class.explorer-search__field-wrap--focused]="inputFocused()"
+  >
+    <input
+      id="explorer-search-input"
+      class="explorer-search__input"
+      type="text"
+      inputmode="search"
+      enterkeyhint="search"
+      name="q"
+      [value]="query()"
+      (input)="onInput($any($event.target).value)"
+      (focus)="onInputFocus()"
+      (blur)="onInputBlur()"
+      [placeholder]="placeholderText"
+      autocomplete="off"
+      spellcheck="false"
+      aria-label="Rechercher dans la blockchain"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="explorer-search-results"
+    />
+
+    @if (loading()) {
+      <span class="explorer-search__spinner" aria-hidden="true"></span>
+    }
+
+    <span class="explorer-search__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M20 20l-3.5-3.5" />
+      </svg>
+    </span>
+  </div>
+
+  @if (menuOpen()) {
+    <ul
+      id="explorer-search-results"
+      class="explorer-search__menu token-select__menu"
+      role="listbox"
+      aria-label="Résultats de recherche"
+    >
+      @if (errorMessage()) {
+        <li class="explorer-search__empty">{{ errorMessage() }}</li>
+      } @else if (results().length === 0 && !loading()) {
+        <li class="explorer-search__empty">Aucun résultat pour « {{ query() }} »</li>
+      } @else {
+        @for (result of results(); track result.label + result.subtitle + result.kind) {
+          <li
+            role="option"
+            class="token-select__option explorer-search__option"
+            (click)="activateResult(result)"
+          >
+            <span class="explorer-search__option-main">
+              <span class="explorer-search__kind">{{ kindLabel(result.kind) }}</span>
+              <span class="explorer-search__label-text">{{ result.label }}</span>
+            </span>
+            <span class="explorer-search__subtitle">{{ result.subtitle }}</span>
+          </li>
+        }
+      }
+    </ul>
+  }
+</form>

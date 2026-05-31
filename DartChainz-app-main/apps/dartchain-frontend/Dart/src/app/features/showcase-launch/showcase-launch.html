@@ -1,0 +1,148 @@
+<div class="showcase-view showcase-view--launch" role="region" aria-label="LaunchLab — projets">
+  @if (isExpanded) {
+    <header class="showcase-launch__head">
+      <div class="showcase-meta showcase-launch__meta-bar">
+        <span class="showcase-meta__rail" aria-hidden="true"></span>
+        <span
+          class="launch-summary-status showcase-meta__status-pill"
+          [ngClass]="phaseClass()"
+          [attr.aria-label]="'État : ' + launchState.statusLabel()"
+        >
+          {{ launchState.statusLabel() }}
+        </span>
+        <span class="showcase-meta__live" aria-live="polite">
+          <span class="showcase-meta__live-dot" aria-hidden="true"></span>
+          {{ liveSummary() }}
+        </span>
+        <span class="showcase-meta__progress" aria-hidden="true">
+          <span
+            class="showcase-meta__progress-fill"
+            [style.width.%]="launchState.progressPercent()"
+          ></span>
+        </span>
+
+        <label class="showcase-meta__search">
+          <span class="sr-only">Rechercher un projet</span>
+          <input
+            type="search"
+            class="showcase-meta__search-input"
+            placeholder="Rechercher…"
+            [value]="searchQuery()"
+            (input)="onSearchInput($any($event.target).value)"
+          />
+        </label>
+
+        <button
+          type="button"
+          class="showcase-meta__refresh"
+          (click)="refresh()"
+          [attr.aria-busy]="loading()"
+          aria-label="Actualiser les projets"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+            <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+            <path d="M17 4v4h-4" />
+            <path d="M7 20v-4h4" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="showcase-launch__filters-row">
+        <div class="showcase-launch__filters" role="tablist" aria-label="Filtrer les projets">
+          @for (status of statusFilters; track status) {
+            <button
+              type="button"
+              class="showcase-launch__filter"
+              [attr.data-filter]="status"
+              [class.showcase-launch__filter--active]="activeStatus() === status"
+              (click)="selectStatus(status)"
+            >
+              {{ statusFilterLabel(status) }}
+            </button>
+          }
+        </div>
+      </div>
+    </header>
+
+    <div class="showcase-launch__content">
+      @if (loading()) {
+        <ul class="showcase-launch__list showcase-launch__list--skeleton" aria-hidden="true">
+          @for (row of [1, 2, 3, 4, 5]; track row) {
+            <li class="showcase-launch__skeleton-item">
+              <span class="showcase-launch__skeleton-logo"></span>
+              <span class="showcase-launch__skeleton-lines">
+                <span></span>
+              </span>
+            </li>
+          }
+        </ul>
+      } @else if (error()) {
+        <div class="showcase-launch__status showcase-launch__status--error">
+          <p>Impossible de charger les projets.</p>
+          <button type="button" class="showcase-launch__retry" (click)="refresh()">Réessayer</button>
+        </div>
+      } @else if (filteredProjects().length === 0) {
+        <div class="showcase-launch__status">
+          <p>Aucun projet pour ce filtre.</p>
+          @if (activeStatus() !== 'all') {
+            <button type="button" class="showcase-launch__retry" (click)="selectStatus('all')">
+              Voir tous
+            </button>
+          }
+        </div>
+      } @else {
+        <ul class="showcase-launch__list" aria-label="Projets launch">
+          @for (project of filteredProjects(); track project.id) {
+            <li class="showcase-launch__item">
+              <div class="showcase-launch__item-row">
+                @if (project.logoUrl) {
+                  <img
+                    class="showcase-launch__logo"
+                    [src]="project.logoUrl"
+                    [alt]="project.name"
+                    width="16"
+                    height="16"
+                  />
+                } @else {
+                  <span
+                    class="showcase-launch__logo showcase-launch__logo--placeholder"
+                    aria-hidden="true"
+                  >
+                    {{ projectInitials(project) }}
+                  </span>
+                }
+                <span class="showcase-launch__name" [title]="project.name">{{ project.name }}</span>
+                <span class="showcase-launch__symbol">{{ project.symbol }}</span>
+                <span class="showcase-launch__raised">
+                  {{ project.raised }}
+                  @if (project.target && project.target !== '—') {
+                    <span class="showcase-launch__sep">/</span>{{ project.target }}
+                  }
+                </span>
+                <span
+                  class="showcase-launch__badge"
+                  [class.showcase-launch__badge--live]="project.status === 'LIVE'"
+                  [class.showcase-launch__badge--soon]="isSoon(project.status)"
+                  [class.showcase-launch__badge--ended]="isEnded(project.status)"
+                >
+                  {{ statusLabel(project.status) }}
+                </span>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    @if (successMessage()) {
+      <p class="showcase-launch__feedback" role="status">{{ successMessage() }}</p>
+    }
+
+    <footer class="showcase-launch__footer">
+      <button type="button" class="showcase-launch__cta" (click)="openDrawer()">
+        Lancer un projet
+      </button>
+    </footer>
+  }
+</div>

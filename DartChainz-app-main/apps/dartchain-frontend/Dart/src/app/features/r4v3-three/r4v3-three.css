@@ -1,0 +1,98 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+:host(.navbar-logo-three) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  overflow: visible;
+}
+
+:host(.navbar-logo-three) .r4v3-three,
+:host(.navbar-logo-three) .logo-3d {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  line-height: 0;
+}
+
+:host(.faucet-inline__logo-three) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0 0 1px;
+  overflow: visible;
+}
+
+:host(.faucet-inline__logo-three) .r4v3-three {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+}
+
+:host(.faucet-inline__logo-three) .logo-3d {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.r4v3-three {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.logo-3d {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  display: block;
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+}
+
+.logo-3d canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 1;
+  background: transparent !important;
+  filter: none;
+}
+
+/* === Responsive 250–500px (r4v3-three) === */
+@media (max-width: 500px) {
+  :host { min-width: 0; max-width: 100%; }
+}
+

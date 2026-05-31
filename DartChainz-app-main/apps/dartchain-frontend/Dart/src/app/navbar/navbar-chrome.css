@@ -1,0 +1,9 @@
+/* Variables partagées — sous-composants navbar */
+
+:host-context(.navbar-wrap),
+.navbar-wrap {
+  --navbar-chrome-font: clamp(0.62rem, 1.5vw, 0.72rem);
+  --navbar-status-font-size: var(--navbar-chrome-font);
+  --navbar-crypto-font-size: clamp(1rem, 2.6vw, 1.28rem);
+  --navbar-chrome-h: var(--nv-control-h, 32px);
+}

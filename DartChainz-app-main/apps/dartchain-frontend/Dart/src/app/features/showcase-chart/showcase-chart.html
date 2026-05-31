@@ -1,0 +1,503 @@
+<div class="showcase-view showcase-view--chart" [class.showcase-view--hub]="hubLayout()">
+  <header class="showcase-chart__head" [class.showcase-chart__head--hub]="hubLayout()">
+    @if (hubLayout()) {
+      <div class="showcase-chart__hub-bar" aria-label="Graphique marché">
+        <h2 class="showcase-chart__hub-title">
+          <span class="showcase-chart__hub-title-label">Graphique</span>
+          <span class="showcase-chart__hub-title-sep" aria-hidden="true">•</span>
+          <span class="showcase-chart__hub-title-pair">{{ pairBase() }} / {{ currencyLabel() }}</span>
+        </h2>
+        <div class="showcase-chart__hub-periods" role="group" aria-label="Période du graphique">
+          @for (pill of hubPeriodPills; track pill.range) {
+            <button
+              type="button"
+              class="showcase-chart__hub-period"
+              [class.showcase-chart__hub-period--active]="activeRange() === pill.range"
+              [attr.aria-pressed]="activeRange() === pill.range"
+              (click)="selectHubPeriod(pill)"
+            >
+              {{ pill.badge }}
+            </button>
+          }
+        </div>
+        <button
+          type="button"
+          class="showcase-chart__hub-expand"
+          aria-label="Agrandir le graphique"
+          title="Plein écran"
+          (click)="toggleHubExpand($event)"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+    } @else {
+    <div class="showcase-chart__toolbar" aria-label="Contrôles du graphique">
+      <div class="showcase-chart__toolbar-start">
+        <span class="showcase-chart__accent" aria-hidden="true"></span>
+        <span class="showcase-chart__title">Graph</span>
+
+        <div class="showcase-chart__market" aria-label="Paire, prix et variation">
+          <div class="showcase-chart__pair-dynamic">
+            <select
+              class="showcase-chart__pair-select showcase-chart__pair-select--crypto"
+              [value]="selectedSymbol()"
+              (change)="selectCrypto($event)"
+              aria-label="Crypto"
+            >
+              @for (symbol of cryptoOptions; track symbol) {
+                <option [value]="symbol">{{ cryptoLabel(symbol) }}</option>
+              }
+            </select>
+            <span class="showcase-chart__pair-sep" aria-hidden="true">/</span>
+            <select
+              class="showcase-chart__pair-select showcase-chart__pair-select--fiat"
+              [value]="chartCurrency()"
+              (change)="onCurrencyChange($event)"
+              aria-label="Devise"
+            >
+              @for (currency of currencies; track currency.id) {
+                <option [value]="currency.id">{{ currency.label }}</option>
+              }
+            </select>
+          </div>
+
+          @if (!loading() && !error()) {
+            @if (hoverInfo(); as hover) {
+              <span
+                class="showcase-chart__quote showcase-chart__quote--inspect"
+                [title]="hover.label + (hover.pinned ? ' · épingle' : '')"
+              >
+                {{ hover.price }}
+              </span>
+            } @else {
+              <span class="showcase-chart__quote">{{ chartPrice() }}</span>
+            }
+            <span
+              class="showcase-chart__delta"
+              [class.showcase-chart__delta--up]="chartPositive()"
+              [class.showcase-chart__delta--down]="!chartPositive()"
+            >
+              {{ chartDelta() }}
+            </span>
+          }
+        </div>
+      </div>
+
+      <div class="showcase-chart__toolbar-indicators" role="group" aria-label="Indicateurs">
+        <button
+          type="button"
+          class="cta cta--swap cta--sm showcase-chart__tool-btn showcase-chart__ind-btn"
+          [class.showcase-chart__ind-btn--active]="showMa()"
+          (click)="toggleMa()"
+        >
+          MA
+        </button>
+        <button
+          type="button"
+          class="cta cta--swap cta--sm showcase-chart__tool-btn showcase-chart__ind-btn"
+          [class.showcase-chart__ind-btn--active]="showRsi()"
+          (click)="toggleRsi()"
+        >
+          RSI
+        </button>
+        <button
+          type="button"
+          class="cta cta--swap cta--sm showcase-chart__tool-btn showcase-chart__ind-btn"
+          [class.showcase-chart__ind-btn--active]="showVolume()"
+          (click)="toggleVolume()"
+        >
+          Vol
+        </button>
+        <button
+          type="button"
+          class="cta cta--swap cta--sm showcase-chart__tool-btn showcase-chart__ind-btn"
+          [class.showcase-chart__ind-btn--active]="alertPanelOpen()"
+          title="Alerte"
+          (click)="toggleAlertPanel()"
+        >
+          Alt
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="cta cta--swap cta--sm showcase-chart__tool-btn showcase-chart__tool-btn--icon showcase-chart__refresh-btn"
+        title="Actualiser"
+        (click)="refresh()"
+      >
+        ↻
+      </button>
+    </div>
+    }
+
+    @if (alertPanelOpen()) {
+      <div class="showcase-chart__alert-panel showcase-chart__alert-panel--inline">
+        <input type="text" placeholder="Seuil haut" [value]="alertAbove()" (input)="alertAbove.set($any($event.target).value)" />
+        <input type="text" placeholder="Seuil bas" [value]="alertBelow()" (input)="alertBelow.set($any($event.target).value)" />
+        <button type="button" class="cta cta--swap cta--sm showcase-chart__tool-btn" (click)="saveAlert()">OK</button>
+        <button type="button" class="cta cta--swap cta--sm showcase-chart__tool-btn" (click)="clearAlert()">×</button>
+      </div>
+    }
+
+    @if (alertTrigger(); as alertMsg) {
+      <p class="showcase-chart__alert-banner" role="status">{{ alertMsg }}</p>
+    }
+  </header>
+
+  <div class="showcase-chart__main">
+    @if (loading()) {
+      <div class="showcase-chart__skeleton" aria-busy="true">
+        <div class="showcase-chart__skeleton-chart"></div>
+      </div>
+    } @else if (error()) {
+      <div class="showcase-chart__error-state">
+        <p>Graphique indisponible.</p>
+        <button type="button" class="cta cta--swap cta--sm showcase-chart__tool-btn" (click)="retry()">Réessayer</button>
+      </div>
+    } @else {
+      <div class="showcase-chart__chart-row" [class.showcase-chart__chart-row--hub]="hubLayout()">
+        @if (!hubLayout()) {
+        <aside
+          class="showcase-chart__metrics-rail"
+          [class.showcase-chart__metrics-rail--menu-open]="timeframeMenuOpen()"
+          aria-label="Période, High, Low, Volume"
+        >
+          <div class="showcase-chart__metrics-rail-timeframe">
+            <div class="showcase-chart__timeframe" #timeframeMenu>
+              <button
+                type="button"
+                class="showcase-chart__timeframe-trigger"
+                [class.showcase-chart__timeframe-trigger--open]="timeframeMenuOpen()"
+                [attr.aria-expanded]="timeframeMenuOpen()"
+                aria-haspopup="menu"
+                [title]="activeTimeframeHint()"
+                (click)="toggleTimeframeMenu($event)"
+              >
+                <svg class="showcase-chart__timeframe-icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="8" cy="8" r="5.75" fill="none" stroke="currentColor" stroke-width="1.1" />
+                  <path d="M8 5V8l2 1.25" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" />
+                </svg>
+                <span class="showcase-chart__timeframe-caption">
+                  <span class="showcase-chart__timeframe-badge">{{ activeTimeframeBadge() }}</span>
+                  <svg class="showcase-chart__timeframe-chevron" viewBox="0 0 8 8" aria-hidden="true">
+                    <path d="M1.5 2.5 L4 5 6.5 2.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                  </svg>
+                </span>
+              </button>
+              @if (timeframeMenuOpen()) {
+                <div class="showcase-chart__timeframe-panel" role="menu" aria-label="Période et intervalle">
+                  @for (section of timeframeMenuSections(); track section.title) {
+                    <div class="showcase-chart__timeframe-section">
+                      <span class="showcase-chart__timeframe-section-title">{{ section.title }}</span>
+                      <div class="showcase-chart__timeframe-grid">
+                        @for (option of section.options; track option.id) {
+                          <button
+                            type="button"
+                            role="menuitem"
+                            class="showcase-chart__timeframe-item"
+                            [class.showcase-chart__timeframe-item--active]="activeTimeframeId() === option.id"
+                            [title]="option.label"
+                            (click)="selectTimeframe(option, $event)"
+                          >
+                            <span class="showcase-chart__timeframe-item-badge">{{ option.badge }}</span>
+                            <span class="showcase-chart__timeframe-item-label">{{ option.label }}</span>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+          <div class="showcase-chart__metric-cell">
+            <span class="showcase-chart__metric-key">H</span>
+            <span class="showcase-chart__metric-val">{{ chartHigh() }}</span>
+          </div>
+          <div class="showcase-chart__metric-cell">
+            <span class="showcase-chart__metric-key">L</span>
+            <span class="showcase-chart__metric-val">{{ chartLow() }}</span>
+          </div>
+          <div class="showcase-chart__metric-cell">
+            <span class="showcase-chart__metric-key">V</span>
+            <span class="showcase-chart__metric-val">{{ chartVolume() }}</span>
+          </div>
+        </aside>
+        }
+
+        <div
+          class="showcase-chart__stage"
+          [class.showcase-chart__stage--hub]="hubLayout()"
+          #hubChartStage
+          (mouseleave)="clearHover()"
+        >
+        <div
+          class="showcase-chart__y-axis"
+          [class.showcase-chart__y-axis--hub]="hubLayout()"
+          [attr.aria-label]="hubLayout() ? hubYAxisTitle() : null"
+          [attr.aria-hidden]="hubLayout() ? null : true"
+        >
+          @if (hubLayout()) {
+            <span class="showcase-chart__y-axis-title">{{ hubYAxisTitle() }}</span>
+          }
+          @for (tick of priceAxisTicks(); track tick.id) {
+            <span
+              class="showcase-chart__y-axis-tick"
+              [class.showcase-chart__y-axis-tick--start]="tick.align === 'start'"
+              [class.showcase-chart__y-axis-tick--end]="tick.align === 'end'"
+              [style.top.%]="tick.topPercent"
+            >{{ tick.label }}</span>
+          }
+        </div>
+        <div class="showcase-chart__plot-gutter" aria-hidden="true"></div>
+        <div class="showcase-chart__plot-area">
+            <div
+              class="showcase-chart__plot"
+              (mousemove)="onPlotMove($event)"
+              (click)="onPlotClick($event)"
+              (mouseleave)="clearHover()"
+            >
+            @if (hoverInfo(); as hover) {
+              <div class="showcase-chart__crosshair" [style.left.%]="hover.xPercent" aria-hidden="true">
+                <div
+                  class="showcase-chart__crosshair-tip"
+                  [class.showcase-chart__crosshair-tip--start]="hover.tipAlign === 'start'"
+                  [class.showcase-chart__crosshair-tip--end]="hover.tipAlign === 'end'"
+                >
+                  <span class="showcase-chart__crosshair-time">{{ hover.label }}</span>
+                  <span class="showcase-chart__crosshair-price">{{ hover.price }}</span>
+                  @if (hover.ohlc) {
+                    <span class="showcase-chart__crosshair-ohlc">O{{ hover.ohlc.open }} H{{ hover.ohlc.high }} L{{ hover.ohlc.low }} C{{ hover.ohlc.close }}</span>
+                  }
+                </div>
+                <span class="showcase-chart__crosshair-line"></span>
+                <span class="showcase-chart__crosshair-dot" [style.top.%]="hover.yPercent"></span>
+              </div>
+            }
+            <svg
+              #chartSvg
+              class="showcase-chart__svg"
+              [attr.viewBox]="'0 0 100 ' + chartViewHeight()"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <filter id="showcaseChartGlow" x="0" y="-10%" width="100%" height="120%">
+                  <feGaussianBlur stdDeviation="0.6" result="blur"></feGaussianBlur>
+                  <feMerge>
+                    <feMergeNode in="blur"></feMergeNode>
+                    <feMergeNode in="SourceGraphic"></feMergeNode>
+                  </feMerge>
+                </filter>
+                <clipPath id="showcaseChartPlotClip">
+                  <rect [attr.x]="chartPlotInset" y="0" [attr.width]="chartPlotWidth" [attr.height]="chartHeight"></rect>
+                </clipPath>
+              </defs>
+              <g clip-path="url(#showcaseChartPlotClip)">
+                <g class="showcase-chart__grid-layer" aria-hidden="true">
+                  @for (line of horizontalGridLines(); track line.id) {
+                    <line
+                      class="showcase-chart__grid showcase-chart__grid--fine"
+                      [attr.x1]="chartPlotInset"
+                      [attr.y1]="line.y"
+                      [attr.x2]="chartPlotRight"
+                      [attr.y2]="line.y"
+                    ></line>
+                  }
+                  @for (line of verticalGridLines(); track line.id) {
+                    <line
+                      class="showcase-chart__grid showcase-chart__grid--fine"
+                      [attr.x1]="line.x"
+                      y1="0"
+                      [attr.x2]="line.x"
+                      [attr.y2]="chartHeight"
+                    ></line>
+                  }
+                </g>
+                @if (showVolume()) {
+                  @for (bar of volumeLayouts(); track $index) {
+                    <rect
+                      class="showcase-chart__vol-bar"
+                      [attr.x]="bar.x"
+                      [attr.y]="chartHeight + 2 + bar.y"
+                      [attr.width]="bar.w"
+                      [attr.height]="bar.h"
+                    ></rect>
+                  }
+                }
+                @if (chartType() === 'line') {
+                  @for (seg of lineTrendSegments(); track $index) {
+                    <path
+                      class="showcase-chart__area-segment"
+                      [class.showcase-chart__area-segment--up]="seg.up"
+                      [class.showcase-chart__area-segment--down]="!seg.up"
+                      [attr.d]="seg.areaD"
+                    ></path>
+                  }
+                  @if (compareLine()) {
+                    <path class="showcase-chart__compare-line" [attr.d]="compareLine()"></path>
+                  }
+                  @if (ma7Line()) {
+                    <path class="showcase-chart__ma showcase-chart__ma--7" [attr.d]="ma7Line()"></path>
+                  }
+                  @if (ma25Line()) {
+                    <path class="showcase-chart__ma showcase-chart__ma--25" [attr.d]="ma25Line()"></path>
+                  }
+                  @for (seg of lineTrendSegments(); track $index) {
+                    <path
+                      class="showcase-chart__line-segment"
+                      [class.showcase-chart__line-segment--up]="seg.up"
+                      [class.showcase-chart__line-segment--down]="!seg.up"
+                      [attr.d]="seg.d"
+                      filter="url(#showcaseChartGlow)"
+                    ></path>
+                  }
+                  <circle
+                    class="showcase-chart__dot"
+                    [class.showcase-chart__dot--up]="lastLineTrendUp()"
+                    [class.showcase-chart__dot--down]="!lastLineTrendUp()"
+                    [attr.cx]="chartEndPoint.x"
+                    [attr.cy]="chartEndPoint.y"
+                    r="1.6"
+                  ></circle>
+                } @else {
+                  @for (candle of candleLayouts(); track trackCandle($index, candle)) {
+                    <line
+                      class="showcase-chart__wick"
+                      [class.showcase-chart__wick--bull]="candle.bullish"
+                      [class.showcase-chart__wick--bear]="!candle.bullish"
+                      [class.showcase-chart__wick--active]="activeHoverIndex() === $index"
+                      [attr.x1]="candle.x"
+                      [attr.x2]="candle.x"
+                      [attr.y1]="candle.wickTop"
+                      [attr.y2]="candle.wickBottom"
+                    ></line>
+                    <rect
+                      class="showcase-chart__candle"
+                      [class.showcase-chart__candle--bull]="candle.bullish"
+                      [class.showcase-chart__candle--bear]="!candle.bullish"
+                      [class.showcase-chart__candle--active]="activeHoverIndex() === $index"
+                      [attr.x]="candle.x - candle.bodyWidth / 2"
+                      [attr.y]="candle.bodyY"
+                      [attr.width]="candle.bodyWidth"
+                      [attr.height]="candle.bodyHeight"
+                      rx="0.15"
+                    ></rect>
+                  }
+                }
+                @if (activeHoverIndex(); as hi) {
+                  @if (chartType() === 'line') {
+                    <circle
+                      class="showcase-chart__hover-dot"
+                      [attr.cx]="plotPointX(hi)"
+                      [attr.cy]="plotPoints()[hi]"
+                      r="1.8"
+                    ></circle>
+                  }
+                }
+                <g class="showcase-chart__hit-layer">
+                  @for (i of plotPointIndices(); track i) {
+                    <rect
+                      class="showcase-chart__hit-rect"
+                      [attr.x]="hitRectX(i)"
+                      [attr.y]="0"
+                      [attr.width]="hitRectWidth()"
+                      [attr.height]="chartViewHeight()"
+                      (mouseenter)="onPointHover(i)"
+                      (click)="onPointClick(i, $event)"
+                    ></rect>
+                  }
+                </g>
+              </g>
+              @if (showRsi()) {
+                <g [attr.transform]="'translate(0, ' + (chartHeight + (showVolume() ? volumeHeight + 4 : 2)) + ')'">
+                  @for (line of rsiGridLines; track line) {
+                    <path class="showcase-chart__grid showcase-chart__grid--rsi" [attr.d]="line"></path>
+                  }
+                  @if (rsiLine()) {
+                    <path class="showcase-chart__rsi-line" [attr.d]="rsiLine()"></path>
+                  }
+                </g>
+              }
+            </svg>
+            </div>
+            <div class="showcase-chart__plot-chrome">
+              <div class="showcase-chart__plot-chrome-bar">
+              @if (!hubLayout()) {
+              <div class="showcase-chart__type-overlay" role="group" aria-label="Type de graphique">
+                <button
+                  type="button"
+                  class="cta cta--swap cta--sm showcase-chart__type-icon-btn"
+                  [class.showcase-chart__type-icon-btn--active]="chartType() === 'line'"
+                  title="Courbe"
+                  aria-label="Courbe"
+                  (click)="setChartType('line')"
+                >
+                  <svg class="showcase-chart__type-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <polyline points="1,12 5,6 9,9 15,3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="cta cta--swap cta--sm showcase-chart__type-icon-btn"
+                  [class.showcase-chart__type-icon-btn--active]="chartType() === 'candles'"
+                  title="Bougies"
+                  aria-label="Bougies"
+                  (click)="setChartType('candles')"
+                >
+                  <svg class="showcase-chart__type-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <line x1="4" y1="3" x2="4" y2="13" stroke="currentColor" stroke-width="1.2" />
+                    <rect x="2.5" y="6" width="3" height="5" rx="0.3" fill="currentColor" />
+                    <line x1="12" y1="2" x2="12" y2="14" stroke="currentColor" stroke-width="1.2" />
+                    <rect x="10.5" y="5" width="3" height="6" rx="0.3" fill="currentColor" />
+                  </svg>
+                </button>
+              </div>
+              }
+              </div>
+            </div>
+          </div>
+        <div class="showcase-chart__axis" aria-hidden="true">
+            @for (tick of axisTicks(); track tick.id ?? tick.index) {
+              <span class="showcase-chart__axis-tick" [style.left.%]="tick.position">
+                <span class="showcase-chart__axis-tick-label">{{ tick.label }}</span>
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (hubLayout() && !loading() && !error()) {
+    <footer class="showcase-chart__hub-footer" aria-label="Statistiques 24h">
+      <div class="showcase-chart__hub-stat">
+        <span class="showcase-chart__hub-stat-label">Vol 24h</span>
+        <span class="showcase-chart__hub-stat-value">{{ hubFooterVol() }}</span>
+      </div>
+      <div class="showcase-chart__hub-stat showcase-chart__hub-stat--divider" aria-hidden="true"></div>
+      <div class="showcase-chart__hub-stat">
+        <span class="showcase-chart__hub-stat-label">High 24h</span>
+        <span class="showcase-chart__hub-stat-value showcase-chart__hub-stat-value--up">{{ chartHigh() }}</span>
+      </div>
+      <div class="showcase-chart__hub-stat showcase-chart__hub-stat--divider" aria-hidden="true"></div>
+      <div class="showcase-chart__hub-stat">
+        <span class="showcase-chart__hub-stat-label">Low 24h</span>
+        <span class="showcase-chart__hub-stat-value showcase-chart__hub-stat-value--down">{{ chartLow() }}</span>
+      </div>
+      <div class="showcase-chart__hub-stat showcase-chart__hub-stat--divider" aria-hidden="true"></div>
+      <div class="showcase-chart__hub-stat">
+        <span class="showcase-chart__hub-stat-label">Cap. ({{ pairBase() }})</span>
+        <span class="showcase-chart__hub-stat-value">{{ hubFooterCap() }}</span>
+      </div>
+      <div class="showcase-chart__hub-stat showcase-chart__hub-stat--divider" aria-hidden="true"></div>
+      <div class="showcase-chart__hub-stat">
+        <span class="showcase-chart__hub-stat-label">TVL</span>
+        <span class="showcase-chart__hub-stat-value">{{ hubFooterTvl() }}</span>
+      </div>
+    </footer>
+  }
+
+</div>

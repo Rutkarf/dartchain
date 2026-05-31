@@ -1,0 +1,67 @@
+<section class="status-panel" aria-labelledby="status-panel-title">
+  <div class="status-shell">
+    <div class="status-row">
+      <div class="status-left">
+        <span class="status-led" [class.is-online]="health().ok"></span>
+
+        <div class="status-hero-copy">
+          <p class="status-hero-label">Réseau</p>
+          <p
+            id="status-panel-title"
+            class="status-hero-state"
+            [class.ok-text]="health().ok"
+            [class.off-text]="!health().ok"
+          >
+            {{ statusLabel() }}
+          </p>
+        </div>
+      </div>
+
+      <div class="status-right">
+        <article class="status-metric">
+          <span class="status-label">Latence</span>
+          <strong class="status-value">
+            @if (loading()) {
+              Check...
+            } @else {
+              {{ latencyLabel() }}
+            }
+          </strong>
+        </article>
+
+        <button
+          type="button"
+          class="status-refresh"
+          (click)="refresh()"
+          [disabled]="loading()"
+          aria-label="Rafraîchir l’état réseau"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+            <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+            <path d="M17 4v4h-4" />
+            <path d="M7 20v-4h4" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="status-subrow">
+      <article class="status-card status-card--compact">
+        <span class="status-label">Service</span>
+        <strong class="status-value">{{ serviceLabel() }}</strong>
+      </article>
+
+      <article class="status-card status-card--compact">
+        <span class="status-label">Endpoint</span>
+        <strong class="status-value">{{ networkLabel() }}</strong>
+      </article>
+    </div>
+
+    @if (error()) {
+      <div class="status-error" role="alert">
+        {{ error() }}
+      </div>
+    }
+  </div>
+</section>

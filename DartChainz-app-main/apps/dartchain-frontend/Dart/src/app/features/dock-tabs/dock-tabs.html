@@ -1,0 +1,88 @@
+<div class="dock-tabstrip">
+  <nav
+    class="dock-tabs"
+    role="tablist"
+    aria-label="Panneaux blockchain"
+    aria-orientation="horizontal"
+  >
+    <button
+      #dockTabButton
+      type="button"
+      class="dock-tab"
+      data-panel="pending"
+      [class.is-active]="activePanel() === 'pending'"
+      [attr.aria-selected]="activePanel() === 'pending' ? 'true' : 'false'"
+      [attr.tabindex]="activePanel() === 'pending' ? '0' : '-1'"
+      role="tab"
+      id="tab-pending"
+      aria-controls="panel-dock"
+      (click)="openPanel('pending')"
+    >
+      <span class="dock-tab-label">Pending</span>
+    </button>
+
+    <button
+      #dockTabButton
+      type="button"
+      class="dock-tab"
+      data-panel="composer"
+      [class.is-active]="activePanel() === 'composer'"
+      [attr.aria-selected]="activePanel() === 'composer' ? 'true' : 'false'"
+      [attr.tabindex]="activePanel() === 'composer' ? '0' : '-1'"
+      role="tab"
+      id="tab-composer"
+      aria-controls="panel-dock"
+      (click)="openPanel('composer')"
+    >
+      <span class="dock-tab-label">Block</span>
+    </button>
+
+    <button
+      #dockTabButton
+      type="button"
+      class="dock-tab dock-tab--wallet"
+      data-panel="wallet"
+      [class.is-active]="activePanel() === 'wallet'"
+      [attr.aria-selected]="activePanel() === 'wallet' ? 'true' : 'false'"
+      [attr.tabindex]="activePanel() === 'wallet' ? '0' : '-1'"
+      role="tab"
+      id="tab-wallet"
+      aria-controls="panel-dock"
+      (click)="openPanel('wallet')"
+    >
+      <span class="dock-tab-label">Wallet</span>
+    </button>
+
+    <button
+      #dockTabButton
+      type="button"
+      class="dock-tab"
+      data-panel="chain"
+      [class.is-active]="activePanel() === 'chain'"
+      [attr.aria-selected]="activePanel() === 'chain' ? 'true' : 'false'"
+      [attr.tabindex]="activePanel() === 'chain' ? '0' : '-1'"
+      role="tab"
+      id="tab-chain"
+      aria-controls="panel-dock"
+      (click)="openPanel('chain')"
+    >
+      <span class="dock-tab-label">Chain</span>
+    </button>
+
+    <button
+      #dockTabButton
+      type="button"
+      class="dock-tab"
+      data-panel="peers"
+      [class.is-active]="activePanel() === 'peers'"
+      [attr.aria-selected]="activePanel() === 'peers' ? 'true' : 'false'"
+      [attr.tabindex]="activePanel() === 'peers' ? '0' : '-1'"
+      role="tab"
+      id="tab-peers"
+      aria-controls="panel-dock"
+      (click)="openPanel('peers')"
+    >
+      <span class="dock-tab-label">Peers</span>
+    </button>
+  </nav>
+</div>

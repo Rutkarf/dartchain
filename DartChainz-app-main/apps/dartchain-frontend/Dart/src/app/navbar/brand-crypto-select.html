@@ -1,0 +1,32 @@
+<div class="token-select brand-crypto-select" [class.token-select--open]="menuOpen">
+  <button
+    type="button"
+    class="token-field token-select__trigger"
+    (click)="toggleMenu($event)"
+    [attr.aria-expanded]="menuOpen"
+    aria-haspopup="listbox"
+    aria-label="Sélectionner une crypto du rate panel"
+  >
+    <span class="token-select__value">{{ selection.selected() }}</span>
+    <span class="token-select__chevron" aria-hidden="true"></span>
+  </button>
+
+  <ul
+    *ngIf="menuOpen"
+    class="token-select__menu"
+    role="listbox"
+    aria-label="Sélection crypto"
+  >
+    <li
+      *ngFor="let symbol of selection.menuSymbols"
+      role="option"
+      [attr.aria-selected]="symbol === selection.selected()"
+      class="token-select__option"
+      [class.token-select__option--active]="symbol === selection.selected()"
+      (click)="selectSymbol(symbol)"
+    >
+      <span class="token-select__option-label">{{ symbol }}</span>
+      <span *ngIf="symbol === 'R4V3'" class="token-select__option-tag">Natif</span>
+    </li>
+  </ul>
+</div>

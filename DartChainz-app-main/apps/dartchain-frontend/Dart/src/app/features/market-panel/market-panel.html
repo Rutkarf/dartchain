@@ -1,0 +1,173 @@
+<section class="market-panel" aria-label="Market">
+  <header class="market-panel__hero">
+    <article class="market-panel__featured" (click)="selectFeaturedConfig(featuredAsset())">
+      <p class="market-panel__pair">
+        <span class="market-panel__pair-main">{{ featuredAsset().displaySymbol }} / USD</span>
+      </p>
+      <p class="market-panel__token-name">{{ featuredAsset().name }}</p>
+      <p class="market-panel__price">{{ featuredChart()?.price ?? '—' }}</p>
+      <p
+        class="market-panel__change"
+        [class.is-up]="featuredChart()?.positive !== false"
+        [class.is-down]="featuredChart()?.positive === false"
+      >
+        {{ featuredChangeLabel() }}
+      </p>
+    </article>
+
+    <div class="market-panel__chart-block">
+      <div class="market-panel__timeframes" role="tablist" aria-label="Période du graphique">
+        @for (frame of timeframes; track frame.range) {
+          <button
+            type="button"
+            class="market-panel__timeframe"
+            role="tab"
+            [class.is-active]="isTimeframeActive(frame.range)"
+            [attr.aria-selected]="isTimeframeActive(frame.range)"
+            (click)="setChartRange(frame.range)"
+          >
+            {{ frame.label }}
+          </button>
+        }
+      </div>
+
+      <div class="market-panel__chart" [class.is-loading]="loadingChart()">
+        @if (featuredCandles().length) {
+          <svg class="market-panel__chart-svg" viewBox="0 0 100 36" preserveAspectRatio="none" aria-hidden="true">
+            @for (candle of featuredCandles(); track $index) {
+              <g [class.is-up]="candle.bullish" [class.is-down]="!candle.bullish">
+                <line
+                  class="market-panel__wick"
+                  [attr.x1]="candle.x"
+                  [attr.x2]="candle.x"
+                  [attr.y1]="candle.wickTop"
+                  [attr.y2]="candle.wickBottom"
+                />
+                <rect
+                  class="market-panel__body"
+                  [attr.x]="candle.x - candle.bodyWidth / 2"
+                  [attr.y]="candle.bodyY"
+                  [attr.width]="candle.bodyWidth"
+                  [attr.height]="candle.bodyHeight"
+                />
+              </g>
+            }
+          </svg>
+        } @else {
+          <div class="market-panel__chart-skeleton" aria-hidden="true"></div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <div class="market-panel__toolbar">
+    <label class="market-panel__search">
+      <span class="market-panel__search-icon" aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        class="market-panel__search-input"
+        placeholder="Search assets..."
+        [ngModel]="searchQuery()"
+        (ngModelChange)="onSearchInput($event)"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </label>
+
+    <div class="market-panel__filters" role="tablist" aria-label="Filtres market">
+      @for (option of filterOptions; track option.id) {
+        <button
+          type="button"
+          class="market-panel__filter"
+          role="tab"
+          [class.is-active]="filter() === option.id"
+          [attr.aria-selected]="filter() === option.id"
+          (click)="setFilter(option.id)"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+
+    <button
+      type="button"
+      class="market-panel__fav-btn"
+      [class.is-active]="filter() === 'fav'"
+      aria-label="Afficher les favoris"
+      (click)="toggleFavoritesShortcut()"
+    >
+      <span aria-hidden="true">★</span>
+    </button>
+  </div>
+
+  <div class="market-panel__table-wrap">
+    <table class="market-panel__table">
+      <thead>
+        <tr>
+          <th scope="col">ASSET</th>
+          <th scope="col">PRICE</th>
+          <th scope="col">24H %</th>
+          <th scope="col">VOLUME</th>
+          <th scope="col">ACTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loadingRows()) {
+          @for (_ of [0, 1, 2, 3, 4]; track $index) {
+            <tr class="market-panel__row market-panel__row--skeleton">
+              <td colspan="5"><span class="market-panel__skeleton-line"></span></td>
+            </tr>
+          }
+        } @else if (filteredRows().length === 0) {
+          <tr>
+            <td colspan="5" class="market-panel__empty">Aucun actif trouvé.</td>
+          </tr>
+        } @else {
+          @for (row of filteredRows(); track row.config.exchangeToken) {
+            <tr
+              class="market-panel__row"
+              [class.is-featured]="isFeatured(row)"
+              (click)="selectFeatured(row)"
+            >
+              <td class="market-panel__asset">
+                <span class="market-panel__asset-icon" [style.--asset-accent]="row.config.accent">
+                  {{ row.config.iconLabel }}
+                </span>
+                <span class="market-panel__asset-meta">
+                  <span class="market-panel__asset-symbol">{{ row.config.displaySymbol }}</span>
+                  <span class="market-panel__asset-name">{{ row.config.name }}</span>
+                </span>
+                <button
+                  type="button"
+                  class="market-panel__row-fav"
+                  [class.is-active]="row.favorite"
+                  [attr.aria-label]="row.favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+                  (click)="toggleFavorite(row, $event)"
+                >
+                  <span aria-hidden="true">{{ row.favorite ? '★' : '☆' }}</span>
+                </button>
+              </td>
+              <td class="market-panel__price-cell">{{ row.price }}</td>
+              <td
+                class="market-panel__change-cell"
+                [class.is-up]="row.positive"
+                [class.is-down]="!row.positive"
+              >
+                {{ formatChange(row) }}
+              </td>
+              <td class="market-panel__volume-cell">{{ row.volume }}</td>
+              <td class="market-panel__actions">
+                <button type="button" class="market-panel__trade market-panel__trade--buy" (click)="onBuy(row, $event)">
+                  BUY
+                </button>
+                <button type="button" class="market-panel__trade market-panel__trade--sell" (click)="onSell(row, $event)">
+                  SELL
+                </button>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -1,0 +1,177 @@
+<section class="wallet-display" aria-labelledby="wallet-panel-title">
+  @if (toastMessage()) {
+    <div class="wallet-display__toast" [class.is-success]="toastKind() === 'success'" [class.is-error]="toastKind() === 'error'" [class.is-info]="toastKind() === 'info'">
+      {{ toastMessage() }}
+    </div>
+  }
+
+  <header class="wallet-display__head">
+    <h2 id="wallet-panel-title" class="wallet-display__title">WALLET / EXPLORER</h2>
+    <div class="wallet-display__network">
+      <span>RÉSEAU : R4V3 MAINNET</span>
+      <button
+        type="button"
+        class="wallet-display__icon-btn"
+        (click)="refreshAll()"
+        [disabled]="refreshingBalance() || creatingWallet() || mining()"
+        aria-label="Actualiser le wallet"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+          <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+          <path d="M17 4v4h-4" />
+          <path d="M7 20v-4h4" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="wallet-display__icon-btn"
+        (click)="createWallet()"
+        [disabled]="creatingWallet()"
+        aria-label="Créer un wallet"
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M8 3v10M3 8h10" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  @if (!hasWallet()) {
+    <div class="wallet-display__status">Aucun wallet actif.</div>
+  }
+
+  @if (errorMessage()) {
+    <div class="wallet-display__flash wallet-display__flash--error">{{ errorMessage() }}</div>
+  } @else if (successMessage()) {
+    <div class="wallet-display__flash wallet-display__flash--success">{{ successMessage() }}</div>
+  }
+
+  <section class="wallet-display__hero" aria-live="polite">
+    <p class="wallet-display__label">SOLDE TOTAL</p>
+    <p class="wallet-display__balance">
+      {{ formatAmount(totalBalance()) }}
+      <span>R4V3</span>
+    </p>
+    <p class="wallet-display__usd">${{ formatUsd(totalUsd()) }} USD</p>
+    <button
+      type="button"
+      class="wallet-display__address"
+      [title]="walletAddress() || 'Créer un wallet'"
+      (click)="copyWalletAddress()"
+      [disabled]="!hasWallet()"
+    >
+      <span class="wallet-display__address-chip"></span>
+      {{ hasWallet() ? shortAddress() : 'Aucun wallet' }}
+      <span class="wallet-display__address-icon" [class.is-copied]="copiedAddress()" aria-hidden="true">
+        @if (copiedAddress()) {
+          ✓
+        } @else {
+          ⧉
+        }
+      </span>
+    </button>
+  </section>
+
+  <section class="wallet-display__metrics">
+    <article class="wallet-display__metric">
+      <p class="wallet-display__metric-label">DISPONIBLE</p>
+      <p class="wallet-display__metric-value">{{ formatAmount(availableBalance()) }} R4V3</p>
+    </article>
+    <article class="wallet-display__metric">
+      <p class="wallet-display__metric-label">EN STAKE</p>
+      <p class="wallet-display__metric-value">{{ formatAmount(stakedBalance()) }} R4V3</p>
+    </article>
+    <article class="wallet-display__metric">
+      <p class="wallet-display__metric-label">RÉCOMPENSES</p>
+      <p class="wallet-display__metric-value">{{ formatAmount(rewardsBalance()) }} R4V3</p>
+    </article>
+    <article class="wallet-display__metric">
+      <p class="wallet-display__metric-label">TX TOTALES</p>
+      <p class="wallet-display__metric-value">{{ formatInt(txTotal()) }}</p>
+    </article>
+  </section>
+
+  <footer class="wallet-display__actions">
+    <button
+      type="button"
+      class="wallet-display__action-btn"
+      (click)="sendAction()"
+      [disabled]="!hasWallet() || sending()"
+      [class.is-active]="showSendPanel()"
+    >
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M2 8h10M8 3l4 5-4 5" />
+      </svg>
+      ENVOYER
+    </button>
+    <button
+      type="button"
+      class="wallet-display__action-btn"
+      (click)="receiveAction()"
+      [disabled]="!hasWallet()"
+      [class.is-active]="showReceivePanel()"
+    >
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M2 8h10M8 13l4-5-4-5" />
+      </svg>
+      RECEVOIR
+    </button>
+  </footer>
+
+  @if (showSendPanel()) {
+    <section class="wallet-display__panel" aria-label="Envoyer des fonds">
+      <header class="wallet-display__panel-head">
+        <h3>ENVOYER</h3>
+        <button type="button" class="wallet-display__panel-close" (click)="closeActionPanels()">×</button>
+      </header>
+      <form class="wallet-display__send-form" [formGroup]="sendForm" (ngSubmit)="submitSend()">
+        <label>
+          <span>Adresse destinataire</span>
+          <input type="text" formControlName="recipient" placeholder="r4v3..." />
+        </label>
+        @if (recipientInvalid()) {
+          <p class="wallet-display__field-error">Adresse destinataire invalide.</p>
+        }
+
+        <label>
+          <span>Montant (R4V3)</span>
+          <input type="number" step="0.0001" min="0.0001" formControlName="amount" />
+        </label>
+        @if (amountInvalid()) {
+          <p class="wallet-display__field-error">Montant minimum 0.0001 R4V3.</p>
+        }
+
+        <label>
+          <span>Mémo (optionnel)</span>
+          <input type="text" formControlName="memo" placeholder="Référence" />
+        </label>
+
+        <button type="submit" class="wallet-display__panel-submit" [disabled]="sending()">
+          {{ sending() ? 'ENVOI…' : 'CONFIRMER ENVOI' }}
+        </button>
+      </form>
+    </section>
+  }
+
+  @if (showReceivePanel()) {
+    <section class="wallet-display__panel" aria-label="Recevoir des fonds">
+      <header class="wallet-display__panel-head">
+        <h3>RECEVOIR</h3>
+        <button type="button" class="wallet-display__panel-close" (click)="closeActionPanels()">×</button>
+      </header>
+      <div class="wallet-display__receive">
+        <p class="wallet-display__receive-label">Adresse de réception</p>
+        <button type="button" class="wallet-display__receive-address" (click)="copyWalletAddress()" [disabled]="!hasWallet()">
+          {{ hasWallet() ? walletAddress() : 'Aucun wallet actif' }}
+        </button>
+        <div class="wallet-display__qr-mock" aria-hidden="true">
+          <span>QR</span>
+        </div>
+        <button type="button" class="wallet-display__panel-submit" (click)="copyWalletAddress()" [disabled]="!hasWallet()">
+          COPIER L'ADRESSE
+        </button>
+      </div>
+    </section>
+  }
+</section>

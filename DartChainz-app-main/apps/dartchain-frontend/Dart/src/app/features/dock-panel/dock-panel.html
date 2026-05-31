@@ -1,0 +1,69 @@
+<section
+  class="dock-panel"
+  [class.is-collapsed]="collapsed"
+  [class.is-expanded]="!collapsed"
+  [class.is-pending]="activePanel === 'pending'"
+  [class.is-block]="activePanel === 'composer'"
+  [class.is-wallet]="activePanel === 'wallet'"
+  [class.is-chain]="activePanel === 'chain'"
+  [class.is-peers]="activePanel === 'peers'"
+  [attr.data-active-panel]="activePanel"
+>
+  @if (isPendingCollapsed) {
+    <header class="dock-panel__handle dock-summary-bar" aria-label="Pending, panneau replié">
+      <app-dock-pending-summary class="dock-summary-bar__content" />
+      <app-mini-bar-slide-indicator />
+    </header>
+  } @else if (isBlockCollapsed) {
+    <header class="dock-panel__handle dock-summary-bar" aria-label="Block, panneau replié">
+      <app-dock-block-summary class="dock-summary-bar__content" />
+      <app-mini-bar-slide-indicator />
+    </header>
+  } @else if (isWalletCollapsed) {
+    <header class="dock-panel__handle dock-summary-bar" aria-label="Wallet, panneau replié">
+      <app-dock-wallet-summary class="dock-summary-bar__content" />
+      <app-mini-bar-slide-indicator />
+    </header>
+  } @else if (isChainCollapsed) {
+    <header class="dock-panel__handle dock-summary-bar" aria-label="Chain, panneau replié">
+      <app-dock-chain-summary class="dock-summary-bar__content" />
+      <app-mini-bar-slide-indicator />
+    </header>
+  } @else if (isPeersCollapsed) {
+    <header class="dock-panel__handle dock-summary-bar" aria-label="Peers, panneau replié">
+      <app-dock-peers-summary class="dock-summary-bar__content" />
+      <app-mini-bar-slide-indicator />
+    </header>
+  }
+
+  <div
+    id="dock-panel-body"
+    class="dock-panel__body"
+    [attr.aria-hidden]="collapsed"
+  >
+    <section
+      class="dock-tabs-panel"
+      id="panel-dock"
+      role="tabpanel"
+      [attr.aria-labelledby]="'tab-' + activePanel"
+    >
+      <div class="dock-tabs-panel__body">
+        <div class="dock-panel-layer" [hidden]="activePanel !== 'wallet'">
+          <app-wallet-panel />
+        </div>
+        <div class="dock-panel-layer" [hidden]="activePanel !== 'pending'">
+          <app-pending-transactions />
+        </div>
+        <div class="dock-panel-layer" [hidden]="activePanel !== 'composer'">
+          <app-block-composer />
+        </div>
+        <div class="dock-panel-layer" [hidden]="activePanel !== 'chain'">
+          <app-blocks-list (selectBlock)="onChainBlockSelect($event)" />
+        </div>
+        <div class="dock-panel-layer" [hidden]="activePanel !== 'peers'">
+          <app-peer-panel />
+        </div>
+      </div>
+    </section>
+  </div>
+</section>

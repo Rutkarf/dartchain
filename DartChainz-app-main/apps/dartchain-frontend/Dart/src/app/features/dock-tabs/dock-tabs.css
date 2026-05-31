@@ -1,0 +1,330 @@
+:host {
+  --showcase-tab-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dock-tab-ease: var(--showcase-tab-ease);
+  --dock-tab-radius: var(--showcase-tab-radius, var(--tab-rail-radius, calc(4px * var(--showcase-tab-scale, 1.5))));
+  --showcase-tab-cyan: var(--tab-accent);
+  --showcase-tab-cyan-dim: rgba(var(--tab-accent-rgb), 0.22);
+  --showcase-tab-indigo: var(--tab-accent-2);
+  --dock-tab-cyan: var(--tab-accent);
+  --dock-tab-cyan-dim: rgba(var(--tab-accent-rgb), 0.22);
+  --dock-tab-indigo: var(--tab-accent-2);
+  --dock-hub-tab-h: var(--dock-hub-tab-h, var(--showcase-hub-tab-h, 18px));
+  --dock-hub-tab-w: var(--dock-hub-tab-w, clamp(2rem, 10vw, 2.75rem));
+  --showcase-tab-gap: 0px;
+  --showcase-tab-fusion-overlap: 2px;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  box-sizing: border-box;
+}
+
+/* Bande horizontale dock — parité showcase-header-tabs */
+:host-context(.dock-header-tabs) {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  height: 100%;
+  --showcase-tab-gap: 0px;
+  --showcase-tab-fusion-overlap: 2px;
+}
+
+:host-context(.dock-header-tabs) .dock-tabstrip {
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+}
+
+:host-context(.dock-header-tabs) .dock-tabs {
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 0;
+  width: fit-content;
+  max-width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.dock-tabstrip {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: 100%;
+  min-width: 0;
+  height: var(--dock-hub-tab-h);
+  min-height: var(--dock-hub-tab-h);
+  max-height: var(--dock-hub-tab-h);
+  overflow: visible;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.dock-tabstrip .dock-tabs {
+  pointer-events: auto;
+}
+
+/* Rail horizontal au-dessus du panneau dock */
+.dock-tabs {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 0;
+  width: fit-content;
+  max-width: 100%;
+  height: var(--dock-hub-tab-h);
+  min-height: var(--dock-hub-tab-h);
+  max-height: var(--dock-hub-tab-h);
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* —— Onglets : parité visuelle hub Showcase Tabs (NEWS / CHAT / LAUNCH) —— */
+.dock-tab {
+  position: relative;
+  flex: 0 0 var(--dock-hub-tab-w);
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  width: var(--dock-hub-tab-w);
+  min-width: 0;
+  max-width: var(--dock-hub-tab-w);
+  min-height: clamp(12px, 100%, 17px);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--glass-tab-border-color);
+  border-top: none;
+  border-bottom: 1px solid rgba(var(--tab-accent-rgb), 0.12);
+  border-radius: 0;
+  background: rgba(var(--brand-black-rgb), 0.38);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+  opacity: 0.68;
+  z-index: 1;
+  overflow: visible;
+  color: var(--text-primary);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  touch-action: manipulation;
+  transition:
+    opacity 180ms ease,
+    background 200ms ease,
+    border-color 160ms ease,
+    box-shadow 220ms ease,
+    transform 160ms ease;
+}
+
+.dock-tab + .dock-tab {
+  border-left: none;
+}
+
+.dock-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  border-radius: 0 0 1px 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--tab-accent-rgb), 0.28),
+    transparent
+  );
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dock-tab::after {
+  display: none;
+}
+
+.dock-tab-label {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  padding-inline: 0;
+  writing-mode: horizontal-tb;
+  transform: none;
+  text-transform: uppercase;
+  font-size: clamp(5px, calc(1.25vw + 1px), 6.5px);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  text-align: center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.dock-tab.is-active .dock-tab-label::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  margin: 1px 0 0;
+  border-radius: 0;
+  background: linear-gradient(90deg, var(--tab-accent), var(--tab-accent-2));
+  box-shadow: 0 0 5px rgba(var(--tab-accent-rgb), 0.42);
+}
+
+.dock-tab:hover {
+  opacity: 0.88;
+  border-color: var(--glass-tab-border-hover-color);
+  background: var(--glass-tab-tint-hover);
+}
+
+.dock-tab:active {
+  transform: scale(0.99);
+}
+
+:host-context(.dock-header-tabs) .dock-tab[data-panel='pending'].is-active {
+  --tab-accent: var(--brand-baltic-blue);
+  --tab-accent-rgb: var(--brand-baltic-blue-rgb);
+  --tab-accent-2: var(--brand-info-grey);
+  --tab-accent-2-rgb: var(--brand-info-grey-rgb);
+  background: var(--showcase-hub-fill-news) padding-box, var(--glass-border) border-box;
+}
+
+:host-context(.dock-header-tabs) .dock-tab[data-panel='composer'].is-active {
+  --tab-accent: var(--brand-ultra-purple);
+  --tab-accent-rgb: var(--brand-ultra-purple-rgb);
+  --tab-accent-2: var(--brand-info-grey);
+  --tab-accent-2-rgb: var(--brand-info-grey-rgb);
+  background: var(--showcase-hub-fill-chat) padding-box, var(--glass-border) border-box;
+}
+
+:host-context(.dock-header-tabs) .dock-tab[data-panel='wallet'].is-active {
+  --tab-accent: var(--accent-warm);
+  --tab-accent-rgb: var(--accent-warm-rgb);
+  --tab-accent-2: var(--chart-trend-up);
+  --tab-accent-2-rgb: var(--chart-trend-up-rgb);
+  background: var(--showcase-hub-fill-launchlab) padding-box, var(--glass-border) border-box;
+}
+
+:host-context(.dock-header-tabs) .dock-tab[data-panel='chain'].is-active {
+  --tab-accent: var(--brand-baltic-blue);
+  --tab-accent-rgb: var(--brand-baltic-blue-rgb);
+  --tab-accent-2: var(--brand-info-grey);
+  --tab-accent-2-rgb: var(--brand-info-grey-rgb);
+  background: var(--showcase-hub-fill-news) padding-box, var(--glass-border) border-box;
+}
+
+:host-context(.dock-header-tabs) .dock-tab[data-panel='peers'].is-active {
+  --tab-accent: var(--brand-ultra-purple);
+  --tab-accent-rgb: var(--brand-ultra-purple-rgb);
+  --tab-accent-2: var(--brand-info-grey);
+  --tab-accent-2-rgb: var(--brand-info-grey-rgb);
+  background: var(--showcase-hub-fill-chat) padding-box, var(--glass-border) border-box;
+}
+
+.dock-tab.is-active,
+:host-context(.dock-header-tabs) .dock-tab.is-active {
+  opacity: 1;
+  z-index: 5;
+  margin-bottom: calc(-1 * var(--showcase-tab-fusion-overlap));
+  padding-bottom: var(--showcase-tab-fusion-overlap);
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 0;
+  color: var(--text-bright);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--showcase-hub-active-fill, var(--glass-fill)) padding-box,
+    var(--glass-border) border-box;
+  box-shadow:
+    inset 0 1px 0 rgba(var(--brand-porcelain-rgb), 0.08),
+    0 2px 12px rgba(var(--tab-accent-rgb), 0.16);
+  transform: none;
+}
+
+.dock-tab.is-active::before {
+  left: 0;
+  right: 0;
+  height: 2px;
+  opacity: 0.85;
+  background: linear-gradient(90deg, var(--tab-accent), var(--tab-accent-2));
+  box-shadow: 0 0 8px rgba(var(--tab-accent-rgb), 0.38);
+}
+
+.dock-tab.is-active .dock-tab-label {
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.dock-tab.is-active:hover,
+:host-context(.dock-header-tabs) .dock-tab.is-active:hover {
+  transform: none;
+  background: var(--glass-fill) padding-box, var(--glass-border) border-box;
+}
+
+.dock-tab:focus {
+  outline: none;
+}
+
+.dock-tab:focus-visible {
+  outline: 1px solid rgba(var(--tab-accent-rgb), 0.65);
+  outline-offset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-tab,
+  .dock-tab.is-active,
+  .dock-tab::after {
+    transition: none;
+  }
+
+  .dock-tab:active,
+  .dock-tab.is-active:hover {
+    transform: none;
+  }
+}
+
+/* Hub horizontal : priorité label (miroir showcase-tabs) */
+.dock-tab-label {
+  padding: 0;
+  padding-inline: 0;
+  margin: 0;
+  letter-spacing: 0;
+}
+
+@media (max-width: 500px) {
+  .dock-tab-label {
+    font-size: clamp(5px, calc(1.25vw + 1px), 6.5px);
+  }
+}
+
+@media (max-width: 299px) {
+  .dock-tab {
+    touch-action: manipulation;
+  }
+}

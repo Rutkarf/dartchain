@@ -1,0 +1,74 @@
+/**
+ * Navbar HUD — palier 300×600 px (251–349 px).
+ */
+
+@media (min-width: 251px) and (max-width: 349px) {
+  :host {
+    --nv-pad-x: 6px;
+    --nv-pad-y: 4px;
+    --nv-logo: 30px;
+    --nv-logo-h: 24px;
+    --nv-logo-shift-y: -8px;
+  }
+
+  .navbar-wrap {
+    padding: 0;
+  }
+
+  .navbar-top {
+    column-gap: 4px;
+    min-height: 0;
+    padding: var(--nv-pad-y) var(--nv-pad-x);
+  }
+
+  .navbar-brand-row {
+    gap: 5px;
+  }
+
+  .navbar-brand-column {
+    gap: 3px;
+  }
+
+  .navbar-subtitle ::ng-deep .bandeau-accueil__content span {
+    font-size: 0.46rem;
+  }
+
+  .navbar-node-panel__box {
+    padding: 3px 5px;
+    gap: 4px;
+  }
+
+  .navbar-node-panel__chart {
+    width: 30px;
+    min-height: 20px;
+  }
+
+  .navbar-node-panel__spark {
+    height: 15px;
+  }
+
+  .navbar-node-panel__title {
+    font-size: 0.44rem;
+  }
+
+  .navbar-node-panel__sync {
+    font-size: 0.46rem;
+  }
+}
+
+html.vp-compact app-navbar .navbar-wrap {
+  padding: 0;
+}
+
+html.vp-compact app-navbar .navbar-top {
+  column-gap: 4px;
+  padding: 4px 6px;
+}
+
+html.vp-compact app-navbar .navbar-brand-row {
+  gap: 5px;
+}
+
+html.vp-compact app-navbar .navbar-node-panel__chart {
+  width: 30px;
+}

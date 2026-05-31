@@ -1,0 +1,107 @@
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+
+import { Block } from '../models/block.model';
+import {
+  BlockchainApiService,
+  BlockchainStats,
+} from './blockchain-api.service';
+import { formatDockRelativeTime, shortDockHash } from '../utils/dock-time.util';
+
+export type DockChainPhase = 'error' | 'loading' | 'empty' | 'synced';
+
+@Injectable({ providedIn: 'root' })
+export class DockChainStateService {
+  private readonly api = inject(BlockchainApiService);
+
+  readonly loading = signal(false);
+  readonly error = signal(false);
+  readonly blocks = signal<Block[]>([]);
+  readonly stats = signal<BlockchainStats | null>(null);
+  readonly lastUpdatedAt = signal<number | null>(null);
+
+  readonly latestBlock = computed(() => this.blocks()[0] ?? null);
+  readonly blockCount = computed(() => this.blocks().length);
+
+  readonly phase = computed((): DockChainPhase => {
+    if (this.error()) {
+      return 'error';
+    }
+    if (this.loading()) {
+      return 'loading';
+    }
+    if (this.blockCount() === 0) {
+      return 'empty';
+    }
+    return 'synced';
+  });
+
+  readonly statusLabel = computed(() => {
+    switch (this.phase()) {
+      case 'error':
+        return 'Erreur';
+      case 'loading':
+        return 'Sync…';
+      case 'empty':
+        return 'Vide';
+      default:
+        return 'Synchronisé';
+    }
+  });
+
+  readonly headline = computed(() => {
+    const tip = this.latestBlock();
+    if (!tip) {
+      return this.error() ? 'Chaîne indisponible' : 'Aucun bloc';
+    }
+
+    return `Tip #${tip.index} · ${shortDockHash(tip.hash)}`;
+  });
+
+  readonly progressLabel = computed(() => {
+    const chainStats = this.stats();
+    if (chainStats?.totalBlocks) {
+      return `${chainStats.totalBlocks} blocs indexés`;
+    }
+
+    const n = this.blockCount();
+    return n > 0 ? `${n} blocs chargés` : '';
+  });
+
+  readonly updatedAgeLabel = computed(() =>
+    formatDockRelativeTime(this.lastUpdatedAt())
+  );
+
+  async load(): Promise<void> {
+    if (this.loading()) {
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set(false);
+
+    try {
+      const [blocksRes, statsRes] = await Promise.all([
+        firstValueFrom(this.api.getBlocks()),
+        firstValueFrom(this.api.getStats()).catch(() => null),
+      ]);
+
+      const blocks = Array.isArray(blocksRes) ? blocksRes : [];
+      this.blocks.set(
+        [...blocks].sort((a, b) => (b.index ?? 0) - (a.index ?? 0))
+      );
+      this.stats.set(statsRes);
+      this.lastUpdatedAt.set(Date.now());
+    } catch {
+      this.blocks.set([]);
+      this.stats.set(null);
+      this.error.set(true);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  refresh(): void {
+    void this.load();
+  }
+}

@@ -1,0 +1,10 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: dartchain-backend
+
+exchange:
+  ledger:
+    path: ${EXCHANGE_LEDGER_PATH:data/exchange-ledger.json}

@@ -1,0 +1,140 @@
+package io.dartchain.backend.showcase.chat;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dartchain.backend.showcase.dto.ChatMessageRequest;
+import io.dartchain.backend.showcase.dto.ChatMessageResponse;
+import io.dartchain.backend.showcase.service.ChatService;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@Component
+public class ChatSocketHandler extends TextWebSocketHandler {
+
+    private final ChatSessionRegistry sessionRegistry;
+    private final ChatService chatService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public ChatSocketHandler(ChatSessionRegistry sessionRegistry, ChatService chatService) {
+        this.sessionRegistry = sessionRegistry;
+        this.chatService = chatService;
+    }
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        sessionRegistry.add(session);
+        sendHistory(session);
+        super.afterConnectionEstablished(session);
+    }
+
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        JsonNode payload = objectMapper.readTree(message.getPayload());
+        String type = payload.path("type").asText("message");
+
+        if (!"message".equals(type)) {
+            return;
+        }
+
+        String author = payload.path("author").asText("").trim();
+        String text = payload.path("text").asText("").trim();
+        String clientId = payload.path("clientId").asText(null);
+        String roomId = payload.path("roomId").asText(ChatService.DEFAULT_ROOM);
+        String fontKey = textOrNull(payload, "fontKey");
+        String fontSize = textOrNull(payload, "fontSize");
+        Boolean bold = boolOrNull(payload, "bold");
+        Boolean italic = boolOrNull(payload, "italic");
+        Boolean underline = boolOrNull(payload, "underline");
+        Boolean strikethrough = boolOrNull(payload, "strikethrough");
+        String fontColor = textOrNull(payload, "fontColor");
+        String highlightColor = textOrNull(payload, "highlightColor");
+        String textAlign = textOrNull(payload, "textAlign");
+        String styleKey = textOrNull(payload, "styleKey");
+
+        if (author.isEmpty() || text.isEmpty()) {
+            return;
+        }
+
+        ChatMessageResponse created = chatService.postMessage(
+                new ChatMessageRequest(
+                        author,
+                        text,
+                        clientId,
+                        roomId,
+                        fontKey,
+                        fontSize,
+                        bold,
+                        italic,
+                        underline,
+                        strikethrough,
+                        fontColor,
+                        highlightColor,
+                        textAlign,
+                        styleKey
+                )
+        );
+
+        broadcastChat(created);
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        sessionRegistry.remove(session);
+        super.afterConnectionClosed(session, status);
+    }
+
+    @Override
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+        sessionRegistry.remove(session);
+        super.handleTransportError(session, exception);
+    }
+
+    private void sendHistory(WebSocketSession session) throws Exception {
+        List<ChatMessageResponse> recent = chatService.getRecentMessages(ChatService.DEFAULT_ROOM, 30);
+
+        Map<String, Object> envelope = new LinkedHashMap<>();
+        envelope.put("type", "history");
+        envelope.put("data", recent);
+
+        session.sendMessage(new TextMessage(objectMapper.writeValueAsString(envelope)));
+    }
+
+    private static String textOrNull(JsonNode payload, String field) {
+        JsonNode node = payload.get(field);
+        if (node == null || node.isNull()) {
+            return null;
+        }
+        String value = node.asText("").trim();
+        return value.isEmpty() ? null : value;
+    }
+
+    private static Boolean boolOrNull(JsonNode payload, String field) {
+        JsonNode node = payload.get(field);
+        if (node == null || node.isNull() || !node.isBoolean()) {
+            return null;
+        }
+        return node.asBoolean();
+    }
+
+    private void broadcastChat(ChatMessageResponse message) throws Exception {
+        Map<String, Object> envelope = new LinkedHashMap<>();
+        envelope.put("type", "chat");
+        envelope.put("data", message);
+
+        String payload = objectMapper.writeValueAsString(envelope);
+        TextMessage textMessage = new TextMessage(payload);
+
+        for (WebSocketSession session : sessionRegistry.getAll()) {
+            if (session.isOpen()) {
+                session.sendMessage(textMessage);
+            }
+        }
+    }
+}

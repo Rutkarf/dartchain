@@ -1,0 +1,26 @@
+<div
+  class="bandeau-accueil"
+  role="region"
+  aria-label="Bandeau d'annonces — faites glisser pour parcourir"
+  [class.bandeau-accueil--dragging]="isDragging"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerCancel($event)"
+>
+  <div #viewport class="bandeau-accueil__viewport">
+    <div #track class="bandeau-accueil__track">
+      <div
+        class="bandeau-accueil__content"
+        *ngFor="let _ of marqueeCopies; let i = index"
+        [attr.aria-hidden]="i > 0 ? 'true' : null"
+      >
+        <span>{{ message1 }}</span>
+        <span>•</span>
+        <span>Dernière transaction : {{ lastTransactionShort }}</span>
+        <span>•</span>
+        <span>Peers connectés : {{ userCount }}</span>
+      </div>
+    </div>
+  </div>
+</div>

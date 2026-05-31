@@ -1,0 +1,35 @@
+.floor-wrapper {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 120px;      /* visible en bas de l’écran */
+  z-index: 1;
+  pointer-events: none;
+}
+
+.floor-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
+/* Mobile first */
+@media (max-width: 480px) {
+  .floor-wrapper {
+    height: 110px;
+  }
+}
+
+/* Tablette+ */
+@media (min-width: 481px) {
+  .floor-wrapper {
+    height: 140px;
+  }
+}
+
+/* === Responsive 250–500px (three-floor) === */
+@media (max-width: 500px) {
+  :host { height: clamp(20px, 4vh, 32px); }
+}

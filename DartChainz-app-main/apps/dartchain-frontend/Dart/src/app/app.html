@@ -1,0 +1,175 @@
+<div class="app-shell">
+  <app-particle-background class="app-background"></app-particle-background>
+
+  <header class="app-navbar-zone">
+    <app-navbar
+      (exploreBlock)="openBlockDrawer($event)"
+      (explorePending)="openPendingPanel()"
+    >
+      <app-bandeau-accueil></app-bandeau-accueil>
+    </app-navbar>
+  </header>
+
+  <section class="app-hub" aria-label="Marché">
+    <div class="app-hub-swap-stack">
+      <div class="app-market-card app-market-card--swap app-showcase-card--swap">
+        <div class="app-market-card__swap-main">
+          <app-exchange-panel></app-exchange-panel>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-market-stack app-market-stack--rate">
+      <div class="app-market-card app-market-card--rate">
+        <app-rate-panel hubGraphOnly></app-rate-panel>
+      </div>
+    </div>
+
+    <div
+      class="app-hub-showcase-block"
+      [class.is-showcase-collapsed]="showcaseCollapsed()"
+    >
+      <header class="showcase-header" aria-label="Showcase">
+        <div class="showcase-header-tabs">
+          <app-showcase-tabs
+            [activeTab]="activeShowcaseTab()"
+            (tabChange)="onShowcaseTabChange($event)"
+          />
+        </div>
+        <div class="showcase-header-actions">
+          <button
+            type="button"
+            class="showcase-toggle"
+            [attr.aria-label]="showcaseCollapseLabel()"
+            [attr.aria-expanded]="!showcaseCollapsed()"
+            (click)="toggleShowcaseCollapsed()"
+          >
+            <span
+              class="showcase-toggle__chevron"
+              [class.is-collapsed]="showcaseCollapsed()"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </header>
+
+      <div
+        class="app-showcase-band"
+        [class.is-collapsed]="showcaseCollapsed()"
+        [attr.data-active-tab]="activeShowcaseTab()"
+      >
+        <app-showcase-panel
+          [activeTab]="activeShowcaseTab()"
+          [collapsed]="showcaseCollapsed()"
+          (selectBlock)="openBlockFromShowcaseIndex($event)"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="app-bottom-stack" aria-label="Dock navigation">
+    <div class="app-bottom-stack__content">
+      @switch (activeBottomTab()) {
+        @case ('wallet') {
+          <div class="app-bottom-stack__panel">
+            <app-wallet-panel></app-wallet-panel>
+          </div>
+        }
+        @case ('faucet') {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--faucet">
+            <app-faucet></app-faucet>
+          </div>
+        }
+        @case ('market') {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--market">
+            <app-market-panel></app-market-panel>
+          </div>
+        }
+        @case ('quests') {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--quests">
+            <app-quests-panel></app-quests-panel>
+          </div>
+        }
+        @case ('peers') {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--peers">
+            <app-peer-panel></app-peer-panel>
+          </div>
+        }
+      }
+    </div>
+
+    <nav class="bottom-dock" role="tablist" aria-label="Navigation principale">
+      <button
+        type="button"
+        class="bottom-dock__tab"
+        role="tab"
+        [attr.aria-selected]="activeBottomTab() === 'wallet'"
+        [class.is-active]="activeBottomTab() === 'wallet'"
+        (click)="onBottomTabChange('wallet')"
+      >
+        <span class="bottom-dock__icon" aria-hidden="true">◫</span>
+        <span class="bottom-dock__label">Wallet</span>
+      </button>
+      <button
+        type="button"
+        class="bottom-dock__tab"
+        role="tab"
+        [attr.aria-selected]="activeBottomTab() === 'faucet'"
+        [class.is-active]="activeBottomTab() === 'faucet'"
+        (click)="onBottomTabChange('faucet')"
+      >
+        <span class="bottom-dock__icon" aria-hidden="true">◍</span>
+        <span class="bottom-dock__label">Faucet</span>
+      </button>
+      <button
+        type="button"
+        class="bottom-dock__tab"
+        role="tab"
+        [attr.aria-selected]="activeBottomTab() === 'market'"
+        [class.is-active]="activeBottomTab() === 'market'"
+        (click)="onBottomTabChange('market')"
+      >
+        <span class="bottom-dock__icon" aria-hidden="true">▥</span>
+        <span class="bottom-dock__label">Market</span>
+      </button>
+      <button
+        type="button"
+        class="bottom-dock__tab"
+        role="tab"
+        [attr.aria-selected]="activeBottomTab() === 'quests'"
+        [class.is-active]="activeBottomTab() === 'quests'"
+        (click)="onBottomTabChange('quests')"
+      >
+        <span class="bottom-dock__icon" aria-hidden="true">◎</span>
+        <span class="bottom-dock__label">Quests</span>
+      </button>
+      <button
+        type="button"
+        class="bottom-dock__tab"
+        role="tab"
+        [attr.aria-selected]="activeBottomTab() === 'peers'"
+        [class.is-active]="activeBottomTab() === 'peers'"
+        (click)="onBottomTabChange('peers')"
+      >
+        <span class="bottom-dock__icon" aria-hidden="true">◉</span>
+        <span class="bottom-dock__label">Peers</span>
+      </button>
+    </nav>
+  </section>
+
+  <app-three-floor></app-three-floor>
+
+  <app-block-detail-drawer
+    [open]="showDrawer()"
+    [block]="selectedBlock()"
+    (close)="closeBlockDrawer()"
+  ></app-block-detail-drawer>
+
+  <app-launch-form-drawer
+    [open]="launchDrawer.isOpen()"
+    [submitting]="launchDrawer.submitting()"
+    [errorMessage]="launchDrawer.errorMessage()"
+    (close)="launchDrawer.close()"
+    (create)="launchDrawer.emitCreate($event)"
+  />
+</div>

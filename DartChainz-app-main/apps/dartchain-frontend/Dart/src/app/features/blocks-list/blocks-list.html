@@ -1,0 +1,117 @@
+<div class="dock-view chain-view" aria-labelledby="blocks-panel-title">
+  <header class="dock-view__head">
+    <div class="dock-view__title-row chain-view__title-row">
+      <div class="dock-view__title-lead">
+        <span class="dock-view__accent" aria-hidden="true"></span>
+        <h3 id="blocks-panel-title" class="dock-view__title">Chain</h3>
+      </div>
+
+      <p class="chain-view__title-center" aria-live="polite">
+        {{ chainStatusLabel() }}
+      </p>
+
+      <div class="chain-view__title-trail">
+        <span
+          class="dock-view__live-dot"
+          [class.dock-view__live-dot--active]="hasBlocks()"
+          aria-hidden="true"
+        ></span>
+        <span class="dock-view__meta">{{ blockCount() }} bloc{{ blockCount() === 1 ? '' : 's' }}</span>
+      </div>
+
+      <button
+        type="button"
+        class="dock-view__refresh"
+        (click)="refresh()"
+        [disabled]="loading()"
+        [class.chain-view__refresh--spinning]="loading()"
+        aria-label="Actualiser la blockchain"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+          <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+          <path d="M17 4v4h-4" />
+          <path d="M7 20v-4h4" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="dock-view__content">
+    @if (error()) {
+      <div class="dock-view__status dock-view__status--error" role="alert">
+        <p>{{ error() }}</p>
+        <button type="button" class="dock-view__retry" (click)="refresh()">Réessayer</button>
+      </div>
+    } @else if (loading() && !hasBlocks()) {
+      <ul class="dock-view__list dock-view__list--skeleton" aria-hidden="true">
+        @for (row of [1, 2, 3, 4]; track row) {
+          <li class="dock-view__skeleton-item">
+            <span class="dock-view__skeleton-line"></span>
+          </li>
+        }
+      </ul>
+    } @else if (hasBlocks()) {
+      <div class="chain-view__toolbar">
+        <input
+          type="search"
+          class="chain-view__search"
+          placeholder="Filtrer"
+          aria-label="Filtrer les blocs"
+          [value]="searchQuery()"
+          (input)="onSearchInput($any($event.target).value)"
+        />
+        @if (latestBlock(); as tip) {
+          <button type="button" class="dock-view__mini-btn" (click)="copyHash(tip.hash)">
+            Copy tip
+          </button>
+        }
+      </div>
+
+      @if (hasFilteredBlocks()) {
+        <ul class="dock-view__list" aria-label="Blocs de la blockchain">
+          @for (block of visibleBlocks(); track block.index) {
+            <li
+              class="dock-view__item"
+              [class.dock-view__item--active]="latestBlock() && block.index === latestBlock()!.index"
+            >
+              <button
+                type="button"
+                class="dock-view__item-row"
+                (click)="openBlock(block)"
+                [attr.aria-label]="'Ouvrir le bloc #' + block.index"
+                [attr.aria-current]="latestBlock() && block.index === latestBlock()!.index ? 'true' : null"
+              >
+                <span class="dock-view__cell dock-view__cell--muted">#{{ block.index }}</span>
+                <span class="dock-view__cell dock-view__cell--strong chain-view__hash" [title]="block.hash || 'Hash indisponible'">
+                  {{ shortHash(block.hash) }}
+                </span>
+                <span class="dock-view__cell chain-view__tx">{{ blockTxCount(block) }} tx</span>
+                <span class="dock-view__cell chain-view__time">
+                  @if (block.timestamp) {
+                    {{ block.timestamp | date:'dd/MM HH:mm' }}
+                  } @else {
+                    N/A
+                  }
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+
+        @if (filteredBlockCount() > visibleBlocks().length) {
+          <p class="dock-view__more">+{{ filteredBlockCount() - visibleBlocks().length }}</p>
+        }
+      } @else {
+        <div class="dock-view__status">
+          <p>Aucun bloc pour « {{ searchQuery().trim() }} »</p>
+          <button type="button" class="dock-view__retry" (click)="clearSearch()">Effacer filtre</button>
+        </div>
+      }
+    } @else {
+      <div class="dock-view__status">
+        <p>Aucun bloc disponible.</p>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,128 @@
+<section class="quests-panel" aria-label="Quests">
+  @if (toastMessage()) {
+    <div class="quests-panel__toast" [class.is-info]="toastKind() === 'info'">
+      {{ toastMessage() }}
+    </div>
+  }
+
+  <header class="quests-panel__title">QUESTS</header>
+
+  <section class="quests-panel__mission-row" aria-label="Mission en cours">
+    <article class="quests-panel__mission-card">
+      <p class="quests-panel__eyebrow quests-panel__eyebrow--cyan">CURRENT MISSION</p>
+      <div class="quests-panel__mission-head">
+        <span class="quests-panel__hex-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path
+              d="M12 2l7 4v8l-7 4-7-4V6z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.4"
+            />
+            <path d="M12 8v4M9 10h6" stroke="currentColor" stroke-width="1.2" />
+          </svg>
+        </span>
+        <div class="quests-panel__mission-copy">
+          <h2 class="quests-panel__mission-name">{{ mission.title }}</h2>
+          <p class="quests-panel__mission-desc">{{ mission.description }}</p>
+        </div>
+      </div>
+      <div class="quests-panel__mission-progress">
+        <div class="quests-panel__progress-track">
+          <span class="quests-panel__progress-fill" [style.width.%]="missionProgress()"></span>
+        </div>
+        <span class="quests-panel__progress-value">{{ missionProgress() }}%</span>
+      </div>
+    </article>
+
+    <article class="quests-panel__reward-card">
+      <p class="quests-panel__eyebrow quests-panel__eyebrow--purple">MISSION REWARD</p>
+      <p class="quests-panel__reward-mts">{{ mission.rewardMts.toFixed(2) }} MTS</p>
+      <p class="quests-panel__reward-xp">+ {{ mission.rewardXp }} XP</p>
+      <button
+        type="button"
+        class="quests-panel__details-btn"
+        [class.is-ready]="missionClaimable()"
+        (click)="missionClaimable() ? onClaimMission() : onViewMissionDetails()"
+      >
+        {{ missionClaimable() ? 'CLAIM REWARD' : 'VIEW DETAILS' }}
+      </button>
+    </article>
+  </section>
+
+  <section class="quests-panel__daily" #dailySection aria-label="Tâches quotidiennes">
+    <header class="quests-panel__daily-head">
+      <h3 class="quests-panel__section-title">DAILY TASKS</h3>
+      <p class="quests-panel__reset">
+        <span class="quests-panel__reset-icon" aria-hidden="true">◷</span>
+        RESETS IN {{ resetCountdown() }}
+      </p>
+    </header>
+
+    <ul class="quests-panel__task-list">
+      @for (task of tasks(); track task.id) {
+        <li class="quests-panel__task" [class.is-complete]="task.complete">
+          <span
+            class="quests-panel__check"
+            [class.is-checked]="task.complete"
+            aria-hidden="true"
+          >
+            {{ task.complete ? '✓' : '' }}
+          </span>
+
+          <div class="quests-panel__task-body">
+            <p class="quests-panel__task-title">{{ task.title }}</p>
+            <p class="quests-panel__task-desc">{{ task.description }}</p>
+            <div class="quests-panel__task-progress-row">
+              <span
+                class="quests-panel__task-progress-bar"
+                [class.is-complete]="task.complete"
+                [style.width.%]="(task.progress / task.target) * 100"
+              ></span>
+              <span class="quests-panel__task-progress-label">{{ task.progressLabel }}</span>
+            </div>
+          </div>
+
+          <div class="quests-panel__task-side">
+            <span class="quests-panel__task-reward">{{ rewardLabel(task.rewardMts) }}</span>
+            @if (task.claimable) {
+              <button type="button" class="quests-panel__btn quests-panel__btn--claim" (click)="onClaim(task)">
+                CLAIM
+              </button>
+            } @else if (!task.complete) {
+              <button type="button" class="quests-panel__btn quests-panel__btn--go" (click)="onGo(task)">
+                GO
+              </button>
+            } @else {
+              <span class="quests-panel__claimed">DONE</span>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <footer class="quests-panel__weekly" aria-label="Récompense hebdomadaire">
+    <div class="quests-panel__weekly-left">
+      <span class="quests-panel__weekly-icon" aria-hidden="true">⬡</span>
+      <div>
+        <p class="quests-panel__weekly-label">WEEKLY REWARD</p>
+        <p class="quests-panel__weekly-mts">{{ weekly.rewardMts.toFixed(2) }} MTS</p>
+      </div>
+    </div>
+    <div class="quests-panel__weekly-boost">
+      <p class="quests-panel__weekly-label">XP BOOST</p>
+      <p class="quests-panel__weekly-percent">+{{ weekly.xpBoostPercent }}%</p>
+    </div>
+    <button
+      type="button"
+      class="quests-panel__crate"
+      [class.is-ready]="weeklyClaimable()"
+      [attr.aria-label]="weeklyClaimable() ? 'Réclamer la récompense hebdomadaire' : 'Coffre hebdomadaire'"
+      (click)="onClaimWeekly()"
+    >
+      <span class="quests-panel__crate-glow" aria-hidden="true"></span>
+      <span class="quests-panel__crate-body" aria-hidden="true"></span>
+    </button>
+  </footer>
+</section>

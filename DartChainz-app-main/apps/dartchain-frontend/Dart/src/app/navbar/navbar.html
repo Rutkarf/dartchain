@@ -1,0 +1,104 @@
+<header class="navbar-wrap">
+  <div class="navbar-top-shell">
+    <nav class="navbar-top" aria-label="Navigation principale">
+      <div class="navbar-brand-column">
+        <div class="navbar-brand-row">
+          <div
+            class="logo-shell"
+            role="button"
+            tabindex="0"
+            aria-label="Interagir avec le logo R4V3"
+            [class.logo-clicked]="logoClicked"
+            (keydown.enter)="onLogoPulse()"
+            (keydown.space)="$event.preventDefault(); onLogoPulse()"
+          >
+            <div class="logo-frame">
+              <app-r4v3-three
+                #logoThree
+                class="navbar-logo-three"
+                presentation="navbar"
+                [modelTargetSize]="28"
+                [cameraFitFactor]="1.148"
+                [frameBiasX]="0"
+                [frameBiasY]="-0.12"
+                [enableOrbit]="true"
+                (logoTapped)="onLogoPulse()"
+              />
+            </div>
+          </div>
+
+          <app-brand-crypto-select class="navbar-brand-select" />
+
+          <app-navbar-network-status
+            #networkStatus
+            class="navbar-brand-row__network"
+          />
+        </div>
+
+        <div class="navbar-subtitle" aria-live="polite">
+          <ng-content />
+        </div>
+      </div>
+
+      <div class="navbar-node-panel" aria-label="Synchronisation du nœud">
+        <div class="navbar-node-panel__box">
+          <div class="navbar-node-panel__meta">
+            <div class="navbar-node-panel__head">
+              <span
+                class="navbar-node-panel__led"
+                [class.is-online]="networkStatus.health().ok"
+                aria-hidden="true"
+              ></span>
+              <span class="navbar-node-panel__title">NODE</span>
+            </div>
+            <p class="navbar-node-panel__sync">
+              SYNC
+              <strong class="navbar-node-panel__pct">{{ networkStatus.syncPercentLabel() }}</strong>
+            </p>
+          </div>
+          <div class="navbar-node-panel__chart" aria-hidden="true">
+            <svg
+              class="navbar-node-panel__spark"
+              viewBox="0 0 48 16"
+              preserveAspectRatio="none"
+              focusable="false"
+            >
+              <polyline
+                points="0,12 8,10 14,6 22,8 30,3 38,5 48,2"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="navbar-aux" role="group" aria-label="Outils et peers">
+        <app-navbar-peer-status class="navbar-aux__peers" />
+        <div class="navbar-aux__search">
+          <app-explorer-search
+            (selectBlock)="exploreBlock.emit($event)"
+            (openPending)="explorePending.emit()"
+          />
+        </div>
+        <div class="navbar-aux__actions">
+          <button
+            type="button"
+            class="navbar-auth-btn"
+            (click)="onRegister()"
+            aria-label="Compte utilisateur"
+            title="Compte"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
