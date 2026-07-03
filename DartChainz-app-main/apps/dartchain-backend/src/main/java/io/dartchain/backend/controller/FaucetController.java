@@ -28,8 +28,11 @@ public class FaucetController {
 
     @PostMapping("/claim")
     @ResponseStatus(HttpStatus.CREATED)
-    public FaucetClaimResponse claim(@Valid @RequestBody FaucetClaimRequest request) {
-        return faucetService.claim(request);
+    public FaucetClaimResponse claim(
+            @Valid @RequestBody FaucetClaimRequest request,
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        return faucetService.claim(request, authorization);
     }
 
     @GetMapping("/claims")

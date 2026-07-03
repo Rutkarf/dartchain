@@ -53,7 +53,9 @@
       {{ formatAmount(totalBalance()) }}
       <span>R4V3</span>
     </p>
-    <p class="wallet-display__usd">${{ formatUsd(totalUsd()) }} USD</p>
+    @if (auth.isAuthenticated()) {
+      <p class="wallet-display__account">Compte : {{ auth.user()?.username }}</p>
+    }
     <button
       type="button"
       class="wallet-display__address"
@@ -79,16 +81,8 @@
       <p class="wallet-display__metric-value">{{ formatAmount(availableBalance()) }} R4V3</p>
     </article>
     <article class="wallet-display__metric">
-      <p class="wallet-display__metric-label">EN STAKE</p>
-      <p class="wallet-display__metric-value">{{ formatAmount(stakedBalance()) }} R4V3</p>
-    </article>
-    <article class="wallet-display__metric">
-      <p class="wallet-display__metric-label">RÉCOMPENSES</p>
-      <p class="wallet-display__metric-value">{{ formatAmount(rewardsBalance()) }} R4V3</p>
-    </article>
-    <article class="wallet-display__metric">
-      <p class="wallet-display__metric-label">TX TOTALES</p>
-      <p class="wallet-display__metric-value">{{ formatInt(txTotal()) }}</p>
+      <p class="wallet-display__metric-label">RÉSEAU</p>
+      <p class="wallet-display__metric-value">DART TESTNET</p>
     </article>
   </section>
 

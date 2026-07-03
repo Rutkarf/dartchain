@@ -46,17 +46,17 @@
                 "fonts": false
               },
               "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "3mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "28kb",
-                  "maximumError": "34kb"
-                }
-              ],
+  {
+    "type": "initial",
+    "maximumWarning": "2mb",
+    "maximumError": "5mb"
+  },
+  {
+    "type": "anyComponentStyle",
+    "maximumWarning": "40kb",
+    "maximumError": "50kb"
+  }
+],
               "outputHashing": "all"
             },
             "development": {

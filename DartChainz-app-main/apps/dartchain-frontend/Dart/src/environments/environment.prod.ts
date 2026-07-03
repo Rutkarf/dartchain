@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://dartchain-backend-latest.onrender.com/api',
-  liveWsUrl: 'wss://dartchain-backend-latest.onrender.com/ws/live',
-  chatWsUrl: 'wss://dartchain-backend-latest.onrender.com/ws/chat',
+  apiUrl: 'https://dartzvz01-tagname.onrender.com/api',
+  liveWsUrl: 'wss://dartzvz01-tagname.onrender.com/ws/live',
+  chatWsUrl: 'wss://dartzvz01-tagname.onrender.com/ws/chat',
 };

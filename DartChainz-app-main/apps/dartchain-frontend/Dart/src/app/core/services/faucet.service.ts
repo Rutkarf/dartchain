@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -41,7 +41,9 @@ export class FaucetService {
     );
   }
 
-  claim(request: FaucetClaimRequest): Observable<FaucetClaimResponse> {
-    return this.http.post<FaucetClaimResponse>(`${this.baseUrl}/claim`, request);
+  claim(request: FaucetClaimRequest, headers?: HttpHeaders): Observable<FaucetClaimResponse> {
+    return this.http.post<FaucetClaimResponse>(`${this.baseUrl}/claim`, request, {
+      headers,
+    });
   }
 }

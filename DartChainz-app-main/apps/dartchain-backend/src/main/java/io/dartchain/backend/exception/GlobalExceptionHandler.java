@@ -1,5 +1,6 @@
 package io.dartchain.backend.exception;
 
+import io.dartchain.backend.auth.AuthException;
 import io.dartchain.backend.dto.ApiErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,20 @@ import java.time.Instant;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuth(AuthException exception) {
+        HttpStatus status = HttpStatus.resolve(exception.getStatusCode());
+        if (status == null) {
+            status = HttpStatus.UNAUTHORIZED;
+        }
+
+        return buildErrorResponse(
+                status,
+                status.getReasonPhrase(),
+                exception.getMessage()
+        );
+    }
 
     @ExceptionHandler(TransactionValidationException.class)
     public ResponseEntity<ApiErrorResponse> handleTransactionValidation(TransactionValidationException exception) {

@@ -4,6 +4,7 @@ import io.dartchain.backend.dto.BlockValidationResult;
 import io.dartchain.backend.dto.StatsResponse;
 import io.dartchain.backend.exception.InvalidBlockException;
 import io.dartchain.backend.model.Block;
+import io.dartchain.backend.model.PendingTransaction;
 import io.dartchain.backend.model.Transaction;
 import io.dartchain.backend.showcase.service.MarketChartService;
 import io.dartchain.backend.utils.CryptoUtils;
@@ -19,19 +20,21 @@ import java.util.UUID;
 public class BlockchainService {
 
     private final List<Block> blockchain = new ArrayList<>();
-    private final List<Transaction> pendingTransactions = new ArrayList<>();
     private final BlockchainValidationService validationService;
     private final MarketChartService marketChartService;
+    private final TransactionPoolService transactionPoolService;
 
     private static final int DIFFICULTY = 4;
     private static final BigDecimal MINING_REWARD = new BigDecimal("10.0");
 
     public BlockchainService(
             BlockchainValidationService validationService,
-            MarketChartService marketChartService
+            MarketChartService marketChartService,
+            TransactionPoolService transactionPoolService
     ) {
         this.validationService = validationService;
         this.marketChartService = marketChartService;
+        this.transactionPoolService = transactionPoolService;
         blockchain.add(createGenesisBlock());
     }
 
@@ -44,7 +47,9 @@ public class BlockchainService {
     }
 
     public synchronized List<Transaction> getPendingTransactions() {
-        return List.copyOf(pendingTransactions);
+        return transactionPoolService.getPendingOnly().stream()
+                .map(TransactionPoolService::toTransaction)
+                .toList();
     }
 
     public synchronized Block getLatestBlock() {
@@ -188,7 +193,7 @@ public class BlockchainService {
             }
         }
 
-        pendingTransactions.add(transaction);
+        transactionPoolService.add(TransactionPoolService.fromTransaction(transaction));
         return transaction;
     }
 
@@ -199,7 +204,8 @@ public class BlockchainService {
 
         List<Transaction> blockTransactions = new ArrayList<>();
 
-        for (Transaction tx : pendingTransactions) {
+        for (PendingTransaction pending : transactionPoolService.drainAll()) {
+            Transaction tx = TransactionPoolService.toTransaction(pending);
             tx.setStatus("CONFIRMED");
             blockTransactions.add(tx);
         }
@@ -243,10 +249,64 @@ public class BlockchainService {
         }
 
         blockchain.add(newBlock);
-        pendingTransactions.clear();
         marketChartService.recordBlockMined();
 
         return newBlock;
+    }
+
+    public synchronized Transaction mintSystemCredit(String recipientAddress, BigDecimal amount, String payload) {
+        if (recipientAddress == null || recipientAddress.isBlank()) {
+            throw new RuntimeException("Adresse destinataire obligatoire");
+        }
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Le montant doit être supérieur à 0");
+        }
+
+        Transaction creditTx = new Transaction();
+        creditTx.setId(UUID.randomUUID().toString());
+        creditTx.setSender("SYSTEM");
+        creditTx.setRecipient(recipientAddress);
+        creditTx.setAmount(amount);
+        creditTx.setTimestamp(System.currentTimeMillis());
+        creditTx.setSignature("SYSTEM");
+        creditTx.setSystemReward(true);
+        creditTx.setStatus("CONFIRMED");
+        creditTx.setPayload(payload != null ? payload : "SYSTEM_CREDIT");
+        creditTx.setHash(HashUtils.sha256(
+                creditTx.getId()
+                        + "|" + creditTx.getSender()
+                        + "|" + creditTx.getRecipient()
+                        + "|" + creditTx.getAmount().toPlainString()
+                        + "|" + creditTx.getTimestamp()
+                        + "|" + creditTx.getPayload()
+        ));
+
+        List<Transaction> blockTransactions = new ArrayList<>();
+        blockTransactions.add(creditTx);
+
+        Block previousBlock = getLatestBlock();
+
+        Block newBlock = new Block();
+        newBlock.setIndex(previousBlock.getIndex() + 1);
+        newBlock.setTimestamp(System.currentTimeMillis());
+        newBlock.setData("System credit to " + recipientAddress);
+        newBlock.setTransactions(blockTransactions);
+        newBlock.setPreviousHash(previousBlock.getHash());
+        newBlock.setNonce(0);
+        newBlock.setDifficulty(DIFFICULTY);
+
+        mine(newBlock);
+
+        BlockValidationResult validation = validationService.validateBlockAgainstChain(newBlock, blockchain);
+        if (!validation.isValid()) {
+            throw new InvalidBlockException(validation.getMessage());
+        }
+
+        blockchain.add(newBlock);
+        marketChartService.recordBlockMined();
+
+        return creditTx;
     }
 
     public synchronized boolean addBlockFromPeer(Block block) {
@@ -298,7 +358,7 @@ public class BlockchainService {
 
         blockchain.clear();
         blockchain.addAll(newBlocks);
-        pendingTransactions.clear();
+        transactionPoolService.clear();
         return true;
     }
 
@@ -439,19 +499,7 @@ public class BlockchainService {
     }
 
     private BigDecimal getPendingOutgoingAmount(String address) {
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (Transaction tx : pendingTransactions) {
-            if (tx == null || tx.getAmount() == null) {
-                continue;
-            }
-
-            if (address.equals(tx.getSender())) {
-                total = total.add(tx.getAmount());
-            }
-        }
-
-        return total;
+        return transactionPoolService.getPendingOutgoingAmount(address);
     }
 
     private boolean isSameBlock(Block a, Block b) {

@@ -21,6 +21,7 @@ import {
   WalletResponse,
 } from '../../core/services/blockchain-api.service';
 import { WalletSessionService } from '../../core/services/wallet-session.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-wallet-panel',
@@ -31,7 +32,7 @@ import { WalletSessionService } from '../../core/services/wallet-session.service
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WalletPanelComponent implements OnInit {
-  private static readonly USD_RATE = 0.1764;
+  protected readonly auth = inject(AuthService);
   private readonly api = inject(BlockchainApiService);
   private readonly walletSession = inject(WalletSessionService);
   private readonly fb = inject(FormBuilder);
@@ -77,16 +78,7 @@ export class WalletPanelComponent implements OnInit {
   protected readonly walletPublicKey = computed(() => this.wallet()?.publicKey ?? '');
   protected readonly walletPrivateKey = computed(() => this.wallet()?.privateKey ?? '');
   protected readonly totalBalance = computed(() => this.balance() ?? 0);
-  protected readonly totalUsd = computed(
-    () => this.totalBalance() * WalletPanelComponent.USD_RATE
-  );
-  protected readonly availableBalance = computed(() => this.totalBalance() * 0.85);
-  protected readonly stakedBalance = computed(() => this.totalBalance() * 0.15);
-  protected readonly rewardsBalance = computed(() => this.totalBalance() * 0.0123);
-  protected readonly txTotal = computed(() => {
-    const seed = this.walletAddress().length;
-    return seed > 0 ? 1200 + seed : 0;
-  });
+  protected readonly availableBalance = computed(() => this.totalBalance());
 
   protected readonly shortAddress = computed(() => {
     const address = this.walletAddress();
@@ -127,6 +119,7 @@ export class WalletPanelComponent implements OnInit {
       this.wallet.set(sessionWallet);
       this.balanceForm.patchValue({ address: sessionWallet.address });
       this.fetchBalance(sessionWallet.address, true, false);
+      this.syncLinkedWallet(sessionWallet);
     }
 
     this.balanceForm.controls.address.valueChanges
@@ -167,6 +160,10 @@ export class WalletPanelComponent implements OnInit {
           this.wallet.set(wallet);
           this.balanceForm.patchValue({ address: wallet.address });
           this.creatingWallet.set(false);
+
+          if (this.auth.isAuthenticated()) {
+            void this.auth.linkWallet(wallet.address, wallet.publicKey);
+          }
 
           if (response.welcomeMessage) {
             this.successMessage.set(response.welcomeMessage);
@@ -494,5 +491,18 @@ export class WalletPanelComponent implements OnInit {
     }
 
     return fallback;
+  }
+
+  private syncLinkedWallet(wallet: WalletResponse): void {
+    if (!this.auth.isAuthenticated()) {
+      return;
+    }
+
+    const profile = this.auth.user();
+    if (profile?.walletAddress === wallet.address) {
+      return;
+    }
+
+    void this.auth.linkWallet(wallet.address, wallet.publicKey);
   }
 }

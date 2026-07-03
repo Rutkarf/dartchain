@@ -54,6 +54,22 @@
   .navbar-node-panel__sync {
     font-size: 0.46rem;
   }
+
+  .navbar-auth-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  .navbar-auth-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .navbar-auth-user__name {
+    display: none;
+  }
 }
 
 html.vp-compact app-navbar .navbar-wrap {

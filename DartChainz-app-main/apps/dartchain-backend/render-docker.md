@@ -41,7 +41,10 @@ docker push rutkarf/dartchain-backend:0.1
 3. **Image URL** : `docker.io/rutkarf/dartchain-backend:latest`
 4. **Credentials** : laisser **vide** (image publique — ne pas ajouter de Registry Secret sauf si le repo est passé en privé)
 5. **Port** : `8080`
-6. **Health check path** : `/api/health`
+6. **Health check path** : `/api/health` (ne pas laisser `/` par défaut)
+
+> **Architecture** : backend Render (Docker) + frontend Angular sur **Cloudflare Pages** (`*.pages.dev`).  
+> Ne pas ouvrir l’URL Render dans le navigateur pour voir l’app — utiliser l’URL Cloudflare Pages.
 
 ### Si Render affiche « No public image found »
 
@@ -57,6 +60,35 @@ docker push rutkarf/dartchain-backend:0.1
 |----------|---------|
 | `PORT` | `8080` (souvent défini automatiquement par Render) |
 | `JAVA_TOOL_OPTIONS` | `-Xmx512m` (selon le plan Render) |
+| `SPRING_PROFILES_ACTIVE` | `postgres` |
+| `DARTCHAIN_PERSISTENCE_MODE` | `postgres` |
+| `DATABASE_URL` | `jdbc:postgresql://host:5432/dartchain` |
+| `DATABASE_USERNAME` | `dartchain` |
+| `DATABASE_PASSWORD` | *(secret)* |
+
+### PostgreSQL (persistance auth — ticket T1)
+
+1. Créer une base PostgreSQL (Render Postgres, Neon, Supabase, etc.)
+2. Lancer le backend avec le profil `postgres` :
+
+```bash
+docker compose up -d
+./mvnw spring-boot:run -Dspring-boot.run.profiles=postgres
+```
+
+Variables minimales :
+
+```text
+SPRING_PROFILES_ACTIVE=postgres
+DARTCHAIN_PERSISTENCE_MODE=postgres
+DATABASE_URL=jdbc:postgresql://localhost:5432/dartchain
+DATABASE_USERNAME=dartchain
+DATABASE_PASSWORD=dartchain
+```
+
+Flyway applique automatiquement `V1__auth.sql` (tables `users`, `auth_sessions`).
+
+Sans PostgreSQL, le mode par défaut reste `memory` (JSON + sessions en mémoire).
 
 ## CORS
 

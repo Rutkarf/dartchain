@@ -11,7 +11,7 @@ public interface FaucetService {
 
     FaucetStateResponse getState(String walletAddress);
 
-    FaucetClaimResponse claim(FaucetClaimRequest request);
+    FaucetClaimResponse claim(FaucetClaimRequest request, String authorizationHeader);
 
     List<FaucetClaim> getAllClaims();
 }

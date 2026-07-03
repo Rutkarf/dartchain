@@ -1,0 +1,159 @@
+@if (auth.drawerOpen()) {
+  <div
+    class="auth-drawer-backdrop"
+    (click)="close()"
+    aria-hidden="false"
+  >
+    <aside
+      class="auth-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="authDrawerTitle"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="auth-drawer__head">
+        <div class="auth-drawer__head-copy">
+          <p class="auth-drawer__eyebrow">Compte DART</p>
+          <h2 id="authDrawerTitle">
+            {{ auth.drawerMode() === 'login' ? 'Connexion' : 'Inscription' }}
+          </h2>
+        </div>
+        <button
+          type="button"
+          class="auth-drawer__close"
+          aria-label="Fermer"
+          [disabled]="auth.loading()"
+          (click)="close()"
+        >
+          ✕
+        </button>
+      </header>
+
+      <div class="auth-drawer__tabs" role="tablist" aria-label="Mode authentification">
+        <button
+          type="button"
+          role="tab"
+          class="auth-drawer__tab"
+          [class.is-active]="auth.drawerMode() === 'login'"
+          [attr.aria-selected]="auth.drawerMode() === 'login'"
+          (click)="switchMode('login')"
+        >
+          Connexion
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="auth-drawer__tab"
+          [class.is-active]="auth.drawerMode() === 'register'"
+          [attr.aria-selected]="auth.drawerMode() === 'register'"
+          (click)="switchMode('register')"
+        >
+          Inscription
+        </button>
+      </div>
+
+      <div class="auth-drawer__body">
+        @if (auth.error(); as errorMessage) {
+          <p class="auth-drawer__error" role="alert">{{ errorMessage }}</p>
+        }
+
+        @if (auth.drawerMode() === 'login') {
+          <form class="auth-drawer__form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+            <label class="auth-drawer__field">
+              <span class="auth-drawer__label">Nom d'utilisateur ou email</span>
+              <input
+                class="auth-drawer__input"
+                type="text"
+                formControlName="identifier"
+                autocomplete="username"
+                placeholder="rutkarf ou vous@exemple.com"
+              />
+            </label>
+
+            <label class="auth-drawer__field">
+              <span class="auth-drawer__label">Mot de passe</span>
+              <div class="auth-drawer__password-wrap">
+                <input
+                  class="auth-drawer__input"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  formControlName="password"
+                  autocomplete="current-password"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  class="auth-drawer__password-toggle"
+                  (click)="togglePassword()"
+                  [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                >
+                  {{ showPassword() ? 'Masquer' : 'Voir' }}
+                </button>
+              </div>
+            </label>
+
+            <button
+              type="submit"
+              class="auth-drawer__submit"
+              [disabled]="auth.loading()"
+            >
+              {{ auth.loading() ? 'Connexion…' : 'Se connecter' }}
+            </button>
+          </form>
+        } @else {
+          <form class="auth-drawer__form" [formGroup]="registerForm" (ngSubmit)="submitRegister()">
+            <label class="auth-drawer__field">
+              <span class="auth-drawer__label">Nom d'utilisateur</span>
+              <input
+                class="auth-drawer__input"
+                type="text"
+                formControlName="username"
+                autocomplete="username"
+                placeholder="rutkarf"
+              />
+            </label>
+
+            <label class="auth-drawer__field">
+              <span class="auth-drawer__label">Email</span>
+              <input
+                class="auth-drawer__input"
+                type="email"
+                formControlName="email"
+                autocomplete="email"
+                placeholder="vous@exemple.com"
+              />
+            </label>
+
+            <label class="auth-drawer__field">
+              <span class="auth-drawer__label">Mot de passe</span>
+              <div class="auth-drawer__password-wrap">
+                <input
+                  class="auth-drawer__input"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  formControlName="password"
+                  autocomplete="new-password"
+                  placeholder="8 caractères minimum"
+                />
+                <button
+                  type="button"
+                  class="auth-drawer__password-toggle"
+                  (click)="togglePassword()"
+                  [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                >
+                  {{ showPassword() ? 'Masquer' : 'Voir' }}
+                </button>
+              </div>
+            </label>
+
+            <button
+              type="submit"
+              class="auth-drawer__submit"
+              [disabled]="auth.loading()"
+            >
+              {{ auth.loading() ? 'Création…' : 'Créer mon compte' }}
+            </button>
+          </form>
+        }
+      </div>
+    </aside>
+  </div>
+}

@@ -1,0 +1,24 @@
+dartchain:
+  persistence:
+    mode: postgres
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/dartchain}
+    username: ${DATABASE_USERNAME:dartchain}
+    password: ${DATABASE_PASSWORD:dartchain}
+    hikari:
+      maximum-pool-size: ${DATABASE_POOL_SIZE:10}
+      minimum-idle: 2
+      connection-timeout: 30000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration

@@ -1,7 +1,7 @@
 <section class="faucet-panel" aria-label="Faucet panel">
   <div class="faucet-panel__title-wrap">
     <h2>FAUCET</h2>
-    <p class="faucet-panel__title-sub">Claim free R4V3 tokens every 60 seconde</p>
+    <p class="faucet-panel__title-sub">Claim testnet R4V3 — connexion et wallet requis</p>
   </div>
 
   <header class="faucet-panel__top">
@@ -66,11 +66,11 @@
     </div>
     <div class="faucet-panel__meta-item">
       <span>PEERS</span>
-      <strong>{{ peers }}</strong>
+      <strong>{{ peers() }}</strong>
     </div>
     <div class="faucet-panel__meta-item">
       <span>BLOCK</span>
-      <strong># {{ blockHeight }}</strong>
+      <strong># {{ blockHeight() }}</strong>
     </div>
     <span class="faucet-panel__dot" aria-hidden="true"></span>
   </footer>

@@ -31,4 +31,20 @@ public final class WalletValidator {
 
         return true;
     }
+
+    public static boolean isValidBlockchainAddress(String walletAddress) {
+        if (walletAddress == null || walletAddress.isBlank()) {
+            return false;
+        }
+
+        if (walletAddress.contains(" ")) {
+            return false;
+        }
+
+        if (walletAddress.length() < 40 || walletAddress.length() > 128) {
+            return false;
+        }
+
+        return walletAddress.matches("[a-fA-F0-9]+");
+    }
 }

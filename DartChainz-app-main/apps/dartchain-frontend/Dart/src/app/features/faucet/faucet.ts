@@ -7,16 +7,20 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  computed,
   inject,
+  signal,
 } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FaucetService,
-  FaucetStateResponse,
   FaucetClaimResponse,
 } from '../../core/services/faucet.service';
 import { QuestsProgressService } from '../../core/services/quests-progress.service';
+import { AuthService } from '../../core/services/auth.service';
+import { WalletSessionService } from '../../core/services/wallet-session.service';
+import { BlockchainApiService } from '../../core/services/blockchain-api.service';
 
 @Component({
   selector: 'app-faucet',
@@ -29,29 +33,37 @@ export class FaucetComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private readonly faucetService = inject(FaucetService);
   private readonly questProgress = inject(QuestsProgressService);
+  private readonly auth = inject(AuthService);
+  private readonly walletSession = inject(WalletSessionService);
+  private readonly blockchain = inject(BlockchainApiService);
 
-  private readonly walletAddress = 'DART123456';
   private readonly clientId = 'angular-faucet-ui';
-  private readonly cooldownStorageKey = `faucetCooldownUntil:${this.walletAddress}`;
-  private static readonly COOLDOWN_SECONDS = 60;
   private static readonly TICK_MS = 100;
   private static readonly DECIMALS = 26;
-  private static readonly VISUAL_INCREMENT = 1n; // +0.000...0001 per tick
+  private static readonly VISUAL_INCREMENT = 1n;
 
-  readonly claimAmount = 1.25;
-  readonly rpcName = 'R4V3 MAINNET';
-  readonly peers = 128;
-  readonly blockHeight = 7_821_210;
+  readonly rpcName = 'DART TESTNET';
+  readonly blockHeight = signal(0);
+  readonly peers = signal(0);
+  readonly claimAmount = signal('—');
+
+  protected readonly walletAddress = computed(() => this.walletSession.address());
+  protected readonly isReady = computed(
+    () => this.auth.isAuthenticated() && !!this.walletAddress()
+  );
 
   private wholePart = 0n;
   private decimalPart = 0n;
   private tickTimerId: number | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private cooldownUntilEpochMs = 0;
+  private cooldownTotalSeconds = 0;
+
   @ViewChild('valueText', { static: true })
   valueTextRef!: ElementRef<HTMLElement>;
   @ViewChild('valueWrap', { static: true })
   valueWrapRef!: ElementRef<HTMLElement>;
+
   eligible = false;
   cooldownSeconds = 0;
   loading = false;
@@ -70,8 +82,8 @@ export class FaucetComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.resetDisplayToZero();
+    this.loadNetworkMeta();
     this.loadState();
-    this.restoreCooldownFromStorage();
     this.startTicker();
   }
 
@@ -91,7 +103,13 @@ export class FaucetComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   claim(): void {
-    if (this.loading || !this.eligible) {
+    if (this.loading || !this.eligible || !this.isReady()) {
+      if (!this.auth.isAuthenticated()) {
+        this.errorMessage = 'Connectez-vous pour utiliser le faucet.';
+        this.auth.openDrawer('login');
+      } else if (!this.walletAddress()) {
+        this.errorMessage = 'Créez et liez un wallet depuis l’onglet Wallet.';
+      }
       return;
     }
 
@@ -101,10 +119,13 @@ export class FaucetComponent implements OnInit, AfterViewInit, OnDestroy {
     this.txHash = '';
 
     this.faucetService
-      .claim({
-        walletAddress: this.walletAddress,
-        clientId: this.clientId,
-      })
+      .claim(
+        {
+          walletAddress: this.walletAddress(),
+          clientId: this.clientId,
+        },
+        this.auth.authHeaders()
+      )
       .pipe(
         finalize(() => {
           this.loading = false;
@@ -115,14 +136,17 @@ export class FaucetComponent implements OnInit, AfterViewInit, OnDestroy {
         next: (response: FaucetClaimResponse) => {
           this.successMessage = response.message;
           this.txHash = response.txHash;
+          this.claimAmount.set(response.amount);
           this.eligible = false;
-          this.cooldownUntilEpochMs = Date.now() + FaucetComponent.COOLDOWN_SECONDS * 1000;
+          this.cooldownTotalSeconds = Math.max(response.cooldownSeconds, 1);
+          this.cooldownUntilEpochMs = Date.now() + response.cooldownSeconds * 1000;
           this.syncCooldownFromTimestamp();
-          this.persistCooldown();
           this.setDisplayFromAmount(response.amount);
           this.triggerBump();
           this.prependHistoryEntry(response.claimedAt, response.amount);
           this.questProgress.recordFaucetClaim();
+          this.walletSession.requestBalanceRefresh();
+          this.loadNetworkMeta();
         },
         error: (error) => {
           this.errorMessage =
@@ -132,22 +156,50 @@ export class FaucetComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadState(): void {
+    const address = this.walletAddress();
+    if (!address) {
+      this.eligible = false;
+      return;
+    }
+
     this.errorMessage = '';
 
     this.faucetService
-      .getState(this.walletAddress)
+      .getState(address)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (state: FaucetStateResponse) => {
+        next: (state) => {
+          this.claimAmount.set(state.lastClaimAmount ?? this.claimAmount());
           const apiCooldown = Math.max(0, state.cooldownSeconds || 0);
-          const apiUntil = apiCooldown > 0 ? Date.now() + apiCooldown * 1000 : 0;
-          this.cooldownUntilEpochMs = Math.max(this.cooldownUntilEpochMs, apiUntil);
+          if (apiCooldown > 0) {
+            this.cooldownTotalSeconds = apiCooldown;
+            this.cooldownUntilEpochMs = Date.now() + apiCooldown * 1000;
+          }
           this.syncCooldownFromTimestamp();
+          if (state.lastClaimAmount) {
+            this.setDisplayFromAmount(state.lastClaimAmount);
+          }
         },
         error: (error) => {
           this.errorMessage =
             error?.error?.message || 'Impossible de charger le faucet.';
         },
+      });
+  }
+
+  private loadNetworkMeta(): void {
+    this.blockchain
+      .getStats()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (stats) => this.blockHeight.set(stats.totalBlocks ?? 0),
+      });
+
+    this.blockchain
+      .getPeerStats()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (stats) => this.peers.set(stats.active ?? stats.total ?? 0),
       });
   }
 
@@ -163,6 +215,12 @@ export class FaucetComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get claimButtonLabel(): string {
+    if (!this.auth.isAuthenticated()) {
+      return 'CONNEXION REQUISE';
+    }
+    if (!this.walletAddress()) {
+      return 'WALLET REQUIS';
+    }
     if (this.loading) {
       return 'CLAIMING...';
     }
@@ -173,10 +231,10 @@ export class FaucetComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   get cooldownProgress(): number {
-    if (this.eligible || this.cooldownSeconds <= 0) {
+    if (this.eligible || this.cooldownSeconds <= 0 || this.cooldownTotalSeconds <= 0) {
       return 0;
     }
-    return this.cooldownSeconds / FaucetComponent.COOLDOWN_SECONDS;
+    return this.cooldownSeconds / this.cooldownTotalSeconds;
   }
 
   get cooldownLabel(): string {
@@ -244,45 +302,17 @@ export class FaucetComponent implements OnInit, AfterViewInit, OnDestroy {
   private syncCooldownFromTimestamp(): void {
     if (this.cooldownUntilEpochMs <= 0) {
       this.cooldownSeconds = 0;
-      this.eligible = true;
-      this.clearPersistedCooldown();
+      this.eligible = this.isReady();
       return;
     }
 
     const deltaMs = this.cooldownUntilEpochMs - Date.now();
     const nextSeconds = Math.max(0, Math.ceil(deltaMs / 1000));
     this.cooldownSeconds = nextSeconds;
-    this.eligible = nextSeconds === 0;
+    this.eligible = nextSeconds === 0 && this.isReady();
     if (this.eligible) {
       this.cooldownUntilEpochMs = 0;
-      this.clearPersistedCooldown();
     }
-  }
-
-  private restoreCooldownFromStorage(): void {
-    const raw = window.localStorage.getItem(this.cooldownStorageKey);
-    if (!raw) {
-      return;
-    }
-
-    const parsed = Number.parseInt(raw, 10);
-    if (!Number.isFinite(parsed) || parsed <= Date.now()) {
-      this.clearPersistedCooldown();
-      return;
-    }
-
-    this.cooldownUntilEpochMs = parsed;
-    this.syncCooldownFromTimestamp();
-  }
-
-  private persistCooldown(): void {
-    if (this.cooldownUntilEpochMs > Date.now()) {
-      window.localStorage.setItem(this.cooldownStorageKey, String(this.cooldownUntilEpochMs));
-    }
-  }
-
-  private clearPersistedCooldown(): void {
-    window.localStorage.removeItem(this.cooldownStorageKey);
   }
 
   private fitNumberToSingleLine(): void {

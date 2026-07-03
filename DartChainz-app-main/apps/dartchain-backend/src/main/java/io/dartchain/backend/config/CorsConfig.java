@@ -20,7 +20,9 @@ public class CorsConfig {
             "https://127.0.0.1:*",
             "https://dartchain.pages.dev",
             "https://*.dartchain.pages.dev",
-            "https://*.pages.dev"
+            "https://*.pages.dev",
+            "https://dartzvz01-tagname.onrender.com",
+            "https://*.onrender.com"
     );
 
     static final List<String> ALLOWED_METHODS = List.of(

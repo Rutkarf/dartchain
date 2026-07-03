@@ -4,6 +4,7 @@ import io.dartchain.backend.explorer.dto.ExplorerSearchResponse;
 import io.dartchain.backend.service.BlockchainService;
 import io.dartchain.backend.showcase.service.MarketChartService;
 import io.dartchain.backend.service.BlockchainValidationService;
+import io.dartchain.backend.service.TransactionPoolService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,12 @@ class ExplorerSearchServiceTest {
 
     @BeforeEach
     void setUp() {
-        BlockchainService blockchainService = new BlockchainService(validationService, marketChartService);
+        TransactionPoolService transactionPoolService = new TransactionPoolService();
+        BlockchainService blockchainService = new BlockchainService(
+                validationService,
+                marketChartService,
+                transactionPoolService
+        );
         explorerSearchService = new ExplorerSearchService(blockchainService);
     }
 

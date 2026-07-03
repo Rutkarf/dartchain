@@ -71,8 +71,8 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: 'brand node';
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas: 'brand node auth';
   align-items: center;
   column-gap: 10px;
   row-gap: 0;
@@ -82,6 +82,88 @@
   border-radius: calc(var(--nv-shell-radius) - 1px);
   background: var(--nv-shell-bg);
   box-sizing: border-box;
+}
+
+/* —— Auth (toujours visible, haut droite) —— */
+.navbar-auth-strip {
+  grid-area: auth;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.navbar-auth-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: min(36vw, 160px);
+}
+
+.navbar-auth-user__name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--nv-cyan);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-auth-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--nv-cyan-rgb), 0.32);
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--nv-cyan);
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.navbar-auth-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.navbar-auth-btn svg :is(path, circle, polyline, line) {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.navbar-auth-btn:hover:not(:disabled) {
+  border-color: rgba(var(--nv-cyan-rgb), 0.55);
+  background: rgba(var(--nv-cyan-rgb), 0.1);
+  box-shadow: 0 0 14px rgba(var(--nv-cyan-rgb), 0.2);
+}
+
+.navbar-auth-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(4, 7, 9, 0.95),
+    0 0 0 3px rgba(var(--nv-cyan-rgb), 0.45);
+}
+
+.navbar-auth-btn--register {
+  border-color: rgba(var(--nv-green-rgb), 0.35);
+  color: var(--nv-green);
+}
+
+.navbar-auth-btn--register:hover:not(:disabled) {
+  border-color: rgba(var(--nv-green-rgb), 0.6);
+  background: rgba(var(--nv-green-rgb), 0.08);
+  box-shadow: 0 0 14px rgba(var(--nv-green-rgb), 0.18);
 }
 
 /* —— Colonne gauche : marque + statut + sous-titre —— */
@@ -301,7 +383,7 @@
 
   .navbar-top {
     grid-template-columns: minmax(0, 1fr) auto minmax(160px, 1fr) auto;
-    grid-template-areas: 'brand node aux aux';
+    grid-template-areas: 'brand node aux auth';
     column-gap: 12px;
   }
 
@@ -325,60 +407,10 @@
     max-width: 280px;
   }
 
-  .navbar-aux__actions {
-    display: flex;
-    flex-shrink: 0;
-  }
-
   .navbar-aux__search app-explorer-search {
     display: flex;
     width: 100%;
     min-width: 0;
-  }
-
-  .navbar-auth-btn {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
-    padding: 0;
-    display: inline-grid;
-    place-items: center;
-    border-radius: 6px;
-    border: 1px solid rgba(var(--nv-cyan-rgb), 0.32);
-    background: rgba(0, 0, 0, 0.4);
-    color: var(--nv-cyan);
-    cursor: pointer;
-    transition:
-      border-color 160ms ease,
-      background 160ms ease,
-      box-shadow 160ms ease;
-  }
-
-  .navbar-auth-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  .navbar-auth-btn svg :is(path, circle) {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.75;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .navbar-auth-btn:hover:not(:disabled) {
-    border-color: rgba(var(--nv-cyan-rgb), 0.55);
-    background: rgba(var(--nv-cyan-rgb), 0.1);
-    box-shadow: 0 0 14px rgba(var(--nv-cyan-rgb), 0.2);
-  }
-
-  .navbar-auth-btn:focus-visible {
-    outline: none;
-    box-shadow:
-      0 0 0 2px rgba(4, 7, 9, 0.95),
-      0 0 0 3px rgba(var(--nv-cyan-rgb), 0.45);
   }
 }
 

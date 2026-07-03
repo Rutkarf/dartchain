@@ -6,6 +6,7 @@ import io.dartchain.backend.model.Block;
 import io.dartchain.backend.model.PendingTransaction;
 import io.dartchain.backend.service.BlockchainService;
 import io.dartchain.backend.service.PendingTransactionService;
+import io.dartchain.backend.service.TransactionPoolService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -19,17 +20,20 @@ public class P2pService {
     private final ObjectMapper objectMapper;
     private final BlockchainService blockchainService;
     private final PendingTransactionService pendingTransactionService;
+    private final TransactionPoolService transactionPoolService;
     private final P2pSessionRegistry sessionRegistry;
 
     public P2pService(
             ObjectMapper objectMapper,
             BlockchainService blockchainService,
             PendingTransactionService pendingTransactionService,
+            TransactionPoolService transactionPoolService,
             P2pSessionRegistry sessionRegistry
     ) {
         this.objectMapper = objectMapper;
         this.blockchainService = blockchainService;
         this.pendingTransactionService = pendingTransactionService;
+        this.transactionPoolService = transactionPoolService;
         this.sessionRegistry = sessionRegistry;
     }
 
@@ -106,7 +110,7 @@ public class P2pService {
 
     public P2pMessage responseTransactionPoolMsg() {
         try {
-            String data = objectMapper.writeValueAsString(pendingTransactionService.getAll());
+            String data = objectMapper.writeValueAsString(transactionPoolService.getAll());
             return new P2pMessage(P2pMessageType.RESPONSE_TRANSACTION_POOL, data);
         } catch (Exception exception) {
             throw new IllegalStateException("Unable to serialize transaction pool", exception);

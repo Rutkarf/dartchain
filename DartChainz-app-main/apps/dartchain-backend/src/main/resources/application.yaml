@@ -1,6 +1,10 @@
 server:
   port: ${PORT:8080}
 
+dartchain:
+  persistence:
+    mode: ${DARTCHAIN_PERSISTENCE_MODE:memory}
+
 spring:
   application:
     name: dartchain-backend
@@ -8,3 +12,9 @@ spring:
 exchange:
   ledger:
     path: ${EXCHANGE_LEDGER_PATH:data/exchange-ledger.json}
+
+auth:
+  users:
+    path: ${AUTH_USERS_PATH:data/auth-users.json}
+  session:
+    ttl-seconds: ${AUTH_SESSION_TTL_SECONDS:604800}

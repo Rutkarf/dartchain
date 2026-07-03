@@ -11,28 +11,29 @@ import io.dartchain.backend.utils.HashUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class PendingTransactionServiceImpl implements PendingTransactionService {
 
-    private final List<PendingTransaction> pendingTransactions = new ArrayList<>();
+    private final TransactionPoolService transactionPoolService;
     private final BlockchainService blockchainService;
     private final TransactionValidationService validationService;
 
     public PendingTransactionServiceImpl(
+            TransactionPoolService transactionPoolService,
             BlockchainService blockchainService,
             TransactionValidationService validationService
     ) {
+        this.transactionPoolService = transactionPoolService;
         this.blockchainService = blockchainService;
         this.validationService = validationService;
     }
 
     @Override
     public synchronized List<PendingTransactionResponse> getPendingTransactions() {
-        return pendingTransactions.stream()
+        return transactionPoolService.getPendingOnly().stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -49,7 +50,7 @@ public class PendingTransactionServiceImpl implements PendingTransactionService 
                 toAddress,
                 amount,
                 data,
-                pendingTransactions
+                transactionPoolService.getAll()
         );
 
         PendingTransaction transaction = new PendingTransaction();
@@ -72,8 +73,7 @@ public class PendingTransactionServiceImpl implements PendingTransactionService 
         ));
 
         validationService.validatePendingTransaction(transaction);
-
-        pendingTransactions.add(transaction);
+        transactionPoolService.add(transaction);
 
         return new AddPendingTransactionResponse(
                 "Transaction pending créée.",
@@ -83,10 +83,10 @@ public class PendingTransactionServiceImpl implements PendingTransactionService 
 
     @Override
     public synchronized MinePendingTransactionResponse minePendingTransaction(String id) {
-        PendingTransaction transaction = pendingTransactions.stream()
-                .filter(tx -> tx.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Pending transaction not found: " + id));
+        PendingTransaction transaction = transactionPoolService.findById(id);
+        if (transaction == null) {
+            throw new IllegalArgumentException("Pending transaction not found: " + id);
+        }
 
         validationService.validatePendingTransaction(transaction);
 
@@ -94,7 +94,7 @@ public class PendingTransactionServiceImpl implements PendingTransactionService 
         Block block = blockchainService.addBlock(blockData);
 
         transaction.setStatus("MINED");
-        pendingTransactions.remove(transaction);
+        transactionPoolService.removeById(id);
 
         return new MinePendingTransactionResponse(
                 "Transaction minée avec succès.",
@@ -104,7 +104,7 @@ public class PendingTransactionServiceImpl implements PendingTransactionService 
 
     @Override
     public synchronized List<PendingTransaction> getAll() {
-        return List.copyOf(pendingTransactions);
+        return transactionPoolService.getAll();
     }
 
     @Override
@@ -119,38 +119,17 @@ public class PendingTransactionServiceImpl implements PendingTransactionService 
             return false;
         }
 
-        boolean alreadyExists = pendingTransactions.stream().anyMatch(tx ->
-                tx.getId().equals(incoming.getId())
-                        || (tx.getHash() != null && tx.getHash().equals(incoming.getHash()))
-        );
-
-        if (alreadyExists) {
-            return false;
-        }
-
-        pendingTransactions.add(incoming);
-        return true;
+        return transactionPoolService.addIfAbsent(incoming);
     }
 
     @Override
     public synchronized PendingTransaction findById(String id) {
-        if (id == null || id.isBlank()) {
-            return null;
-        }
-
-        return pendingTransactions.stream()
-                .filter(tx -> id.equals(tx.getId()))
-                .findFirst()
-                .orElse(null);
+        return transactionPoolService.findById(id);
     }
 
     @Override
     public synchronized boolean removeById(String id) {
-        if (id == null || id.isBlank()) {
-            return false;
-        }
-
-        return pendingTransactions.removeIf(tx -> id.equals(tx.getId()));
+        return transactionPoolService.removeById(id);
     }
 
     private PendingTransactionResponse toResponse(PendingTransaction tx) {
