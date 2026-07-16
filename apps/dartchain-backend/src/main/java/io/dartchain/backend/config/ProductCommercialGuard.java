@@ -52,11 +52,6 @@ public class ProductCommercialGuard implements InitializingBean {
             throw new IllegalStateException(
                     "Le mode commercial exige dartchain.product.allow-server-wallet-create=false.");
         }
-
-        if (productProperties.isFaucetEnabled()) {
-            throw new IllegalStateException(
-                    "Le mode commercial exige dartchain.product.faucet-enabled=false.");
-        }
     }
 
     private boolean isProdOrStagingProfile() {

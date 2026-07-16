@@ -5,6 +5,6 @@ export const environment = {
   liveWsUrl: 'wss://dartchain-backend-1-0-0.onrender.com/ws/live',
   chatWsUrl: 'wss://dartchain-backend-1-0-0.onrender.com/ws/chat',
   commercial: true,
-  faucetEnabled: false,
+  faucetEnabled: true,
   showcaseEnabled: true,
 };

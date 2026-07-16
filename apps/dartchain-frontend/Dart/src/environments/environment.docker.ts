@@ -15,6 +15,6 @@ export const environment = {
   liveWsUrl: runtimeWsUrl('/ws/live'),
   chatWsUrl: runtimeWsUrl('/ws/chat'),
   commercial: true,
-  faucetEnabled: false,
-  showcaseEnabled: false,
+  faucetEnabled: true,
+  showcaseEnabled: true,
 };

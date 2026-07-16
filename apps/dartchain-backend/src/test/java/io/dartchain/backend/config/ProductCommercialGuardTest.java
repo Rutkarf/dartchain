@@ -49,13 +49,12 @@ class ProductCommercialGuardTest {
     }
 
     @Test
-    void rejectsFaucetWhenCommercial() {
+    void allowsFaucetWhenCommercial() {
         ProductProperties properties = commercialProperties(true, false, false, true);
         MockEnvironment environment = hardenedEnvironment("postgres");
 
-        assertThatThrownBy(() -> new ProductCommercialGuard(environment, properties).validate())
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("faucet-enabled");
+        assertThatCode(() -> new ProductCommercialGuard(environment, properties).validate())
+                .doesNotThrowAnyException();
     }
 
     @Test

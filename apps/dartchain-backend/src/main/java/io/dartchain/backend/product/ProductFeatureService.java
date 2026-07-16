@@ -29,7 +29,7 @@ public class ProductFeatureService {
 
     public void requireFaucet() {
         if (!productProperties.isFaucetEnabled()) {
-            throw new FeatureDisabledException("Le faucet est désactivé en mode commercial.");
+            throw new FeatureDisabledException("Le faucet est désactivé.");
         }
     }
 }

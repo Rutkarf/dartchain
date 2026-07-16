@@ -10,8 +10,8 @@ dartchain:
     commercial: true
     allow-legacy-private-key: false
     allow-server-wallet-create: false
-    faucet-enabled: false
-    showcase-enabled: false
+    faucet-enabled: true
+    showcase-enabled: true
     legacy-api-aliases-enabled: true
   ops:
     restrict-actuator: true

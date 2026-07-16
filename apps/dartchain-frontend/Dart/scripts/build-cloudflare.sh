@@ -16,11 +16,16 @@ BACKEND_URL="${BACKEND_URL#https://}"
 BACKEND_URL="https://${BACKEND_URL}"
 BACKEND_HOST="${BACKEND_URL#https://}"
 
-# Showcase activé par défaut (aligné backend dev / démo publique). Désactiver : SHOWCASE_ENABLED=false
+# Features produit (démo publique). Désactiver : SHOWCASE_ENABLED=false / FAUCET_ENABLED=false
 SHOWCASE_ENABLED="${SHOWCASE_ENABLED:-true}"
+FAUCET_ENABLED="${FAUCET_ENABLED:-true}"
 case "${SHOWCASE_ENABLED}" in
   true|1|yes|on) SHOWCASE_TS="true" ;;
   *) SHOWCASE_TS="false" ;;
+esac
+case "${FAUCET_ENABLED}" in
+  true|1|yes|on) FAUCET_TS="true" ;;
+  *) FAUCET_TS="false" ;;
 esac
 
 cat > "${ROOT}/src/environments/environment.prod.ts" <<EOF
@@ -31,7 +36,7 @@ export const environment = {
   liveWsUrl: 'wss://${BACKEND_HOST}/ws/live',
   chatWsUrl: 'wss://${BACKEND_HOST}/ws/chat',
   commercial: true,
-  faucetEnabled: false,
+  faucetEnabled: ${FAUCET_TS},
   showcaseEnabled: ${SHOWCASE_TS},
 };
 EOF
