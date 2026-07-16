@@ -1,0 +1,58 @@
+# Blueprint Render — backend Docker Hub + Postgres (free tier)
+# Usage : Render Dashboard → New → Blueprint → connecter le repo → chemin deploy/render.yaml
+#
+# Avant déploiement :
+# 1. Pousser l'image : voir deploy/docker-hub.env.example
+# 2. Remplacer DOCKERHUB_USER ci-dessous
+# 3. Après le 1er déploiement, définir DARTCHAIN_CORS_EXTRA avec l'URL *.pages.dev
+
+databases:
+  - name: dartchain-db
+    plan: free
+    databaseName: dartchain
+    user: dartchain
+
+services:
+  - type: web
+    name: dartchain-backend
+    runtime: image
+    plan: free
+    region: frankfurt
+    image:
+      url: docker.io/DOCKERHUB_USER/dartchain-backend:1.0.0
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SPRING_PROFILES_ACTIVE
+        value: postgres,prod
+      - key: DARTCHAIN_PERSISTENCE_MODE
+        value: postgres
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xmx384m
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: dartchain-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: dartchain-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: dartchain-db
+          property: database
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: dartchain-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: dartchain-db
+          property: password
+      - key: DARTCHAIN_JWT_SECRET
+        generateValue: true
+      - key: DARTCHAIN_ACTUATOR_TOKEN
+        generateValue: true
+      - key: DARTCHAIN_CORS_EXTRA
+        value: https://YOUR-PROJECT.pages.dev

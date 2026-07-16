@@ -4,7 +4,7 @@ dartchain:
 
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/dartchain}
+    url: ${DATABASE_URL:jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:dartchain}}
     username: ${DATABASE_USERNAME:dartchain}
     password: ${DATABASE_PASSWORD:dartchain}
     hikari:

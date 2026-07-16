@@ -6,7 +6,7 @@
     "start": "ng serve --configuration development --project Dart --host 0.0.0.0 --port 4200",
     "build": "ng build",
     "build:docker": "ng build --configuration docker",
-    "build:cloudflare": "ng build --configuration production",
+    "build:cloudflare": "bash scripts/build-cloudflare.sh",
     "build:stats": "bash scripts/bundle-stats.sh",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

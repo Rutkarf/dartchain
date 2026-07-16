@@ -11,7 +11,7 @@ RUN npm run build:docker
 # —— Runtime nginx ——
 FROM nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist/Dart/browser /usr/share/nginx/html
+COPY --from=build /app/dist/browser /usr/share/nginx/html
 
 EXPOSE 80
 

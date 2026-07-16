@@ -38,3 +38,4 @@ apps/dartchain-backend/data/*.json
 # Divers
 coverage/
 reports/
+.tools/

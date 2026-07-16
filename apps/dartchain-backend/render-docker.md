@@ -1,5 +1,8 @@
 # Déploiement backend sur Render (image Docker Hub)
 
+> Configurations complètes : voir `deploy/render.yaml`, `deploy/render.env.example`, `deploy/docker-hub.env.example`  
+> Frontend Cloudflare Pages : `deploy/cloudflare.env.example`
+
 ## Image Docker (publique)
 
 Page Hub : https://hub.docker.com/r/rutkarf/dartchain-backend
@@ -7,13 +10,13 @@ Page Hub : https://hub.docker.com/r/rutkarf/dartchain-backend
 **URL exacte à coller dans Render :**
 
 ```text
-docker.io/rutkarf/dartchain-backend:latest
+docker.io/rutkarf/dartchain-backend:1.0.0
 ```
 
-Variante acceptée :
+Tag `latest` (optionnel) :
 
 ```text
-rutkarf/dartchain-backend:latest
+docker.io/rutkarf/dartchain-backend:latest
 ```
 
 > Ne pas utiliser l’URL du site web (`https://hub.docker.com/...`) — uniquement l’URL registry ci-dessus.
@@ -22,16 +25,11 @@ rutkarf/dartchain-backend:latest
 
 ```bash
 cd apps/dartchain-backend
-docker build -t rutkarf/dartchain-backend:latest .
+docker build -t rutkarf/dartchain-backend:1.0.0 .
+docker tag rutkarf/dartchain-backend:1.0.0 rutkarf/dartchain-backend:latest
 docker login
+docker push rutkarf/dartchain-backend:1.0.0
 docker push rutkarf/dartchain-backend:latest
-```
-
-Version taguée (recommandé) :
-
-```bash
-docker tag rutkarf/dartchain-backend:latest rutkarf/dartchain-backend:0.1
-docker push rutkarf/dartchain-backend:0.1
 ```
 
 ## Render — Web Service (Docker)
@@ -62,9 +60,10 @@ docker push rutkarf/dartchain-backend:0.1
 | `JAVA_TOOL_OPTIONS` | `-Xmx512m` (selon le plan Render) |
 | `SPRING_PROFILES_ACTIVE` | `postgres,prod` |
 | `DARTCHAIN_PERSISTENCE_MODE` | `postgres` |
-| `DATABASE_URL` | `jdbc:postgresql://host:5432/dartchain` |
+| `DATABASE_HOST` / `DATABASE_PORT` / `DATABASE_NAME` | *(Render Postgres — voir `deploy/render.yaml`)* |
 | `DATABASE_USERNAME` | `dartchain` |
 | `DATABASE_PASSWORD` | *(secret)* |
+| `DARTCHAIN_CORS_EXTRA` | `https://YOUR-PROJECT.pages.dev` |
 
 Le profil `prod` active `application-prod.yaml` (compression HTTP, logs INFO).
 
@@ -94,7 +93,9 @@ Variables minimales :
 ```text
 SPRING_PROFILES_ACTIVE=postgres
 DARTCHAIN_PERSISTENCE_MODE=postgres
-DATABASE_URL=jdbc:postgresql://localhost:5432/dartchain
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_NAME=dartchain
 DATABASE_USERNAME=dartchain
 DATABASE_PASSWORD=dartchain
 ```
