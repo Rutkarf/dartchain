@@ -1,0 +1,6 @@
+# Cloudflare Pages — déploiement via `npx wrangler deploy` (Workers & Pages unifié)
+# Le build Angular doit tourner AVANT le deploy (voir scripts/cloudflare-build.sh).
+
+name = "dartchain"
+compatibility_date = "2025-07-16"
+pages_build_output_dir = "apps/dartchain-frontend/Dart/dist/browser"
