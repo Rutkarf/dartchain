@@ -5,9 +5,9 @@
     (click)="toggleMenu($event)"
     [attr.aria-expanded]="menuOpen"
     aria-haspopup="listbox"
-    aria-label="Sélectionner une crypto du rate panel"
+    aria-label="Sélectionner une crypto — rate panel et LaunchLab"
   >
-    <span class="token-select__value">{{ selection.selected() }}</span>
+      <span class="token-select__value">{{ selection.selected() }}</span>
     <span class="token-select__chevron" aria-hidden="true"></span>
   </button>
 
@@ -17,6 +17,7 @@
     role="listbox"
     aria-label="Sélection crypto"
   >
+    <li class="token-select__section" role="presentation">Rate panel</li>
     <li
       *ngFor="let symbol of selection.menuSymbols"
       role="option"
@@ -28,5 +29,40 @@
       <span class="token-select__option-label">{{ symbol }}</span>
       <span *ngIf="symbol === 'R4V3'" class="token-select__option-tag">Natif</span>
     </li>
+
+    <li class="token-select__section token-select__section--launch" role="presentation">
+      LaunchLab
+      <span class="token-select__section-count" *ngIf="hasLaunchProjects()">
+        {{ launchProjects().length }}
+      </span>
+    </li>
+
+    @if (launchState.loading()) {
+      <li class="token-select__empty" role="presentation">Chargement des lancements…</li>
+    } @else if (launchState.error()) {
+      <li class="token-select__empty" role="presentation">Lancements indisponibles</li>
+    } @else if (!hasLaunchProjects()) {
+      <li class="token-select__empty" role="presentation">Aucun token lancé pour le moment</li>
+    } @else {
+      <li
+        *ngFor="let project of launchProjects()"
+        role="option"
+        [attr.aria-selected]="project.symbol === selection.selected()"
+        class="token-select__option token-select__option--launch"
+        [class.token-select__option--active]="project.symbol === selection.selected()"
+        (click)="selectLaunchProject(project, $event)"
+      >
+        <span class="token-select__option-main">
+          <span class="token-select__option-label">{{ project.symbol }}</span>
+          <span class="token-select__option-name">{{ project.name }}</span>
+        </span>
+        <span
+          class="token-select__option-tag"
+          [class.token-select__option-tag--live]="project.status === 'LIVE'"
+        >
+          {{ launchStatusLabel(project.status) }}
+        </span>
+      </li>
+    }
   </ul>
 </div>

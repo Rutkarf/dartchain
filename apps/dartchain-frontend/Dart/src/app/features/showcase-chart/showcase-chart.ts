@@ -28,6 +28,7 @@ import {
   chartQuoteSymbol,
 } from '../../core/constants/rate-panel-symbols';
 import { ChartAlertsService } from '../../core/services/chart-alerts.service';
+import { ChartSummaryStateService } from '../../core/services/chart-summary-state.service';
 import { BrandCryptoSelectionService } from '../../core/services/brand-crypto-selection.service';
 import {
   ChartCurrency,
@@ -137,6 +138,7 @@ export class ShowcaseChartComponent {
   private readonly blockchain = inject(BlockchainApiService);
   private readonly brandCrypto = inject(BrandCryptoSelectionService);
   private readonly chartAlerts = inject(ChartAlertsService);
+  private readonly chartSummary = inject(ChartSummaryStateService);
   private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild('chartSvg') chartSvg?: ElementRef<SVGSVGElement>;
@@ -551,6 +553,25 @@ export class ShowcaseChartComponent {
       .subscribe(() => this.loadChart(false));
 
     this.loadTradeHistory();
+
+    this.chartSummary.registerRefreshHandler(() => this.loadChart());
+
+    effect(() => {
+      this.chartSummary.sync({
+        title: 'Graphique',
+        pairLabel: `${this.pairBase()} / ${this.currencyLabel()}`,
+        price: this.chartPrice(),
+        delta: this.chartDelta(),
+        positive: this.chartPositive(),
+        rangeBadge: this.activeTimeframeBadge(),
+        volume: this.hubFooterVol(),
+        high: this.chartHigh(),
+        low: this.chartLow(),
+        loading: this.loading(),
+        error: this.error(),
+        sparklinePoints: this.chartPoints(),
+      });
+    });
   }
 
   selectRange(range: ChartRange): void {

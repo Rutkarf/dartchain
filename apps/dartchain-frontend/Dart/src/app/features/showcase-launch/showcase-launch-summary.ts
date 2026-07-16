@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
 import { LaunchWorkflowPhase } from '../../core/services/showcase-launch-state.service';
 import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-state.service';
 
@@ -24,6 +25,9 @@ export class ShowcaseLaunchSummaryComponent implements OnInit {
   protected readonly launchState = inject(ShowcaseLaunchStateService);
 
   @Output() readonly refreshClick = new EventEmitter<void>();
+
+  @HostBinding(`class.${COLLAPSED_SUMMARY_BAR_CLASS}`)
+  readonly collapsedSummaryBar = true;
 
   @HostBinding('class.launch-summary-bar__content')
   readonly contentClass = true;

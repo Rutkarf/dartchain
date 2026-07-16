@@ -1,0 +1,40 @@
+<div class="navbar-node-panel" aria-label="État de synchronisation du nœud">
+  <div
+    class="navbar-node-panel__box"
+    role="status"
+    tabindex="0"
+    appNavbarHint="Synchronisation du nœud avec le réseau DartChain — pourcentage estimé selon la latence et l'état du réseau"
+  >
+    <div class="navbar-node-panel__meta">
+      <div class="navbar-node-panel__head">
+        <span
+          class="navbar-node-panel__led"
+          [class.is-online]="networkOnline"
+          aria-hidden="true"
+        ></span>
+        <span class="navbar-node-panel__title">NODE</span>
+      </div>
+      <p class="navbar-node-panel__sync">
+        SYNC
+        <strong class="navbar-node-panel__pct">{{ syncPercentLabel }}</strong>
+      </p>
+    </div>
+    <div class="navbar-node-panel__chart" aria-hidden="true">
+      <svg
+        class="navbar-node-panel__spark"
+        viewBox="0 0 48 16"
+        preserveAspectRatio="none"
+        focusable="false"
+      >
+        <polyline
+          [attr.points]="chartSummary.sparklinePolyline()"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+  </div>
+</div>

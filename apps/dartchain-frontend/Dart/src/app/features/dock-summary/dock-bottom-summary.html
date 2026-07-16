@@ -1,0 +1,32 @@
+<div class="dock-bottom-summary" [attr.data-active-tab]="activeTab">
+  @switch (activeTab) {
+    @case ('wallet') {
+      <app-dock-wallet-summary />
+    }
+    @case ('faucet') {
+      @if (product.faucetEnabled) {
+        <app-dock-faucet-summary />
+      }
+    }
+    @case ('transactions') {
+      <app-dock-transactions-summary />
+    }
+    @case ('chain') {
+      <app-dock-chain-summary />
+    }
+    @case ('market') {
+      <app-dock-market-summary />
+    }
+    @case ('quests') {
+      <app-dock-quests-summary />
+    }
+    @case ('peers') {
+      <app-dock-peers-summary />
+    }
+    @case ('admin') {
+      @if (auth.isAdmin()) {
+        <p class="dock-bottom-summary__fallback" role="status">Admin · replié</p>
+      }
+    }
+  }
+</div>

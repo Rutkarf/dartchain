@@ -58,8 +58,8 @@ export class ShowcasePanelComponent {
     return isR4v3ShowcaseTab(this.activeTab);
   }
 
-  isSmartTab(tab: ShowcaseTab): boolean {
-    return isNewsShowcaseTab(tab) || isR4v3ShowcaseTab(tab) || tab === 'rv23' || tab === 'dao';
+  isSmartTab(_tab: ShowcaseTab): boolean {
+    return true;
   }
 
   panelTitle(tab: ShowcaseTab): string {

@@ -113,7 +113,7 @@ describe('ExchangePanelComponent', () => {
 
   it('shows create wallet label when no wallet', () => {
     flushPanel();
-    expect((component as any).swapButtonLabel()).toBe('+ Wallet');
+    expect((component as any).swapButtonLabel()).toBe('Créer un wallet');
   });
 
   it('computes estimated To amount from rate', () => {

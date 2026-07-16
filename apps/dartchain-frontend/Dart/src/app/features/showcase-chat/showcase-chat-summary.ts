@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
 import { ShowcaseChatStateService } from '../../core/services/showcase-chat-state.service';
 import { ShowcaseChatService } from '../../core/services/showcase-chat.service';
 
@@ -25,6 +26,9 @@ export class ShowcaseChatSummaryComponent implements OnInit {
   protected readonly chatState = inject(ShowcaseChatStateService);
 
   @Output() readonly refreshClick = new EventEmitter<void>();
+
+  @HostBinding(`class.${COLLAPSED_SUMMARY_BAR_CLASS}`)
+  readonly collapsedSummaryBar = true;
 
   @HostBinding('class.showcase-chat-bar__content')
   readonly contentClass = true;

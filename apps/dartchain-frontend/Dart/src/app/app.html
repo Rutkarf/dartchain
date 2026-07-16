@@ -15,6 +15,8 @@
     id="app-main-content"
     class="app-hub"
     [class.is-showcase-disabled]="!product.showcaseEnabled"
+    [class.is-showcase-collapsed]="product.showcaseEnabled && showcaseCollapsed()"
+    [class.is-chart-collapsed]="chartCollapsed()"
     aria-label="Marché"
     tabindex="-1"
   >
@@ -109,8 +111,6 @@
       <header class="showcase-header app-bottom-stack__header" aria-label="Navigation principale">
         <div
           class="showcase-header-tabs"
-          [class.is-collapsed]="dockCollapsed()"
-          [attr.aria-hidden]="dockCollapsed()"
         >
           <nav class="showcase-tabs app-bottom-stack__tabs" role="tablist">
             <button
@@ -219,8 +219,14 @@
       <div
         class="app-bottom-stack__content app-bottom-stack__band"
         [class.is-collapsed]="dockCollapsed()"
-        [attr.aria-hidden]="dockCollapsed()"
+        [class.is-smart-collapsed]="dockCollapsed()"
+        [attr.data-active-tab]="activeBottomTab()"
       >
+      @if (dockCollapsed()) {
+        <div class="app-bottom-stack__summary">
+          <app-dock-bottom-summary [activeTab]="activeBottomTab()" />
+        </div>
+      } @else {
       @switch (activeBottomTab()) {
         @case ('wallet') {
           <div class="app-bottom-stack__panel">
@@ -266,6 +272,7 @@
           </div>
           }
         }
+      }
       }
     </div>
     </div>

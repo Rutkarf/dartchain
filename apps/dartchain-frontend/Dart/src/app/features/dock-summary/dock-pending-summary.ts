@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
 import {
   DockPendingPhase,
   DockPendingStateService,
@@ -23,6 +24,9 @@ import {
 })
 export class DockPendingSummaryComponent implements OnInit, OnDestroy {
   protected readonly state = inject(DockPendingStateService);
+
+  @HostBinding(`class.${COLLAPSED_SUMMARY_BAR_CLASS}`)
+  readonly collapsedSummaryBar = true;
 
   @HostBinding('class.dock-summary-bar__content')
   readonly contentClass = true;

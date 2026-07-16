@@ -4,18 +4,11 @@
   [class.is-expanded]="!collapsed"
   [attr.data-active-tab]="activeTab"
 >
-  @if (collapsed && !isSmartTab(activeTab)) {
-    <header class="showcase-panel__handle showcase-panel__handle--collapsed">
-      <span class="showcase-panel__accent" aria-hidden="true"></span>
-      <span class="showcase-panel__title">{{ panelTitle(activeTab) }}</span>
-    </header>
-  }
-
   <div
     id="showcase-panel-body"
     class="showcase-panel__body"
-    [class.showcase-panel__body--smart-collapsed]="collapsed && isSmartTab(activeTab)"
-    [attr.aria-hidden]="collapsed && !isSmartTab(activeTab)"
+    [class.showcase-panel__body--smart-collapsed]="collapsed"
+    [attr.aria-hidden]="false"
   >
     <app-showcase-window
       [activeTab]="activeTab"

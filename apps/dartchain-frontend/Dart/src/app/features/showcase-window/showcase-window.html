@@ -75,16 +75,37 @@
           }
         </div>
       }
-      @default {
+      @case ('reseau') {
         <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--terminal">
-          @defer (on idle) {
-            <app-showcase-terminal
-              [mode]="activeTab"
-              [expanded]="!collapsed"
-              (selectBlock)="onSelectBlock($event)"
-            />
-          } @placeholder {
-            <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+          @if (collapsed) {
+            <app-showcase-terminal-summary mode="reseau" />
+          } @else {
+            @defer (on idle) {
+              <app-showcase-terminal
+                [mode]="activeTab"
+                [expanded]="true"
+                (selectBlock)="onSelectBlock($event)"
+              />
+            } @placeholder {
+              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+            }
+          }
+        </div>
+      }
+      @case ('peers') {
+        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--terminal">
+          @if (collapsed) {
+            <app-showcase-terminal-summary mode="peers" />
+          } @else {
+            @defer (on idle) {
+              <app-showcase-terminal
+                [mode]="activeTab"
+                [expanded]="true"
+                (selectBlock)="onSelectBlock($event)"
+              />
+            } @placeholder {
+              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+            }
           }
         </div>
       }

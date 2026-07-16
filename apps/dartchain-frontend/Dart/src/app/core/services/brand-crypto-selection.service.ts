@@ -77,6 +77,29 @@ export class BrandCryptoSelectionService {
     });
   }
 
+  /** Token LaunchLab : sélection graphique + paire swap vers R4V3. */
+  selectLaunchToken(symbol: string, coinId?: string | null): void {
+    const normalized = symbol.trim().toUpperCase();
+    if (!normalized) {
+      return;
+    }
+
+    if ((this.menuSymbols as readonly string[]).includes(normalized)) {
+      this.select(normalized as BrandCryptoSymbol, coinId);
+    } else {
+      this.selected.set(normalized);
+      this.selectedCoinId.set(
+        coinId?.trim() ||
+          this.ratePanelPrefs.coinIdForSymbol(normalized) ||
+          coinIdForSymbol(normalized) ||
+          null
+      );
+    }
+
+    this.selectForExchange(normalized);
+    this.requestExchangeTrade(normalized, EXCHANGE_NATIVE_TOKEN);
+  }
+
   /** Après swap réussi : pré-sélectionner la paire sur le graphique. */
   selectSwapPair(fromToken: string, toToken: string): void {
     const chartSymbol =

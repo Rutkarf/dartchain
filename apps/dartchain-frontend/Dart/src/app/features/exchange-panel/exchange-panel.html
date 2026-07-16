@@ -1,29 +1,30 @@
-<section class="exchange-panel" aria-label="Échange LaunchLab">
+<section class="exchange-panel" aria-label="Convertir vos tokens LaunchLab">
   <div class="exchange-panel__shell ds-surface ds-surface--card">
     <div class="exchange-panel__inner">
       @if (loadingPanel()) {
         <div class="exchange-panel__skeleton exchange-panel__skeleton--body" aria-hidden="true"></div>
       } @else {
         <div
-          class="exchange-panel__route"
+          class="exchange-panel__pair"
           role="listbox"
           aria-labelledby="exchange-pair-label"
-          aria-label="Tokens LaunchLab"
+          aria-label="Choisir le token à recevoir"
         >
-          <button
-            type="button"
-            class="exchange-panel__from"
+          <span
+            class="exchange-panel__from-pill"
             [title]="'Solde ' + formatBalance(fromBalance()) + ' ' + tokenUnitLabel(fromToken())"
-            tabindex="-1"
-            disabled
           >
             {{ displayTokenSymbol(fromToken()) }}
-          </button>
+          </span>
 
-          <span class="exchange-panel__swap-label" id="exchange-pair-label" aria-hidden="true">
-            <span class="exchange-panel__swap-line"></span>
-            <span class="exchange-panel__swap-text">SWAP</span>
-            <span class="exchange-panel__swap-head">▶</span>
+          <span class="exchange-panel__arrow" id="exchange-pair-label" aria-hidden="true">→</span>
+
+          <span
+            class="exchange-panel__to-pill"
+            [title]="tokenDisplayName(toToken())"
+            aria-live="polite"
+          >
+            {{ toToken() }}
           </span>
 
           <div class="exchange-panel__targets">
@@ -35,6 +36,7 @@
                   class="exchange-panel__chip"
                   [class.exchange-panel__chip--active]="isLaunchChipActive(slot)"
                   [attr.aria-selected]="isLaunchChipActive(slot)"
+                  [attr.aria-label]="'Recevoir ' + tokenDisplayName(slot)"
                   (click)="selectLaunchChip(slot)"
                   [title]="tokenDisplayName(slot)"
                 >
@@ -47,17 +49,24 @@
           </div>
         </div>
 
-        <footer class="exchange-panel__convert" [formGroup]="amountForm">
-          <p class="exchange-panel__convert-hint" id="exchange-convert-hint" aria-live="polite">
+        <p class="exchange-panel__meta" id="exchange-convert-hint" aria-live="polite">
+          <span class="exchange-panel__sr-only">Estimation reçue&nbsp;</span>
+          <span class="exchange-panel__meta-estimate">
             ≈ {{ formattedEstimatedTo() }} {{ toToken() }}
-            · {{ formatBalance(fromBalance()) }} {{ tokenUnitLabel(fromToken()) }}
-            @if (rateLine()) {
-              · {{ rateLine() }}
-            }
-          </p>
-          <div class="exchange-panel__convert-row">
+          </span>
+          · {{ formatBalance(fromBalance()) }} {{ tokenUnitLabel(fromToken()) }}
+          @if (rateLine()) {
+            · {{ rateLine() }}
+          }
+          @if (unitUsdPriceTo() != null) {
+            · {{ prixSubline() }}
+          }
+        </p>
+
+        <footer class="exchange-panel__action" [formGroup]="amountForm">
+          <div class="exchange-panel__amount-row">
             <label class="exchange-panel__sr-only" for="exchange-amount-input">
-              Montant {{ tokenUnitLabel(fromToken()) }}
+              Montant à convertir en {{ toToken() }}
             </label>
             <input
               id="exchange-amount-input"
@@ -76,23 +85,26 @@
               class="exchange-panel__max"
               [disabled]="fromBalance() <= 0"
               (click)="setMaxAmount()"
+              aria-label="Utiliser le solde maximum"
+              title="Montant maximum"
             >
               MAX
             </button>
-            <button
-              type="button"
-              class="exchange-panel__swap-btn"
-              [class.exchange-panel__swap-btn--ready]="swapAction() === 'swap'"
-              [class.exchange-panel__swap-btn--funnel]="isFunnelCta()"
-              [class.exchange-panel__swap-btn--inactive]="swapButtonDisabled()"
-              (click)="onSwapClick()"
-              [disabled]="swapButtonDisabled()"
-              [attr.aria-label]="swapButtonLabel()"
-              [title]="swapButtonLabel()"
-            >
-              {{ swapButtonLabel() }}
-            </button>
           </div>
+
+          <button
+            type="button"
+            class="exchange-panel__cta"
+            [class.exchange-panel__cta--ready]="swapAction() === 'swap'"
+            [class.exchange-panel__cta--funnel]="isFunnelCta()"
+            [class.exchange-panel__cta--warn]="swapAction() === 'insufficient' && fromBalance() > 0"
+            (click)="onSwapClick()"
+            [disabled]="swapButtonDisabled()"
+            [attr.aria-label]="swapButtonLabel()"
+            [title]="swapCtaHint() || swapButtonLabel()"
+          >
+            {{ swapButtonLabel() }}
+          </button>
         </footer>
 
         @if (showSuccessToast() && successMessage()) {

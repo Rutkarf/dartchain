@@ -8,6 +8,12 @@
   min-height: 0;
   margin: 0;
   padding: 0;
+  overflow: visible;
+}
+
+:host.is-token-menu-open {
+  z-index: 320;
+  overflow: visible;
 }
 
 :host-context(.navbar-brand) {
@@ -29,6 +35,11 @@
   position: relative;
   width: auto;
   min-width: auto;
+  overflow: visible;
+}
+
+.token-select--open {
+  z-index: 320;
 }
 
 :host-context(.navbar-controls-band) .token-field {
@@ -205,9 +216,9 @@
   position: absolute;
   left: 0;
   right: auto;
-  min-width: 100%;
+  min-width: min(100%, 11rem);
   top: calc(100% + 3px);
-  z-index: 60;
+  z-index: 330;
   margin: 0;
   padding: 3px;
   list-style: none;
@@ -219,7 +230,7 @@
   box-shadow:
     0 6px 18px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  max-height: 120px;
+  max-height: min(220px, 42vh);
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -274,6 +285,78 @@
   text-transform: uppercase;
   color: var(--text-primary);
   line-height: 1;
+}
+
+.token-select__section {
+  margin: 4px 4px 2px;
+  padding: 2px 4px 0;
+  font-size: 0.48rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(var(--accent-primary-rgb), 0.72);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.token-select__section--launch {
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(var(--accent-primary-rgb), 0.14);
+}
+
+.token-select__section-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: rgba(var(--accent-primary-rgb), 0.14);
+  font-size: 0.42rem;
+}
+
+.token-select__empty {
+  margin: 0 4px 4px;
+  padding: 6px 4px;
+  font-size: 0.58rem;
+  line-height: 1.35;
+  color: var(--text-secondary, #8b929e);
+  list-style: none;
+}
+
+.token-select__option--launch {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.token-select__option-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.token-select__option-name {
+  font-size: 0.48rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-secondary, #8b929e);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.token-select__option--launch .token-select__option-tag {
+  align-self: flex-end;
+  font-size: 0.42rem;
+}
+
+.token-select__option-tag--live {
+  color: var(--nv-green, #39ff14);
 }
 
 @media (max-width: 250px) {

@@ -11,6 +11,8 @@ import { AuthDrawerComponent } from '../features/auth-drawer/auth-drawer';
 import { AuthService } from '../core/services/auth.service';
 import { ShellFeedbackService } from '../core/services/shell-feedback.service';
 import { LocaleService } from '../core/i18n/locale.service';
+import { NavbarNodePanelComponent } from './navbar-node-panel';
+import { NavbarHintDirective } from './navbar-hint.directive';
 
 @Component({
   selector: 'app-navbar',
@@ -24,9 +26,11 @@ import { LocaleService } from '../core/i18n/locale.service';
     SearchbarComponent,
     R4v3ThreeComponent,
     AuthDrawerComponent,
+    NavbarNodePanelComponent,
+    NavbarHintDirective,
   ],
   templateUrl: './navbar.html',
-  styleUrls: ['./navbar.css', './navbar-chrome.css', './navbar-viewport-compact.css'],
+  styleUrls: ['./navbar.css', './navbar-chrome.css', './navbar-viewport-compact.css', './navbar-hint.css'],
 })
 export class NavbarComponent {
   readonly auth = inject(AuthService);
@@ -35,6 +39,9 @@ export class NavbarComponent {
 
   @ViewChild('logoThree')
   logoThree?: R4v3ThreeComponent;
+
+  @ViewChild('networkStatus')
+  networkStatus!: NavbarNetworkStatusComponent;
 
   @Output() exploreBlock = new EventEmitter<Block>();
   @Output() explorePending = new EventEmitter<void>();
@@ -74,11 +81,20 @@ export class NavbarComponent {
     }, 520);
   }
 
+  onToggleLocale(): void {
+    this.locale.toggle();
+  }
+
+  /** Compatibilité — le panneau NODE gère désormais l’ouverture réseau en secondaire. */
   onNodePanelToggle(): void {
     this.shell.toggleStatusPanel();
   }
 
-  onToggleLocale(): void {
-    this.locale.toggle();
+  networkOnline(): boolean {
+    return this.networkStatus?.health().ok ?? true;
+  }
+
+  networkSyncLabel(): string {
+    return this.networkStatus?.syncPercentLabel() ?? '…';
   }
 }

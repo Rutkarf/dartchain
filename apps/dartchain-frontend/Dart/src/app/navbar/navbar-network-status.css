@@ -85,48 +85,69 @@
   line-height: 1;
 }
 
-:host-context(.navbar-metrics__network) .navbar-network-metrics,
-:host-context(.navbar-brand-row__network) .navbar-network-metrics {
+:host-context(.navbar-metrics__network) .navbar-network-metrics {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
 :host-context(.navbar-brand-row__network) {
-  height: auto;
-  max-height: none;
+  height: 0.8125rem;
+  max-height: 0.8125rem;
+  min-height: 0;
   flex: 0 0 auto;
-  min-width: 0;
+  align-self: center;
+  margin: 0;
+  padding: 0;
+}
+
+:host-context(.navbar-brand-row__network) .navbar-network {
+  height: 0.8125rem;
+  max-height: 0.8125rem;
 }
 
 :host-context(.navbar-brand-row__network) .navbar-network-metrics {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.22rem;
   flex-wrap: nowrap;
   white-space: nowrap;
+  height: 0.8125rem;
+  max-height: 0.8125rem;
+  padding: 0 0.28rem 0 0.24rem;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.26);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 2px 0 0 rgba(var(--navbar-led-online-rgb, 57, 255, 20), 0.55);
 }
 
 :host-context(.navbar-brand-row__network) .navbar-network-latency {
-  color: var(--ds-text-secondary, #8b929e);
+  color: var(--ds-text-primary, #e8ecf0);
   font-family: var(--ds-font-mono, var(--font-body));
-  font-size: var(--ds-text-xs, 0.5625rem);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-shadow: none;
+  font-size: 0.46875rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 6px rgba(var(--navbar-led-online-rgb, 57, 255, 20), 0.22);
   white-space: nowrap;
   flex-shrink: 0;
+  line-height: 1;
 }
 
 :host-context(.navbar-brand-row__network) .navbar-network-led-wrap {
-  width: 6px;
-  height: 6px;
-  margin-inline-end: 4px;
+  width: 5px;
+  height: 5px;
+  margin: 0;
 }
 
 :host-context(.navbar-brand-row__network) .navbar-network-led {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
+}
+
+:host-context(.navbar-brand-row__network) .navbar-network-led-wrap.is-online .navbar-network-led {
+  background: var(--navbar-led-online, #39ff14);
+  box-shadow: 0 0 4px rgba(var(--navbar-led-online-rgb, 57, 255, 20), 0.65);
 }
 
 :host-context(.navbar-brand-row__network) .navbar-network-refresh {
@@ -152,30 +173,25 @@
 }
 
 @media (min-width: 251px) and (max-width: 349px) {
-  :host-context(.navbar-metrics__network) {
-    height: auto;
-    max-height: none;
+  :host-context(.navbar-brand-row__network) {
+    height: 0.75rem;
+    max-height: 0.75rem;
   }
 
-  :host-context(.navbar-metrics__network) .navbar-network-metrics {
-    gap: 3px;
+  :host-context(.navbar-brand-row__network) .navbar-network,
+  :host-context(.navbar-brand-row__network) .navbar-network-metrics {
+    height: 0.75rem;
+    max-height: 0.75rem;
   }
 
-  :host-context(.navbar-metrics__network) .navbar-network-led-wrap {
-    width: 5px;
-    height: 5px;
-    margin-inline-end: 2px;
+  :host-context(.navbar-brand-row__network) .navbar-network-latency {
+    font-size: 0.4375rem;
   }
 
-  :host-context(.navbar-metrics__network) .navbar-network-led {
-    width: 5px;
-    height: 5px;
-  }
-
-  :host-context(.navbar-metrics__network) .navbar-network-latency {
-    font-size: 0.525rem;
-    letter-spacing: 0.02em;
-    text-shadow: none;
+  :host-context(.navbar-brand-row__network) .navbar-network-led-wrap,
+  :host-context(.navbar-brand-row__network) .navbar-network-led {
+    width: 4px;
+    height: 4px;
   }
 }
 

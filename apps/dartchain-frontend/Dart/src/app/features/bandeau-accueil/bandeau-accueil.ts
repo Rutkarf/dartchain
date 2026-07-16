@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  effect,
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -16,6 +17,7 @@ import {
   PendingTransaction,
   LiveUpdateMessage,
 } from '../../core/services/blockchain-api.service';
+import { NavbarTickerStateService } from '../../core/services/navbar-ticker-state.service';
 
 @Component({
   selector: 'app-bandeau-accueil',
@@ -29,11 +31,13 @@ export class BandeauAccueilComponent
 {
   private readonly api = inject(BlockchainApiService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly ticker = inject(NavbarTickerStateService);
 
   @ViewChild('track', { read: ElementRef }) trackRef?: ElementRef<HTMLElement>;
   @ViewChild('viewport', { read: ElementRef })
   viewportRef?: ElementRef<HTMLElement>;
 
+  /** Champs historiques — synchronisés avec NavbarTickerStateService. */
   message1 = '';
   lastTransaction = 'Chargement...';
   lastTransactionShort = 'Chargement...';
@@ -53,11 +57,25 @@ export class BandeauAccueilComponent
   private dragStartClientX = 0;
   private dragStartOffsetPx = 0;
 
+  constructor() {
+    effect(() => {
+      const segments = this.ticker.segments();
+      this.message1 = segments.find((s) => s.id === 'network')?.value ?? 'DARTCHAIN';
+      this.lastTransactionShort =
+        segments.find((s) => s.id === 'tx')?.value ?? 'Aucune transaction récente';
+      this.lastTransaction = this.lastTransactionShort;
+      const peers = segments.find((s) => s.id === 'peers')?.value ?? '0';
+      this.userCount = Number.parseInt(peers.split('/')[0], 10) || 0;
+      queueMicrotask(() => this.updateMarqueeCopies());
+    });
+  }
+
   ngOnInit(): void {
     this.autoScrollEnabled = !window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches;
 
+    this.ticker.refresh();
     this.fetchBanner();
     this.listenLiveUpdates();
   }
@@ -174,31 +192,9 @@ export class BandeauAccueilComponent
     track.style.transform = `translate3d(${this.offsetPx}px, 0, 0)`;
   }
 
+  /** Compatibilité — délègue au service centralisé. */
   private fetchBanner(): void {
-    this.api
-      .getBanner()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (data) => {
-          this.message1 = data.message1 ?? 'Bienvenue sur Dart Explorer !';
-          this.lastTransaction =
-            data.lastTransaction ?? 'Aucune transaction récente';
-          this.lastTransactionShort =
-            data.lastTransactionShort ?? this.lastTransaction;
-          this.userCount = data.userCount ?? 0;
-
-          queueMicrotask(() => this.updateMarqueeCopies());
-        },
-        error: (error: unknown) => {
-          console.error('Erreur banner:', error);
-          this.message1 = 'Bienvenue sur Dart Explorer !';
-          this.lastTransaction = 'Erreur de récupération';
-          this.lastTransactionShort = this.lastTransaction;
-          this.userCount = 0;
-
-          queueMicrotask(() => this.updateMarqueeCopies());
-        },
-      });
+    this.ticker.refresh();
   }
 
   private listenLiveUpdates(): void {
@@ -214,10 +210,6 @@ export class BandeauAccueilComponent
 
           if (message.type === 'snapshot') {
             this.applyLatestTransaction(message.data.pendingTransactions);
-
-            if (message.data.stats) {
-              this.userCount = message.data.stats.totalBlocks ?? this.userCount;
-            }
 
             queueMicrotask(() => this.updateMarqueeCopies());
           }

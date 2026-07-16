@@ -10,6 +10,7 @@ import { ShowcaseLaunchComponent } from '../showcase-launch/showcase-launch';
 import { ShowcaseR4v3SummaryComponent } from '../showcase-r4v3/showcase-r4v3-summary';
 import { ShowcaseR4v3Component } from '../showcase-r4v3/showcase-r4v3';
 import { ShowcaseTerminalComponent } from '../showcase-terminal/showcase-terminal';
+import { ShowcaseTerminalSummaryComponent } from '../showcase-terminal/showcase-terminal-summary';
 
 @Component({
   selector: 'app-showcase-window',
@@ -24,6 +25,7 @@ import { ShowcaseTerminalComponent } from '../showcase-terminal/showcase-termina
     ShowcaseLaunchSummaryComponent,
     ShowcaseR4v3Component,
     ShowcaseR4v3SummaryComponent,
+    ShowcaseTerminalSummaryComponent,
   ],
   templateUrl: './showcase-window.html',
   styleUrls: ['./showcase-window.css'],

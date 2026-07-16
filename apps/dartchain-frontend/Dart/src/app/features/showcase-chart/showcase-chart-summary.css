@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+.chart-summary-bar__brand {
+  color: var(--text-primary);
+  background: rgba(var(--tab-accent-rgb), 0.1);
+  border-color: rgba(var(--tab-accent-rgb), 0.18);
+}

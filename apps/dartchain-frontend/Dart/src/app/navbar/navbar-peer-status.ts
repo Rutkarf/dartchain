@@ -3,6 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { BlockchainApiService } from '../core/services/blockchain-api.service';
+import { NavbarHintDirective } from './navbar-hint.directive';
 
 interface PeerStats {
   active: number;
@@ -12,9 +13,9 @@ interface PeerStats {
 @Component({
   selector: 'app-navbar-peer-status',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NavbarHintDirective],
   templateUrl: './navbar-peer-status.html',
-  styleUrl: './navbar-peer-status.css',
+  styleUrls: ['./navbar-peer-status.css', './navbar-hint.css'],
 })
 export class NavbarPeerStatusComponent implements OnInit {
   private readonly api = inject(BlockchainApiService);

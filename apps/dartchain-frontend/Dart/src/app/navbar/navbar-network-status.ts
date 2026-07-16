@@ -3,6 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { BlockchainApiService } from '../core/services/blockchain-api.service';
+import { NavbarHintDirective } from './navbar-hint.directive';
 
 interface HealthCheck {
   ok: boolean;
@@ -12,9 +13,9 @@ interface HealthCheck {
 @Component({
   selector: 'app-navbar-network-status',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NavbarHintDirective],
   templateUrl: './navbar-network-status.html',
-  styleUrl: './navbar-network-status.css',
+  styleUrls: ['./navbar-network-status.css', './navbar-hint.css'],
 })
 export class NavbarNetworkStatusComponent implements OnInit {
   private readonly api = inject(BlockchainApiService);

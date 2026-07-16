@@ -39,3 +39,6 @@ apps/dartchain-backend/data/*.json
 coverage/
 reports/
 .tools/
+
+# Reliquat archive GitHub / montages Docker accidentels
+DartChainz-app-main/

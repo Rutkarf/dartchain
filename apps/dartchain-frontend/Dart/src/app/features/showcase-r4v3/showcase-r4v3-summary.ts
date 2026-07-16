@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
 import { DockWalletStateService } from '../../core/services/dock-wallet-state.service';
 import { ShowcaseR4v3StateService } from '../../core/services/showcase-r4v3-state.service';
 
@@ -25,6 +26,9 @@ export class ShowcaseR4v3SummaryComponent implements OnInit {
   private readonly walletState = inject(DockWalletStateService);
 
   @Output() readonly refreshClick = new EventEmitter<void>();
+
+  @HostBinding(`class.${COLLAPSED_SUMMARY_BAR_CLASS}`)
+  readonly collapsedSummaryBar = true;
 
   @HostBinding('class.r4v3-summary-bar__content')
   readonly contentClass = true;

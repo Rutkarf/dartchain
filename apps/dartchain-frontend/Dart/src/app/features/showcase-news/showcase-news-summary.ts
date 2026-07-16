@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
 import { ShowcaseNewsStateService } from '../../core/services/showcase-news-state.service';
 
 @Component({
@@ -23,6 +24,9 @@ export class ShowcaseNewsSummaryComponent {
   private readonly newsState = inject(ShowcaseNewsStateService);
 
   @Output() readonly refreshClick = new EventEmitter<void>();
+
+  @HostBinding(`class.${COLLAPSED_SUMMARY_BAR_CLASS}`)
+  readonly collapsedSummaryBar = true;
 
   @HostBinding('class.showcase-news-bar__content')
   readonly contentClass = true;

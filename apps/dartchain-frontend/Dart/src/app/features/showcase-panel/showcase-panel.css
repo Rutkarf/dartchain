@@ -4,7 +4,11 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+}
+
+:host(.is-collapsed) {
+  overflow: visible;
+  height: 100%;
 }
 
 .showcase-panel {
@@ -14,6 +18,11 @@
   height: 100%;
   min-height: 0;
   overflow: hidden;
+}
+
+.showcase-panel.is-collapsed {
+  overflow: visible;
+  height: 100%;
 }
 
 .showcase-panel__handle {
@@ -58,4 +67,8 @@
 
 .showcase-panel.is-collapsed .showcase-panel__body--smart-collapsed {
   display: flex;
+  flex: 0 0 100%;
+  overflow: visible;
+  min-height: 0;
+  height: 100%;
 }

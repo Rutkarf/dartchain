@@ -257,17 +257,34 @@ export class ExchangePanelComponent {
   protected readonly swapButtonLabel = computed(() => {
     switch (this.swapAction()) {
       case 'create-wallet':
-        return '+ Wallet';
+        return 'Créer un wallet';
       case 'login-required':
-        return 'Login →';
+        return 'Se connecter';
       case 'enter-amount':
-        return 'GO →';
+        return 'Convertir →';
       case 'insufficient':
-        return this.fromBalance() <= 0 ? '+ R4V3' : 'Solde ↓';
+        return this.fromBalance() <= 0 ? 'Obtenir des R4V3' : 'Solde insuffisant';
       case 'swapping':
-        return '···';
+        return 'Conversion…';
       default:
-        return 'SWAP →';
+        return 'Convertir →';
+    }
+  });
+
+  protected readonly swapCtaHint = computed(() => {
+    switch (this.swapAction()) {
+      case 'create-wallet':
+        return 'Wallet requis pour convertir vos tokens en actifs LaunchLab.';
+      case 'login-required':
+        return 'Connectez-vous pour valider la conversion.';
+      case 'enter-amount':
+        return 'Saisissez un montant pour voir ce que vous recevrez.';
+      case 'insufficient':
+        return this.fromBalance() <= 0
+          ? 'Obtenez des R4V3 sur le faucet testnet.'
+          : 'Réduisez le montant ou rechargez votre solde.';
+      default:
+        return '';
     }
   });
 

@@ -15,11 +15,13 @@
         *ngFor="let _ of marqueeCopies; let i = index"
         [attr.aria-hidden]="i > 0 ? 'true' : null"
       >
-        <span>{{ message1 }}</span>
-        <span>•</span>
-        <span>Dernière transaction : {{ lastTransactionShort }}</span>
-        <span>•</span>
-        <span>Peers connectés : {{ userCount }}</span>
+        <ng-container *ngFor="let segment of ticker.segments(); let last = last">
+          <span [class]="'bandeau-accueil__chip bandeau-accueil__chip--' + segment.id">
+            <span class="bandeau-accueil__label">{{ segment.label }}</span>
+            <span class="bandeau-accueil__value">{{ segment.value }}</span>
+          </span>
+          <span *ngIf="!last" class="bandeau-accueil__sep" aria-hidden="true"></span>
+        </ng-container>
       </div>
     </div>
   </div>

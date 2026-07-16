@@ -1,4 +1,5 @@
 <div class="showcase-view showcase-view--chart" [class.showcase-view--hub]="hubLayout()" [class.showcase-view--compact]="compactLayout()">
+  @if (!(hubLayout() && chartCollapsed())) {
   <header class="showcase-chart__head" [class.showcase-chart__head--hub]="hubLayout()" [class.showcase-chart__head--compact]="compactLayout()">
     @if (compactLayout()) {
       <div class="showcase-chart__compact-bar" aria-label="Graphique R4V3 compact">
@@ -160,6 +161,7 @@
       <p class="showcase-chart__alert-banner" role="status">{{ alertMsg }}</p>
     }
   </header>
+  }
 
   @if ((!hubLayout() && !compactLayout()) || (hubLayout() && !chartCollapsed()) || compactLayout()) {
   <div class="showcase-chart__main" [class.showcase-chart__main--compact]="compactLayout()">

@@ -846,20 +846,29 @@
 }
 
 :host(.rate-panel--hub-collapsed) .rate-panel__shell {
-  height: auto;
+  height: 100%;
   min-height: 0;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  overflow: visible;
 }
 
 :host(.rate-panel--hub-collapsed) .rate-panel-graph-zone--hub {
-  flex: 0 0 auto;
-  height: auto;
+  flex: 1 1 auto;
+  height: 100%;
   min-height: 0;
+  overflow: visible;
 }
 
 :host(.rate-panel--hub-collapsed) .rate-panel-chart {
-  flex: 0 0 auto;
-  height: auto;
+  flex: 1 1 auto;
+  height: 100%;
   min-height: 0;
-  padding: 2px 3px;
+  overflow: visible;
+  padding: 0;
+}
+
+:host(.rate-panel--hub-collapsed) .rate-panel-chart--collapsed {
+  position: relative;
+  display: flex;
+  align-items: center;
 }

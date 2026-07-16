@@ -13,7 +13,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="default | test">
+    <springProfile name="default | test | postgres">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>

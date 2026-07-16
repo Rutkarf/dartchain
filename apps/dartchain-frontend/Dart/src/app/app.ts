@@ -53,6 +53,7 @@ import { FocusTrapDirective } from './core/directives/focus-trap.directive';
 import { AuthService } from './core/services/auth.service';
 import { ShowcaseNewsStateService } from './core/services/showcase-news-state.service';
 import { AdminPanelComponent } from './features/admin-panel/admin-panel';
+import { DockBottomSummaryComponent } from './features/dock-summary/dock-bottom-summary';
 
 @Component({
   selector: 'app-root',
@@ -81,6 +82,7 @@ import { AdminPanelComponent } from './features/admin-panel/admin-panel';
     ThreeFloor,
     FocusTrapDirective,
     AdminPanelComponent,
+    DockBottomSummaryComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -157,6 +159,12 @@ export class AppComponent {
 
   private handleDockOpenPanel = (event: Event): void => {
     const panel = (event as CustomEvent<{ panel?: string }>).detail?.panel;
+    if (!panel) {
+      return;
+    }
+
+    this.dockCollapsed.set(false);
+
     if (
       panel === 'pending' ||
       panel === 'composer' ||
@@ -165,6 +173,11 @@ export class AppComponent {
       panel === 'peers'
     ) {
       this.openBlockchainPanel(panel as OverlayPanel);
+      return;
+    }
+
+    if (panel === 'faucet' || panel === 'market' || panel === 'quests') {
+      this.onBottomTabChange(panel);
     }
   };
 

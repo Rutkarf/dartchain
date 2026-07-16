@@ -19,13 +19,18 @@
   --nv-margin-top: var(--ds-navbar-top-inset, max(clamp(6px, 1.6vh, 12px), env(safe-area-inset-top, 0px)));
   --nv-wrap-pad-x: var(--ds-shell-inline, 12px);
   --nv-pad-x: var(--ds-space-3, 12px);
-  --nv-pad-top: var(--ds-navbar-pad-top, clamp(6px, 1.4vh, 9px));
-  --nv-pad-y: var(--ds-navbar-pad-bottom, clamp(5px, 1.2vh, 7px));
-  --nv-inner-gap: var(--ds-navbar-inner-gap, clamp(3px, 0.8vh, 5px));
+  --nv-pad-top: var(--ds-navbar-pad-top, clamp(3px, 0.8vh, 5px));
+  --nv-pad-y: var(--ds-navbar-pad-bottom, clamp(2px, 0.6vh, 4px));
+  --nv-inner-gap: 0px;
+  --nv-ticker-row-h: 0.8125rem;
+  --nv-action-row-h: var(--nv-ticker-row-h);
+  --nv-action-btn: 26px;
+  --nv-shell-min-h: calc(
+    var(--nv-logo-h) + var(--nv-ticker-row-h) + var(--nv-pad-top) + var(--nv-pad-y)
+  );
   --nv-logo: 28px;
   --nv-logo-h: 24px;
   --nv-logo-shift-y: -8px;
-  --nv-shell-min-h: var(--ds-zone-navbar, 56px);
   --nv-desktop-min: 1100px;
 }
 
@@ -45,7 +50,7 @@
   min-height: var(--nv-shell-min-h);
   padding: 0;
   border-radius: var(--nv-shell-radius);
-  overflow: hidden;
+  overflow: visible;
   background: transparent;
   box-shadow: none;
 }
@@ -59,24 +64,25 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content max-content;
-  grid-template-areas: 'brand node auth';
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(0, max-content);
+  grid-template-areas: 'stack node auth';
+  align-items: start;
   column-gap: var(--ds-space-2, 8px);
   row-gap: 0;
   width: 100%;
   min-height: var(--nv-shell-min-h);
+  height: auto;
   padding: var(--nv-pad-top) var(--nv-pad-x) var(--nv-pad-y);
   box-sizing: border-box;
   border-radius: var(--nv-shell-radius);
-  overflow: hidden;
+  overflow: visible;
   /* Fond : .ds-surface.ds-surface--strip (ds-surface.css) */
 }
 
 .navbar-top.ds-surface.ds-surface--strip {
   border: none;
   border-radius: var(--nv-shell-radius);
-  overflow: hidden;
+  overflow: visible;
   box-shadow: var(--ds-surface-shadow-strip);
 }
 
@@ -89,8 +95,11 @@
   gap: var(--ds-space-1, 4px);
   flex: 0 0 auto;
   flex-shrink: 0;
-  padding-block-start: 1px;
+  padding: 0;
   align-self: center;
+  height: var(--nv-action-row-h);
+  min-height: var(--nv-action-row-h);
+  max-height: var(--nv-action-row-h);
 }
 
 .navbar-auth-user {
@@ -139,10 +148,10 @@
 }
 
 .navbar-auth-btn {
-  width: var(--ds-icon-btn, 32px);
-  height: var(--ds-icon-btn, 32px);
-  min-width: var(--ds-icon-btn, 32px);
-  min-height: var(--ds-icon-btn, 32px);
+  width: var(--nv-action-btn, 26px);
+  height: var(--nv-action-btn, 26px);
+  min-width: var(--nv-action-btn, 26px);
+  min-height: var(--nv-action-btn, 26px);
   padding: 0;
   display: inline-grid;
   place-items: center;
@@ -151,15 +160,43 @@
   background: rgba(0, 0, 0, 0.25);
   color: var(--ds-text-primary, #e8ecf0);
   cursor: pointer;
+  flex: 0 0 auto;
+  flex-shrink: 0;
   transition:
     border-color 160ms ease,
     background 160ms ease,
-    color 160ms ease;
+    color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .navbar-auth-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
+}
+
+.navbar-auth-btn--labeled {
+  width: auto;
+  min-width: var(--ds-icon-btn, 32px);
+  padding: 0 10px 0 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navbar-auth-btn__label {
+  font-family: var(--ds-font-ui, var(--font-body));
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (min-width: 1100px) {
+  .navbar-auth-btn--labeled {
+    width: auto;
+  }
 }
 
 .navbar-auth-btn svg :is(path, circle, polyline, line) {
@@ -174,6 +211,7 @@
   border-color: var(--ds-border-accent, rgba(var(--nv-cyan-rgb), 0.28));
   background: rgba(var(--nv-cyan-rgb), 0.08);
   color: var(--nv-cyan);
+  box-shadow: 0 2px 8px rgba(var(--nv-cyan-rgb), 0.1);
 }
 
 .navbar-auth-btn:focus-visible {
@@ -262,17 +300,61 @@
   }
 }
 
-/* —— Colonne marque + bandeau —— */
+/* —— Ligne marque (logo + token + réseau) —— */
+/* —— Stack gauche : logo + ticker collés —— */
+.navbar-brand-stack {
+  grid-area: stack;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  max-width: 100%;
+  overflow: visible;
+  align-self: start;
+}
+
+.navbar-brand-head {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  overflow: visible;
+  padding: 0;
+  z-index: 3;
+}
+
+.navbar-ticker {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  height: var(--nv-ticker-row-h);
+  min-height: var(--nv-ticker-row-h);
+  max-height: var(--nv-ticker-row-h);
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
 .navbar-brand-column {
   grid-area: brand;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   gap: var(--nv-inner-gap);
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   padding-inline-end: 2px;
-  padding-block-start: 1px;
+  padding-block: 0;
+}
+
+.navbar-subtitle {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
 }
 
 .navbar-brand-row {
@@ -280,25 +362,36 @@
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  gap: clamp(5px, 1.4vw, 8px);
+  gap: clamp(4px, 1.2vw, 7px);
   min-width: 0;
   max-width: 100%;
-  min-height: var(--nv-logo-h);
-  overflow: hidden;
-  padding-block: 1px;
+  height: var(--nv-logo-h);
+  min-height: 0;
+  max-height: var(--nv-logo-h);
+  overflow: visible;
+  padding: 0;
+  position: relative;
+  z-index: 2;
 }
 
 .navbar-brand-row .navbar-brand-select {
   flex: 0 1 auto;
   min-width: 0;
   max-width: 3.25rem;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.navbar-brand-row .navbar-brand-select.is-token-menu-open,
+.navbar-brand-row .navbar-brand-select[data-token-menu-open='true'] {
+  z-index: 320;
+  overflow: visible;
 }
 
 .navbar-brand-row .navbar-brand-row__network {
   flex: 0 0 auto;
   min-width: 0;
-  margin-inline-end: 2px;
+  margin-inline-end: 0;
+  align-self: center;
 }
 
 .logo-shell {
@@ -343,16 +436,11 @@
   filter: drop-shadow(0 0 6px rgba(var(--nv-cyan-rgb), 0.28));
 }
 
-.navbar-subtitle {
-  min-width: 0;
-  padding-inline-start: 0;
-  padding-block-start: 1px;
-  overflow: hidden;
-}
-
+.navbar-ticker ::ng-deep .bandeau-accueil,
 .navbar-subtitle ::ng-deep .bandeau-accueil {
-  min-height: 0;
-  height: auto;
+  min-height: var(--nv-ticker-row-h);
+  max-height: var(--nv-ticker-row-h);
+  height: var(--nv-ticker-row-h);
   padding: 0;
   margin: 0;
   background: transparent;
@@ -360,26 +448,14 @@
   cursor: grab;
 }
 
+.navbar-ticker ::ng-deep .bandeau-accueil__viewport,
 .navbar-subtitle ::ng-deep .bandeau-accueil__viewport {
   min-height: 0;
 }
 
-.navbar-subtitle ::ng-deep .bandeau-accueil__content span {
+.navbar-ticker ::ng-deep .bandeau-accueil__chip,
+.navbar-subtitle ::ng-deep .bandeau-accueil__chip {
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--ds-text-xs, 0.5625rem);
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  line-height: 1.3;
-  color: var(--ds-text-muted, #5c6370);
-}
-
-.navbar-subtitle ::ng-deep .bandeau-accueil__content span:nth-child(odd) {
-  color: var(--ds-text-secondary, #8b929e);
-}
-
-.navbar-subtitle ::ng-deep .bandeau-accueil__content span:nth-child(even) {
-  color: var(--ds-border-default, rgba(255, 255, 255, 0.12));
-  opacity: 1;
 }
 
 /* —— Carte NODE compacte —— */
@@ -539,7 +615,7 @@ button.navbar-node-panel__box:focus-visible {
 
   .navbar-top {
     grid-template-columns: minmax(0, 1fr) auto minmax(160px, 1fr) auto;
-    grid-template-areas: 'brand node aux auth';
+    grid-template-areas: 'stack node aux auth';
     column-gap: 12px;
   }
 
@@ -547,6 +623,7 @@ button.navbar-node-panel__box:focus-visible {
     grid-area: aux;
     display: inline-flex;
     align-items: center;
+    align-self: center;
     justify-content: flex-end;
     gap: 8px;
     min-width: 0;

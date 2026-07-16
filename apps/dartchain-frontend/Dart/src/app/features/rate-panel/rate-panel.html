@@ -80,10 +80,14 @@
     </header>
     }
 
-  <div class="rate-panel-chart" aria-label="Graphique marché">
+  <div class="rate-panel-chart" [class.rate-panel-chart--collapsed]="hubGraphOnly() && chartCollapsed()" aria-label="Graphique marché">
+    @if (hubGraphOnly() && chartCollapsed()) {
+      <app-showcase-chart-summary />
+    }
     <app-showcase-chart
       class="showcase-chart--rate-panel"
       [class.showcase-chart--hub]="hubGraphOnly()"
+      [class.rate-panel-chart__engine--hidden]="hubGraphOnly() && chartCollapsed()"
       [hubLayout]="hubGraphOnly()"
       [chartCollapsed]="chartCollapsed()"
     />

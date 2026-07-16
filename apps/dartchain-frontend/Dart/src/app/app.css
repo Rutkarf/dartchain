@@ -44,8 +44,8 @@
   --bandeau-bottom-gap: 0;
   --market-after-ticker-gap: var(--stack-gap-navbar-market);
 
-  /* Hauteur bande marché — swap ultra-compact */
-  --market-height: clamp(118px, 15.5vh, 130px);
+  /* Hauteur bande marché — swap tunnel conversion compact */
+  --market-height: clamp(122px, 16vh, 138px);
   /* Tokens swap (miroir exchange-panel) pour l’écart sous MONTANT */
   --swap-row-h: 14px;
   --swap-mid-h: 11px;
@@ -70,11 +70,16 @@
   --hub-market-showcase-gap: calc(var(--band-external-gap) * 2);
   --showcase-tab-fusion-overlap: 2px;
   --showcase-smart-bar-h: clamp(28px, 7vw, 34px);
+  --chart-smart-bar-h: clamp(28px, 7vw, 34px);
+  --chart-stack-header-h: clamp(14px, 3.8vw, 18px);
+  --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
+  --market-chart-collapsed-h: calc(
+    var(--chart-stack-header-h) + var(--chart-smart-bar-h)
+  );
   --showcase-panel-handle-h: clamp(12px, 3.2vw, 16px);
-  --showcase-collapsed-band-h: var(--showcase-panel-handle-h);
+  --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
   --hub-showcase-block-height-collapsed: calc(
-    var(--showcase-hub-tab-h) + var(--showcase-collapsed-band-h) -
-      var(--showcase-tab-fusion-overlap)
+    var(--showcase-hub-tab-h) + var(--showcase-smart-bar-h)
   );
   /* Combler uniquement le row-gap hub, sans empiéter sur la barre d’onglets showcase */
   --hub-rate-to-toolbar-gap: clamp(3px, 0.8vw, 6px);
@@ -153,7 +158,9 @@
   --bottom-stack-height-expanded: calc(
     var(--showcase-hub-tab-h) + var(--bottom-stack-panel-height)
   );
-  --bottom-stack-height-collapsed: var(--showcase-hub-tab-h);
+  --bottom-stack-height-collapsed: calc(
+    var(--showcase-hub-tab-h) + var(--dock-smart-bar-h)
+  );
   --bottom-stack-active-height: var(--bottom-stack-height-expanded);
 }
 
@@ -314,6 +321,7 @@ app-three-floor {
 
 .app-bottom-stack.is-dock-collapsed {
   --bottom-stack-active-height: var(--bottom-stack-height-collapsed);
+  margin-top: 0;
 }
 
 .bottom-stack__shell,
@@ -342,8 +350,8 @@ app-three-floor {
   box-shadow: var(--ds-surface-shadow);
 }
 
-.app-bottom-stack.is-dock-collapsed .app-bottom-stack__content.is-collapsed,
-.app-bottom-stack.is-dock-collapsed .app-bottom-stack__band.is-collapsed {
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__content.is-collapsed:not(.is-smart-collapsed),
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__band.is-collapsed:not(.is-smart-collapsed) {
   flex: 0 0 0;
   max-height: 0;
   min-height: 0;
@@ -355,19 +363,42 @@ app-three-floor {
   margin: 0;
 }
 
-.app-bottom-stack.is-dock-collapsed .showcase-header-tabs.is-collapsed {
-  flex: 0 0 0;
-  width: 0;
-  min-width: 0;
-  max-width: 0;
-  height: 0;
-  min-height: 0;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  pointer-events: none;
+.app-bottom-stack.is-dock-collapsed .showcase-block__shell {
+  overflow: visible;
+}
+
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__content.is-smart-collapsed,
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__band.is-smart-collapsed {
+  flex: 0 0 var(--dock-smart-bar-h);
+  min-height: var(--dock-smart-bar-h);
+  max-height: var(--dock-smart-bar-h);
+  height: var(--dock-smart-bar-h);
+  opacity: 1;
+  pointer-events: auto;
+  overflow: visible;
   padding: 0;
   margin: 0;
+}
+
+.app-bottom-stack__summary {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__summary .collapsed-summary-bar,
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__summary app-dock-bottom-summary {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
 }
 
 .app-bottom-stack__content,
@@ -499,6 +530,69 @@ app-three-floor {
   align-self: stretch;
   overflow: visible;
   transition: grid-template-rows 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app-hub.is-showcase-collapsed {
+  grid-template-rows: var(--market-height) var(--hub-showcase-block-height-collapsed);
+}
+
+.app-hub.is-chart-collapsed {
+  --market-chart-height: var(--market-chart-collapsed-h);
+}
+
+.app-hub.is-showcase-collapsed.is-chart-collapsed:not(.is-showcase-disabled) {
+  grid-template-rows: var(--market-height) var(--hub-showcase-block-height-collapsed);
+}
+
+.app-market-stack--rate.is-chart-collapsed {
+  --market-chart-height: var(--market-chart-collapsed-h);
+  min-height: var(--market-chart-collapsed-h);
+  height: var(--market-chart-collapsed-h);
+  max-height: var(--market-chart-collapsed-h);
+  align-self: start;
+}
+
+.app-market-stack--rate.is-chart-collapsed .app-market-card--rate {
+  flex: 0 0 var(--chart-smart-bar-h);
+  min-height: var(--chart-smart-bar-h);
+  height: var(--chart-smart-bar-h);
+  max-height: var(--chart-smart-bar-h);
+  overflow: visible;
+}
+
+.app-market-stack--rate.is-chart-collapsed .rate-panel-chart--collapsed {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+.app-market-stack--rate.is-chart-collapsed .rate-panel-chart--collapsed .collapsed-summary-bar,
+.app-market-stack--rate.is-chart-collapsed .rate-panel-chart--collapsed app-showcase-chart-summary {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+.app-market-stack--rate.is-chart-collapsed .rate-panel-chart__engine--hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  pointer-events: none;
 }
 
 .app-hub.is-showcase-disabled {
@@ -949,27 +1043,70 @@ app-three-floor {
   }
 }
 
-.app-hub-showcase-block.is-showcase-collapsed:has(.showcase-panel.is-news),
-.app-hub-showcase-block.is-showcase-collapsed:has(.showcase-panel.is-chat),
-.app-hub-showcase-block.is-showcase-collapsed:has(.showcase-panel.is-launch) {
+.app-hub-showcase-block.is-showcase-collapsed {
   --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
+  min-height: var(--hub-showcase-block-height-collapsed);
+  max-height: var(--hub-showcase-block-height-collapsed);
+  height: var(--hub-showcase-block-height-collapsed);
+  transition:
+    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.app-hub-showcase-block .app-showcase-band.is-collapsed:has(.showcase-news-bar),
-.app-hub-showcase-block .app-showcase-band.is-collapsed:has(.showcase-chat-bar),
-.app-hub-showcase-block .app-showcase-band.is-collapsed:has(.launch-summary-bar) {
+.app-hub-showcase-block.is-showcase-collapsed .showcase-block__shell {
+  overflow: visible;
+}
+
+.app-hub-showcase-block.is-showcase-collapsed .app-showcase-band.is-collapsed {
+  flex: 0 0 var(--showcase-smart-bar-h);
+  min-height: var(--showcase-smart-bar-h);
+  height: var(--showcase-smart-bar-h);
+  max-height: var(--showcase-smart-bar-h);
+  overflow: visible;
+}
+
+.app-hub-showcase-block.is-showcase-collapsed .showcase-tab-panel {
+  padding: 0;
+  overflow: visible;
+  border-radius: 0;
+  min-height: var(--showcase-smart-bar-h);
+  height: var(--showcase-smart-bar-h);
+  max-height: var(--showcase-smart-bar-h);
+  flex: 0 0 var(--showcase-smart-bar-h);
+}
+
+.app-hub-showcase-block.is-showcase-collapsed .showcase-tab-panel > * {
+  flex: 0 0 100%;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+}
+
+.app-hub-showcase-block.is-showcase-collapsed app-showcase-panel,
+.app-hub-showcase-block.is-showcase-collapsed app-showcase-panel.showcase-panel,
+.app-hub-showcase-block.is-showcase-collapsed app-showcase-window,
+.app-hub-showcase-block.is-showcase-collapsed .showcase-window,
+.app-hub-showcase-block.is-showcase-collapsed .showcase-window__body {
+  overflow: visible;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+}
+
+.app-hub.is-showcase-collapsed + .app-bottom-stack.is-dock-collapsed {
+  margin-top: 0;
+}
+
+.app-hub.is-showcase-collapsed {
+  margin-block-end: 0;
+}
+
+.app-hub-showcase-block .app-showcase-band.is-collapsed:has(.collapsed-summary-bar) {
   overflow: visible;
   min-height: var(--showcase-smart-bar-h);
   height: var(--showcase-smart-bar-h);
   max-height: var(--showcase-smart-bar-h);
-}
-
-.app-hub-showcase-block.is-showcase-collapsed {
-  min-height: var(--hub-showcase-block-height-collapsed);
-  max-height: var(--hub-showcase-block-height-collapsed);
-  transition:
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-hub-showcase-block .app-showcase-band {
@@ -1409,9 +1546,7 @@ app-three-floor {
   overflow: hidden;
 }
 
-.app-showcase-band.is-collapsed:has(.showcase-chat-bar) app-showcase-panel,
-.app-showcase-band.is-collapsed:has(.showcase-news-bar) app-showcase-panel,
-.app-showcase-band.is-collapsed:has(.launch-summary-bar) app-showcase-panel {
+.app-showcase-band.is-collapsed:has(.collapsed-summary-bar) app-showcase-panel {
   height: 100%;
   max-height: 100%;
   overflow: visible;
@@ -2104,9 +2239,10 @@ app-block-detail-drawer {
     --market-exchange-height-estimate: 58px;
     --market-chart-height-expanded: clamp(96px, 18vh, 112px);
     --chart-stack-header-h: clamp(14px, 3.8vw, 18px);
-    --market-chart-card-collapsed-h: clamp(12px, 3.2vw, 16px);
+    --chart-smart-bar-h: clamp(28px, 7vw, 34px);
+    --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
     --market-chart-collapsed-h: calc(
-      var(--chart-stack-header-h) + var(--market-chart-card-collapsed-h)
+      var(--chart-stack-header-h) + var(--chart-smart-bar-h)
     );
     --market-chart-height: var(--market-chart-height-expanded);
     --market-band-height: calc(
@@ -2162,6 +2298,14 @@ app-block-detail-drawer {
 
   .app-navbar-zone {
     margin-bottom: var(--navbar-hub-gap);
+  }
+
+  .app-hub.is-showcase-collapsed {
+    grid-template-rows:
+      auto
+      var(--market-chart-height)
+      var(--hub-showcase-block-height-collapsed);
+    margin-block-end: 0;
   }
 
   .app-hub {
@@ -2221,6 +2365,36 @@ app-block-detail-drawer {
     flex: 1 1 0;
     min-height: 0;
     overflow: hidden;
+  }
+
+  .app-hub.is-chart-collapsed {
+    --market-chart-height: var(--market-chart-collapsed-h);
+    --market-band-height: calc(
+      var(--market-exchange-height-estimate) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
+    );
+    --market-height: var(--market-band-height);
+  }
+
+  .app-hub.is-chart-collapsed:not(.is-showcase-disabled) {
+    grid-template-rows:
+      auto
+      var(--market-chart-height)
+      var(--hub-showcase-block-height);
+  }
+
+  .app-hub.is-showcase-collapsed.is-chart-collapsed:not(.is-showcase-disabled) {
+    grid-template-rows:
+      auto
+      var(--market-chart-height)
+      var(--hub-showcase-block-height-collapsed);
+  }
+
+  .app-hub:has(.app-market-stack--rate.is-chart-collapsed) {
+    --market-chart-height: var(--market-chart-collapsed-h);
+    --market-band-height: calc(
+      var(--market-exchange-height-estimate) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
+    );
+    --market-height: var(--market-band-height);
   }
 
   .app-market-stack--rate.is-chart-collapsed .app-market-card--rate {

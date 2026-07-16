@@ -40,6 +40,7 @@ import {
   ChartTrendSegment,
 } from '../showcase-chart/chart-display.util';
 import { ShowcaseChartComponent } from '../showcase-chart/showcase-chart';
+import { ShowcaseChartSummaryComponent } from '../showcase-chart/showcase-chart-summary';
 
 export interface RatePanelView {
   featured: RatePanelData;
@@ -54,7 +55,7 @@ export interface RatePanelView {
     '[class.rate-panel--hub-graph]': 'hubGraphOnly()',
     '[class.rate-panel--hub-collapsed]': 'hubGraphOnly() && chartCollapsed()',
   },
-  imports: [NgClass, AsyncPipe, NgTemplateOutlet, ShowcaseChartComponent],
+  imports: [NgClass, AsyncPipe, NgTemplateOutlet, ShowcaseChartComponent, ShowcaseChartSummaryComponent],
   templateUrl: './rate-panel.html',
   styleUrls: ['./rate-panel.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
