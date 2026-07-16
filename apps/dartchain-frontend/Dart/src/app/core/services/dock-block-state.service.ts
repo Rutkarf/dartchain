@@ -9,12 +9,18 @@ export type DockBlockPhase = 'error' | 'loading' | 'ready';
 
 @Injectable({ providedIn: 'root' })
 export class DockBlockStateService {
+  private static readonly MIN_REFRESH_GAP_MS = 3_000;
+  private static readonly RATE_LIMIT_BACKOFF_MS = 60_000;
+
   private readonly api = inject(BlockchainApiService);
 
   readonly loading = signal(false);
   readonly error = signal(false);
   readonly latestBlock = signal<Block | null>(null);
   readonly lastUpdatedAt = signal<number | null>(null);
+
+  private lastFetchMs = 0;
+  private rateLimitedUntil = 0;
 
   readonly phase = computed((): DockBlockPhase => {
     if (this.error()) {
@@ -65,8 +71,18 @@ export class DockBlockStateService {
     formatDockRelativeTime(this.lastUpdatedAt())
   );
 
-  async load(): Promise<void> {
+  async load(force = false): Promise<void> {
     if (this.loading()) {
+      return;
+    }
+
+    if (this.isRateLimited()) {
+      this.error.set(true);
+      return;
+    }
+
+    const now = Date.now();
+    if (!force && now - this.lastFetchMs < DockBlockStateService.MIN_REFRESH_GAP_MS) {
       return;
     }
 
@@ -79,15 +95,31 @@ export class DockBlockStateService {
       const sorted = [...blocks].sort((a, b) => (b.index ?? 0) - (a.index ?? 0));
       this.latestBlock.set(sorted[0] ?? null);
       this.lastUpdatedAt.set(Date.now());
-    } catch {
-      this.latestBlock.set(null);
-      this.error.set(true);
+      this.lastFetchMs = Date.now();
+    } catch (error) {
+      this.handleRateLimit(error);
+      if (!this.isRateLimited()) {
+        this.latestBlock.set(null);
+        this.error.set(true);
+      }
     } finally {
       this.loading.set(false);
     }
   }
 
-  refresh(): void {
-    void this.load();
+  refresh(force = false): void {
+    void this.load(force);
+  }
+
+  private isRateLimited(): boolean {
+    return Date.now() < this.rateLimitedUntil;
+  }
+
+  private handleRateLimit(error: unknown): void {
+    const status = (error as { status?: number })?.status;
+    if (status === 429) {
+      this.rateLimitedUntil = Date.now() + DockBlockStateService.RATE_LIMIT_BACKOFF_MS;
+      this.error.set(true);
+    }
   }
 }

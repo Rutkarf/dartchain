@@ -12,6 +12,9 @@ export type DockChainPhase = 'error' | 'loading' | 'empty' | 'synced';
 
 @Injectable({ providedIn: 'root' })
 export class DockChainStateService {
+  private static readonly MIN_REFRESH_GAP_MS = 3_000;
+  private static readonly RATE_LIMIT_BACKOFF_MS = 60_000;
+
   private readonly api = inject(BlockchainApiService);
 
   readonly loading = signal(false);
@@ -19,6 +22,9 @@ export class DockChainStateService {
   readonly blocks = signal<Block[]>([]);
   readonly stats = signal<BlockchainStats | null>(null);
   readonly lastUpdatedAt = signal<number | null>(null);
+
+  private lastFetchMs = 0;
+  private rateLimitedUntil = 0;
 
   readonly latestBlock = computed(() => this.blocks()[0] ?? null);
   readonly blockCount = computed(() => this.blocks().length);
@@ -72,8 +78,18 @@ export class DockChainStateService {
     formatDockRelativeTime(this.lastUpdatedAt())
   );
 
-  async load(): Promise<void> {
+  async load(force = false): Promise<void> {
     if (this.loading()) {
+      return;
+    }
+
+    if (this.isRateLimited()) {
+      this.error.set(true);
+      return;
+    }
+
+    const now = Date.now();
+    if (!force && now - this.lastFetchMs < DockChainStateService.MIN_REFRESH_GAP_MS) {
       return;
     }
 
@@ -92,16 +108,32 @@ export class DockChainStateService {
       );
       this.stats.set(statsRes);
       this.lastUpdatedAt.set(Date.now());
-    } catch {
-      this.blocks.set([]);
-      this.stats.set(null);
-      this.error.set(true);
+      this.lastFetchMs = Date.now();
+    } catch (error) {
+      this.handleRateLimit(error);
+      if (!this.isRateLimited()) {
+        this.blocks.set([]);
+        this.stats.set(null);
+        this.error.set(true);
+      }
     } finally {
       this.loading.set(false);
     }
   }
 
-  refresh(): void {
-    void this.load();
+  refresh(force = false): void {
+    void this.load(force);
+  }
+
+  private isRateLimited(): boolean {
+    return Date.now() < this.rateLimitedUntil;
+  }
+
+  private handleRateLimit(error: unknown): void {
+    const status = (error as { status?: number })?.status;
+    if (status === 429) {
+      this.rateLimitedUntil = Date.now() + DockChainStateService.RATE_LIMIT_BACKOFF_MS;
+      this.error.set(true);
+    }
   }
 }

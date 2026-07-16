@@ -57,7 +57,7 @@ export class DockBlockSummaryComponent implements OnInit, OnDestroy {
   }
 
   private onGlobalRefresh = (): void => {
-    this.state.refresh();
+    this.state.refresh(true);
   };
 
   statusClass(phase: DockBlockPhase): string {
@@ -66,7 +66,7 @@ export class DockBlockSummaryComponent implements OnInit, OnDestroy {
 
   onRefresh(event: Event): void {
     event.stopPropagation();
-    this.state.refresh();
+    this.state.refresh(true);
   }
 
   onCompose(event: Event): void {

@@ -86,8 +86,8 @@ export class DockTransactionsSummaryComponent implements OnInit, OnDestroy {
   }
 
   private onGlobalRefresh = (): void => {
-    this.pendingState.refresh();
-    this.blockState.refresh();
+    this.pendingState.refresh(true);
+    this.blockState.refresh(true);
   };
 
   statusClass(): string {
@@ -105,8 +105,8 @@ export class DockTransactionsSummaryComponent implements OnInit, OnDestroy {
 
   onRefresh(event: Event): void {
     event.stopPropagation();
-    this.pendingState.refresh();
-    this.blockState.refresh();
+    this.pendingState.refresh(true);
+    this.blockState.refresh(true);
   }
 
   onOpen(event: Event): void {

@@ -11,6 +11,9 @@ export type DockPendingPhase = 'error' | 'loading' | 'empty' | 'ready' | 'busy';
 
 @Injectable({ providedIn: 'root' })
 export class DockPendingStateService {
+  private static readonly MIN_REFRESH_GAP_MS = 3_000;
+  private static readonly RATE_LIMIT_BACKOFF_MS = 60_000;
+
   private readonly api = inject(BlockchainApiService);
 
   readonly loading = signal(false);
@@ -18,6 +21,9 @@ export class DockPendingStateService {
   readonly transactions = signal<PendingTransaction[]>([]);
   readonly lastUpdatedAt = signal<number | null>(null);
   readonly mining = signal(false);
+
+  private lastFetchMs = 0;
+  private rateLimitedUntil = 0;
 
   readonly count = computed(() => this.transactions().length);
 
@@ -75,8 +81,18 @@ export class DockPendingStateService {
     formatDockRelativeTime(this.lastUpdatedAt())
   );
 
-  async load(): Promise<void> {
+  async load(force = false): Promise<void> {
     if (this.loading()) {
+      return;
+    }
+
+    if (this.isRateLimited()) {
+      this.error.set(true);
+      return;
+    }
+
+    const now = Date.now();
+    if (!force && now - this.lastFetchMs < DockPendingStateService.MIN_REFRESH_GAP_MS) {
       return;
     }
 
@@ -94,15 +110,31 @@ export class DockPendingStateService {
         })
       );
       this.lastUpdatedAt.set(Date.now());
-    } catch {
-      this.transactions.set([]);
-      this.error.set(true);
+      this.lastFetchMs = Date.now();
+    } catch (error) {
+      this.handleRateLimit(error);
+      if (!this.isRateLimited()) {
+        this.transactions.set([]);
+        this.error.set(true);
+      }
     } finally {
       this.loading.set(false);
     }
   }
 
-  refresh(): void {
-    void this.load();
+  refresh(force = false): void {
+    void this.load(force);
+  }
+
+  private isRateLimited(): boolean {
+    return Date.now() < this.rateLimitedUntil;
+  }
+
+  private handleRateLimit(error: unknown): void {
+    const status = (error as { status?: number })?.status;
+    if (status === 429) {
+      this.rateLimitedUntil = Date.now() + DockPendingStateService.RATE_LIMIT_BACKOFF_MS;
+      this.error.set(true);
+    }
   }
 }

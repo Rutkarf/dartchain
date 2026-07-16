@@ -49,12 +49,9 @@ public class RateLimitProperties {
                 "/api/peers",
                 "/api/peers/reconnect",
                 "/api/peers/disconnect",
-                "/api/pending-transactions",
                 "/api/transactions",
                 "/api/showcase/chat/messages",
-                "/api/showcase/launch/projects",
-                "/api/blocks",
-                "/api/blocks/validate"
+                "/api/showcase/launch/projects"
         );
     }
 }

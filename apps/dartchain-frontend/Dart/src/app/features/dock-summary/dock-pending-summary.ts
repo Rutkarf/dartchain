@@ -57,7 +57,7 @@ export class DockPendingSummaryComponent implements OnInit, OnDestroy {
   }
 
   private onGlobalRefresh = (): void => {
-    this.state.refresh();
+    this.state.refresh(true);
   };
 
   statusClass(phase: DockPendingPhase): string {
@@ -73,7 +73,7 @@ export class DockPendingSummaryComponent implements OnInit, OnDestroy {
 
   onRefresh(event: Event): void {
     event.stopPropagation();
-    this.state.refresh();
+    this.state.refresh(true);
   }
 
   onExpand(event: Event): void {

@@ -113,7 +113,7 @@ export class NavbarTickerStateService {
 
   refresh(): void {
     this.fetchBanner();
-    this.chainState.refresh();
+    this.chainState.refresh(true);
   }
 
   private fetchBanner(): void {

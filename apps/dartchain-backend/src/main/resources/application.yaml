@@ -24,7 +24,7 @@ dartchain:
     bootstrap-admin-username: ${DARTCHAIN_BOOTSTRAP_ADMIN:}
     password-min-length: 8
   rate-limit:
-    max-requests: 20
+    max-requests: 60
     window-ms: 60000
   security:
     strict-pending-signatures: true

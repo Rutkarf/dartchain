@@ -57,7 +57,7 @@ export class DockChainSummaryComponent implements OnInit, OnDestroy {
   }
 
   private onGlobalRefresh = (): void => {
-    this.state.refresh();
+    this.state.refresh(true);
   };
 
   statusClass(phase: DockChainPhase): string {
@@ -72,7 +72,7 @@ export class DockChainSummaryComponent implements OnInit, OnDestroy {
 
   onRefresh(event: Event): void {
     event.stopPropagation();
-    this.state.refresh();
+    this.state.refresh(true);
   }
 
   onOpen(event: Event): void {

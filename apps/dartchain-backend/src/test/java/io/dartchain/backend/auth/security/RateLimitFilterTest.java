@@ -17,11 +17,17 @@ class RateLimitFilterTest {
     }
 
     @Test
-    void limitsConfiguredPaths() {
+    void limitsConfiguredMutationPaths() {
         assertThat(rateLimitFilter.isLimitedPath("/api/exchange-panel/swap")).isTrue();
         assertThat(rateLimitFilter.isLimitedPath("/api/blockchain/mine")).isTrue();
         assertThat(rateLimitFilter.isLimitedPath("/api/showcase/chat/messages")).isTrue();
-        assertThat(rateLimitFilter.isLimitedPath("/api/pending-transactions")).isTrue();
+    }
+
+    @Test
+    void doesNotLimitChainReadEndpoints() {
+        assertThat(rateLimitFilter.isLimitedPath("/api/pending-transactions")).isFalse();
+        assertThat(rateLimitFilter.isLimitedPath("/api/blocks")).isFalse();
+        assertThat(rateLimitFilter.isLimitedPath("/api/blocks/validate")).isFalse();
     }
 
     @Test

@@ -74,6 +74,9 @@ export class ShowcaseNewsComponent {
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private readonly contentPanel = viewChild<ElementRef<HTMLElement>>('contentPanel');
   private readonly searchInput$ = new Subject<string>();
+  private chainSyncTimerId: number | null = null;
+  private lastChainSyncAt = 0;
+  private static readonly CHAIN_SYNC_MIN_GAP_MS = 12_000;
 
   readonly loading = signal(true);
   readonly loadingMore = signal(false);
@@ -182,7 +185,7 @@ export class ShowcaseNewsComponent {
           message.type === 'snapshot'
         ) {
           this.loadFeed(false);
-          this.syncChainLiveStatus();
+          this.scheduleChainLiveSync();
         }
       });
   }
@@ -505,7 +508,35 @@ export class ShowcaseNewsComponent {
       });
   }
 
+  private scheduleChainLiveSync(force = false): void {
+    const now = Date.now();
+    if (
+      !force &&
+      now - this.lastChainSyncAt < ShowcaseNewsComponent.CHAIN_SYNC_MIN_GAP_MS
+    ) {
+      if (this.chainSyncTimerId !== null) {
+        return;
+      }
+
+      const delay =
+        ShowcaseNewsComponent.CHAIN_SYNC_MIN_GAP_MS - (now - this.lastChainSyncAt);
+      this.chainSyncTimerId = window.setTimeout(() => {
+        this.chainSyncTimerId = null;
+        this.syncChainLiveStatus();
+      }, delay);
+      return;
+    }
+
+    if (this.chainSyncTimerId !== null) {
+      window.clearTimeout(this.chainSyncTimerId);
+      this.chainSyncTimerId = null;
+    }
+
+    this.syncChainLiveStatus();
+  }
+
   private syncChainLiveStatus(): void {
+    this.lastChainSyncAt = Date.now();
     if (this.error()) {
       this.chainLiveTone.set('offline');
       this.latestBlockIndex.set(null);
