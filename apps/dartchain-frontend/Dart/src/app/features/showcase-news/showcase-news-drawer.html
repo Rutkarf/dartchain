@@ -1,0 +1,105 @@
+@if (item(); as news) {
+  <div
+    class="showcase-news-drawer-backdrop"
+    (click)="dismiss()"
+    aria-hidden="true"
+  >
+    <aside
+      #drawerPanel
+      class="showcase-news-drawer ds-surface ds-surface--card ds-surface--drawer"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      [attr.aria-labelledby]="'newsDrawerTitle-' + news.id"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="showcase-news-drawer__head">
+        <div class="showcase-news-drawer__toolbar">
+          <div class="showcase-news-drawer__nav" aria-label="Navigation entre articles">
+            <button
+              type="button"
+              class="showcase-news-drawer__nav-btn ds-surface ds-surface--showcase-tab"
+              [disabled]="!canPrev()"
+              aria-label="Article précédent"
+              (click)="navigatePrev.emit()"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              class="showcase-news-drawer__nav-btn ds-surface ds-surface--showcase-tab"
+              [disabled]="!canNext()"
+              aria-label="Article suivant"
+              (click)="navigateNext.emit()"
+            >
+              ›
+            </button>
+          </div>
+
+          <span class="showcase-news-drawer__category ds-surface ds-surface--showcase-tab">
+            {{ categoryLabel(news.category) }}
+          </span>
+
+          <button
+            type="button"
+            class="showcase-news-drawer__close ds-surface ds-surface--showcase-tab"
+            aria-label="Fermer l'article"
+            (click)="dismiss()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
+
+        <h3 class="showcase-news-drawer__title" [id]="'newsDrawerTitle-' + news.id">
+          {{ news.title }}
+        </h3>
+
+        <p class="showcase-news-drawer__meta">
+          <span>{{ news.relativeTime }}</span>
+          <span class="showcase-news-drawer__meta-sep" aria-hidden="true">·</span>
+          <span>{{ formatPublishedAt(news.publishedAt) }}</span>
+          <span class="showcase-news-drawer__meta-sep" aria-hidden="true">·</span>
+          <span>{{ news.source }}</span>
+        </p>
+      </header>
+
+      <div class="showcase-news-drawer__body">
+        <div class="showcase-news-drawer__content ds-surface ds-surface--panel">
+          @if (loading()) {
+            <div class="showcase-news-drawer__skeleton" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          } @else {
+            <p class="showcase-news-drawer__summary">
+              {{ news.body || news.summary || 'Aucun résumé disponible.' }}
+            </p>
+          }
+        </div>
+
+        <footer class="showcase-news-drawer__actions">
+          @if (actionLabel(news); as label) {
+            <button
+              type="button"
+              class="showcase-news-drawer__action showcase-news-drawer__action--primary ds-surface ds-surface--showcase-tab"
+              (click)="runAction.emit(news)"
+            >
+              {{ label }}
+            </button>
+          }
+          <button
+            type="button"
+            class="showcase-news-drawer__action ds-surface ds-surface--showcase-tab"
+            (click)="copySummary.emit(news)"
+          >
+            Copier
+          </button>
+        </footer>
+      </div>
+    </aside>
+  </div>
+}

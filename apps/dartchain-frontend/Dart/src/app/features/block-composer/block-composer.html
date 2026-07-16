@@ -1,0 +1,185 @@
+<div class="dock-view block-view" aria-labelledby="composer-title">
+  @if (compact) {
+    <form
+      class="block-view__form block-view__form--compact"
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      novalidate
+    >
+      <div class="block-view__compact-toolbar">
+        <div class="block-view__compact-actions">
+          <button type="button" class="dock-view__mini-btn" (click)="fillFromWallet()">
+            Wallet
+          </button>
+          <button type="button" class="dock-view__mini-btn" (click)="clearForm()" [disabled]="loading()">
+            Reset
+          </button>
+        </div>
+        <div class="block-view__compact-meta">
+          @if (latestBlock(); as tip) {
+            <button type="button" class="block-view__compact-tip" (click)="openLatestBlock()">
+              Tip #{{ tip.index }}
+            </button>
+          }
+          <span class="block-view__compact-count">{{ rawTextLength() }}/500</span>
+        </div>
+      </div>
+
+      <label class="block-view__compact-field block-view__compact-field--full" for="from-address">
+        <span class="block-view__compact-label">From</span>
+        <input
+          id="from-address"
+          class="dock-view__input block-view__compact-input"
+          type="text"
+          formControlName="fromAddress"
+          placeholder="Adresse expéditeur"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </label>
+
+      <div class="block-view__compact-row">
+        <label class="block-view__compact-field block-view__compact-field--grow" for="to-address">
+          <span class="block-view__compact-label">To</span>
+          <input
+            id="to-address"
+            class="dock-view__input block-view__compact-input"
+            type="text"
+            formControlName="toAddress"
+            placeholder="Destinataire"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </label>
+        <label class="block-view__compact-field block-view__compact-field--amount" for="amount">
+          <span class="block-view__compact-label">Amount</span>
+          <input
+            id="amount"
+            class="dock-view__input block-view__compact-input"
+            type="number"
+            inputmode="decimal"
+            step="any"
+            min="0"
+            formControlName="amount"
+            placeholder="0.00"
+          />
+        </label>
+      </div>
+
+      @if (errorMessage()) {
+        <p class="block-view__compact-feedback block-view__compact-feedback--error">{{ errorMessage() }}</p>
+      } @else if (successMessage()) {
+        <p class="block-view__compact-feedback block-view__compact-feedback--success">{{ successMessage() }}</p>
+      } @else if (data.pendingError() && !embedded) {
+        <p class="block-view__compact-feedback block-view__compact-feedback--warn">{{ data.pendingError() }}</p>
+      }
+
+      <button
+        type="submit"
+        class="dock-view__cta block-view__compact-submit"
+        [disabled]="loading()"
+        [attr.aria-busy]="loading()"
+      >
+        {{ submitButtonLabel() }}
+      </button>
+    </form>
+  } @else {
+    <header class="dock-view__head">
+      <div class="dock-view__title-row block-view__title-row">
+        <div class="dock-view__title-lead">
+          <span class="dock-view__accent" aria-hidden="true"></span>
+          <h2 id="composer-title" class="dock-view__title">{{ locale.t('transactions.composer') }}</h2>
+        </div>
+
+        <p class="block-view__title-center" aria-live="polite">
+          @if (chainLoading()) {
+            Sync…
+          } @else if (latestBlock()) {
+            Tip #{{ latestBlock()!.index }}
+          } @else {
+            Mempool
+          }
+        </p>
+
+        <span
+          class="dock-view__meta block-view__char-count"
+          [class.dock-view__meta--danger]="showMaxLengthError"
+        >
+          {{ rawTextLength() }}/500
+        </span>
+
+        <button
+          type="button"
+          class="dock-view__refresh"
+          (click)="handleRefresh()"
+          [disabled]="loading()"
+          aria-label="Actualiser"
+        >
+          ↻
+        </button>
+      </div>
+    </header>
+
+    <div class="dock-view__content">
+      @if (latestBlock(); as tip) {
+        <button type="button" class="block-view__chain-tip" (click)="openLatestBlock()">
+          <span class="block-view__tip-label">#{{ tip.index }}</span>
+          <span class="block-view__tip-hash" [title]="tip.hash">{{ shortHash(tip.hash) }}</span>
+          <span class="block-view__tip-meta">{{ blockTxCount(tip) }} tx</span>
+          <span class="block-view__tip-action">Voir</span>
+        </button>
+      }
+
+      <form class="dock-view__form block-view__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="dock-view__scroll">
+          <div class="block-view__quick-actions">
+            <button type="button" class="dock-view__mini-btn" (click)="fillFromWallet()" [disabled]="!walletAddress()">
+              Mon wallet
+            </button>
+            <button type="button" class="dock-view__mini-btn" (click)="clearForm()" [disabled]="loading()">
+              Reset
+            </button>
+          </div>
+
+          <div class="dock-view__form-grid block-view__grid">
+            <label class="dock-view__field" for="from-address-full">
+              <span class="dock-view__label">From</span>
+              <input id="from-address-full" class="dock-view__input" type="text" formControlName="fromAddress" />
+            </label>
+            <label class="dock-view__field" for="to-address-full">
+              <span class="dock-view__label">To</span>
+              <input id="to-address-full" class="dock-view__input" type="text" formControlName="toAddress" />
+            </label>
+            <label class="dock-view__field block-view__field--amount" for="amount-full">
+              <span class="dock-view__label">Amount</span>
+              <input id="amount-full" class="dock-view__input" type="number" formControlName="amount" />
+            </label>
+            <label class="dock-view__field dock-view__field--full" for="block-data-full">
+              <span class="dock-view__label">Message</span>
+              <textarea id="block-data-full" class="dock-view__textarea" formControlName="data" rows="3" maxlength="500"></textarea>
+            </label>
+          </div>
+
+          <p class="dock-view__hint">{{ helperText }}</p>
+
+          @if (errorMessage()) {
+            <p class="dock-view__feedback dock-view__feedback--error">{{ errorMessage() }}</p>
+          } @else if (successMessage()) {
+            <p class="dock-view__feedback dock-view__feedback--success">{{ successMessage() }}</p>
+          }
+        </div>
+
+        <footer class="dock-view__footer block-view__footer">
+          @if (!embedded) {
+            <button type="button" class="dock-view__mini-btn block-view__footer-link" (click)="openPendingDock()">
+              {{ locale.t('transactions.viewMempool') }}
+            </button>
+          }
+          <button type="submit" class="dock-view__cta" [disabled]="loading()" [attr.aria-busy]="loading()">
+            {{ submitButtonLabel() }}
+          </button>
+        </footer>
+      </form>
+    </div>
+  }
+</div>

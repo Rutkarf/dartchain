@@ -1,0 +1,54 @@
+logging:
+  level:
+    root: INFO
+    io.dartchain: INFO
+
+server:
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain,text/css,application/javascript
+  error:
+    include-message: always
+
+spring:
+  jpa:
+    open-in-view: false
+
+dartchain:
+  persistence:
+    mode: postgres
+  chain:
+    allow-server-evm-wallet-create: false
+  auth:
+    jwt-secret: ${DARTCHAIN_JWT_SECRET:}
+    bootstrap-admin-username: ${DARTCHAIN_BOOTSTRAP_ADMIN:}
+  product:
+    commercial: true
+    allow-legacy-private-key: false
+    allow-server-wallet-create: false
+    faucet-enabled: false
+    showcase-enabled: false
+    legacy-api-aliases-enabled: true
+  security:
+    strict-pending-signatures: true
+  ops:
+    restrict-actuator: true
+    actuator-token: ${DARTCHAIN_ACTUATOR_TOKEN:}
+  cors:
+    allowed-origin-patterns:
+      - http://localhost:*
+      - http://127.0.0.1:*
+      - https://localhost:*
+      - https://127.0.0.1:*
+      - https://dartchain.pages.dev
+      - https://*.dartchain.pages.dev
+      - ${DARTCHAIN_CORS_EXTRA:https://dartzvz01-tagname.onrender.com}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never

@@ -1,0 +1,89 @@
+@if (open() && block()) {
+  <div
+    class="drawer-backdrop"
+    (click)="closeDrawer()"
+    aria-hidden="true"
+  >
+    <aside
+      class="drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="blockDetailTitle"
+      [appFocusTrap]="true"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="drawer-head">
+        <div class="drawer-head-copy">
+          <p class="drawer-eyebrow">Bloc #{{ block()!.index }}</p>
+          <h3 id="blockDetailTitle">Bloc {{ block()!.index }}</h3>
+          <p class="drawer-subtitle">
+            {{ formatTimestamp(block()!.timestamp) }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="drawer-close"
+          aria-label="Fermer le détail du bloc"
+          (click)="closeDrawer()"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Index</span>
+            <span class="detail-value">#{{ block()!.index }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Horodatage</span>
+            <span class="detail-value">
+              {{ formatTimestamp(block()!.timestamp) }}
+            </span>
+          </div>
+
+          <div class="detail-item detail-item-full">
+            <span class="detail-label">Hash du bloc</span>
+            <span class="detail-code" [title]="block()!.hash">
+              {{ block()!.hash }}
+            </span>
+          </div>
+
+          <div class="detail-item detail-item-full">
+            <span class="detail-label">Hash précédent</span>
+            <span class="detail-code" [title]="block()!.previousHash">
+              {{ block()!.previousHash }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Difficulté</span>
+            <span class="detail-value">{{ difficultyLabel(block()!.difficulty) }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">Nonce</span>
+            <span class="detail-value">{{ block()!.nonce }}</span>
+          </div>
+
+          <div class="detail-item detail-item-full">
+            <span class="detail-label">Résumé rapide</span>
+            <span class="detail-inline-code" [title]="block()!.hash">
+              {{ shortHash(block()!.hash) }}
+            </span>
+          </div>
+
+          <div class="detail-item detail-item-full">
+            <span class="detail-label">Contenu</span>
+            <p class="detail-content">
+              {{ block()!.data || 'Aucune donnée' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+}

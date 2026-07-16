@@ -1,0 +1,90 @@
+:host {
+  display: flex;
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
+}
+
+.chain-graph {
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chain-graph__scroll {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  padding: 4px 2px;
+  scrollbar-width: thin;
+}
+
+.chain-graph__svg {
+  display: block;
+  height: clamp(56px, 18cqw, 72px);
+  min-width: 100%;
+}
+
+.chain-graph__link {
+  stroke: rgba(var(--accent-primary-rgb), 0.45);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.chain-graph__node-circle {
+  fill: rgba(var(--brand-black-rgb), 0.55);
+  stroke: rgba(var(--accent-primary-rgb), 0.55);
+  stroke-width: 1.5;
+}
+
+.chain-graph__node.is-tip .chain-graph__node-circle {
+  fill: rgba(var(--accent-primary-rgb), 0.22);
+  stroke: rgba(var(--accent-primary-rgb), 0.95);
+}
+
+.chain-graph__node-index {
+  fill: var(--text-primary);
+  font-size: 8px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.chain-graph__node-hash {
+  fill: rgba(var(--text-primary-rgb), 0.65);
+  font-size: 5px;
+  text-anchor: middle;
+}
+
+.chain-graph__actions {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.chain-graph__hit {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.chain-graph__hit:focus-visible {
+  outline: 2px solid rgba(var(--accent-primary-rgb), 0.9);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chain-graph__scroll {
+    scroll-behavior: auto;
+  }
+}

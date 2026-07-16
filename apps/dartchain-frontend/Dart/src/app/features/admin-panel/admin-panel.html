@@ -1,0 +1,115 @@
+<section class="admin-panel" aria-label="Administration">
+  @if (errorMessage()) {
+    <div class="admin-panel__toast admin-panel__toast--error" role="alert">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <header class="admin-panel__head">
+    <div>
+      <h2 class="admin-panel__title">{{ locale.t('admin.title') }}</h2>
+      <p class="admin-panel__subtitle">{{ locale.t('admin.subtitle') }}</p>
+    </div>
+    <button
+      type="button"
+      class="admin-panel__refresh"
+      (click)="refresh()"
+      [disabled]="loading()"
+      [class.is-spinning]="loading()"
+      [attr.aria-label]="locale.t('admin.refresh')"
+    >
+      ↻
+    </button>
+  </header>
+
+  @if (snapshot(); as data) {
+    <section class="admin-panel__meta" aria-label="Métadonnées">
+      <span class="admin-panel__badge">Phase {{ data.phase }}</span>
+      <span class="admin-panel__meta-item">
+        {{ locale.t('admin.collected') }}: {{ formatTimestamp(data.collectedAt) }}
+      </span>
+      @if (data.metadata?.['observabilityModel']) {
+        <span class="admin-panel__meta-item">
+          {{ data.metadata['observabilityModel'] }}
+        </span>
+      }
+    </section>
+
+    @if (data.alerts.length > 0) {
+      <section class="admin-panel__alerts" aria-label="Alertes">
+        <h3 class="admin-panel__section-title">{{ locale.t('admin.alerts') }}</h3>
+        <ul class="admin-panel__alert-list">
+          @for (alert of data.alerts; track alert.code) {
+            <li
+              class="admin-panel__alert"
+              [class.admin-panel__alert--warn]="alert.level === 'warn'"
+              [class.admin-panel__alert--error]="alert.level === 'error'"
+            >
+              <strong>{{ alert.code }}</strong>
+              <span>{{ alert.message }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    } @else {
+      <p class="admin-panel__ok">{{ locale.t('admin.noAlerts') }}</p>
+    }
+
+    <section class="admin-panel__stats" aria-label="Jauges">
+      <h3 class="admin-panel__section-title">{{ locale.t('admin.gauges') }}</h3>
+      <div class="admin-panel__grid">
+        @for (entry of gaugeEntries(); track entry.key) {
+          <article class="admin-panel__stat">
+            <p class="admin-panel__stat-label">{{ formatKey(entry.key) }}</p>
+            <p class="admin-panel__stat-value">{{ entry.value }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="admin-panel__stats" aria-label="Latence">
+      <h3 class="admin-panel__section-title">{{ locale.t('admin.latency') }}</h3>
+      <div class="admin-panel__grid">
+        @for (entry of latencyEntries(); track entry.key) {
+          <article class="admin-panel__stat">
+            <p class="admin-panel__stat-label">{{ formatKey(entry.key) }}</p>
+            <p class="admin-panel__stat-value admin-panel__stat-value--cyan">
+              {{ entry.value }}{{ entry.key.toLowerCase().includes('ms') ? ' ms' : '' }}
+            </p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="admin-panel__stats" aria-label="Compteurs">
+      <h3 class="admin-panel__section-title">{{ locale.t('admin.counters') }}</h3>
+      <div class="admin-panel__grid admin-panel__grid--compact">
+        @for (entry of counterEntries(); track entry.key) {
+          <article class="admin-panel__stat admin-panel__stat--compact">
+            <p class="admin-panel__stat-label">{{ formatKey(entry.key) }}</p>
+            <p class="admin-panel__stat-value">{{ entry.value }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="admin-panel__events" aria-label="Événements récents">
+      <h3 class="admin-panel__section-title">{{ locale.t('admin.events') }}</h3>
+      @if (data.recentEvents.length === 0) {
+        <p class="admin-panel__empty">{{ locale.t('admin.noEvents') }}</p>
+      } @else {
+        <ul class="admin-panel__event-list">
+          @for (event of data.recentEvents; track event.at + event.type) {
+            <li class="admin-panel__event">
+              <span class="admin-panel__event-time">{{ formatTimestamp(event.at) }}</span>
+              <span class="admin-panel__event-type">{{ event.type }}</span>
+              <span class="admin-panel__event-detail">{{ event.detail }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  } @else if (loading()) {
+    <p class="admin-panel__loading">{{ locale.t('admin.loading') }}</p>
+  }
+</section>

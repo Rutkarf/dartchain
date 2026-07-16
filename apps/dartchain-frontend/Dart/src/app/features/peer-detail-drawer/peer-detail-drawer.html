@@ -1,0 +1,80 @@
+@if (open() && peer()) {
+  <div class="drawer-backdrop" (click)="closeDrawer()" aria-hidden="true">
+    <aside
+      class="drawer"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="locale.t('peers.detailTitle')"
+      [appFocusTrap]="true"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="drawer-head">
+        <div class="drawer-head-copy">
+          <p class="drawer-eyebrow">{{ locale.t('peers.detailTitle') }}</p>
+          <h3>{{ peer()!.nodeName }}</h3>
+          <p class="drawer-subtitle">{{ peer()!.endpoint }}</p>
+        </div>
+
+        <button
+          type="button"
+          class="drawer-close"
+          [attr.aria-label]="locale.t('peers.detailClose')"
+          (click)="closeDrawer()"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="detail-grid">
+          <div class="detail-item detail-item-full">
+            <span class="detail-label">{{ locale.t('peers.detailUrl') }}</span>
+            <span class="detail-code" [title]="peer()!.url">{{ peer()!.url }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">{{ locale.t('peers.detailStatus') }}</span>
+            <span class="detail-value">{{ statusLabel(peer()!.status) }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">{{ locale.t('peers.detailSync') }}</span>
+            <span class="detail-value">
+              {{ peer()!.syncLabel }}
+              @if (peer()!.syncEstimated) {
+                <span class="detail-estimated">({{ locale.t('peers.estimated') }})</span>
+              }
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">{{ locale.t('peers.detailLatency') }}</span>
+            <span class="detail-value">
+              {{ peer()!.latencyLabel }}
+              @if (peer()!.latencyEstimated) {
+                <span class="detail-estimated">({{ locale.t('peers.estimated') }})</span>
+              }
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">{{ locale.t('peers.detailChainHeight') }}</span>
+            <span class="detail-value">{{ chainHeightLabel(peer()!) }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">{{ locale.t('peers.detailLastSync') }}</span>
+            <span class="detail-value">{{ formatLastSync(peer()!.lastSyncAt) }}</span>
+          </div>
+
+          @if (peer()!.message) {
+            <div class="detail-item detail-item-full">
+              <span class="detail-label">{{ locale.t('peers.detailMessage') }}</span>
+              <p class="detail-content">{{ peer()!.message }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </aside>
+  </div>
+}

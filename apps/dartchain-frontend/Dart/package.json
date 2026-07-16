@@ -1,0 +1,60 @@
+{
+  "name": "dart",
+  "version": "1.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --configuration development --project Dart --host 0.0.0.0 --port 4200",
+    "build": "ng build",
+    "build:docker": "ng build --configuration docker",
+    "build:cloudflare": "ng build --configuration production",
+    "build:stats": "bash scripts/bundle-stats.sh",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "test:coverage": "ng test --no-watch --coverage",
+    "verify:auth": "ng test --no-watch --coverage=false --include=**/auth-session.storage.spec.ts --include=**/auth.interceptor.spec.ts",
+    "verify:chain": "ng test --no-watch --coverage=false --include=**/wallet-address.util.spec.ts",
+    "verify:admin": "ng test --no-watch --coverage=false --include=**/ops-snapshot.service.spec.ts --include=**/admin-panel.spec.ts",
+    "verify:a11y": "bash scripts/verify-a11y-ux.sh",
+    "verify:release": "bash scripts/release-verify.sh"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@9.2.0",
+  "dependencies": {
+    "@angular/animations": "^21.2.7",
+    "@angular/common": "^21.2.7",
+    "@angular/compiler": "^21.2.7",
+    "@angular/core": "^21.2.7",
+    "@angular/forms": "^21.2.7",
+    "@angular/platform-browser": "^21.2.7",
+    "@angular/router": "^21.2.7",
+    "qrcode": "^1.5.4",
+    "rxjs": "~7.8.0",
+    "three": "^0.183.2",
+    "tslib": "^2.3.0",
+    "zone.js": "^0.16.1"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.2.7",
+    "@angular/cli": "^21.2.7",
+    "@angular/compiler-cli": "^21.2.7",
+    "@types/qrcode": "^1.5.6",
+    "@types/three": "^0.183.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "angular-cli-ghpages": "^3.0.3",
+    "jsdom": "^27.1.0",
+    "typescript": "~5.9.2",
+    "vitest": "^4.1.10"
+  }
+}

@@ -1,0 +1,93 @@
+<section
+  class="showcase-window"
+  [attr.aria-label]="windowAriaLabel()"
+  [attr.data-active-tab]="activeTab"
+>
+  <div
+    class="showcase-window__body"
+    [id]="'showcase-panel-' + activeTab"
+    role="tabpanel"
+    [attr.aria-labelledby]="'showcase-tab-' + activeTab"
+  >
+    @switch (activeTab) {
+      @case ('tours') {
+        <div class="showcase-tab-panel ds-surface ds-surface--card">
+          @if (collapsed) {
+            <app-showcase-news-summary />
+          } @else {
+            @defer (on idle) {
+              <app-showcase-news [isExpanded]="true" />
+            } @placeholder {
+              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+            }
+          }
+        </div>
+      }
+      @case ('r4v3') {
+        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--r4v3">
+          @if (collapsed) {
+            <app-showcase-r4v3-summary />
+          } @else {
+            @defer (on idle) {
+              <app-showcase-r4v3 [isExpanded]="true" />
+            } @placeholder {
+              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+            }
+          }
+        </div>
+      }
+      @case ('daonews') {
+        <div class="showcase-tab-panel ds-surface ds-surface--card">
+          @if (collapsed) {
+            <app-showcase-news-summary />
+          } @else {
+            @defer (on idle) {
+              <app-showcase-news [isExpanded]="true" />
+            } @placeholder {
+              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+            }
+          }
+        </div>
+      }
+      @case ('rv23') {
+        <div class="showcase-tab-panel ds-surface ds-surface--card">
+          @if (collapsed) {
+            <app-showcase-chat-summary />
+          } @else {
+            @defer (on idle) {
+              <app-showcase-chat [isExpanded]="true" />
+            } @placeholder {
+              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+            }
+          }
+        </div>
+      }
+      @case ('dao') {
+        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--launch">
+          @if (collapsed) {
+            <app-showcase-launch-summary />
+          } @else {
+            @defer (on idle) {
+              <app-showcase-launch [isExpanded]="true" />
+            } @placeholder {
+              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+            }
+          }
+        </div>
+      }
+      @default {
+        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--terminal">
+          @defer (on idle) {
+            <app-showcase-terminal
+              [mode]="activeTab"
+              [expanded]="!collapsed"
+              (selectBlock)="onSelectBlock($event)"
+            />
+          } @placeholder {
+            <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>

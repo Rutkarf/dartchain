@@ -1,0 +1,167 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm",
+    "analytics": false
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "Dart": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+  {
+    "glob": "**/*",
+    "input": "public"
+  },
+  {
+    "glob": "**/*",
+    "input": "src/assets",
+    "output": "/assets"
+  }
+],
+            "styles": [
+              "src/styles.css"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": {
+                "fonts": false
+              },
+              "allowedCommonJsDependencies": ["qrcode", "dijkstrajs"],
+              "budgets": [
+  {
+    "type": "initial",
+    "maximumWarning": "2mb",
+    "maximumError": "5mb"
+  },
+  {
+    "type": "anyComponentStyle",
+    "maximumWarning": "42kb",
+    "maximumError": "52kb"
+  }
+],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "docker": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.docker.ts"
+                }
+              ],
+              "optimization": {
+                "fonts": false
+              },
+              "outputHashing": "all",
+              "allowedCommonJsDependencies": ["qrcode", "dijkstrajs"],
+              "budgets": [
+  {
+    "type": "initial",
+    "maximumWarning": "2mb",
+    "maximumError": "5mb"
+  },
+  {
+    "type": "anyComponentStyle",
+    "maximumWarning": "42kb",
+    "maximumError": "52kb"
+  }
+]
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 4200,
+            "host": "0.0.0.0"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "Dart:build:production"
+            },
+            "development": {
+              "buildTarget": "Dart:build:development",
+              "proxyConfig": "proxy.conf.json"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "setupFiles": ["src/test-setup.ts"],
+            "runnerConfig": true,
+            "coverage": true,
+            "coverageInclude": ["src/**/*.ts"],
+            "coverageExclude": [
+              "src/**/*.spec.ts",
+              "src/test-setup.ts",
+              "src/main.ts",
+              "src/app/app.config.ts",
+              "src/app/app.routes.ts",
+              "src/environments/environment.docker.ts",
+              "src/environments/environment.prod.ts",
+              "src/app/r4v3-scene/**/*.ts",
+              "src/app/three-floor/**/*.ts",
+              "src/app/particle-background/particle-background.ts",
+              "src/app/features/chain-graph/**/*.ts",
+              "src/app/features/r4v3-three/**/*.ts",
+              "src/app/viewport-300x600.ts",
+              "src/app/features/dock-panel/**/*.ts",
+              "src/app/features/dock-summary/**/*.ts",
+              "src/app/features/dock-tabs/**/*.ts",
+              "src/app/core/services/dock-*.service.ts",
+              "src/app/core/utils/detect-webgl.util.ts",
+              "src/app/core/utils/dock-time.util.ts",
+              "src/app/features/wallet-panel/**/*.ts",
+              "src/app/features/pending-transactions/**/*.ts",
+              "src/app/features/block-detail-drawer/**/*.ts",
+              "src/app/features/launch-form-drawer/**/*.ts",
+              "src/app/features/showcase-chart/**/*.ts",
+              "src/app/searchbar/**/*.ts",
+              "src/app/navbar/explorer-search.ts",
+              "src/app/features/peer-panel/**/*.ts",
+              "src/app/app.ts",
+              "src/app/features/showcase-tabs/**/*.ts",
+              "src/app/navbar/brand-crypto-select.ts",
+              "src/app/navbar/navbar.ts",
+              "src/app/features/showcase-terminal/**/*.ts",
+              "src/app/features/blocks-list/blocks-list.ts",
+              "src/app/features/showcase-launch/showcase-launch.ts"
+            ],
+            "coverageThresholds": {
+              "statements": 50,
+              "branches": 49,
+              "functions": 49,
+              "lines": 50
+            }
+          }
+        }
+      }
+    }
+  }
+}

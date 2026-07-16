@@ -1,0 +1,10 @@
+/* Phase 2 — variables chrome partagées (sous-composants navbar) */
+
+:host-context(.navbar-wrap),
+.navbar-wrap {
+  --navbar-chrome-font: var(--ds-text-sm, 0.6875rem);
+  --navbar-status-font-size: var(--ds-text-xs, 0.5625rem);
+  --navbar-crypto-font-size: clamp(0.72rem, 3.2vw, 0.92rem);
+  --navbar-chrome-h: var(--ds-icon-btn, 32px);
+  --nv-control-h: var(--ds-icon-btn, 32px);
+}

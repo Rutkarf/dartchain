@@ -1,0 +1,26 @@
+<section class="transactions-dock" aria-label="Transactions dock">
+  <header class="transactions-dock__head">
+    <span class="transactions-dock__title">{{ locale.t('dock.transactions') }}</span>
+    <span class="transactions-dock__meta" aria-live="polite">
+      {{ mempoolSummary() }}
+    </span>
+    <button
+      type="button"
+      class="transactions-dock__refresh"
+      (click)="refreshAll()"
+      [attr.aria-label]="locale.t('transactions.refreshAll')"
+    >
+      ↻
+    </button>
+  </header>
+
+  <div class="transactions-dock__composer" #composerPanel>
+    <app-block-composer [embedded]="true" [compact]="true" />
+  </div>
+
+  <div class="transactions-dock__split" aria-hidden="true"></div>
+
+  <div class="transactions-dock__mempool" #mempoolPanel>
+    <app-pending-transactions [embedded]="true" [compact]="true" />
+  </div>
+</section>

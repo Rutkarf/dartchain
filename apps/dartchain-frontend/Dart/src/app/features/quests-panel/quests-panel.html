@@ -1,0 +1,201 @@
+<section class="quests-panel" [attr.aria-label]="locale.t('quests.title')" tabindex="0">
+  @if (toastMessage()) {
+    <div
+      class="quests-panel__toast"
+      [class.is-info]="toastKind() === 'info'"
+      [class.is-error]="toastKind() === 'error'"
+      role="status"
+    >
+      {{ toastMessage() }}
+    </div>
+  }
+
+  @if (errorBanner()) {
+    <div class="quests-panel__error" role="alert">
+      <span>{{ errorBanner() }}</span>
+      <button
+        type="button"
+        class="quests-panel__error-dismiss"
+        (click)="dismissError()"
+        [attr.aria-label]="locale.t('quests.error')"
+      >
+        ×
+      </button>
+    </div>
+  }
+
+  <header class="quests-panel__strip">
+    <h1 class="quests-panel__title">{{ locale.t('quests.title') }}</h1>
+    <div class="quests-panel__kpis" [attr.aria-label]="locale.t('quests.title')">
+      <span class="quests-panel__kpi quests-panel__kpi--xp" [title]="locale.t('quests.xp')">
+        <span class="quests-panel__kpi-label">{{ locale.t('quests.xp') }}</span>
+        <span class="quests-panel__kpi-value">{{ state().totalXp }}</span>
+      </span>
+      <span
+        class="quests-panel__kpi quests-panel__kpi--r4v3"
+        [title]="locale.t('quests.pendingRewardsHint')"
+      >
+        <span class="quests-panel__kpi-label">{{ locale.t('quests.pendingRewards') }}</span>
+        <span class="quests-panel__kpi-value">{{ formatMts(state().pendingMts) }}</span>
+      </span>
+      <span class="quests-panel__reset" [title]="locale.t('quests.reset')">
+        <span class="quests-panel__reset-icon" aria-hidden="true">◷</span>
+        {{ resetCountdown() }}
+      </span>
+      <button
+        type="button"
+        class="quests-panel__refresh"
+        (click)="refreshQuests()"
+        [disabled]="loading()"
+        [attr.aria-label]="locale.t('quests.refresh')"
+      >
+        ↻
+      </button>
+    </div>
+  </header>
+
+  <section class="quests-panel__mission-strip" [attr.aria-label]="locale.t('quests.mission')">
+    <div class="quests-panel__mission-main">
+      <span class="quests-panel__mission-icon" aria-hidden="true">⬡</span>
+      <div class="quests-panel__mission-text">
+        <p class="quests-panel__mission-name" [title]="mission().description">
+          {{ mission().title }}
+        </p>
+        <div class="quests-panel__mission-progress">
+          <span class="quests-panel__progress-track">
+            <span class="quests-panel__progress-fill" [style.width.%]="missionProgress()"></span>
+          </span>
+          <span class="quests-panel__progress-value">{{ missionProgress() }}%</span>
+        </div>
+      </div>
+    </div>
+    <div class="quests-panel__mission-reward">
+      <span class="quests-panel__reward-label">{{ mission().rewardMts.toFixed(2) }} R4V3</span>
+      <button
+        type="button"
+        class="quests-panel__mission-btn"
+        [class.is-ready]="missionClaimable()"
+        (click)="missionClaimable() ? onClaimMission() : onViewMissionDetails()"
+      >
+        {{ missionClaimable() ? locale.t('quests.claim') : locale.t('quests.details') }}
+      </button>
+    </div>
+  </section>
+
+  <div class="quests-panel__daily-head">
+    <h2 class="quests-panel__section-title">
+      {{ locale.t('quests.daily') }}
+      @if (usesServerAutoClaim()) {
+        <span class="quests-panel__auto-badge" [title]="locale.t('quests.autoHint')">
+          {{ locale.t('quests.auto') }}
+        </span>
+      }
+    </h2>
+    <span class="quests-panel__daily-summary">{{ tasksSummary() }}</span>
+  </div>
+
+  <ul class="quests-panel__list" #dailySection role="list" [attr.aria-label]="locale.t('quests.daily')">
+    @if (loading() && tasks().length === 0) {
+      @for (_ of [0, 1, 2, 3]; track $index) {
+        <li class="quests-panel__row quests-panel__row--skeleton" aria-hidden="true"></li>
+      }
+    } @else {
+      @for (task of tasks(); track task.id) {
+        <li
+          class="quests-panel__row"
+          role="listitem"
+          [class.is-complete]="task.complete"
+          [class.is-auto]="task.autoHooked"
+          [attr.aria-label]="task.title + ' ' + task.progressLabel"
+        >
+          <span
+            class="quests-panel__check"
+            [class.is-checked]="task.complete"
+            aria-hidden="true"
+          >
+            {{ task.complete ? '✓' : '' }}
+          </span>
+
+          <div class="quests-panel__row-body">
+            <p class="quests-panel__row-title" [title]="task.description">
+              {{ task.title }}
+              @if (task.autoHooked) {
+                <span class="quests-panel__row-auto">{{ locale.t('quests.auto').charAt(0) }}</span>
+              }
+            </p>
+            <div class="quests-panel__row-progress">
+              <span
+                class="quests-panel__row-progress-bar"
+                [class.is-complete]="task.complete"
+                [style.width.%]="(task.progress / task.target) * 100"
+              ></span>
+              <span class="quests-panel__row-progress-label">{{ task.progressLabel }}</span>
+            </div>
+          </div>
+
+          <div class="quests-panel__row-side">
+            <span class="quests-panel__row-reward">{{ rewardLabel(task.rewardMts) }}</span>
+            @if (task.claimable) {
+              <button
+                type="button"
+                class="quests-panel__btn quests-panel__btn--claim"
+                [attr.aria-label]="locale.t('quests.claim')"
+                (click)="onClaim(task)"
+              >
+                +
+              </button>
+            } @else if (task.autoClaimed) {
+              <span
+                class="quests-panel__status quests-panel__status--auto"
+                [title]="locale.t('quests.autoDone')"
+              >
+                ✓
+              </span>
+            } @else if (task.pendingWallet) {
+              <button
+                type="button"
+                class="quests-panel__btn quests-panel__btn--wallet"
+                [attr.aria-label]="locale.t('quests.walletLink')"
+                (click)="onPendingWallet($event)"
+              >
+                W
+              </button>
+            } @else if (!task.complete) {
+              <button
+                type="button"
+                class="quests-panel__btn quests-panel__btn--go"
+                [class.is-login]="task.action === 'login'"
+                [attr.aria-label]="goAriaLabel(task)"
+                (click)="onGo(task)"
+              >
+                {{ goButtonLabel(task) }}
+              </button>
+            } @else {
+              <span class="quests-panel__status quests-panel__status--done" [title]="locale.t('quests.done')">
+                ✓
+              </span>
+            }
+          </div>
+        </li>
+      }
+    }
+  </ul>
+
+  <footer class="quests-panel__weekly" [attr.aria-label]="locale.t('quests.weekly')">
+    <div class="quests-panel__weekly-copy">
+      <span class="quests-panel__weekly-label">{{ locale.t('quests.weekly') }}</span>
+      <span class="quests-panel__weekly-mts">{{ weekly().rewardMts.toFixed(2) }} R4V3</span>
+      <span class="quests-panel__weekly-boost">+{{ weekly().xpBoostPercent }}% {{ locale.t('quests.xpBoost') }}</span>
+    </div>
+    <button
+      type="button"
+      class="quests-panel__crate"
+      [class.is-ready]="weeklyClaimable()"
+      [attr.aria-label]="weeklyClaimable() ? locale.t('quests.claimWeekly') : locale.t('quests.crateLocked')"
+      (click)="onClaimWeekly()"
+    >
+      <span class="quests-panel__crate-glow" aria-hidden="true"></span>
+      <span class="quests-panel__crate-body" aria-hidden="true"></span>
+    </button>
+  </footer>
+</section>

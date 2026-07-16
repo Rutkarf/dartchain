@@ -1,0 +1,238 @@
+package io.dartchain.backend.service;
+
+import io.dartchain.backend.auth.AuthService;
+import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.config.FaucetConfig;
+import io.dartchain.backend.dto.FaucetClaimRequest;
+import io.dartchain.backend.dto.FaucetClaimResponse;
+import io.dartchain.backend.dto.FaucetConfigResponse;
+import io.dartchain.backend.dto.FaucetStateResponse;
+import io.dartchain.backend.exception.FaucetException;
+import io.dartchain.backend.faucet.store.FaucetClaimStore;
+import io.dartchain.backend.model.FaucetClaim;
+import io.dartchain.backend.model.Transaction;
+import io.dartchain.backend.ops.ApplicationMetricsCollector;
+import io.dartchain.backend.quests.QuestService;
+import io.dartchain.backend.utils.FaucetTimeUtils;
+import io.dartchain.backend.utils.WalletValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class FaucetServiceImpl implements FaucetService {
+
+    private final FaucetClaimStore claimStore;
+    private final FaucetConfig faucetConfig;
+    private final BlockchainService blockchainService;
+    private final AuthService authService;
+    private final QuestService questService;
+    private final ApplicationMetricsCollector metricsCollector;
+
+    public FaucetServiceImpl(
+            FaucetConfig faucetConfig,
+            BlockchainService blockchainService,
+            AuthService authService,
+            FaucetClaimStore claimStore
+    ) {
+        this(faucetConfig, blockchainService, authService, claimStore, null, null);
+    }
+
+    public FaucetServiceImpl(
+            FaucetConfig faucetConfig,
+            BlockchainService blockchainService,
+            AuthService authService,
+            FaucetClaimStore claimStore,
+            QuestService questService
+    ) {
+        this(faucetConfig, blockchainService, authService, claimStore, questService, null);
+    }
+
+    @Autowired
+    public FaucetServiceImpl(
+            FaucetConfig faucetConfig,
+            BlockchainService blockchainService,
+            AuthService authService,
+            FaucetClaimStore claimStore,
+            @Lazy QuestService questService,
+            ApplicationMetricsCollector metricsCollector
+    ) {
+        this.claimStore = claimStore;
+        this.faucetConfig = faucetConfig;
+        this.blockchainService = blockchainService;
+        this.authService = authService;
+        this.questService = questService;
+        this.metricsCollector = metricsCollector;
+    }
+
+    @Override
+    public synchronized FaucetStateResponse getState(String walletAddress) {
+        String normalizedWallet = normalizeWallet(walletAddress);
+        return buildState(normalizedWallet);
+    }
+
+    @Override
+    public synchronized FaucetClaimResponse claim(FaucetClaimRequest request, String authorizationHeader) {
+        if (request == null) {
+            throw new FaucetException("Claim request is required");
+        }
+
+        UserAccount account = authService.requireAuthenticatedAccount(authorizationHeader);
+
+        String normalizedWallet = normalizeWallet(request.getWalletAddress());
+        authService.ensureWalletOwnership(account, normalizedWallet);
+
+        FaucetStateResponse state = buildState(normalizedWallet);
+        if (!state.isEligible()) {
+            throw new FaucetException(
+                    "Claim not allowed yet. Next eligible at: " + state.getNextEligibleAt()
+            );
+        }
+
+        long now = System.currentTimeMillis();
+        long nextEligibleAt = now + faucetConfig.getCooldownDuration().toMillis();
+        BigDecimal amount = resolveClaimAmount(request);
+
+        Transaction onChainTx = blockchainService.mintSystemCredit(
+                normalizedWallet,
+                amount,
+                "FAUCET_CLAIM"
+        );
+
+        FaucetClaim claim = new FaucetClaim();
+        claim.setId(UUID.randomUUID().toString());
+        claim.setWalletAddress(normalizedWallet);
+        claim.setAmount(amount);
+        claim.setClaimedAt(now);
+        claim.setNextEligibleAt(nextEligibleAt);
+        claim.setClientId(request.getClientId());
+        claim.setTxHash(onChainTx.getHash());
+
+        claimStore.save(claim);
+
+        if (metricsCollector != null) {
+            metricsCollector.recordFaucetClaim(normalizedWallet);
+        }
+
+        if (questService != null) {
+            questService.completeFaucetClaimQuest(account.getId());
+        }
+
+        FaucetClaimResponse response = new FaucetClaimResponse();
+        response.setSuccess(true);
+        response.setMessage("Faucet claim credited on-chain");
+        response.setWalletAddress(claim.getWalletAddress());
+        response.setAmount(claim.getAmount().toPlainString());
+        response.setClaimedAt(FaucetTimeUtils.toIso(claim.getClaimedAt()));
+        response.setNextEligibleAt(FaucetTimeUtils.toIso(claim.getNextEligibleAt()));
+        response.setCooldownSeconds(FaucetTimeUtils.remainingCooldownSeconds(now, claim.getNextEligibleAt()));
+        response.setTxHash(claim.getTxHash());
+
+        return response;
+    }
+
+    @Override
+    public synchronized List<FaucetClaim> getClaimsForWallet(String walletAddress) {
+        return getClaimsForWallet(walletAddress, 0, Integer.MAX_VALUE);
+    }
+
+    @Override
+    public synchronized List<FaucetClaim> getClaimsForWallet(String walletAddress, int offset, int limit) {
+        String normalizedWallet = normalizeWallet(walletAddress);
+        List<FaucetClaim> all = claimStore.findAllByWalletOrderByClaimedAtDesc(normalizedWallet);
+        if (offset <= 0 && limit >= all.size()) {
+            return all;
+        }
+
+        int safeOffset = Math.max(0, offset);
+        int safeLimit = Math.max(1, limit);
+        int end = Math.min(all.size(), safeOffset + safeLimit);
+        if (safeOffset >= all.size()) {
+            return List.of();
+        }
+        return all.subList(safeOffset, end);
+    }
+
+    @Override
+    public FaucetConfigResponse getConfig() {
+        FaucetConfigResponse response = new FaucetConfigResponse();
+        response.setDefaultClaimAmount(faucetConfig.getAmount().toPlainString());
+        response.setCooldownSeconds(faucetConfig.getCooldownSeconds());
+        response.setWalletPrefix(faucetConfig.getWalletPrefix());
+        response.setNativeToken("R4V3");
+        response.setSmallestUnit("m4t3r");
+        response.setMaxClaimAmount("1");
+        return response;
+    }
+
+    private FaucetStateResponse buildState(String normalizedWallet) {
+        FaucetClaim lastClaim = claimStore.findLastClaimByWallet(normalizedWallet).orElse(null);
+
+        FaucetStateResponse response = new FaucetStateResponse();
+        response.setWalletAddress(normalizedWallet);
+        response.setDefaultClaimAmount(faucetConfig.getAmount().toPlainString());
+        response.setConfigCooldownSeconds(faucetConfig.getCooldownSeconds());
+
+        if (lastClaim == null) {
+            response.setEligible(true);
+            response.setCooldownSeconds(0);
+            response.setNextEligibleAt(null);
+            response.setLastClaimAmount(null);
+            response.setLastClaimAt(null);
+            return response;
+        }
+
+        long now = System.currentTimeMillis();
+        long cooldownSeconds = FaucetTimeUtils.remainingCooldownSeconds(now, lastClaim.getNextEligibleAt());
+
+        response.setEligible(cooldownSeconds == 0);
+        response.setCooldownSeconds(cooldownSeconds);
+        response.setNextEligibleAt(FaucetTimeUtils.toIso(lastClaim.getNextEligibleAt()));
+        response.setLastClaimAmount(lastClaim.getAmount().toPlainString());
+        response.setLastClaimAt(FaucetTimeUtils.toIso(lastClaim.getClaimedAt()));
+
+        return response;
+    }
+
+    private BigDecimal resolveClaimAmount(FaucetClaimRequest request) {
+        String rawAmount = request.getAmount();
+        if (rawAmount != null && !rawAmount.isBlank()) {
+            BigDecimal amount;
+            try {
+                amount = new BigDecimal(rawAmount.trim().replace(',', '.'));
+            } catch (NumberFormatException exception) {
+                throw new FaucetException("Montant faucet invalide");
+            }
+
+            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new FaucetException("Le montant doit être supérieur à 0");
+            }
+
+            if (amount.compareTo(BigDecimal.ONE) > 0) {
+                throw new FaucetException("Le montant dépasse le plafond faucet");
+            }
+
+            if (amount.scale() > 26) {
+                throw new FaucetException("Précision maximale : 26 décimales (m4t3r)");
+            }
+
+            return amount;
+        }
+
+        return faucetConfig.getAmount();
+    }
+
+    private String normalizeWallet(String walletAddress) {
+        String normalizedWallet = WalletValidator.normalize(walletAddress);
+
+        if (!WalletValidator.isValidBlockchainAddress(normalizedWallet)) {
+            throw new FaucetException("Invalid wallet address");
+        }
+
+        return normalizedWallet;
+    }
+}

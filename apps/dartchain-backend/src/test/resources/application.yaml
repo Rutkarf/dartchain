@@ -1,0 +1,15 @@
+dartchain:
+  persistence:
+    mode: memory
+  product:
+    commercial: false
+    allow-legacy-private-key: false
+    allow-server-wallet-create: false
+  auth:
+    jwt-secret: test-jwt-secret-not-for-production
+  ops:
+    actuator-token: test-actuator-token-not-for-production
+  rate-limit:
+    max-requests: 10000
+  security:
+    strict-pending-signatures: true

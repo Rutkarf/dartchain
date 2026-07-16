@@ -1,0 +1,35 @@
+logging:
+  level:
+    root: INFO
+    io.dartchain: DEBUG
+
+dartchain:
+  persistence:
+    mode: postgres
+  product:
+    commercial: true
+    allow-legacy-private-key: false
+    allow-server-wallet-create: false
+    faucet-enabled: false
+    showcase-enabled: false
+    legacy-api-aliases-enabled: true
+  ops:
+    restrict-actuator: true
+    actuator-token: ${DARTCHAIN_ACTUATOR_TOKEN:}
+  cors:
+    allowed-origin-patterns:
+      - http://localhost:*
+      - http://127.0.0.1:*
+      - https://localhost:*
+      - https://127.0.0.1:*
+      - https://staging.dartchain.pages.dev
+      - ${DARTCHAIN_CORS_EXTRA:https://dartzvz01-tagname.onrender.com}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized

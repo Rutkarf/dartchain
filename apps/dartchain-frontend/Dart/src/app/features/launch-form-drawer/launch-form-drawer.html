@@ -1,0 +1,208 @@
+@if (open()) {
+  <div
+    class="launch-drawer-backdrop"
+    (click)="closeDrawer()"
+    aria-hidden="false"
+  >
+    <aside
+      class="launch-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="launchFormEyebrow"
+      [appFocusTrap]="true"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="launch-drawer__head">
+        <div class="launch-drawer__head-copy">
+          <p id="launchFormEyebrow" class="launch-drawer__eyebrow">LaunchLab</p>
+        </div>
+        <button
+          type="button"
+          class="cta cta--tertiary cta--sm launch-drawer__close"
+          aria-label="Fermer le formulaire"
+          [disabled]="submitting()"
+          (click)="closeDrawer()"
+        >
+          ✕
+        </button>
+      </header>
+
+      <div class="launch-drawer__body">
+        @if (errorMessage()) {
+          <p class="launch-drawer__error">{{ errorMessage() }}</p>
+        }
+
+        <form class="launch-drawer__form" [formGroup]="form" (ngSubmit)="submit()">
+          <p class="launch-drawer__section-title launch-drawer__span-all">Identité du token</p>
+
+          <div class="launch-drawer__logo-cell">
+            @if (logoPreview(); as preview) {
+              <img class="launch-drawer__logo-preview" [src]="preview" alt="Logo" />
+            } @else {
+              <span class="launch-drawer__logo-preview launch-drawer__logo-preview--empty" aria-hidden="true">?</span>
+            }
+            <div class="launch-drawer__logo-upload">
+              <span class="launch-drawer__label">Logo du token</span>
+              <label
+                class="launch-drawer__browse cta cta--tertiary cta--sm"
+                title="Choisir une image enregistrée sur votre ordinateur"
+              >
+                <span class="launch-drawer__browse-icon" aria-hidden="true"></span>
+                <span class="launch-drawer__browse-text">Browse</span>
+                <input
+                  class="launch-drawer__browse-input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  (change)="onLogoChange($event)"
+                />
+              </label>
+              <span class="launch-drawer__browse-hint">Importer depuis votre ordinateur (PNG, JPG, WebP, SVG)</span>
+            </div>
+            @if (logoPreview()) {
+              <button type="button" class="launch-drawer__link-btn" (click)="clearLogo()">×</button>
+            }
+            @if (logoError(); as logoErr) {
+              <span class="launch-drawer__field-hint launch-drawer__field-hint--err launch-drawer__span-all">{{ logoErr }}</span>
+            }
+          </div>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Nom *</span>
+            <input type="text" formControlName="name" maxlength="40" autocomplete="off" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Symbole *</span>
+            <input type="text" formControlName="symbol" maxlength="8" autocomplete="off" placeholder="MTK" />
+          </label>
+
+          <label class="launch-drawer__field launch-drawer__span-2">
+            <span class="launch-drawer__label">Description</span>
+            <input type="text" formControlName="description" maxlength="600" placeholder="Courte description" />
+          </label>
+
+          <p class="launch-drawer__section-title launch-drawer__span-all">On-chain & levée</p>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Blockchain *</span>
+            <select class="launch-drawer__glass-select" formControlName="chain">
+              @for (chain of chainOptions; track chain) {
+                <option [value]="chain">{{ chain }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Supply</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="totalSupply" min="1" step="1" placeholder="1e9" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('totalSupply', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('totalSupply', -1)"></button>
+              </span>
+            </span>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Décimales *</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="decimals" min="0" max="18" step="1" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('decimals', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('decimals', -1)"></button>
+              </span>
+            </span>
+          </label>
+
+          <label class="launch-drawer__field launch-drawer__span-2">
+            <span class="launch-drawer__label">Contrat (optionnel)</span>
+            <input type="text" formControlName="contractAddress" autocomplete="off" placeholder="0x…" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Soft cap</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="targetAmount" min="0" step="100" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('targetAmount', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('targetAmount', -1)"></button>
+              </span>
+            </span>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Hard cap</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="hardCap" min="0" step="100" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('hardCap', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('hardCap', -1)"></button>
+              </span>
+            </span>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Liquidité %</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="liquidityPercent" min="0" max="100" step="1" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('liquidityPercent', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('liquidityPercent', -1)"></button>
+              </span>
+            </span>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Lancement</span>
+            <input type="datetime-local" formControlName="launchDate" />
+          </label>
+
+          <p class="launch-drawer__section-title launch-drawer__span-all">Liens & communauté</p>
+
+          <label class="launch-drawer__field launch-drawer__span-2">
+            <span class="launch-drawer__label">Site web</span>
+            <input type="url" formControlName="website" placeholder="https://…" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Whitepaper</span>
+            <input type="url" formControlName="whitepaperUrl" placeholder="https://…" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Twitter / X</span>
+            <input type="text" formControlName="twitter" placeholder="@projet" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Telegram</span>
+            <input type="text" formControlName="telegram" placeholder="t.me/…" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Discord</span>
+            <input type="text" formControlName="discord" placeholder="discord.gg/…" />
+          </label>
+
+          <div class="launch-drawer__actions launch-drawer__span-all">
+            <button
+              type="button"
+              class="cta cta--secondary cta--sm launch-drawer__btn launch-drawer__btn--ghost"
+              [disabled]="submitting()"
+              (click)="closeDrawer()"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              class="cta cta--primary cta--sm launch-drawer__btn launch-drawer__btn--primary"
+              [disabled]="form.invalid || submitting()"
+            >
+              {{ submitting() ? 'Création…' : 'Créer le projet' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </aside>
+  </div>
+}

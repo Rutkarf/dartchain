@@ -1,0 +1,312 @@
+<div class="showcase-view showcase-view--chat" role="region" aria-label="Chat du salon global">
+  @if (isExpanded) {
+    <header class="showcase-chat__head">
+      <div class="showcase-meta showcase-chat__meta-bar">
+        <span class="showcase-meta__rail" aria-hidden="true"></span>
+        <span class="showcase-meta__room">{{ chatState.roomLabel() }}</span>
+        <span
+          class="showcase-meta__status"
+          [class.showcase-meta__status--online]="chatState.connected()"
+          [class.showcase-meta__status--offline]="!chatState.connected()"
+          [attr.aria-label]="chatState.statusLabel()"
+          [attr.title]="chatState.statusLabel()"
+        ></span>
+
+        @if (chatState.hasUnread()) {
+          <span
+            class="unread-badge showcase-meta__unread"
+            [attr.aria-label]="chatState.unreadCount() + ' non lus'"
+          >
+            {{ chatState.unreadCount() > 99 ? '99+' : chatState.unreadCount() }}
+          </span>
+        }
+
+        <label class="showcase-meta__search">
+          <span class="showcase-chat__sr-only">Rechercher dans le chat</span>
+          <input
+            type="search"
+            class="showcase-meta__search-input"
+            placeholder="Rechercher…"
+            [value]="searchQuery()"
+            (input)="onSearchInput($any($event.target).value)"
+          />
+        </label>
+
+        <button
+          type="button"
+          class="showcase-meta__refresh"
+          title="Réinitialiser la mise en forme"
+          aria-label="Réinitialiser la mise en forme"
+          (click)="refreshToolbar()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+            <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+            <path d="M17 4v4h-4" />
+            <path d="M7 20v-4h4" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="showcase-chat__ribbon-row" role="toolbar" aria-label="Chat — mise en forme">
+        <div class="showcase-chat__ribbon">
+          <div class="showcase-chat__ribbon-group showcase-chat__ribbon-group--font">
+            <div class="showcase-chat__font-field">
+              <select
+                class="showcase-chat__menu-select showcase-chat__menu-select--font"
+                [value]="prefs.fontKey()"
+                (change)="onFontChange($event)"
+                aria-label="Police"
+                title="Police"
+              >
+                @for (opt of fontOptions; track opt.key) {
+                  <option [value]="opt.key">{{ opt.label }}</option>
+                }
+              </select>
+              <span class="showcase-chat__font-chevron" aria-hidden="true"></span>
+            </div>
+
+            <button
+              type="button"
+              class="showcase-chat__tool-btn showcase-chat__icon-btn showcase-chat__layout-btn"
+              [attr.aria-label]="bubbleStyleTitle()"
+              [title]="bubbleStyleTitle()"
+              (click)="prefs.cycleBubbleStyle()"
+            >
+              <span class="showcase-chat__layout-glyph" aria-hidden="true">{{
+                bubbleStylePreview()
+              }}</span>
+            </button>
+          </div>
+
+          <div class="showcase-chat__ribbon-group showcase-chat__ribbon-group--chars">
+            <div class="showcase-chat__toggle-group" role="group" aria-label="Style de caractère">
+              <button
+                type="button"
+                class="showcase-chat__tool-btn showcase-chat__icon-btn"
+                [class.showcase-chat__icon-btn--active]="prefs.format().bold"
+                [attr.aria-pressed]="prefs.format().bold"
+                title="Gras"
+                (click)="prefs.toggleBold()"
+              >
+                <strong>B</strong>
+              </button>
+              <button
+                type="button"
+                class="showcase-chat__tool-btn showcase-chat__icon-btn"
+                [class.showcase-chat__icon-btn--active]="prefs.format().italic"
+                [attr.aria-pressed]="prefs.format().italic"
+                title="Italique"
+                (click)="prefs.toggleItalic()"
+              >
+                <em>I</em>
+              </button>
+              <button
+                type="button"
+                class="showcase-chat__tool-btn showcase-chat__icon-btn"
+                [class.showcase-chat__icon-btn--active]="prefs.format().underline"
+                [attr.aria-pressed]="prefs.format().underline"
+                title="Souligné"
+                (click)="prefs.toggleUnderline()"
+              >
+                <span class="showcase-chat__u">U</span>
+              </button>
+              <button
+                type="button"
+                class="showcase-chat__tool-btn showcase-chat__icon-btn"
+                [class.showcase-chat__icon-btn--active]="prefs.format().strikethrough"
+                [attr.aria-pressed]="prefs.format().strikethrough"
+                title="Barré"
+                (click)="prefs.toggleStrikethrough()"
+              >
+                <span class="showcase-chat__strike">S</span>
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="showcase-chat__ribbon-group showcase-chat__ribbon-group--styles"
+            role="group"
+            aria-label="Styles rapides"
+          >
+            @for (preset of stylePresets; track preset.label) {
+              <button
+                type="button"
+                class="showcase-chat__tool-btn showcase-chat__icon-btn showcase-chat__style-preset-btn"
+                [title]="preset.title"
+                [attr.aria-label]="preset.title"
+                (click)="applyStylePreset(preset.patch)"
+              >
+                {{ preset.label }}
+              </button>
+            }
+          </div>
+
+          <div class="showcase-chat__ribbon-group showcase-chat__ribbon-group--colors">
+            <div class="showcase-chat__dropdown" [class.is-open]="isMenuOpen('colors')">
+              <button
+                type="button"
+                class="showcase-chat__tool-btn showcase-chat__dropdown-trigger showcase-chat__dropdown-trigger--colors"
+                [class.showcase-chat__dropdown-trigger--active]="isMenuOpen('colors')"
+                title="Couleurs du texte et surlignage"
+                aria-label="Couleurs du texte et surlignage"
+                [attr.aria-expanded]="isMenuOpen('colors')"
+                (click)="toggleMenu($event, 'colors')"
+              >
+                <span class="showcase-chat__color-trigger" aria-hidden="true">
+                  <span class="showcase-chat__trigger-a">A</span>
+                  <span class="showcase-chat__color-trigger-bars">
+                    <span
+                      class="showcase-chat__trigger-bar"
+                      [style.background]="prefs.format().fontColor"
+                    ></span>
+                    <span
+                      class="showcase-chat__trigger-bar showcase-chat__trigger-bar--mini"
+                      [style.background]="
+                        isTransparentHighlight(prefs.format().highlightColor)
+                          ? 'transparent'
+                          : prefs.format().highlightColor
+                      "
+                    ></span>
+                  </span>
+                </span>
+              </button>
+              @if (isMenuOpen('colors')) {
+                <div
+                  class="showcase-chat__palette showcase-chat__palette--combined"
+                  role="dialog"
+                  aria-label="Couleurs"
+                  (click)="stopMenuClick($event)"
+                >
+                  <p class="showcase-chat__palette-title">Couleur de police</p>
+                  <div
+                    class="showcase-chat__palette-grid"
+                    role="listbox"
+                    aria-label="Couleurs de police"
+                  >
+                    @for (color of fontColorGrid; track color) {
+                      <button
+                        type="button"
+                        class="showcase-chat__palette-swatch"
+                        [style.background]="color"
+                        [class.is-active]="prefs.format().fontColor === color"
+                        [attr.aria-label]="'Couleur ' + color"
+                        (click)="pickFontColor(color, $event)"
+                      ></button>
+                    }
+                  </div>
+                  <label class="showcase-chat__palette-more">
+                    <span>Plus de couleurs</span>
+                    <input
+                      type="color"
+                      [value]="prefs.format().fontColor"
+                      (input)="onCustomFontColor($event)"
+                      aria-label="Couleur personnalisée"
+                    />
+                  </label>
+
+                  <p class="showcase-chat__palette-title showcase-chat__palette-title--section">
+                    Surlignage
+                  </p>
+                  <div class="showcase-chat__palette-grid" role="listbox" aria-label="Surlignage">
+                    @for (color of highlightGrid; track color) {
+                      <button
+                        type="button"
+                        class="showcase-chat__palette-swatch"
+                        [class.is-transparent]="isTransparentHighlight(color)"
+                        [class.is-active]="prefs.format().highlightColor === color"
+                        [style.background]="
+                          isTransparentHighlight(color) ? 'transparent' : color
+                        "
+                        [attr.aria-label]="
+                          isTransparentHighlight(color) ? 'Sans surlignage' : 'Surlignage ' + color
+                        "
+                        (click)="pickHighlight(color, $event)"
+                      ></button>
+                    }
+                  </div>
+                  <button
+                    type="button"
+                    class="showcase-chat__palette-clear"
+                    (click)="clearHighlight($event)"
+                  >
+                    Retirer le surlignage
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    @if (chatState.sendError()) {
+      <div class="showcase-chat__error" role="alert">
+        <span>{{ chatState.sendError() }}</span>
+        <button
+          type="button"
+          class="showcase-chat__error-dismiss"
+          aria-label="Fermer l'alerte"
+          (click)="dismissSendError()"
+        >
+          ×
+        </button>
+      </div>
+    }
+
+    <div class="showcase-chat__content">
+      <ul class="showcase-chat__messages" aria-live="polite">
+        @for (msg of filteredMessages(); track msg.id) {
+          <li [ngClass]="lineNgClass(msg)">
+            <div class="showcase-chat__line-inner">
+              @if (messageTime(msg)) {
+                <span class="showcase-chat__time">{{ messageTime(msg) }}</span>
+              } @else {
+                <span
+                  class="showcase-chat__time showcase-chat__time--placeholder"
+                  aria-hidden="true"
+                ></span>
+              }
+              <span
+                class="showcase-chat__led"
+                [class.showcase-chat__led--online]="messageLedOnline(msg)"
+                [class.showcase-chat__led--offline]="!messageLedOnline(msg)"
+                [attr.title]="messageLedOnline(msg) ? 'Connecté' : 'Déconnecté'"
+                [attr.aria-label]="messageLedOnline(msg) ? 'Connecté' : 'Déconnecté'"
+              ></span>
+              <span class="showcase-chat__author">{{ displayAuthor(msg) }}</span>
+              <span class="showcase-chat__text" [ngStyle]="textStyle(msg)">{{ msg.text }}</span>
+            </div>
+          </li>
+        }
+        <li #messagesEnd class="showcase-chat__anchor" aria-hidden="true"></li>
+      </ul>
+    </div>
+
+    <form class="showcase-chat__composer" (submit)="onComposerSubmit($event)">
+      @if (!auth.isAuthenticated()) {
+        <p class="showcase-chat__auth-hint" role="note">
+          Connectez-vous pour envoyer un message dans le salon.
+        </p>
+      }
+      <div [ngClass]="composerBubbleClass()">
+        <input
+          type="text"
+          class="showcase-chat__input"
+          [placeholder]="auth.isAuthenticated() ? 'Tape ton message…' : 'Connexion requise pour écrire…'"
+          [formControl]="messageControl"
+          [ngStyle]="composerTextStyle()"
+          (keydown)="onKeydown($event)"
+          aria-label="Message chat"
+        />
+        <button
+          type="submit"
+          class="showcase-chat__send"
+          [disabled]="auth.isAuthenticated() && messageControl.invalid"
+        >
+          {{ sendButtonLabel() }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

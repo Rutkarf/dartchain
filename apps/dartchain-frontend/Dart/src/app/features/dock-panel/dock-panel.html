@@ -1,0 +1,51 @@
+<section
+  class="dock-panel ds-surface ds-surface--card"
+  [class.is-collapsed]="collapsed"
+  [class.is-expanded]="!collapsed"
+  [class.is-pending]="activePanel === 'pending'"
+  [class.is-block]="activePanel === 'composer'"
+  [class.is-chain]="activePanel === 'chain'"
+  [attr.data-active-panel]="activePanel"
+>
+  @if (isPendingCollapsed) {
+    <header class="dock-panel__handle dock-summary-bar ds-surface ds-surface--dock" aria-label="Pending, panneau replié">
+      <app-dock-pending-summary class="dock-summary-bar__content" />
+      <app-mini-bar-slide-indicator />
+    </header>
+  } @else if (isBlockCollapsed) {
+    <header class="dock-panel__handle dock-summary-bar ds-surface ds-surface--dock" aria-label="Block, panneau replié">
+      <app-dock-block-summary class="dock-summary-bar__content" />
+      <app-mini-bar-slide-indicator />
+    </header>
+  } @else if (isChainCollapsed) {
+    <header class="dock-panel__handle dock-summary-bar ds-surface ds-surface--dock" aria-label="Chain, panneau replié">
+      <app-dock-chain-summary class="dock-summary-bar__content" />
+      <app-mini-bar-slide-indicator />
+    </header>
+  }
+
+  <div
+    id="dock-panel-body"
+    class="dock-panel__body"
+    [attr.aria-hidden]="collapsed"
+  >
+    <section
+      class="dock-tabs-panel ds-surface ds-surface--showcase-body"
+      id="panel-dock"
+      role="tabpanel"
+      [attr.aria-labelledby]="'tab-' + activePanel"
+    >
+      <div class="dock-tabs-panel__body">
+        <div class="dock-panel-layer" [hidden]="activePanel !== 'pending'">
+          <app-pending-transactions />
+        </div>
+        <div class="dock-panel-layer" [hidden]="activePanel !== 'composer'">
+          <app-block-composer />
+        </div>
+        <div class="dock-panel-layer" [hidden]="activePanel !== 'chain'">
+          <app-blocks-list (selectBlock)="onChainBlockSelect($event)" />
+        </div>
+      </div>
+    </section>
+  </div>
+</section>

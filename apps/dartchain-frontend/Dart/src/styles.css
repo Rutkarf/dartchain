@@ -1,0 +1,433 @@
+@import './theme.css';
+@import './styles/design-system-tokens.css';
+@import './styles/ds-surface.css';
+@import './styles/showcase-tabs-global.css';
+@import './styles/dock-shell.css';
+@import './cta-buttons.css';
+@import './styles/dock-view-tokens.css';
+
+/* —— Viewport one-page (pas de scroll global) —— */
+html,
+body,
+app-root {
+  display: block;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Dock stack : onglets horizontaux visibles au-dessus du panneau repliable */
+.app-dock-stack .dock-header-tabs app-dock-tabs,
+.app-dock-stack .app-dock-tabstrip app-dock-tabs {
+  display: block !important;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: visible !important;
+}
+
+.app-dock-stack .app-dock-block {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.app-dock-stack .dock-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+}
+
+.app-dock-stack .dock-header-tabs,
+.app-dock-stack .dock-tabstrip,
+.app-dock-stack .app-dock-tabstrip {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: flex-end !important;
+  width: 100% !important;
+  height: var(--dock-hub-tab-h, 20px) !important;
+  min-height: var(--dock-hub-tab-h, 20px) !important;
+  max-height: var(--dock-hub-tab-h, 20px) !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  z-index: 10 !important;
+}
+
+.app-dock-stack .dock-tabs {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: flex-end !important;
+  justify-content: flex-end !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  height: var(--dock-hub-tab-h, 20px) !important;
+  min-height: var(--dock-hub-tab-h, 20px) !important;
+  max-height: var(--dock-hub-tab-h, 20px) !important;
+  gap: 0 !important;
+  overflow: visible !important;
+  visibility: visible !important;
+}
+
+.app-dock-stack .dock-tab {
+  display: flex !important;
+  flex: 0 0 var(--dock-hub-tab-w, 2.25rem) !important;
+  width: var(--dock-hub-tab-w, 2.25rem) !important;
+  min-width: var(--dock-hub-tab-w, 2.25rem) !important;
+  max-width: var(--dock-hub-tab-w, 2.25rem) !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  visibility: visible !important;
+}
+
+.app-dock-stack .dock-tab-label {
+  writing-mode: horizontal-tb !important;
+  transform: none !important;
+  white-space: nowrap !important;
+}
+
+.app-dock-stack .app-dock-band {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+app-dock-panel .dock-tabs-panel {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+}
+
+/* Contenus dock : même calage que Pending / Block (pas d’ombre externe dans la gouttière) */
+app-dock-panel .dock-panel-layer > app-wallet-panel,
+app-dock-panel .dock-panel-layer > app-pending-transactions,
+app-dock-panel .dock-panel-layer > app-block-composer,
+app-dock-panel .dock-panel-layer > app-blocks-list,
+app-dock-panel .dock-panel-layer > app-peer-panel {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+app-dock-panel .wallet-compact,
+app-dock-panel .pending-panel,
+app-dock-panel .composer-card,
+app-dock-panel .blocks-panel,
+app-dock-panel .peer-panel {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+app-dock-panel .dock-panel-layer:has(app-pending-transactions),
+app-dock-panel .dock-panel-layer:has(app-block-composer),
+app-dock-panel .dock-panel-layer:has(app-wallet-panel),
+app-dock-panel .dock-panel-layer:has(app-blocks-list),
+app-dock-panel .dock-panel-layer:has(app-peer-panel) {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+app-dock-panel .dock-panel-layer > app-pending-transactions,
+app-dock-panel .dock-panel-layer > app-block-composer,
+app-dock-panel .dock-panel-layer > app-wallet-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+}
+
+app-dock-panel .peer-shell {
+  padding: 5px;
+}
+
+app-dock-panel .composer-card,
+app-dock-panel .pending-panel,
+app-dock-panel .wallet-compact {
+  padding: 0;
+}
+
+app-dock-panel .overlay-card {
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  box-shadow: inset 0 1px 0 var(--surface-inset-top);
+}
+
+app-showcase-tabs .showcase-tabs {
+  width: 100%;
+  min-width: var(--tab-rail-width, 30px);
+}
+
+app-showcase-tabs .showcase-tab {
+  min-width: 100%;
+  width: 100%;
+}
+
+/* —— Typographie globale —— */
+html,
+body,
+button,
+input,
+textarea,
+select,
+optgroup {
+  font-family: var(--font-body);
+}
+
+:where(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .brand-title,
+  .bandeau-accueil__content span,
+  .dock-tab-label,
+  .showcase-tab,
+  .showcase-tab__label,
+  .showcase-window__title,
+  .faucet-inline__claim-text,
+  .faucet-inline__value,
+  .wallet-compact__title,
+  .showcase-news__title,
+  .showcase-news__filter,
+  .showcase-news__refresh,
+  .showcase-chat__title,
+  .showcase-chat__menu-select,
+  .launch-drawer__glass-select,
+  .showcase-chat__menu-btn,
+  .showcase-chat__dropdown-trigger,
+  .showcase-news__tag,
+  .showcase-news__item-title,
+  .showcase-chart__range-btn,
+  .showcase-chart__type-btn,
+  .showcase-chart__tool-btn,
+  .showcase-chart__retry,
+  .rate-card__symbol,
+  .launch-drawer__eyebrow,
+  .launch-drawer h3,
+  .drawer-eyebrow,
+  .drawer h3,
+  .composer-title,
+  .pending-title,
+  .pending-state-title,
+  .exchange-panel__label-row,
+  .icon-btn span,
+  .navbar-auth-btn,
+  .composer-primary,
+  .composer-secondary,
+  .cta
+) {
+  font-family: var(--font-display);
+}
+
+:where(
+  .wallet-compact__mono,
+  .pending-hash,
+  .block-hash,
+  .detail-code,
+  .detail-inline-code
+) {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+
+/* Panneaux — coque vitrée commune */
+:where(
+  .composer-card,
+  .pending-panel,
+  .peer-shell,
+  .wallet-compact,
+  .status-shell,
+  .launch-drawer,
+  .drawer
+) {
+  border: 1px solid transparent;
+  background: var(--glass-fill) padding-box, var(--glass-border) border-box;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Faucet : hauteur au contenu, sans coque vitrée, collé ticker / marché */
+app-faucet {
+  display: block;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  margin-block: 0;
+  padding-block: 0;
+  line-height: 0;
+}
+
+.navbar-ticker-faucet-stack {
+  gap: 0;
+  row-gap: 0;
+  margin-block: 0;
+  padding-block: 0;
+}
+
+.navbar-ticker-faucet-stack .navbar-bandeau-slot,
+.navbar-ticker-faucet-stack .navbar-faucet-slot {
+  margin-block: 0;
+  padding-block: 0;
+}
+
+.faucet-inline {
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  margin-block: 0;
+  padding-block: 0;
+  background: none;
+  border: none;
+  outline: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.faucet-inline,
+.faucet-inline__core {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.faucet-inline__core {
+  margin-block: 0;
+  padding-block: 0;
+}
+
+.navbar-bandeau-slot,
+.navbar-faucet-slot {
+  margin: 0;
+  padding: 0;
+  margin-block: 0;
+  padding-block: 0;
+}
+
+.navbar-bandeau-slot app-bandeau-accueil,
+.navbar-faucet-slot app-faucet {
+  display: block;
+  margin: 0;
+  padding: 0;
+  margin-block: 0;
+  padding-block: 0;
+}
+
+/* Le layout principal est désormais piloté uniquement par `src/app/app.css`.
+   On évite ici toute redéfinition globale de `.app-shell` pour ne pas écraser
+   les hauteurs/rows compactes (300x600). */
+
+html,
+body {
+  width: 100%;
+  background: var(--bg-base);
+  overflow-x: hidden;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body :where(input, textarea, select) {
+  color: var(--text-primary);
+  -webkit-text-fill-color: var(--text-primary);
+}
+
+body :where(input, textarea)::placeholder {
+  color: var(--text-placeholder) !important;
+  -webkit-text-fill-color: var(--text-placeholder) !important;
+}
+
+body :where(button, input, textarea, select):disabled {
+  color: var(--text-disabled) !important;
+  -webkit-text-fill-color: var(--text-disabled) !important;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.exchange-panel__swap--inactive:not(:disabled) {
+  opacity: 0.78;
+  filter: brightness(0.92) saturate(0.92);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/*
+ * Dock — reset panneaux legacy (bordures cyan). Surface = ds-surface (dock-shell.css).
+ */
+.app-bottom-stack .showcase-block__shell.ds-surface.ds-surface--card {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+.app-bottom-stack .showcase-block__shell .app-bottom-stack__panel {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.app-bottom-stack .app-bottom-stack__panel app-faucet {
+  line-height: normal;
+  height: 100%;
+  min-height: 0;
+}
+
+.app-bottom-stack .app-bottom-stack__panel .wallet-display,
+.app-bottom-stack .app-bottom-stack__panel .peer-panel,
+.app-bottom-stack .app-bottom-stack__panel .quests-panel,
+.app-bottom-stack .app-bottom-stack__panel .faucet-panel {
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-bottom-stack .dock-view,
+.app-bottom-stack .pending-view {
+  background: transparent;
+}
+
+/* Panneau dock : occupe la 2e ligne du stack */
+.app-dock-stack .dock-tabs-panel,
+.app-dock-stack .dock-tabs-panel__body,
+.app-dock-stack .dock-panel-layer {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+}

@@ -1,0 +1,198 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+
+  --dock-panel-handle-h: clamp(12px, 3.2vw, 16px);
+  --dock-smart-bar-h: clamp(28px, 7vw, 34px);
+  --dock-panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dock-panel-duration: 280ms;
+}
+
+@keyframes panel-smart-bar-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:host(.is-collapsed.is-pending),
+:host(.is-collapsed.is-block),
+:host(.is-collapsed.is-wallet),
+:host(.is-collapsed.is-chain),
+:host(.is-collapsed.is-peers) {
+  overflow: visible;
+}
+
+.dock-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: none;
+  box-shadow: var(--ds-surface-shadow);
+  background-color: var(--ds-surface-tint);
+  background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
+  backdrop-filter: var(--ds-surface-backdrop);
+  -webkit-backdrop-filter: var(--ds-surface-backdrop);
+}
+
+.dock-panel__handle {
+  position: relative;
+  flex: 0 0 var(--dock-panel-handle-h);
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: var(--dock-panel-handle-h);
+  max-height: var(--dock-panel-handle-h);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.dock-panel.is-collapsed.is-pending,
+.dock-panel.is-collapsed.is-block,
+.dock-panel.is-collapsed.is-wallet,
+.dock-panel.is-collapsed.is-chain,
+.dock-panel.is-collapsed.is-peers {
+  --dock-panel-handle-h: var(--dock-smart-bar-h, clamp(28px, 7vw, 34px));
+  overflow: visible;
+}
+
+.dock-panel__handle.dock-summary-bar {
+  flex: 0 0 var(--dock-smart-bar-h, clamp(28px, 7vw, 34px));
+  min-height: var(--dock-smart-bar-h, clamp(28px, 7vw, 34px));
+  height: var(--dock-smart-bar-h, clamp(28px, 7vw, 34px));
+  max-height: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+  padding: 0 0 5px;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+  border-bottom: 1px solid var(--ds-surface-border-bottom);
+  animation: panel-smart-bar-slide-down var(--dock-panel-duration) var(--dock-panel-ease) both;
+}
+
+.dock-panel__handle.dock-summary-bar.ds-surface.ds-surface--dock {
+  background-color: var(--ds-surface-tint);
+  background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
+  backdrop-filter: var(--ds-surface-backdrop);
+  -webkit-backdrop-filter: var(--ds-surface-backdrop);
+}
+
+.dock-tabs-panel.ds-surface.ds-surface--showcase-body {
+  background-color: var(--ds-surface-tint);
+  background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
+  backdrop-filter: var(--ds-surface-backdrop);
+  -webkit-backdrop-filter: var(--ds-surface-backdrop);
+}
+
+.dock-summary-bar__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.dock-panel.is-expanded .dock-panel__body {
+  flex: 1 1 auto;
+  height: 100%;
+  max-height: 100%;
+}
+
+.dock-panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow: hidden;
+  transition: grid-template-rows var(--dock-panel-duration) var(--dock-panel-ease);
+}
+
+.dock-panel__body > .dock-tabs-panel {
+  min-height: 0;
+  overflow: hidden;
+  transform: translateY(0);
+  transition: transform var(--dock-panel-duration) var(--dock-panel-ease);
+}
+
+.dock-panel.is-collapsed .dock-panel__body {
+  grid-template-rows: 0fr;
+  flex: 0 0 auto;
+  pointer-events: none;
+}
+
+.dock-panel.is-collapsed .dock-panel__body > .dock-tabs-panel {
+  transform: translateY(-10px);
+}
+
+.dock-panel.is-expanded .dock-tabs-panel {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+.dock-tabs-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dock-tabs-panel__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dock-panel-layer {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dock-panel-layer[hidden] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock-panel__body,
+  .dock-panel__body > .dock-tabs-panel,
+  .dock-panel__handle.dock-summary-bar {
+    transition: none;
+    animation: none;
+    transform: none;
+  }
+}

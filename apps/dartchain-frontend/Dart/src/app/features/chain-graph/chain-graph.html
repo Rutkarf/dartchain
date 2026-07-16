@@ -1,0 +1,51 @@
+<div class="chain-graph" role="img" [attr.aria-label]="'Graphe de ' + layoutNodes().length + ' blocs'">
+  <div class="chain-graph__scroll">
+    <svg
+      class="chain-graph__svg"
+      [attr.viewBox]="'0 0 ' + graphWidth() + ' 88'"
+      preserveAspectRatio="xMinYMid meet"
+      aria-hidden="true"
+      focusable="false"
+    >
+      @for (segment of linkSegments(); track $index) {
+        <line
+          class="chain-graph__link"
+          [attr.x1]="segment.x1"
+          [attr.y1]="segment.y1"
+          [attr.x2]="segment.x2"
+          [attr.y2]="segment.y2"
+        />
+      }
+
+      @for (node of layoutNodes(); track node.block.index) {
+        <g class="chain-graph__node" [class.is-tip]="node.isTip">
+          <circle
+            class="chain-graph__node-circle"
+            [attr.cx]="node.x"
+            [attr.cy]="node.y"
+            r="16"
+          />
+          <text class="chain-graph__node-index" [attr.x]="node.x" [attr.y]="node.y + 3">
+            {{ node.block.index }}
+          </text>
+          <text class="chain-graph__node-hash" [attr.x]="node.x" [attr.y]="node.y + 28">
+            {{ shortHash(node.block.hash) }}
+          </text>
+        </g>
+      }
+    </svg>
+
+    <div class="chain-graph__actions" aria-hidden="true">
+      @for (node of layoutNodes(); track node.block.index) {
+        <button
+          type="button"
+          class="chain-graph__hit"
+          [style.left.px]="node.x - 18"
+          [style.top.px]="node.y - 18"
+          [attr.aria-label]="'Ouvrir le bloc #' + node.block.index"
+          (click)="openBlock(node.block)"
+        ></button>
+      }
+    </div>
+  </div>
+</div>

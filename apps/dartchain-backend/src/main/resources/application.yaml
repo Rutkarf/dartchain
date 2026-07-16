@@ -1,0 +1,119 @@
+server:
+  port: ${PORT:8080}
+
+dartchain:
+  persistence:
+    mode: ${DARTCHAIN_PERSISTENCE_MODE:memory}
+  product:
+    commercial: false
+    allow-legacy-private-key: false
+    allow-server-wallet-create: false
+    faucet-enabled: true
+    showcase-enabled: true
+    legacy-api-aliases-enabled: false
+  chain:
+    chain-id: 3377
+    network-name: DartChain Native
+    native-token: R4V3
+    allow-server-evm-wallet-create: true
+  auth:
+    jwt-secret: ${DARTCHAIN_JWT_SECRET:dev-only-change-in-prod}
+    access-token-ttl-seconds: 3600
+    refresh-token-ttl-seconds: 604800
+    legacy-session-enabled: false
+    bootstrap-admin-username: ${DARTCHAIN_BOOTSTRAP_ADMIN:}
+    password-min-length: 8
+  rate-limit:
+    max-requests: 20
+    window-ms: 60000
+  security:
+    strict-pending-signatures: true
+  ops:
+    restrict-actuator: false
+    actuator-token: ${DARTCHAIN_ACTUATOR_TOKEN:}
+    mempool-alert-threshold: ${DARTCHAIN_MEMPOOL_ALERT_THRESHOLD:50}
+    http-error-alert-threshold: ${DARTCHAIN_HTTP_ERROR_ALERT_THRESHOLD:10}
+    slow-request-threshold-ms: ${DARTCHAIN_SLOW_REQUEST_THRESHOLD_MS:2000}
+    rbac-denied-alert-threshold: ${DARTCHAIN_RBAC_DENIED_ALERT_THRESHOLD:20}
+  cors:
+    allowed-origin-patterns:
+      - http://localhost:*
+      - http://127.0.0.1:*
+      - https://localhost:*
+      - https://127.0.0.1:*
+      - https://dartchain.pages.dev
+      - https://*.dartchain.pages.dev
+      - https://*.pages.dev
+      - https://dartzvz01-tagname.onrender.com
+      - https://*.onrender.com
+  data-import:
+    enabled: false
+    exit-after-import: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+      access:
+        default: unrestricted
+    access:
+      default: read_only
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
+      access: unrestricted
+    info:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: 0.17.0-SNAPSHOT
+    phase: AF
+  dartchain:
+    persistence-mode: ${dartchain.persistence.mode:memory}
+    postgres-only-profiles: prod,staging
+
+spring:
+  application:
+    name: dartchain-backend
+
+blockchain:
+  state:
+    path: ${BLOCKCHAIN_STATE_PATH:data/blockchain-state.json}
+
+exchange:
+  ledger:
+    path: ${EXCHANGE_LEDGER_PATH:data/exchange-ledger.json}
+
+launch:
+  projects:
+    path: ${LAUNCH_PROJECTS_PATH:data/launch-projects.json}
+
+chat:
+  messages:
+    path: ${CHAT_MESSAGES_PATH:data/chat-messages.json}
+
+news:
+  items:
+    path: ${NEWS_ITEMS_PATH:data/news-items.json}
+
+quests:
+  progress:
+    path: ${QUESTS_PROGRESS_PATH:data/quest-progress.json}
+
+faucet:
+  claims:
+    path: ${FAUCET_CLAIMS_PATH:data/faucet-claims.json}
+
+auth:
+  users:
+    path: ${AUTH_USERS_PATH:data/auth-users.json}
+  session:
+    ttl-seconds: ${AUTH_SESSION_TTL_SECONDS:604800}

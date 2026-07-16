@@ -1,0 +1,70 @@
+/**
+ * Dock — même surface carbone glass que showcase / exchange / navbar (ds-surface).
+ * z-index 6 : reste au-dessus du three-floor (z-index 2).
+ */
+
+.app-bottom-stack {
+  position: relative;
+  z-index: 6 !important;
+  isolation: isolate;
+}
+
+/* Shell = ds-surface ds-surface--card (identique au showcase-block__shell) */
+.app-bottom-stack .showcase-block__shell.bottom-stack__shell.ds-surface.ds-surface--card {
+  border: none;
+  box-shadow: var(--ds-surface-shadow);
+}
+
+.app-bottom-stack .showcase-header.app-bottom-stack__header,
+.app-bottom-stack .app-bottom-stack__content,
+.app-bottom-stack .app-bottom-stack__band,
+.app-bottom-stack .showcase-header-tabs,
+.app-bottom-stack .showcase-header-actions,
+.app-bottom-stack .app-bottom-stack__panel {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.app-bottom-stack .showcase-header-tabs {
+  flex: 1 1 0% !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: calc(100% - var(--showcase-toggle-w, 28px)) !important;
+  overflow: hidden !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tabs,
+.app-bottom-stack .showcase-header-tabs .app-bottom-stack__tabs {
+  display: flex !important;
+  flex-flow: row nowrap !important;
+  align-items: stretch !important;
+  gap: 2px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab,
+.app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab__label {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  text-align: center !important;
+}
+
+.app-bottom-stack .showcase-header-actions {
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+}

@@ -1,0 +1,40 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.jks
+secrets/
+credentials/
+
+# IDE
+.idea/
+*.iml
+out/
+.vscode/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Frontend (Angular)
+apps/dartchain-frontend/Dart/node_modules/
+apps/dartchain-frontend/Dart/dist/
+apps/dartchain-frontend/Dart/.angular/
+
+# Backend (Java)
+apps/dartchain-backend/target/
+apps/dartchain-backend/bin/
+apps/dartchain-backend/*.jar
+apps/dartchain-backend/data/*.json
+!apps/dartchain-backend/data/seed/
+
+# Divers
+coverage/
+reports/

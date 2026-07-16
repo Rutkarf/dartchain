@@ -1,0 +1,118 @@
+<section class="exchange-panel" aria-label="Échange LaunchLab">
+  <div class="exchange-panel__shell ds-surface ds-surface--card">
+    <div class="exchange-panel__inner">
+      @if (loadingPanel()) {
+        <div class="exchange-panel__skeleton exchange-panel__skeleton--body" aria-hidden="true"></div>
+      } @else {
+        <div
+          class="exchange-panel__route"
+          role="listbox"
+          aria-labelledby="exchange-pair-label"
+          aria-label="Tokens LaunchLab"
+        >
+          <button
+            type="button"
+            class="exchange-panel__from"
+            [title]="'Solde ' + formatBalance(fromBalance()) + ' ' + tokenUnitLabel(fromToken())"
+            tabindex="-1"
+            disabled
+          >
+            {{ displayTokenSymbol(fromToken()) }}
+          </button>
+
+          <span class="exchange-panel__swap-label" id="exchange-pair-label" aria-hidden="true">
+            <span class="exchange-panel__swap-line"></span>
+            <span class="exchange-panel__swap-text">SWAP</span>
+            <span class="exchange-panel__swap-head">▶</span>
+          </span>
+
+          <div class="exchange-panel__targets">
+            @for (slot of launchGridSlots(); track $index) {
+              @if (slot) {
+                <button
+                  type="button"
+                  role="option"
+                  class="exchange-panel__chip"
+                  [class.exchange-panel__chip--active]="isLaunchChipActive(slot)"
+                  [attr.aria-selected]="isLaunchChipActive(slot)"
+                  (click)="selectLaunchChip(slot)"
+                  [title]="tokenDisplayName(slot)"
+                >
+                  {{ slot }}
+                </button>
+              } @else {
+                <span class="exchange-panel__chip exchange-panel__chip--empty" aria-hidden="true"></span>
+              }
+            }
+          </div>
+        </div>
+
+        <footer class="exchange-panel__convert" [formGroup]="amountForm">
+          <p class="exchange-panel__convert-hint" id="exchange-convert-hint" aria-live="polite">
+            ≈ {{ formattedEstimatedTo() }} {{ toToken() }}
+            · {{ formatBalance(fromBalance()) }} {{ tokenUnitLabel(fromToken()) }}
+            @if (rateLine()) {
+              · {{ rateLine() }}
+            }
+          </p>
+          <div class="exchange-panel__convert-row">
+            <label class="exchange-panel__sr-only" for="exchange-amount-input">
+              Montant {{ tokenUnitLabel(fromToken()) }}
+            </label>
+            <input
+              id="exchange-amount-input"
+              class="exchange-panel__amount-input"
+              type="text"
+              inputmode="decimal"
+              formControlName="amount"
+              [placeholder]="amountPlaceholder()"
+              [attr.aria-describedby]="'exchange-convert-hint'"
+              (input)="onAmountInput()"
+              (keydown.enter)="onAmountEnter($event)"
+            />
+            <span class="exchange-panel__value-unit">{{ tokenUnitLabel(fromToken()) }}</span>
+            <button
+              type="button"
+              class="exchange-panel__max"
+              [disabled]="fromBalance() <= 0"
+              (click)="setMaxAmount()"
+            >
+              MAX
+            </button>
+            <button
+              type="button"
+              class="exchange-panel__swap-btn"
+              [class.exchange-panel__swap-btn--ready]="swapAction() === 'swap'"
+              [class.exchange-panel__swap-btn--funnel]="isFunnelCta()"
+              [class.exchange-panel__swap-btn--inactive]="swapButtonDisabled()"
+              (click)="onSwapClick()"
+              [disabled]="swapButtonDisabled()"
+              [attr.aria-label]="swapButtonLabel()"
+              [title]="swapButtonLabel()"
+            >
+              {{ swapButtonLabel() }}
+            </button>
+          </div>
+        </footer>
+
+        @if (showSuccessToast() && successMessage()) {
+          <div class="exchange-panel__overlay exchange-panel__toast" role="status">
+            <span>{{ successMessage() }}</span>
+            <button type="button" class="exchange-panel__toast-dismiss" (click)="dismissSuccessToast()">×</button>
+          </div>
+        }
+
+        @if (showStatus() && (errorMessage() || (successMessage() && !showSuccessToast()))) {
+          <p
+            class="exchange-panel__overlay exchange-panel__status"
+            [class.exchange-panel__status--error]="!!errorMessage()"
+            [class.exchange-panel__status--success]="!!successMessage() && !errorMessage()"
+            [attr.role]="errorMessage() ? 'alert' : 'status'"
+          >
+            {{ errorMessage() || successMessage() }}
+          </p>
+        }
+      }
+    </div>
+  </div>
+</section>

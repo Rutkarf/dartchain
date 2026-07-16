@@ -1,0 +1,414 @@
+<div class="showcase-view showcase-view--r4v3" role="region" aria-label="Token R4V3">
+  @if (isExpanded) {
+    <header class="showcase-r4v3__head">
+      <div class="showcase-meta showcase-r4v3__meta-bar">
+        <button
+          type="button"
+          class="showcase-meta__live showcase-meta__live-btn showcase-r4v3__live-btn"
+          (click)="onBrandTap($event)"
+          [attr.aria-label]="liveAriaLabel()"
+        >
+          <span class="showcase-meta__live-dot showcase-meta__live-dot--active" aria-hidden="true"></span>
+          <span class="showcase-r4v3__live-brand">R4V3</span>
+          @if (panel(); as quote) {
+            <span class="showcase-r4v3__live-quote">
+              <span class="showcase-r4v3__live-value">{{ quote.value }}</span>
+              <span
+                class="showcase-r4v3__live-change"
+                [class.showcase-r4v3__live-change--up]="quote.positive"
+                [class.showcase-r4v3__live-change--down]="!quote.positive"
+              >
+                {{ quote.change }}
+              </span>
+            </span>
+          } @else {
+            <span class="showcase-r4v3__live-quote showcase-r4v3__live-quote--muted">…</span>
+          }
+        </button>
+
+        @if (state.unreadCount() > 0) {
+          <button
+            type="button"
+            class="showcase-meta__mark-read"
+            (click)="markAllRead()"
+            aria-label="Tout marquer comme lu"
+          >
+            Lu
+          </button>
+        }
+
+        <div class="showcase-r4v3__meta-actions">
+          <label class="showcase-meta__search">
+            <span class="sr-only">Rechercher dans R4V3</span>
+            <input
+              type="search"
+              class="showcase-meta__search-input"
+              placeholder="Rechercher…"
+              [value]="state.searchQuery()"
+              (input)="onSearchInput($any($event.target).value)"
+            />
+          </label>
+
+          <label class="showcase-meta__filter">
+            <span class="sr-only">Filtrer par source</span>
+            <select
+              class="showcase-meta__filter-select"
+              [value]="state.sourceFilter()"
+              (change)="setSourceFilter($any($event.target).value)"
+              [attr.aria-label]="'Filtrer : ' + state.sourceFilterLabel()"
+            >
+              <option value="all">Toutes</option>
+              <option value="CHAIN">On</option>
+              <option value="EDITORIAL">Edit</option>
+            </select>
+          </label>
+
+          <button
+            type="button"
+            class="showcase-meta__refresh"
+          [class.showcase-meta__refresh--loading]="loading()"
+          [class.showcase-meta__refresh--pulse]="refreshPulse()"
+          (click)="refresh()"
+          [attr.aria-busy]="loading()"
+          [attr.aria-label]="refreshAriaLabel()"
+        >
+          @if (state.unreadCount() > 0) {
+            <span class="showcase-meta__refresh-badge" aria-hidden="true">
+              {{ state.unreadCount() > 9 ? '9+' : state.unreadCount() }}
+            </span>
+          }
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+            <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+            <path d="M17 4v4h-4" />
+            <path d="M7 20v-4h4" />
+          </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div #contentPanel class="showcase-r4v3__content">
+      @if (loading()) {
+        <ul class="showcase-r4v3__list showcase-r4v3__list--skeleton" aria-hidden="true">
+          @for (row of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track row) {
+            <li class="showcase-r4v3__skeleton-item">
+              <span class="showcase-r4v3__skeleton-tag"></span>
+              <span class="showcase-r4v3__skeleton-lines"><span></span></span>
+            </li>
+          }
+        </ul>
+      } @else if (error()) {
+        <div class="showcase-r4v3__status showcase-r4v3__status--error" role="alert">
+          <p>Impossible de charger R4V3.</p>
+          <button type="button" class="showcase-r4v3__retry" (click)="refresh()">Réessayer</button>
+        </div>
+      } @else {
+        <ul class="showcase-r4v3__list" aria-label="Listing R4V3">
+          <li
+            class="showcase-r4v3__item showcase-r4v3__item--pin"
+            [class.showcase-r4v3__item--selected]="isPinActive('quest')"
+            [class.showcase-r4v3__item--keyboard]="isKeyboardFocused(0)"
+          >
+            <button type="button" class="showcase-r4v3__item-btn" (click)="openQuests()">
+              <span class="showcase-r4v3__tag" data-kind="quest">
+                <span class="showcase-r4v3__tag-icon" aria-hidden="true">◆</span>
+                <span class="showcase-r4v3__tag-label">Quest</span>
+              </span>
+              <span class="showcase-r4v3__item-title">
+                {{ missionProgress() }}% · {{ swapQuestLabel() }}
+              </span>
+              <span class="showcase-r4v3__time">→</span>
+              <span class="showcase-r4v3__unread-dot showcase-r4v3__unread-dot--placeholder" aria-hidden="true"></span>
+            </button>
+          </li>
+
+          <li
+            class="showcase-r4v3__item showcase-r4v3__item--pin showcase-r4v3__item--spotlight"
+            [class.showcase-r4v3__item--selected]="isPinActive('quote')"
+            [class.showcase-r4v3__item--keyboard]="isKeyboardFocused(1)"
+          >
+            <button type="button" class="showcase-r4v3__item-btn" (click)="openChart()">
+              <span class="showcase-r4v3__tag" data-kind="r4v3">
+                <span class="showcase-r4v3__tag-icon" aria-hidden="true">◈</span>
+                <span class="showcase-r4v3__tag-label">R4V3</span>
+              </span>
+              <span class="showcase-r4v3__item-title showcase-r4v3__item-title--spotlight">
+                @if (panel(); as quote) {
+                  <span class="showcase-r4v3__quote-value">{{ quote.value }}</span>
+                  <span
+                    class="showcase-r4v3__quote-change"
+                    [class.showcase-r4v3__quote-change--up]="quote.positive"
+                    [class.showcase-r4v3__quote-change--down]="!quote.positive"
+                  >
+                    {{ quote.change }}
+                  </span>
+                } @else {
+                  Cours indisponible
+                }
+                @if (ratesLatencyMs() !== null) {
+                  <span class="showcase-r4v3__quote-latency">· {{ ratesLatencyMs() }}ms</span>
+                }
+              </span>
+              <span class="showcase-r4v3__time">live</span>
+              <span class="showcase-r4v3__unread-dot showcase-r4v3__unread-dot--placeholder" aria-hidden="true"></span>
+            </button>
+          </li>
+
+          <li
+            class="showcase-r4v3__item showcase-r4v3__item--pin"
+            [class.showcase-r4v3__item--selected]="isPinActive('wallet')"
+            [class.showcase-r4v3__item--keyboard]="isKeyboardFocused(2)"
+          >
+            <button type="button" class="showcase-r4v3__item-btn" (click)="openWallet()">
+              <span class="showcase-r4v3__tag" data-kind="wallet">
+                <span class="showcase-r4v3__tag-icon" aria-hidden="true">◎</span>
+                <span class="showcase-r4v3__tag-label">Wallet</span>
+              </span>
+              <span class="showcase-r4v3__item-title">{{ walletBalanceLabel() }} R4V3</span>
+              <span class="showcase-r4v3__time">→</span>
+              <span class="showcase-r4v3__unread-dot showcase-r4v3__unread-dot--placeholder" aria-hidden="true"></span>
+            </button>
+          </li>
+
+          @if (swapStats(); as stats) {
+            <li
+              class="showcase-r4v3__item showcase-r4v3__item--pin"
+              [class.showcase-r4v3__item--selected]="isPinActive('swap')"
+              [class.showcase-r4v3__item--keyboard]="isKeyboardFocused(3)"
+            >
+              <button type="button" class="showcase-r4v3__item-btn" (click)="focusSwap()">
+                <span class="showcase-r4v3__tag" data-kind="swap">
+                  <span class="showcase-r4v3__tag-icon" aria-hidden="true">⇄</span>
+                  <span class="showcase-r4v3__tag-label">Swap</span>
+                </span>
+                <span class="showcase-r4v3__item-title">
+                  {{ stats.swapNewsCount }} swap{{ stats.swapNewsCount > 1 ? 's' : '' }}
+                  @if (stats.lastSwapSummary !== '—') {
+                    · {{ stats.lastSwapSummary }}
+                  }
+                </span>
+                <span class="showcase-r4v3__time">live</span>
+                <span class="showcase-r4v3__unread-dot showcase-r4v3__unread-dot--placeholder" aria-hidden="true"></span>
+              </button>
+            </li>
+          }
+
+          @for (token of launchTokens(); track token.symbol; let ti = $index) {
+            <li
+              class="showcase-r4v3__item showcase-r4v3__item--token"
+              [class.showcase-r4v3__item--selected]="isPinActive('token', token.symbol)"
+              [class.showcase-r4v3__item--keyboard]="isKeyboardFocused(pinRowCount() + ti)"
+            >
+              <div
+                class="showcase-r4v3__item-btn showcase-r4v3__item-btn--token"
+                role="button"
+                tabindex="0"
+                (click)="openTokenPanel(token)"
+                (keydown.enter)="openTokenPanel(token)"
+              >
+                <span class="showcase-r4v3__tag" [attr.data-symbol]="token.symbol">
+                  <span class="showcase-r4v3__tag-icon" aria-hidden="true">●</span>
+                  <span class="showcase-r4v3__tag-label">{{ token.symbol }}</span>
+                </span>
+                <span class="showcase-r4v3__item-title">
+                  {{ token.priceVsR4v3 }}
+                  <span
+                    class="showcase-r4v3__token-change"
+                    [class.showcase-r4v3__token-change--up]="token.positive"
+                    [class.showcase-r4v3__token-change--down]="!token.positive"
+                  >
+                    · {{ token.change }}
+                  </span>
+                </span>
+                <span class="showcase-r4v3__token-actions" (click)="$event.stopPropagation()">
+                  <button type="button" (click)="tradeToken(token, 'buy')">Buy</button>
+                  <button type="button" (click)="tradeToken(token, 'sell')">Sell</button>
+                </span>
+              </div>
+            </li>
+          }
+
+          @if (filteredItems().length === 0) {
+            <li class="showcase-r4v3__item showcase-r4v3__item--empty">
+              <div class="showcase-r4v3__item-btn showcase-r4v3__item-btn--static">
+                <span class="showcase-r4v3__tag">
+                  <span class="showcase-r4v3__tag-icon" aria-hidden="true">—</span>
+                  <span class="showcase-r4v3__tag-label">R4V3</span>
+                </span>
+                <span class="showcase-r4v3__item-title showcase-r4v3__item-title--muted">
+                  Aucune actualité · {{ state.sourceFilterLabel() }}
+                  @if (state.debouncedSearchQuery().trim()) {
+                    · « {{ state.debouncedSearchQuery().trim() }} »
+                  }
+                </span>
+                <span class="showcase-r4v3__time">—</span>
+                <span class="showcase-r4v3__unread-dot showcase-r4v3__unread-dot--placeholder" aria-hidden="true"></span>
+              </div>
+            </li>
+          } @else {
+            @for (item of filteredItems(); track item.id; let ni = $index) {
+              <li
+                class="showcase-r4v3__item"
+                [class.showcase-r4v3__item--featured]="isFeatured(item)"
+                [class.showcase-r4v3__item--selected]="selectedItem()?.id === item.id"
+                [class.showcase-r4v3__item--unread]="isUnread(item)"
+                [class.showcase-r4v3__item--keyboard]="isKeyboardFocused(newsOffset() + ni)"
+              >
+                <button
+                  type="button"
+                  class="showcase-r4v3__item-btn"
+                  (click)="openItem(item)"
+                  [attr.aria-expanded]="selectedItem()?.id === item.id"
+                >
+                  <span class="showcase-r4v3__tag" [attr.data-source]="item.source">
+                    <span class="showcase-r4v3__tag-icon" aria-hidden="true">{{ sourceIcon(item) }}</span>
+                    <span class="showcase-r4v3__tag-label">{{ sourceLabel(item) }}</span>
+                  </span>
+                  <span class="showcase-r4v3__item-title">{{ item.title }}</span>
+                  <span class="showcase-r4v3__time">{{ item.relativeTime }}</span>
+                  <span
+                    class="showcase-r4v3__unread-dot"
+                    [class.showcase-r4v3__unread-dot--placeholder]="!isUnread(item)"
+                    [attr.aria-hidden]="!isUnread(item)"
+                    [attr.aria-label]="isUnread(item) ? 'Non lu' : null"
+                  ></span>
+                </button>
+              </li>
+            }
+          }
+        </ul>
+
+        @if (state.hasMore() && !state.debouncedSearchQuery().trim()) {
+          <button
+            type="button"
+            class="showcase-r4v3__load-more"
+            [disabled]="loadingMore()"
+            (click)="loadMore()"
+          >
+            {{ loadingMore() ? 'Chargement…' : 'Charger plus' }}
+          </button>
+        }
+      }
+    </div>
+
+    <footer #swapFooter class="showcase-r4v3__swap-footer" aria-label="Swap inline R4V3">
+      <p class="showcase-r4v3__swap-route" aria-hidden="true">
+        {{ swapFromToken() }} → {{ swapToToken() }}
+      </p>
+
+      <form class="showcase-r4v3__swap-row" [formGroup]="swapForm" (ngSubmit)="submitSwap()">
+        <select
+          class="showcase-r4v3__swap-select"
+          [value]="swapCounterToken()"
+          (change)="setSwapCounter($any($event.target).value)"
+          aria-label="Token LaunchLab"
+        >
+          @for (symbol of launchTokenOptions(); track symbol) {
+            <option [value]="symbol">{{ symbol }}</option>
+          }
+        </select>
+
+        <button
+          type="button"
+          class="showcase-r4v3__swap-flip"
+          [class.showcase-r4v3__swap-flip--active]="swapDirection() === 'sell'"
+          (click)="flipSwapDirection($event)"
+          [attr.aria-label]="'Inverser : ' + swapFromToken() + ' → ' + swapToToken()"
+          [attr.aria-pressed]="swapDirection() === 'sell'"
+        >
+          ⇄
+        </button>
+
+        <input
+          type="text"
+          inputmode="decimal"
+          class="showcase-r4v3__swap-input"
+          formControlName="amount"
+          placeholder="Montant"
+          aria-label="Montant swap"
+        />
+
+        <button
+          type="submit"
+          class="showcase-r4v3__swap-submit"
+          [disabled]="swapping()"
+          [attr.aria-busy]="swapping()"
+        >
+          {{ swapping() ? '…' : 'Swap' }}
+        </button>
+      </form>
+
+      @if (swapMessage()) {
+        <p
+          class="showcase-r4v3__swap-feedback"
+          [class.showcase-r4v3__swap-feedback--error]="swapError()"
+          role="status"
+        >
+          {{ swapMessage() }}
+        </p>
+      }
+    </footer>
+
+    @if (activePin(); as pin) {
+      <div
+        class="showcase-r4v3__pin-backdrop"
+        (click)="closePinPanel()"
+        aria-hidden="true"
+      >
+        <aside
+          #pinPanel
+          class="showcase-r4v3__pin-panel ds-surface ds-surface--card ds-surface--drawer"
+          role="dialog"
+          aria-modal="true"
+          tabindex="-1"
+          [attr.aria-labelledby]="'r4v3PinTitle-' + pin.kind"
+          (click)="$event.stopPropagation()"
+        >
+          <header class="showcase-r4v3__pin-head">
+            <h3 class="showcase-r4v3__pin-title" [id]="'r4v3PinTitle-' + pin.kind">
+              {{ pinTitle(pin) }}
+            </h3>
+            <button
+              type="button"
+              class="showcase-r4v3__pin-close ds-surface ds-surface--showcase-tab"
+              (click)="closePinPanel()"
+              aria-label="Fermer"
+            >
+              ×
+            </button>
+          </header>
+
+          <div class="showcase-r4v3__pin-body-wrap">
+            <p class="showcase-r4v3__pin-body">{{ pinBody(pin) }}</p>
+
+            @if (pin.kind === 'token' && pin.token) {
+              <div class="showcase-r4v3__pin-token-actions">
+                <button type="button" (click)="tradeToken(pin.token, 'buy')">Buy</button>
+                <button type="button" (click)="tradeToken(pin.token, 'sell')">Sell</button>
+              </div>
+            }
+          </div>
+
+          <footer class="showcase-r4v3__pin-foot">
+            <button type="button" class="showcase-r4v3__pin-action" (click)="runPinAction()">
+              {{ pinActionLabel(pin) }}
+            </button>
+          </footer>
+        </aside>
+      </div>
+    }
+
+    <app-showcase-news-drawer
+      [item]="detailItem() ?? selectedItem()"
+      [loading]="detailLoading()"
+      [canPrev]="canNavigatePrev()"
+      [canNext]="canNavigateNext()"
+      (closeDrawer)="closeItem()"
+      (navigatePrev)="navigatePrev()"
+      (navigateNext)="navigateNext()"
+      (runAction)="runAction($event)"
+      (copySummary)="copySummary($event)"
+    />
+  }
+</div>

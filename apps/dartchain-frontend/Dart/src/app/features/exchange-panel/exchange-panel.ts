@@ -1,0 +1,774 @@
+import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  HostListener,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+
+import {
+  EXCHANGE_LAUNCHPAD_FALLBACK_TOKENS,
+  EXCHANGE_LAUNCHPAD_SWAP_TOKENS,
+  EXCHANGE_NATIVE_TOKEN,
+  buildLaunchpadGridSlots,
+  defaultLaunchCounterToken,
+  filterLaunchpadTokenList,
+  isExchangeNativeToken,
+  isLaunchpadSwapToken,
+  tokenUnitLabel,
+} from '../../core/constants/exchange-launchpad.constants';
+import { coinIdForSymbol } from '../../core/constants/rate-panel-symbols';
+import { BlockchainApiService } from '../../core/services/blockchain-api.service';
+import { BrandCryptoSelectionService } from '../../core/services/brand-crypto-selection.service';
+import { CryptoRatesService } from '../../core/services/crypto-rate.service';
+import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-state.service';
+import { ShowcaseNavigationService } from '../../core/services/showcase-navigation.service';
+import { QuestsProgressService } from '../../core/services/quests-progress.service';
+import { WalletSessionService } from '../../core/services/wallet-session.service';
+import { AuthService } from '../../core/services/auth.service';
+
+type SwapAction =
+  | 'create-wallet'
+  | 'login-required'
+  | 'enter-amount'
+  | 'insufficient'
+  | 'swapping'
+  | 'swap';
+
+const LAUNCH_TOKEN_DISPLAY: Record<string, string> = {
+  R4V3: 'R4V3',
+  PXD: 'Pixel DAO',
+  LAB3: 'Lab #03',
+  NVFI: 'NovaFi',
+  ORB: 'Orbit Swap',
+  CPET: 'Chain Pets',
+  MRAIL: 'Meta Rail',
+};
+
+@Component({
+  selector: 'app-exchange-panel',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './exchange-panel.html',
+  styleUrls: ['./exchange-panel.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ExchangePanelComponent {
+  private readonly api = inject(BlockchainApiService);
+  private readonly auth = inject(AuthService);
+  private readonly walletSession = inject(WalletSessionService);
+  private readonly brandCrypto = inject(BrandCryptoSelectionService);
+  private readonly cryptoRates = inject(CryptoRatesService);
+  private readonly launchState = inject(ShowcaseLaunchStateService);
+  private readonly nav = inject(ShowcaseNavigationService);
+  private readonly questProgress = inject(QuestsProgressService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly fb = inject(FormBuilder);
+
+  readonly launchpadTokens = signal<string[]>([...EXCHANGE_LAUNCHPAD_FALLBACK_TOKENS]);
+
+  protected readonly fromToken = signal<string>(EXCHANGE_NATIVE_TOKEN);
+  protected readonly toToken = signal<string>(defaultLaunchCounterToken());
+  protected readonly fromBalance = signal(0);
+  protected readonly toBalance = signal(0);
+  protected readonly rate = signal(1);
+  protected readonly testnet = signal(true);
+  protected readonly loadingPanel = signal(false);
+  protected readonly swapping = signal(false);
+  protected readonly errorMessage = signal('');
+  protected readonly successMessage = signal('');
+  protected readonly showStatus = signal(false);
+  protected readonly showSuccessToast = signal(false);
+
+  protected readonly amountValue = signal('');
+  protected readonly change24hLabel = signal('—');
+  protected readonly change24hPositive = signal(true);
+  protected readonly unitUsdPriceFetched = signal<number | null>(null);
+  protected readonly unitUsdPriceFetchedIsFrom = signal(true);
+
+  protected readonly launchpadSwapTokens = signal<string[]>([
+    ...EXCHANGE_LAUNCHPAD_SWAP_TOKENS,
+  ]);
+
+  protected readonly launchGridSlots = computed(() =>
+    buildLaunchpadGridSlots(this.launchpadSwapTokens())
+  );
+
+  protected readonly nativeTokenLabel = EXCHANGE_NATIVE_TOKEN;
+
+  protected readonly nativeFrom = computed(() => isExchangeNativeToken(this.fromToken()));
+
+  protected isLaunchChipActive(symbol: string): boolean {
+    return this.nativeFrom()
+      ? this.toToken() === symbol
+      : this.fromToken() === symbol;
+  }
+
+  protected readonly unitUsdPriceTo = computed(() => {
+    const usdFetched = this.unitUsdPriceFetched();
+    if (usdFetched == null) {
+      return null;
+    }
+
+    const fetchedIsFrom = this.unitUsdPriceFetchedIsFrom();
+    if (!fetchedIsFrom) {
+      return usdFetched;
+    }
+
+    const r = this.rate();
+    if (!Number.isFinite(r) || r <= 0) {
+      return null;
+    }
+
+    return usdFetched / r;
+  });
+
+  protected readonly amountForm = this.fb.nonNullable.group({
+    amount: ['', [Validators.required]],
+  });
+
+  protected readonly walletAddress = computed(() => this.walletSession.address());
+  protected readonly hasWallet = computed(() => !!this.walletAddress());
+
+  protected readonly parsedAmount = computed(() => {
+    const raw = this.amountValue().trim().replace(',', '.');
+    if (!raw) {
+      return 0;
+    }
+
+    const value = Number.parseFloat(raw);
+    return Number.isFinite(value) && value > 0 ? value : 0;
+  });
+
+  protected readonly estimatedTo = computed(() => {
+    const amount = this.parsedAmount();
+    if (amount <= 0) {
+      return 0;
+    }
+
+    return amount * this.rate();
+  });
+
+  protected readonly formattedEstimatedTo = computed(() =>
+    this.formatBalance(this.estimatedTo())
+  );
+
+  protected readonly rateLine = computed(() => {
+    const r = this.rate();
+    if (!Number.isFinite(r) || r <= 0) {
+      return '';
+    }
+
+    return `1 ${this.displayTokenSymbol(this.fromToken())} = ${this.formatRateCompact(r)} ${this.toToken()}`;
+  });
+
+  protected readonly amountPlaceholder = computed(() => {
+    if (this.amountValue().trim()) {
+      return '0';
+    }
+
+    return '0.0';
+  });
+
+  protected readonly pairSubtitle = computed(
+    () =>
+      `${this.tokenDisplayName(this.fromToken())} / ${this.tokenDisplayName(this.toToken())}`
+  );
+
+  protected readonly soldeSubline = computed(() => {
+    const usd = this.unitUsdPriceFrom();
+    const balance = this.fromBalance();
+    if (usd == null) {
+      return 'LaunchLab testnet';
+    }
+
+    const totalUsd = balance * usd;
+    if (!Number.isFinite(totalUsd)) {
+      return '—';
+    }
+
+    return `$${this.formatUsd(totalUsd, 2)} USD`;
+  });
+
+  protected readonly prixSubline = computed(() => {
+    const usd = this.unitUsdPriceTo();
+    if (usd == null) {
+      return 'LaunchLab testnet';
+    }
+
+    return `$${this.formatUsd(usd, 4)} USD`;
+  });
+
+  protected readonly unitUsdPriceFrom = computed(() => {
+    const usdFetched = this.unitUsdPriceFetched();
+    if (usdFetched == null) {
+      return null;
+    }
+
+    if (this.unitUsdPriceFetchedIsFrom()) {
+      return usdFetched;
+    }
+
+    const r = this.rate();
+    if (!Number.isFinite(r) || r <= 0) {
+      return null;
+    }
+
+    return usdFetched * r;
+  });
+
+  protected readonly swapAction = computed((): SwapAction => {
+    if (this.swapping()) {
+      return 'swapping';
+    }
+
+    if (!this.hasWallet()) {
+      return 'create-wallet';
+    }
+
+    if (!this.auth.isAuthenticated()) {
+      return 'login-required';
+    }
+
+    const amount = this.parsedAmount();
+    if (amount <= 0) {
+      return 'enter-amount';
+    }
+
+    if (amount > this.fromBalance() + 1e-9) {
+      return 'insufficient';
+    }
+
+    return 'swap';
+  });
+
+  protected readonly swapButtonLabel = computed(() => {
+    switch (this.swapAction()) {
+      case 'create-wallet':
+        return '+ Wallet';
+      case 'login-required':
+        return 'Login →';
+      case 'enter-amount':
+        return 'GO →';
+      case 'insufficient':
+        return this.fromBalance() <= 0 ? '+ R4V3' : 'Solde ↓';
+      case 'swapping':
+        return '···';
+      default:
+        return 'SWAP →';
+    }
+  });
+
+  protected readonly isFunnelCta = computed(() => {
+    const action = this.swapAction();
+    return (
+      action === 'create-wallet' ||
+      action === 'login-required' ||
+      (action === 'insufficient' && this.fromBalance() <= 0)
+    );
+  });
+
+  protected readonly swapButtonDisabled = computed(() => {
+    const action = this.swapAction();
+    if (action === 'insufficient' && this.fromBalance() <= 0) {
+      return this.loadingPanel() || this.swapping();
+    }
+    return (
+      this.loadingPanel() ||
+      action === 'enter-amount' ||
+      action === 'insufficient' ||
+      action === 'swapping'
+    );
+  });
+
+  constructor() {
+    this.launchState.loadProjects();
+
+    effect(() => {
+      this.walletSession.address();
+      this.fromToken();
+      this.toToken();
+      this.fetchExchangePanel();
+    });
+
+    effect(() => {
+      const requested = this.brandCrypto.exchangeFromToken();
+      if (!requested) {
+        return;
+      }
+
+      this.applyFromToken(requested);
+      this.brandCrypto.exchangeFromToken.set(null);
+    });
+
+    effect(() => {
+      const trade = this.brandCrypto.exchangeTradeRequest();
+      if (!trade) {
+        return;
+      }
+
+      this.applyTradePair(trade.from, trade.to);
+      this.brandCrypto.exchangeTradeRequest.set(null);
+    });
+
+    effect((onCleanup) => {
+      const from = this.fromToken();
+      const to = this.toToken();
+
+      const fromCoinId = coinIdForSymbol(from);
+      const toCoinId = coinIdForSymbol(to);
+      const useFrom = !!fromCoinId;
+      const coinId = useFrom ? fromCoinId : toCoinId;
+
+      if (!coinId) {
+        this.change24hLabel.set('LaunchLab');
+        this.change24hPositive.set(true);
+        this.unitUsdPriceFetched.set(null);
+        this.unitUsdPriceFetchedIsFrom.set(true);
+        return;
+      }
+
+      this.unitUsdPriceFetchedIsFrom.set(useFrom);
+      const token = useFrom ? from : to;
+
+      const sub = this.cryptoRates
+        .getMarketChart(token, '24h', 'usd', coinId)
+        .subscribe((data) => {
+          if (!data) {
+            this.change24hLabel.set('—');
+            this.unitUsdPriceFetched.set(null);
+            return;
+          }
+
+          const sign = data.positive ? '+' : '';
+          this.change24hLabel.set(`${sign}${data.changePercent.toFixed(2)}%`);
+          this.change24hPositive.set(data.positive);
+          this.unitUsdPriceFetched.set(this.parseUsdPrice(data.currentPrice));
+        });
+
+      onCleanup(() => sub.unsubscribe());
+    });
+  }
+
+  protected tokenUnitLabel(symbol: string): string {
+    return tokenUnitLabel(symbol);
+  }
+
+  protected displayTokenSymbol(symbol: string): string {
+    return isExchangeNativeToken(symbol) ? EXCHANGE_NATIVE_TOKEN : symbol.trim().toUpperCase();
+  }
+
+  protected pairDirectionLabel(): string {
+    return `${this.displayTokenSymbol(this.fromToken())} → ${this.toToken()}`;
+  }
+
+  protected nativeRowMeta(): string {
+    if (isExchangeNativeToken(this.fromToken())) {
+      return `${this.formatBalance(this.fromBalance())} dispo`;
+    }
+    if (isExchangeNativeToken(this.toToken())) {
+      return `${this.formatBalance(this.toBalance())} dispo`;
+    }
+    return 'Natif';
+  }
+
+  protected tokenRowMeta(symbol: string): string {
+    if (this.fromToken() === symbol) {
+      return `${this.formatBalance(this.fromBalance())} dispo`;
+    }
+    if (this.nativeFrom() && this.toToken() === symbol) {
+      const r = this.rate();
+      if (Number.isFinite(r) && r > 0) {
+        return `1 R4V3 = ${this.formatRateCompact(r)}`;
+      }
+    }
+    return this.tokenDisplayName(symbol);
+  }
+
+  protected formatUnitPrice(): string {
+    const r = this.rate();
+    if (!Number.isFinite(r) || r <= 0) {
+      return '—';
+    }
+
+    if (r >= 1) {
+      return this.formatBalance(r);
+    }
+
+    return r.toLocaleString('fr-FR', {
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 6,
+    });
+  }
+
+  protected tokenIconText(symbol: string): string {
+    switch (symbol) {
+      case 'PXD':
+        return 'P';
+      case 'LAB3':
+        return '3';
+      case 'NVFI':
+        return 'N';
+      case 'ORB':
+        return 'O';
+      case 'CPET':
+        return 'C';
+      case 'MRAIL':
+        return 'M';
+      case 'R4V3':
+        return 'R';
+      default:
+        return symbol.slice(0, 1).toUpperCase() || '?';
+    }
+  }
+
+  protected selectLaunchChip(symbol: string): void {
+    const normalized = symbol.trim().toUpperCase();
+    if (!isLaunchpadSwapToken(normalized)) {
+      return;
+    }
+
+    if (this.nativeFrom()) {
+      this.setSwapPair(EXCHANGE_NATIVE_TOKEN, normalized);
+    } else {
+      this.setSwapPair(normalized, EXCHANGE_NATIVE_TOKEN);
+    }
+  }
+
+  @HostListener('window:exchange-panel-focus')
+  onExternalFocusRequest(): void {
+    this.host.nativeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+    this.host.nativeElement.classList.add('is-quest-focus');
+    window.setTimeout(() => {
+      this.host.nativeElement.classList.remove('is-quest-focus');
+    }, 1800);
+  }
+
+  protected onAmountInput(): void {
+    this.amountValue.set(this.amountForm.controls.amount.value);
+    this.markInteraction();
+    this.clearMessages();
+    this.showSuccessToast.set(false);
+  }
+
+  protected onAmountEnter(event: Event): void {
+    event.preventDefault();
+    this.onSwapClick();
+  }
+
+  protected setPercentAmount(percent: number): void {
+    const balance = this.fromBalance();
+    if (balance <= 0 || percent <= 0) {
+      return;
+    }
+
+    const amount = (balance * percent) / 100;
+    this.amountForm.patchValue({ amount: this.formatAmount(amount) });
+    this.amountValue.set(this.formatAmount(amount));
+    this.markInteraction();
+  }
+
+  protected setMaxAmount(): void {
+    const balance = this.fromBalance();
+    if (balance <= 0) {
+      return;
+    }
+
+    this.amountForm.patchValue({ amount: this.formatAmount(balance) });
+    this.amountValue.set(this.formatAmount(balance));
+    this.markInteraction();
+  }
+
+  protected onSwapClick(): void {
+    this.markInteraction();
+
+    if (this.swapAction() === 'create-wallet') {
+      this.nav.dispatchNewsAction('OPEN_WALLET');
+      return;
+    }
+
+    if (this.swapAction() === 'login-required') {
+      this.errorMessage.set('Connectez-vous pour swapper.');
+      this.showStatus.set(true);
+      this.auth.openDrawer('login');
+      return;
+    }
+
+    if (this.swapAction() === 'insufficient' && this.fromBalance() <= 0) {
+      this.nav.dispatchNewsAction('OPEN_FAUCET');
+      return;
+    }
+
+    if (this.swapAction() !== 'swap') {
+      return;
+    }
+
+    this.executeSwap();
+  }
+
+  protected dismissSuccessToast(): void {
+    this.showSuccessToast.set(false);
+  }
+
+  protected formatBalance(value: number): string {
+    if (value >= 1) {
+      return value.toLocaleString('fr-FR', {
+        maximumFractionDigits: 4,
+      });
+    }
+
+    return value.toLocaleString('fr-FR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 8,
+    });
+  }
+
+  private applyFromToken(symbol: string): void {
+    const normalized = symbol.trim().toUpperCase();
+    if (isLaunchpadSwapToken(normalized)) {
+      this.setSwapPair(EXCHANGE_NATIVE_TOKEN, normalized);
+      return;
+    }
+
+    this.setSwapPair(
+      EXCHANGE_NATIVE_TOKEN,
+      defaultLaunchCounterToken(this.launchpadSwapTokens())
+    );
+  }
+
+  private applyTradePair(from: string, to: string): void {
+    const fromNorm = from.trim().toUpperCase();
+    const toNorm = to.trim().toUpperCase();
+
+    if (isExchangeNativeToken(fromNorm) && isLaunchpadSwapToken(toNorm)) {
+      this.setSwapPair(fromNorm, toNorm);
+      return;
+    }
+
+    if (isLaunchpadSwapToken(fromNorm) && isExchangeNativeToken(toNorm)) {
+      this.setSwapPair(fromNorm, toNorm);
+      return;
+    }
+
+    this.setSwapPair(EXCHANGE_NATIVE_TOKEN, defaultLaunchCounterToken(this.launchpadSwapTokens()));
+  }
+
+  private setSwapPair(from: string, to: string): void {
+    const fromNorm = from.trim().toUpperCase();
+    const toNorm = to.trim().toUpperCase();
+    this.fromToken.set(fromNorm);
+    this.toToken.set(toNorm);
+    this.brandCrypto.publishActiveExchangePair(fromNorm, toNorm);
+    this.markInteraction();
+    this.clearMessages();
+    this.fetchExchangePanel();
+  }
+
+  private enforceNativeOutPair(launchSymbol: string): void {
+    this.setSwapPair(EXCHANGE_NATIVE_TOKEN, launchSymbol);
+  }
+
+  private isValidLaunchpadPair(from: string, to: string): boolean {
+    return (
+      isExchangeNativeToken(from) &&
+      isLaunchpadSwapToken(to) &&
+      from !== to
+    );
+  }
+
+  private executeSwap(): void {
+    this.clearMessages();
+
+    const address = this.walletAddress();
+    if (!address) {
+      return;
+    }
+
+    const amount = this.parsedAmount();
+    if (amount <= 0 || amount > this.fromBalance()) {
+      return;
+    }
+
+    this.swapping.set(true);
+
+    this.api
+      .swapExchangeTokens({
+        fromToken: this.fromToken(),
+        toToken: this.toToken(),
+        amount,
+        walletAddress: address,
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.fromBalance.set(response.fromBalance);
+          this.toBalance.set(response.toBalance);
+          this.rate.set(response.rate);
+          this.successMessage.set(
+            response.message ||
+              `Reçu ${this.formatAmount(response.amountOut)} ${response.toToken}`
+          );
+          this.showStatus.set(true);
+          this.showSuccessToast.set(true);
+          this.amountForm.reset({ amount: '' });
+          this.amountValue.set('');
+          this.swapping.set(false);
+
+          this.walletSession.requestBalanceRefresh();
+          window.dispatchEvent(new CustomEvent('naivechain-refresh'));
+          window.dispatchEvent(
+            new CustomEvent('market-swap-complete', {
+              detail: {
+                fromToken: response.fromToken,
+                toToken: response.toToken,
+                amountIn: response.amountIn,
+                amountOut: response.amountOut,
+              },
+            })
+          );
+          this.brandCrypto.selectSwapPair(response.fromToken, response.toToken);
+          void this.questProgress.recordSwap(response.fromToken, response.toToken);
+        },
+        error: (error: unknown) => {
+          const message = this.resolveErrorMessage(error, 'Swap impossible.');
+          this.errorMessage.set(message);
+          if (message.includes('Connectez-vous')) {
+            this.auth.openDrawer('login');
+          }
+          this.showStatus.set(true);
+          this.swapping.set(false);
+        },
+      });
+  }
+
+  private fetchExchangePanel(): void {
+    this.loadingPanel.set(true);
+
+    const params: {
+      walletAddress?: string;
+      fromToken: string;
+      toToken: string;
+    } = {
+      fromToken: this.fromToken(),
+      toToken: this.toToken(),
+    };
+
+    const address = this.walletAddress();
+    if (address) {
+      params.walletAddress = address;
+    }
+
+    this.api
+      .getExchangePanel(params)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          if (Array.isArray(data.availableTokens) && data.availableTokens.length > 0) {
+            this.launchpadTokens.set(filterLaunchpadTokenList(data.availableTokens));
+            this.launchpadSwapTokens.set(
+              filterLaunchpadTokenList(data.availableTokens).filter(
+                (token) => !isExchangeNativeToken(token)
+              )
+            );
+          }
+          this.fromBalance.set(data.fromBalance);
+          this.toBalance.set(data.toBalance);
+          this.rate.set(data.rate);
+          this.testnet.set(data.testnet ?? true);
+          this.loadingPanel.set(false);
+        },
+        error: () => {
+          this.errorMessage.set('Impossible de charger le panneau d’échange.');
+          this.showStatus.set(true);
+          this.loadingPanel.set(false);
+        },
+      });
+  }
+
+  private formatAmount(value: number): string {
+    const rounded = Math.round(value * 1e8) / 1e8;
+    return rounded.toString();
+  }
+
+  private formatRate(value: number): string {
+    if (value >= 1000) {
+      return value.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+    }
+    if (value >= 1) {
+      return value.toLocaleString('fr-FR', { maximumFractionDigits: 4 });
+    }
+    return value.toLocaleString('fr-FR', { maximumFractionDigits: 8 });
+  }
+
+  private formatRateCompact(value: number): string {
+    if (value >= 1_000_000) {
+      return `${(value / 1_000_000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}M`;
+    }
+    if (value >= 10_000) {
+      return `${Math.round(value).toLocaleString('fr-FR')}`;
+    }
+    return this.formatRate(value);
+  }
+
+  private markInteraction(): void {
+    if (!this.showStatus()) {
+      this.showStatus.set(false);
+    }
+  }
+
+  protected clearMessages(): void {
+    this.errorMessage.set('');
+    this.successMessage.set('');
+  }
+
+  private resolveErrorMessage(error: unknown, fallback: string): string {
+    if (error instanceof Error && error.message) {
+      if (error.message.includes('401') || error.message.toLowerCase().includes('unauthorized')) {
+        return 'Connectez-vous pour swapper.';
+      }
+      return error.message;
+    }
+
+    return fallback;
+  }
+
+  protected tokenDisplayName(symbol: string): string {
+    const normalized = symbol.trim().toUpperCase();
+    const fromLaunch = this.launchState
+      .projects()
+      .find((project) => project.symbol.toUpperCase() === normalized);
+    if (fromLaunch) {
+      return fromLaunch.name;
+    }
+
+    return LAUNCH_TOKEN_DISPLAY[normalized] ?? normalized;
+  }
+
+  private formatUsd(value: number, fractionDigits = 2): string {
+    return value.toLocaleString('en-US', {
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+    });
+  }
+
+  private parseUsdPrice(raw: string): number | null {
+    const normalized = raw.replace(/[^\d.,-]/g, '').replace(',', '.');
+    const value = Number.parseFloat(normalized);
+    return Number.isFinite(value) ? value : null;
+  }
+}

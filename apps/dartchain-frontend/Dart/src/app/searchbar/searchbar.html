@@ -1,0 +1,23 @@
+<form class="searchbar" role="search" (submit)="onSubmit($event)">
+  <label class="searchbar__label">
+    <span class="searchbar__icon" aria-hidden="true">⌕</span>
+    <input
+      class="searchbar__input"
+      type="search"
+      name="explorer"
+      placeholder="Explorer…"
+      autocomplete="off"
+      aria-label="Rechercher un bloc"
+      (focus)="onFocus()"
+    />
+  </label>
+  <button
+    type="button"
+    class="searchbar__pending"
+    aria-label="Ouvrir les transactions en attente"
+    title="Pending"
+    (click)="onPendingShortcut($event)"
+  >
+    ⏳
+  </button>
+</form>

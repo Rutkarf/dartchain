@@ -1,0 +1,323 @@
+<div class="app-shell" data-testid="app-shell">
+  <a class="app-skip-link" href="#app-main-content">{{ locale.t('skip.main') }}</a>
+  <app-particle-background class="app-background"></app-particle-background>
+
+  <header class="app-navbar-zone">
+    <app-navbar
+      (exploreBlock)="openBlockDrawer($event)"
+      (explorePending)="openPendingPanel()"
+    >
+      <app-bandeau-accueil></app-bandeau-accueil>
+    </app-navbar>
+  </header>
+
+  <section id="app-main-content" class="app-hub" aria-label="Marché" tabindex="-1">
+    <div class="app-hub-swap-stack">
+      <div class="app-market-card app-market-card--swap app-showcase-card--swap">
+        <div class="app-market-card__swap-main">
+          <app-exchange-panel></app-exchange-panel>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="app-market-stack app-market-stack--rate"
+      [class.is-chart-collapsed]="chartCollapsed()"
+    >
+      <header class="chart-stack-header" aria-label="Contrôle graphique">
+        <div class="chart-stack-header__actions">
+          <button
+            type="button"
+            class="chart-toggle showcase-toggle"
+            [attr.aria-label]="chartCollapseLabel()"
+            [attr.aria-expanded]="!chartCollapsed()"
+            (click)="toggleChartCollapsed()"
+          >
+            <span
+              class="showcase-toggle__chevron"
+              [class.is-collapsed]="chartCollapsed()"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </header>
+      <div class="app-market-card app-market-card--rate">
+        <app-rate-panel hubGraphOnly [chartCollapsed]="chartCollapsed()"></app-rate-panel>
+      </div>
+    </div>
+
+    @if (product.showcaseEnabled) {
+    <div
+      class="app-hub-showcase-block"
+      [class.is-showcase-collapsed]="showcaseCollapsed()"
+    >
+      <div class="showcase-block__shell ds-surface ds-surface--card">
+        <header class="showcase-header" aria-label="Showcase">
+          <div class="showcase-header-tabs">
+            <app-showcase-tabs
+              [activeTab]="activeShowcaseTab()"
+              (tabChange)="onShowcaseTabChange($event)"
+            />
+          </div>
+          <div class="showcase-header-actions">
+            <button
+              type="button"
+              class="showcase-toggle"
+              [attr.aria-label]="showcaseCollapseLabel()"
+              [attr.aria-expanded]="!showcaseCollapsed()"
+              (click)="toggleShowcaseCollapsed()"
+            >
+              <span
+                class="showcase-toggle__chevron"
+                [class.is-collapsed]="showcaseCollapsed()"
+                aria-hidden="true"
+              ></span>
+            </button>
+          </div>
+        </header>
+
+        <div
+          class="app-showcase-band"
+          [class.is-collapsed]="showcaseCollapsed()"
+          [attr.data-active-tab]="activeShowcaseTab()"
+        >
+          <app-showcase-panel
+            [activeTab]="activeShowcaseTab()"
+            [collapsed]="showcaseCollapsed()"
+            (selectBlock)="openBlockFromShowcaseIndex($event)"
+          />
+        </div>
+      </div>
+    </div>
+    }
+  </section>
+
+  <section
+    class="app-bottom-stack"
+    [class.is-dock-collapsed]="dockCollapsed()"
+    aria-label="Dock navigation"
+  >
+    <div
+      class="showcase-block__shell bottom-stack__shell ds-surface ds-surface--card"
+    >
+      <header class="showcase-header app-bottom-stack__header" aria-label="Navigation principale">
+        <div
+          class="showcase-header-tabs"
+          [class.is-collapsed]="dockCollapsed()"
+          [attr.aria-hidden]="dockCollapsed()"
+        >
+          <nav class="showcase-tabs app-bottom-stack__tabs" role="tablist">
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeBottomTab() === 'wallet'"
+              [class.is-active]="activeBottomTab() === 'wallet'"
+              (click)="onBottomTabChange('wallet')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('dock.wallet') }}</span>
+            </button>
+            @if (product.faucetEnabled) {
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeBottomTab() === 'faucet'"
+              [class.is-active]="activeBottomTab() === 'faucet'"
+              (click)="onBottomTabChange('faucet')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('dock.faucet') }}</span>
+            </button>
+            }
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeBottomTab() === 'transactions'"
+              [class.is-active]="activeBottomTab() === 'transactions'"
+              (click)="onBottomTabChange('transactions')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('dock.transactions') }}</span>
+            </button>
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeBottomTab() === 'chain'"
+              [class.is-active]="activeBottomTab() === 'chain'"
+              (click)="onBottomTabChange('chain')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('chain.title') }}</span>
+            </button>
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeBottomTab() === 'market'"
+              [class.is-active]="activeBottomTab() === 'market'"
+              (click)="onBottomTabChange('market')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('dock.market') }}</span>
+            </button>
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeBottomTab() === 'quests'"
+              [class.is-active]="activeBottomTab() === 'quests'"
+              (click)="onBottomTabChange('quests')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('dock.quests') }}</span>
+            </button>
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeBottomTab() === 'peers'"
+              [class.is-active]="activeBottomTab() === 'peers'"
+              (click)="onBottomTabChange('peers')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('dock.peers') }}</span>
+            </button>
+            @if (auth.isAdmin()) {
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeBottomTab() === 'admin'"
+              [class.is-active]="activeBottomTab() === 'admin'"
+              (click)="onBottomTabChange('admin')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('dock.admin') }}</span>
+            </button>
+            }
+          </nav>
+        </div>
+        <div class="showcase-header-actions">
+          <button
+            type="button"
+            class="showcase-toggle"
+            [attr.aria-label]="dockCollapseLabel()"
+            [attr.aria-expanded]="!dockCollapsed()"
+            (click)="toggleDockCollapsed()"
+          >
+            <span
+              class="showcase-toggle__chevron"
+              [class.is-collapsed]="dockCollapsed()"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </header>
+
+      <div
+        class="app-bottom-stack__content app-bottom-stack__band"
+        [class.is-collapsed]="dockCollapsed()"
+        [attr.aria-hidden]="dockCollapsed()"
+      >
+      @switch (activeBottomTab()) {
+        @case ('wallet') {
+          <div class="app-bottom-stack__panel">
+            <app-wallet-panel></app-wallet-panel>
+          </div>
+        }
+        @case ('faucet') {
+          @if (product.faucetEnabled) {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--faucet">
+            <app-faucet></app-faucet>
+          </div>
+          }
+        }
+        @case ('transactions') {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--transactions">
+            <app-transactions-dock></app-transactions-dock>
+          </div>
+        }
+        @case ('chain') {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--chain">
+            <app-blocks-list (selectBlock)="openBlockDrawer($event)"></app-blocks-list>
+          </div>
+        }
+        @case ('market') {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--market">
+            <app-market-panel></app-market-panel>
+          </div>
+        }
+        @case ('quests') {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--quests">
+            <app-quests-panel></app-quests-panel>
+          </div>
+        }
+        @case ('peers') {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--peers">
+            <app-peer-panel></app-peer-panel>
+          </div>
+        }
+        @case ('admin') {
+          @if (auth.isAdmin()) {
+          <div class="app-bottom-stack__panel app-bottom-stack__panel--admin">
+            <app-admin-panel></app-admin-panel>
+          </div>
+          }
+        }
+      }
+    </div>
+    </div>
+  </section>
+
+  <app-three-floor></app-three-floor>
+
+  @if (r4v3SceneVisible()) {
+    @defer (on idle) {
+      <app-r4v3-scene class="app-r4v3-scene-layer" aria-hidden="true" />
+    }
+  }
+
+  @if (statusPanelOpen()) {
+    <aside class="app-status-drawer" aria-label="État réseau détaillé" [appFocusTrap]="true">
+      <header class="app-status-drawer__head">
+        <h2 class="app-status-drawer__title">Réseau</h2>
+        <button
+          type="button"
+          class="app-status-drawer__close"
+          aria-label="Fermer le panneau réseau"
+          (click)="closeStatusPanel()"
+        >
+          ×
+        </button>
+      </header>
+      <app-status-overlay />
+    </aside>
+  }
+
+  @if (shellBannerError(); as bannerError) {
+    <div class="app-shell-error-banner">
+      <app-error-banner [message]="bannerError" />
+    </div>
+  }
+
+  <app-block-detail-drawer
+    [open]="showDrawer()"
+    [block]="selectedBlock()"
+    (close)="closeBlockDrawer()"
+  ></app-block-detail-drawer>
+
+  <app-launch-form-drawer
+    [open]="launchDrawer.isOpen()"
+    [submitting]="launchDrawer.submitting()"
+    [errorMessage]="launchDrawer.errorMessage()"
+    (close)="launchDrawer.close()"
+    (create)="launchDrawer.emitCreate($event)"
+  />
+
+  @if (questFeedback(); as feedback) {
+    <div
+      class="app-quest-feedback"
+      [class.is-info]="feedback.kind === 'info'"
+      [class.is-error]="feedback.kind === 'error'"
+      role="status"
+    >
+      {{ feedback.message }}
+    </div>
+  }
+</div>

@@ -1,0 +1,223 @@
+<section class="faucet-panel" aria-label="Faucet panel">
+  @if (toastMessage()) {
+    <div
+      class="faucet-panel__toast"
+      [class.is-success]="toastKind() === 'success'"
+      [class.is-info]="toastKind() === 'info'"
+      [class.is-error]="toastKind() === 'error'"
+      role="status"
+    >
+      {{ toastMessage() }}
+    </div>
+  }
+
+  <header class="faucet-panel__head">
+    <div class="faucet-panel__title-wrap">
+      <h2>{{ locale.t('faucet.title') }}</h2>
+      <p class="faucet-panel__title-sub">
+        {{ locale.t('faucet.subtitle') }}
+        @if (shortWalletAddress()) {
+          · {{ locale.t('faucet.walletLinked') }}: {{ shortWalletAddress() }}
+        }
+      </p>
+      <button
+        type="button"
+        class="faucet-panel__refresh"
+        (click)="refreshPanel()"
+        [attr.aria-label]="locale.t('faucet.refresh')"
+      >
+        ↻
+      </button>
+    </div>
+
+    @if (faucetDisabled()) {
+      <p class="faucet-panel__banner faucet-panel__banner--disabled" role="alert">
+        {{ t('faucet.disabled') }}
+      </p>
+    }
+
+    @if (offlineMode() && !faucetDisabled()) {
+      <p class="faucet-panel__banner faucet-panel__banner--offline" role="status">
+        {{ t('faucet.offline') }}
+        <button type="button" class="faucet-panel__retry" (click)="retryConnection()">
+          {{ t('faucet.retry') }}
+        </button>
+      </p>
+    }
+
+    @if (isReady() && !walletValid()) {
+      <p class="faucet-panel__banner faucet-panel__banner--warn" role="alert">
+        {{ t('faucet.error.walletInvalid') }}
+      </p>
+    }
+
+    <div class="faucet-panel__top">
+      <article class="faucet-panel__tile faucet-panel__tile--amount">
+        <div #valueWrap class="faucet-panel__value-wrap">
+          <div
+            class="faucet-panel__value-fit"
+            [style.transform]="'scale(' + valueFitScale() + ')'"
+          >
+            <span
+              #valueText
+              class="faucet-panel__value"
+              [class.is-bumping]="bump"
+              [class.is-capped]="atMaxClaim()"
+              [attr.aria-label]="displayLine"
+            >
+              <span class="faucet-panel__value-whole">{{ wholePartDisplay }} {{ nativeTokenLabel() }}</span>
+              <span class="faucet-panel__value-sep">,</span>
+              <span class="faucet-panel__value-decimal">{{ decimalDigits }}</span>
+              <span class="faucet-panel__value-unit">m4t3r</span>
+            </span>
+          </div>
+        </div>
+        @if (atMaxClaim()) {
+          <p class="faucet-panel__cap-hint">
+            {{ t('faucet.atMaxClaim', { max: '1', token: nativeTokenLabel() }) }}
+          </p>
+        }
+      </article>
+      <article class="faucet-panel__tile faucet-panel__tile--cooldown">
+        <p class="faucet-panel__label">{{ locale.t('faucet.cooldown') }}</p>
+        <div
+          class="faucet-panel__cooldown-ring"
+          [style.--cooldown-progress]="cooldownProgress"
+        >
+          <span class="faucet-panel__cooldown-value">{{ cooldownLabel }}</span>
+        </div>
+        @if (cooldownSeconds > 0) {
+          <p class="faucet-panel__sub faucet-panel__sub--eligible">{{ nextEligibleLabel() }}</p>
+        }
+      </article>
+    </div>
+
+    <button
+      type="button"
+      class="faucet-panel__claim"
+      [disabled]="claimDisabled()"
+      [class.is-inactive]="!eligible && !loading && isReady()"
+      [class.is-cooling]="!eligible && !loading && isReady() && cooldownSeconds > 0"
+      (click)="claim()"
+    >
+      {{ claimButtonLabel }}
+    </button>
+
+    @if (errorMessage) {
+      <p class="faucet-panel__feedback faucet-panel__feedback--error" role="alert">
+        {{ errorMessage }}
+      </p>
+    }
+    @if (successMessage) {
+      <p class="faucet-panel__feedback faucet-panel__feedback--success" role="status">
+        {{ successMessage }}
+        @if (txHash) {
+          <span class="faucet-panel__tx-actions">
+            <button
+              type="button"
+              class="faucet-panel__tx"
+              (click)="copyTxHash()"
+              [attr.aria-label]="locale.t('faucet.txCopy')"
+            >
+              Tx: {{ txHash }}
+            </button>
+            <button
+              type="button"
+              class="faucet-panel__tx faucet-panel__tx--explorer"
+              (click)="openTxInExplorer()"
+              [attr.aria-label]="locale.t('faucet.txExplorer')"
+            >
+              {{ locale.t('faucet.txExplorer') }}
+            </button>
+            @if (blockHeight() != null && blockHeight()! > 0) {
+              <button
+                type="button"
+                class="faucet-panel__tx faucet-panel__tx--explorer"
+                (click)="openBlockInExplorer()"
+                [attr.aria-label]="locale.t('faucet.blockExplorer')"
+              >
+                {{ locale.t('faucet.blockExplorer') }} #{{ blockHeight() }}
+              </button>
+            }
+          </span>
+        }
+      </p>
+    }
+  </header>
+
+  <div class="faucet-panel__body">
+    <section class="faucet-panel__history" [attr.aria-label]="locale.t('faucet.history')">
+      <div class="faucet-panel__history-head">
+        <h3>{{ locale.t('faucet.history') }}</h3>
+        <div class="faucet-panel__history-actions">
+          @if (history.length > 0) {
+            <button type="button" class="faucet-panel__history-toggle" (click)="exportHistoryJson()">
+              {{ locale.t('faucet.exportHistory') }}
+            </button>
+          }
+          @if (history.length > 5) {
+            <button type="button" class="faucet-panel__history-toggle" (click)="toggleHistoryExpanded()">
+              {{ historyExpanded() ? locale.t('faucet.viewLess') : locale.t('faucet.viewAll') }}
+            </button>
+          }
+        </div>
+      </div>
+      <div class="faucet-panel__rows">
+        @if (history.length === 0) {
+          <div class="faucet-panel__empty">{{ locale.t('faucet.historyEmpty') }}</div>
+        } @else {
+          @for (row of visibleHistory(); track row.date + row.time + row.action + (row.txHash ?? '')) {
+            <div class="faucet-panel__row">
+              <span>{{ row.action }} | {{ row.date }} {{ row.time }}</span>
+              <span>{{ row.amount }}</span>
+              <span class="faucet-panel__row-status">{{ row.status }}</span>
+              @if (row.txHash) {
+                <button
+                  type="button"
+                  class="faucet-panel__row-explorer"
+                  (click)="openTxInExplorer(row.txHash)"
+                  [attr.aria-label]="locale.t('faucet.txExplorer')"
+                >
+                  ↗
+                </button>
+              }
+            </div>
+          }
+          @if (historyExpanded() && hasMoreHistory()) {
+            <button type="button" class="faucet-panel__load-more" (click)="loadMoreHistory()">
+              {{ locale.t('faucet.loadMore') }}
+            </button>
+          }
+        }
+      </div>
+    </section>
+  </div>
+
+  <footer class="faucet-panel__meta">
+    <div class="faucet-panel__meta-item">
+      <span>{{ locale.t('faucet.network') }}</span>
+      <strong [attr.title]="t('faucet.networkHint')">{{ networkLabel() }}</strong>
+    </div>
+    <div class="faucet-panel__meta-item">
+      <span>{{ locale.t('faucet.peers') }}</span>
+      <strong [attr.title]="t('faucet.peersHint')">{{ peersLabel() }}</strong>
+    </div>
+    <div class="faucet-panel__meta-item">
+      <span>{{ locale.t('faucet.block') }}</span>
+      <button
+        type="button"
+        class="faucet-panel__block-link"
+        [disabled]="blockHeight() == null || blockHeight()! <= 0"
+        (click)="openBlockInExplorer()"
+        [attr.title]="t('faucet.blockHint')"
+      >
+        {{ blockHeightLabel() }}
+      </button>
+    </div>
+    <span
+      class="faucet-panel__dot"
+      [class.is-offline]="!networkOnline()"
+      [attr.aria-label]="networkOnline() ? locale.t('faucet.networkOnline') : locale.t('faucet.networkOffline')"
+    ></span>
+  </footer>
+</section>

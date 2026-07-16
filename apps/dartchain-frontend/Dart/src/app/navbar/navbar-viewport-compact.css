@@ -1,0 +1,120 @@
+/**
+ * Navbar — Phase 2 viewport compact (251–349 px, cible 300×500).
+ */
+
+@media (min-width: 251px) and (max-width: 349px) {
+  :host {
+    --nv-margin-top: max(clamp(5px, 1.4vh, 10px), env(safe-area-inset-top, 0px));
+    --nv-wrap-pad-x: 8px;
+    --nv-pad-x: 8px;
+    --nv-pad-top: clamp(5px, 1.3vh, 8px);
+    --nv-pad-y: clamp(4px, 1.1vh, 6px);
+    --nv-inner-gap: clamp(2px, 0.6vh, 4px);
+    --nv-shell-radius: clamp(7px, 2.2vw, 10px);
+    --nv-logo: 24px;
+    --nv-logo-h: 22px;
+    --nv-logo-shift-y: -7px;
+    --nv-shell-min-h: var(--ds-zone-navbar, 56px);
+  }
+
+  .navbar-wrap {
+    padding: var(--nv-margin-top) var(--nv-wrap-pad-x) 0;
+  }
+
+  .navbar-top {
+    column-gap: 6px;
+    min-height: var(--nv-shell-min-h);
+    padding: var(--nv-pad-top) var(--nv-pad-x) var(--nv-pad-y);
+    grid-template-columns: minmax(0, 1fr) max-content max-content;
+  }
+
+  .navbar-brand-row {
+    gap: 4px;
+    min-height: var(--nv-logo-h);
+  }
+
+  .navbar-brand-row .navbar-brand-select {
+    max-width: 2.65rem;
+  }
+
+  .navbar-brand-column {
+    gap: var(--nv-inner-gap);
+    padding-inline-end: 4px;
+  }
+
+  .navbar-subtitle ::ng-deep .bandeau-accueil__content span {
+    font-size: 0.5625rem;
+    line-height: 1.25;
+  }
+
+  .navbar-node-panel__box {
+    padding: 3px 5px;
+    gap: 0;
+  }
+
+  .navbar-node-panel__chart {
+    display: none;
+  }
+
+  .navbar-node-panel__title {
+    font-size: 0.5rem;
+  }
+
+  .navbar-node-panel__sync {
+    font-size: 0.5rem;
+  }
+
+  .navbar-auth-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  .navbar-auth-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .navbar-auth-user__name {
+    display: none;
+  }
+}
+
+@media (min-width: 251px) and (max-width: 349px) and (max-height: 520px) {
+  :host {
+    --nv-margin-top: max(clamp(4px, 1.1vh, 8px), env(safe-area-inset-top, 0px));
+    --nv-shell-min-h: 52px;
+    --nv-pad-top: clamp(4px, 1.1vh, 7px);
+    --nv-pad-y: 3px;
+    --nv-logo-h: 20px;
+    --nv-logo-shift-y: -6px;
+  }
+
+  .navbar-top {
+    min-height: 52px;
+    padding-block: var(--nv-pad-top) var(--nv-pad-y);
+  }
+
+  .navbar-subtitle ::ng-deep .bandeau-accueil__content span {
+    font-size: 0.525rem;
+  }
+}
+
+html.vp-compact app-navbar .navbar-wrap {
+  padding: var(--ds-navbar-top-inset, max(clamp(5px, 1.4vh, 10px), env(safe-area-inset-top, 0px))) 8px 0;
+}
+
+html.vp-compact app-navbar .navbar-top {
+  column-gap: 6px;
+  padding: var(--ds-navbar-pad-top, clamp(5px, 1.3vh, 8px)) 8px var(--ds-navbar-pad-bottom, clamp(4px, 1.1vh, 6px));
+  min-height: var(--ds-zone-navbar, 56px);
+}
+
+html.vp-compact app-navbar .navbar-brand-row {
+  gap: 6px;
+}
+
+html.vp-compact app-navbar .navbar-node-panel__chart {
+  display: none;
+}

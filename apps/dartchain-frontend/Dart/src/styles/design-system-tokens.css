@@ -1,0 +1,208 @@
+/**
+ * Phase 1 — Design system tokens (refonte cyberpunk mature).
+ *
+ * Préfixe --ds-* : n’écrase pas theme.css tant que les phases 2–20
+ * n’appliquent pas explicitement ces variables aux composants.
+ *
+ * Zones (ordre de lecture @ 300×500) :
+ *   navbar → exchange → chart → showcase-header → showcase-panel
+ *   → bottom-panel → bottom-dock → floor-peek
+ */
+
+:root {
+  /* —— Fond & atmosphère (particules + floor conservés) —— */
+  --ds-bg-deep: #0a0612;
+  --ds-bg-deep-rgb: 10, 6, 18;
+  --ds-bg-elevated: #121018;
+  --ds-bg-elevated-rgb: 18, 16, 24;
+  --ds-bg-glass: rgba(var(--ds-bg-deep-rgb), 0.72);
+  --ds-bg-glass-strong: rgba(var(--ds-bg-deep-rgb), 0.88);
+
+  /* —— Surface carbone métallisé : glass sombre, quasi transparent —— */
+  --ds-surface-base-rgb: 14, 16, 22;
+  --ds-surface-base-deep-rgb: 6, 7, 10;
+  --ds-surface-metal-rgb: 72, 82, 98;
+  --ds-surface-metal-highlight-rgb: 148, 168, 196;
+
+  /* Teinte gunmetal ~2.5 % — particules Three.js prioritaires */
+  --ds-surface-tint: rgba(var(--ds-surface-base-deep-rgb), 0.025);
+
+  /* Glass léger : blur minimal pour ne pas flouter les particules */
+  --ds-surface-backdrop: blur(1.5px) saturate(1.12);
+
+  /* Base métallique sombre (quasi invisible) */
+  --ds-surface-bg: linear-gradient(
+    168deg,
+    rgba(var(--ds-surface-metal-highlight-rgb), 0.025) 0%,
+    rgba(var(--ds-surface-base-rgb), 0.015) 38%,
+    rgba(var(--ds-surface-base-deep-rgb), 0.008) 72%,
+    rgba(var(--ds-surface-metal-rgb), 0.02) 100%
+  );
+  --ds-surface-metallic: linear-gradient(
+    125deg,
+    rgba(var(--ds-surface-metal-highlight-rgb), 0.03) 0%,
+    rgba(var(--ds-surface-base-deep-rgb), 0.006) 42%,
+    rgba(var(--ds-neon-cyan-rgb), 0.012) 58%,
+    rgba(var(--ds-surface-base-deep-rgb), 0.004) 100%
+  );
+  --ds-surface-veil: linear-gradient(
+    180deg,
+    rgba(var(--ds-surface-base-rgb), 0.04) 0%,
+    rgba(var(--ds-surface-base-deep-rgb), 0.012) 50%,
+    rgba(var(--ds-surface-base-rgb), 0.028) 100%
+  );
+
+  /* Tissage carbone fin (twill 2×2, maille 4px) */
+  --ds-surface-carbon-weave:
+    repeating-linear-gradient(
+      45deg,
+      rgba(var(--ds-surface-base-deep-rgb), 0.32) 0px,
+      rgba(var(--ds-surface-base-deep-rgb), 0.32) 0.5px,
+      rgba(var(--ds-surface-metal-rgb), 0.16) 0.5px,
+      rgba(var(--ds-surface-metal-rgb), 0.16) 1px,
+      rgba(18, 20, 26, 0.22) 1px,
+      rgba(18, 20, 26, 0.22) 2px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(var(--ds-surface-base-deep-rgb), 0.28) 0px,
+      rgba(var(--ds-surface-base-deep-rgb), 0.28) 0.5px,
+      rgba(var(--ds-surface-metal-rgb), 0.14) 0.5px,
+      rgba(var(--ds-surface-metal-rgb), 0.14) 1px,
+      rgba(14, 16, 22, 0.2) 1px,
+      rgba(14, 16, 22, 0.2) 2px
+    );
+  --ds-surface-carbon-size: 4px 4px;
+
+  /* Reflet métallique discret */
+  --ds-surface-metallic-sheen: linear-gradient(
+    180deg,
+    rgba(var(--ds-surface-metal-highlight-rgb), 0.05) 0%,
+    rgba(255, 255, 255, 0.015) 8%,
+    transparent 28%,
+    transparent 72%,
+    rgba(var(--ds-neon-cyan-rgb), 0.018) 100%
+  );
+  --ds-surface-metallic-edge: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--ds-surface-metal-highlight-rgb), 0.02) 48%,
+    rgba(var(--ds-surface-metal-highlight-rgb), 0.035) 50%,
+    rgba(var(--ds-surface-metal-highlight-rgb), 0.018) 52%,
+    transparent 100%
+  );
+  --ds-surface-micro-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E");
+
+  --ds-surface-bg-header: var(--ds-surface-bg);
+  --ds-surface-bg-dock: var(--ds-surface-bg);
+  --ds-surface-bg-solid: rgba(var(--ds-surface-base-deep-rgb), 0.94);
+  --ds-surface-opacity-solid: 0.94;
+
+  --ds-surface-carbon-opacity: 0.28;
+  --ds-surface-sheen-opacity: 0.22;
+  /* Legacy aliases */
+  --ds-surface-noise-opacity: var(--ds-surface-carbon-opacity);
+  --ds-surface-grid-opacity: var(--ds-surface-sheen-opacity);
+  --ds-surface-noise: var(--ds-surface-carbon-weave);
+  --ds-surface-grid: var(--ds-surface-metallic-sheen);
+  --ds-surface-grid-size: var(--ds-surface-carbon-size);
+
+  --ds-surface-blur: var(--ds-surface-backdrop);
+  --ds-surface-radius: var(--ds-radius-md, 10px);
+  --ds-surface-border: rgba(var(--ds-surface-metal-highlight-rgb), 0.1);
+  --ds-surface-border-top: rgba(var(--ds-surface-metal-highlight-rgb), 0.12);
+  --ds-surface-border-bottom: rgba(var(--ds-neon-cyan-rgb), 0.12);
+  --ds-surface-shadow:
+    inset 0 1px 0 rgba(var(--ds-surface-metal-highlight-rgb), 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    0 2px 12px rgba(0, 0, 0, 0.18);
+  --ds-surface-shadow-strip:
+    inset 0 1px 0 rgba(var(--ds-surface-metal-highlight-rgb), 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+    0 3px 10px rgba(0, 0, 0, 0.14);
+
+  /* Alias legacy → surface */
+  --ds-glass-blur: var(--ds-surface-blur);
+  --ds-glass-shadow: var(--ds-surface-shadow);
+  --ds-neon-cyan: #00f5ff;
+  --ds-neon-cyan-rgb: 0, 245, 255;
+  --ds-neon-magenta: #ff2d9a;
+  --ds-neon-magenta-rgb: 255, 45, 154;
+  --ds-neon-violet: #7b61ff;
+  --ds-neon-violet-rgb: 123, 97, 255;
+
+  /* —— Texte —— */
+  --ds-text-primary: #e8ecf0;
+  --ds-text-secondary: #8b929e;
+  --ds-text-muted: #5c6370;
+  --ds-text-data: #00f5ff;
+
+  /* —— Bordures & séparateurs —— */
+  --ds-border-subtle: rgba(255, 255, 255, 0.06);
+  --ds-border-default: rgba(255, 255, 255, 0.1);
+  --ds-border-accent: rgba(var(--ds-neon-cyan-rgb), 0.22);
+  --ds-border-accent-active: rgba(var(--ds-neon-cyan-rgb), 0.45);
+
+  /* —— Rayons —— */
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 10px;
+  --ds-radius-pill: 999px;
+
+  /* —— Espacement (grille 4px, viewport 300×500) —— */
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-shell-inline: var(--ds-space-3);
+  --ds-section-gap: var(--ds-space-2);
+  --ds-panel-gap: var(--ds-space-2);
+
+  /* —— Typographie —— */
+  --ds-font-ui: 'Inter', 'Roboto', system-ui, sans-serif;
+  --ds-font-display: 'Orbit', 'Inter', sans-serif;
+  --ds-font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
+  --ds-text-xs: 0.5625rem;   /* 9px */
+  --ds-text-sm: 0.6875rem;   /* 11px */
+  --ds-text-md: 0.8125rem;   /* 13px */
+  --ds-text-lg: 1rem;        /* 16px */
+  --ds-text-xl: 1.375rem;    /* 22px — soldes */
+
+  --ds-glow-active: 0 0 12px rgba(var(--ds-neon-cyan-rgb), 0.18);
+
+  /* —— Tabs : différenciation niveau A (vue) vs B (filtre) —— */
+  --ds-tab-a-height: 26px;
+  --ds-tab-a-bg-active: rgba(var(--ds-neon-cyan-rgb), 0.12);
+  --ds-tab-a-border-active: var(--ds-neon-cyan);
+  --ds-tab-b-height: 22px;
+  --ds-tab-b-bg: transparent;
+  --ds-tab-b-border: var(--ds-border-default);
+
+  /* —— Layout budgets @ 300×500 (réf. ui-layout-zones.constants.ts) —— */
+  --ds-zone-navbar: 56px;
+  --ds-navbar-top-inset: max(clamp(6px, 1.6vh, 12px), env(safe-area-inset-top, 0px));
+  --ds-navbar-shell-radius: clamp(8px, 2.4vw, 12px);
+  --ds-navbar-pad-top: clamp(6px, 1.4vh, 9px);
+  --ds-navbar-pad-bottom: clamp(5px, 1.2vh, 7px);
+  --ds-navbar-inner-gap: clamp(3px, 0.8vh, 5px);
+  --ds-exchange-shell-radius: clamp(8px, 2.4vw, 12px);
+  --ds-exchange-pad: clamp(8px, 1.6vw, 11px);
+  --ds-exchange-gap: clamp(6px, 1.2vw, 9px);
+  --ds-exchange-margin: clamp(2px, 0.5vw, 4px);
+  --ds-exchange-row-gap: clamp(4px, 0.9vw, 6px);
+  --ds-exchange-shell-width: 100%;
+  --ds-exchange-font-min: 0.5625rem; /* 9px — lisibilité mobile Phase 17 */
+  --ds-zone-market: 118px;
+  --ds-zone-showcase-header: 28px;
+  --ds-zone-showcase-body: 90px;
+  --ds-zone-bottom-panel: 130px;
+  --ds-zone-bottom-dock: 48px;
+  --ds-zone-floor-peek: 12px;
+
+  /* —— Hub column ratio 35/65 —— */
+  --ds-hub-exchange-fr: 7;
+  --ds-hub-chart-fr: 13;
+
+  /* —— Touch targets mobile —— */
+  --ds-touch-min: 36px;
+  --ds-icon-btn: 32px;
+}
