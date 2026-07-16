@@ -501,6 +501,11 @@ app-three-floor {
   transition: grid-template-rows 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.app-hub.is-showcase-disabled {
+  grid-template-rows: var(--market-height);
+  row-gap: 0;
+}
+
 .app-market-card {
   min-width: 0;
   min-height: 0;

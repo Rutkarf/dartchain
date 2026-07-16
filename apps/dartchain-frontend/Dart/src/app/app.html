@@ -11,7 +11,13 @@
     </app-navbar>
   </header>
 
-  <section id="app-main-content" class="app-hub" aria-label="Marché" tabindex="-1">
+  <section
+    id="app-main-content"
+    class="app-hub"
+    [class.is-showcase-disabled]="!product.showcaseEnabled"
+    aria-label="Marché"
+    tabindex="-1"
+  >
     <div class="app-hub-swap-stack">
       <div class="app-market-card app-market-card--swap app-showcase-card--swap">
         <div class="app-market-card__swap-main">

@@ -16,6 +16,13 @@ BACKEND_URL="${BACKEND_URL#https://}"
 BACKEND_URL="https://${BACKEND_URL}"
 BACKEND_HOST="${BACKEND_URL#https://}"
 
+# Showcase activé par défaut (aligné backend dev / démo publique). Désactiver : SHOWCASE_ENABLED=false
+SHOWCASE_ENABLED="${SHOWCASE_ENABLED:-true}"
+case "${SHOWCASE_ENABLED}" in
+  true|1|yes|on) SHOWCASE_TS="true" ;;
+  *) SHOWCASE_TS="false" ;;
+esac
+
 cat > "${ROOT}/src/environments/environment.prod.ts" <<EOF
 /** Généré par scripts/build-cloudflare.sh — ne pas éditer manuellement avant un déploiement CF. */
 export const environment = {
@@ -25,7 +32,7 @@ export const environment = {
   chatWsUrl: 'wss://${BACKEND_HOST}/ws/chat',
   commercial: true,
   faucetEnabled: false,
-  showcaseEnabled: false,
+  showcaseEnabled: ${SHOWCASE_TS},
 };
 EOF
 

@@ -6,5 +6,5 @@ export const environment = {
   chatWsUrl: 'wss://dartchain-backend-1-0-0.onrender.com/ws/chat',
   commercial: true,
   faucetEnabled: false,
-  showcaseEnabled: false,
+  showcaseEnabled: true,
 };
