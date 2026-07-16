@@ -1,9 +1,9 @@
-/** Remplacé automatiquement par scripts/build-cloudflare.sh au build Cloudflare Pages. */
+/** Généré par scripts/build-cloudflare.sh — ne pas éditer manuellement avant un déploiement CF. */
 export const environment = {
   production: true,
-  apiUrl: 'https://YOUR-BACKEND.onrender.com/api',
-  liveWsUrl: 'wss://YOUR-BACKEND.onrender.com/ws/live',
-  chatWsUrl: 'wss://YOUR-BACKEND.onrender.com/ws/chat',
+  apiUrl: 'https://dartchain-backend-1-0-0.onrender.com/api',
+  liveWsUrl: 'wss://dartchain-backend-1-0-0.onrender.com/ws/live',
+  chatWsUrl: 'wss://dartchain-backend-1-0-0.onrender.com/ws/chat',
   commercial: true,
   faucetEnabled: false,
   showcaseEnabled: false,

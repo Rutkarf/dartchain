@@ -6,7 +6,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FRONT="${ROOT}/apps/dartchain-frontend/Dart"
 
 if [[ -z "${BACKEND_URL:-}" || "${BACKEND_URL}" == *"YOUR-BACKEND"* ]]; then
-  echo "WARN: BACKEND_URL non défini — placeholder utilisé (à configurer dans Cloudflare Build variables)" >&2
+  export BACKEND_URL="https://dartchain-backend-1-0-0.onrender.com"
+  echo "WARN: BACKEND_URL absent — défaut ${BACKEND_URL}" >&2
 fi
 
 cd "${FRONT}"

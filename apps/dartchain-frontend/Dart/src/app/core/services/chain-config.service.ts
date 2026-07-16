@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
+import { environment } from '../../../environments/environment';
+
 export interface ChainConfig {
   chainId: number;
   networkName: string;
@@ -26,7 +28,7 @@ export class ChainConfigService {
     }
 
     const config = await firstValueFrom(
-      this.http.get<ChainConfig>('/api/v1/chain/config')
+      this.http.get<ChainConfig>(`${environment.apiUrl.replace(/\/+$/, '')}/v1/chain/config`)
     );
     this.configSignal.set(config);
     return config;

@@ -2,13 +2,16 @@ import { HttpBackend, HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 import type { AuthResponse } from '../models/auth.model';
+import { environment } from '../../../environments/environment';
 import {
   clearAuthSession,
   readStoredRefreshToken,
   updateStoredAccessToken,
 } from './auth-session.storage';
 
-const REFRESH_URL = '/api/v1/auth/refresh';
+function refreshUrl(): string {
+  return `${environment.apiUrl.replace(/\/+$/, '')}/v1/auth/refresh`;
+}
 
 let refreshInFlight: Promise<string | null> | null = null;
 
@@ -47,7 +50,7 @@ async function performRefresh(httpBackend: HttpBackend): Promise<string | null> 
 
   try {
     const response = await firstValueFrom(
-      http.post<AuthResponse>(REFRESH_URL, { refreshToken })
+      http.post<AuthResponse>(refreshUrl(), { refreshToken })
     );
 
     const accessToken = response.accessToken ?? response.token;

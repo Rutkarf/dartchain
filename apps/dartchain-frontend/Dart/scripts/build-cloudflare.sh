@@ -5,8 +5,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}"
 
-BACKEND_URL="${BACKEND_URL:-https://YOUR-BACKEND.onrender.com}"
+BACKEND_URL="${BACKEND_URL:-https://dartchain-backend-1-0-0.onrender.com}"
 BACKEND_URL="${BACKEND_URL%/}"
+if [[ "${BACKEND_URL}" == *"YOUR-BACKEND"* ]]; then
+  echo "FAIL: BACKEND_URL invalide (${BACKEND_URL}). Définir BACKEND_URL dans Cloudflare Pages." >&2
+  exit 1
+fi
 BACKEND_URL="${BACKEND_URL#http://}"
 BACKEND_URL="${BACKEND_URL#https://}"
 BACKEND_URL="https://${BACKEND_URL}"
