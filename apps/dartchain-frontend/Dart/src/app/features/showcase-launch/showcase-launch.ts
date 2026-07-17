@@ -51,6 +51,7 @@ export class ShowcaseLaunchComponent {
   readonly successMessage = this.launchState.successMessage;
   readonly projects = this.launchState.projects;
   readonly searchQuery = signal('');
+  readonly searchExpanded = signal(false);
   readonly activeStatus = signal<LaunchStatusFilter>('all');
   readonly statusFilters = LAUNCH_STATUS_FILTERS;
 
@@ -101,6 +102,18 @@ export class ShowcaseLaunchComponent {
 
   protected onSearchInput(value: string): void {
     this.searchQuery.set(value);
+  }
+
+  protected openSearch(): void {
+    this.searchExpanded.set(true);
+  }
+
+  protected closeSearch(event?: Event): void {
+    event?.preventDefault();
+    if (this.searchQuery().trim()) {
+      return;
+    }
+    this.searchExpanded.set(false);
   }
 
   protected selectStatus(status: LaunchStatusFilter): void {

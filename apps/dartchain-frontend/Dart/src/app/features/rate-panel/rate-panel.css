@@ -798,6 +798,8 @@
   flex: 1 1 0;
   min-height: 0;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 0;
   border: none;
   border-radius: 0;
@@ -838,8 +840,8 @@
 :host(.rate-panel--hub-graph) .rate-panel-chart {
   flex: 1 1 0;
   min-height: 0;
-  height: 100%;
-  padding: 4px 4px 4px 4px;
+  height: auto;
+  padding: 0 1px;
   border-radius: 0;
   background: transparent;
   box-sizing: border-box;

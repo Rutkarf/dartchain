@@ -31,7 +31,7 @@
   width: 100% !important;
   min-width: 0 !important;
   max-width: calc(100% - var(--showcase-toggle-w, 28px)) !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tabs,
@@ -45,7 +45,14 @@
   height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
-  overflow: hidden !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab:has(.showcase-tab__unread-toast),
+.app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface:has(.showcase-tab__unread-toast) {
+  overflow: visible !important;
+  z-index: 2 !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab,

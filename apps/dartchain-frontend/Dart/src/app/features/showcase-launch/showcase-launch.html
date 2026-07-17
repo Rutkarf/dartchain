@@ -2,64 +2,90 @@
   @if (isExpanded) {
     <header class="showcase-launch__head">
       <div class="showcase-meta showcase-launch__meta-bar">
-        <span class="showcase-meta__rail" aria-hidden="true"></span>
-        <span
-          class="launch-summary-status showcase-meta__status-pill"
-          [ngClass]="phaseClass()"
-          [attr.aria-label]="'État : ' + launchState.statusLabel()"
-        >
-          {{ launchState.statusLabel() }}
-        </span>
-        <span class="showcase-meta__live" aria-live="polite">
-          <span class="showcase-meta__live-dot" aria-hidden="true"></span>
-          {{ liveSummary() }}
-        </span>
-        <span class="showcase-meta__progress" aria-hidden="true">
+        <div class="showcase-meta__status-zone showcase-launch__status-zone">
+          <span class="showcase-meta__rail" aria-hidden="true"></span>
           <span
-            class="showcase-meta__progress-fill"
-            [style.width.%]="launchState.progressPercent()"
-          ></span>
-        </span>
-
-        <label class="showcase-meta__search">
-          <span class="sr-only">Rechercher un projet</span>
-          <input
-            type="search"
-            class="showcase-meta__search-input"
-            placeholder="Rechercher…"
-            [value]="searchQuery()"
-            (input)="onSearchInput($any($event.target).value)"
-          />
-        </label>
-
-        <button
-          type="button"
-          class="showcase-meta__refresh"
-          (click)="refresh()"
-          [attr.aria-busy]="loading()"
-          aria-label="Actualiser les projets"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M21 12a9 9 0 0 1-15.5 6.36" />
-            <path d="M3 12a9 9 0 0 1 15.5-6.36" />
-            <path d="M17 4v4h-4" />
-            <path d="M7 20v-4h4" />
-          </svg>
-        </button>
-
-        <label class="showcase-meta__filter">
-          <span class="sr-only">Filtrer les projets</span>
-          <select
-            class="showcase-meta__filter-select"
-            [value]="activeStatus()"
-            (change)="selectStatus($any($event.target).value)"
-            aria-label="Filtrer les projets LaunchLab"
+            class="launch-summary-status showcase-meta__status-pill"
+            [ngClass]="phaseClass()"
+            [attr.aria-label]="'État : ' + launchState.statusLabel()"
           >
-            @for (status of statusFilters; track status) {
-              <option [value]="status">{{ statusFilterLabel(status) }}</option>
+            {{ launchState.statusLabel() }}
+          </span>
+          <span class="showcase-meta__live" aria-live="polite" [attr.title]="liveSummary()">
+            <span class="showcase-meta__live-dot" aria-hidden="true"></span>
+            {{ liveSummary() }}
+          </span>
+          <span class="showcase-meta__progress" aria-hidden="true">
+            <span
+              class="showcase-meta__progress-fill"
+              [style.width.%]="launchState.progressPercent()"
+            ></span>
+          </span>
+        </div>
+
+        <div class="showcase-meta-actions showcase-launch__meta-actions">
+          <div
+            class="showcase-meta__search-wrap"
+            [class.is-expanded]="searchExpanded()"
+          >
+            @if (searchExpanded()) {
+              <label class="showcase-meta__search">
+                <span class="sr-only">Rechercher un projet</span>
+                <input
+                  type="search"
+                  class="showcase-meta__search-input"
+                  placeholder="Rechercher…"
+                  [value]="searchQuery()"
+                  (input)="onSearchInput($any($event.target).value)"
+                  (blur)="closeSearch()"
+                  (keydown.escape)="closeSearch($event)"
+                />
+              </label>
+            } @else {
+              <button
+                type="button"
+                class="showcase-meta__search-toggle"
+                (click)="openSearch()"
+                aria-label="Rechercher un projet"
+                title="Rechercher"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.5-3.5" />
+                </svg>
+              </button>
             }
-          </select>
-        </label>
+          </div>
+
+          <button
+            type="button"
+            class="showcase-meta__refresh"
+            (click)="refresh()"
+            [attr.aria-busy]="loading()"
+            aria-label="Actualiser les projets"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+              <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+              <path d="M17 4v4h-4" />
+              <path d="M7 20v-4h4" />
+            </svg>
+          </button>
+
+          <label class="showcase-meta__filter">
+            <span class="sr-only">Filtrer les projets</span>
+            <select
+              class="showcase-meta__filter-select"
+              [value]="activeStatus()"
+              (change)="selectStatus($any($event.target).value)"
+              aria-label="Filtrer les projets LaunchLab"
+            >
+              @for (status of statusFilters; track status) {
+                <option [value]="status">{{ statusFilterLabel(status) }}</option>
+              }
+            </select>
+          </label>
+        </div>
       </div>
     </header>
 

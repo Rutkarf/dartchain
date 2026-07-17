@@ -26,18 +26,21 @@
           }
         </button>
 
-        @if (state.unreadCount() > 0) {
-          <button
-            type="button"
-            class="showcase-meta__mark-read"
-            (click)="markAllRead()"
-            aria-label="Tout marquer comme lu"
-          >
-            Lu
-          </button>
-        }
+        <div class="showcase-r4v3__meta-actions showcase-meta-actions">
+          @if (state.unreadCount() > 0) {
+            <button
+              type="button"
+              class="showcase-meta__mark-read showcase-meta__mark-read--icon"
+              (click)="markAllRead()"
+              aria-label="Tout marquer comme lu"
+              title="Tout marquer comme lu"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </button>
+          }
 
-        <div class="showcase-r4v3__meta-actions">
           <label class="showcase-meta__search">
             <span class="sr-only">Rechercher dans R4V3</span>
             <input

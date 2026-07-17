@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-import { formatDockRelativeTime } from '../utils/dock-time.util';
+import { buildChartTrendSegments, chartYFromNormalizedCoord } from '../../features/showcase-chart/chart-display.util';
 
 export type ChartSummaryPhase = 'error' | 'loading' | 'ready';
 
@@ -32,13 +32,36 @@ export class ChartSummaryStateService {
   readonly low = signal('—');
   readonly loading = signal(true);
   readonly error = signal(false);
-  readonly lastUpdatedAt = signal<number | null>(null);
   readonly sparklinePoints = signal<number[]>([50, 48, 44, 46, 40, 42, 38]);
 
   private refreshHandler: (() => void) | null = null;
 
+  readonly symbolLabel = computed(() => {
+    const [base] = this.pairLabel().split('/');
+    return base?.trim() || '—';
+  });
+
+  readonly sparklineSegments = computed(() =>
+    buildChartTrendSegments(this.sparklinePoints(), 100, 20, 20, 0, 100)
+  );
+
+  readonly sparklineHead = computed(() => {
+    const points = this.sparklinePoints();
+    if (points.length < 2) {
+      return null;
+    }
+
+    const last = points.length - 1;
+    return {
+      x: 100,
+      y: chartYFromNormalizedCoord(points[last], 20),
+      up: points[last] >= points[last - 1],
+    };
+  });
+
+  /** Polyline compacte — utilisée par le panneau NODE de la navbar. */
   readonly sparklinePolyline = computed(() =>
-    buildSparklinePolyline(this.sparklinePoints(), 48, 16, 2)
+    buildSparklinePolyline(this.sparklinePoints(), 48, 16, 1)
   );
 
   readonly phase = computed((): ChartSummaryPhase => {
@@ -51,40 +74,7 @@ export class ChartSummaryStateService {
     return 'ready';
   });
 
-  readonly statusLabel = computed(() => {
-    switch (this.phase()) {
-      case 'error':
-        return 'Erreur';
-      case 'loading':
-        return 'Sync…';
-      default:
-        return this.positive() ? 'Hausse' : 'Baisse';
-    }
-  });
-
-  readonly headline = computed(() => {
-    if (this.loading()) {
-      return 'Chargement du graphique…';
-    }
-    if (this.error()) {
-      return 'Graphique indisponible';
-    }
-
-    const trend = this.positive() ? '▲' : '▼';
-    return `${this.price()} · ${trend} ${this.delta()}`;
-  });
-
-  readonly progressLabel = computed(() => {
-    const parts = [
-      this.pairLabel(),
-      this.rangeBadge() ? `Période ${this.rangeBadge()}` : '',
-      this.volume() !== '—' ? `Vol ${this.volume()}` : '',
-    ].filter(Boolean);
-
-    return parts.join(' · ');
-  });
-
-  readonly detailLabel = computed(() => {
+  readonly highLowLabel = computed(() => {
     const high = this.high();
     const low = this.low();
     if (high === '—' && low === '—') {
@@ -92,10 +82,6 @@ export class ChartSummaryStateService {
     }
     return `H ${high} · L ${low}`;
   });
-
-  readonly updatedAgeLabel = computed(() =>
-    formatDockRelativeTime(this.lastUpdatedAt())
-  );
 
   registerRefreshHandler(handler: () => void): void {
     this.refreshHandler = handler;
@@ -118,8 +104,8 @@ export class ChartSummaryStateService {
       this.sparklinePoints.set(snapshot.sparklinePoints);
     }
 
-    if (!snapshot.loading) {
-      this.lastUpdatedAt.set(Date.now());
+    if (snapshot.loading && !snapshot.sparklinePoints?.length) {
+      return;
     }
   }
 

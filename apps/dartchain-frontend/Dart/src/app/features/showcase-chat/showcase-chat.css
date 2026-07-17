@@ -102,6 +102,19 @@
   border-radius: 4px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.08);
   background: rgba(var(--brand-black-rgb), 0.18);
+  --showcase-meta-control-h: var(--chat-meta-control-h, 11px);
+}
+
+.showcase-chat__status-zone {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.showcase-chat__meta-actions {
+  flex-shrink: 0;
 }
 
 .showcase-meta__rail {

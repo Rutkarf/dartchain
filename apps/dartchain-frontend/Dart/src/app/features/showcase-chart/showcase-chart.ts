@@ -17,7 +17,20 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
 
-import { ChartRange } from '../../core/models/showcase.model';
+import {
+  EXCHANGE_NATIVE_TOKEN,
+  isExchangeNativeToken,
+  isLaunchpadSwapToken,
+} from '../../core/constants/exchange-launchpad.constants';
+import { LaunchProject, ChartRange } from '../../core/models/showcase.model';
+import { MarketDataService } from '../../core/services/market-data.service';
+import { RatePanelPreferencesService } from '../../core/services/rate-panel-preferences.service';
+import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-state.service';
+import { ShowcaseR4v3StateService } from '../../core/services/showcase-r4v3-state.service';
+import { R4v3ThreeComponent } from '../r4v3-three/r4v3-three';
+import { ChartSearchResult } from './chart-token-search.model';
+import { ChartTokenSearchComponent } from './chart-token-search';
+import { readChartWatchlist, upsertChartWatchlist } from './chart-watchlist.util';
 import {
   BRAND_DEFAULT_CRYPTO,
   BrandCryptoSymbol,
@@ -43,6 +56,7 @@ import {
   ChartDisplayType,
   buildChartTrendSegments,
   buildOhlcFromPriceSeries,
+  chartYFromNormalizedCoord,
   layoutCandlesForSvg,
   priceAtSeriesIndex,
   pricesToChartCoordinates,
@@ -73,6 +87,21 @@ import {
   isIntervalId,
 } from './chart-timeframe.constants';
 import { ChartSeriesPayload, transformSeriesForTimeframe } from './chart-timeframe.util';
+import {
+  R4v3ChartView,
+  buildR4v3DepthBars,
+  buildR4v3Heatmap,
+  buildR4v3PulseSpikes,
+  buildR4v3Series,
+  buildR4v3TimelinePins,
+  buildR4v3Waterfall,
+  computeR4v3FlowStats,
+  computeR4v3HealthScore,
+  resampleActivitySeries,
+  r4v3AxisHint,
+  r4v3ResolvedViewLabel,
+  resolveR4v3AutoView,
+} from './r4v3-chart.util';
 
 const CHART_TYPES: ReadonlyArray<{ id: ChartDisplayType; label: string }> = [
   { id: 'line', label: 'Courbe' },
@@ -101,6 +130,17 @@ const HUB_PERIOD_PILLS: readonly HubPeriodPill[] = [
   { range: '30d', badge: '30D' },
 ];
 
+const R4V3_VIEW_PILLS: readonly { id: R4v3ChartView; badge: string }[] = [
+  { id: 'auto', badge: 'AUTO' },
+  { id: 'flow', badge: 'VUE' },
+  { id: 'pulse', badge: 'PULSE' },
+  { id: 'fuel', badge: 'FUEL' },
+  { id: 'health', badge: 'SANTÉ' },
+];
+
+const R4V3_PEG_PRICE = '1,00 €';
+const R4V3_PEG_DELTA = '0,00 %';
+
 function formatCompactMetric(value: number): string {
   if (!Number.isFinite(value) || value <= 0) {
     return '—';
@@ -117,13 +157,15 @@ function formatCompactMetric(value: number): string {
 @Component({
   selector: 'app-showcase-chart',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, R4v3ThreeComponent, ChartTokenSearchComponent],
   templateUrl: './showcase-chart.html',
   styleUrls: ['./showcase-chart.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class.showcase-chart--hub-collapsed]': 'hubLayout() && chartCollapsed()',
     '[class.showcase-chart--compact]': 'compactLayout()',
+    '[class.showcase-chart--r4v3]': 'isR4v3Chart()',
+    '[class.showcase-chart--launch-overlay]': 'hubLaunchOverlay()',
   },
 })
 export class ShowcaseChartComponent {
@@ -139,6 +181,10 @@ export class ShowcaseChartComponent {
   private readonly brandCrypto = inject(BrandCryptoSelectionService);
   private readonly chartAlerts = inject(ChartAlertsService);
   private readonly chartSummary = inject(ChartSummaryStateService);
+  private readonly launchState = inject(ShowcaseLaunchStateService);
+  private readonly r4v3State = inject(ShowcaseR4v3StateService);
+  private readonly marketData = inject(MarketDataService);
+  private readonly preferences = inject(RatePanelPreferencesService);
   private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild('chartSvg') chartSvg?: ElementRef<SVGSVGElement>;
@@ -160,6 +206,7 @@ export class ShowcaseChartComponent {
     { range: '24h', badge: '24H' },
     { range: '7d', badge: '7J' },
   ];
+  readonly r4v3ViewPills = R4V3_VIEW_PILLS;
 
   readonly loading = signal(true);
   readonly error = signal(false);
@@ -178,6 +225,24 @@ export class ShowcaseChartComponent {
   readonly alertPanelOpen = signal(false);
   readonly alertAbove = signal('');
   readonly alertBelow = signal('');
+  readonly r4v3ViewMode = signal<R4v3ChartView>('auto');
+  readonly r4v3LivePulse = signal(false);
+  readonly showLaunchCurve = signal(true);
+  readonly showR4v3OverlayCurve = signal(true);
+  readonly chartWatchlist = signal<ChartSearchResult[]>(readChartWatchlist());
+  readonly tokenThumbBySymbol = signal<Readonly<Record<string, string>>>({});
+  readonly heatmapPulseIndex = signal<number | null>(null);
+  readonly pricePulse = signal(false);
+  readonly chartTransition = signal(false);
+  readonly brokenTokenLogos = signal<ReadonlySet<string>>(new Set());
+
+  private pricePulseTimer: ReturnType<typeof setTimeout> | null = null;
+  private chartTransitionTimer: ReturnType<typeof setTimeout> | null = null;
+  private touchScrubbing = false;
+  private pinchStartDistance: number | null = null;
+  private pinchStartZoom = { start: 0, end: 100 };
+  private longPressTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastPlotTapAt = 0;
 
   readonly chartPrice = signal('—');
   readonly chartDelta = signal('—');
@@ -205,11 +270,19 @@ export class ShowcaseChartComponent {
     return `${sectionTitle} · ${tf.label} · CoinGecko ${tf.coingeckoGranularity}`;
   });
   readonly isNativeDart = computed(() => this.selectedSymbol() === BRAND_DEFAULT_CRYPTO);
+  readonly isR4v3Chart = computed(() => this.isNativeDart());
+  readonly hubLaunchOverlay = computed(() => {
+    if (!this.hubLayout() || this.isR4v3Chart()) {
+      return false;
+    }
+
+    return isLaunchpadSwapToken(this.pairBase());
+  });
   readonly currencyLabel = computed(
     () => this.currencies.find((entry) => entry.id === this.chartCurrency())?.label ?? 'EUR'
   );
 
-  readonly chartHeight = 64;
+  readonly chartHeight = 100;
   readonly volumeHeight = 14;
   readonly rsiHeight = 16;
   /** Marge SVG gauche (%) — évite que grille / courbe chevauchent les prix. */
@@ -225,15 +298,25 @@ export class ShowcaseChartComponent {
     return pricesToChartCoordinates(this.visiblePrices());
   });
 
+  /** Hub / compact : toujours courbe (évite mode bougies vide sans contrôle UI). */
+  readonly effectiveChartType = computed((): ChartDisplayType =>
+    this.hubLayout() || this.compactLayout() ? 'line' : this.chartType()
+  );
+
   /** Segments vert/rouge pour le mode courbe. */
   readonly lineTrendSegments = computed(() =>
-    buildChartTrendSegments(
-      this.plotPoints(),
-      this.chartWidth,
-      this.chartHeight,
-      this.chartHeight
-    )
+    this.buildPlotTrendSegments(this.displayPlotPoints())
   );
+
+  /** Courbe garantie — repli sparkline si données insuffisantes. */
+  readonly renderTrendSegments = computed(() => {
+    const segments = this.lineTrendSegments();
+    if (segments.length) {
+      return segments;
+    }
+
+    return this.buildPlotTrendSegments(undefined);
+  });
 
   readonly lastLineTrendUp = computed(() => {
     const segments = this.lineTrendSegments();
@@ -295,7 +378,12 @@ export class ShowcaseChartComponent {
     return label.toUpperCase().includes(unit.toUpperCase()) ? label : `${label} ${unit}`;
   });
 
-  readonly hubYAxisTitle = computed(() => `PRIX (${this.currencyLabel()})`);
+  readonly hubYAxisTitle = computed(() => {
+    if (this.isR4v3Chart()) {
+      return this.r4v3AxisTitle();
+    }
+    return `PRIX (${this.currencyLabel()})`;
+  });
 
   readonly hubFooterVol = computed(() => {
     const vol = this.chartVolume();
@@ -306,23 +394,273 @@ export class ShowcaseChartComponent {
     return vol.toUpperCase().includes(base) ? vol : `${vol} ${base}`;
   });
 
-  readonly hubFooterCap = computed(() => {
-    const bars = this.volumeBars();
-    if (!bars.length) {
-      return '—';
+  readonly activeLaunchProject = computed((): LaunchProject | null => {
+    const symbol = this.pairBase().trim().toUpperCase();
+    if (!isLaunchpadSwapToken(symbol)) {
+      return null;
     }
-    const sum = bars.reduce((acc, value) => acc + (Number.isFinite(value) ? value : 0), 0);
-    return formatCompactMetric(sum);
+
+    return (
+      this.launchState
+        .projects()
+        .find((project) => project.symbol.trim().toUpperCase() === symbol) ?? null
+    );
   });
 
-  readonly hubFooterTvl = computed(() => {
-    const bars = this.volumeBars();
-    if (!bars.length) {
-      return '—';
-    }
-    const sum = bars.reduce((acc, value) => acc + (Number.isFinite(value) ? value : 0), 0);
-    return formatCompactMetric(sum * 0.28);
+  readonly hubLaunchRaised = computed(() => this.activeLaunchProject()?.raised?.trim() || '—');
+
+  readonly hubLaunchTarget = computed(() => {
+    const target = this.activeLaunchProject()?.target?.trim();
+    return target || '—';
   });
+
+  readonly hubLaunchStatusLabel = computed(() => {
+    const status = this.activeLaunchProject()?.status;
+    switch (status) {
+      case 'LIVE':
+        return 'Live';
+      case 'SOON':
+        return 'Soon';
+      case 'ENDED':
+        return 'Ended';
+      default:
+        return null;
+    }
+  });
+
+  readonly hubLaunchStatusClass = computed(() => {
+    const status = this.activeLaunchProject()?.status;
+    switch (status) {
+      case 'LIVE':
+        return 'live';
+      case 'SOON':
+        return 'soon';
+      case 'ENDED':
+        return 'ended';
+      default:
+        return '';
+    }
+  });
+
+  readonly hubHasLaunchDetails = computed(
+    () =>
+      this.hubLaunchRaised() !== '—' ||
+      this.hubLaunchTarget() !== '—' ||
+      !!this.hubLaunchStatusLabel()
+  );
+
+  readonly r4v3LiquidityProxy = computed(() => {
+    const volumes = this.visibleVolumes();
+    const average = volumes.length
+      ? volumes.reduce((sum, value) => sum + value, 0) / volumes.length
+      : 50;
+    const swapBoost = Math.min((this.r4v3State.swapStats()?.swapNewsCount ?? 0) * 4, 22);
+    return Math.max(35, Math.min(95, average * 0.55 + swapBoost + 18));
+  });
+
+  readonly r4v3Context = computed(() => ({
+    pointCount: this.plotPoints().length,
+    volumes: this.visibleVolumes(),
+    timestamps: this.visibleTimestamps(),
+    panelPoints: this.r4v3State.panel()?.points ?? [],
+    recentTrades: this.marketData
+      .recentTrades()
+      .filter(
+        (trade) =>
+          trade.fromToken.trim().toUpperCase() === EXCHANGE_NATIVE_TOKEN ||
+          trade.toToken.trim().toUpperCase() === EXCHANGE_NATIVE_TOKEN
+      )
+      .slice(0, 24),
+    swapNewsCount: this.r4v3State.swapStats()?.swapNewsCount ?? 0,
+    launchProjects: this.launchState.projects(),
+    liquidityProxy: this.r4v3LiquidityProxy(),
+  }));
+
+  readonly r4v3EffectiveView = computed((): Exclude<R4v3ChartView, 'auto'> => {
+    const mode = this.r4v3ViewMode();
+    if (mode !== 'auto') {
+      return mode;
+    }
+    return resolveR4v3AutoView(this.r4v3Context());
+  });
+
+  readonly r4v3PlotPoints = computed(() => buildR4v3Series(this.r4v3Context(), this.r4v3ViewMode()));
+
+  readonly r4v3OverlayPlotPoints = computed(() => {
+    if (!this.hubLaunchOverlay()) {
+      return [] as number[];
+    }
+
+    const overlay = this.r4v3PlotPoints();
+    const count = this.plotPoints().length;
+    if (!count) {
+      return overlay;
+    }
+
+    return resampleActivitySeries(overlay, count);
+  });
+
+  readonly r4v3OverlayTrendSegments = computed(() =>
+    this.buildPlotTrendSegments(this.r4v3OverlayPlotPoints())
+  );
+
+  readonly renderR4v3OverlayTrendSegments = computed(() => {
+    const segments = this.r4v3OverlayTrendSegments();
+    if (segments.length) {
+      return segments;
+    }
+
+    return this.buildPlotTrendSegments(undefined);
+  });
+
+  /** Courbe toujours rendue — jamais de SVG vide en hub. */
+  readonly hasRenderableCurve = computed(() => this.renderTrendSegments().length > 0);
+
+  readonly r4v3OverlayLastTrendUp = computed(() => {
+    const segments = this.r4v3OverlayTrendSegments();
+    return segments.length ? segments[segments.length - 1].up : true;
+  });
+
+  readonly displayPlotPoints = computed(() =>
+    this.isR4v3Chart() ? this.r4v3PlotPoints() : this.plotPoints()
+  );
+
+  readonly r4v3Heatmap = computed(() =>
+    buildR4v3Heatmap(this.r4v3Context(), this.chartWidth, this.chartPlotInset)
+  );
+
+  readonly r4v3Waterfall = computed(() =>
+    buildR4v3Waterfall(this.r4v3Context(), this.chartWidth, this.chartHeight, this.chartPlotInset)
+  );
+
+  readonly r4v3TimelinePins = computed(() =>
+    buildR4v3TimelinePins(
+      this.r4v3PlotPoints(),
+      this.r4v3Context(),
+      this.chartWidth,
+      this.chartPlotInset
+    )
+  );
+
+  readonly r4v3PulseSpikes = computed(() =>
+    buildR4v3PulseSpikes(
+      this.r4v3PlotPoints(),
+      this.r4v3Context(),
+      this.chartWidth,
+      this.chartHeight,
+      this.chartPlotInset
+    )
+  );
+
+  readonly r4v3DepthBars = computed(() =>
+    buildR4v3DepthBars(
+      this.chartWidth,
+      this.chartHeight,
+      this.chartPlotInset,
+      this.r4v3Context().liquidityProxy
+    )
+  );
+
+  readonly r4v3FlowStats = computed(() => computeR4v3FlowStats(this.r4v3Context()));
+
+  readonly r4v3HealthScore = computed(() => computeR4v3HealthScore(this.r4v3Context()));
+
+  readonly r4v3FuelTotal = computed(() => {
+    const total = this.r4v3Context().launchProjects.reduce((sum, project) => {
+      const raw = Number.parseFloat((project.raised ?? '0').replace(/[^\d.-]/g, ''));
+      return sum + (Number.isFinite(raw) ? raw : 0);
+    }, 0);
+    return total > 0 ? formatCompactMetric(total) : '—';
+  });
+
+  readonly r4v3LastSwapSummary = computed(
+    () => this.r4v3State.swapStats()?.lastSwapSummary?.trim() || '—'
+  );
+
+  readonly r4v3ViewBadge = computed(() =>
+    r4v3ResolvedViewLabel(this.r4v3ViewMode(), this.r4v3Context())
+  );
+
+  readonly r4v3AxisTitle = computed(() =>
+    r4v3AxisHint(this.r4v3ViewMode(), this.r4v3Context())
+  );
+
+  readonly isChartCalm = computed(
+    () =>
+      (this.isR4v3Chart() || this.hubLaunchOverlay()) &&
+      this.r4v3FlowStats().swaps === 0 &&
+      !this.loading() &&
+      !this.error()
+  );
+
+  readonly hubCompareTrendSegments = computed(() => {
+    const compare = this.visibleCompare();
+    if (!compare?.length || !this.hubLayout()) {
+      return [];
+    }
+
+    return this.buildPlotTrendSegments(compare);
+  });
+
+  readonly compareEndPoint = computed(() => {
+    const compare = this.visibleCompare();
+    if (!compare?.length) {
+      return { x: 0, y: 0 };
+    }
+    return this.getChartEndPoint(compare);
+  });
+
+  readonly r4v3FooterPrimary = computed(() => {
+    const view = this.r4v3EffectiveView();
+    const flow = this.r4v3FlowStats();
+
+    switch (view) {
+      case 'flow':
+        return [
+          { label: 'Net', value: flow.netLabel },
+          { label: 'Buys', value: flow.buys > 0 ? formatCompactMetric(flow.buys) : '0' },
+          { label: 'Sells', value: flow.sells > 0 ? formatCompactMetric(flow.sells) : '0' },
+        ];
+      case 'pulse':
+        return [
+          { label: 'Events', value: String(flow.swaps) },
+          { label: 'Vol 24h', value: this.hubFooterVol() },
+          { label: 'Live', value: this.r4v3LastSwapSummary() !== '—' ? 'On' : 'Calme' },
+        ];
+      case 'fuel':
+        return [
+          { label: 'Fuel', value: this.r4v3FuelTotal() },
+          { label: 'Target', value: this.hubLaunchTarget() },
+          { label: 'Raised', value: this.hubLaunchRaised() },
+        ];
+      case 'health':
+        return [
+          { label: 'Score', value: `${this.r4v3HealthScore()}/100` },
+          { label: 'Liq.', value: `${Math.round(this.r4v3LiquidityProxy())}%` },
+          { label: 'Swaps', value: String(flow.swaps) },
+        ];
+      default:
+        return [
+          { label: 'Vol 24h', value: this.hubFooterVol() },
+          { label: 'Net', value: flow.netLabel },
+          { label: 'Swaps', value: String(flow.swaps) },
+        ];
+    }
+  });
+
+  readonly r4v3FooterSecondary = computed(() => [
+    { label: 'Fuel', value: this.r4v3FuelTotal(), tone: undefined as 'up' | undefined },
+    { label: 'Santé', value: `${this.r4v3HealthScore()}/100`, tone: 'up' as const },
+    {
+      label: 'Liq.',
+      value: `${Math.round(this.r4v3LiquidityProxy())}%`,
+      tone: undefined as 'up' | undefined,
+    },
+  ]);
+
+  readonly hubLinePath = computed(() => this.buildChartLine(this.displayPlotPoints()));
+
+  readonly hubAreaPath = computed(() => this.buildChartArea(this.displayPlotPoints()));
 
   readonly visibleCompare = computed(() => {
     const compare = this.comparePoints();
@@ -419,8 +757,8 @@ export class ShowcaseChartComponent {
 
   /** Prix alignés sur chaque ligne horizontale du cadrillage. */
   readonly priceAxisTicks = computed(() => {
-    const levels = this.priceGridLevels();
     const plotHeight = this.chartHeight;
+    const hub = this.hubLayout();
 
     const tickAlign = (index: number, last: number): 'start' | 'center' | 'end' => {
       if (index === 0) {
@@ -432,17 +770,63 @@ export class ShowcaseChartComponent {
       return 'center';
     };
 
+    if (this.isR4v3Chart()) {
+      const points = this.displayPlotPoints();
+      if (points.length) {
+        const min = Math.min(...points);
+        const max = Math.max(...points);
+        const mid = (min + max) / 2;
+        const toTopPercent = (coord: number) =>
+          plotHeight > 0 ? (chartYFromNormalizedCoord(coord, plotHeight) / plotHeight) * 100 : 50;
+
+        return [
+          {
+            id: 'act-top',
+            label: this.formatActivityTick(max),
+            topPercent: toTopPercent(max),
+            align: 'start' as const,
+          },
+          {
+            id: 'act-mid',
+            label: this.formatActivityTick(mid),
+            topPercent: toTopPercent(mid),
+            align: 'center' as const,
+          },
+          {
+            id: 'act-bot',
+            label: this.formatActivityTick(min),
+            topPercent: toTopPercent(min),
+            align: 'end' as const,
+          },
+        ];
+      }
+    }
+
+    const levels = this.priceGridLevels();
+
     if (!levels.length) {
-      return Array.from({ length: 10 }, (_, index) => ({
+      const count = hub ? 3 : 10;
+      const fallbackLabels =
+        hub && this.isR4v3Chart()
+          ? (['Fort', 'Neutre', 'Calme'] as const)
+          : null;
+      return Array.from({ length: count }, (_, index) => ({
         id: `y-fallback-${index}`,
-        label: '—',
-        topPercent: index === 0 ? 0 : index === 9 ? 100 : (index / 9) * 100,
-        align: tickAlign(index, 9),
+        label: fallbackLabels
+          ? fallbackLabels[index === 0 ? 0 : index === count - 1 ? 2 : 1]
+          : '—',
+        topPercent: index === 0 ? 0 : index === count - 1 ? 100 : (index / (count - 1)) * 100,
+        align: tickAlign(index, count - 1),
       }));
     }
 
-    const last = levels.length - 1;
-    return levels.map((level, index) => ({
+    const visibleLevels =
+      hub && levels.length > 3
+        ? [levels[0], levels[Math.floor(levels.length / 2)], levels[levels.length - 1]]
+        : levels;
+
+    const last = visibleLevels.length - 1;
+    return visibleLevels.map((level, index) => ({
       id: `y-${index}`,
       label: level.label,
       topPercent: plotHeight > 0 ? (level.y / plotHeight) * 100 : 50,
@@ -452,15 +836,19 @@ export class ShowcaseChartComponent {
 
   readonly hoverInfo = computed(() => {
     const index = this.activeHoverIndex();
-    const plotPoints = this.plotPoints();
+    const plotPoints = this.displayPlotPoints();
     const prices = this.visiblePrices();
-    if (index === null || !plotPoints.length || !prices.length) {
+    if (index === null || !plotPoints.length) {
+      return null;
+    }
+
+    if (!this.isR4v3Chart() && !prices.length) {
       return null;
     }
 
     const bounds = this.priceBounds();
     const price =
-      bounds !== null && prices.length
+      !this.isR4v3Chart() && bounds !== null && prices.length
         ? priceAtSeriesIndex(plotPoints, index, bounds.high, bounds.low)
         : null;
 
@@ -481,13 +869,34 @@ export class ShowcaseChartComponent {
         ? ohlcAtIndex(plotPoints, prices, index)
         : null;
 
+    const overlayPoints = this.hubLaunchOverlay() ? this.r4v3OverlayPlotPoints() : [];
+    const overlayValue = overlayPoints[index];
+    const overlayLine =
+      this.hubLaunchOverlay() && overlayValue !== undefined
+        ? `R4V3 ${Math.round(overlayValue)} · ${this.r4v3AxisTitle()}`
+        : null;
+
+    const comparePoints = this.visibleCompare();
+    const compareValue = comparePoints?.[index];
+    const compareLine =
+      comparePoints && compareValue !== undefined && this.compareSymbol() !== COMPARE_NONE
+        ? `${this.compareSymbol()} ${Math.round(compareValue)}`
+        : null;
+
     return {
       index,
       xPercent,
       yPercent: 100 - value,
       tipAlign: (xPercent < 18 ? 'start' : xPercent > 82 ? 'end' : 'center') as 'start' | 'end' | 'center',
       label,
-      price: price !== null ? this.formatAxisPrice(price, bounds?.reference ?? '') : '—',
+      price:
+        this.isR4v3Chart()
+          ? `${Math.round(value)} · ${this.r4v3AxisTitle()}`
+          : price !== null
+            ? this.formatAxisPrice(price, bounds?.reference ?? '')
+            : '—',
+      overlayLine,
+      compareLine,
       ohlc,
       pinned: this.pinnedIndex() !== null,
     };
@@ -511,7 +920,11 @@ export class ShowcaseChartComponent {
   readonly plotPointIndices = computed(() => this.plotPoints().map((_, index) => index));
 
   get chartEndPoint(): { x: number; y: number } {
-    return this.getChartEndPoint(this.plotPoints());
+    return this.getChartEndPoint(this.displayPlotPoints());
+  }
+
+  get r4v3OverlayEndPoint(): { x: number; y: number } {
+    return this.getChartEndPoint(this.r4v3OverlayPlotPoints());
   }
 
   chartViewHeight(): number {
@@ -526,6 +939,54 @@ export class ShowcaseChartComponent {
   }
 
   constructor() {
+    this.launchState.loadProjects();
+    this.marketData.init();
+
+    this.destroyRef.onDestroy(() => {
+      if (this.pricePulseTimer != null) {
+        clearTimeout(this.pricePulseTimer);
+      }
+      if (this.chartTransitionTimer != null) {
+        clearTimeout(this.chartTransitionTimer);
+      }
+    });
+
+    effect(() => {
+      if (!this.isR4v3Chart() && !this.hubLaunchOverlay()) {
+        return;
+      }
+
+      if (!this.r4v3State.panel()) {
+        this.r4v3State.load(false);
+      }
+    });
+
+    effect(() => {
+      if (!this.isR4v3Chart() && !this.hubLaunchOverlay()) {
+        return;
+      }
+
+      void this.r4v3State.swapStats()?.swapNewsCount;
+      void this.marketData.recentTrades().length;
+      this.triggerR4v3LivePulse();
+    });
+
+    if (typeof window !== 'undefined') {
+      const onSwapComplete = (): void => {
+        if (!this.isR4v3Chart() && !this.hubLaunchOverlay()) {
+          return;
+        }
+        this.r4v3State.requestRefresh();
+        this.loadChart(false);
+        this.triggerR4v3LivePulse();
+      };
+
+      window.addEventListener('market-swap-complete', onSwapComplete);
+      this.destroyRef.onDestroy(() => {
+        window.removeEventListener('market-swap-complete', onSwapComplete);
+      });
+    }
+
     effect(() => {
       const symbol = this.selectedSymbol();
       const range = this.activeRange();
@@ -545,7 +1006,34 @@ export class ShowcaseChartComponent {
       if (this.chartCurrency() !== 'usd') {
         this.chartCurrency.set('usd');
       }
-      this.showVolume.set(true);
+      this.showVolume.set(false);
+    });
+
+    effect(() => {
+      if (!this.hubLayout()) {
+        return;
+      }
+
+      const pair = this.brandCrypto.activeExchangePair();
+      if (!pair) {
+        return;
+      }
+
+      const from = pair.from.trim().toUpperCase();
+      const to = pair.to.trim().toUpperCase();
+      const launchSymbol = isExchangeNativeToken(from)
+        ? to
+        : isExchangeNativeToken(to)
+          ? from
+          : null;
+
+      if (!launchSymbol || !isLaunchpadSwapToken(launchSymbol)) {
+        return;
+      }
+
+      if (this.selectedSymbol().trim().toUpperCase() !== launchSymbol) {
+        this.brandCrypto.selectLaunchChart(launchSymbol);
+      }
     });
 
     interval(30_000)
@@ -557,6 +1045,14 @@ export class ShowcaseChartComponent {
     this.chartSummary.registerRefreshHandler(() => this.loadChart());
 
     effect(() => {
+      const plotPoints = this.displayPlotPoints();
+      const sparklinePoints =
+        plotPoints.length >= 2
+          ? plotPoints
+          : this.chartPoints().length >= 2
+            ? this.chartPoints()
+            : [50, 48, 44, 46, 40, 42, 38];
+
       this.chartSummary.sync({
         title: 'Graphique',
         pairLabel: `${this.pairBase()} / ${this.currencyLabel()}`,
@@ -569,7 +1065,7 @@ export class ShowcaseChartComponent {
         low: this.chartLow(),
         loading: this.loading(),
         error: this.error(),
-        sparklinePoints: this.chartPoints(),
+        sparklinePoints,
       });
     });
   }
@@ -587,7 +1083,107 @@ export class ShowcaseChartComponent {
     if (this.activeRange() === pill.range) {
       return;
     }
+    this.triggerChartTransition();
     this.selectRange(pill.range);
+  }
+
+  selectR4v3View(view: R4v3ChartView): void {
+    if (this.r4v3ViewMode() === view) {
+      return;
+    }
+    this.triggerChartTransition();
+    this.r4v3ViewMode.set(view);
+  }
+
+  onChartTokenSelected(result: ChartSearchResult): void {
+    const symbol = result.symbol.trim().toUpperCase();
+    this.tokenThumbBySymbol.update((current) => ({
+      ...current,
+      [symbol]: result.thumb?.trim() || current[symbol] || '',
+    }));
+    this.chartWatchlist.set(upsertChartWatchlist(result));
+
+    if (symbol === BRAND_DEFAULT_CRYPTO) {
+      this.brandCrypto.select(BRAND_DEFAULT_CRYPTO);
+      return;
+    }
+
+    if (isLaunchpadSwapToken(symbol)) {
+      this.brandCrypto.selectLaunchChart(symbol, result.id);
+      return;
+    }
+
+    this.brandCrypto.select(symbol as BrandCryptoSymbol, result.id);
+  }
+
+  toggleLaunchCurveVisibility(): void {
+    this.showLaunchCurve.update((visible) => {
+      if (visible && !this.showR4v3OverlayCurve()) {
+        return true;
+      }
+      return !visible;
+    });
+  }
+
+  toggleR4v3OverlayVisibility(): void {
+    this.showR4v3OverlayCurve.update((visible) => {
+      if (visible && !this.showLaunchCurve()) {
+        return true;
+      }
+      return !visible;
+    });
+  }
+
+  enableCompareToken(entry: ChartSearchResult): void {
+    this.compareSymbol.set(entry.symbol);
+    this.loadCompareOverlay();
+  }
+
+  onR4v3LogoTap(): void {
+    this.triggerPricePulse();
+    this.triggerR4v3LivePulse();
+  }
+
+  formatActivityTick(value: number): string {
+    if (value >= 70) {
+      return 'Fort';
+    }
+    if (value <= 30) {
+      return 'Calme';
+    }
+    return 'Moyen';
+  }
+
+  tokenLogoUrl(symbol: string): string | null {
+    const normalized = symbol.trim().toUpperCase();
+    if (this.brokenTokenLogos().has(normalized)) {
+      return null;
+    }
+
+    const cached = this.tokenThumbBySymbol()[normalized]?.trim();
+    if (cached) {
+      return cached;
+    }
+
+    const project = this.launchState
+      .projects()
+      .find((entry) => entry.symbol.trim().toUpperCase() === normalized);
+
+    const logoUrl = project?.logoUrl?.trim();
+    return logoUrl ? logoUrl : null;
+  }
+
+  onTokenLogoError(symbol: string): void {
+    const normalized = symbol.trim().toUpperCase();
+    this.brokenTokenLogos.update((current) => {
+      if (current.has(normalized)) {
+        return current;
+      }
+
+      const next = new Set(current);
+      next.add(normalized);
+      return next;
+    });
   }
 
   toggleTimeframeMenu(event: MouseEvent): void {
@@ -773,14 +1369,102 @@ export class ShowcaseChartComponent {
   }
 
   onPlotMove(event: MouseEvent): void {
-    if (this.pinnedIndex() !== null) {
+    if (this.touchScrubbing || this.pinnedIndex() !== null) {
       return;
     }
 
-    const index = this.indexFromEvent(event);
+    const index = this.indexFromPointer(event.clientX, event.currentTarget as HTMLElement);
     if (index !== null) {
       this.hoverIndex.set(index);
     }
+  }
+
+  onPlotTouchStart(event: TouchEvent): void {
+    if (event.touches.length === 2) {
+      this.pinchStartDistance = this.touchDistance(event.touches);
+      this.pinchStartZoom = { start: this.zoomStart(), end: this.zoomEnd() };
+      return;
+    }
+
+    if (event.touches.length !== 1) {
+      return;
+    }
+
+    this.touchScrubbing = true;
+    const touch = event.touches[0];
+    const index = this.indexFromPointer(touch.clientX, event.currentTarget as HTMLElement);
+    if (index !== null) {
+      this.hoverIndex.set(index);
+    }
+
+    if (this.longPressTimer != null) {
+      clearTimeout(this.longPressTimer);
+    }
+
+    this.longPressTimer = setTimeout(() => {
+      if (index !== null) {
+        this.pinnedIndex.set(index);
+      }
+    }, 480);
+  }
+
+  onPlotTouchMove(event: TouchEvent): void {
+    if (event.touches.length === 2 && this.pinchStartDistance) {
+      event.preventDefault();
+      const distance = this.touchDistance(event.touches);
+      if (distance <= 0) {
+        return;
+      }
+
+      const ratio = this.pinchStartDistance / distance;
+      const span = this.pinchStartZoom.end - this.pinchStartZoom.start;
+      const center = (this.pinchStartZoom.start + this.pinchStartZoom.end) / 2;
+      const nextSpan = Math.max(12, Math.min(100, span * ratio));
+      const nextStart = Math.max(0, center - nextSpan / 2);
+      const nextEnd = Math.min(100, center + nextSpan / 2);
+      this.zoomStart.set(nextStart);
+      this.zoomEnd.set(nextEnd);
+      return;
+    }
+
+    if (!this.touchScrubbing || event.touches.length !== 1) {
+      return;
+    }
+
+    event.preventDefault();
+    const touch = event.touches[0];
+    const index = this.indexFromPointer(touch.clientX, event.currentTarget as HTMLElement);
+    if (index !== null) {
+      this.hoverIndex.set(index);
+      if (this.pinnedIndex() !== null) {
+        this.pinnedIndex.set(index);
+      }
+    }
+  }
+
+  onPlotTouchEnd(event: TouchEvent): void {
+    if (this.longPressTimer != null) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
+
+    if (event.touches.length === 0) {
+      this.pinchStartDistance = null;
+    }
+
+    if (event.touches.length === 1 && event.changedTouches.length === 1) {
+      const now = Date.now();
+      if (now - this.lastPlotTapAt < 320) {
+        this.resetZoom();
+        this.pinnedIndex.set(null);
+        this.hoverIndex.set(null);
+        this.lastPlotTapAt = 0;
+      } else {
+        this.lastPlotTapAt = now;
+      }
+    }
+
+    this.touchScrubbing = false;
   }
 
   onPointHover(index: number): void {
@@ -803,7 +1487,17 @@ export class ShowcaseChartComponent {
   }
 
   onPlotClick(event: MouseEvent): void {
-    const index = this.indexFromEvent(event);
+    const now = Date.now();
+    if (now - this.lastPlotTapAt < 320) {
+      this.resetZoom();
+      this.pinnedIndex.set(null);
+      this.hoverIndex.set(null);
+      this.lastPlotTapAt = 0;
+      return;
+    }
+    this.lastPlotTapAt = now;
+
+    const index = this.indexFromPointer(event.clientX, event.currentTarget as HTMLElement);
     if (index === null) {
       return;
     }
@@ -815,6 +1509,16 @@ export class ShowcaseChartComponent {
 
     this.pinnedIndex.set(index);
     this.hoverIndex.set(index);
+  }
+
+  private touchDistance(touches: TouchList): number {
+    if (touches.length < 2) {
+      return 0;
+    }
+
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
   }
 
   plotPointX(index: number): number {
@@ -844,7 +1548,7 @@ export class ShowcaseChartComponent {
   }
 
   clearHover(): void {
-    if (this.pinnedIndex() === null) {
+    if (this.pinnedIndex() === null && !this.touchScrubbing) {
       this.hoverIndex.set(null);
     }
   }
@@ -861,18 +1565,20 @@ export class ShowcaseChartComponent {
   }
 
   buildChartLine(points: number[]): string {
-    const width = this.chartWidth;
     const height = this.chartHeight;
+    const xStart = this.chartPlotInset;
+    const xEnd = this.chartPlotRight;
+    const plotSpan = Math.max(xEnd - xStart, 1);
     const last = points.length - 1;
 
     if (last <= 0) {
-      return `M0 ${height / 2} L100 ${height / 2}`;
+      return `M${xStart} ${height / 2} L${xEnd} ${height / 2}`;
     }
 
     return points
       .map((point, index) => {
-        const x = (index / last) * width;
-        const y = height - (point / 100) * height;
+        const x = xStart + (index / last) * plotSpan;
+        const y = chartYFromNormalizedCoord(point, height);
         return `${index === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`;
       })
       .join(' ');
@@ -880,7 +1586,9 @@ export class ShowcaseChartComponent {
 
   buildChartArea(points: number[]): string {
     const h = this.chartHeight;
-    return `${this.buildChartLine(points)} L100 ${h} L0 ${h} Z`;
+    const xStart = this.chartPlotInset;
+    const xEnd = this.chartPlotRight;
+    return `${this.buildChartLine(points)} L${xEnd} ${h} L${xStart} ${h} Z`;
   }
 
   trackCandle(_: number, candle: CandleSvgLayout): string {
@@ -1071,13 +1779,13 @@ export class ShowcaseChartComponent {
       return;
     }
 
+    const coinId =
+      this.chartWatchlist().find((entry) => entry.symbol === compare)?.id ||
+      this.preferences.coinIdForSymbol(compare) ||
+      null;
+
     this.rates
-      .getMarketChart(
-        compare,
-        this.activeRange(),
-        this.chartCurrency(),
-        this.brandCrypto.selectedCoinId()
-      )
+      .getMarketChart(compare, this.activeRange(), this.chartCurrency(), coinId)
       .pipe(take(1))
       .subscribe((chart) => {
         this.comparePoints.set(chart?.points ?? null);
@@ -1153,6 +1861,16 @@ export class ShowcaseChartComponent {
     this.rawPrices.set(chart.prices);
     this.rawTimestamps.set(chart.timestamps);
     this.checkAlertThreshold();
+
+    if (this.isR4v3Chart()) {
+      this.chartPrice.set(R4V3_PEG_PRICE);
+      this.chartDelta.set(R4V3_PEG_DELTA);
+      this.chartPositive.set(true);
+    }
+
+    if (this.hubLayout()) {
+      this.triggerPricePulse();
+    }
   }
 
   private checkAlertThreshold(): void {
@@ -1202,14 +1920,21 @@ export class ShowcaseChartComponent {
   }
 
   private indexFromEvent(event: MouseEvent): number | null {
-    const plot = event.currentTarget as HTMLElement;
+    return this.indexFromPointer(event.clientX, event.currentTarget as HTMLElement);
+  }
+
+  private indexFromPointer(clientX: number, plot: HTMLElement | null): number | null {
+    if (!plot) {
+      return null;
+    }
+
     const rect = plot.getBoundingClientRect();
     if (rect.width <= 0) {
       return null;
     }
 
-    const x = event.clientX - rect.left;
-    const plotPoints = this.plotPoints();
+    const x = clientX - rect.left;
+    const plotPoints = this.displayPlotPoints();
     const n = plotPoints.length;
     if (!n) {
       return null;
@@ -1234,6 +1959,48 @@ export class ShowcaseChartComponent {
     return nearest;
   }
 
+  private triggerPricePulse(): void {
+    this.pricePulse.set(false);
+
+    if (this.pricePulseTimer != null) {
+      clearTimeout(this.pricePulseTimer);
+    }
+
+    queueMicrotask(() => {
+      this.pricePulse.set(true);
+      this.pricePulseTimer = setTimeout(() => {
+        this.pricePulse.set(false);
+        this.pricePulseTimer = null;
+      }, 180);
+    });
+  }
+
+  private triggerChartTransition(): void {
+    this.chartTransition.set(true);
+
+    if (this.chartTransitionTimer != null) {
+      clearTimeout(this.chartTransitionTimer);
+    }
+
+    this.chartTransitionTimer = setTimeout(() => {
+      this.chartTransition.set(false);
+      this.chartTransitionTimer = null;
+    }, 200);
+  }
+
+  private triggerR4v3LivePulse(): void {
+    this.r4v3LivePulse.set(false);
+    const points = this.displayPlotPoints();
+    this.heatmapPulseIndex.set(points.length ? points.length - 1 : null);
+    queueMicrotask(() => {
+      this.r4v3LivePulse.set(true);
+      window.setTimeout(() => {
+        this.r4v3LivePulse.set(false);
+        this.heatmapPulseIndex.set(null);
+      }, 900);
+    });
+  }
+
   private resolveGridTimestamps(): number[] {
     const timestamps = this.visibleTimestamps();
     if (timestamps.length >= 2) {
@@ -1250,10 +2017,46 @@ export class ShowcaseChartComponent {
       return null;
     }
 
+    const rawMin = Math.min(...prices);
+    const rawMax = Math.max(...prices);
+    let span = rawMax - rawMin;
+
+    if (span === 0) {
+      span = Math.max(Math.abs(rawMax) * 0.02, 1e-8);
+    }
+
+    const pad = span * 0.07;
+
     return {
-      high: Math.max(...prices),
-      low: Math.min(...prices),
+      high: rawMax + pad,
+      low: rawMin - pad,
       reference: this.chartPrice(),
+    };
+  }
+
+  private buildPlotTrendSegments(values: number[] | undefined) {
+    return buildChartTrendSegments(
+      values,
+      this.chartWidth,
+      this.chartHeight,
+      this.chartHeight,
+      this.chartPlotInset,
+      this.chartPlotRight
+    );
+  }
+
+  private getChartEndPoint(points: number[]): { x: number; y: number } {
+    const last = points.length - 1;
+
+    if (last <= 0) {
+      return { x: this.chartPlotRight, y: this.chartHeight / 2 };
+    }
+
+    const lastPoint = points[last] ?? 50;
+
+    return {
+      x: this.chartPlotRight,
+      y: chartYFromNormalizedCoord(lastPoint, this.chartHeight),
     };
   }
 
@@ -1296,20 +2099,5 @@ export class ShowcaseChartComponent {
       return stored;
     }
     return 'eur';
-  }
-
-  private getChartEndPoint(points: number[]): { x: number; y: number } {
-    const last = points.length - 1;
-
-    if (last <= 0) {
-      return { x: 100, y: this.chartHeight / 2 };
-    }
-
-    const lastPoint = points[last] ?? 50;
-
-    return {
-      x: 100,
-      y: this.chartHeight - (lastPoint / 100) * this.chartHeight,
-    };
   }
 }

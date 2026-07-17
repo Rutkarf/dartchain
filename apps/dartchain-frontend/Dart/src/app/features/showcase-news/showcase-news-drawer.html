@@ -1,105 +1,179 @@
 @if (item(); as news) {
   <div
-    class="showcase-news-drawer-backdrop"
+    class="news-insight-backdrop"
     (click)="dismiss()"
     aria-hidden="true"
   >
     <aside
       #drawerPanel
-      class="showcase-news-drawer ds-surface ds-surface--card ds-surface--drawer"
+      class="showcase-news-drawer news-insight-panel ds-surface ds-surface--card ds-surface--drawer"
       role="dialog"
       aria-modal="true"
       tabindex="-1"
+      [appFocusTrap]="true"
       [attr.aria-labelledby]="'newsDrawerTitle-' + news.id"
       (click)="$event.stopPropagation()"
     >
-      <header class="showcase-news-drawer__head">
-        <div class="showcase-news-drawer__toolbar">
-          <div class="showcase-news-drawer__nav" aria-label="Navigation entre articles">
-            <button
-              type="button"
-              class="showcase-news-drawer__nav-btn ds-surface ds-surface--showcase-tab"
-              [disabled]="!canPrev()"
-              aria-label="Article précédent"
-              (click)="navigatePrev.emit()"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              class="showcase-news-drawer__nav-btn ds-surface ds-surface--showcase-tab"
-              [disabled]="!canNext()"
-              aria-label="Article suivant"
-              (click)="navigateNext.emit()"
-            >
-              ›
-            </button>
+      <header class="news-insight-panel__head">
+        <div class="news-insight-panel__head-row">
+          <div class="news-insight-panel__identity">
+            <span class="news-insight-panel__icon" aria-hidden="true">{{
+              categoryIcon(news.category)
+            }}</span>
+            <div class="news-insight-panel__identity-copy">
+              <p class="news-insight-panel__eyebrow">
+                <span>{{ categoryLabel(news.category) }}</span>
+                <span class="news-insight-panel__eyebrow-sep" aria-hidden="true">·</span>
+                <span>{{ sourceLabel(news.source) }}</span>
+                @if (news.featured) {
+                  <span class="news-insight-panel__featured">À la une</span>
+                }
+              </p>
+            </div>
           </div>
 
-          <span class="showcase-news-drawer__category ds-surface ds-surface--showcase-tab">
-            {{ categoryLabel(news.category) }}
-          </span>
-
-          <button
-            type="button"
-            class="showcase-news-drawer__close ds-surface ds-surface--showcase-tab"
-            aria-label="Fermer l'article"
-            (click)="dismiss()"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
-          </button>
-        </div>
-
-        <h3 class="showcase-news-drawer__title" [id]="'newsDrawerTitle-' + news.id">
-          {{ news.title }}
-        </h3>
-
-        <p class="showcase-news-drawer__meta">
-          <span>{{ news.relativeTime }}</span>
-          <span class="showcase-news-drawer__meta-sep" aria-hidden="true">·</span>
-          <span>{{ formatPublishedAt(news.publishedAt) }}</span>
-          <span class="showcase-news-drawer__meta-sep" aria-hidden="true">·</span>
-          <span>{{ news.source }}</span>
-        </p>
-      </header>
-
-      <div class="showcase-news-drawer__body">
-        <div class="showcase-news-drawer__content ds-surface ds-surface--panel">
-          @if (loading()) {
-            <div class="showcase-news-drawer__skeleton" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
+          <div class="news-insight-panel__head-actions">
+            <div class="news-insight-panel__nav" aria-label="Navigation entre articles">
+              @if (positionLabel()) {
+                <span class="news-insight-panel__nav-pos">{{ positionLabel() }}</span>
+              }
+              <button
+                type="button"
+                class="news-insight-panel__icon-btn"
+                [disabled]="!canPrev()"
+                aria-label="Article précédent"
+                (click)="navigatePrev.emit()"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                class="news-insight-panel__icon-btn"
+                [disabled]="!canNext()"
+                aria-label="Article suivant"
+                (click)="navigateNext.emit()"
+              >
+                ›
+              </button>
             </div>
-          } @else {
-            <p class="showcase-news-drawer__summary">
-              {{ news.body || news.summary || 'Aucun résumé disponible.' }}
-            </p>
-          }
-        </div>
-
-        <footer class="showcase-news-drawer__actions">
-          @if (actionLabel(news); as label) {
             <button
               type="button"
-              class="showcase-news-drawer__action showcase-news-drawer__action--primary ds-surface ds-surface--showcase-tab"
-              (click)="runAction.emit(news)"
+              class="news-insight-panel__icon-btn news-insight-panel__icon-btn--close"
+              aria-label="Fermer l'article"
+              (click)="dismiss()"
             >
-              {{ label }}
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
             </button>
-          }
+          </div>
+        </div>
+
+        <h3 class="news-insight-panel__title" [id]="'newsDrawerTitle-' + news.id">
+          {{ news.title }}
+        </h3>
+      </header>
+
+      <div class="news-insight-panel__body">
+        @if (loading()) {
+          <div class="news-insight-panel__layout news-insight-panel__layout--loading" aria-hidden="true">
+            <div class="news-insight-panel__metrics ds-surface ds-surface--panel">
+              <div class="news-insight-panel__metric-grid">
+                @for (cell of [1, 2, 3, 4]; track cell) {
+                  <div class="news-insight-panel__metric-cell news-insight-panel__skeleton-cell"></div>
+                }
+              </div>
+            </div>
+            <div class="news-insight-panel__content ds-surface ds-surface--panel">
+              <span class="news-insight-panel__skeleton-line"></span>
+              <span class="news-insight-panel__skeleton-line"></span>
+              <span class="news-insight-panel__skeleton-line news-insight-panel__skeleton-line--short"></span>
+            </div>
+          </div>
+        } @else {
+          <div class="news-insight-panel__layout">
+            <section
+              class="news-insight-panel__metrics ds-surface ds-surface--panel"
+              aria-label="Métriques de l'actualité"
+            >
+              <div class="news-insight-panel__metric-grid">
+                <div class="news-insight-panel__metric-cell">
+                  <span class="news-insight-panel__metric-label">Fraîcheur</span>
+                  <span class="news-insight-panel__metric-value">{{ news.relativeTime }}</span>
+                </div>
+                <div class="news-insight-panel__metric-cell">
+                  <span class="news-insight-panel__metric-label">Source</span>
+                  <span class="news-insight-panel__metric-value">{{ sourceLabel(news.source) }}</span>
+                </div>
+                <div class="news-insight-panel__metric-cell">
+                  <span class="news-insight-panel__metric-label">Publié le</span>
+                  <span class="news-insight-panel__metric-value">{{
+                    formatPublishedAt(news.publishedAt)
+                  }}</span>
+                </div>
+                <div class="news-insight-panel__metric-cell">
+                  <span class="news-insight-panel__metric-label">Cible</span>
+                  <span
+                    class="news-insight-panel__metric-value news-insight-panel__metric-value--mono"
+                    [attr.title]="targetLabel(news)"
+                  >
+                    {{ targetLabel(news) }}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section
+              class="news-insight-panel__content ds-surface ds-surface--panel"
+              aria-label="Contenu de l'actualité"
+            >
+              <div class="news-insight-panel__content-block">
+                <span class="news-insight-panel__content-label">Résumé</span>
+                <p
+                  class="news-insight-panel__content-text"
+                  [attr.title]="summaryText(news)"
+                >
+                  {{ summaryText(news) }}
+                </p>
+              </div>
+
+              @if (showDetailSection(news)) {
+                <div class="news-insight-panel__content-block">
+                  <span class="news-insight-panel__content-label">Détail</span>
+                  <p
+                    class="news-insight-panel__content-text news-insight-panel__content-text--detail"
+                    [attr.title]="news.body"
+                  >
+                    {{ news.body }}
+                  </p>
+                </div>
+              }
+            </section>
+          </div>
+        }
+      </div>
+
+      <footer class="news-insight-panel__foot">
+        @if (actionLabel(news); as label) {
           <button
             type="button"
-            class="showcase-news-drawer__action ds-surface ds-surface--showcase-tab"
-            (click)="copySummary.emit(news)"
+            class="news-insight-panel__action news-insight-panel__action--primary ds-surface ds-surface--showcase-tab"
+            (click)="runAction.emit(news)"
           >
-            Copier
+            {{ label }}
           </button>
-        </footer>
-      </div>
+        }
+        <button
+          type="button"
+          class="news-insight-panel__action ds-surface ds-surface--showcase-tab"
+          [class.news-insight-panel__action--copied]="copied()"
+          [class.news-insight-panel__action--copy-failed]="copyFailed()"
+          [attr.aria-live]="copied() || copyFailed() ? 'polite' : null"
+          (click)="onCopy(news, $event)"
+        >
+          {{ copyButtonLabel() }}
+        </button>
+      </footer>
     </aside>
   </div>
 }

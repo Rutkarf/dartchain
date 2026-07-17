@@ -52,8 +52,10 @@ import { ProductConfigService } from './core/config/product-config.service';
 import { FocusTrapDirective } from './core/directives/focus-trap.directive';
 import { AuthService } from './core/services/auth.service';
 import { ShowcaseNewsStateService } from './core/services/showcase-news-state.service';
+import { ShowcaseHubUiService } from './core/services/showcase-hub-ui.service';
 import { AdminPanelComponent } from './features/admin-panel/admin-panel';
 import { DockBottomSummaryComponent } from './features/dock-summary/dock-bottom-summary';
+import { AuthDrawerComponent } from './features/auth-drawer/auth-drawer';
 
 @Component({
   selector: 'app-root',
@@ -83,6 +85,7 @@ import { DockBottomSummaryComponent } from './features/dock-summary/dock-bottom-
     FocusTrapDirective,
     AdminPanelComponent,
     DockBottomSummaryComponent,
+    AuthDrawerComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -98,12 +101,14 @@ export class AppComponent {
   private readonly shell = inject(ShellFeedbackService);
   private readonly blockchain = inject(BlockchainApiService);
   private readonly newsState = inject(ShowcaseNewsStateService);
+  private readonly showcaseHubUi = inject(ShowcaseHubUiService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly activeShowcaseTab = signal<ShowcaseTab>('tours');
   readonly activeBottomTab = signal<BottomDockTab>('wallet');
   readonly showcaseCollapsed = signal(false);
   readonly chartCollapsed = signal(false);
+  readonly exchangeCollapsed = signal(false);
   readonly dockCollapsed = signal(false);
   readonly showDrawer = signal(false);
   readonly selectedBlock = signal<Block | null>(null);
@@ -140,6 +145,10 @@ export class AppComponent {
     this.dockNav.questAction$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((action) => this.handleQuestAction(action));
+
+    this.showcaseHubUi.expandRequested$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.showcaseCollapsed.set(false));
 
     window.addEventListener('open-block-drawer', this.handleOpenBlockDrawer);
     window.addEventListener('dock-open-panel', this.handleDockOpenPanel);
@@ -223,12 +232,20 @@ export class AppComponent {
     this.chartCollapsed.update((collapsed) => !collapsed);
   }
 
+  toggleExchangeCollapsed(): void {
+    this.exchangeCollapsed.update((collapsed) => !collapsed);
+  }
+
   toggleDockCollapsed(): void {
     this.dockCollapsed.update((collapsed) => !collapsed);
   }
 
   chartCollapseLabel(): string {
     return this.chartCollapsed() ? 'Déplier le graphique' : 'Replier le graphique';
+  }
+
+  exchangeCollapseLabel(): string {
+    return this.exchangeCollapsed() ? 'Déplier l\'échange' : 'Replier l\'échange';
   }
 
   dockCollapseLabel(): string {
@@ -401,6 +418,7 @@ export class AppComponent {
   private focusSwapQuest(): void {
     this.activeShowcaseTab.set('dao');
     this.showcaseCollapsed.set(false);
+    this.exchangeCollapsed.set(false);
     this.scrollToSelector('.app-market-card--swap');
     window.dispatchEvent(new CustomEvent('exchange-panel-focus'));
   }

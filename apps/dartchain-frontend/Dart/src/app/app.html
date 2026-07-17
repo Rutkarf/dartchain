@@ -17,13 +17,31 @@
     [class.is-showcase-disabled]="!product.showcaseEnabled"
     [class.is-showcase-collapsed]="product.showcaseEnabled && showcaseCollapsed()"
     [class.is-chart-collapsed]="chartCollapsed()"
+    [class.is-exchange-collapsed]="exchangeCollapsed()"
     aria-label="Marché"
     tabindex="-1"
   >
-    <div class="app-hub-swap-stack">
+    <div class="app-hub-swap-stack" [class.is-exchange-collapsed]="exchangeCollapsed()">
+      <header class="chart-stack-header swap-stack-header" aria-label="Contrôle échange">
+        <div class="chart-stack-header__actions">
+          <button
+            type="button"
+            class="chart-toggle showcase-toggle"
+            [attr.aria-label]="exchangeCollapseLabel()"
+            [attr.aria-expanded]="!exchangeCollapsed()"
+            (click)="toggleExchangeCollapsed()"
+          >
+            <span
+              class="showcase-toggle__chevron"
+              [class.is-collapsed]="exchangeCollapsed()"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </header>
       <div class="app-market-card app-market-card--swap app-showcase-card--swap">
         <div class="app-market-card__swap-main">
-          <app-exchange-panel></app-exchange-panel>
+          <app-exchange-panel [exchangeCollapsed]="exchangeCollapsed()"></app-exchange-panel>
         </div>
       </div>
     </div>
@@ -59,28 +77,30 @@
       class="app-hub-showcase-block"
       [class.is-showcase-collapsed]="showcaseCollapsed()"
     >
+      <header class="chart-stack-header showcase-stack-header" aria-label="Contrôle showcase">
+        <div class="chart-stack-header__actions">
+          <button
+            type="button"
+            class="chart-toggle showcase-toggle"
+            [attr.aria-label]="showcaseCollapseLabel()"
+            [attr.aria-expanded]="!showcaseCollapsed()"
+            (click)="toggleShowcaseCollapsed()"
+          >
+            <span
+              class="showcase-toggle__chevron"
+              [class.is-collapsed]="showcaseCollapsed()"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </header>
       <div class="showcase-block__shell ds-surface ds-surface--card">
-        <header class="showcase-header" aria-label="Showcase">
+        <header class="showcase-header showcase-header--tabs" aria-label="Showcase">
           <div class="showcase-header-tabs">
             <app-showcase-tabs
               [activeTab]="activeShowcaseTab()"
               (tabChange)="onShowcaseTabChange($event)"
             />
-          </div>
-          <div class="showcase-header-actions">
-            <button
-              type="button"
-              class="showcase-toggle"
-              [attr.aria-label]="showcaseCollapseLabel()"
-              [attr.aria-expanded]="!showcaseCollapsed()"
-              (click)="toggleShowcaseCollapsed()"
-            >
-              <span
-                class="showcase-toggle__chevron"
-                [class.is-collapsed]="showcaseCollapsed()"
-                aria-hidden="true"
-              ></span>
-            </button>
           </div>
         </header>
 
@@ -105,13 +125,28 @@
     [class.is-dock-collapsed]="dockCollapsed()"
     aria-label="Dock navigation"
   >
+    <header class="chart-stack-header dock-stack-header" aria-label="Contrôle dock">
+      <div class="chart-stack-header__actions">
+        <button
+          type="button"
+          class="chart-toggle showcase-toggle"
+          [attr.aria-label]="dockCollapseLabel()"
+          [attr.aria-expanded]="!dockCollapsed()"
+          (click)="toggleDockCollapsed()"
+        >
+          <span
+            class="showcase-toggle__chevron"
+            [class.is-collapsed]="dockCollapsed()"
+            aria-hidden="true"
+          ></span>
+        </button>
+      </div>
+    </header>
     <div
       class="showcase-block__shell bottom-stack__shell ds-surface ds-surface--card"
     >
-      <header class="showcase-header app-bottom-stack__header" aria-label="Navigation principale">
-        <div
-          class="showcase-header-tabs"
-        >
+      <header class="showcase-header showcase-header--tabs app-bottom-stack__header" aria-label="Navigation principale">
+        <div class="showcase-header-tabs">
           <nav class="showcase-tabs app-bottom-stack__tabs" role="tablist">
             <button
               type="button"
@@ -198,21 +233,6 @@
             </button>
             }
           </nav>
-        </div>
-        <div class="showcase-header-actions">
-          <button
-            type="button"
-            class="showcase-toggle"
-            [attr.aria-label]="dockCollapseLabel()"
-            [attr.aria-expanded]="!dockCollapsed()"
-            (click)="toggleDockCollapsed()"
-          >
-            <span
-              class="showcase-toggle__chevron"
-              [class.is-collapsed]="dockCollapsed()"
-              aria-hidden="true"
-            ></span>
-          </button>
         </div>
       </header>
 
@@ -333,4 +353,6 @@
       {{ feedback.message }}
     </div>
   }
+
+  <app-auth-drawer />
 </div>

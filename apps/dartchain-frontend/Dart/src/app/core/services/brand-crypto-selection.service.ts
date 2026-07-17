@@ -84,32 +84,48 @@ export class BrandCryptoSelectionService {
       return;
     }
 
-    if ((this.menuSymbols as readonly string[]).includes(normalized)) {
-      this.select(normalized as BrandCryptoSymbol, coinId);
-    } else {
-      this.selected.set(normalized);
-      this.selectedCoinId.set(
-        coinId?.trim() ||
-          this.ratePanelPrefs.coinIdForSymbol(normalized) ||
-          coinIdForSymbol(normalized) ||
-          null
-      );
-    }
-
+    this.selectLaunchChart(normalized, coinId);
     this.selectForExchange(normalized);
     this.requestExchangeTrade(normalized, EXCHANGE_NATIVE_TOKEN);
   }
 
+  /** Met à jour le graphique pour un token LaunchLab sans toucher au swap. */
+  selectLaunchChart(symbol: string, coinId?: string | null): void {
+    const normalized = symbol.trim().toUpperCase();
+    if (!normalized) {
+      return;
+    }
+
+    if ((this.menuSymbols as readonly string[]).includes(normalized)) {
+      this.select(normalized as BrandCryptoSymbol, coinId);
+      return;
+    }
+
+    this.selected.set(normalized);
+    this.selectedCoinId.set(
+      coinId?.trim() ||
+        this.ratePanelPrefs.coinIdForSymbol(normalized) ||
+        coinIdForSymbol(normalized) ||
+        null
+    );
+  }
+
   /** Après swap réussi : pré-sélectionner la paire sur le graphique. */
   selectSwapPair(fromToken: string, toToken: string): void {
-    const chartSymbol =
-      toToken === EXCHANGE_NATIVE_TOKEN ? fromToken : toToken;
-    if ((RATE_PANEL_SYMBOLS as readonly string[]).includes(chartSymbol)) {
-      this.select(chartSymbol);
-    } else if (chartSymbol === EXCHANGE_NATIVE_TOKEN) {
+    const from = fromToken.trim().toUpperCase();
+    const to = toToken.trim().toUpperCase();
+    const chartSymbol = to === EXCHANGE_NATIVE_TOKEN ? from : to;
+
+    if (chartSymbol === EXCHANGE_NATIVE_TOKEN) {
       this.select(BRAND_DEFAULT_CRYPTO);
-    } else if ((EXCHANGE_FROM_TOKENS as readonly string[]).includes(chartSymbol)) {
-      this.select(BRAND_DEFAULT_CRYPTO);
+      return;
     }
+
+    if ((RATE_PANEL_SYMBOLS as readonly string[]).includes(chartSymbol)) {
+      this.select(chartSymbol as BrandCryptoSymbol);
+      return;
+    }
+
+    this.selectLaunchChart(chartSymbol);
   }
 }

@@ -82,6 +82,7 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
+    this.closeDrawer();
     const token = this.tokenSignal();
     const refreshToken = readStoredRefreshToken();
 
@@ -238,6 +239,7 @@ export class AuthService {
   private clearSession(): void {
     this.tokenSignal.set(null);
     this.userSignal.set(null);
+    this.closeDrawer();
     clearAuthSession();
   }
 

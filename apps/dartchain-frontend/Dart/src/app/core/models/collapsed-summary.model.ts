@@ -112,3 +112,10 @@ export const CHART_COLLAPSED_SUMMARY: CollapsedSummaryTabConfig = {
   summarySelector: 'app-showcase-chart-summary',
   metrics: ['pair', 'price', 'delta', 'range', 'volume', 'high', 'low', 'updatedAt'],
 };
+
+export const EXCHANGE_COLLAPSED_SUMMARY: CollapsedSummaryTabConfig = {
+  id: 'exchange',
+  title: 'SWAP',
+  summarySelector: 'app-exchange-panel .collapsed-summary-bar',
+  metrics: ['fromToken', 'toToken', 'amount', 'estimate', 'rate', 'balance', 'swapAction'],
+};

@@ -1,15 +1,250 @@
 :host {
   display: flex;
   flex: 1 1 auto;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
   min-width: 0;
   height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
-.chart-summary-bar__brand {
-  color: var(--text-primary);
-  background: rgba(var(--tab-accent-rgb), 0.1);
-  border-color: rgba(var(--tab-accent-rgb), 0.18);
+.chart-summary-bar {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: clamp(4px, 1.2vw, 8px);
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0 clamp(4px, 1vw, 6px) 0 clamp(6px, 1.4vw, 8px);
+  box-sizing: border-box;
+}
+
+.chart-summary-bar__identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.chart-summary-bar__symbol {
+  font-family: var(--font-data, ui-monospace, Menlo, monospace);
+  font-size: clamp(0.5rem, 2.4vw, 0.625rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #f4fbff;
+  white-space: nowrap;
+}
+
+.chart-summary-bar__range {
+  flex: 0 0 auto;
+  padding: 0 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.2);
+  background: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.08);
+  color: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.9);
+  font-family: var(--font-data, ui-monospace, Menlo, monospace);
+  font-size: clamp(0.4375rem, 2vw, 0.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.chart-summary-bar__quote {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  flex: 0 0 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.chart-summary-bar__price {
+  font-family: var(--font-data, ui-monospace, Menlo, monospace);
+  font-size: clamp(0.5625rem, 2.6vw, 0.6875rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #f4fbff;
+  line-height: 1;
+}
+
+.chart-summary-bar__price--muted {
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 600;
+}
+
+.chart-summary-bar__delta {
+  font-family: var(--font-data, ui-monospace, Menlo, monospace);
+  font-size: clamp(0.4375rem, 2.1vw, 0.5625rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.chart-summary-bar__delta.is-up {
+  color: var(--chart-trend-up, #00ff88);
+}
+
+.chart-summary-bar__delta.is-down {
+  color: var(--chart-trend-down, #ff3366);
+}
+
+.chart-summary-bar__spark-wrap {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  height: clamp(14px, 4.2vw, 18px);
+  min-height: clamp(14px, 4.2vw, 18px);
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-summary-bar__spark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+
+.chart-summary-bar__spark-seg {
+  fill: none;
+  stroke-width: 1.75;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-summary-bar__spark-area {
+  stroke: none;
+  opacity: 0.22;
+}
+
+.chart-summary-bar__spark-area.is-up {
+  fill: var(--chart-trend-up, #00ff88);
+}
+
+.chart-summary-bar__spark-area.is-down {
+  fill: var(--chart-trend-down, #ff3366);
+}
+
+.chart-summary-bar__spark-head {
+  stroke: rgba(0, 0, 0, 0.35);
+  stroke-width: 0.35;
+  vector-effect: non-scaling-stroke;
+}
+
+.chart-summary-bar__spark-head.is-up {
+  fill: var(--chart-trend-up, #00ff88);
+}
+
+.chart-summary-bar__spark-head.is-down {
+  fill: var(--chart-trend-down, #ff3366);
+}
+
+.chart-summary-bar__spark-seg.is-up {
+  stroke: var(--chart-trend-up, #00ff88);
+}
+
+.chart-summary-bar__spark-seg.is-down {
+  stroke: var(--chart-trend-down, #ff3366);
+}
+
+.chart-summary-bar__spark-skeleton {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.12) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: chart-summary-spark-loading 900ms ease-in-out infinite;
+}
+
+@keyframes chart-summary-spark-loading {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.chart-summary-bar__metrics {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(4px, 1vw, 6px);
+  flex: 0 0 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.chart-summary-bar__metric {
+  font-family: var(--font-data, ui-monospace, Menlo, monospace);
+  font-size: clamp(0.4rem, 1.9vw, 0.5rem);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1;
+}
+
+.chart-summary-bar__metric--hl {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.chart-summary-bar__refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: clamp(18px, 5vw, 22px);
+  height: clamp(18px, 5vw, 22px);
+  padding: 0;
+  border: 1px solid rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.16);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.62);
+  cursor: pointer;
+}
+
+.chart-summary-bar__refresh:hover {
+  border-color: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.35);
+  color: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.95);
+}
+
+.chart-summary-bar__refresh svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 420px) {
+  .chart-summary-bar {
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    gap: 4px;
+  }
+
+  .chart-summary-bar__metrics {
+    display: none;
+  }
+}
+
+@media (max-width: 300px) {
+  .chart-summary-bar__range {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-summary-bar__spark-skeleton {
+    animation: none;
+  }
 }

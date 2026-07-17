@@ -19,9 +19,6 @@ import {
   debounceTime,
   distinctUntilChanged,
   interval,
-  forkJoin,
-  of,
-  catchError,
   take,
 } from 'rxjs';
 
@@ -30,16 +27,14 @@ import {
   NewsItem,
   NewsSource,
 } from '../../core/models/showcase.model';
-import { Block } from '../../core/models/block.model';
 import { ShowcaseApiService } from '../../core/services/showcase-api.service';
-import { ShowcaseNewsStateService } from '../../core/services/showcase-news-state.service';
 import { ShowcaseNavigationService } from '../../core/services/showcase-navigation.service';
+import { ShowcaseNewsStateService } from '../../core/services/showcase-news-state.service';
 import { BlockchainApiService } from '../../core/services/blockchain-api.service';
 import { ShowcaseNewsDrawerComponent } from './showcase-news-drawer';
+import { buildNewsCopyText, copyTextToClipboard } from '../../core/utils/clipboard.util';
 
 const NEWS_PAGE_SIZE = 10;
-
-export type ChainLiveTone = 'offline' | 'active' | 'pending';
 
 @Component({
   selector: 'app-showcase-news',
@@ -74,9 +69,6 @@ export class ShowcaseNewsComponent {
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private readonly contentPanel = viewChild<ElementRef<HTMLElement>>('contentPanel');
   private readonly searchInput$ = new Subject<string>();
-  private chainSyncTimerId: number | null = null;
-  private lastChainSyncAt = 0;
-  private static readonly CHAIN_SYNC_MIN_GAP_MS = 12_000;
 
   readonly loading = signal(true);
   readonly loadingMore = signal(false);
@@ -89,14 +81,11 @@ export class ShowcaseNewsComponent {
   readonly liveActivity = signal('');
   readonly lastUpdatedAt = signal<Date | null>(null);
   readonly featuredId = signal<string | null>(null);
-  readonly chainLiveTone = signal<ChainLiveTone>('active');
-  readonly latestBlockIndex = signal<number | null>(null);
-  readonly latestBlockTimestamp = signal<number | null>(null);
   readonly keyboardFocusIndex = signal(-1);
-  readonly refreshPulse = signal(false);
+  readonly searchExpanded = signal(false);
   readonly ageTick = signal(0);
 
-  readonly chainLiveClickable = computed(() => this.latestBlockIndex() !== null);
+  readonly chainLiveClickable = computed(() => this.newsState.latestBlockIndex() !== null);
 
   readonly selectedItem = signal<NewsItem | null>(null);
   readonly detailItem = signal<NewsItem | null>(null);
@@ -128,24 +117,6 @@ export class ShowcaseNewsComponent {
     return index >= 0 && index < this.filteredItems().length - 1;
   });
 
-  readonly syncAgeShort = computed(() => {
-    this.ageTick();
-    const updated = this.lastUpdatedAt();
-    if (!updated) {
-      return '';
-    }
-    return this.formatAgeShort(Math.floor((Date.now() - updated.getTime()) / 1000));
-  });
-
-  readonly blockAgeShort = computed(() => {
-    this.ageTick();
-    const timestamp = this.latestBlockTimestamp();
-    if (!timestamp) {
-      return '';
-    }
-    return this.formatAgeShort(Math.floor((Date.now() - timestamp) / 1000));
-  });
-
   constructor() {
     this.searchInput$
       .pipe(debounceTime(200), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
@@ -158,7 +129,7 @@ export class ShowcaseNewsComponent {
 
     this.newsState.refresh$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.loadFeed());
+      .subscribe(() => this.syncFromNewsState());
 
     this.newsState.categoryChange$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -185,13 +156,8 @@ export class ShowcaseNewsComponent {
           message.type === 'snapshot'
         ) {
           this.loadFeed(false);
-          this.scheduleChainLiveSync();
         }
       });
-  }
-
-  protected chainLiveToneClass(): string {
-    return `showcase-meta__live-dot showcase-meta__live-dot--${this.chainLiveTone()}`;
   }
 
   protected refreshAriaLabel(): string {
@@ -203,7 +169,7 @@ export class ShowcaseNewsComponent {
   }
 
   protected openLatestBlock(): void {
-    const index = this.latestBlockIndex();
+    const index = this.newsState.latestBlockIndex();
     if (index === null) {
       return;
     }
@@ -234,6 +200,19 @@ export class ShowcaseNewsComponent {
         },
         error: () => this.nav.dispatchNewsAction('VIEW_BLOCK', String(index)),
       });
+  }
+
+  protected openSearch(): void {
+    this.searchExpanded.set(true);
+    queueMicrotask(() => this.searchInput()?.nativeElement.focus());
+  }
+
+  protected closeSearch(event?: Event): void {
+    event?.preventDefault();
+    if (this.searchQuery().trim()) {
+      return;
+    }
+    this.searchExpanded.set(false);
   }
 
   protected isUnread(item: NewsItem): boolean {
@@ -390,8 +369,7 @@ export class ShowcaseNewsComponent {
   }
 
   protected copySummary(item: NewsItem): void {
-    const text = `${item.title}\n\n${item.body || item.summary}`;
-    navigator.clipboard.writeText(text).catch(() => undefined);
+    void copyTextToClipboard(buildNewsCopyText(item));
   }
 
   protected retry(): void {
@@ -463,131 +441,26 @@ export class ShowcaseNewsComponent {
   }
 
   private loadFeed(showLoading = true): void {
+    this.newsState.setSourceFilter(this.sourceFilter());
     if (showLoading) {
       this.loading.set(true);
-      this.newsState.setLoading(true);
     }
     this.error.set(false);
-
-    const category = this.newsState.activeCategory();
-    const source = this.sourceFilter();
-
-    this.api
-      .getNewsFeed({
-        category: category === 'all' ? undefined : category,
-        source,
-        limit: NEWS_PAGE_SIZE,
-        offset: 0,
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (feed) => {
-          this.items.set(feed.items);
-          this.newsState.setCategories(feed.categories);
-          this.hasMore.set(feed.hasMore);
-          this.applyLiveActivity(feed.liveActivity);
-          this.featuredId.set(feed.featuredId);
-          const updated = feed.lastRefreshedAt
-            ? new Date(feed.lastRefreshedAt)
-            : new Date();
-          this.lastUpdatedAt.set(updated);
-          this.newsState.setLastUpdatedAt(updated);
-          this.newsState.syncFeedItems(feed.items, false);
-          this.handleRefreshNewItems();
-          this.loading.set(false);
-          this.newsState.setLoading(false);
-          this.syncChainLiveStatus();
-        },
-        error: () => {
-          this.error.set(true);
-          this.loading.set(false);
-          this.newsState.setLoading(false);
-          this.chainLiveTone.set('offline');
-          this.latestBlockIndex.set(null);
-        },
-      });
+    this.newsState.refreshFeed(showLoading, this.sourceFilter());
   }
 
-  private scheduleChainLiveSync(force = false): void {
-    const now = Date.now();
-    if (
-      !force &&
-      now - this.lastChainSyncAt < ShowcaseNewsComponent.CHAIN_SYNC_MIN_GAP_MS
-    ) {
-      if (this.chainSyncTimerId !== null) {
-        return;
-      }
+  private syncFromNewsState(): void {
+    this.items.set(this.newsState.feedItems());
+    this.hasMore.set(this.newsState.hasMore());
+    this.liveActivity.set(this.newsState.liveActivity());
+    this.lastUpdatedAt.set(this.newsState.lastUpdatedAt());
+    this.featuredId.set(this.newsState.featuredId());
+    this.loading.set(this.newsState.loading());
+    this.error.set(this.newsState.feedError());
 
-      const delay =
-        ShowcaseNewsComponent.CHAIN_SYNC_MIN_GAP_MS - (now - this.lastChainSyncAt);
-      this.chainSyncTimerId = window.setTimeout(() => {
-        this.chainSyncTimerId = null;
-        this.syncChainLiveStatus();
-      }, delay);
-      return;
+    if (this.newsState.refreshPulse()) {
+      this.scrollToFirstUnread();
     }
-
-    if (this.chainSyncTimerId !== null) {
-      window.clearTimeout(this.chainSyncTimerId);
-      this.chainSyncTimerId = null;
-    }
-
-    this.syncChainLiveStatus();
-  }
-
-  private syncChainLiveStatus(): void {
-    this.lastChainSyncAt = Date.now();
-    if (this.error()) {
-      this.chainLiveTone.set('offline');
-      this.latestBlockIndex.set(null);
-      return;
-    }
-
-    forkJoin({
-      blocks: this.blockchain.getBlocks().pipe(catchError(() => of([] as Block[]))),
-      pending: this.blockchain.getPendingTransactions().pipe(catchError(() => of([]))),
-    })
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: ({ blocks, pending }) => {
-          const latestBlock = blocks.length > 0 ? blocks[blocks.length - 1] : null;
-          const latest = latestBlock?.index ?? null;
-          this.latestBlockIndex.set(latest);
-          this.latestBlockTimestamp.set(latestBlock?.timestamp ?? null);
-
-          if (pending.length > 0) {
-            this.chainLiveTone.set('pending');
-            return;
-          }
-
-          if (latest !== null) {
-            this.chainLiveTone.set('active');
-            return;
-          }
-
-          this.chainLiveTone.set('pending');
-        },
-        error: () => {
-          this.chainLiveTone.set('offline');
-          this.latestBlockIndex.set(null);
-          this.latestBlockTimestamp.set(null);
-        },
-      });
-  }
-
-  private handleRefreshNewItems(): void {
-    if (!this.newsState.newItemsToast()) {
-      return;
-    }
-
-    this.newsState.dismissNewItemsToast();
-    this.triggerRefreshPulse();
-    this.scrollToFirstUnread();
-  }
-
-  private triggerRefreshPulse(): void {
-    this.refreshPulse.set(true);
-    window.setTimeout(() => this.refreshPulse.set(false), 1_100);
   }
 
   private scrollToFirstUnread(): void {
@@ -630,39 +503,6 @@ export class ShowcaseNewsComponent {
       item.category.toLowerCase().includes(query) ||
       item.body.toLowerCase().includes(query)
     );
-  }
-
-  private formatAgeShort(seconds: number): string {
-    if (seconds < 5) {
-      return "à l'instant";
-    }
-    if (seconds < 60) {
-      return `${seconds}s`;
-    }
-    if (seconds < 3_600) {
-      return `${Math.floor(seconds / 60)}min`;
-    }
-    return `${Math.floor(seconds / 3_600)}h`;
-  }
-
-  private applyLiveActivity(activity: string): void {
-    this.liveActivity.set(activity);
-    this.newsState.setLiveActivity(activity);
-
-    const parsed = this.parseBlockIndexFromLive(activity);
-    if (parsed !== null) {
-      this.latestBlockIndex.set(parsed);
-    }
-  }
-
-  private parseBlockIndexFromLive(activity: string): number | null {
-    const match = /Bloc #(\d+)/i.exec(activity);
-    if (!match) {
-      return null;
-    }
-
-    const index = Number.parseInt(match[1], 10);
-    return Number.isNaN(index) ? null : index;
   }
 
   private loadDetail(id: string): void {

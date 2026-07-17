@@ -81,6 +81,7 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly messages = this.chat.messages;
   readonly openMenu = signal<ChatMenuId>(null);
   readonly searchQuery = signal('');
+  readonly searchExpanded = signal(false);
 
   readonly filteredMessages = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
@@ -150,6 +151,18 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   protected onSearchInput(value: string): void {
     this.searchQuery.set(value);
+  }
+
+  protected openSearch(): void {
+    this.searchExpanded.set(true);
+  }
+
+  protected closeSearch(event?: Event): void {
+    event?.preventDefault();
+    if (this.searchQuery().trim()) {
+      return;
+    }
+    this.searchExpanded.set(false);
   }
 
   protected dismissSendError(): void {

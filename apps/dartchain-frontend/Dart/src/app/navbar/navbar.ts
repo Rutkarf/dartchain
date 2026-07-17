@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild, inject } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, computed, inject } from '@angular/core';
 import { Block } from '../core/models/block.model';
 import { CommonModule } from '@angular/common';
 import { NavbarNetworkStatusComponent } from './navbar-network-status';
@@ -7,7 +7,6 @@ import { BrandCryptoSelectComponent } from './brand-crypto-select';
 import { ExplorerSearchComponent } from './explorer-search';
 import { SearchbarComponent } from '../searchbar/searchbar';
 import { R4v3ThreeComponent } from '../features/r4v3-three/r4v3-three';
-import { AuthDrawerComponent } from '../features/auth-drawer/auth-drawer';
 import { AuthService } from '../core/services/auth.service';
 import { ShellFeedbackService } from '../core/services/shell-feedback.service';
 import { LocaleService } from '../core/i18n/locale.service';
@@ -25,7 +24,6 @@ import { NavbarHintDirective } from './navbar-hint.directive';
     ExplorerSearchComponent,
     SearchbarComponent,
     R4v3ThreeComponent,
-    AuthDrawerComponent,
     NavbarNodePanelComponent,
     NavbarHintDirective,
   ],
@@ -36,6 +34,15 @@ export class NavbarComponent {
   readonly auth = inject(AuthService);
   readonly locale = inject(LocaleService);
   private readonly shell = inject(ShellFeedbackService);
+
+  /** Une seule variante auth visible : logout OU (connexion + inscription), jamais les deux. */
+  readonly authStripMode = computed(() => {
+    if (this.auth.drawerOpen()) {
+      return 'hidden' as const;
+    }
+
+    return this.auth.isAuthenticated() ? ('logout' as const) : ('guest' as const);
+  });
 
   @ViewChild('logoThree')
   logoThree?: R4v3ThreeComponent;

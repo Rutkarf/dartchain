@@ -9,8 +9,42 @@ export interface ChartTrendSegment {
 /** Sparkline de repli (rate panel sans données). */
 export const RATE_SPARKLINE_FALLBACK = [10, 9.4, 8.8, 7.9, 8.1, 7.1, 7.3, 6.2, 5.4, 4.8, 4.1];
 
+/** Marge de sécurité haut/bas en espace normalisé 0–100. */
+export const CHART_COORD_EDGE_PAD = 3;
+
+/** Padding relatif appliqué au domaine min/max avant normalisation. */
+export const CHART_DOMAIN_PAD_RATIO = 0.07;
+
 export function chartYFromNormalizedCoord(coord: number, height: number): number {
   return height - (coord / 100) * height;
+}
+
+/** Mappe une série numérique vers l'espace vertical 0–100 avec domaine paddé. */
+export function mapSeriesToChartCoordinates(
+  values: number[],
+  domainPadRatio = CHART_DOMAIN_PAD_RATIO,
+  edgePad = CHART_COORD_EDGE_PAD
+): number[] {
+  if (!values.length) {
+    return [];
+  }
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  let span = max - min;
+
+  if (span === 0) {
+    const base = Math.max(Math.abs(max), 1);
+    span = base * 0.05;
+  }
+
+  const pad = span * domainPadRatio;
+  const domainMin = min - pad;
+  const domainMax = max + pad;
+  const domainSpan = Math.max(domainMax - domainMin, 1e-12);
+  const usable = Math.max(100 - edgePad * 2, 1);
+
+  return values.map((value) => edgePad + usable * ((value - domainMin) / domainSpan));
 }
 
 /** Segments vert (hausse) / rouge (baisse) pour courbes SVG. */
@@ -18,7 +52,9 @@ export function buildChartTrendSegments(
   values: number[] | undefined,
   width: number,
   height: number,
-  baselineY: number
+  baselineY: number,
+  plotXStart = 0,
+  plotXEnd?: number
 ): ChartTrendSegment[] {
   const series = values?.length ? values : RATE_SPARKLINE_FALLBACK;
 
@@ -26,13 +62,15 @@ export function buildChartTrendSegments(
     return [];
   }
 
+  const xEnd = plotXEnd ?? width;
+  const plotSpan = Math.max(xEnd - plotXStart, 1);
   const last = series.length - 1;
   const segments: ChartTrendSegment[] = [];
 
   for (let i = 1; i < series.length; i++) {
     const up = series[i] >= series[i - 1];
-    const x0 = ((i - 1) / last) * width;
-    const x1 = (i / last) * width;
+    const x0 = plotXStart + ((i - 1) / last) * plotSpan;
+    const x1 = plotXStart + (i / last) * plotSpan;
     const y0 = chartYFromNormalizedCoord(series[i - 1], height);
     const y1 = chartYFromNormalizedCoord(series[i], height);
     const xf0 = x0.toFixed(2);
@@ -123,28 +161,24 @@ export interface CandleSvgLayout {
 
 /** Map real prices to SVG Y coordinates (0–100 chart space). */
 export function pricesToChartCoordinates(prices: number[]): number[] {
-  if (!prices.length) {
-    return [];
-  }
-
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-
-  if (max === min) {
-    return prices.map(() => 50);
-  }
-
-  return prices.map((price) => 8 + ((price - min) / (max - min)) * 84);
+  return mapSeriesToChartCoordinates(prices);
 }
 
 /** Prix réel → coordonnée Y SVG dans la zone du graphique principal (avec marge visuelle). */
-export function priceToSvgY(price: number, min: number, max: number, height: number): number {
+export function priceToSvgY(
+  price: number,
+  min: number,
+  max: number,
+  height: number,
+  domainValues?: number[]
+): number {
   if (max === min) {
     return height / 2;
   }
 
-  const chartCoord = 8 + ((price - min) / (max - min)) * 84;
-  return height - (chartCoord / 100) * height;
+  const domain = domainValues?.length ? domainValues : [min, max];
+  const chartCoord = mapPriceToChartCoordinate(price, domain);
+  return chartYFromNormalizedCoord(chartCoord, height);
 }
 
 /** Prix → Y SVG pleine hauteur (cadrillage + axe Y, sans marge basse). */
@@ -157,15 +191,35 @@ export function priceToSvgYGrid(price: number, min: number, max: number, height:
   return ratio * height;
 }
 
+/** Mappe un prix brut vers une coordonnée 0–100 en réutilisant le domaine d'une série. */
+export function mapPriceToChartCoordinate(price: number, domainValues: number[]): number {
+  if (!domainValues.length) {
+    return 50;
+  }
+
+  const min = Math.min(...domainValues);
+  const max = Math.max(...domainValues);
+  let span = max - min;
+
+  if (span === 0) {
+    span = Math.max(Math.abs(max), 1) * 0.05;
+  }
+
+  const pad = span * CHART_DOMAIN_PAD_RATIO;
+  const domainMin = min - pad;
+  const domainMax = max + pad;
+  const domainSpan = Math.max(domainMax - domainMin, 1e-12);
+  const usable = Math.max(100 - CHART_COORD_EDGE_PAD * 2, 1);
+
+  return CHART_COORD_EDGE_PAD + usable * ((price - domainMin) / domainSpan);
+}
+
 export function buildOhlcFromPriceSeries(prices: number[]): OhlcCandle[] {
   if (!prices.length) {
     return [];
   }
 
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const span = Math.max(max - min, 1e-12);
-  const toY = (price: number) => 8 + ((price - min) / span) * 84;
+  const toY = (price: number) => mapPriceToChartCoordinate(price, prices);
 
   return prices.map((close, index) => {
     const open = index === 0 ? close : prices[index - 1];

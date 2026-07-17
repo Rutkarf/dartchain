@@ -58,4 +58,14 @@ describe('AuthService', () => {
     service.setDrawerMode('register');
     expect(service.drawerMode()).toBe('register');
   });
+
+  it('closes auth drawer when logging out', async () => {
+    service.openDrawer('login');
+    expect(service.drawerOpen()).toBe(true);
+
+    await service.logout();
+
+    expect(service.drawerOpen()).toBe(false);
+    expect(service.isAuthenticated()).toBe(false);
+  });
 });

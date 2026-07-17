@@ -110,6 +110,11 @@
   border: 1px solid var(--ds-surface-border);
 }
 
+.showcase-tab.ds-surface.ds-surface--showcase-tab:has(.showcase-tab__unread-toast) {
+  overflow: visible;
+  z-index: 2;
+}
+
 .showcase-tab.ds-surface.ds-surface--showcase-tab,
 .dock-tab.ds-surface.ds-surface--showcase-tab,
 .app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab {
@@ -140,6 +145,12 @@
 .ds-surface--showcase-tab .dock-tab-label {
   position: relative;
   z-index: 1;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.82);
+}
+
+.ds-surface--showcase-tab .showcase-tab__unread-toast {
+  position: absolute;
+  z-index: 3;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.82);
 }
 

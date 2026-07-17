@@ -94,6 +94,7 @@
   border-radius: 4px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.08);
   background: rgba(var(--brand-black-rgb), 0.18);
+  --showcase-meta-control-h: var(--r4v3-meta-control-h);
 }
 
 .showcase-r4v3__meta-bar > * {

@@ -2,6 +2,7 @@
 @import './styles/design-system-tokens.css';
 @import './styles/ds-surface.css';
 @import './styles/showcase-tabs-global.css';
+@import './styles/showcase-meta-shared.css';
 @import './styles/dock-shell.css';
 @import './cta-buttons.css';
 @import './styles/dock-view-tokens.css';
@@ -175,16 +176,6 @@ app-dock-panel .overlay-card {
   min-height: 0;
   margin: 0;
   box-shadow: inset 0 1px 0 var(--surface-inset-top);
-}
-
-app-showcase-tabs .showcase-tabs {
-  width: 100%;
-  min-width: var(--tab-rail-width, 30px);
-}
-
-app-showcase-tabs .showcase-tab {
-  min-width: 100%;
-  width: 100%;
 }
 
 /* —— Typographie globale —— */

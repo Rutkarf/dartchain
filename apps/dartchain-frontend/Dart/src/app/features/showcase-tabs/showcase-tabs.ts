@@ -35,6 +35,15 @@ export class ShowcaseTabsComponent {
     return this.newsState.unreadCount();
   }
 
+  unreadBadgeLabel(): string {
+    const count = this.unreadNewsCount();
+    return count > 99 ? '99+' : String(count);
+  }
+
+  newsToastLive(): boolean {
+    return this.newsState.newItemsToast() || this.newsState.refreshPulse();
+  }
+
   unreadR4v3Count(): number {
     return this.r4v3State.unreadCount();
   }
@@ -49,5 +58,23 @@ export class ShowcaseTabsComponent {
 
   isActive(tab: ShowcaseTab): boolean {
     return this.activeTab === tab;
+  }
+
+  tabAriaLabel(tab: { id: ShowcaseTab; label: string }): string {
+    if (tab.id === 'tours') {
+      const count = this.unreadNewsCount();
+      if (count > 0) {
+        return `${tab.label}, ${count} non lue${count > 1 ? 's' : ''}`;
+      }
+    }
+
+    if (tab.id === 'r4v3') {
+      const count = this.unreadR4v3Count();
+      if (count > 0) {
+        return `${tab.label}, ${count} non lue${count > 1 ? 's' : ''} R4V3`;
+      }
+    }
+
+    return tab.label;
   }
 }

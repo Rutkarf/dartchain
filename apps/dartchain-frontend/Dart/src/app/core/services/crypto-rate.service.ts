@@ -18,6 +18,8 @@ export interface CryptoSearchResult {
   symbol: string;
   name: string;
   thumb: string;
+  source?: 'coingecko' | 'geckoterminal' | 'launchlab';
+  network?: string;
 }
 
 export type ChartCurrency = 'eur' | 'usd' | 'r4v3';

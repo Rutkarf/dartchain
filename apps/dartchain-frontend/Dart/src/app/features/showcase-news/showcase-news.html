@@ -6,90 +6,128 @@
   @if (isExpanded) {
     <header class="showcase-news__head">
       <div class="showcase-meta showcase-news__meta-bar">
-        @if (chainLiveClickable()) {
-          <button
-            type="button"
-            class="showcase-meta__live showcase-meta__live-btn"
-            (click)="openLatestBlock()"
-            [attr.aria-label]="'Ouvrir le ' + liveActivity()"
-          >
-            <span [class]="chainLiveToneClass()" aria-hidden="true"></span>
-            <span class="showcase-meta__live-text">{{ liveActivity() }}</span>
-            @if (syncAgeShort()) {
-              <span class="showcase-meta__live-age">· sync {{ syncAgeShort() }}</span>
-            }
-            @if (blockAgeShort()) {
-              <span class="showcase-meta__live-age">· bloc {{ blockAgeShort() }}</span>
-            }
-          </button>
-        } @else {
-          <p class="showcase-meta__live" aria-live="polite">
-            <span [class]="chainLiveToneClass()" aria-hidden="true"></span>
-            <span class="showcase-meta__live-text">{{ liveActivity() || 'Hors ligne' }}</span>
-            @if (syncAgeShort()) {
-              <span class="showcase-meta__live-age">· sync {{ syncAgeShort() }}</span>
-            }
-            @if (blockAgeShort()) {
-              <span class="showcase-meta__live-age">· bloc {{ blockAgeShort() }}</span>
-            }
-          </p>
-        }
-
-        @if (newsState.unreadCount() > 0) {
-          <button
-            type="button"
-            class="showcase-meta__mark-read"
-            (click)="markAllRead()"
-            aria-label="Tout marquer comme lu"
-          >
-            Lu
-          </button>
-        }
-
-        <label class="showcase-meta__search">
-          <span class="sr-only">Rechercher dans les actualités</span>
-          <input
-            #searchInput
-            type="search"
-            class="showcase-meta__search-input"
-            placeholder="Rechercher…"
-            [value]="searchQuery()"
-            (input)="onSearchInput($any($event.target).value)"
-          />
-        </label>
-
-        <button
-          type="button"
-          class="showcase-meta__source"
-          (click)="toggleSourceFilter()"
-          [attr.aria-label]="'Filtrer : ' + sourceFilterLabel()"
-          [attr.aria-pressed]="sourceFilter() !== 'all'"
-        >
-          <span aria-hidden="true">{{ sourceFilterIcon() }}</span>
-        </button>
-
-        <button
-          type="button"
-          class="showcase-meta__refresh"
-          [class.showcase-meta__refresh--loading]="loading()"
-          [class.showcase-meta__refresh--pulse]="refreshPulse()"
-          (click)="refresh()"
-          [attr.aria-busy]="loading()"
-          [attr.aria-label]="refreshAriaLabel()"
-        >
-          @if (newsState.unreadCount() > 0) {
-            <span class="showcase-meta__refresh-badge" aria-hidden="true">
-              {{ newsState.unreadCount() > 9 ? '9+' : newsState.unreadCount() }}
-            </span>
+        <div class="showcase-meta__status-zone showcase-news__status-zone">
+          @if (chainLiveClickable()) {
+            <button
+              type="button"
+              class="showcase-meta__live showcase-meta__live-btn"
+              (click)="openLatestBlock()"
+              [attr.aria-label]="'Ouvrir le ' + newsState.chainStatusPrimary()"
+              [attr.title]="newsState.chainStatusTooltip()"
+            >
+              <span [class]="newsState.chainLiveToneClass()" aria-hidden="true"></span>
+              <span class="showcase-meta__live-text">{{ newsState.chainStatusPrimary() }}</span>
+            </button>
+          } @else {
+            <p
+              class="showcase-meta__live"
+              aria-live="polite"
+              [attr.title]="newsState.chainStatusTooltip()"
+            >
+              <span [class]="newsState.chainLiveToneClass()" aria-hidden="true"></span>
+              <span class="showcase-meta__live-text">{{ newsState.chainStatusPrimary() }}</span>
+            </p>
           }
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M21 12a9 9 0 0 1-15.5 6.36" />
-            <path d="M3 12a9 9 0 0 1 15.5-6.36" />
-            <path d="M17 4v4h-4" />
-            <path d="M7 20v-4h4" />
-          </svg>
-        </button>
+        </div>
+
+        <div class="showcase-meta-actions showcase-news__meta-actions">
+          @if (newsState.unreadCount() > 0) {
+            <button
+              type="button"
+              class="showcase-meta__mark-read showcase-meta__mark-read--icon"
+              (click)="markAllRead()"
+              aria-label="Tout marquer comme lu"
+              title="Tout marquer comme lu"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </button>
+          }
+
+          <div
+            class="showcase-meta__search-wrap"
+            [class.is-expanded]="searchExpanded()"
+          >
+            @if (searchExpanded()) {
+              <label class="showcase-meta__search">
+                <span class="sr-only">Rechercher dans les actualités</span>
+                <input
+                  #searchInput
+                  type="search"
+                  class="showcase-meta__search-input"
+                  placeholder="Rechercher…"
+                  [value]="searchQuery()"
+                  (input)="onSearchInput($any($event.target).value)"
+                  (blur)="closeSearch()"
+                  (keydown.escape)="closeSearch($event)"
+                />
+              </label>
+            } @else {
+              <button
+                type="button"
+                class="showcase-meta__search-toggle"
+                (click)="openSearch()"
+                aria-label="Rechercher dans les actualités"
+                title="Rechercher"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.5-3.5" />
+                </svg>
+              </button>
+            }
+          </div>
+
+          <button
+            type="button"
+            class="showcase-meta__source"
+            (click)="toggleSourceFilter()"
+            [attr.aria-label]="'Filtrer : ' + sourceFilterLabel()"
+            [attr.aria-pressed]="sourceFilter() !== 'all'"
+            [attr.title]="sourceFilterLabel()"
+          >
+            <span aria-hidden="true">{{ sourceFilterIcon() }}</span>
+          </button>
+
+          <button
+            type="button"
+            class="showcase-meta__refresh"
+            [class.showcase-meta__refresh--loading]="loading()"
+            [class.showcase-meta__refresh--pulse]="newsState.refreshPulse()"
+            (click)="refresh()"
+            [attr.aria-busy]="loading()"
+            [attr.aria-label]="refreshAriaLabel()"
+          >
+            @if (newsState.unreadCount() > 0) {
+              <span class="showcase-meta__refresh-badge" aria-hidden="true">
+                {{ newsState.unreadCount() > 9 ? '9+' : newsState.unreadCount() }}
+              </span>
+            }
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+              <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+              <path d="M17 4v4h-4" />
+              <path d="M7 20v-4h4" />
+            </svg>
+          </button>
+        </div>
       </div>
+
+      @if (newsState.unreadCount() > 0) {
+        <div class="showcase-unread-banner showcase-news__unread-banner">
+          <span class="showcase-unread-banner__label">
+            {{ newsState.unreadCount() }} non lue{{ newsState.unreadCount() > 1 ? 's' : '' }}
+          </span>
+          <button
+            type="button"
+            class="showcase-unread-banner__action"
+            (click)="markAllRead()"
+          >
+            Tout marquer lu
+          </button>
+        </div>
+      }
     </header>
 
     <div #contentPanel class="showcase-news__content">
@@ -175,6 +213,8 @@
       [loading]="detailLoading()"
       [canPrev]="canNavigatePrev()"
       [canNext]="canNavigateNext()"
+      [itemIndex]="selectedIndex()"
+      [itemTotal]="filteredItems().length"
       (closeDrawer)="closeItem()"
       (navigatePrev)="navigatePrev()"
       (navigateNext)="navigateNext()"

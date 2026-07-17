@@ -1,17 +1,30 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Subject, catchError, forkJoin, of, take } from 'rxjs';
 
-import { NewsDensity, NewsItem } from '../models/showcase.model';
+import { Block } from '../models/block.model';
+import { NewsDensity, NewsItem, NewsSource } from '../models/showcase.model';
+import { BlockchainApiService } from './blockchain-api.service';
+import { NewsArrivalFeedbackService } from './news-arrival-feedback.service';
+import { ShowcaseApiService } from './showcase-api.service';
 
 const READ_IDS_KEY = 'dartchain-news-read-ids';
 const DENSITY_KEY = 'dartchain-news-density';
+const NEWS_PAGE_SIZE = 10;
+
+export type ChainLiveTone = 'offline' | 'active' | 'pending';
 
 @Injectable({ providedIn: 'root' })
 export class ShowcaseNewsStateService {
+  private readonly api = inject(ShowcaseApiService);
+  private readonly blockchain = inject(BlockchainApiService);
+  private readonly newsFeedback = inject(NewsArrivalFeedbackService);
+
   private readonly readIds = signal<Set<string>>(this.loadReadIds());
   private readonly knownIds = signal<Set<string>>(new Set());
   private readonly refreshRequested = new Subject<void>();
   private readonly categoryChanged = new Subject<string>();
+  private lastChainSyncAt = 0;
+  private static readonly CHAIN_SYNC_MIN_GAP_MS = 12_000;
 
   readonly density = signal<NewsDensity>(this.loadDensity());
   readonly unreadCount = signal(0);
@@ -20,8 +33,16 @@ export class ShowcaseNewsStateService {
   readonly liveActivity = signal('');
   readonly lastUpdatedAt = signal<Date | null>(null);
   readonly loading = signal(false);
+  readonly feedError = signal(false);
   readonly categories = signal<string[]>(['all']);
   readonly activeCategory = signal('all');
+  readonly sourceFilter = signal<NewsSource | 'all'>('all');
+  readonly chainLiveTone = signal<ChainLiveTone>('active');
+  readonly latestBlockIndex = signal<number | null>(null);
+  readonly latestBlockTimestamp = signal<number | null>(null);
+  readonly refreshPulse = signal(false);
+  readonly hasMore = signal(false);
+  readonly featuredId = signal<string | null>(null);
 
   readonly refresh$ = this.refreshRequested.asObservable();
   readonly categoryChange$ = this.categoryChanged.asObservable();
@@ -51,6 +72,109 @@ export class ShowcaseNewsStateService {
 
     return `il y a ${Math.floor(seconds / 60)} min`;
   });
+
+  readonly latestItemAgeLabel = computed(() => {
+    const previews = this.unreadPreviews();
+    if (previews.length > 0 && previews[0].relativeTime) {
+      return previews[0].relativeTime;
+    }
+
+    const items = this.feedItems();
+    if (items.length > 0 && items[0].relativeTime) {
+      return items[0].relativeTime;
+    }
+
+    return this.liveAgeLabel();
+  });
+
+  readonly chainStatusPrimary = computed(() => {
+    const index = this.latestBlockIndex();
+    const tone = this.chainLiveTone();
+
+    if (index !== null) {
+      const toneLabel =
+        tone === 'pending' ? 'pending' : tone === 'offline' ? 'offline' : 'active';
+      return `Bloc #${index} · ${toneLabel}`;
+    }
+
+    return this.liveActivity() || 'Hors ligne';
+  });
+
+  readonly chainStatusTooltip = computed(() => {
+    const updated = this.lastUpdatedAt();
+    const blockTs = this.latestBlockTimestamp();
+    const parts: string[] = [];
+
+    if (updated) {
+      const syncSeconds = Math.floor((Date.now() - updated.getTime()) / 1000);
+      parts.push(`sync ${this.formatAgeShort(syncSeconds)}`);
+    }
+
+    if (blockTs) {
+      const blockSeconds = Math.floor((Date.now() - blockTs) / 1000);
+      parts.push(`bloc ${this.formatAgeShort(blockSeconds)}`);
+    }
+
+    return parts.join(' · ');
+  });
+
+  readonly collapsedPrimaryItem = computed(() => {
+    const items = this.feedItems();
+    if (items.length === 0) {
+      return null;
+    }
+
+    const unread = items.filter((item) => !this.readIds().has(item.id));
+    return unread.length > 0 ? unread[0] : items[0];
+  });
+
+  readonly collapsedHeadlineTitle = computed(() => {
+    const item = this.collapsedPrimaryItem();
+    if (item) {
+      return item.title;
+    }
+
+    if (this.loading()) {
+      return '';
+    }
+
+    return this.liveActivity() || 'Aucune actualité';
+  });
+
+  readonly collapsedHeadlineAge = computed(() => {
+    const item = this.collapsedPrimaryItem();
+    return item?.relativeTime ?? '';
+  });
+
+  readonly collapsedCategoryIcon = computed(() => {
+    const item = this.collapsedPrimaryItem();
+    if (!item) {
+      return '•';
+    }
+
+    return this.categoryIcon(item.category);
+  });
+
+  readonly collapsedCategoryLabel = computed(() => {
+    const item = this.collapsedPrimaryItem();
+    if (!item) {
+      return '';
+    }
+
+    return this.categoryLabel(item.category);
+  });
+
+  readonly chainStatusChip = computed(() => {
+    const index = this.latestBlockIndex();
+    if (index === null) {
+      return '—';
+    }
+
+    return `Bloc ${index}`;
+  });
+
+  /** @deprecated Prefer collapsedHeadlineTitle + collapsedHeadlineAge */
+  readonly collapsedPreviewHeadline = computed(() => this.collapsedHeadlineTitle());
 
   isUnread(id: string): boolean {
     return !this.readIds().has(id);
@@ -87,6 +211,7 @@ export class ShowcaseNewsStateService {
   syncFeedItems(items: NewsItem[], append: boolean): void {
     const incomingIds = items.map((item) => item.id);
     const known = this.knownIds();
+    const wasKnown = known.size > 0;
     const hasNew = incomingIds.some((id) => !known.has(id));
 
     const merged = append
@@ -96,6 +221,11 @@ export class ShowcaseNewsStateService {
     this.knownIds.set(merged);
     this.unreadCount.set([...merged].filter((id) => !this.readIds().has(id)).length);
     this.newItemsToast.set(hasNew && !append);
+
+    if (wasKnown && hasNew) {
+      this.newsFeedback.notifyNewItems();
+      this.triggerRefreshPulse();
+    }
 
     if (!append) {
       this.feedItems.set(items);
@@ -110,6 +240,11 @@ export class ShowcaseNewsStateService {
 
   setLiveActivity(value: string): void {
     this.liveActivity.set(value);
+
+    const parsed = this.parseBlockIndexFromLive(value);
+    if (parsed !== null) {
+      this.latestBlockIndex.set(parsed);
+    }
   }
 
   setLastUpdatedAt(value: Date | null): void {
@@ -121,7 +256,60 @@ export class ShowcaseNewsStateService {
   }
 
   requestRefresh(): void {
-    this.refreshRequested.next();
+    this.refreshFeed(true);
+  }
+
+  ensureFeedLoaded(): void {
+    if (this.feedItems().length === 0 && !this.loading()) {
+      this.refreshFeed(true);
+    }
+  }
+
+  refreshFeed(showLoading = true, source?: NewsSource | 'all'): void {
+    if (showLoading) {
+      this.setLoading(true);
+    }
+    this.feedError.set(false);
+
+    const category = this.activeCategory();
+    const resolvedSource = source ?? this.sourceFilter();
+
+    this.api
+      .getNewsFeed({
+        category: category === 'all' ? undefined : category,
+        source: resolvedSource,
+        limit: NEWS_PAGE_SIZE,
+        offset: 0,
+      })
+      .pipe(take(1))
+      .subscribe({
+        next: (feed) => {
+          this.setCategories(feed.categories);
+          this.hasMore.set(feed.hasMore);
+          this.featuredId.set(feed.featuredId);
+          this.setLiveActivity(feed.liveActivity);
+          const updated = feed.lastRefreshedAt
+            ? new Date(feed.lastRefreshedAt)
+            : new Date();
+          this.setLastUpdatedAt(updated);
+          this.syncFeedItems(feed.items, false);
+
+          if (this.newItemsToast()) {
+            this.dismissNewItemsToast();
+            this.triggerRefreshPulse();
+          }
+
+          this.setLoading(false);
+          this.syncChainLiveStatus();
+          this.refreshRequested.next();
+        },
+        error: () => {
+          this.feedError.set(true);
+          this.setLoading(false);
+          this.chainLiveTone.set('offline');
+          this.latestBlockIndex.set(null);
+        },
+      });
   }
 
   setCategories(categories: string[]): void {
@@ -146,6 +334,10 @@ export class ShowcaseNewsStateService {
     this.categoryChanged.next(category);
   }
 
+  setSourceFilter(source: NewsSource | 'all'): void {
+    this.sourceFilter.set(source);
+  }
+
   categoryLabel(category: string): string {
     if (category === 'all') {
       return 'Tous';
@@ -158,8 +350,102 @@ export class ShowcaseNewsStateService {
     return category;
   }
 
+  categoryIcon(category: string): string {
+    switch (category.toLowerCase()) {
+      case 'réseau':
+        return '⛓';
+      case 'r4v3':
+        return '◆';
+      case 'peers':
+        return '◎';
+      case 'écosystème':
+      case 'd.a.o':
+        return '✦';
+      default:
+        return '•';
+    }
+  }
+
   dismissNewItemsToast(): void {
     this.newItemsToast.set(false);
+  }
+
+  chainLiveToneClass(): string {
+    return `showcase-meta__live-dot showcase-meta__live-dot--${this.chainLiveTone()}`;
+  }
+
+  private syncChainLiveStatus(force = false): void {
+    const now = Date.now();
+    if (!force && now - this.lastChainSyncAt < ShowcaseNewsStateService.CHAIN_SYNC_MIN_GAP_MS) {
+      return;
+    }
+
+    this.lastChainSyncAt = now;
+
+    if (this.feedError()) {
+      this.chainLiveTone.set('offline');
+      this.latestBlockIndex.set(null);
+      return;
+    }
+
+    forkJoin({
+      blocks: this.blockchain.getBlocks().pipe(catchError(() => of([] as Block[]))),
+      pending: this.blockchain.getPendingTransactions().pipe(catchError(() => of([]))),
+    })
+      .pipe(take(1))
+      .subscribe({
+        next: ({ blocks, pending }) => {
+          const latestBlock = blocks.length > 0 ? blocks[blocks.length - 1] : null;
+          const latest = latestBlock?.index ?? null;
+          this.latestBlockIndex.set(latest);
+          this.latestBlockTimestamp.set(latestBlock?.timestamp ?? null);
+
+          if (pending.length > 0) {
+            this.chainLiveTone.set('pending');
+            return;
+          }
+
+          if (latest !== null) {
+            this.chainLiveTone.set('active');
+            return;
+          }
+
+          this.chainLiveTone.set('pending');
+        },
+        error: () => {
+          this.chainLiveTone.set('offline');
+          this.latestBlockIndex.set(null);
+          this.latestBlockTimestamp.set(null);
+        },
+      });
+  }
+
+  private triggerRefreshPulse(): void {
+    this.refreshPulse.set(true);
+    window.setTimeout(() => this.refreshPulse.set(false), 1_100);
+  }
+
+  private formatAgeShort(seconds: number): string {
+    if (seconds < 5) {
+      return "à l'instant";
+    }
+    if (seconds < 60) {
+      return `${seconds}s`;
+    }
+    if (seconds < 3_600) {
+      return `${Math.floor(seconds / 60)}min`;
+    }
+    return `${Math.floor(seconds / 3_600)}h`;
+  }
+
+  private parseBlockIndexFromLive(activity: string): number | null {
+    const match = /Bloc #(\d+)/i.exec(activity);
+    if (!match) {
+      return null;
+    }
+
+    const index = Number.parseInt(match[1], 10);
+    return Number.isNaN(index) ? null : index;
   }
 
   private loadReadIds(): Set<string> {

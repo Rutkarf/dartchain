@@ -1,31 +1,235 @@
 <section class="exchange-panel" aria-label="Convertir vos tokens LaunchLab">
   <div class="exchange-panel__shell ds-surface ds-surface--card">
-    <div class="exchange-panel__inner">
-      @if (loadingPanel()) {
-        <div class="exchange-panel__skeleton exchange-panel__skeleton--body" aria-hidden="true"></div>
+    @if (loadingPanel()) {
+      @if (exchangeCollapsed()) {
+        <div class="exchange-panel__collapsed-skeleton collapsed-summary-bar" aria-hidden="true">
+          <span class="exchange-panel__collapsed-skeleton-pill"></span>
+          <span class="exchange-panel__collapsed-skeleton-chips"></span>
+          <span class="exchange-panel__collapsed-skeleton-input"></span>
+          <span class="exchange-panel__collapsed-skeleton-cta"></span>
+        </div>
       } @else {
+        <div class="exchange-panel__skeleton" aria-hidden="true">
+          <div class="exchange-panel__skeleton-route">
+            <span class="exchange-panel__skeleton-pill"></span>
+            <span class="exchange-panel__skeleton-flip"></span>
+            <span class="exchange-panel__skeleton-pill exchange-panel__skeleton-pill--to"></span>
+            <span class="exchange-panel__skeleton-grid"></span>
+          </div>
+          <div class="exchange-panel__skeleton-well">
+            <span class="exchange-panel__skeleton-input"></span>
+            <span class="exchange-panel__skeleton-cta"></span>
+          </div>
+        </div>
+      }
+    } @else if (exchangeCollapsed()) {
+      <div
+        class="exchange-panel__collapsed collapsed-summary-bar"
+        role="region"
+        aria-label="Swap rapide"
+        [formGroup]="amountForm"
+      >
+        <span class="exchange-panel__sr-only" id="exchange-collapsed-hint" aria-live="polite">
+          {{ pairSubtitle() }} · Solde {{ formatBalance(fromBalance()) }} {{ tokenUnitLabel(fromToken()) }}
+          @if (rateLine()) {
+            · {{ rateLine() }}
+          }
+          · Estimation ≈ {{ formattedEstimatedTo() }} {{ toToken() }}
+        </span>
+
         <div
-          class="exchange-panel__pair"
+          class="exchange-panel__collapsed-route"
+          [class.exchange-panel__collapsed-route--flip]="pairFlipping()"
+        >
+          <span
+            class="exchange-panel__collapsed-pill exchange-panel__collapsed-pill--from"
+            [title]="'Solde ' + formatBalance(fromBalance()) + ' ' + tokenUnitLabel(fromToken())"
+          >
+            @if (tokenLogoUrl(fromToken()); as fromLogo) {
+              <img
+                class="exchange-panel__collapsed-pill-icon"
+                [src]="fromLogo"
+                alt=""
+                (error)="onTokenLogoError(fromToken())"
+              />
+            } @else {
+              <span class="exchange-panel__collapsed-pill-icon" aria-hidden="true">{{ tokenIconText(fromToken()) }}</span>
+            }
+            <span class="exchange-panel__collapsed-pill-label">{{ displayTokenSymbol(fromToken()) }}</span>
+          </span>
+
+          <button
+            type="button"
+            class="exchange-panel__collapsed-flip"
+            [class.exchange-panel__collapsed-flip--active]="pairFlipping()"
+            [disabled]="!canFlipPair() || swapping()"
+            (click)="flipPair()"
+            aria-label="Inverser la paire"
+            title="Inverser la paire"
+          >
+            <span aria-hidden="true">⇄</span>
+          </button>
+
+          <span class="exchange-panel__collapsed-pill exchange-panel__collapsed-pill--to" [title]="tokenDisplayName(toToken())">
+            @if (tokenLogoUrl(toToken()); as toLogo) {
+              <img
+                class="exchange-panel__collapsed-pill-icon"
+                [src]="toLogo"
+                alt=""
+                (error)="onTokenLogoError(toToken())"
+              />
+            } @else {
+              <span class="exchange-panel__collapsed-pill-icon" aria-hidden="true">{{ tokenIconText(toToken()) }}</span>
+            }
+            <span class="exchange-panel__collapsed-pill-label">{{ toToken() }}</span>
+          </span>
+        </div>
+
+        <div class="exchange-panel__collapsed-chips" role="listbox" aria-label="Choisir le token à recevoir">
+          @for (slot of launchpadSwapTokens(); track slot) {
+            <button
+              type="button"
+              role="option"
+              class="exchange-panel__collapsed-chip"
+              [class.exchange-panel__collapsed-chip--active]="isLaunchChipActive(slot)"
+              [attr.aria-selected]="isLaunchChipActive(slot)"
+              [attr.aria-label]="'Recevoir ' + tokenDisplayName(slot)"
+              (click)="selectLaunchChip(slot)"
+              [title]="tokenDisplayName(slot)"
+            >
+              @if (tokenLogoUrl(slot); as chipLogo) {
+                <img
+                  class="exchange-panel__collapsed-chip-icon"
+                  [src]="chipLogo"
+                  alt=""
+                  (error)="onTokenLogoError(slot)"
+                />
+              } @else {
+                <span class="exchange-panel__collapsed-chip-icon" aria-hidden="true">{{ tokenIconText(slot) }}</span>
+              }
+              <span class="exchange-panel__collapsed-chip-label">{{ slot }}</span>
+            </button>
+          }
+        </div>
+
+        <div
+          class="exchange-panel__collapsed-amount"
+          [class.exchange-panel__collapsed-amount--valid]="amountInputState() === 'valid'"
+          [class.exchange-panel__collapsed-amount--warn]="amountInputState() === 'insufficient'"
+        >
+          <label class="exchange-panel__sr-only" for="exchange-collapsed-amount-input">
+            Montant à convertir en {{ toToken() }}
+          </label>
+          <input
+            id="exchange-collapsed-amount-input"
+            class="exchange-panel__collapsed-amount-input"
+            type="text"
+            inputmode="decimal"
+            formControlName="amount"
+            [placeholder]="amountPlaceholder()"
+            [attr.aria-describedby]="'exchange-collapsed-hint'"
+            (input)="onAmountInput()"
+            (keydown.enter)="onAmountEnter($event)"
+          />
+          <span
+            class="exchange-panel__collapsed-estimate"
+            [class.exchange-panel__collapsed-estimate--pulse]="estimatePulse()"
+            aria-hidden="true"
+            [title]="quoteDetailsTitle() || null"
+          >
+            ≈ {{ formattedEstimatedTo() }}
+          </span>
+          <button
+            type="button"
+            class="exchange-panel__collapsed-max"
+            [disabled]="fromBalance() <= 0"
+            (click)="setMaxAmount()"
+            aria-label="Utiliser le solde maximum"
+            [title]="maxButtonTitle()"
+          >
+            MAX
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="exchange-panel__collapsed-cta"
+          [class.exchange-panel__collapsed-cta--ready]="swapAction() === 'swap'"
+          [class.exchange-panel__collapsed-cta--funnel]="isFunnelCta()"
+          [class.exchange-panel__collapsed-cta--warn]="swapAction() === 'insufficient' && fromBalance() > 0"
+          [class.exchange-panel__collapsed-cta--loading]="swapAction() === 'swapping'"
+          (click)="onSwapClick()"
+          [disabled]="swapButtonDisabled()"
+          [attr.aria-label]="swapButtonLabel()"
+          [attr.aria-busy]="swapAction() === 'swapping'"
+          [title]="swapCtaHint() || swapButtonLabel()"
+        >
+          @if (swapAction() === 'swapping') {
+            <span class="exchange-panel__cta-spinner" aria-hidden="true"></span>
+          }
+          <span class="exchange-panel__collapsed-cta-label">{{ swapButtonLabelCompact() }}</span>
+        </button>
+      </div>
+    } @else {
+      <div class="exchange-panel__inner">
+        <header
+          class="exchange-panel__route"
           role="listbox"
           aria-labelledby="exchange-pair-label"
           aria-label="Choisir le token à recevoir"
         >
-          <span
-            class="exchange-panel__from-pill"
-            [title]="'Solde ' + formatBalance(fromBalance()) + ' ' + tokenUnitLabel(fromToken())"
+          <div
+            class="exchange-panel__pair-summary"
+            [class.exchange-panel__pair-summary--flip]="pairFlipping()"
           >
-            {{ displayTokenSymbol(fromToken()) }}
-          </span>
+            <span
+              class="exchange-panel__from-pill"
+              [title]="'Solde ' + formatBalance(fromBalance()) + ' ' + tokenUnitLabel(fromToken())"
+            >
+              @if (tokenLogoUrl(fromToken()); as fromLogo) {
+                <img
+                  class="exchange-panel__pill-icon exchange-panel__pill-icon--img"
+                  [src]="fromLogo"
+                  alt=""
+                  (error)="onTokenLogoError(fromToken())"
+                />
+              } @else {
+                <span class="exchange-panel__pill-icon" aria-hidden="true">{{ tokenIconText(fromToken()) }}</span>
+              }
+              <span class="exchange-panel__pill-label">{{ displayTokenSymbol(fromToken()) }}</span>
+            </span>
 
-          <span class="exchange-panel__arrow" id="exchange-pair-label" aria-hidden="true">→</span>
+            <button
+              type="button"
+              class="exchange-panel__flip"
+              id="exchange-pair-label"
+              [class.exchange-panel__flip--active]="pairFlipping()"
+              [disabled]="!canFlipPair() || swapping()"
+              (click)="flipPair()"
+              [attr.aria-label]="'Inverser ' + displayTokenSymbol(fromToken()) + ' et ' + toToken()"
+              title="Inverser la paire"
+            >
+              <span class="exchange-panel__flip-icon" aria-hidden="true">⇄</span>
+            </button>
 
-          <span
-            class="exchange-panel__to-pill"
-            [title]="tokenDisplayName(toToken())"
-            aria-live="polite"
-          >
-            {{ toToken() }}
-          </span>
+            <span
+              class="exchange-panel__to-pill"
+              [title]="tokenDisplayName(toToken())"
+              aria-live="polite"
+            >
+              @if (tokenLogoUrl(toToken()); as toLogo) {
+                <img
+                  class="exchange-panel__pill-icon exchange-panel__pill-icon--img"
+                  [src]="toLogo"
+                  alt=""
+                  (error)="onTokenLogoError(toToken())"
+                />
+              } @else {
+                <span class="exchange-panel__pill-icon" aria-hidden="true">{{ tokenIconText(toToken()) }}</span>
+              }
+              <span class="exchange-panel__pill-label">{{ toToken() }}</span>
+            </span>
+          </div>
 
           <div class="exchange-panel__targets">
             @for (slot of launchGridSlots(); track $index) {
@@ -40,31 +244,56 @@
                   (click)="selectLaunchChip(slot)"
                   [title]="tokenDisplayName(slot)"
                 >
-                  {{ slot }}
+                  @if (tokenLogoUrl(slot); as chipLogo) {
+                    <img
+                      class="exchange-panel__chip-icon exchange-panel__chip-icon--img"
+                      [src]="chipLogo"
+                      alt=""
+                      (error)="onTokenLogoError(slot)"
+                    />
+                  } @else {
+                    <span class="exchange-panel__chip-icon" aria-hidden="true">{{ tokenIconText(slot) }}</span>
+                  }
+                  <span class="exchange-panel__chip-label">{{ slot }}</span>
                 </button>
               } @else {
                 <span class="exchange-panel__chip exchange-panel__chip--empty" aria-hidden="true"></span>
               }
             }
           </div>
-        </div>
+        </header>
 
-        <p class="exchange-panel__meta" id="exchange-convert-hint" aria-live="polite">
-          <span class="exchange-panel__sr-only">Estimation reçue&nbsp;</span>
-          <span class="exchange-panel__meta-estimate">
-            ≈ {{ formattedEstimatedTo() }} {{ toToken() }}
+        <footer class="exchange-panel__action exchange-panel__action--well" [formGroup]="amountForm">
+          <span class="exchange-panel__sr-only" id="exchange-convert-hint" aria-live="polite">
+            Estimation reçue ≈ {{ formattedEstimatedTo() }} {{ toToken() }} ·
+            {{ formatBalance(fromBalance()) }} {{ tokenUnitLabel(fromToken()) }}
+            @if (rateLine()) {
+              · {{ rateLine() }}
+            }
+            @if (unitUsdPriceTo() != null) {
+              · {{ prixSubline() }}
+            }
           </span>
-          · {{ formatBalance(fromBalance()) }} {{ tokenUnitLabel(fromToken()) }}
-          @if (rateLine()) {
-            · {{ rateLine() }}
-          }
-          @if (unitUsdPriceTo() != null) {
-            · {{ prixSubline() }}
-          }
-        </p>
 
-        <footer class="exchange-panel__action" [formGroup]="amountForm">
-          <div class="exchange-panel__amount-row">
+          <div
+            class="exchange-panel__amount-row"
+            [class.exchange-panel__amount-row--valid]="amountInputState() === 'valid'"
+            [class.exchange-panel__amount-row--warn]="amountInputState() === 'insufficient'"
+          >
+            @if (quoteDetailsExpanded() && hasQuoteDetails()) {
+              <span class="exchange-panel__rate-popover" aria-live="polite">
+                @if (rateLine()) {
+                  <span>{{ rateLine() }}</span>
+                }
+                @if (rateLine() && unitUsdPriceTo() != null) {
+                  <span class="exchange-panel__rate-popover-sep" aria-hidden="true">·</span>
+                }
+                @if (unitUsdPriceTo() != null) {
+                  <span>{{ prixSubline() }}</span>
+                }
+              </span>
+            }
+
             <label class="exchange-panel__sr-only" for="exchange-amount-input">
               Montant à convertir en {{ toToken() }}
             </label>
@@ -79,17 +308,45 @@
               (input)="onAmountInput()"
               (keydown.enter)="onAmountEnter($event)"
             />
-            <span class="exchange-panel__value-unit">{{ tokenUnitLabel(fromToken()) }}</span>
-            <button
-              type="button"
-              class="exchange-panel__max"
-              [disabled]="fromBalance() <= 0"
-              (click)="setMaxAmount()"
-              aria-label="Utiliser le solde maximum"
-              title="Montant maximum"
+            <span
+              class="exchange-panel__amount-estimate"
+              [class.exchange-panel__amount-estimate--pulse]="estimatePulse()"
+              [title]="quoteDetailsTitle() || null"
+              aria-hidden="true"
             >
-              MAX
-            </button>
+              ≈ {{ formattedEstimatedTo() }} {{ toToken() }}
+            </span>
+            <div class="exchange-panel__amount-trailing">
+              <span
+                class="exchange-panel__value-balance"
+                [title]="'Solde ' + formatBalance(fromBalance()) + ' ' + tokenUnitLabel(fromToken())"
+              >
+                {{ formatBalance(fromBalance()) }}
+              </span>
+              <span class="exchange-panel__value-unit">{{ tokenUnitLabel(fromToken()) }}</span>
+              @if (hasQuoteDetails()) {
+                <button
+                  type="button"
+                  class="exchange-panel__meta-expand"
+                  [attr.aria-expanded]="quoteDetailsExpanded()"
+                  [attr.aria-label]="quoteDetailsTitle() || 'Détails du taux'"
+                  (click)="toggleQuoteDetails()"
+                  [title]="quoteDetailsTitle() || 'Taux et prix'"
+                >
+                  ···
+                </button>
+              }
+              <button
+                type="button"
+                class="exchange-panel__max"
+                [disabled]="fromBalance() <= 0"
+                (click)="setMaxAmount()"
+                aria-label="Utiliser le solde maximum"
+                [title]="maxButtonTitle()"
+              >
+                MAX
+              </button>
+            </div>
           </div>
 
           <button
@@ -98,33 +355,38 @@
             [class.exchange-panel__cta--ready]="swapAction() === 'swap'"
             [class.exchange-panel__cta--funnel]="isFunnelCta()"
             [class.exchange-panel__cta--warn]="swapAction() === 'insufficient' && fromBalance() > 0"
+            [class.exchange-panel__cta--loading]="swapAction() === 'swapping'"
             (click)="onSwapClick()"
             [disabled]="swapButtonDisabled()"
             [attr.aria-label]="swapButtonLabel()"
+            [attr.aria-busy]="swapAction() === 'swapping'"
             [title]="swapCtaHint() || swapButtonLabel()"
           >
-            {{ swapButtonLabel() }}
+            @if (swapAction() === 'swapping') {
+              <span class="exchange-panel__cta-spinner" aria-hidden="true"></span>
+            }
+            <span class="exchange-panel__cta-label">{{ swapButtonLabel() }}</span>
           </button>
         </footer>
+      </div>
+    }
 
-        @if (showSuccessToast() && successMessage()) {
-          <div class="exchange-panel__overlay exchange-panel__toast" role="status">
-            <span>{{ successMessage() }}</span>
-            <button type="button" class="exchange-panel__toast-dismiss" (click)="dismissSuccessToast()">×</button>
-          </div>
-        }
+    @if (showSuccessToast() && successMessage()) {
+      <div class="exchange-panel__overlay exchange-panel__toast" role="status">
+        <span>{{ successMessage() }}</span>
+        <button type="button" class="exchange-panel__toast-dismiss" (click)="dismissSuccessToast()">×</button>
+      </div>
+    }
 
-        @if (showStatus() && (errorMessage() || (successMessage() && !showSuccessToast()))) {
-          <p
-            class="exchange-panel__overlay exchange-panel__status"
-            [class.exchange-panel__status--error]="!!errorMessage()"
-            [class.exchange-panel__status--success]="!!successMessage() && !errorMessage()"
-            [attr.role]="errorMessage() ? 'alert' : 'status'"
-          >
-            {{ errorMessage() || successMessage() }}
-          </p>
-        }
-      }
-    </div>
+    @if (showStatus() && (errorMessage() || (successMessage() && !showSuccessToast()))) {
+      <p
+        class="exchange-panel__overlay exchange-panel__status"
+        [class.exchange-panel__status--error]="!!errorMessage()"
+        [class.exchange-panel__status--success]="!!successMessage() && !errorMessage()"
+        [attr.role]="errorMessage() ? 'alert' : 'status'"
+      >
+        {{ errorMessage() || successMessage() }}
+      </p>
+    }
   </div>
 </section>

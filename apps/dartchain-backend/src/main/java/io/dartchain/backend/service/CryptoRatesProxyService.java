@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class CryptoRatesProxyService {
 
     private static final String COINGECKO_BASE = "https://api.coingecko.com/api/v3";
+    private static final String GECKO_TERMINAL_BASE = "https://api.geckoterminal.com/api/v2";
     private static final long CACHE_TTL_MS = 60_000;
     private static final double DART_EUR_REFERENCE = 1.248;
 
@@ -182,9 +183,38 @@ public class CryptoRatesProxyService {
             return List.of();
         }
 
+        String trimmed = query.trim();
+        List<CryptoSearchResult> results = new ArrayList<>(searchCoinGecko(trimmed));
+        java.util.Set<String> seen = new java.util.HashSet<>();
+
+        for (CryptoSearchResult result : results) {
+            seen.add(result.id().toLowerCase(Locale.ROOT));
+            seen.add(result.symbol().toUpperCase(Locale.ROOT));
+        }
+
+        for (CryptoSearchResult terminal : searchGeckoTerminal(trimmed)) {
+            if (results.size() >= 8) {
+                break;
+            }
+
+            String idKey = terminal.id().toLowerCase(Locale.ROOT);
+            String symbolKey = terminal.symbol().toUpperCase(Locale.ROOT);
+            if (seen.contains(idKey) || seen.contains(symbolKey)) {
+                continue;
+            }
+
+            seen.add(idKey);
+            seen.add(symbolKey);
+            results.add(terminal);
+        }
+
+        return results;
+    }
+
+    private List<CryptoSearchResult> searchCoinGecko(String query) {
         try {
             String searchJson = restClient.get()
-                    .uri(COINGECKO_BASE + "/search?query={query}", query.trim())
+                    .uri(COINGECKO_BASE + "/search?query={query}", query)
                     .retrieve()
                     .body(String.class);
 
@@ -192,7 +222,7 @@ public class CryptoRatesProxyService {
             List<CryptoSearchResult> results = new ArrayList<>();
 
             for (JsonNode coin : coins) {
-                if (results.size() >= 8) {
+                if (results.size() >= 6) {
                     break;
                 }
 
@@ -205,13 +235,101 @@ public class CryptoRatesProxyService {
                     continue;
                 }
 
-                results.add(new CryptoSearchResult(id, symbol, name, thumb));
+                results.add(new CryptoSearchResult(id, symbol, name, thumb, "coingecko", ""));
             }
 
             return results;
         } catch (Exception exception) {
             return List.of();
         }
+    }
+
+    private List<CryptoSearchResult> searchGeckoTerminal(String query) {
+        try {
+            String searchJson = restClient.get()
+                    .uri(GECKO_TERMINAL_BASE + "/search/pools?query={query}&include=base_token,quote_token&page=1", query)
+                    .header("Accept", "application/json;version=20230302")
+                    .retrieve()
+                    .body(String.class);
+
+            JsonNode root = objectMapper.readTree(searchJson);
+            Map<String, JsonNode> tokensById = new HashMap<>();
+
+            for (JsonNode node : root.path("included")) {
+                if ("token".equals(node.path("type").asText())) {
+                    tokensById.put(node.path("id").asText(), node);
+                }
+            }
+
+            List<CryptoSearchResult> results = new ArrayList<>();
+            java.util.Set<String> seen = new java.util.HashSet<>();
+
+            for (JsonNode pool : root.path("data")) {
+                if (results.size() >= 4) {
+                    break;
+                }
+
+                JsonNode relationships = pool.path("relationships");
+                for (String relation : List.of("base_token", "quote_token")) {
+                    String tokenId = relationships.path(relation).path("data").path("id").asText("");
+                    if (tokenId.isBlank()) {
+                        continue;
+                    }
+
+                    JsonNode token = tokensById.get(tokenId);
+                    if (token == null) {
+                        continue;
+                    }
+
+                    JsonNode attributes = token.path("attributes");
+                    String symbol = attributes.path("symbol").asText("").toUpperCase(Locale.ROOT);
+                    String name = attributes.path("name").asText("");
+                    String imageUrl = attributes.path("image_url").asText("");
+                    String coinGeckoId = attributes.path("coingecko_coin_id").asText("");
+
+                    if (symbol.isBlank() || name.isBlank() || coinGeckoId.isBlank()) {
+                        continue;
+                    }
+
+                    String dedupeKey = coinGeckoId.toLowerCase(Locale.ROOT);
+                    if (seen.contains(dedupeKey)) {
+                        continue;
+                    }
+                    seen.add(dedupeKey);
+
+                    String network = networkFromTokenId(tokenId);
+                    results.add(new CryptoSearchResult(
+                            coinGeckoId,
+                            symbol,
+                            name,
+                            imageUrl,
+                            "geckoterminal",
+                            network
+                    ));
+
+                    if (results.size() >= 4) {
+                        break;
+                    }
+                }
+            }
+
+            return results;
+        } catch (Exception exception) {
+            return List.of();
+        }
+    }
+
+    private String networkFromTokenId(String tokenId) {
+        if (tokenId == null || tokenId.isBlank()) {
+            return "";
+        }
+
+        int separator = tokenId.indexOf('_');
+        if (separator <= 0) {
+            return tokenId;
+        }
+
+        return tokenId.substring(0, separator).toUpperCase(Locale.ROOT);
     }
 
     private List<CryptoRatePanelResponse> fetchPanelsForCoins(List<CoinConfig> coins) throws java.io.IOException {

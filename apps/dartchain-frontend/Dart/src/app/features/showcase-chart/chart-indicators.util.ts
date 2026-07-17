@@ -1,4 +1,4 @@
-import { OhlcCandle, buildOhlcFromSeries } from './chart-display.util';
+import { OhlcCandle, buildOhlcFromSeries, mapSeriesToChartCoordinates } from './chart-display.util';
 
 export function sliceSeries<T>(values: T[], startPercent: number, endPercent: number): T[] {
   if (!values.length) {
@@ -66,18 +66,7 @@ export function computeRsi(points: number[], period = 14): number[] {
 }
 
 export function normalizeToChartScale(values: number[]): number[] {
-  if (!values.length) {
-    return [];
-  }
-
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-
-  if (max === min) {
-    return values.map(() => 50);
-  }
-
-  return values.map((value) => 8 + ((value - min) / (max - min)) * 84);
+  return mapSeriesToChartCoordinates(values);
 }
 
 export function buildIndicatorLine(

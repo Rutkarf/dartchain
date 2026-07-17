@@ -5,9 +5,11 @@ import {
   DestroyRef,
   ElementRef,
   HostListener,
+  booleanAttribute,
   computed,
   effect,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -46,6 +48,8 @@ type SwapAction =
   | 'swapping'
   | 'swap';
 
+type AmountInputState = 'neutral' | 'valid' | 'insufficient';
+
 const LAUNCH_TOKEN_DISPLAY: Record<string, string> = {
   R4V3: 'R4V3',
   PXD: 'Pixel DAO',
@@ -63,6 +67,9 @@ const LAUNCH_TOKEN_DISPLAY: Record<string, string> = {
   templateUrl: './exchange-panel.html',
   styleUrls: ['./exchange-panel.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.exchange-panel--collapsed]': 'exchangeCollapsed()',
+  },
 })
 export class ExchangePanelComponent {
   private readonly api = inject(BlockchainApiService);
@@ -76,6 +83,8 @@ export class ExchangePanelComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly fb = inject(FormBuilder);
+
+  readonly exchangeCollapsed = input(false, { transform: booleanAttribute });
 
   readonly launchpadTokens = signal<string[]>([...EXCHANGE_LAUNCHPAD_FALLBACK_TOKENS]);
 
@@ -97,6 +106,13 @@ export class ExchangePanelComponent {
   protected readonly change24hPositive = signal(true);
   protected readonly unitUsdPriceFetched = signal<number | null>(null);
   protected readonly unitUsdPriceFetchedIsFrom = signal(true);
+  protected readonly quoteDetailsExpanded = signal(false);
+  protected readonly pairFlipping = signal(false);
+  protected readonly estimatePulse = signal(false);
+  protected readonly brokenTokenLogos = signal<ReadonlySet<string>>(new Set());
+
+  private estimatePulseTimer: ReturnType<typeof setTimeout> | null = null;
+  private pairFlipTimer: ReturnType<typeof setTimeout> | null = null;
 
   protected readonly launchpadSwapTokens = signal<string[]>([
     ...EXCHANGE_LAUNCHPAD_SWAP_TOKENS,
@@ -172,6 +188,52 @@ export class ExchangePanelComponent {
     }
 
     return `1 ${this.displayTokenSymbol(this.fromToken())} = ${this.formatRateCompact(r)} ${this.toToken()}`;
+  });
+
+  protected readonly hasQuoteDetails = computed(
+    () => !!this.rateLine() || this.unitUsdPriceTo() != null
+  );
+
+  protected readonly quoteDetailsTitle = computed(() => {
+    const parts: string[] = [];
+    if (this.rateLine()) {
+      parts.push(this.rateLine());
+    }
+    if (this.unitUsdPriceTo() != null) {
+      parts.push(this.prixSubline());
+    }
+    return parts.join(' · ');
+  });
+
+  protected readonly maxButtonTitle = computed(
+    () =>
+      `Utiliser le solde maximum (${this.formatBalance(this.fromBalance())} ${this.tokenUnitLabel(this.fromToken())})`
+  );
+
+  protected readonly amountInputState = computed((): AmountInputState => {
+    if (!this.hasWallet() || !this.auth.isAuthenticated()) {
+      return 'neutral';
+    }
+
+    const amount = this.parsedAmount();
+    if (amount <= 0) {
+      return 'neutral';
+    }
+
+    if (amount > this.fromBalance() + 1e-9) {
+      return 'insufficient';
+    }
+
+    return 'valid';
+  });
+
+  protected readonly canFlipPair = computed(() => {
+    const from = this.fromToken().trim().toUpperCase();
+    const to = this.toToken().trim().toUpperCase();
+    return (
+      (isExchangeNativeToken(from) && isLaunchpadSwapToken(to)) ||
+      (isLaunchpadSwapToken(from) && isExchangeNativeToken(to))
+    );
   });
 
   protected readonly amountPlaceholder = computed(() => {
@@ -266,8 +328,32 @@ export class ExchangePanelComponent {
         return this.fromBalance() <= 0 ? 'Obtenir des R4V3' : 'Solde insuffisant';
       case 'swapping':
         return 'Conversion…';
-      default:
-        return 'Convertir →';
+      default: {
+        const amountIn = this.formatBalance(this.parsedAmount());
+        const amountOut = this.formattedEstimatedTo();
+        const fromUnit = this.tokenUnitLabel(this.fromToken());
+        const toSymbol = this.toToken();
+        return `Convertir ${amountIn} ${fromUnit} → ${amountOut} ${toSymbol}`;
+      }
+    }
+  });
+
+  protected readonly swapButtonLabelCompact = computed(() => {
+    switch (this.swapAction()) {
+      case 'create-wallet':
+        return 'Wallet';
+      case 'login-required':
+        return 'Connexion';
+      case 'enter-amount':
+        return 'Swap';
+      case 'insufficient':
+        return this.fromBalance() <= 0 ? 'Faucet' : 'Insuffisant';
+      case 'swapping':
+        return '…';
+      default: {
+        const amountOut = this.formattedEstimatedTo();
+        return `→ ${amountOut}`;
+      }
     }
   });
 
@@ -312,6 +398,15 @@ export class ExchangePanelComponent {
 
   constructor() {
     this.launchState.loadProjects();
+
+    this.destroyRef.onDestroy(() => {
+      if (this.estimatePulseTimer != null) {
+        clearTimeout(this.estimatePulseTimer);
+      }
+      if (this.pairFlipTimer != null) {
+        clearTimeout(this.pairFlipTimer);
+      }
+    });
 
     effect(() => {
       this.walletSession.address();
@@ -451,6 +546,60 @@ export class ExchangePanelComponent {
     }
   }
 
+  protected tokenLogoUrl(symbol: string): string | null {
+    const normalized = symbol.trim().toUpperCase();
+    if (this.brokenTokenLogos().has(normalized)) {
+      return null;
+    }
+
+    if (isExchangeNativeToken(normalized)) {
+      return null;
+    }
+
+    const fromLaunch = this.launchState
+      .projects()
+      .find((project) => project.symbol.trim().toUpperCase() === normalized);
+
+    const logoUrl = fromLaunch?.logoUrl?.trim();
+    return logoUrl ? logoUrl : null;
+  }
+
+  protected onTokenLogoError(symbol: string): void {
+    const normalized = symbol.trim().toUpperCase();
+    this.brokenTokenLogos.update((current) => {
+      if (current.has(normalized)) {
+        return current;
+      }
+
+      const next = new Set(current);
+      next.add(normalized);
+      return next;
+    });
+  }
+
+  protected toggleQuoteDetails(): void {
+    this.quoteDetailsExpanded.update((expanded) => !expanded);
+  }
+
+  protected flipPair(): void {
+    if (!this.canFlipPair() || this.loadingPanel() || this.swapping()) {
+      return;
+    }
+
+    const from = this.fromToken().trim().toUpperCase();
+    const to = this.toToken().trim().toUpperCase();
+    this.setSwapPair(to, from);
+
+    this.pairFlipping.set(true);
+    if (this.pairFlipTimer != null) {
+      clearTimeout(this.pairFlipTimer);
+    }
+    this.pairFlipTimer = setTimeout(() => {
+      this.pairFlipping.set(false);
+      this.pairFlipTimer = null;
+    }, 180);
+  }
+
   protected selectLaunchChip(symbol: string): void {
     const normalized = symbol.trim().toUpperCase();
     if (!isLaunchpadSwapToken(normalized)) {
@@ -481,6 +630,7 @@ export class ExchangePanelComponent {
     this.markInteraction();
     this.clearMessages();
     this.showSuccessToast.set(false);
+    this.triggerEstimatePulse();
   }
 
   protected onAmountEnter(event: Event): void {
@@ -509,6 +659,7 @@ export class ExchangePanelComponent {
     this.amountForm.patchValue({ amount: this.formatAmount(balance) });
     this.amountValue.set(this.formatAmount(balance));
     this.markInteraction();
+    this.triggerEstimatePulse();
   }
 
   protected onSwapClick(): void {
@@ -593,6 +744,7 @@ export class ExchangePanelComponent {
     this.brandCrypto.publishActiveExchangePair(fromNorm, toNorm);
     this.markInteraction();
     this.clearMessages();
+    this.quoteDetailsExpanded.set(false);
     this.fetchExchangePanel();
   }
 
@@ -787,5 +939,21 @@ export class ExchangePanelComponent {
     const normalized = raw.replace(/[^\d.,-]/g, '').replace(',', '.');
     const value = Number.parseFloat(normalized);
     return Number.isFinite(value) ? value : null;
+  }
+
+  private triggerEstimatePulse(): void {
+    this.estimatePulse.set(false);
+
+    if (this.estimatePulseTimer != null) {
+      clearTimeout(this.estimatePulseTimer);
+    }
+
+    queueMicrotask(() => {
+      this.estimatePulse.set(true);
+      this.estimatePulseTimer = setTimeout(() => {
+        this.estimatePulse.set(false);
+        this.estimatePulseTimer = null;
+      }, 180);
+    });
   }
 }

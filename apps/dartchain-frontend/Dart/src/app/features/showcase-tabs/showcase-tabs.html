@@ -10,12 +10,17 @@
       [attr.tabindex]="isActive(tab.id) ? '0' : '-1'"
       [attr.aria-controls]="'showcase-panel-' + tab.id"
       [attr.id]="'showcase-tab-' + tab.id"
+      [attr.aria-label]="tabAriaLabel(tab)"
       (click)="selectTab(tab.id)"
     >
       <span class="showcase-tab__label">{{ tab.label }}</span>
       @if (tab.id === 'tours' && unreadNewsCount() > 0) {
-        <span class="showcase-tab__badge" [attr.aria-label]="unreadNewsCount() + ' non lues'">
-          {{ unreadNewsCount() > 9 ? '9+' : unreadNewsCount() }}
+        <span
+          class="showcase-tab__unread-toast"
+          [class.showcase-tab__unread-toast--live]="newsToastLive()"
+          aria-hidden="true"
+        >
+          {{ unreadBadgeLabel() }}
         </span>
       }
       @if (tab.id === 'r4v3' && unreadR4v3Count() > 0) {

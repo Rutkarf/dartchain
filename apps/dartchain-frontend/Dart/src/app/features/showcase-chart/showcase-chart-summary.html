@@ -1,52 +1,85 @@
-<div class="dock-summary-bar" role="status" aria-live="polite" [attr.aria-label]="'Résumé ' + title()">
-  <div class="dock-summary-main">
-    <span class="dock-summary-main__rail" aria-hidden="true"></span>
-    <span class="dock-summary-status chart-summary-bar__brand">{{ title() }}</span>
-    <span
-      class="dock-summary-status"
-      [ngClass]="statusClass(phase())"
-      [attr.aria-label]="'État : ' + statusLabel()"
-    >
-      {{ statusLabel() }}
-    </span>
+<div
+  class="chart-summary-bar"
+  role="status"
+  aria-live="polite"
+  [attr.aria-label]="'Résumé ' + symbolLabel() + ' ' + price()"
+>
+  <div class="chart-summary-bar__identity">
+    <span class="chart-summary-bar__symbol">{{ symbolLabel() }}</span>
+    <span class="chart-summary-bar__range">{{ rangeBadge() }}</span>
   </div>
 
-  <div class="dock-summary-progress">
-    <p class="dock-summary-progress__text">
-      @if (loading()) {
-        <span class="dock-summary-progress__text--muted">Chargement…</span>
-      } @else {
-        <span>{{ headline() }}</span>
-        @if (progressLabel()) {
-          <span class="dock-summary-progress__text--muted"> · {{ progressLabel() }}</span>
-        }
-        @if (detailLabel()) {
-          <span class="dock-summary-progress__text--muted"> · {{ detailLabel() }}</span>
-        }
-      }
-    </p>
-  </div>
-
-  <div class="dock-summary-meta">
-    @if (updatedAgeLabel()) {
-      <span class="dock-summary-meta__time">{{ updatedAgeLabel() }}</span>
+  <div class="chart-summary-bar__quote">
+    @if (loading()) {
+      <span class="chart-summary-bar__price chart-summary-bar__price--muted">…</span>
+    } @else if (error()) {
+      <span class="chart-summary-bar__price chart-summary-bar__price--muted">Indispo.</span>
+    } @else {
+      <span class="chart-summary-bar__price">{{ price() }}</span>
+      <span
+        class="chart-summary-bar__delta"
+        [class.is-up]="positive()"
+        [class.is-down]="!positive()"
+      >
+        {{ delta() }}
+      </span>
     }
   </div>
 
-  <div class="dock-summary-actions">
-    <button
-      type="button"
-      class="dock-summary-actions__btn dock-summary-actions__refresh"
-      (click)="onRefresh($event)"
-      [attr.aria-busy]="loading()"
-      aria-label="Actualiser le graphique"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M21 12a9 9 0 0 1-15.5 6.36" />
-        <path d="M3 12a9 9 0 0 1 15.5-6.36" />
-        <path d="M17 4v4h-4" />
-        <path d="M7 20v-4h4" />
+  <div class="chart-summary-bar__spark-wrap" aria-hidden="true">
+    @if (loading()) {
+      <div class="chart-summary-bar__spark-skeleton"></div>
+    } @else {
+      <svg class="chart-summary-bar__spark" viewBox="0 0 100 20" preserveAspectRatio="none">
+        @for (seg of sparklineSegments(); track $index) {
+          <path
+            class="chart-summary-bar__spark-area"
+            [class.is-up]="seg.up"
+            [class.is-down]="!seg.up"
+            [attr.d]="seg.areaD"
+          ></path>
+          <path
+            class="chart-summary-bar__spark-seg"
+            [class.is-up]="seg.up"
+            [class.is-down]="!seg.up"
+            [attr.d]="seg.d"
+          ></path>
+        }
+        @if (sparklineHead(); as head) {
+          <circle
+            class="chart-summary-bar__spark-head"
+            [class.is-up]="head.up"
+            [class.is-down]="!head.up"
+            [attr.cx]="head.x"
+            [attr.cy]="head.y"
+            r="1.35"
+          ></circle>
+        }
       </svg>
-    </button>
+    }
   </div>
+
+  <div class="chart-summary-bar__metrics">
+    @if (volume() !== '—') {
+      <span class="chart-summary-bar__metric">Vol {{ volume() }}</span>
+    }
+    @if (highLowLabel()) {
+      <span class="chart-summary-bar__metric chart-summary-bar__metric--hl">{{ highLowLabel() }}</span>
+    }
+  </div>
+
+  <button
+    type="button"
+    class="chart-summary-bar__refresh"
+    (click)="onRefresh($event)"
+    [attr.aria-busy]="loading()"
+    aria-label="Actualiser le graphique"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+      <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+      <path d="M17 4v4h-4" />
+      <path d="M7 20v-4h4" />
+    </svg>
+  </button>
 </div>
