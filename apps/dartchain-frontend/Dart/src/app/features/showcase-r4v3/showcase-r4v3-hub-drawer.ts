@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  HostBinding,
   HostListener,
   OnDestroy,
   computed,
@@ -43,6 +44,11 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
   private readonly drawerPanel = viewChild<ElementRef<HTMLElement>>('drawerPanel');
   private copyResetTimer: number | null = null;
   private successResetTimer: number | null = null;
+
+  @HostBinding('class.r4v3-hub-drawer-host--open')
+  get drawerHostOpen(): boolean {
+    return this.payload() != null;
+  }
 
   private readonly faq = inject(R4v3FaqStateService);
   private readonly community = inject(R4v3CommunityFaqService);
@@ -99,6 +105,18 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
   readonly titleLength = computed(() => this.askTitle().trim().length);
 
   readonly canSubmitForm = computed(() => this.askTitle().trim().length >= 8);
+
+  readonly communityQuestionLive = computed(() => {
+    const item = this.payload();
+    if (item?.kind !== 'community') {
+      return null;
+    }
+
+    return (
+      this.community.questions().find((question) => question.id === item.question.id) ??
+      item.question
+    );
+  });
 
   readonly positionLabel = computed(() => {
     const index = this.itemIndex();
@@ -246,6 +264,15 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
 
   protected dismiss(): void {
     this.closeDrawer.emit();
+  }
+
+  protected voteCommunityQuestion(direction: 'UP' | 'DOWN'): void {
+    const question = this.communityQuestionLive();
+    if (!question) {
+      return;
+    }
+
+    this.community.voteQuestion(question.id, direction);
   }
 
   protected onWikiSearchInput(value: string): void {

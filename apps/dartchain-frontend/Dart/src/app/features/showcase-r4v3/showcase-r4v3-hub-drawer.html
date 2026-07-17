@@ -128,41 +128,67 @@
           }
           @case ('community') {
             <article class="r4v3-hub-drawer__article">
-              <div class="r4v3-hub-drawer__stats">
-                <div class="r4v3-hub-drawer__stat">
-                  <span class="r4v3-hub-drawer__stat-label">Auteur</span>
-                  <span class="r4v3-hub-drawer__stat-value">{{ content.question.authorName }}</span>
+              @if (communityQuestionLive(); as question) {
+                <div class="r4v3-hub-drawer__stats">
+                  <div class="r4v3-hub-drawer__stat">
+                    <span class="r4v3-hub-drawer__stat-label">Auteur</span>
+                    <span class="r4v3-hub-drawer__stat-value">{{ question.authorName }}</span>
+                  </div>
+                  <div class="r4v3-hub-drawer__stat">
+                    <span class="r4v3-hub-drawer__stat-label">Upvotes</span>
+                    <span class="r4v3-hub-drawer__stat-value">{{ question.upvotes }}</span>
+                  </div>
+                  <div class="r4v3-hub-drawer__stat">
+                    <span class="r4v3-hub-drawer__stat-label">Score</span>
+                    <span class="r4v3-hub-drawer__stat-value">{{ question.score }}</span>
+                  </div>
+                  <div class="r4v3-hub-drawer__stat">
+                    <span class="r4v3-hub-drawer__stat-label">Publié</span>
+                    <span class="r4v3-hub-drawer__stat-value">{{ question.relativeTime }}</span>
+                  </div>
                 </div>
-                <div class="r4v3-hub-drawer__stat">
-                  <span class="r4v3-hub-drawer__stat-label">Score</span>
-                  <span class="r4v3-hub-drawer__stat-value">{{ content.question.score }}</span>
+
+                <div class="r4v3-hub-drawer__votes" aria-label="Votes communautaires">
+                  <button
+                    type="button"
+                    class="r4v3-hub-drawer__vote-btn"
+                    [class.r4v3-hub-drawer__vote-btn--active]="question.userVote === 'UP'"
+                    (click)="voteCommunityQuestion('UP')"
+                  >
+                    ▲ {{ question.upvotes }}
+                  </button>
+                  <button
+                    type="button"
+                    class="r4v3-hub-drawer__vote-btn"
+                    [class.r4v3-hub-drawer__vote-btn--active]="question.userVote === 'DOWN'"
+                    (click)="voteCommunityQuestion('DOWN')"
+                  >
+                    ▼ {{ question.downvotes }}
+                  </button>
                 </div>
-                <div class="r4v3-hub-drawer__stat">
-                  <span class="r4v3-hub-drawer__stat-label">Réponses</span>
-                  <span class="r4v3-hub-drawer__stat-value">{{ content.question.answerCount }}</span>
-                </div>
-                <div class="r4v3-hub-drawer__stat">
-                  <span class="r4v3-hub-drawer__stat-label">Publié</span>
-                  <span class="r4v3-hub-drawer__stat-value">{{ content.question.relativeTime }}</span>
-                </div>
-              </div>
-              <section class="r4v3-hub-drawer__card">
-                <span class="r4v3-hub-drawer__card-label">Question</span>
-                <p class="r4v3-hub-drawer__prose">{{ content.question.body }}</p>
-              </section>
-              @if (content.question.answers.length > 0) {
-                @for (answer of content.question.answers; track answer.id) {
-                  <section class="r4v3-hub-drawer__card">
-                    <span class="r4v3-hub-drawer__card-label">
-                      {{ answer.authorName }}
-                      @if (answer.isStaff) { · Staff }
-                      @if (answer.isValidated) { · Validée }
-                    </span>
-                    <p class="r4v3-hub-drawer__prose">{{ answer.body }}</p>
-                  </section>
+
+                <section class="r4v3-hub-drawer__card r4v3-hub-drawer__card--lead">
+                  <span class="r4v3-hub-drawer__card-label">Question</span>
+                  <p class="r4v3-hub-drawer__prose r4v3-hub-drawer__prose--lead">{{ question.title }}</p>
+                </section>
+                <section class="r4v3-hub-drawer__card">
+                  <span class="r4v3-hub-drawer__card-label">Détails</span>
+                  <p class="r4v3-hub-drawer__prose">{{ question.body }}</p>
+                </section>
+                @if (question.answers.length > 0) {
+                  @for (answer of question.answers; track answer.id) {
+                    <section class="r4v3-hub-drawer__card">
+                      <span class="r4v3-hub-drawer__card-label">
+                        {{ answer.authorName }}
+                        @if (answer.isStaff) { · Staff }
+                        @if (answer.isValidated) { · Validée }
+                      </span>
+                      <p class="r4v3-hub-drawer__prose">{{ answer.body }}</p>
+                    </section>
+                  }
+                } @else {
+                  <p class="r4v3-hub-drawer__empty">Aucune réponse pour le moment.</p>
                 }
-              } @else {
-                <p class="r4v3-hub-drawer__empty">Aucune réponse pour le moment.</p>
               }
             </article>
           }

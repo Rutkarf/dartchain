@@ -17,18 +17,24 @@
     <span class="r4v3-summary-bar__peg">{{ pegDisplayLabel() }}</span>
   </span>
 
-  <div class="r4v3-summary-bar__ticker" aria-live="polite">
+  <div
+    class="r4v3-summary-bar__ticker"
+    role="button"
+    tabindex="0"
+    [attr.aria-label]="tickerAriaLabel()"
+    (click)="onTickerClick($event)"
+    (keydown.enter)="onTickerClick($event)"
+    (keydown.space)="onTickerClick($event)"
+  >
     @if (tickerQuestion(); as question) {
-      <div class="r4v3-summary-bar__ticker-viewport">
-        <div
-          class="r4v3-summary-bar__ticker-track"
-          [class.r4v3-summary-bar__ticker-track--scroll]="tickerNeedsScroll(question.title)"
-        >
-          <span class="r4v3-summary-bar__ticker-text">{{ question.title }}</span>
-          @if (tickerNeedsScroll(question.title)) {
-            <span class="r4v3-summary-bar__ticker-text" aria-hidden="true">{{ question.title }}</span>
-          }
-        </div>
+      <div
+        #tickerViewport
+        class="r4v3-summary-bar__ticker-viewport"
+        [class.r4v3-summary-bar__ticker-viewport--draggable]="tickerOverflow()"
+        [class.r4v3-summary-bar__ticker-viewport--dragging]="tickerDragging()"
+        (pointerdown)="onTickerPointerDown($event)"
+      >
+        <span class="r4v3-summary-bar__ticker-text">{{ question.title }}</span>
       </div>
     } @else if (headerBusy()) {
       <span class="r4v3-summary-bar__ticker-fallback">Chargement FAQ…</span>
@@ -66,14 +72,5 @@
       <path d="M17 4v4h-4" />
       <path d="M7 20v-4h4" />
     </svg>
-  </button>
-
-  <button
-    type="button"
-    class="r4v3-summary-bar__swap"
-    (click)="onSwap($event)"
-    aria-label="Ouvrir le swap R4V3"
-  >
-    ⇄
   </button>
 </div>

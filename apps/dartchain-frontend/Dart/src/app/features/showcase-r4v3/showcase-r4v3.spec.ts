@@ -36,40 +36,33 @@ const mockR4v3Dashboard = {
 function flushAncillaryRequests(http: HttpTestingController): void {
   http.match((r) => r.url.includes('/showcase/launch/projects')).forEach((req) => req.flush([]));
   http.match((r) => r.url.includes('/showcase/faq/questions')).forEach((req) => {
-    if (req.request.url.includes('/latest')) {
-      req.flush({
-        id: 'faq-3',
-        authorId: 'seed-user-3',
-        authorName: 'SwissHODL',
-        title: 'Quelle est la prochaine évolution du protocole R4V3 ?',
-        body: 'Roadmap mainnet',
-        createdAt: '2026-07-17T06:00:00Z',
-        status: 'ACTIVE',
-        score: 2,
-        upvotes: 2,
-        downvotes: 0,
-        answerCount: 0,
-        pendingStaffReview: true,
-      });
+    const payload = {
+      id: 'faq-3',
+      authorId: 'seed-user-3',
+      authorName: 'SwissHODL',
+      title: 'Quelle est la prochaine évolution du protocole R4V3 ?',
+      body: 'Roadmap mainnet',
+      createdAt: '2026-07-17T06:00:00Z',
+      status: 'ACTIVE',
+      score: 2,
+      upvotes: 2,
+      downvotes: 0,
+      answerCount: 0,
+      pendingStaffReview: true,
+    };
+
+    if (req.request.url.includes('/popular')) {
+      req.flush({ questions: [payload], totalCount: 1 });
       return;
     }
+
+    if (req.request.url.includes('/latest')) {
+      req.flush(payload);
+      return;
+    }
+
     req.flush({
-      questions: [
-        {
-          id: 'faq-3',
-          authorId: 'seed-user-3',
-          authorName: 'SwissHODL',
-          title: 'Quelle est la prochaine évolution du protocole R4V3 ?',
-          body: 'Roadmap mainnet',
-          createdAt: '2026-07-17T06:00:00Z',
-          status: 'ACTIVE',
-          score: 2,
-          upvotes: 2,
-          downvotes: 0,
-          answerCount: 0,
-          pendingStaffReview: true,
-        },
-      ],
+      questions: [payload],
       totalCount: 1,
     });
   });
@@ -103,6 +96,36 @@ describe('ShowcaseR4v3Component', () => {
   afterEach(() => {
     http.match(() => true).forEach((req) => {
       try {
+        if (req.request.url.includes('/showcase/faq/questions')) {
+          const payload = {
+            id: 'faq-3',
+            authorId: 'seed-user-3',
+            authorName: 'SwissHODL',
+            title: 'Quelle est la prochaine évolution du protocole R4V3 ?',
+            body: 'Roadmap mainnet',
+            createdAt: '2026-07-17T06:00:00Z',
+            status: 'ACTIVE',
+            score: 2,
+            upvotes: 2,
+            downvotes: 0,
+            answerCount: 0,
+            pendingStaffReview: true,
+          };
+
+          if (req.request.url.includes('/popular')) {
+            req.flush({ questions: [payload], totalCount: 1 });
+            return;
+          }
+
+          if (req.request.url.includes('/latest')) {
+            req.flush(payload);
+            return;
+          }
+
+          req.flush({ questions: [payload], totalCount: 1 });
+          return;
+        }
+
         req.flush(req.request.method === 'GET' ? mockR4v3Dashboard : {});
       } catch {
         // already handled
@@ -120,11 +143,12 @@ describe('ShowcaseR4v3Component', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelectorAll('.showcase-r4v3__pillar').length).toBe(6);
-    expect(fixture.nativeElement.querySelector('.showcase-r4v3__peg')?.textContent).toContain(
+    expect(fixture.nativeElement.querySelectorAll('.showcase-r4v3__pillar-column').length).toBe(3);
+    expect(fixture.nativeElement.querySelector('.showcase-r4v3__peg--hero')?.textContent).toContain(
       '1 R4V3 = 1 CHF / 1 GBP'
     );
-    expect(fixture.nativeElement.querySelector('.showcase-r4v3__status-led--ok')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('.showcase-r4v3__status-cluster')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-r4v3__live-quote')).toBeFalsy();
+    expect(fixture.nativeElement.querySelector('.showcase-r4v3__status-led--banner')).toBeTruthy();
   });
 
   it('should open hub drawer from pillar click', async () => {

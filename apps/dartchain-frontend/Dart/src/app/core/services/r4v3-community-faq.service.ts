@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Subject, debounceTime, distinctUntilChanged, finalize, take } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, finalize, map, of, switchMap, take } from 'rxjs';
 
 import { CommunityFaqApiQuestion } from '../models/showcase.model';
 import { CommunityFaqQuestion } from '../models/r4v3-hub.model';
@@ -83,19 +83,37 @@ export class R4v3CommunityFaqService {
       .subscribe({
         next: (response) => {
           this.questions.set(response.questions.map((item) => this.mapQuestion(item)));
-          this.refreshLatestTicker();
+          this.refreshTickerQuestion();
         },
         error: () => this.error.set(true),
       });
   }
 
-  refreshLatestTicker(): void {
+  refreshTickerQuestion(): void {
     this.api
-      .getLatestCommunityFaqQuestion()
-      .pipe(take(1))
+      .getPopularCommunityFaqQuestions(5)
+      .pipe(
+        take(1),
+        switchMap((popular) => {
+          const questions = popular?.questions ?? [];
+          const topUpvoted = questions.find((item) => item.upvotes > 0);
+          if (topUpvoted) {
+            return of(topUpvoted);
+          }
+
+          return this.api.getLatestCommunityFaqQuestion().pipe(
+            map((latest) => latest ?? questions[0] ?? null)
+          );
+        })
+      )
       .subscribe((item) => {
         this.latestTicker.set(item ? this.mapQuestion(item) : this.questions()[0] ?? null);
       });
+  }
+
+  /** @deprecated Utiliser refreshTickerQuestion */
+  refreshLatestTicker(): void {
+    this.refreshTickerQuestion();
   }
 
   markRead(id: string): void {

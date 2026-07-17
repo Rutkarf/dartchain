@@ -19,9 +19,9 @@
   --panel-radius: 10px;
   /* Gouttière horizontale entre panneaux juxtaposés (swap | rates, showcase | tabs, dock | panel) */
   --panel-column-gap: 6px;
-  /* Bande marché : exchange 35 % | rate 65 % */
-  --hub-market-swap-col: 7fr;
-  --hub-market-rate-col: 13fr;
+  /* Bande marché : pile verticale Exchange → Graph (toujours une colonne) */
+  --hub-market-swap-col: 1fr;
+  --hub-market-rate-col: 1fr;
 
   --floor-peek-height: clamp(28px, 5vh, 48px);
   --app-bottom-footer-space: 0;
@@ -48,7 +48,12 @@
   --market-exchange-strip-h: clamp(24px, 5.5vw, 30px);
   --market-exchange-height-estimate: var(--market-exchange-strip-h);
   --hub-market-internal-gap: 2px;
-  --market-height: clamp(152px, 21vh, 180px);
+  --market-chart-height-expanded: clamp(140px, 22vh, 200px);
+  --market-chart-height: var(--market-chart-height-expanded);
+  --market-band-height: calc(
+    var(--market-exchange-height-estimate) + var(--market-chart-height) + var(--hub-market-internal-gap)
+  );
+  --market-height: var(--market-band-height);
   /* Tokens swap (miroir exchange-panel) pour l’écart sous MONTANT */
   --swap-row-h: 14px;
   --swap-mid-h: 11px;
@@ -138,7 +143,7 @@
   --dock-tab-scale: 1.38;
   /* Moitié de l’espace mort hub (~60px @ 300×600) redistribuée au showcase (+ dock via couplage) */
   --showcase-band-slack: 0px;
-  --showcase-band-height: calc(clamp(132px, 22vh, 200px) + var(--showcase-band-slack));
+  --showcase-band-height: calc(clamp(132px, 22vh, 200px) * 1.1 + var(--showcase-band-slack));
   --faucet-band-height: auto;
   --faucet-row-h: clamp(18px, 4.5vw, 22px);
   --hub-faucet-pad-block: 1px;
@@ -515,20 +520,23 @@ app-three-floor {
   max-width: 100%;
 }
 
-/* —— Hub : swap | rate (ligne 1) —— */
+/* —— Hub : Exchange → Graph → Showcase (toujours vertical) —— */
 .app-hub {
   flex: 0 0 auto;
   grid-column: 1;
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: minmax(0, var(--hub-market-swap-col)) minmax(0, var(--hub-market-rate-col));
-  grid-template-rows: var(--market-height) var(--hub-showcase-block-height);
-  column-gap: var(--panel-column-gap);
-  row-gap: var(--hub-market-showcase-gap);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows:
+    auto
+    var(--market-chart-height)
+    var(--hub-showcase-block-height);
+  column-gap: 0;
+  row-gap: var(--hub-market-internal-gap);
   margin: 0;
   margin-block-start: 0;
-  margin-block-end: 0;
+  margin-block-end: var(--hub-market-showcase-gap);
   width: 100%;
   min-width: 0;
   min-height: 0;
@@ -536,23 +544,52 @@ app-three-floor {
   box-sizing: border-box;
   align-self: stretch;
   overflow: visible;
-  transition: grid-template-rows .28s ease;
+  transition: grid-template-rows 0.28s ease;
 }
 
 .app-hub.is-showcase-collapsed {
-  grid-template-rows: var(--market-height) var(--hub-showcase-block-height-collapsed);
+  grid-template-rows:
+    auto
+    var(--market-chart-height)
+    var(--hub-showcase-block-height-collapsed);
 }
 
 .app-hub.is-chart-collapsed {
   --market-chart-height: var(--market-chart-collapsed-h);
+  --market-band-height: calc(
+    var(--market-exchange-height-estimate) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
+  );
+  --market-height: var(--market-band-height);
 }
 
 .app-hub.is-exchange-collapsed {
   --market-exchange-height-estimate: var(--market-exchange-collapsed-h);
+  --market-band-height: calc(
+    var(--market-exchange-collapsed-h) + var(--market-chart-height) + var(--hub-market-internal-gap)
+  );
+  --market-height: var(--market-band-height);
+}
+
+.app-hub.is-exchange-collapsed.is-chart-collapsed {
+  --market-band-height: calc(
+    var(--market-exchange-collapsed-h) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
+  );
+  --market-height: var(--market-band-height);
 }
 
 .app-hub.is-showcase-collapsed.is-chart-collapsed:not(.is-showcase-disabled) {
-  grid-template-rows: var(--market-height) var(--hub-showcase-block-height-collapsed);
+  grid-template-rows:
+    auto
+    var(--market-chart-height)
+    var(--hub-showcase-block-height-collapsed);
+}
+
+.app-hub:has(.app-market-stack--rate.is-chart-collapsed) {
+  --market-chart-height: var(--market-chart-collapsed-h);
+  --market-band-height: calc(
+    var(--market-exchange-height-estimate) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
+  );
+  --market-height: var(--market-band-height);
 }
 
 .app-market-stack--rate.is-chart-collapsed {
@@ -607,8 +644,9 @@ app-three-floor {
 }
 
 .app-hub.is-showcase-disabled {
-  grid-template-rows: var(--market-height);
-  row-gap: 0;
+  grid-template-rows: auto var(--market-chart-height);
+  row-gap: var(--hub-market-internal-gap);
+  margin-block-end: 0;
 }
 
 .app-market-card {
@@ -710,22 +748,27 @@ app-three-floor {
 }
 
 .app-market-stack--rate {
-  grid-column: 2;
-  grid-row: 1;
+  grid-column: 1;
+  grid-row: 2;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-self: stretch;
   width: 100%;
   min-width: 0;
-  height: 100%;
-  min-height: var(--market-height);
-  max-height: none;
+  min-height: var(--market-chart-height);
+  height: var(--market-chart-height);
+  max-height: var(--market-chart-height);
   margin-bottom: 0;
   gap: 0;
-  overflow: visible;
-  pointer-events: none;
+  overflow: hidden;
+  pointer-events: auto;
   position: relative;
+  box-sizing: border-box;
+  transition:
+    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .chart-stack-header {
@@ -796,8 +839,8 @@ app-three-floor {
 
 /* —— Bloc showcase : onglets + panneau —— */
 .app-hub-showcase-block {
-  grid-column: 1 / -1;
-  grid-row: 2;
+  grid-column: 1;
+  grid-row: 3;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -2289,115 +2332,21 @@ app-block-detail-drawer {
     margin-bottom: var(--navbar-hub-gap);
   }
 
-  .app-hub.is-showcase-collapsed {
-    grid-template-rows:
-      auto
-      var(--market-chart-height)
-      var(--hub-showcase-block-height-collapsed);
-    margin-block-end: 0;
-  }
-
   .app-hub {
-    width: 100%;
-    min-height: 0;
-    height: auto;
-    margin-inline: 0;
-    margin-block-end: var(--hub-market-showcase-gap);
-    margin-block-start: 0;
     padding: 0 4px;
-    padding-block: 0;
-    box-sizing: border-box;
-    align-self: stretch;
-    column-gap: 0;
-    row-gap: var(--hub-market-internal-gap);
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows:
-      auto
-      var(--market-chart-height)
-      var(--hub-showcase-block-height);
-    overflow: visible;
+    margin-block-end: var(--hub-market-showcase-gap);
   }
 
   .app-hub-swap-stack {
-    grid-column: 1;
-    grid-row: 1;
-    align-self: start;
-    width: 100%;
-    min-height: 0;
-    height: auto;
-    max-height: none;
     overflow: hidden;
-  }
-
-  .app-hub-swap-stack .app-market-card--swap {
-    min-height: 0;
-    height: auto;
-    max-height: none;
-  }
-
-  .app-market-stack--rate {
-    grid-column: 1;
-    grid-row: 2;
-    min-height: var(--market-chart-height);
-    height: var(--market-chart-height);
-    max-height: var(--market-chart-height);
-    margin-bottom: 0;
-    overflow: visible;
-    pointer-events: none;
-    transition:
-      min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-      height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-      max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .app-market-stack--rate .app-market-card--rate {
     flex: 1 1 0;
     min-height: 0;
     overflow: hidden;
-  }
-
-  .app-hub.is-chart-collapsed {
-    --market-chart-height: var(--market-chart-collapsed-h);
-    --market-band-height: calc(
-      var(--market-exchange-height-estimate) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
-    );
-    --market-height: var(--market-band-height);
-  }
-
-  .app-hub.is-exchange-collapsed {
-    --market-band-height: calc(
-      var(--market-exchange-collapsed-h) + var(--market-chart-height) + var(--hub-market-internal-gap)
-    );
-    --market-height: var(--market-band-height);
-  }
-
-  .app-hub.is-exchange-collapsed.is-chart-collapsed {
-    --market-band-height: calc(
-      var(--market-exchange-collapsed-h) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
-    );
-    --market-height: var(--market-band-height);
-  }
-
-  .app-hub.is-chart-collapsed:not(.is-showcase-disabled) {
-    grid-template-rows:
-      auto
-      var(--market-chart-height)
-      var(--hub-showcase-block-height);
-  }
-
-  .app-hub.is-showcase-collapsed.is-chart-collapsed:not(.is-showcase-disabled) {
-    grid-template-rows:
-      auto
-      var(--market-chart-height)
-      var(--hub-showcase-block-height-collapsed);
-  }
-
-  .app-hub:has(.app-market-stack--rate.is-chart-collapsed) {
-    --market-chart-height: var(--market-chart-collapsed-h);
-    --market-band-height: calc(
-      var(--market-exchange-height-estimate) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
-    );
-    --market-height: var(--market-band-height);
+    border: none;
+    border-radius: 0;
   }
 
   .app-market-stack--rate.is-chart-collapsed .app-market-card--rate {
@@ -2408,28 +2357,9 @@ app-block-detail-drawer {
   }
 
   .app-market-stack--rate.is-chart-collapsed {
-    --market-chart-height: var(--market-chart-collapsed-h);
     min-height: var(--market-chart-collapsed-h);
     height: var(--market-chart-collapsed-h);
     max-height: var(--market-chart-collapsed-h);
-  }
-
-  .app-hub:has(.app-market-stack--rate.is-chart-collapsed) {
-    --market-chart-height: var(--market-chart-collapsed-h);
-    --market-band-height: calc(
-      var(--market-exchange-height-estimate) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
-    );
-    --market-height: var(--market-band-height);
-  }
-
-  .app-market-stack--rate .app-market-card--rate {
-    border: none;
-    border-radius: 0;
-  }
-
-  .app-hub-showcase-block {
-    grid-column: 1;
-    grid-row: 3;
   }
 
   .app-bottom-stack {

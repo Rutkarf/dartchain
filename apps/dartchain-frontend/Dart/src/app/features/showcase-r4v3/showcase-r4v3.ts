@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval } from 'rxjs';
 
-import { R4V3_HUB_PILLARS } from '../../core/constants/r4v3-hub-pillars.constants';
+import { R4V3_HUB_PILLAR_COLUMNS, R4V3_HUB_PILLARS } from '../../core/constants/r4v3-hub-pillars.constants';
 import {
   r4v3FaqCategoryIcon,
   r4v3FaqCategoryLabel,
@@ -81,6 +81,7 @@ export class ShowcaseR4v3Component {
   private lastBrandTapAt = 0;
 
   readonly pillars = R4V3_HUB_PILLARS;
+  readonly pillarColumns = R4V3_HUB_PILLAR_COLUMNS;
   readonly drawerPayload = signal<R4v3HubDrawerPayload | null>(null);
   readonly drawerOpenedFromWiki = signal(false);
   readonly keyboardFocusIndex = signal(-1);
@@ -95,9 +96,6 @@ export class ShowcaseR4v3Component {
   readonly refreshPulse = this.state.refreshPulse;
   readonly systemStatus = this.state.systemStatus;
   readonly pegDisplayLabel = this.state.pegDisplayLabel;
-  readonly liveValueLabel = this.state.liveValueLabel;
-  readonly liveChangeLabel = this.state.liveChangeLabel;
-  readonly liveChangePositive = this.state.liveChangePositive;
 
   readonly filteredEntries = this.faq.filteredEntries;
   readonly categories = this.faq.categories;
@@ -154,7 +152,7 @@ export class ShowcaseR4v3Component {
 
   readonly liveAriaLabel = computed(() => {
     const status = this.systemStatusLabel(this.systemStatus());
-    return `${this.pegDisplayLabel()} ${this.liveValueLabel()} ${this.liveChangeLabel()} · ${status}`;
+    return `${this.pegDisplayLabel()} · ${status}`;
   });
 
   readonly headerRefreshing = computed(() => this.loading() || this.refreshing() || this.community.refreshing());
@@ -171,6 +169,12 @@ export class ShowcaseR4v3Component {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         window.setTimeout(() => this.focusSwapInline(), 120);
+      });
+
+    this.hubUi.openCommunityQuestionRequested$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((questionId) => {
+        window.setTimeout(() => this.openCommunityQuestionById(questionId), 80);
       });
 
     interval(60_000)
@@ -293,7 +297,7 @@ export class ShowcaseR4v3Component {
   }
 
   protected onCommunityQuestionSubmitted(): void {
-    this.community.refreshLatestTicker();
+    this.community.refreshTickerQuestion();
   }
 
   protected openPillar(pillar: R4v3HubPillar): void {
@@ -307,6 +311,16 @@ export class ShowcaseR4v3Component {
     this.keyboardFocusIndex.set(
       this.filteredEntries().findIndex((item) => item.id === entry.id)
     );
+  }
+
+  protected openCommunityQuestionById(questionId: string): void {
+    const question =
+      this.communityQuestions().find((item) => item.id === questionId) ??
+      this.community.latestTicker();
+
+    if (question && question.id === questionId) {
+      this.openCommunityQuestion(question);
+    }
   }
 
   protected openCommunityQuestion(question: CommunityFaqQuestion): void {

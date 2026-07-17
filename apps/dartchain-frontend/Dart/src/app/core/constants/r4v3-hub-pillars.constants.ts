@@ -141,3 +141,10 @@ export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
     ],
   },
 ] as const;
+
+/** 3 colonnes × 2 informations (A–B | C–D | E–F). */
+export const R4V3_HUB_PILLAR_COLUMNS: readonly (readonly R4v3HubPillar[])[] = [
+  [R4V3_HUB_PILLARS[0], R4V3_HUB_PILLARS[1]],
+  [R4V3_HUB_PILLARS[2], R4V3_HUB_PILLARS[3]],
+  [R4V3_HUB_PILLARS[4], R4V3_HUB_PILLARS[5]],
+];

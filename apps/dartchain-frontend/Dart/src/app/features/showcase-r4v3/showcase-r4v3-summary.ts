@@ -1,11 +1,15 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   HostBinding,
   OnInit,
   computed,
+  effect,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -25,11 +29,17 @@ import { R4v3SystemStatus } from '../../core/models/r4v3-hub.model';
   styleUrls: ['./showcase-r4v3-summary.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ShowcaseR4v3SummaryComponent implements OnInit {
+export class ShowcaseR4v3SummaryComponent implements OnInit, AfterViewInit {
   protected readonly state = inject(ShowcaseR4v3StateService);
   protected readonly community = inject(R4v3CommunityFaqService);
   private readonly walletState = inject(DockWalletStateService);
   private readonly hubUi = inject(ShowcaseHubUiService);
+
+  private readonly tickerViewport = viewChild<ElementRef<HTMLElement>>('tickerViewport');
+  private dragStartX = 0;
+  private dragStartScroll = 0;
+  private dragMoved = false;
+  private dragPointerId: number | null = null;
 
   @HostBinding(`class.${COLLAPSED_SUMMARY_BAR_CLASS}`)
   readonly collapsedSummaryBar = true;
@@ -45,6 +55,8 @@ export class ShowcaseR4v3SummaryComponent implements OnInit {
 
   readonly whitepaperLoading = signal(false);
   readonly whitepaperError = signal('');
+  readonly tickerOverflow = signal(false);
+  readonly tickerDragging = signal(false);
 
   readonly panel = this.state.panel;
   readonly refreshing = this.state.refreshing;
@@ -52,6 +64,14 @@ export class ShowcaseR4v3SummaryComponent implements OnInit {
   readonly systemStatus = this.state.systemStatus;
   readonly pegDisplayLabel = this.state.pegDisplayLabel;
   readonly tickerQuestion = this.community.latestTicker;
+
+  readonly tickerAriaLabel = computed(() => {
+    const question = this.tickerQuestion();
+    if (!question) {
+      return 'Aucune question communautaire';
+    }
+    return `Question communautaire : ${question.title}. Cliquer pour ouvrir le détail.`;
+  });
 
   readonly whitepaperAriaLabel = computed(() => {
     const error = this.whitepaperError();
@@ -61,6 +81,13 @@ export class ShowcaseR4v3SummaryComponent implements OnInit {
     return error ? `White paper — ${error}` : 'Ouvrir le white paper R4V3';
   });
 
+  constructor() {
+    effect(() => {
+      this.tickerQuestion();
+      queueMicrotask(() => this.syncTickerScroll());
+    });
+  }
+
   ngOnInit(): void {
     if (this.state.items().length === 0 && !this.state.loading()) {
       this.state.load();
@@ -68,20 +95,20 @@ export class ShowcaseR4v3SummaryComponent implements OnInit {
     if (this.community.questions().length === 0 && !this.community.loading()) {
       this.community.load(false);
     } else {
-      this.community.refreshLatestTicker();
+      this.community.refreshTickerQuestion();
     }
     void this.walletState.load();
+  }
+
+  ngAfterViewInit(): void {
+    this.syncTickerScroll();
   }
 
   barAriaLabel(): string {
     const ticker = this.tickerQuestion();
     const status = this.systemStatusLabel(this.systemStatus());
-    const questionPart = ticker ? `Dernière question : ${ticker.title}. ` : '';
+    const questionPart = ticker ? `Question : ${ticker.title}. ` : '';
     return `${this.pegDisplayLabel()}. ${questionPart}${status}. Cliquer pour développer.`;
-  }
-
-  tickerNeedsScroll(title: string): boolean {
-    return title.trim().length > 48;
   }
 
   systemStatusLabel(status: R4v3SystemStatus): string {
@@ -106,7 +133,9 @@ export class ShowcaseR4v3SummaryComponent implements OnInit {
   onBarClick(event: Event): void {
     const target = event.target as HTMLElement | null;
     if (
-      target?.closest('.r4v3-summary-bar__refresh, .r4v3-summary-bar__swap, .r4v3-summary-bar__whitepaper')
+      target?.closest(
+        '.r4v3-summary-bar__refresh, .r4v3-summary-bar__whitepaper, .r4v3-summary-bar__ticker'
+      )
     ) {
       return;
     }
@@ -116,6 +145,68 @@ export class ShowcaseR4v3SummaryComponent implements OnInit {
   onBarKeydown(event: Event): void {
     event.preventDefault();
     this.hubUi.requestExpand();
+  }
+
+  onTickerClick(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (this.dragMoved) {
+      this.dragMoved = false;
+      return;
+    }
+
+    const question = this.tickerQuestion();
+    if (!question) {
+      return;
+    }
+
+    this.hubUi.requestOpenCommunityQuestion(question.id);
+  }
+
+  onTickerPointerDown(event: PointerEvent): void {
+    const viewport = this.tickerViewport()?.nativeElement;
+    if (!viewport || !this.tickerOverflow()) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.dragMoved = false;
+    this.dragPointerId = event.pointerId;
+    this.dragStartX = event.clientX;
+    this.dragStartScroll = viewport.scrollLeft;
+    this.tickerDragging.set(true);
+    viewport.setPointerCapture(event.pointerId);
+
+    const onMove = (moveEvent: PointerEvent): void => {
+      if (moveEvent.pointerId !== this.dragPointerId) {
+        return;
+      }
+
+      const delta = moveEvent.clientX - this.dragStartX;
+      if (Math.abs(delta) > 4) {
+        this.dragMoved = true;
+      }
+
+      viewport.scrollLeft = this.dragStartScroll - delta;
+    };
+
+    const onUp = (upEvent: PointerEvent): void => {
+      if (upEvent.pointerId !== this.dragPointerId) {
+        return;
+      }
+
+      viewport.releasePointerCapture(upEvent.pointerId);
+      this.tickerDragging.set(false);
+      this.dragPointerId = null;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   }
 
   async onWhitepaper(event: Event): Promise<void> {
@@ -145,8 +236,22 @@ export class ShowcaseR4v3SummaryComponent implements OnInit {
     void this.walletState.load();
   }
 
-  onSwap(event: Event): void {
-    event.stopPropagation();
-    this.hubUi.requestExpandR4v3Swap();
+  private syncTickerScroll(): void {
+    const viewport = this.tickerViewport()?.nativeElement;
+    if (!viewport) {
+      this.tickerOverflow.set(false);
+      return;
+    }
+
+    const overflow = viewport.scrollWidth > viewport.clientWidth + 1;
+    this.tickerOverflow.set(overflow);
+
+    if (!overflow) {
+      viewport.scrollLeft = 0;
+      return;
+    }
+
+    const centered = Math.max(0, (viewport.scrollWidth - viewport.clientWidth) / 2);
+    viewport.scrollLeft = centered;
   }
 }

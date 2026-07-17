@@ -1,33 +1,16 @@
 <div class="showcase-view showcase-view--r4v3" role="region" aria-label="Hub d'information R4V3">
   @if (isExpanded) {
-    <header class="showcase-r4v3__head">
-      <div class="showcase-meta showcase-r4v3__meta-bar">
-        <button
-          type="button"
-          class="showcase-meta__live showcase-meta__live-btn showcase-r4v3__live-btn"
-          (click)="onBrandTap($event)"
-          [attr.aria-label]="liveAriaLabel()"
-        >
-          <span class="showcase-r4v3__status-cluster">
-            <span
-              class="showcase-r4v3__status-led"
-              [class]="systemStatusClass(systemStatus())"
-              aria-hidden="true"
-            ></span>
-            <span class="showcase-r4v3__peg">{{ pegDisplayLabel() }}</span>
-          </span>
-          <span class="showcase-r4v3__live-quote" [class.showcase-r4v3__live-quote--loading]="headerRefreshing()">
-            <span class="showcase-r4v3__live-value">{{ liveValueLabel() }}</span>
-            <span
-              class="showcase-r4v3__live-change"
-              [class.showcase-r4v3__live-change--up]="liveChangePositive()"
-              [class.showcase-r4v3__live-change--down]="!liveChangePositive()"
-            >
-              {{ liveChangeLabel() }}
-            </span>
-          </span>
-        </button>
+    <div class="showcase-r4v3__peg-banner" aria-label="Parité R4V3">
+      <span
+        class="showcase-r4v3__status-led showcase-r4v3__status-led--banner"
+        [class]="systemStatusClass(systemStatus())"
+        aria-hidden="true"
+      ></span>
+      <span class="showcase-r4v3__peg showcase-r4v3__peg--hero">{{ pegDisplayLabel() }}</span>
+    </div>
 
+    <header class="showcase-r4v3__head">
+      <div class="showcase-meta showcase-r4v3__meta-bar showcase-r4v3__meta-bar--tools">
         <button
           type="button"
           class="showcase-r4v3__doc-icon"
@@ -70,27 +53,29 @@
     <div #contentPanel class="showcase-r4v3__content">
       <div class="showcase-r4v3__dashboard">
         <section class="showcase-r4v3__hero" aria-label="Piliers R4V3">
-          <ul class="showcase-r4v3__pillars">
-            @for (pillar of pillars; track pillar.id) {
-              <li>
-                <button
-                  type="button"
-                  class="showcase-r4v3__pillar"
-                  [class]="pillarAccentClass(pillar)"
-                  (click)="openPillar(pillar)"
-                  [attr.aria-label]="pillar.label + ' — ' + pillar.detail"
-                >
-                  <span class="showcase-r4v3__pillar-glow" aria-hidden="true"></span>
-                  <span class="showcase-r4v3__pillar-icon" aria-hidden="true">{{ pillar.icon }}</span>
-                  <span class="showcase-r4v3__pillar-copy">
-                    <strong class="showcase-r4v3__pillar-label">{{ pillar.label }}</strong>
-                    <span class="showcase-r4v3__pillar-detail">{{ pillar.detail }}</span>
-                  </span>
-                  <span class="showcase-r4v3__pillar-chevron" aria-hidden="true">›</span>
-                </button>
-              </li>
+          <div class="showcase-r4v3__pillar-grid">
+            @for (column of pillarColumns; track column[0].id; let colIndex = $index) {
+              <div class="showcase-r4v3__pillar-column" [attr.aria-label]="'Colonne ' + (colIndex + 1)">
+                @for (pillar of column; track pillar.id) {
+                  <button
+                    type="button"
+                    class="showcase-r4v3__pillar"
+                    [class]="pillarAccentClass(pillar)"
+                    (click)="openPillar(pillar)"
+                    [attr.aria-label]="pillar.label + ' — ' + pillar.detail"
+                  >
+                    <span class="showcase-r4v3__pillar-glow" aria-hidden="true"></span>
+                    <span class="showcase-r4v3__pillar-icon" aria-hidden="true">{{ pillar.icon }}</span>
+                    <span class="showcase-r4v3__pillar-copy">
+                      <strong class="showcase-r4v3__pillar-label">{{ pillar.label }}</strong>
+                      <span class="showcase-r4v3__pillar-detail">{{ pillar.detail }}</span>
+                    </span>
+                    <span class="showcase-r4v3__pillar-chevron" aria-hidden="true">›</span>
+                  </button>
+                }
+              </div>
             }
-          </ul>
+          </div>
         </section>
 
         <nav class="showcase-r4v3__section-nav" aria-label="Wiki et FAQ communautaire">
