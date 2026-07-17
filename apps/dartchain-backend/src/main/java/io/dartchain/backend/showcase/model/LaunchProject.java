@@ -15,6 +15,9 @@ public class LaunchProject {
     private String logoUrl;
     private String description;
     private String chain;
+    private String whitepaperUrl;
+    private String website;
+    private String launchDate;
 
     public LaunchProject() {
     }
@@ -29,7 +32,10 @@ public class LaunchProject {
             Instant createdAt,
             String logoUrl,
             String description,
-            String chain
+            String chain,
+            String whitepaperUrl,
+            String website,
+            String launchDate
     ) {
         this.id = id;
         this.name = name;
@@ -41,6 +47,9 @@ public class LaunchProject {
         this.logoUrl = logoUrl;
         this.description = description;
         this.chain = chain;
+        this.whitepaperUrl = whitepaperUrl;
+        this.website = website;
+        this.launchDate = launchDate;
     }
 
     public String getId() {
@@ -121,5 +130,29 @@ public class LaunchProject {
 
     public void setChain(String chain) {
         this.chain = chain;
+    }
+
+    public String getWhitepaperUrl() {
+        return whitepaperUrl;
+    }
+
+    public void setWhitepaperUrl(String whitepaperUrl) {
+        this.whitepaperUrl = whitepaperUrl;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getLaunchDate() {
+        return launchDate;
+    }
+
+    public void setLaunchDate(String launchDate) {
+        this.launchDate = launchDate;
     }
 }

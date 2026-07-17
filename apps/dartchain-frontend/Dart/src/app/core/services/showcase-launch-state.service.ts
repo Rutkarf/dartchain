@@ -144,6 +144,85 @@ export class ShowcaseLaunchStateService {
     return `il y a ${Math.floor(seconds / 60)} min`;
   });
 
+  readonly liveProjects = computed(() =>
+    this.projects().filter((project) => project.status === 'LIVE')
+  );
+
+  readonly latestProject = computed(() => this.projects()[0] ?? null);
+
+  readonly collapsedStatusKey = computed((): LaunchStatus | 'empty' => {
+    const latest = this.latestProject();
+    return latest?.status ?? 'empty';
+  });
+
+  readonly collapsedStatusLabel = computed(() => {
+    switch (this.collapsedStatusKey()) {
+      case 'LIVE':
+        return 'Live';
+      case 'SOON':
+        return 'Soon';
+      case 'ENDED':
+        return 'Ended';
+      default:
+        return this.loading() ? 'Sync…' : 'Launch';
+    }
+  });
+
+  readonly collapsedStatusCount = computed(() => {
+    const counts = this.counts();
+    switch (this.collapsedStatusKey()) {
+      case 'LIVE':
+        return counts.live;
+      case 'SOON':
+        return counts.soon;
+      case 'ENDED':
+        return counts.ended;
+      default:
+        return counts.total;
+    }
+  });
+
+  readonly collapsedStatusHeadline = computed(() => {
+    const count = this.collapsedStatusCount();
+    const label = this.collapsedStatusLabel().toUpperCase();
+    if (this.loading()) {
+      return 'SYNC…';
+    }
+    if (this.error()) {
+      return 'ERREUR';
+    }
+    return count > 0 ? `${count} ${label}` : label;
+  });
+
+  readonly collapsedTickerProjects = computed(() => {
+    if (this.collapsedStatusKey() === 'LIVE') {
+      return this.liveProjects();
+    }
+
+    const latest = this.latestProject();
+    return latest ? [latest] : [];
+  });
+
+  readonly collapsedPhaseClass = computed(() => {
+    switch (this.collapsedStatusKey()) {
+      case 'LIVE':
+        return 'running';
+      case 'SOON':
+        return 'waiting';
+      case 'ENDED':
+        return 'done';
+      default:
+        return this.phase();
+    }
+  });
+
+  marketCapLabel(project: LaunchProject): string {
+    if (project.target && project.target !== '—') {
+      return `${project.raised} / ${project.target}`;
+    }
+    return project.raised;
+  }
+
   loadProjects(): void {
     this.loading.set(true);
     this.error.set(false);

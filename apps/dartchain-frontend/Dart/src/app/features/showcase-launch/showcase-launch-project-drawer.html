@@ -1,0 +1,119 @@
+@if (project(); as item) {
+  <div class="launch-project-backdrop" (click)="dismiss()" aria-hidden="true">
+    <aside
+      #drawerPanel
+      class="launch-project-drawer ds-surface ds-surface--card ds-surface--drawer"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      [appFocusTrap]="true"
+      [attr.aria-labelledby]="'launchDrawerTitle-' + item.id"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="launch-project-drawer__head">
+        <div class="launch-project-drawer__identity">
+          @if (item.logoUrl) {
+            <img
+              class="launch-project-drawer__logo"
+              [src]="item.logoUrl"
+              [alt]="item.name"
+              width="28"
+              height="28"
+            />
+          } @else {
+            <span class="launch-project-drawer__logo launch-project-drawer__logo--placeholder" aria-hidden="true">
+              {{ initials(item) }}
+            </span>
+          }
+          <div class="launch-project-drawer__identity-copy">
+            <p class="launch-project-drawer__eyebrow">
+              <span
+                class="launch-project-drawer__status"
+                [class.launch-project-drawer__status--live]="item.status === 'LIVE'"
+                [class.launch-project-drawer__status--soon]="item.status === 'SOON'"
+                [class.launch-project-drawer__status--ended]="item.status === 'ENDED'"
+              >
+                {{ statusLabel(item.status) }}
+              </span>
+              @if (item.chain) {
+                <span class="launch-project-drawer__chain">{{ item.chain }}</span>
+              }
+            </p>
+            <h3 class="launch-project-drawer__title" [id]="'launchDrawerTitle-' + item.id">
+              {{ item.name }}
+              <span class="launch-project-drawer__symbol">{{ item.symbol }}</span>
+            </h3>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="launch-project-drawer__close"
+          aria-label="Fermer le projet"
+          (click)="dismiss()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="launch-project-drawer__body">
+        <dl class="launch-project-drawer__metrics">
+          <div class="launch-project-drawer__metric">
+            <dt>Market cap</dt>
+            <dd>{{ marketCapLabel(item) }}</dd>
+          </div>
+          @if (item.launchDate) {
+            <div class="launch-project-drawer__metric">
+              <dt>Lancement</dt>
+              <dd>{{ item.launchDate }}</dd>
+            </div>
+          }
+          @if (progressPercent(item) !== null) {
+            <div class="launch-project-drawer__metric launch-project-drawer__metric--wide">
+              <dt>Progression</dt>
+              <dd>
+                <span class="launch-project-drawer__progress-track" aria-hidden="true">
+                  <span
+                    class="launch-project-drawer__progress-fill"
+                    [style.width.%]="progressPercent(item)!"
+                  ></span>
+                </span>
+                <span class="launch-project-drawer__progress-label">{{ progressPercent(item) }}%</span>
+              </dd>
+            </div>
+          }
+        </dl>
+
+        @if (item.description) {
+          <p class="launch-project-drawer__description">{{ item.description }}</p>
+        } @else {
+          <p class="launch-project-drawer__description launch-project-drawer__description--muted">
+            Projet LaunchLab {{ item.symbol }} — détails disponibles prochainement.
+          </p>
+        }
+
+        <div class="launch-project-drawer__links">
+          @if (item.whitepaperUrl) {
+            <button type="button" class="launch-project-drawer__link-btn" (click)="openWhitepaper(item)">
+              Whitepaper
+            </button>
+          }
+          @if (item.website) {
+            <button type="button" class="launch-project-drawer__link-btn" (click)="openWebsite(item)">
+              Site officiel
+            </button>
+          }
+        </div>
+      </div>
+
+      <footer class="launch-project-drawer__foot">
+        @if (canSwap(item)) {
+          <button type="button" class="launch-project-drawer__swap" (click)="swap.emit(item)">
+            Swap {{ item.symbol }}
+          </button>
+        }
+      </footer>
+    </aside>
+  </div>
+}

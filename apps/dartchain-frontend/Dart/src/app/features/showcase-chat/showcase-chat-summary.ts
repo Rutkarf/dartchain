@@ -46,6 +46,9 @@ export class ShowcaseChatSummaryComponent implements OnInit {
   readonly statusLabel = this.chatState.statusLabel;
   readonly previewHeadline = this.chatState.previewHeadline;
   readonly lastTimeLabel = this.chatState.lastTimeLabel;
+  readonly lastPreviewAuthor = this.chatState.lastPreviewAuthor;
+  readonly lastPreviewText = this.chatState.lastPreviewText;
+  readonly refreshing = this.chatState.refreshing;
 
   ngOnInit(): void {
     this.chat.connect();
@@ -53,7 +56,7 @@ export class ShowcaseChatSummaryComponent implements OnInit {
 
   onRefresh(event: Event): void {
     event.stopPropagation();
-    this.chatState.requestRefresh();
+    void this.chatState.refreshMessages();
     this.refreshClick.emit();
   }
 }

@@ -91,9 +91,7 @@ export class ShowcaseR4v3Component {
 
   readonly panel = this.state.panel;
   readonly loading = this.state.loading;
-  readonly refreshing = this.state.refreshing;
   readonly error = this.state.error;
-  readonly refreshPulse = this.state.refreshPulse;
   readonly systemStatus = this.state.systemStatus;
   readonly pegDisplayLabel = this.state.pegDisplayLabel;
 
@@ -155,8 +153,6 @@ export class ShowcaseR4v3Component {
     return `${this.pegDisplayLabel()} · ${status}`;
   });
 
-  readonly headerRefreshing = computed(() => this.loading() || this.refreshing() || this.community.refreshing());
-
   constructor() {
     if (!this.state.panel() && !this.state.loading()) {
       this.state.load(false);
@@ -184,16 +180,6 @@ export class ShowcaseR4v3Component {
         this.community.load(false);
         void this.walletState.load();
       });
-  }
-
-  protected refresh(): void {
-    this.state.refresh();
-    this.community.load(false);
-    void this.walletState.load();
-  }
-
-  protected refreshAriaLabel(): string {
-    return this.headerRefreshing() ? 'Actualisation du hub R4V3…' : 'Actualiser le hub R4V3';
   }
 
   protected systemStatusClass(status: R4v3SystemStatus): string {

@@ -7,6 +7,8 @@ import { ShowcaseChatSummaryComponent } from '../showcase-chat/showcase-chat-sum
 import { ShowcaseChatComponent } from '../showcase-chat/showcase-chat';
 import { ShowcaseLaunchSummaryComponent } from '../showcase-launch/showcase-launch-summary';
 import { ShowcaseLaunchComponent } from '../showcase-launch/showcase-launch';
+import { ShowcaseDaoSummaryComponent } from '../showcase-dao/showcase-dao-summary';
+import { ShowcaseDaoComponent } from '../showcase-dao/showcase-dao';
 import { ShowcaseR4v3SummaryComponent } from '../showcase-r4v3/showcase-r4v3-summary';
 import { ShowcaseR4v3Component } from '../showcase-r4v3/showcase-r4v3';
 import { ShowcaseTerminalComponent } from '../showcase-terminal/showcase-terminal';
@@ -23,6 +25,8 @@ import { ShowcaseTerminalSummaryComponent } from '../showcase-terminal/showcase-
     ShowcaseChatSummaryComponent,
     ShowcaseLaunchComponent,
     ShowcaseLaunchSummaryComponent,
+    ShowcaseDaoComponent,
+    ShowcaseDaoSummaryComponent,
     ShowcaseR4v3Component,
     ShowcaseR4v3SummaryComponent,
     ShowcaseTerminalSummaryComponent,
@@ -44,7 +48,7 @@ export class ShowcaseWindowComponent {
       case 'r4v3':
         return 'Token natif R4V3 — cours, swap et actualités';
       case 'daonews':
-        return 'Actualités showcase — D.A.O';
+        return 'Gouvernance D.A.O — DAO communautaires';
       case 'rv23':
         return 'Chat showcase';
       case 'dao':

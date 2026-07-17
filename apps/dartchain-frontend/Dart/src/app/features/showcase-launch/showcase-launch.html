@@ -1,29 +1,23 @@
-<div class="showcase-view showcase-view--launch" role="region" aria-label="LaunchLab — projets">
+<div class="showcase-launch-hub showcase-view showcase-view--news" role="region" aria-label="LaunchLab — projets">
   @if (isExpanded) {
-    <header class="showcase-launch__head">
-      <div class="showcase-meta showcase-launch__meta-bar">
-        <div class="showcase-meta__status-zone showcase-launch__status-zone">
-          <span class="showcase-meta__rail" aria-hidden="true"></span>
-          <span
-            class="launch-summary-status showcase-meta__status-pill"
-            [ngClass]="phaseClass()"
-            [attr.aria-label]="'État : ' + launchState.statusLabel()"
+    <header class="showcase-news__head">
+      <div class="showcase-meta showcase-news__meta-bar showcase-launch__meta-bar">
+        <div class="showcase-meta__status-zone showcase-news__status-zone">
+          <p
+            class="showcase-meta__live"
+            aria-live="polite"
+            [attr.title]="liveSummaryTooltip()"
           >
-            {{ launchState.statusLabel() }}
-          </span>
-          <span class="showcase-meta__live" aria-live="polite" [attr.title]="liveSummary()">
-            <span class="showcase-meta__live-dot" aria-hidden="true"></span>
-            {{ liveSummary() }}
-          </span>
-          <span class="showcase-meta__progress" aria-hidden="true">
             <span
-              class="showcase-meta__progress-fill"
-              [style.width.%]="launchState.progressPercent()"
+              class="showcase-launch__live-led"
+              [class.showcase-launch__live-led--dim]="liveCount() === 0"
+              aria-hidden="true"
             ></span>
-          </span>
+            <span class="showcase-meta__live-text">{{ liveCountLabel() }}</span>
+          </p>
         </div>
 
-        <div class="showcase-meta-actions showcase-launch__meta-actions">
+        <div class="showcase-meta-actions showcase-news__meta-actions">
           <div
             class="showcase-meta__search-wrap"
             [class.is-expanded]="searchExpanded()"
@@ -32,6 +26,7 @@
               <label class="showcase-meta__search">
                 <span class="sr-only">Rechercher un projet</span>
                 <input
+                  #searchInput
                   type="search"
                   class="showcase-meta__search-input"
                   placeholder="Rechercher…"
@@ -60,9 +55,10 @@
           <button
             type="button"
             class="showcase-meta__refresh"
+            [class.showcase-meta__refresh--loading]="loading()"
             (click)="refresh()"
             [attr.aria-busy]="loading()"
-            aria-label="Actualiser les projets"
+            [attr.aria-label]="refreshAriaLabel()"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M21 12a9 9 0 0 1-15.5 6.36" />
@@ -71,62 +67,52 @@
               <path d="M7 20v-4h4" />
             </svg>
           </button>
-
-          <label class="showcase-meta__filter">
-            <span class="sr-only">Filtrer les projets</span>
-            <select
-              class="showcase-meta__filter-select"
-              [value]="activeStatus()"
-              (change)="selectStatus($any($event.target).value)"
-              aria-label="Filtrer les projets LaunchLab"
-            >
-              @for (status of statusFilters; track status) {
-                <option [value]="status">{{ statusFilterLabel(status) }}</option>
-              }
-            </select>
-          </label>
         </div>
       </div>
     </header>
 
-    <div class="showcase-launch__content">
+    <div class="showcase-news__content showcase-launch__content">
       @if (loading()) {
-        <ul class="showcase-launch__list showcase-launch__list--skeleton" aria-hidden="true">
-          @for (row of [1, 2, 3, 4, 5]; track row) {
-            <li class="showcase-launch__skeleton-item">
-              <span class="showcase-launch__skeleton-logo"></span>
-              <span class="showcase-launch__skeleton-lines">
+        <ul class="showcase-news__list showcase-news__list--skeleton" aria-hidden="true">
+          @for (row of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track row) {
+            <li class="showcase-news__skeleton-item showcase-launch__skeleton-item">
+              <span class="showcase-news__skeleton-tag"></span>
+              <span class="showcase-news__skeleton-lines">
+                <span></span>
                 <span></span>
               </span>
             </li>
           }
         </ul>
       } @else if (error()) {
-        <div class="showcase-launch__status showcase-launch__status--error">
+        <div class="showcase-news__status showcase-news__status--error">
           <p>Impossible de charger les projets.</p>
-          <button type="button" class="showcase-launch__retry" (click)="refresh()">Réessayer</button>
+          <button type="button" class="showcase-news__retry" (click)="refresh()">Réessayer</button>
         </div>
       } @else if (filteredProjects().length === 0) {
-        <div class="showcase-launch__status">
-          <p>Aucun projet pour ce filtre.</p>
-          @if (activeStatus() !== 'all') {
-            <button type="button" class="showcase-launch__retry" (click)="selectStatus('all')">
-              Voir tous
+        <div class="showcase-news__status">
+          <p>{{ emptyMessage() }}</p>
+          @if (searchQuery().trim()) {
+            <button type="button" class="showcase-news__retry" (click)="clearSearch()">
+              Effacer
             </button>
           }
         </div>
       } @else {
-        <ul class="showcase-launch__list" aria-label="Projets launch">
+        <ul class="showcase-news__list showcase-launch__list" aria-label="Projets launch">
           @for (project of filteredProjects(); track project.id) {
-            <li class="showcase-launch__item">
+            <li
+              class="showcase-news__item showcase-launch__item"
+              [class.showcase-launch__item--selected]="selectedProject()?.id === project.id"
+            >
               <div class="showcase-launch__item-row">
                 @if (project.logoUrl) {
                   <img
                     class="showcase-launch__logo"
                     [src]="project.logoUrl"
                     [alt]="project.name"
-                    width="16"
-                    height="16"
+                    width="14"
+                    height="14"
                   />
                 } @else {
                   <span
@@ -136,14 +122,9 @@
                     {{ projectInitials(project) }}
                   </span>
                 }
+
                 <span class="showcase-launch__name" [title]="project.name">{{ project.name }}</span>
-                <span class="showcase-launch__symbol">{{ project.symbol }}</span>
-                <span class="showcase-launch__raised">
-                  {{ project.raised }}
-                  @if (project.target && project.target !== '—') {
-                    <span class="showcase-launch__sep">/</span>{{ project.target }}
-                  }
-                </span>
+
                 <span
                   class="showcase-launch__badge"
                   [class.showcase-launch__badge--live]="project.status === 'LIVE'"
@@ -152,30 +133,69 @@
                 >
                   {{ statusLabel(project.status) }}
                 </span>
+
+                <span class="showcase-launch__raised" [title]="marketCapLabel(project)">
+                  {{ marketCapLabel(project) }}
+                </span>
+
+                <button
+                  type="button"
+                  class="showcase-launch__whitepaper"
+                  [class.showcase-launch__whitepaper--disabled]="!hasWhitepaper(project)"
+                  [disabled]="!hasWhitepaper(project)"
+                  [attr.aria-label]="whitepaperAriaLabel(project)"
+                  [attr.title]="whitepaperAriaLabel(project)"
+                  (click)="openWhitepaper(project, $event)"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+                  </svg>
+                </button>
+
+                <button
+                  type="button"
+                  class="showcase-launch__ticker"
+                  (click)="openProject(project)"
+                  [attr.aria-expanded]="selectedProject()?.id === project.id"
+                  [attr.aria-label]="'Voir ' + project.symbol"
+                >
+                  {{ project.symbol }}
+                </button>
+
                 @if (canSwapProject(project)) {
                   <button
                     type="button"
-                    class="showcase-launch__swap-btn"
+                    class="showcase-launch__action"
                     (click)="swapProject(project, $event)"
+                    [attr.aria-label]="swapAriaLabel(project)"
                   >
-                    SWAP
+                    Swap
                   </button>
+                } @else {
+                  <span class="showcase-launch__action showcase-launch__action--muted" aria-hidden="true">—</span>
                 }
               </div>
             </li>
           }
         </ul>
+
+        @if (successMessage()) {
+          <p class="showcase-launch__feedback" role="status">{{ successMessage() }}</p>
+        }
+
+        <button type="button" class="showcase-launch__cta" (click)="openDrawer()">
+          <span class="showcase-launch__cta-glow" aria-hidden="true"></span>
+          <span class="showcase-launch__cta-label">{{ launchCtaLabel() }}</span>
+          <span class="showcase-launch__cta-sub">Rejoindre le Launchpad</span>
+        </button>
       }
     </div>
 
-    @if (successMessage()) {
-      <p class="showcase-launch__feedback" role="status">{{ successMessage() }}</p>
-    }
-
-    <footer class="showcase-launch__footer">
-      <button type="button" class="showcase-launch__cta" (click)="openDrawer()">
-        {{ launchCtaLabel() }}
-      </button>
-    </footer>
+    <app-showcase-launch-project-drawer
+      [project]="selectedProject()"
+      (closeDrawer)="closeProject()"
+      (swap)="onDrawerSwap($event)"
+    />
   }
 </div>

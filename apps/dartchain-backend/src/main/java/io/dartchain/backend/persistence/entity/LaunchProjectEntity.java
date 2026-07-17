@@ -43,6 +43,15 @@ public class LaunchProjectEntity {
     @Column(length = 64)
     private String chain;
 
+    @Column(name = "whitepaper_url")
+    private String whitepaperUrl;
+
+    @Column
+    private String website;
+
+    @Column(name = "launch_date", length = 40)
+    private String launchDate;
+
     public String getId() {
         return id;
     }
@@ -121,5 +130,29 @@ public class LaunchProjectEntity {
 
     public void setChain(String chain) {
         this.chain = chain;
+    }
+
+    public String getWhitepaperUrl() {
+        return whitepaperUrl;
+    }
+
+    public void setWhitepaperUrl(String whitepaperUrl) {
+        this.whitepaperUrl = whitepaperUrl;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String getLaunchDate() {
+        return launchDate;
+    }
+
+    public void setLaunchDate(String launchDate) {
+        this.launchDate = launchDate;
     }
 }

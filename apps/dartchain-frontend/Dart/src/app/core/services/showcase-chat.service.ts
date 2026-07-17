@@ -1,4 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { catchError, firstValueFrom, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ChatMessage } from '../models/showcase.model';
 import { formatChatDisplayName, isGuestChatAuthor } from '../constants/chat-display.constants';
@@ -30,10 +31,12 @@ export class ShowcaseChatService {
   private readonly messagesSignal = signal<ChatMessage[]>([]);
   private readonly connectedSignal = signal(false);
   private readonly sendErrorSignal = signal<string | null>(null);
+  private readonly refreshingHistorySignal = signal(false);
 
   readonly messages = this.messagesSignal.asReadonly();
   readonly connected = this.connectedSignal.asReadonly();
   readonly sendError = this.sendErrorSignal.asReadonly();
+  readonly refreshingHistory = this.refreshingHistorySignal.asReadonly();
 
   getUsername(): string {
     const stored = localStorage.getItem(USERNAME_KEY)?.trim();
@@ -160,6 +163,29 @@ export class ShowcaseChatService {
     this.socket.close();
     this.socket = null;
     this.connectedSignal.set(false);
+  }
+
+  async refreshMessages(): Promise<void> {
+    if (this.refreshingHistorySignal()) {
+      return;
+    }
+
+    this.refreshingHistorySignal.set(true);
+
+    try {
+      const history = await firstValueFrom(
+        this.api.getChatMessages(50).pipe(catchError(() => of({ messages: [] as ChatMessage[] })))
+      );
+      const messages = Array.isArray(history.messages) ? history.messages : [];
+      this.messagesSignal.set(this.markSelf(messages));
+
+      if (!this.connectedSignal()) {
+        this.disconnect();
+        this.connect();
+      }
+    } finally {
+      this.refreshingHistorySignal.set(false);
+    }
   }
 
   sendMessage(text: string): void {

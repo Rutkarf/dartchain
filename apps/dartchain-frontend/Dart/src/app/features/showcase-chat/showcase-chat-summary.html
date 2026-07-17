@@ -4,16 +4,22 @@
   aria-live="polite"
   [attr.aria-label]="'Résumé du chat ' + roomLabel()"
 >
-  <div class="showcase-chat-main">
-    <span class="showcase-chat-main__rail" aria-hidden="true"></span>
-    <span class="showcase-chat-main__room">{{ roomLabel() }}</span>
+  <div class="showcase-chat-main showcase-chat-main--preview">
     <span
-      class="showcase-chat-main__status"
-      [class.showcase-chat-main__status--online]="connected()"
-      [class.showcase-chat-main__status--offline]="!connected()"
+      [class]="chatState.chatLedClass()"
       [attr.aria-label]="statusLabel()"
       [attr.title]="statusLabel()"
     ></span>
+
+    @if (lastPreviewAuthor()) {
+      <span class="showcase-chat-preview__author">{{ lastPreviewAuthor() }}:</span>
+      <span class="showcase-chat-preview__text">{{ lastPreviewText() }}</span>
+    } @else {
+      <span class="showcase-chat-preview__text showcase-chat-preview__text--muted">
+        {{ connected() ? 'Aucun message pour l’instant' : 'Connexion au salon…' }}
+      </span>
+    }
+
     @if (hasUnread()) {
       <span class="unread-badge" [attr.aria-label]="unreadCount() + ' non lus'">
         {{ unreadCount() > 99 ? '99+' : unreadCount() }}
@@ -21,24 +27,13 @@
     }
   </div>
 
-  <p class="showcase-chat-preview">
-    @if (previewHeadline()) {
-      <span class="showcase-chat-preview__text">{{ previewHeadline() }}</span>
-    } @else {
-      <span class="showcase-chat-preview__text showcase-chat-preview__text--muted">
-        {{ connected() ? 'Aucun message pour l’instant' : 'Connexion au salon…' }}
-      </span>
-    }
-  </p>
-
   <div class="showcase-chat-meta">
-    @if (lastTimeLabel()) {
-      <span class="showcase-chat-meta__time">{{ lastTimeLabel() }}</span>
-    }
     <button
       type="button"
       class="showcase-chat-meta__refresh"
+      [class.showcase-chat-meta__refresh--loading]="refreshing()"
       (click)="onRefresh($event)"
+      [attr.aria-busy]="refreshing()"
       aria-label="Actualiser le chat"
     >
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">

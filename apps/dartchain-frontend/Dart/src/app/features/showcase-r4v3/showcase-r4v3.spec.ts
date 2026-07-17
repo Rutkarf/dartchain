@@ -147,6 +147,8 @@ describe('ShowcaseR4v3Component', () => {
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__peg--hero')?.textContent).toContain(
       '1 R4V3 = 1 CHF / 1 GBP'
     );
+    expect(fixture.nativeElement.querySelector('.showcase-r4v3__doc-icon--peg')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-meta__refresh')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__live-quote')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__status-led--banner')).toBeTruthy();
   });

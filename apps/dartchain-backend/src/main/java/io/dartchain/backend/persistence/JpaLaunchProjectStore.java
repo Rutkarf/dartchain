@@ -66,7 +66,10 @@ public class JpaLaunchProjectStore implements LaunchProjectStore {
                 entity.getCreatedAt(),
                 entity.getLogoUrl(),
                 entity.getDescription(),
-                entity.getChain()
+                entity.getChain(),
+                entity.getWhitepaperUrl(),
+                entity.getWebsite(),
+                entity.getLaunchDate()
         );
     }
 
@@ -82,6 +85,9 @@ public class JpaLaunchProjectStore implements LaunchProjectStore {
         entity.setLogoUrl(project.getLogoUrl());
         entity.setDescription(project.getDescription());
         entity.setChain(project.getChain());
+        entity.setWhitepaperUrl(project.getWhitepaperUrl());
+        entity.setWebsite(project.getWebsite());
+        entity.setLaunchDate(project.getLaunchDate());
         return entity;
     }
 }

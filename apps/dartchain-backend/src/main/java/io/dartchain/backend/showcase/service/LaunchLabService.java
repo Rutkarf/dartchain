@@ -38,13 +38,97 @@ public class LaunchLabService {
         }
 
         List<LaunchProject> seeded = List.of(
-                seed("r4v3", "R4V3", "R4V3", LaunchStatus.LIVE, "8100", "25000", null),
-                seed("lab-03", "Lab #03", "LAB3", LaunchStatus.SOON, "0", "10000", null),
-                seed("lab-04", "NovaFi", "NVFI", LaunchStatus.SOON, "1200", "15000", null),
-                seed("lab-05", "Pixel DAO", "PXD", LaunchStatus.LIVE, "4200", "8000", null),
-                seed("lab-06", "Orbit Swap", "ORB", LaunchStatus.SOON, "0", "20000", null),
-                seed("lab-07", "Chain Pets", "CPET", LaunchStatus.ENDED, "19000", "19000", null),
-                seed("lab-08", "Meta Rail", "MRAIL", LaunchStatus.SOON, "800", "12000", null)
+                seed(
+                        "r4v3",
+                        "R4V3",
+                        "R4V3",
+                        LaunchStatus.LIVE,
+                        "8100",
+                        "25000",
+                        null,
+                        "Token natif de l'écosystème DartChain, indexé CHF/GBP.",
+                        "https://dartchain.io/whitepaper/r4v3.pdf",
+                        "https://dartchain.io",
+                        "2026-Q1"
+                ),
+                seed(
+                        "lab-03",
+                        "Lab #03",
+                        "LAB3",
+                        LaunchStatus.SOON,
+                        "0",
+                        "10000",
+                        null,
+                        "Projet expérimental LaunchLab orienté gouvernance communautaire.",
+                        "https://dartchain.io/whitepaper/lab3.pdf",
+                        "https://dartchain.io/lab3",
+                        "2026-Q3"
+                ),
+                seed(
+                        "lab-04",
+                        "NovaFi",
+                        "NVFI",
+                        LaunchStatus.SOON,
+                        "1200",
+                        "15000",
+                        null,
+                        "Infrastructure DeFi modulaire pour actifs tokenisés.",
+                        "https://dartchain.io/whitepaper/novafi.pdf",
+                        "https://novafi.example",
+                        "2026-Q2"
+                ),
+                seed(
+                        "lab-05",
+                        "Pixel DAO",
+                        "PXD",
+                        LaunchStatus.LIVE,
+                        "4200",
+                        "8000",
+                        null,
+                        "DAO créative pour collections NFT et trésorerie on-chain.",
+                        "https://dartchain.io/whitepaper/pxd.pdf",
+                        "https://pixeldao.example",
+                        "2026-Q1"
+                ),
+                seed(
+                        "lab-06",
+                        "Orbit Swap",
+                        "ORB",
+                        LaunchStatus.SOON,
+                        "0",
+                        "20000",
+                        null,
+                        "AMM cross-chain à faible latence pour paires LaunchLab.",
+                        null,
+                        "https://orbitswap.example",
+                        "2026-Q4"
+                ),
+                seed(
+                        "lab-07",
+                        "Chain Pets",
+                        "CPET",
+                        LaunchStatus.ENDED,
+                        "19000",
+                        "19000",
+                        null,
+                        "Collection GameFi clôturée après atteinte du hard cap.",
+                        "https://dartchain.io/whitepaper/cpet.pdf",
+                        "https://chainpets.example",
+                        "2025-Q4"
+                ),
+                seed(
+                        "lab-08",
+                        "Meta Rail",
+                        "MRAIL",
+                        LaunchStatus.SOON,
+                        "800",
+                        "12000",
+                        null,
+                        "Rail de liquidité pour actifs synthétiques R4V3.",
+                        "https://dartchain.io/whitepaper/mrail.pdf",
+                        "https://metarail.example",
+                        "2026-Q3"
+                )
         );
 
         projects.addAll(seeded);
@@ -100,7 +184,10 @@ public class LaunchLabService {
                 Instant.now(),
                 normalizeOptional(request.logoUrl()),
                 normalizeOptional(request.description()),
-                normalizeOptional(request.chain())
+                normalizeOptional(request.chain()),
+                normalizeOptional(request.whitepaperUrl()),
+                normalizeOptional(request.website()),
+                normalizeOptional(request.launchDate())
         );
 
         projects.add(project);
@@ -115,7 +202,11 @@ public class LaunchLabService {
             LaunchStatus status,
             String raised,
             String target,
-            String logoUrl
+            String logoUrl,
+            String description,
+            String whitepaperUrl,
+            String website,
+            String launchDate
     ) {
         return new LaunchProject(
                 id,
@@ -126,8 +217,11 @@ public class LaunchLabService {
                 new BigDecimal(target),
                 Instant.now(),
                 logoUrl,
-                null,
-                null
+                description,
+                "DartChain",
+                whitepaperUrl,
+                website,
+                launchDate
         );
     }
 
@@ -139,7 +233,12 @@ public class LaunchLabService {
                 project.getStatus().name(),
                 formatAmount(project.getRaisedAmount()),
                 formatAmount(project.getTargetAmount()),
-                project.getLogoUrl()
+                project.getLogoUrl(),
+                project.getDescription(),
+                project.getChain(),
+                project.getWhitepaperUrl(),
+                project.getWebsite(),
+                project.getLaunchDate()
         );
     }
 

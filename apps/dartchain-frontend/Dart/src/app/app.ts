@@ -378,6 +378,14 @@ export class AppComponent {
     });
   }
 
+  @HostListener('window:exchange-panel-open')
+  onExchangePanelOpen(): void {
+    this.exchangeCollapsed.set(false);
+    queueMicrotask(() => {
+      this.scrollToSelector('.app-market-card--swap');
+    });
+  }
+
   private handleQuestAction(action: QuestNavigateAction): void {
     switch (action) {
       case 'faucet':

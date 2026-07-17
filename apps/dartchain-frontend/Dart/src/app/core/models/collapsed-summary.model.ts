@@ -53,8 +53,8 @@ export const SHOWCASE_COLLAPSED_SUMMARY_TABS: Readonly<
   daonews: {
     id: 'daonews',
     title: 'D.A.O',
-    summarySelector: 'app-showcase-news-summary',
-    metrics: ['unread', 'daoActivity', 'relativeTime'],
+    summarySelector: 'app-showcase-dao-summary',
+    metrics: ['activeDaos', 'proposals', 'votes', 'relativeTime'],
   },
 };
 

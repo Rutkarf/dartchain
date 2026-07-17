@@ -7,5 +7,10 @@ public record LaunchProjectResponse(
         String status,
         String raised,
         String target,
-        String logoUrl
+        String logoUrl,
+        String description,
+        String chain,
+        String whitepaperUrl,
+        String website,
+        String launchDate
 ) {}

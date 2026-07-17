@@ -8,7 +8,7 @@
   overflow: visible;
 }
 
-.launch-summary-bar {
+.dao-summary-bar {
   display: grid;
   grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto auto;
   align-items: center;
@@ -23,7 +23,7 @@
   line-height: 1;
 }
 
-.launch-summary-main {
+.dao-summary-main {
   grid-column: 1;
   display: flex;
   flex-direction: row;
@@ -33,12 +33,12 @@
   height: 100%;
 }
 
-.launch-summary-main--dynamic {
+.dao-summary-main--dynamic {
   flex: 0 0 auto;
   max-width: none;
 }
 
-.launch-summary-status {
+.dao-summary-status {
   display: inline-flex;
   align-items: center;
   flex: 0 1 auto;
@@ -58,48 +58,39 @@
   border: 1px solid transparent;
 }
 
-.launch-summary-status--cluster {
-  gap: 0;
+.dao-summary-status--cluster {
+  gap: 4px;
   padding: 0 6px;
 }
 
-.launch-summary-status--ready {
-  color: var(--text-primary);
-  background: rgba(var(--tab-accent-rgb), 0.14);
-  border-color: rgba(var(--tab-accent-rgb), 0.2);
-}
-
-.launch-summary-status--waiting {
-  color: #f5d76e;
-  background: rgba(245, 215, 110, 0.12);
-  border-color: rgba(245, 215, 110, 0.28);
-}
-
-.launch-summary-status--running {
+.dao-summary-status--active {
   color: #7dffb2;
   background: rgba(61, 214, 140, 0.14);
   border-color: rgba(61, 214, 140, 0.32);
 }
 
-.launch-summary-status--done {
+.dao-summary-status--inactive {
   color: rgba(255, 255, 255, 0.72);
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.14);
 }
 
-.launch-summary-status--loading {
-  color: var(--tab-accent);
-  background: rgba(var(--tab-accent-rgb), 0.1);
-  border-color: rgba(var(--tab-accent-rgb), 0.22);
+.dao-summary-status__led {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3dd68c;
+  box-shadow: 0 0 4px rgba(61, 214, 140, 0.75);
+  flex: 0 0 auto;
 }
 
-.launch-summary-status--error {
-  color: #ff9b8a;
-  background: rgba(255, 120, 100, 0.14);
-  border-color: rgba(255, 120, 100, 0.32);
+.dao-summary-status__led--dim {
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: none;
 }
 
-.launch-summary-ticker {
+.dao-summary-ticker {
   grid-column: 2;
   display: flex;
   flex-direction: row;
@@ -115,7 +106,7 @@
   text-align: center;
 }
 
-.launch-summary-ticker__viewport {
+.dao-summary-ticker__viewport {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -126,7 +117,7 @@
   overflow: hidden;
 }
 
-.launch-summary-ticker__slide {
+.dao-summary-ticker__slide {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -139,11 +130,11 @@
   opacity: 1;
 }
 
-.launch-summary-ticker__slide--enter {
-  animation: launch-summary-ticker-rise 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+.dao-summary-ticker__slide--enter {
+  animation: dao-summary-ticker-rise 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.launch-summary-ticker__symbol {
+.dao-summary-ticker__symbol {
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
@@ -157,7 +148,7 @@
   line-height: 1;
 }
 
-.launch-summary-ticker__cap {
+.dao-summary-ticker__access {
   display: inline-flex;
   align-items: center;
   flex: 0 1 auto;
@@ -169,11 +160,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
-.launch-summary-ticker__fallback {
+.dao-summary-ticker__fallback {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -189,7 +179,7 @@
   line-height: 1;
 }
 
-.launch-summary-meta {
+.dao-summary-meta {
   grid-column: 3;
   display: flex;
   flex-direction: row;
@@ -202,7 +192,7 @@
   white-space: nowrap;
 }
 
-.launch-summary-meta__time {
+.dao-summary-meta__time {
   display: inline-flex;
   align-items: center;
   height: 100%;
@@ -211,7 +201,7 @@
   color: var(--text-muted, rgba(255, 255, 255, 0.5));
 }
 
-.launch-summary-actions {
+.dao-summary-actions {
   grid-column: 4;
   display: flex;
   flex-direction: row;
@@ -224,7 +214,7 @@
   border-left: 1px solid rgba(var(--tab-accent-rgb), 0.1);
 }
 
-.launch-summary-actions__refresh {
+.dao-summary-actions__refresh {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -240,7 +230,7 @@
   touch-action: manipulation;
 }
 
-.launch-summary-actions__refresh svg {
+.dao-summary-actions__refresh svg {
   width: 9px;
   height: 9px;
   fill: none;
@@ -250,16 +240,16 @@
   stroke-linejoin: round;
 }
 
-.launch-summary-actions__refresh--loading svg {
-  animation: launch-summary-refresh-spin 0.75s linear infinite;
+.dao-summary-actions__refresh--loading svg {
+  animation: dao-summary-refresh-spin 0.75s linear infinite;
 }
 
-.launch-summary-actions__refresh:focus-visible {
+.dao-summary-actions__refresh:focus-visible {
   outline: 1px solid rgba(var(--tab-accent-rgb), 0.55);
   outline-offset: 1px;
 }
 
-@keyframes launch-summary-ticker-rise {
+@keyframes dao-summary-ticker-rise {
   from {
     opacity: 0;
     transform: translateY(0.35em);
@@ -270,20 +260,20 @@
   }
 }
 
-@keyframes launch-summary-refresh-spin {
+@keyframes dao-summary-refresh-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .launch-summary-ticker__slide,
-  .launch-summary-ticker__slide--enter {
+  .dao-summary-ticker__slide,
+  .dao-summary-ticker__slide--enter {
     animation: none;
     transition: none;
   }
 
-  .launch-summary-actions__refresh--loading svg {
+  .dao-summary-actions__refresh--loading svg {
     animation: none;
   }
 }

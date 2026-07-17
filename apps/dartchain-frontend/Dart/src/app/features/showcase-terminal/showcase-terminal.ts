@@ -39,10 +39,13 @@ export interface TerminalRow {
   selector: 'app-showcase-terminal',
   standalone: true,
   templateUrl: './showcase-terminal.html',
-  styleUrls: ['./showcase-terminal.css'],
+  styleUrls: ['./showcase-terminal.css', './showcase-terminal-reseau.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShowcaseTerminalComponent implements OnInit, OnChanges {
+  private static readonly RESEAU_PAGE_SIZE = 10;
+  private static readonly DEFAULT_PAGE_SIZE = 5;
+
   private readonly api = inject(BlockchainApiService);
   private readonly newsState = inject(ShowcaseNewsStateService);
   private readonly destroyRef = inject(DestroyRef);
@@ -53,8 +56,9 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
   readonly selectBlock = output<number>();
 
   readonly loading = signal(true);
+  readonly loadingMore = signal(false);
   readonly error = signal<string | null>(null);
-  readonly visibleLimit = signal(5);
+  readonly visibleLimit = signal(ShowcaseTerminalComponent.RESEAU_PAGE_SIZE);
   private readonly modeValue = signal<ShowcaseTab>('tours');
 
   private readonly blocks = signal<Block[]>([]);
@@ -78,6 +82,55 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
 
   readonly eventCount = computed(() => this.allRows().length);
 
+  readonly reseauStatusValue = computed(() => {
+    const connected = this.peers().filter((peer) => peer.status === 'CONNECTED').length;
+    if (connected > 0) {
+      return String(connected);
+    }
+
+    const blockCount = this.stats()?.totalBlocks ?? this.blocks().length;
+    return blockCount > 0 ? String(blockCount) : '0';
+  });
+
+  readonly peersStatusValue = computed(() => {
+    const connected = this.peers().filter((peer) => peer.status === 'CONNECTED').length;
+    return String(connected);
+  });
+
+  readonly reseauStatusTooltip = computed(() => {
+    const parts: string[] = [];
+    const stats = this.stats();
+    const blockCount = stats?.totalBlocks ?? this.blocks().length;
+
+    if (blockCount > 0) {
+      parts.push(`${blockCount} blocs indexés`);
+    }
+
+    const connected = this.peers().filter((peer) => peer.status === 'CONNECTED').length;
+    if (this.peers().length > 0) {
+      parts.push(`${connected}/${this.peers().length} peers connectés`);
+    }
+
+    return parts.join(' · ') || 'État réseau';
+  });
+
+  readonly peersStatusTooltip = computed(() => {
+    const connectedPeers = this.peers().filter((peer) => peer.status === 'CONNECTED');
+    const connected = connectedPeers.length;
+    const total = this.peers().length;
+
+    if (total === 0) {
+      return 'Aucun peer enregistré';
+    }
+
+    if (connected === 0) {
+      return `${total} peer${total > 1 ? 's' : ''} · aucun connecté`;
+    }
+
+    const names = connectedPeers.map((peer) => this.peerDisplayName(peer)).join(', ');
+    return `${connected} peer${connected > 1 ? 's' : ''} connecté${connected > 1 ? 's' : ''} · ${names}`;
+  });
+
   readonly allRows = computed(() => {
     switch (this.modeValue()) {
       case 'reseau':
@@ -100,6 +153,8 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
   readonly canLoadMore = computed(() => this.visibleLimit() < this.allRows().length);
 
   ngOnInit(): void {
+    this.modeValue.set(this.mode);
+    this.visibleLimit.set(this.pageSize());
     void this.refresh();
   }
 
@@ -107,7 +162,7 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
     if (changes['mode']) {
       this.modeValue.set(this.mode);
       if (!changes['mode'].firstChange) {
-        this.visibleLimit.set(5);
+        this.visibleLimit.set(this.pageSize());
       }
     }
   }
@@ -142,7 +197,70 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
   }
 
   loadMore(): void {
-    this.visibleLimit.update((limit) => Math.min(limit + 5, this.allRows().length));
+    if (!this.canLoadMore() || this.loadingMore()) {
+      return;
+    }
+
+    this.loadingMore.set(true);
+    window.setTimeout(() => {
+      this.visibleLimit.update((limit) =>
+        Math.min(limit + this.pageSize(), this.allRows().length)
+      );
+      this.loadingMore.set(false);
+    }, 120);
+  }
+
+  protected refreshAriaLabel(): string {
+    if (this.loading()) {
+      return this.modeValue() === 'peers'
+        ? 'Actualisation des peers…'
+        : 'Actualisation du réseau…';
+    }
+
+    return this.modeValue() === 'peers' ? 'Actualiser les peers' : 'Actualiser le réseau';
+  }
+
+  protected hubStatusValue(): string {
+    return this.modeValue() === 'peers' ? this.peersStatusValue() : this.reseauStatusValue();
+  }
+
+  protected hubStatusTooltip(): string {
+    return this.modeValue() === 'peers' ? this.peersStatusTooltip() : this.reseauStatusTooltip();
+  }
+
+  protected hubEmptyMessage(): string {
+    return this.modeValue() === 'peers'
+      ? 'Aucun peer disponible pour le moment.'
+      : 'Aucun événement réseau pour le moment.';
+  }
+
+  protected hubAriaLabel(): string {
+    return this.modeValue() === 'peers' ? 'Peers connectés' : 'Réseau blockchain';
+  }
+
+  protected hubLedDim(): boolean {
+    if (this.modeValue() !== 'peers') {
+      return false;
+    }
+
+    return this.peers().filter((peer) => peer.status === 'CONNECTED').length === 0;
+  }
+
+  protected rowTagIcon(row: TerminalRow): string {
+    switch (row.statusKind) {
+      case 'sync':
+        return '⛓';
+      case 'validated':
+        return '✓';
+      case 'confirmed':
+        return '●';
+      case 'info':
+        return 'ℹ';
+    }
+  }
+
+  protected rowTagLabel(row: TerminalRow): string {
+    return row.status;
   }
 
   onRowClick(row: TerminalRow): void {
@@ -205,7 +323,7 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
       },
     ];
 
-    for (const block of this.blocks().slice(0, 6)) {
+    for (const block of this.blocks()) {
       rows.push({
         id: `net-${block.index}`,
         ref: `#${block.index}`,
@@ -243,26 +361,12 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
   }
 
   private buildPeersRows(): TerminalRow[] {
-    const peerItems = this.peers();
-    if (!peerItems.length) {
-      return [
-        {
-          id: 'peer-empty',
-          ref: '#P0',
-          time: this.formatTime(Date.now()),
-          action: 'Aucun peer connecté pour le moment',
-          status: 'INFO',
-          statusKind: 'info',
-        },
-      ];
-    }
-
-    return peerItems.slice(0, 12).map((peer, index) => ({
-      id: `peer-${index}`,
+    return this.peers().map((peer, index) => ({
+      id: `peer-${peer.url}-${index}`,
       ref: `#P${index + 1}`,
       time: this.formatTime(Date.now()),
-      action: `${peer.url} • ${peer.status}`,
-      status: peer.status === 'CONNECTED' ? 'VALIDÉ' : 'INFO',
+      action: `${this.peerDisplayName(peer)} · ${peer.url}`,
+      status: peer.status === 'CONNECTED' ? 'CONNECTÉ' : peer.status,
       statusKind: peer.status === 'CONNECTED' ? 'validated' : 'info',
     }));
   }
@@ -329,5 +433,23 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
       return value;
     }
     return `${value.slice(0, size)}…${value.slice(-size)}`;
+  }
+
+  private pageSize(): number {
+    return this.modeValue() === 'reseau' || this.modeValue() === 'peers'
+      ? ShowcaseTerminalComponent.RESEAU_PAGE_SIZE
+      : ShowcaseTerminalComponent.DEFAULT_PAGE_SIZE;
+  }
+
+  private peerDisplayName(peer: PeerView): string {
+    try {
+      const parsed = new URL(peer.url);
+      const host = parsed.hostname.replace(/^www\./i, '');
+      const label = host.split('.')[0] || host;
+      return label || peer.url;
+    } catch {
+      const cleaned = peer.url.replace(/^https?:\/\//i, '').split('/')[0] ?? peer.url;
+      return cleaned.length > 18 ? `${cleaned.slice(0, 14)}…` : cleaned;
+    }
   }
 }

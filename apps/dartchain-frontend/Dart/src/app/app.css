@@ -859,6 +859,14 @@ app-three-floor {
     max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* R4V3 actif : +10 % hauteur contenu showcase (onglets inchangés) */
+.app-hub-showcase-block:has(.app-showcase-band[data-active-tab='r4v3']) {
+  --hub-showcase-block-height: calc(
+    var(--showcase-hub-header-h) + var(--showcase-band-height) * 1.1 -
+      var(--showcase-tab-fusion-overlap)
+  );
+}
+
 .showcase-block__shell {
   display: flex;
   flex-direction: column;

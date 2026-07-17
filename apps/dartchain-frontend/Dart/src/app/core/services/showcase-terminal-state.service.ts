@@ -117,6 +117,29 @@ export class ShowcaseTerminalStateService {
     formatDockRelativeTime(this.lastUpdatedAt())
   );
 
+  readonly peersCollapsedHeadline = computed(() => {
+    if (this.loading()) {
+      return 'Synchronisation des peers…';
+    }
+
+    if (this.error()) {
+      return 'Peers indisponibles';
+    }
+
+    const connectedPeers = this.peers().filter((peer) => peer.status === 'CONNECTED');
+    const connected = connectedPeers.length;
+
+    if (connected === 0) {
+      return '0 PEER CONNECTÉ';
+    }
+
+    const names = connectedPeers.map((peer) => this.peerDisplayName(peer.url)).join(', ');
+    const label = connected === 1 ? 'PEER CONNECTÉ' : 'PEERS CONNECTÉS';
+    return `${connected} ${label} : ${names}`;
+  });
+
+  readonly peersLedActive = computed(() => this.connectedCount() > 0 && !this.loading());
+
   setMode(mode: ShowcaseTerminalMode): void {
     this.mode.set(mode);
   }
@@ -157,5 +180,17 @@ export class ShowcaseTerminalStateService {
 
   refresh(): void {
     void this.load();
+  }
+
+  private peerDisplayName(url: string): string {
+    try {
+      const parsed = new URL(url);
+      const host = parsed.hostname.replace(/^www\./i, '');
+      const label = host.split('.')[0] || host;
+      return label || url;
+    } catch {
+      const cleaned = url.replace(/^https?:\/\//i, '').split('/')[0] ?? url;
+      return cleaned.length > 18 ? `${cleaned.slice(0, 14)}…` : cleaned;
+    }
   }
 }

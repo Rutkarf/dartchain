@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   HostBinding,
   Input,
+  ViewChild,
   computed,
   inject,
   signal,
@@ -10,24 +12,30 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { LaunchProject, LaunchStatus } from '../../core/models/showcase.model';
+import {
+  EXCHANGE_NATIVE_TOKEN,
+  defaultLaunchCounterToken,
+  isExchangeNativeToken,
+  isLaunchpadSwapToken,
+} from '../../core/constants/exchange-launchpad.constants';
 import { AuthService } from '../../core/services/auth.service';
 import { BrandCryptoSelectionService } from '../../core/services/brand-crypto-selection.service';
 import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-state.service';
-
-type LaunchStatusFilter = 'all' | LaunchStatus;
-
-const LAUNCH_STATUS_FILTERS: LaunchStatusFilter[] = ['all', 'LIVE', 'SOON', 'ENDED'];
+import { ShowcaseLaunchProjectDrawerComponent } from './showcase-launch-project-drawer';
 
 @Component({
   selector: 'app-showcase-launch',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ShowcaseLaunchProjectDrawerComponent],
   templateUrl: './showcase-launch.html',
   styleUrls: ['./showcase-launch.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShowcaseLaunchComponent {
   @Input() isExpanded = true;
+
+  @ViewChild('searchInput')
+  private searchInput?: ElementRef<HTMLInputElement>;
 
   @HostBinding('class.is-launch')
   readonly isLaunchHost = true;
@@ -52,19 +60,27 @@ export class ShowcaseLaunchComponent {
   readonly projects = this.launchState.projects;
   readonly searchQuery = signal('');
   readonly searchExpanded = signal(false);
-  readonly activeStatus = signal<LaunchStatusFilter>('all');
-  readonly statusFilters = LAUNCH_STATUS_FILTERS;
+  readonly selectedProject = signal<LaunchProject | null>(null);
 
-  readonly visibleLaunchSlots = 5;
+  readonly liveCount = computed(() => this.launchState.counts().live);
+
+  readonly liveCountLabel = computed(() => `${this.liveCount()} LIVE`);
+
+  readonly liveSummaryTooltip = computed(() => {
+    const live = this.liveCount();
+    if (live === 0) {
+      return 'Aucun projet live pour le moment';
+    }
+    const names = this.launchState
+      .liveProjects()
+      .map((project) => project.symbol)
+      .join(', ');
+    return `${live} projet${live > 1 ? 's' : ''} live · ${names}`;
+  });
 
   readonly filteredProjects = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
-    const status = this.activeStatus();
-    let list = this.projects();
-
-    if (status !== 'all') {
-      list = list.filter((project) => project.status === status);
-    }
+    const list = this.projects();
 
     if (!query) {
       return list;
@@ -77,19 +93,24 @@ export class ShowcaseLaunchComponent {
     });
   });
 
-  readonly liveSummary = computed(() => {
-    const { live } = this.launchState.counts();
-    return `${live} live`;
-  });
-
   readonly launchCtaLabel = computed(() =>
-    this.auth.isAuthenticated() ? 'Lancer un projet' : 'CONNEXION REQUISE'
+    this.auth.isAuthenticated() ? 'Lancer un projet' : 'Connexion requise'
   );
 
   constructor() {
     if (this.launchState.projects().length === 0 && !this.launchState.loading()) {
       this.launchState.loadProjects();
     }
+  }
+
+  protected refreshAriaLabel(): string {
+    return this.loading() ? 'Actualisation des projets…' : 'Actualiser les projets';
+  }
+
+  protected emptyMessage(): string {
+    return this.searchQuery().trim()
+      ? 'Aucun projet ne correspond à votre recherche.'
+      : 'Aucun projet disponible pour le moment.';
   }
 
   protected openDrawer(): void {
@@ -106,6 +127,7 @@ export class ShowcaseLaunchComponent {
 
   protected openSearch(): void {
     this.searchExpanded.set(true);
+    queueMicrotask(() => this.searchInput?.nativeElement.focus());
   }
 
   protected closeSearch(event?: Event): void {
@@ -116,23 +138,9 @@ export class ShowcaseLaunchComponent {
     this.searchExpanded.set(false);
   }
 
-  protected selectStatus(status: LaunchStatusFilter): void {
-    this.activeStatus.set(status);
-  }
-
-  protected statusFilterLabel(status: LaunchStatusFilter): string {
-    switch (status) {
-      case 'all':
-        return 'Tous';
-      case 'LIVE':
-        return 'Live';
-      case 'SOON':
-        return 'Soon';
-      case 'ENDED':
-        return 'Ended';
-      default:
-        return status;
-    }
+  protected clearSearch(): void {
+    this.searchQuery.set('');
+    this.searchExpanded.set(false);
   }
 
   protected statusLabel(status: LaunchStatus): string {
@@ -159,31 +167,97 @@ export class ShowcaseLaunchComponent {
     return symbol.slice(0, 2).toUpperCase();
   }
 
-  protected phaseClass(): string {
-    return `launch-summary-status--${this.launchState.phase()}`;
+  protected marketCapLabel(project: LaunchProject): string {
+    return this.launchState.marketCapLabel(project);
   }
 
-  protected swapProject(project: LaunchProject, event: MouseEvent): void {
+  protected hasWhitepaper(project: LaunchProject): boolean {
+    return Boolean(project.whitepaperUrl?.trim());
+  }
+
+  protected whitepaperAriaLabel(project: LaunchProject): string {
+    return this.hasWhitepaper(project)
+      ? `Ouvrir le whitepaper ${project.symbol}`
+      : `Whitepaper indisponible pour ${project.symbol}`;
+  }
+
+  protected openWhitepaper(project: LaunchProject, event: MouseEvent): void {
     event.stopPropagation();
+    const url = project.whitepaperUrl?.trim();
+    if (!url) {
+      return;
+    }
+    globalThis.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  protected openProject(project: LaunchProject): void {
+    this.selectedProject.set(project);
+  }
+
+  protected closeProject(): void {
+    this.selectedProject.set(null);
+  }
+
+  protected onDrawerSwap(project: LaunchProject): void {
+    this.swapProject(project, new Event('click'));
+  }
+
+  protected swapProject(project: LaunchProject, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
 
     const symbol = project.symbol.trim().toUpperCase();
-    if (!symbol || symbol === 'R4V3') {
-      this.brandCrypto.requestExchangeTrade('R4V3', 'PXD');
-    } else {
-      this.brandCrypto.requestExchangeTrade('R4V3', symbol);
+    if (!symbol) {
+      return;
     }
 
-    this.scrollToExchangePanel();
+    if (isLaunchpadSwapToken(symbol)) {
+      this.brandCrypto.selectLaunchToken(symbol);
+      this.showSwapFeedback(`Swap R4V3 → ${symbol}`);
+    } else if (isExchangeNativeToken(symbol)) {
+      const counter = defaultLaunchCounterToken();
+      this.brandCrypto.requestExchangeTrade(EXCHANGE_NATIVE_TOKEN, counter);
+      this.brandCrypto.select(EXCHANGE_NATIVE_TOKEN);
+      this.showSwapFeedback(`Swap R4V3 → ${counter}`);
+    } else {
+      return;
+    }
+
+    this.openExchangePanel();
   }
 
   protected canSwapProject(project: LaunchProject): boolean {
-    return project.status === 'LIVE' || project.status === 'SOON';
+    if (project.status !== 'LIVE' && project.status !== 'SOON') {
+      return false;
+    }
+
+    const symbol = project.symbol.trim().toUpperCase();
+    return isLaunchpadSwapToken(symbol) || isExchangeNativeToken(symbol);
   }
 
-  private scrollToExchangePanel(): void {
+  protected swapAriaLabel(project: LaunchProject): string {
+    const symbol = project.symbol.trim().toUpperCase();
+    if (isExchangeNativeToken(symbol)) {
+      const counter = defaultLaunchCounterToken();
+      return `Swap R4V3 vers ${counter}`;
+    }
+    return `Swap R4V3 vers ${symbol}`;
+  }
+
+  private showSwapFeedback(message: string): void {
+    this.launchState.successMessage.set(message);
+    window.setTimeout(() => {
+      if (this.launchState.successMessage() === message) {
+        this.launchState.successMessage.set(null);
+      }
+    }, 2800);
+  }
+
+  private openExchangePanel(): void {
+    globalThis.dispatchEvent(new CustomEvent('exchange-panel-open'));
     globalThis.document.querySelector('.app-market-card--swap')?.scrollIntoView({
       behavior: 'smooth',
-      block: 'center',
+      block: 'nearest',
     });
     globalThis.dispatchEvent(new CustomEvent('exchange-panel-focus'));
   }

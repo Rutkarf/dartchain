@@ -136,6 +136,11 @@ export interface LaunchProject {
   raised: string;
   target?: string;
   logoUrl?: string | null;
+  description?: string | null;
+  whitepaperUrl?: string | null;
+  website?: string | null;
+  launchDate?: string | null;
+  chain?: string | null;
 }
 
 export interface CreateLaunchProjectRequest {

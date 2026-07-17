@@ -2,38 +2,35 @@
   class="launch-summary-bar"
   role="status"
   aria-live="polite"
-  aria-label="Résumé des lancements"
+  aria-label="Résumé LaunchLab"
 >
-  <div class="launch-summary-main">
-    <span class="launch-summary-main__rail" aria-hidden="true"></span>
+  <div class="launch-summary-main launch-summary-main--dynamic">
     <span
-      class="launch-summary-status"
-      [ngClass]="phaseClass(phase())"
-      [attr.aria-label]="'État : ' + statusLabel()"
+      class="launch-summary-status launch-summary-status--cluster"
+      [ngClass]="phaseClass()"
+      [attr.aria-label]="'Statut : ' + collapsedStatusHeadline()"
+      [attr.title]="collapsedStatusHeadline()"
     >
-      {{ statusLabel() }}
+      {{ collapsedStatusHeadline() }}
     </span>
-    @if (counts().total > 0) {
-      <span class="launch-summary-main__count" [attr.aria-label]="counts().total + ' projets'">
-        {{ counts().total }}
-      </span>
-    }
   </div>
 
-  <div class="launch-summary-progress">
-    <span class="launch-summary-progress__track" aria-hidden="true">
-      <span
-        class="launch-summary-progress__fill"
-        [style.width.%]="progressPercent()"
-      ></span>
-    </span>
-    <p class="launch-summary-progress__text">
-      @if (headline()) {
-        <span>{{ headline() }}</span>
-      } @else {
-        <span class="launch-summary-progress__text--muted">{{ progressLabel() }}</span>
-      }
-    </p>
+  <div class="launch-summary-ticker" aria-live="polite">
+    @if (carouselProject(); as project) {
+      <div class="launch-summary-ticker__viewport">
+        <div
+          class="launch-summary-ticker__slide"
+          [class.launch-summary-ticker__slide--enter]="carouselAnimating()"
+        >
+          <span class="launch-summary-ticker__symbol">{{ project.symbol }}</span>
+          <span class="launch-summary-ticker__cap">{{ marketCapLabel(project) }}</span>
+        </div>
+      </div>
+    } @else if (loading()) {
+      <span class="launch-summary-ticker__fallback">Synchronisation…</span>
+    } @else {
+      <span class="launch-summary-ticker__fallback">Aucun projet actif</span>
+    }
   </div>
 
   <div class="launch-summary-meta">
@@ -46,6 +43,7 @@
     <button
       type="button"
       class="launch-summary-actions__refresh"
+      [class.launch-summary-actions__refresh--loading]="loading()"
       (click)="onRefresh($event)"
       [attr.aria-busy]="loading()"
       aria-label="Actualiser les lancements"
@@ -56,14 +54,6 @@
         <path d="M17 4v4h-4" />
         <path d="M7 20v-4h4" />
       </svg>
-    </button>
-    <button
-      type="button"
-      class="launch-summary-actions__launch"
-      (click)="onLaunch($event)"
-      aria-label="Lancer un projet"
-    >
-      Lancer
     </button>
   </div>
 </div>

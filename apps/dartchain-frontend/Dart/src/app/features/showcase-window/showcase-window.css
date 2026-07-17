@@ -46,6 +46,10 @@
   padding: 2px;
 }
 
+.showcase-tab-panel--r4v3 {
+  padding: 0 2px 2px;
+}
+
 .showcase-tab-panel.ds-surface.ds-surface--card {
   border: none;
   box-shadow: inset 0 1px 0 rgba(var(--ds-surface-metal-highlight-rgb, 148, 168, 196), 0.04);

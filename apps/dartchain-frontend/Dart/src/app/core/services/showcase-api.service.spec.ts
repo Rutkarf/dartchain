@@ -55,9 +55,24 @@ describe('ShowcaseApiService', () => {
     service.getLaunchProjects().subscribe((projects) => {
       expect(projects.length).toBe(1);
       expect(projects[0].symbol).toBe('DART');
+      expect(projects[0].description).toBe('Projet test');
+      expect(projects[0].whitepaperUrl).toBe('https://example.com/wp.pdf');
     });
 
     const req = http.expectOne((r) => r.url.includes('/showcase/launch/projects'));
-    req.flush([{ id: '1', name: 'DART', symbol: 'DART', status: 'LIVE', raised: '1k' }]);
+    req.flush([
+      {
+        id: '1',
+        name: 'DART',
+        symbol: 'DART',
+        status: 'LIVE',
+        raised: '1k',
+        target: '5k',
+        description: 'Projet test',
+        whitepaperUrl: 'https://example.com/wp.pdf',
+        website: 'https://example.com',
+        launchDate: '2026-Q1',
+      },
+    ]);
   });
 });

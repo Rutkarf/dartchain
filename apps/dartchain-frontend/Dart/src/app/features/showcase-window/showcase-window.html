@@ -37,12 +37,12 @@
         </div>
       }
       @case ('daonews') {
-        <div class="showcase-tab-panel ds-surface ds-surface--card">
+        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--dao">
           @if (collapsed) {
-            <app-showcase-news-summary />
+            <app-showcase-dao-summary />
           } @else {
             @defer (on idle) {
-              <app-showcase-news [isExpanded]="true" />
+              <app-showcase-dao [isExpanded]="true" />
             } @placeholder {
               <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
             }

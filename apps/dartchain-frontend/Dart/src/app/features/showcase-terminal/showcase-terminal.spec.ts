@@ -10,7 +10,7 @@ import { ShowcaseTerminalComponent } from './showcase-terminal';
 describe('ShowcaseTerminalComponent (Phase V)', () => {
   let fixture: ComponentFixture<ShowcaseTerminalComponent>;
 
-  beforeEach(async () => {
+  const configure = async (mode: 'reseau' | 'peers' = 'reseau') => {
     await TestBed.configureTestingModule({
       imports: [ShowcaseTerminalComponent],
       providers: [
@@ -30,10 +30,15 @@ describe('ShowcaseTerminalComponent (Phase V)', () => {
                 },
               ])
             ),
-            getPeers: vi.fn(() => of([])),
+            getPeers: vi.fn(() =>
+              of([
+                { url: 'https://node-alice.local:3000', status: 'CONNECTED' },
+                { url: 'https://validator-42.local:3000', status: 'CONNECTED' },
+              ])
+            ),
             getStats: vi.fn(() =>
               of({
-                blocks: 1,
+                totalBlocks: 1,
                 pendingTransactions: 0,
                 difficulty: 4,
               })
@@ -44,22 +49,51 @@ describe('ShowcaseTerminalComponent (Phase V)', () => {
           provide: ShowcaseNewsStateService,
           useValue: {
             items: vi.fn(() => []),
+            liveActivity: vi.fn(() => ''),
+            feedItems: vi.fn(() => []),
           },
         },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShowcaseTerminalComponent);
-    fixture.componentRef.setInput('mode', 'reseau');
+    fixture.componentRef.setInput('mode', mode);
     fixture.componentRef.setInput('expanded', true);
     fixture.detectChanges();
     await fixture.whenStable();
+  };
+
+  beforeEach(async () => {
+    await configure('reseau');
   });
 
-  it('should create and load terminal rows for reseau mode', async () => {
+  it('should create and render reseau showcase aligned with news layout', async () => {
     expect(fixture.componentInstance).toBeTruthy();
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.showcase-terminal')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-terminal-reseau')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-news__meta-bar')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-terminal-reseau__led')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-meta__refresh')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-terminal__title')).toBeFalsy();
+    expect(fixture.nativeElement.querySelector('.showcase-news__list')).toBeTruthy();
+  });
+
+  it('should render peers showcase with hub header and no legacy terminal chrome', async () => {
+    fixture.componentRef.setInput('mode', 'peers');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('.showcase-terminal-reseau')).toBeTruthy();
+    expect(root.querySelector('.showcase-news__meta-bar')).toBeTruthy();
+    expect(root.querySelector('.showcase-terminal-reseau__led')).toBeTruthy();
+    expect(root.querySelector('.showcase-meta__live-text')?.textContent?.trim()).toBe('2');
+    expect(root.querySelector('.showcase-meta__refresh')).toBeTruthy();
+    expect(root.querySelector('.showcase-terminal__title')).toBeFalsy();
+    expect(root.querySelector('.showcase-terminal__icon-btn')).toBeFalsy();
+    expect(root.querySelector('.showcase-news__list')).toBeTruthy();
+    expect(root.querySelectorAll('.showcase-news__item').length).toBe(2);
   });
 });

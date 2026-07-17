@@ -254,9 +254,12 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.prefs.patchFormat({ highlightColor: 'transparent' });
   }
 
-  protected refreshToolbar(): void {
-    this.closeMenu();
-    this.prefs.resetFormat();
+  protected refreshMessages(): void {
+    void this.chatState.refreshMessages();
+  }
+
+  protected refreshAriaLabel(): string {
+    return this.chatState.refreshing() ? 'Actualisation du chat…' : 'Actualiser le chat';
   }
 
   protected onCustomFontColor(event: Event): void {

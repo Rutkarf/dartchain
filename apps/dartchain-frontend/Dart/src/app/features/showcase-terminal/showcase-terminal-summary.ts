@@ -7,6 +7,7 @@ import {
   OnDestroy,
   OnInit,
   SimpleChanges,
+  computed,
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -23,7 +24,11 @@ import {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './showcase-terminal-summary.html',
-  styleUrls: ['./showcase-terminal-summary.css', '../dock-summary/dock-summary-shared.css'],
+  styleUrls: [
+    './showcase-terminal-summary.css',
+    '../dock-summary/dock-summary-shared.css',
+    './showcase-terminal-reseau.css',
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShowcaseTerminalSummaryComponent implements OnInit, OnChanges, OnDestroy {
@@ -48,6 +53,19 @@ export class ShowcaseTerminalSummaryComponent implements OnInit, OnChanges, OnDe
   readonly progressLabel = this.state.progressLabel;
   readonly updatedAgeLabel = this.state.updatedAgeLabel;
   readonly loading = this.state.loading;
+
+  readonly collapsedStatusValue = computed(() => {
+    const connected = this.state.connectedCount();
+    if (connected > 0) {
+      return String(connected);
+    }
+
+    const blocks = this.state.blocks();
+    return blocks > 0 ? String(blocks) : '0';
+  });
+
+  readonly peersCollapsedHeadline = this.state.peersCollapsedHeadline;
+  readonly peersLedActive = this.state.peersLedActive;
 
   ngOnInit(): void {
     this.state.setMode(this.mode);

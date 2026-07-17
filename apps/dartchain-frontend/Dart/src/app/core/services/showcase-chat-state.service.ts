@@ -8,6 +8,8 @@ import {
 import { ChatMessage } from '../models/showcase.model';
 import { ShowcaseChatService } from './showcase-chat.service';
 
+export type ChatLiveTone = 'active' | 'pending' | 'offline';
+
 @Injectable({ providedIn: 'root' })
 export class ShowcaseChatStateService {
   private readonly chat = inject(ShowcaseChatService);
@@ -15,6 +17,7 @@ export class ShowcaseChatStateService {
   private readonly lastSeenMessageId = signal<string | null>(null);
 
   readonly refresh$ = this.refreshRequested.asObservable();
+  readonly refreshing = signal(false);
   readonly roomLabel = signal('Salon global');
 
   readonly connected = this.chat.connected;
@@ -34,6 +37,28 @@ export class ShowcaseChatStateService {
   readonly lastMessage = computed(() => {
     const messages = this.messages();
     return messages.length > 0 ? messages[messages.length - 1] : null;
+  });
+
+  readonly lastPreviewAuthor = computed(() => {
+    const message = this.lastMessage();
+    return message ? formatChatDisplayName(message.author) : '';
+  });
+
+  readonly lastPreviewText = computed(() => {
+    const message = this.lastMessage();
+    return message ? message.text.trim() : '';
+  });
+
+  readonly chatLiveTone = computed((): ChatLiveTone => {
+    if (this.refreshing() || this.chat.refreshingHistory()) {
+      return 'pending';
+    }
+
+    if (this.connected()) {
+      return 'active';
+    }
+
+    return 'offline';
   });
 
   readonly previewHeadline = computed(() => {
@@ -65,11 +90,19 @@ export class ShowcaseChatStateService {
   });
 
   readonly statusLabel = computed(() => {
-    if (this.connected()) {
-      return 'En ligne';
+    switch (this.chatLiveTone()) {
+      case 'active':
+        return 'Chat disponible';
+      case 'pending':
+        return 'Synchronisation…';
+      case 'offline':
+        return 'Chat indisponible';
     }
-    return 'Hors ligne';
   });
+
+  chatLedClass(): string {
+    return `showcase-chat__live-led showcase-chat__live-led--${this.chatLiveTone()}`;
+  }
 
   markAsRead(): void {
     const messages = this.messages();
@@ -80,8 +113,21 @@ export class ShowcaseChatStateService {
   }
 
   requestRefresh(): void {
-    this.chat.disconnect();
-    this.chat.connect();
-    this.refreshRequested.next();
+    void this.refreshMessages();
+  }
+
+  async refreshMessages(): Promise<void> {
+    if (this.refreshing()) {
+      return;
+    }
+
+    this.refreshing.set(true);
+
+    try {
+      await this.chat.refreshMessages();
+      this.refreshRequested.next();
+    } finally {
+      this.refreshing.set(false);
+    }
   }
 }
