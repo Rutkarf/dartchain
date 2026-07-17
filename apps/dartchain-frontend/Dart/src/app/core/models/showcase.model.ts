@@ -157,3 +157,36 @@ export interface CreateLaunchProjectRequest {
   launchDate?: string | null;
   contractAddress?: string | null;
 }
+
+export type CommunityFaqApiStatus = 'ACTIVE' | 'PINNED' | 'ARCHIVED';
+export type CommunityFaqVoteDirection = 'UP' | 'DOWN';
+
+export interface CommunityFaqApiQuestion {
+  id: string;
+  authorId: string;
+  authorName: string;
+  title: string;
+  body: string;
+  createdAt: string;
+  status: CommunityFaqApiStatus;
+  score: number;
+  upvotes: number;
+  downvotes: number;
+  answerCount: number;
+  pendingStaffReview: boolean;
+  userVote?: CommunityFaqVoteDirection | null;
+}
+
+export interface CommunityFaqListResponse {
+  questions: CommunityFaqApiQuestion[];
+  totalCount: number;
+}
+
+export interface CreateCommunityFaqQuestionRequest {
+  title: string;
+  body: string;
+}
+
+export interface CommunityFaqVoteRequest {
+  direction: CommunityFaqVoteDirection;
+}

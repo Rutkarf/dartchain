@@ -4,6 +4,13 @@ export const EXCHANGE_NATIVE_TOKEN = 'R4V3';
 /** Libellé UI pour le solde R4V3 (plus petite unité, aligné faucet). */
 export const EXCHANGE_NATIVE_UNIT_LABEL = 'm4t3r';
 
+/** Valeur placeholder du champ montant (sans unité). */
+export const EXCHANGE_AMOUNT_VALUE_PLACEHOLDER =
+  '0,00000000000000000000000001';
+
+/** Placeholder complet montant + unité m4t3r (sr-only / hints). */
+export const EXCHANGE_AMOUNT_PLACEHOLDER = `${EXCHANGE_AMOUNT_VALUE_PLACEHOLDER} ${EXCHANGE_NATIVE_UNIT_LABEL}`;
+
 /** 5 tokens LaunchLab échangeables contre R4V3 / m4t3r. */
 export const EXCHANGE_LAUNCHPAD_SWAP_TOKENS = [
   'PXD',

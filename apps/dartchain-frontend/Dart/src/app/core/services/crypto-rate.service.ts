@@ -130,7 +130,7 @@ export class CryptoRatesService {
       catchError(() =>
         of({
           symbol: BRAND_DEFAULT_CRYPTO,
-          pair: 'R4V3 / EUR',
+          pair: 'R4V3 / CHF',
           value: '1,00',
           change: '—',
           positive: true,
@@ -172,7 +172,7 @@ export class CryptoRatesService {
 
     return symbols.map((symbol) => ({
       symbol,
-      pair: symbol.toUpperCase() === BRAND_DEFAULT_CRYPTO ? 'R4V3 / EUR' : `${symbol} / R4V3`,
+      pair: symbol.toUpperCase() === BRAND_DEFAULT_CRYPTO ? 'R4V3 / CHF' : `${symbol} / R4V3`,
       value: '—',
       change: '—',
       positive: true,

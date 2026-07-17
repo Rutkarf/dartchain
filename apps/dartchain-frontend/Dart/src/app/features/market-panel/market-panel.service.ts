@@ -247,7 +247,7 @@ export class MarketPanelService {
 
   private fallbackRow(config: MarketAssetConfig, favorite: boolean): MarketAssetRow {
     const samples: Record<string, Omit<MarketAssetRow, 'config' | 'favorite'>> = {
-      R4V3: { price: '0,12 €', changePercent: 2.45, positive: true, volume: '1,24 M €', priceUnavailable: true },
+      R4V3: { price: '1,00 CHF', changePercent: 0, positive: true, volume: 'Peg CHF/GBP', priceUnavailable: false },
       PXD: { price: '0,05 €', changePercent: 1.8, positive: true, volume: 'LaunchLab', priceUnavailable: true },
       NVFI: { price: '0,05 €', changePercent: 0.4, positive: true, volume: 'LaunchLab', priceUnavailable: true },
       LAB3: { price: '0,05 €', changePercent: 0, positive: true, volume: 'LaunchLab', priceUnavailable: true },

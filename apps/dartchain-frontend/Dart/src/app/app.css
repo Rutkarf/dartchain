@@ -32,9 +32,9 @@
   --showcase-dock-offset: 4px;
   --stack-gap-showcase-dock: calc(var(--section-stack-gap) * 2);
   --band-external-gap: calc(var(--stack-gap-showcase-dock) + var(--showcase-dock-offset));
-  --stack-gap-navbar-market: var(--band-external-gap);
+  --stack-gap-navbar-market: 2px;
   --stack-gap-market-showcase: var(--band-external-gap);
-  --navbar-hub-gap: var(--band-external-gap);
+  --navbar-hub-gap: 2px;
   --navbar-stack-estimate: calc(var(--ds-zone-navbar, 56px) + var(--ds-navbar-top-inset, 0px));
   --hub-wallet-gap: 0px;
   /* Marges gauche / droite (respiration horizontale légère) */
@@ -45,7 +45,10 @@
   --market-after-ticker-gap: var(--stack-gap-navbar-market);
 
   /* Hauteur bande marché — zone graphique hub (priorité courbe) */
-  --market-height: clamp(132px, 18vh, 156px);
+  --market-exchange-strip-h: clamp(24px, 5.5vw, 30px);
+  --market-exchange-height-estimate: var(--market-exchange-strip-h);
+  --hub-market-internal-gap: 2px;
+  --market-height: clamp(152px, 21vh, 180px);
   /* Tokens swap (miroir exchange-panel) pour l’écart sous MONTANT */
   --swap-row-h: 14px;
   --swap-mid-h: 11px;
@@ -663,7 +666,7 @@ app-three-floor {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  overflow: hidden;
+  overflow: visible;
   padding: 0;
   box-sizing: border-box;
 }
@@ -1619,10 +1622,12 @@ app-exchange-panel {
   max-height: none;
   flex: 0 0 auto;
   align-self: stretch;
-  overflow: hidden;
+  overflow: visible;
 }
 
 
+app-exchange-panel:has(.exchange-panel__grid-popover),
+app-exchange-panel:has(.exchange-panel__token-menu),
 app-exchange-panel:has(.token-select--open) {
   overflow: visible;
   z-index: 25;
@@ -1633,11 +1638,15 @@ app-exchange-panel:has(.token-select--open) {
   z-index: 100;
 }
 
+.app-market-card--swap:has(.exchange-panel__grid-popover),
+.app-market-card--swap:has(.exchange-panel__token-menu),
 .app-market-card--swap:has(.token-select--open) {
   overflow: visible;
   z-index: 110;
 }
 
+.app-hub-swap-stack:has(.exchange-panel__grid-popover),
+.app-hub-swap-stack:has(.exchange-panel__token-menu),
 .app-hub-swap-stack:has(.token-select--open) {
   overflow: visible;
   z-index: 110;
@@ -1834,7 +1843,7 @@ app-block-detail-drawer {
   :host {
     --section-stack-gap: clamp(4px, 1vw, 6px);
     --showcase-band-height: min(calc(90px * var(--showcase-tab-scale)), 17.5vh);
-    --market-height: clamp(156px, 26vh, 196px);
+    --market-height: clamp(168px, 28vh, 208px);
     --showcase-hub-tab-h: clamp(13px, 3.6vw, 16px);
     --faucet-band-height: auto;
     --floor-peek-height: clamp(24px, 4.5vh, 36px);
@@ -2212,12 +2221,12 @@ app-block-detail-drawer {
     --showcase-dock-offset: 0px;
     --stack-gap-showcase-dock: 0px;
     --band-external-gap: 2px;
-    --navbar-hub-gap: 2px;
+    --navbar-hub-gap: 1px;
     --hub-market-showcase-gap: 4px;
-    --hub-market-internal-gap: 4px;
-    --market-exchange-height: 58px;
-    --market-exchange-height-estimate: 58px;
-    --market-chart-height-expanded: clamp(118px, 24vh, 152px);
+    --hub-market-internal-gap: 2px;
+    --market-exchange-height: var(--market-exchange-strip-h);
+    --market-exchange-height-estimate: var(--market-exchange-strip-h);
+    --market-chart-height-expanded: clamp(136px, 28vh, 176px);
     --chart-stack-header-h: clamp(14px, 3.8vw, 18px);
     --chart-smart-bar-h: clamp(28px, 7vw, 34px);
     --market-chart-card-collapsed-h: var(--chart-smart-bar-h);

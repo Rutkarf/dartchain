@@ -8,6 +8,8 @@ import {
   R4v3SwapStats,
   R4v3TokenQuote,
 } from '../models/showcase.model';
+import { R4V3_PEG_LABEL } from '../constants/r4v3-token.constants';
+import { R4v3SystemStatus } from '../models/r4v3-hub.model';
 import { RatePanelData } from './crypto-rate.service';
 import { ShowcaseApiService } from './showcase-api.service';
 import { ShowcaseNewsStateService } from './showcase-news-state.service';
@@ -35,8 +37,47 @@ export class ShowcaseR4v3StateService {
   readonly searchQuery = signal('');
   readonly debouncedSearchQuery = signal('');
   readonly refreshPulse = signal(false);
+  readonly refreshing = signal(false);
 
   readonly refresh$ = this.refreshRequested.asObservable();
+
+  readonly systemStatus = computed((): R4v3SystemStatus => {
+    if (this.error()) {
+      return 'incident';
+    }
+
+    if (this.loading() || this.refreshing()) {
+      return 'degraded';
+    }
+
+    const latency = this.ratesLatencyMs();
+    if (latency != null && latency > 450) {
+      return 'degraded';
+    }
+
+    if (!this.panel()) {
+      return 'degraded';
+    }
+
+    return 'ok';
+  });
+
+  readonly pegDisplayLabel = computed(() => {
+    const panel = this.panel();
+    if (panel?.pair?.toUpperCase().includes('CHF') || panel?.pair?.toUpperCase().includes('GBP')) {
+      return R4V3_PEG_LABEL;
+    }
+
+    if (panel?.pair?.trim()) {
+      return panel.pair.replace(/\s*\/\s*/g, ' = ').replace(/^R4V3/, '1 R4V3');
+    }
+
+    return R4V3_PEG_LABEL;
+  });
+
+  readonly liveValueLabel = computed(() => this.panel()?.value ?? '…');
+  readonly liveChangeLabel = computed(() => this.panel()?.change ?? '…');
+  readonly liveChangePositive = computed(() => this.panel()?.positive ?? true);
 
   readonly filteredItems = computed(() => {
     const query = this.debouncedSearchQuery().trim().toLowerCase();
@@ -86,6 +127,17 @@ export class ShowcaseR4v3StateService {
     }
 
     return `il y a ${Math.floor(seconds / 60)}min`;
+  });
+
+  readonly collapsedSubline = computed(() => {
+    const quote = this.panel();
+    const parts: string[] = ['Hub R4V3'];
+
+    if (quote) {
+      parts.push(`${quote.value} ${quote.change}`);
+    }
+
+    return parts.join(' · ');
   });
 
   constructor() {
@@ -143,7 +195,21 @@ export class ShowcaseR4v3StateService {
     this.refreshRequested.next();
   }
 
-  load(showLoading = true, append = false, forSearch = false): void {
+  refresh(): void {
+    this.load(true, false, false, true);
+  }
+
+  load(
+    showLoading = true,
+    append = false,
+    forSearch = false,
+    manualRefresh = false
+  ): void {
+    if (manualRefresh) {
+      this.refreshing.set(true);
+      this.triggerRefreshPulse();
+    }
+
     if (showLoading && !append) {
       this.loading.set(true);
     }
@@ -168,12 +234,18 @@ export class ShowcaseR4v3StateService {
             this.error.set(true);
             this.loading.set(false);
             this.loadingMore.set(false);
+            this.refreshing.set(false);
             return;
           }
 
           this.applyPayload(payload, append, previousFeatured);
           this.loading.set(false);
           this.loadingMore.set(false);
+          this.refreshing.set(false);
+
+          if (manualRefresh) {
+            this.triggerRefreshPulse();
+          }
 
           if (!append) {
             this.ensureSearchCoverage();
@@ -185,6 +257,7 @@ export class ShowcaseR4v3StateService {
           this.error.set(true);
           this.loading.set(false);
           this.loadingMore.set(false);
+          this.refreshing.set(false);
         },
       });
   }

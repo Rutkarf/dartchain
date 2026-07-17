@@ -148,7 +148,7 @@ public class CryptoRatesProxyService {
 
             return new CryptoRatePanelResponse(
                     "R4V3",
-                    "R4V3 / EUR",
+                    "R4V3 / CHF",
                     formatValue(1.0),
                     (change24h >= 0 ? "+" : "") + String.format(Locale.US, "%.2f", change24h) + "%",
                     change24h >= 0,
@@ -157,7 +157,7 @@ public class CryptoRatesProxyService {
         } catch (Exception exception) {
             return new CryptoRatePanelResponse(
                     "R4V3",
-                    "R4V3 / EUR",
+                    "R4V3 / CHF",
                     formatValue(1.0),
                     "—",
                     true,
@@ -668,7 +668,7 @@ public class CryptoRatesProxyService {
     ) {}
 
     /**
-     * Prix unitaire en EUR pour le calcul des taux de swap (R4V3 = 1 EUR).
+     * Prix unitaire en EUR pour le calcul des taux de swap (R4V3 = 1 CHF / 1 GBP).
      */
     public BigDecimal getEurUnitPrice(String symbol) {
         if (symbol == null || symbol.isBlank()) {

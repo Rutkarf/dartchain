@@ -15,6 +15,10 @@ import {
   NewsSource,
   PostChatMessageRequest,
   R4v3ShowcaseResponse,
+  CommunityFaqApiQuestion,
+  CommunityFaqListResponse,
+  CreateCommunityFaqQuestionRequest,
+  CommunityFaqVoteRequest,
 } from '../models/showcase.model';
 
 import { formatFromMessage } from '../constants/chat-format.constants';
@@ -93,7 +97,7 @@ export class ShowcaseApiService {
       );
   }
 
-  getChart(range: ChartRange = '24h', pair = 'R4V3-EUR'): Observable<ChartResponse | null> {
+  getChart(range: ChartRange = '24h', pair = 'R4V3-CHF'): Observable<ChartResponse | null> {
     const params = new HttpParams().set('range', range).set('pair', pair);
 
     return this.http
@@ -129,6 +133,44 @@ export class ShowcaseApiService {
 
   createLaunchProject(body: CreateLaunchProjectRequest): Observable<LaunchProject> {
     return this.http.post<LaunchProject>(`${this.baseUrl}/launch/projects`, body);
+  }
+
+  getCommunityFaqQuestions(limit = 50): Observable<CommunityFaqListResponse> {
+    const params = new HttpParams().set('limit', limit).set('sort', 'rank');
+
+    return this.http
+      .get<CommunityFaqListResponse>(`${this.baseUrl}/faq/questions`, { params })
+      .pipe(catchError(() => of({ questions: [], totalCount: 0 })));
+  }
+
+  getLatestCommunityFaqQuestion(): Observable<CommunityFaqApiQuestion | null> {
+    return this.http
+      .get<CommunityFaqApiQuestion>(`${this.baseUrl}/faq/questions/latest`)
+      .pipe(catchError(() => of(null)));
+  }
+
+  getPopularCommunityFaqQuestions(limit = 10): Observable<CommunityFaqListResponse> {
+    const params = new HttpParams().set('limit', limit);
+
+    return this.http
+      .get<CommunityFaqListResponse>(`${this.baseUrl}/faq/questions/popular`, { params })
+      .pipe(catchError(() => of({ questions: [], totalCount: 0 })));
+  }
+
+  createCommunityFaqQuestion(
+    body: CreateCommunityFaqQuestionRequest
+  ): Observable<CommunityFaqApiQuestion> {
+    return this.http.post<CommunityFaqApiQuestion>(`${this.baseUrl}/faq/questions`, body);
+  }
+
+  voteCommunityFaqQuestion(
+    id: string,
+    body: CommunityFaqVoteRequest
+  ): Observable<CommunityFaqApiQuestion> {
+    return this.http.post<CommunityFaqApiQuestion>(
+      `${this.baseUrl}/faq/questions/${encodeURIComponent(id)}/vote`,
+      body
+    );
   }
 
   private normalizeFeed(feed: NewsFeedResponse): NewsFeedResponse {

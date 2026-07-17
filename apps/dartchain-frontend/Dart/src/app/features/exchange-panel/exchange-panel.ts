@@ -22,6 +22,7 @@ import {
 import {
   EXCHANGE_LAUNCHPAD_FALLBACK_TOKENS,
   EXCHANGE_LAUNCHPAD_SWAP_TOKENS,
+  EXCHANGE_AMOUNT_VALUE_PLACEHOLDER,
   EXCHANGE_NATIVE_TOKEN,
   buildLaunchpadGridSlots,
   defaultLaunchCounterToken,
@@ -110,6 +111,8 @@ export class ExchangePanelComponent {
   protected readonly pairFlipping = signal(false);
   protected readonly estimatePulse = signal(false);
   protected readonly brokenTokenLogos = signal<ReadonlySet<string>>(new Set());
+  protected readonly tokenGridOpen = signal(false);
+  protected readonly tokenMenuOpen = signal(false);
 
   private estimatePulseTimer: ReturnType<typeof setTimeout> | null = null;
   private pairFlipTimer: ReturnType<typeof setTimeout> | null = null;
@@ -126,10 +129,35 @@ export class ExchangePanelComponent {
 
   protected readonly nativeFrom = computed(() => isExchangeNativeToken(this.fromToken()));
 
+  protected readonly counterLaunchToken = computed(() => this.toToken());
+
+  protected amountInputId(): string {
+    return this.exchangeCollapsed() ? 'exchange-collapsed-amount-input' : 'exchange-amount-input';
+  }
+
+  protected swapCtaVisibleLabel(): string {
+    if (this.exchangeCollapsed()) {
+      return this.swapButtonLabelCompact();
+    }
+
+    switch (this.swapAction()) {
+      case 'create-wallet':
+        return 'Wallet';
+      case 'login-required':
+        return 'Connexion';
+      case 'enter-amount':
+        return 'Swap';
+      case 'insufficient':
+        return this.fromBalance() <= 0 ? 'Faucet' : 'Insuffisant';
+      case 'swapping':
+        return '…';
+      default:
+        return 'Swap';
+    }
+  }
+
   protected isLaunchChipActive(symbol: string): boolean {
-    return this.nativeFrom()
-      ? this.toToken() === symbol
-      : this.fromToken() === symbol;
+    return this.toToken() === symbol;
   }
 
   protected readonly unitUsdPriceTo = computed(() => {
@@ -236,13 +264,8 @@ export class ExchangePanelComponent {
     );
   });
 
-  protected readonly amountPlaceholder = computed(() => {
-    if (this.amountValue().trim()) {
-      return '0';
-    }
-
-    return '0.0';
-  });
+  protected readonly amountPlaceholder = EXCHANGE_AMOUNT_VALUE_PLACEHOLDER;
+  protected readonly amountInputMinWidth = `${EXCHANGE_AMOUNT_VALUE_PLACEHOLDER.length}ch`;
 
   protected readonly pairSubtitle = computed(
     () =>
@@ -581,6 +604,64 @@ export class ExchangePanelComponent {
     this.quoteDetailsExpanded.update((expanded) => !expanded);
   }
 
+  protected toggleTokenGrid(event?: Event): void {
+    event?.stopPropagation();
+    this.closeTokenMenu();
+    this.tokenGridOpen.update((open) => !open);
+  }
+
+  protected closeTokenGrid(): void {
+    this.tokenGridOpen.set(false);
+  }
+
+  protected toggleTokenMenu(event?: Event): void {
+    event?.stopPropagation();
+    this.closeTokenGrid();
+    this.tokenMenuOpen.update((open) => !open);
+  }
+
+  protected closeTokenMenu(): void {
+    this.tokenMenuOpen.set(false);
+  }
+
+  protected selectLaunchFromMenu(symbol: string): void {
+    this.selectLaunchChip(symbol);
+    this.closeTokenMenu();
+  }
+
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent): void {
+    if (!this.tokenGridOpen() && !this.tokenMenuOpen()) {
+      return;
+    }
+
+    const target = event.target as Node | null;
+    if (target && this.host.nativeElement.contains(target)) {
+      return;
+    }
+
+    this.closeTokenGrid();
+    this.closeTokenMenu();
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscapeKey(): void {
+    if (this.tokenGridOpen()) {
+      this.closeTokenGrid();
+    }
+    if (this.tokenMenuOpen()) {
+      this.closeTokenMenu();
+    }
+    if (this.quoteDetailsExpanded()) {
+      this.quoteDetailsExpanded.set(false);
+    }
+  }
+
+  protected selectLaunchChipFromGrid(symbol: string): void {
+    this.selectLaunchChip(symbol);
+    this.closeTokenGrid();
+  }
+
   protected flipPair(): void {
     if (!this.canFlipPair() || this.loadingPanel() || this.swapping()) {
       return;
@@ -590,6 +671,7 @@ export class ExchangePanelComponent {
     const to = this.toToken().trim().toUpperCase();
     this.setSwapPair(to, from);
 
+    this.closeTokenGrid();
     this.pairFlipping.set(true);
     if (this.pairFlipTimer != null) {
       clearTimeout(this.pairFlipTimer);
@@ -606,11 +688,9 @@ export class ExchangePanelComponent {
       return;
     }
 
-    if (this.nativeFrom()) {
-      this.setSwapPair(EXCHANGE_NATIVE_TOKEN, normalized);
-    } else {
-      this.setSwapPair(normalized, EXCHANGE_NATIVE_TOKEN);
-    }
+    this.setSwapPair(EXCHANGE_NATIVE_TOKEN, normalized);
+    this.closeTokenGrid();
+    this.closeTokenMenu();
   }
 
   @HostListener('window:exchange-panel-focus')
@@ -729,7 +809,7 @@ export class ExchangePanelComponent {
     }
 
     if (isLaunchpadSwapToken(fromNorm) && isExchangeNativeToken(toNorm)) {
-      this.setSwapPair(fromNorm, toNorm);
+      this.setSwapPair(EXCHANGE_NATIVE_TOKEN, fromNorm);
       return;
     }
 

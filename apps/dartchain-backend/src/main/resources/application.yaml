@@ -104,6 +104,10 @@ news:
   items:
     path: ${NEWS_ITEMS_PATH:data/news-items.json}
 
+faq:
+  questions:
+    path: ${FAQ_QUESTIONS_PATH:data/faq-questions.json}
+
 quests:
   progress:
     path: ${QUESTS_PROGRESS_PATH:data/quest-progress.json}

@@ -49,7 +49,7 @@
                 <span
                   class="showcase-chart__hub-price showcase-chart__hub-price--peg"
                   [class.showcase-chart__hub-price--pulse]="pricePulse()"
-                  title="R4V3 — token indexé sur 1 € (peg stable)"
+                  title="R4V3 — token indexé sur 1 CHF / 1 GBP (peg stable)"
                 >
                   {{ chartPrice() }}
                 </span>
@@ -156,7 +156,7 @@
                 </span>
               }
               @if (hubLaunchOverlay() && !loading() && !error()) {
-                <span class="showcase-chart__hub-peg-chip" aria-label="R4V3 peg fixe">R4V3 1,00 €</span>
+                <span class="showcase-chart__hub-peg-chip" aria-label="R4V3 peg fixe">R4V3 1,00 CHF</span>
               }
             </div>
           </div>

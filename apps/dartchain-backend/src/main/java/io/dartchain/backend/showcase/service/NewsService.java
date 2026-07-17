@@ -72,7 +72,7 @@ public class NewsService {
                 "editorial-2",
                 "R4V3",
                 "Volume R4V3 en hausse sur 24h",
-                "Activité accrue sur la paire R4V3 / EUR.",
+                "Activité accrue sur la paire R4V3 / CHF.",
                 "Le panneau taux et le swap permettent de suivre l'évolution du token natif R4V3 "
                         + "et de simuler des échanges depuis le bandeau marché.",
                 now.minus(Duration.ofMinutes(14)),

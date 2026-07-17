@@ -77,7 +77,7 @@ describe('AppComponent', () => {
         }
         if (url.includes('/chart')) {
           request.flush({
-            pair: 'R4V3-EUR',
+            pair: 'R4V3-CHF',
             range: '24h',
             currentPrice: '100',
             changePercent: 1.2,

@@ -70,7 +70,7 @@ export type BrandCryptoSymbol = typeof BRAND_DEFAULT_CRYPTO | RatePanelSymbol | 
 
 /** Paire API showcase/chart (`BASE-QUOTE`). */
 export function chartPairForSymbol(symbol: BrandCryptoSymbol): string {
-  return symbol === BRAND_DEFAULT_CRYPTO ? 'R4V3-EUR' : `${symbol}-R4V3`;
+  return symbol === BRAND_DEFAULT_CRYPTO ? 'R4V3-CHF' : `${symbol}-R4V3`;
 }
 
 export function chartBaseSymbol(symbol: BrandCryptoSymbol): string {

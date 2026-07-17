@@ -5,7 +5,7 @@
     (click)="toggleMenu($event)"
     [attr.aria-expanded]="menuOpen"
     aria-haspopup="listbox"
-    aria-label="Sélectionner une crypto — rate panel et LaunchLab"
+    aria-label="Sélectionner un token de la plateforme"
   >
       <span class="token-select__value">{{ selection.selected() }}</span>
     <span class="token-select__chevron" aria-hidden="true"></span>
@@ -15,37 +15,36 @@
     *ngIf="menuOpen"
     class="token-select__menu"
     role="listbox"
-    aria-label="Sélection crypto"
+    aria-label="Tokens plateforme"
   >
-    <li class="token-select__section" role="presentation">Rate panel</li>
+    <li class="token-select__section" role="presentation">Natif</li>
     <li
-      *ngFor="let symbol of selection.menuSymbols"
       role="option"
-      [attr.aria-selected]="symbol === selection.selected()"
+      [attr.aria-selected]="nativeToken === selection.selected()"
       class="token-select__option"
-      [class.token-select__option--active]="symbol === selection.selected()"
-      (click)="selectSymbol(symbol)"
+      [class.token-select__option--active]="nativeToken === selection.selected()"
+      (click)="selectSymbol(nativeToken)"
     >
-      <span class="token-select__option-label">{{ symbol }}</span>
-      <span *ngIf="symbol === 'R4V3'" class="token-select__option-tag">Natif</span>
+      <span class="token-select__option-label">{{ nativeToken }}</span>
+      <span class="token-select__option-tag">Natif</span>
     </li>
 
     <li class="token-select__section token-select__section--launch" role="presentation">
       LaunchLab
       <span class="token-select__section-count" *ngIf="hasLaunchProjects()">
-        {{ launchProjects().length }}
+        {{ platformLaunchProjects().length }}
       </span>
     </li>
 
     @if (launchState.loading()) {
       <li class="token-select__empty" role="presentation">Chargement des lancements…</li>
-    } @else if (launchState.error()) {
+    } @else if (launchState.error() && !hasLaunchProjects()) {
       <li class="token-select__empty" role="presentation">Lancements indisponibles</li>
     } @else if (!hasLaunchProjects()) {
       <li class="token-select__empty" role="presentation">Aucun token lancé pour le moment</li>
     } @else {
       <li
-        *ngFor="let project of launchProjects()"
+        *ngFor="let project of platformLaunchProjects()"
         role="option"
         [attr.aria-selected]="project.symbol === selection.selected()"
         class="token-select__option token-select__option--launch"

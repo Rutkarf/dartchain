@@ -22,6 +22,7 @@ import {
   isExchangeNativeToken,
   isLaunchpadSwapToken,
 } from '../../core/constants/exchange-launchpad.constants';
+import { R4V3_PEG_DISPLAY_PRICE } from '../../core/constants/r4v3-token.constants';
 import { LaunchProject, ChartRange } from '../../core/models/showcase.model';
 import { MarketDataService } from '../../core/services/market-data.service';
 import { RatePanelPreferencesService } from '../../core/services/rate-panel-preferences.service';
@@ -138,7 +139,7 @@ const R4V3_VIEW_PILLS: readonly { id: R4v3ChartView; badge: string }[] = [
   { id: 'health', badge: 'SANTÉ' },
 ];
 
-const R4V3_PEG_PRICE = '1,00 €';
+const R4V3_PEG_PRICE = R4V3_PEG_DISPLAY_PRICE;
 const R4V3_PEG_DELTA = '0,00 %';
 
 function formatCompactMetric(value: number): string {
@@ -1011,6 +1012,10 @@ export class ShowcaseChartComponent {
 
     effect(() => {
       if (!this.hubLayout()) {
+        return;
+      }
+
+      if (this.selectedSymbol().trim().toUpperCase() === BRAND_DEFAULT_CRYPTO) {
         return;
       }
 

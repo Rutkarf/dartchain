@@ -22,7 +22,7 @@ class CryptoRatesControllerIntegrationTest {
         mockMvc.perform(get("/api/crypto-rates/panels/native"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.symbol").value("R4V3"))
-                .andExpect(jsonPath("$.pair").value("R4V3 / EUR"))
+                .andExpect(jsonPath("$.pair").value("R4V3 / CHF"))
                 .andExpect(jsonPath("$.value").exists())
                 .andExpect(jsonPath("$.points").isArray());
     }

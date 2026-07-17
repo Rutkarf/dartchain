@@ -19,7 +19,7 @@ public class ShowcaseChartController {
 
     @GetMapping
     public ChartResponse getChart(
-            @RequestParam(defaultValue = "R4V3-EUR") String pair,
+            @RequestParam(defaultValue = "R4V3-CHF") String pair,
             @RequestParam(defaultValue = "24h") String range
     ) {
         return marketChartService.getChart(pair, range);

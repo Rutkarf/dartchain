@@ -17,31 +17,13 @@
     [class.is-showcase-disabled]="!product.showcaseEnabled"
     [class.is-showcase-collapsed]="product.showcaseEnabled && showcaseCollapsed()"
     [class.is-chart-collapsed]="chartCollapsed()"
-    [class.is-exchange-collapsed]="exchangeCollapsed()"
     aria-label="Marché"
     tabindex="-1"
   >
-    <div class="app-hub-swap-stack" [class.is-exchange-collapsed]="exchangeCollapsed()">
-      <header class="chart-stack-header swap-stack-header" aria-label="Contrôle échange">
-        <div class="chart-stack-header__actions">
-          <button
-            type="button"
-            class="chart-toggle showcase-toggle"
-            [attr.aria-label]="exchangeCollapseLabel()"
-            [attr.aria-expanded]="!exchangeCollapsed()"
-            (click)="toggleExchangeCollapsed()"
-          >
-            <span
-              class="showcase-toggle__chevron"
-              [class.is-collapsed]="exchangeCollapsed()"
-              aria-hidden="true"
-            ></span>
-          </button>
-        </div>
-      </header>
+    <div class="app-hub-swap-stack">
       <div class="app-market-card app-market-card--swap app-showcase-card--swap">
         <div class="app-market-card__swap-main">
-          <app-exchange-panel [exchangeCollapsed]="exchangeCollapsed()"></app-exchange-panel>
+          <app-exchange-panel></app-exchange-panel>
         </div>
       </div>
     </div>

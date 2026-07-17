@@ -55,7 +55,7 @@ public class MarketChartService {
     }
 
     public ChartResponse getChart(String pair, String range) {
-        String resolvedPair = pair == null || pair.isBlank() ? "R4V3-EUR" : pair.trim();
+        String resolvedPair = pair == null || pair.isBlank() ? "R4V3-CHF" : pair.trim();
         String resolvedRange = normalizeRange(range);
 
         long cutoff = resolveCutoff(resolvedRange);
