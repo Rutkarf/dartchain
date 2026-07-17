@@ -29,6 +29,7 @@ type PendingTransactionView = PendingTransaction & {
 export class PendingTransactionsComponent {
   @Input() embedded = false;
   @Input() compact = false;
+  @Input() hideCompactBar = false;
 
   @HostBinding('class.pending-view--compact')
   get compactHostClass(): boolean {

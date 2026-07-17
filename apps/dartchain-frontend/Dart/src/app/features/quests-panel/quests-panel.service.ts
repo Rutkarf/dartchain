@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 
 import { QuestsApiService } from '../../core/services/quests-api.service';
+import { WalletSessionService } from '../../core/services/wallet-session.service';
 import {
   DailyQuestDefinition,
   QuestCatalogResponse,
@@ -22,6 +23,7 @@ const AUTH_TOKEN_KEY = 'dartchain_auth_token';
 @Injectable({ providedIn: 'root' })
 export class QuestsPanelService {
   private readonly questsApi = inject(QuestsApiService);
+  private readonly walletSession = inject(WalletSessionService);
   private readonly stateSubject = new BehaviorSubject<QuestPersistedState>(this.loadState());
 
   private catalogDailyQuests: DailyQuestDefinition[] | null = null;
@@ -63,7 +65,8 @@ export class QuestsPanelService {
 
     const guestState = this.readGuestStateSnapshot();
     if (!guestState) {
-      this.syncFromServer();
+      await this.syncStateAsync();
+      this.walletSession.requestBalanceRefresh();
       return;
     }
 
@@ -79,7 +82,8 @@ export class QuestsPanelService {
       localStorage.removeItem(QUESTS_STORAGE_KEY);
     }
 
-    this.syncFromServer();
+    await this.syncStateAsync();
+    this.walletSession.requestBalanceRefresh();
   }
 
   snapshot(): QuestPersistedState {
@@ -378,7 +382,39 @@ export class QuestsPanelService {
   }
 
   private applyServerState(state: QuestPersistedState): void {
-    this.stateSubject.next(this.normalizeServerState(state));
+    const before = this.snapshot();
+    const normalized = this.normalizeServerState(state);
+    this.stateSubject.next(normalized);
+    if (this.shouldRefreshWalletBalance(before, normalized)) {
+      this.walletSession.requestBalanceRefresh();
+    }
+  }
+
+  private shouldRefreshWalletBalance(
+    before: QuestPersistedState,
+    after: QuestPersistedState
+  ): boolean {
+    if (after.pendingMts > before.pendingMts) {
+      return true;
+    }
+
+    if (!before.missionClaimed && after.missionClaimed) {
+      return true;
+    }
+
+    if (!before.weeklyClaimed && after.weeklyClaimed) {
+      return true;
+    }
+
+    for (const quest of this.getDailyQuests()) {
+      const wasClaimed = before.tasks[quest.id]?.claimed === true;
+      const isClaimed = after.tasks[quest.id]?.claimed === true;
+      if (!wasClaimed && isClaimed) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private normalizeServerState(state: QuestPersistedState): QuestPersistedState {

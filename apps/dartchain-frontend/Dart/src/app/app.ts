@@ -56,6 +56,7 @@ import { ShowcaseHubUiService } from './core/services/showcase-hub-ui.service';
 import { AdminPanelComponent } from './features/admin-panel/admin-panel';
 import { DockBottomSummaryComponent } from './features/dock-summary/dock-bottom-summary';
 import { AuthDrawerComponent } from './features/auth-drawer/auth-drawer';
+import { FaucetRuntimeService } from './core/services/faucet-runtime.service';
 
 @Component({
   selector: 'app-root',
@@ -91,6 +92,9 @@ import { AuthDrawerComponent } from './features/auth-drawer/auth-drawer';
   styleUrl: './app.css',
 })
 export class AppComponent {
+  private readonly faucetRuntime = inject(FaucetRuntimeService);
+  private readonly destroyRef = inject(DestroyRef);
+
   readonly launchDrawer = inject(LaunchDrawerService);
   readonly locale = inject(LocaleService);
   readonly product = inject(ProductConfigService);
@@ -102,7 +106,6 @@ export class AppComponent {
   private readonly blockchain = inject(BlockchainApiService);
   private readonly newsState = inject(ShowcaseNewsStateService);
   private readonly showcaseHubUi = inject(ShowcaseHubUiService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly activeShowcaseTab = signal<ShowcaseTab>('tours');
   readonly activeBottomTab = signal<BottomDockTab>('wallet');
@@ -122,6 +125,10 @@ export class AppComponent {
   constructor() {
     const unbindViewport = bindViewportCompactClass();
     this.destroyRef.onDestroy(() => unbindViewport());
+
+    if (this.product.faucetEnabled) {
+      this.faucetRuntime.start();
+    }
 
     this.questProgress.recordDailyLogin();
 

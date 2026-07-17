@@ -1,9 +1,27 @@
 <section class="transactions-dock" aria-label="Transactions dock">
   <header class="transactions-dock__head">
-    <span class="transactions-dock__title">{{ locale.t('dock.transactions') }}</span>
-    <span class="transactions-dock__meta" aria-live="polite">
-      {{ mempoolSummary() }}
-    </span>
+    <div class="transactions-dock__actions">
+      <button type="button" class="transactions-dock__mini-btn" (click)="resetForm()">
+        Reset
+      </button>
+    </div>
+
+    <div class="transactions-dock__meta-wrap" aria-live="polite">
+      <span class="transactions-dock__meta">
+        {{ mempoolSummary() }}
+      </span>
+      @if (latestBlock(); as tip) {
+        <button
+          type="button"
+          class="transactions-dock__tip"
+          (click)="openLatestBlock()"
+          [attr.aria-label]="'Ouvrir le bloc tip #' + tip.index"
+        >
+          Tip #{{ tip.index }}
+        </button>
+      }
+    </div>
+
     <button
       type="button"
       class="transactions-dock__refresh"
@@ -14,13 +32,38 @@
     </button>
   </header>
 
-  <div class="transactions-dock__composer" #composerPanel>
-    <app-block-composer [embedded]="true" [compact]="true" />
+  <div class="transactions-dock__scroll">
+    <div class="transactions-dock__composer" #composerPanel>
+      <app-block-composer
+        #composerRef
+        [embedded]="true"
+        [compact]="true"
+        [showCompactToolbar]="false"
+        [hideCompactTip]="true"
+        [externalSubmit]="true"
+      />
+    </div>
+
+    <div class="transactions-dock__split" aria-hidden="true"></div>
+
+    <div class="transactions-dock__mempool" #mempoolPanel>
+      <app-pending-transactions
+        [embedded]="true"
+        [compact]="true"
+        [hideCompactBar]="true"
+      />
+    </div>
   </div>
 
-  <div class="transactions-dock__split" aria-hidden="true"></div>
-
-  <div class="transactions-dock__mempool" #mempoolPanel>
-    <app-pending-transactions [embedded]="true" [compact]="true" />
-  </div>
+  <footer class="transactions-dock__footer">
+    <button
+      type="submit"
+      class="transactions-dock__submit"
+      form="block-composer-compact-form"
+      [disabled]="composerLoading()"
+      [attr.aria-busy]="composerLoading()"
+    >
+      {{ locale.t('transactions.createTx') }}
+    </button>
+  </footer>
 </section>

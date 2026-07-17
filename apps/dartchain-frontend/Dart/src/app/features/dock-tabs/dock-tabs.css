@@ -75,13 +75,13 @@
 
 .dock-tab {
   position: relative;
-  flex: 0 0 var(--dock-hub-tab-w);
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--dock-hub-tab-w);
-  min-width: var(--dock-hub-tab-w);
-  max-width: var(--dock-hub-tab-w);
+  width: auto;
+  min-width: max-content;
+  max-width: none;
   min-height: 100%;
   height: 100%;
   margin: 0;
@@ -97,8 +97,8 @@
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: unset;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;

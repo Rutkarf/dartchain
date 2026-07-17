@@ -10,20 +10,18 @@
 
 .faucet-panel {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 2px;
   width: 100%;
   height: 100%;
   min-height: 0;
   padding: 3px 4px 4px;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 229, 255, 0.34);
-  background:
-    linear-gradient(180deg, rgba(2, 14, 24, 0.96), rgba(2, 10, 18, 0.98)) padding-box,
-    linear-gradient(165deg, rgba(0, 229, 255, 0.42), rgba(0, 168, 255, 0.12)) border-box;
-  box-shadow:
-    0 0 18px rgba(0, 229, 255, 0.14),
-    inset 0 1px 0 rgba(130, 230, 255, 0.15);
+  border-radius: var(--ds-surface-radius, 10px);
+  background-color: var(--ds-surface-tint);
+  background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
+  backdrop-filter: var(--ds-surface-backdrop);
+  -webkit-backdrop-filter: var(--ds-surface-backdrop);
+  box-shadow: inset 0 1px 0 rgba(var(--ds-surface-metal-highlight-rgb, 148, 168, 196), 0.04);
   overflow: hidden;
   box-sizing: border-box;
   position: relative;
@@ -76,8 +74,52 @@
   overflow: hidden;
 }
 
-.faucet-panel__meta {
-  grid-row: 3;
+.faucet-panel__meta-inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0 2px 1px;
+  min-width: 0;
+  font-size: 5.5px;
+  line-height: 1.2;
+  color: rgba(167, 209, 228, 0.88);
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.faucet-panel__meta-inline strong {
+  color: #d8f4ff;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.faucet-panel__meta-sep {
+  color: rgba(167, 209, 228, 0.45);
+}
+
+.faucet-panel__meta-inline .faucet-panel__block-link {
+  display: inline;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: inherit;
+  line-height: inherit;
+  color: #d8f4ff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.faucet-panel__meta-inline .faucet-panel__block-link:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.faucet-panel__value-token {
+  color: rgba(186, 240, 255, 0.92);
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
 
 .faucet-panel__title-wrap {
@@ -130,6 +172,7 @@
   grid-template-columns: minmax(0, 1fr) 50px;
   gap: 2px;
   min-height: 0;
+  margin-bottom: 1px;
 }
 
 .faucet-panel__top .faucet-panel__tile--amount {
@@ -297,8 +340,25 @@
   white-space: nowrap;
 }
 
+.faucet-panel__claim-row {
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  min-width: 0;
+  min-height: 18px;
+}
+
+.faucet-panel__claim-row.is-success .faucet-panel__claim {
+  flex: 0 1 auto;
+  max-width: 42%;
+}
+
 .faucet-panel__claim {
+  flex: 1 1 auto;
+  width: 100%;
   height: 18px;
+  margin: 0;
+  flex-shrink: 0;
   border-radius: 6px;
   border: 1px solid rgba(0, 229, 255, 0.62);
   background: linear-gradient(180deg, rgba(0, 229, 255, 0.14), rgba(0, 145, 220, 0.08));
@@ -328,6 +388,62 @@
 
 .faucet-panel__claim:disabled.is-cooling {
   cursor: not-allowed;
+}
+
+.faucet-panel__claim.is-success {
+  border-color: rgba(0, 255, 136, 0.42);
+  background: linear-gradient(180deg, rgba(0, 255, 136, 0.12), rgba(0, 120, 80, 0.08));
+  color: #b8ffd8;
+  cursor: default;
+}
+
+.faucet-panel__claim-success-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 5px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 255, 136, 0.45);
+  background: rgba(4, 24, 16, 0.88);
+  color: #85ffd3;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: clamp(5px, 1.6cqw, 7px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow:
+    0 0 8px rgba(0, 255, 136, 0.14),
+    inset 0 1px 0 rgba(180, 255, 220, 0.12);
+}
+
+.faucet-panel__tx-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 14px;
+  padding: 0 1px;
+}
+
+.faucet-panel__tx-line .faucet-panel__tx {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.faucet-panel__tx-line .faucet-panel__tx--explorer {
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .faucet-panel__feedback {
@@ -444,25 +560,12 @@
   overflow: hidden;
 }
 
-.faucet-panel__history-head {
+.faucet-panel__history-actions {
   flex: 0 0 auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 4px;
-}
-
-.faucet-panel__history-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.faucet-panel__history-head h3 {
-  margin: 0;
-  font-size: 6px;
-  letter-spacing: 0.08em;
-  color: rgba(186, 223, 239, 0.88);
 }
 
 .faucet-panel__history-toggle {
@@ -493,38 +596,48 @@
 
 .faucet-panel__row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto;
-  gap: 4px;
+  grid-template-columns: 34px 44px 44px minmax(0, 1fr) 44px 14px;
+  gap: 3px;
   align-items: center;
   min-width: 0;
   font-size: 6px;
   color: rgba(187, 212, 228, 0.8);
-  white-space: nowrap;
 }
 
-.faucet-panel__row span {
+.faucet-panel__row--head {
+  font-size: 5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(167, 209, 228, 0.62);
+  border-bottom: 1px solid rgba(0, 229, 255, 0.12);
+  padding-bottom: 1px;
+  margin-bottom: 1px;
+}
+
+.faucet-panel__row span,
+.faucet-panel__row button {
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.faucet-panel__row span:nth-child(2),
-.faucet-panel__row span:nth-child(3) {
+.faucet-panel__row-amount {
   overflow: visible;
   text-overflow: clip;
-}
-
-.faucet-panel__row span:last-child {
-  color: #45ffac;
-  text-align: right;
-  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .faucet-panel__row-status {
   color: #45ffac;
   text-align: right;
   font-weight: 700;
+}
+
+.faucet-panel__row-explorer-spacer {
+  display: block;
+  width: 14px;
+  height: 1px;
 }
 
 .faucet-panel__row-explorer {
@@ -639,14 +752,42 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #2dff90;
-  box-shadow: 0 0 8px rgba(45, 255, 144, 0.8);
   flex-shrink: 0;
+  background: #ffd56a;
+  box-shadow: 0 0 6px rgba(255, 213, 106, 0.65);
+}
+
+.faucet-panel__dot.is-ready {
+  background: #2dff90;
+  box-shadow: 0 0 8px rgba(45, 255, 144, 0.85);
+  animation: faucet-led-pulse 1.4s ease-in-out infinite;
+}
+
+.faucet-panel__dot.is-cooldown {
+  background: #ffd56a;
+  box-shadow: 0 0 8px rgba(255, 213, 106, 0.75);
 }
 
 .faucet-panel__dot.is-offline {
   background: #ff5c5c;
   box-shadow: 0 0 8px rgba(255, 92, 92, 0.75);
+}
+
+.faucet-panel__dot.is-disabled {
+  background: rgba(148, 156, 170, 0.55);
+  box-shadow: none;
+}
+
+@keyframes faucet-led-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.72;
+    transform: scale(0.88);
+  }
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel {
@@ -656,7 +797,7 @@
   box-shadow: none;
   padding: 2px 3px 3px;
   gap: 1px;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__title-wrap {
@@ -698,6 +839,20 @@
   font-size: 7.5px;
 }
 
+:host-context(.app-bottom-stack__panel) .faucet-panel__claim-success-info {
+  font-size: 5px;
+  padding: 0 4px;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__tx-line {
+  min-height: 12px;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__tx-line .faucet-panel__tx,
+:host-context(.app-bottom-stack__panel) .faucet-panel__tx-line .faucet-panel__tx--explorer {
+  font-size: 5px;
+}
+
 :host-context(.app-bottom-stack__panel) .faucet-panel__body {
   min-height: 0;
   max-height: none;
@@ -707,13 +862,10 @@
   min-height: 0;
 }
 
-:host-context(.app-bottom-stack__panel) .faucet-panel__meta {
-  min-height: 18px;
-  padding-bottom: 2px;
-}
-
-:host-context(.app-bottom-stack__panel) .faucet-panel__meta-item strong {
-  font-size: 6.5px;
+:host-context(.app-bottom-stack__panel) .faucet-panel__meta-inline {
+  font-size: 5px;
+  gap: 3px;
+  padding: 0 1px;
 }
 
 @media (max-width: 349px) {

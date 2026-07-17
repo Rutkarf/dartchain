@@ -28,11 +28,15 @@ export class QuestsProgressService {
 
   recordDailyLogin(): void {
     if (this.quests.isAuthenticated()) {
-      this.quests.syncFromServer();
+      void this.quests.syncStateAsync().then(() => {
+        this.walletSession.requestBalanceRefresh();
+      });
       return;
     }
 
-    void this.quests.recordProgress('daily-login', 1);
+    void this.quests.recordProgress('daily-login', 1).then(() => {
+      this.walletSession.requestBalanceRefresh();
+    });
   }
 
   recordFaucetClaim(): Promise<void> {
@@ -79,7 +83,9 @@ export class QuestsProgressService {
   }
 
   syncFromServer(): void {
-    this.quests.syncFromServer();
+    void this.quests.syncStateAsync().then(() => {
+      this.walletSession.requestBalanceRefresh();
+    });
   }
 
   mergeGuestProgressOnLogin(): Promise<void> {

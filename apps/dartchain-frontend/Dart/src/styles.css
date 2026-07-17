@@ -77,10 +77,10 @@ app-root {
 
 .app-dock-stack .dock-tab {
   display: flex !important;
-  flex: 0 0 var(--dock-hub-tab-w, 2.25rem) !important;
-  width: var(--dock-hub-tab-w, 2.25rem) !important;
-  min-width: var(--dock-hub-tab-w, 2.25rem) !important;
-  max-width: var(--dock-hub-tab-w, 2.25rem) !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: none !important;
   height: 100% !important;
   min-height: 100% !important;
   visibility: visible !important;
@@ -399,13 +399,19 @@ body {
   min-height: 0;
 }
 
-.app-bottom-stack .app-bottom-stack__panel .wallet-display,
+.app-bottom-stack .app-bottom-stack__panel .wallet-display:not(.ds-surface),
 .app-bottom-stack .app-bottom-stack__panel .peer-panel,
 .app-bottom-stack .app-bottom-stack__panel .quests-panel,
 .app-bottom-stack .app-bottom-stack__panel .faucet-panel {
   border: none !important;
   border-radius: 0 !important;
   background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-bottom-stack .app-bottom-stack__panel .wallet-display.ds-surface {
+  border: none !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
 }
 

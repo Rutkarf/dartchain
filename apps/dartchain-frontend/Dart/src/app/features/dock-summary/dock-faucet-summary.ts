@@ -39,7 +39,6 @@ export class DockFaucetSummaryComponent implements OnInit, OnDestroy {
   readonly loading = this.state.loading;
 
   ngOnInit(): void {
-    void this.state.load();
     window.addEventListener('naivechain-refresh', this.onGlobalRefresh);
   }
 

@@ -4,11 +4,13 @@ import { Subject } from 'rxjs';
 import { WalletResponse } from './blockchain-api.service';
 
 const STORAGE_KEY = 'r4v3chainz-wallet';
+const BALANCE_REFRESH_RETRY_MS = [350, 900, 2000] as const;
 
 @Injectable({ providedIn: 'root' })
 export class WalletSessionService {
   private readonly walletSignal = signal<WalletResponse | null>(this.readFromStorage());
   private readonly balanceRefreshSubject = new Subject<void>();
+  private balanceRefreshTimers: ReturnType<typeof setTimeout>[] = [];
 
   readonly wallet = this.walletSignal.asReadonly();
   readonly address = computed(() => this.wallet()?.address ?? '');
@@ -25,6 +27,14 @@ export class WalletSessionService {
   }
 
   requestBalanceRefresh(): void {
+    this.emitBalanceRefresh();
+    this.balanceRefreshTimers.forEach((timer) => clearTimeout(timer));
+    this.balanceRefreshTimers = BALANCE_REFRESH_RETRY_MS.map((delay) =>
+      setTimeout(() => this.emitBalanceRefresh(), delay)
+    );
+  }
+
+  private emitBalanceRefresh(): void {
     this.balanceRefreshSubject.next();
   }
 

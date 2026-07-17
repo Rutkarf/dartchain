@@ -37,6 +37,9 @@ import { LocaleService } from '../../core/i18n/locale.service';
 export class BlockComposerComponent implements OnInit {
   @Input() embedded = false;
   @Input() compact = false;
+  @Input() showCompactToolbar = true;
+  @Input() hideCompactTip = false;
+  @Input() externalSubmit = false;
 
   @HostBinding('class.block-view--compact')
   get compactHostClass(): boolean {
@@ -92,8 +95,12 @@ export class BlockComposerComponent implements OnInit {
       return 'Connexion';
     }
 
-    return this.compact ? 'Créer tx' : 'Créer transaction';
+    return this.compact ? 'CRÉER TX' : 'Créer transaction';
   });
+
+  readonly messagePlaceholder = computed(
+    () => `${this.rawTextLength()}/500`
+  );
 
   readonly walletAddress = computed(() => this.walletSession.address());
 

@@ -1,87 +1,119 @@
 <div class="dock-view block-view" aria-labelledby="composer-title">
   @if (compact) {
     <form
+      id="block-composer-compact-form"
       class="block-view__form block-view__form--compact"
       [formGroup]="form"
       (ngSubmit)="submit()"
       novalidate
     >
-      <div class="block-view__compact-toolbar">
-        <div class="block-view__compact-actions">
-          <button type="button" class="dock-view__mini-btn" (click)="fillFromWallet()">
-            Wallet
-          </button>
-          <button type="button" class="dock-view__mini-btn" (click)="clearForm()" [disabled]="loading()">
-            Reset
-          </button>
-        </div>
-        <div class="block-view__compact-meta">
-          @if (latestBlock(); as tip) {
-            <button type="button" class="block-view__compact-tip" (click)="openLatestBlock()">
-              Tip #{{ tip.index }}
+      @if (showCompactToolbar) {
+        <div class="block-view__compact-toolbar">
+          <div class="block-view__compact-actions">
+            <button type="button" class="dock-view__mini-btn" (click)="fillFromWallet()">
+              Wallet
             </button>
-          }
-          <span class="block-view__compact-count">{{ rawTextLength() }}/500</span>
+            <button type="button" class="dock-view__mini-btn" (click)="clearForm()" [disabled]="loading()">
+              Reset
+            </button>
+          </div>
+          <div class="block-view__compact-meta">
+            @if (latestBlock(); as tip) {
+              <button type="button" class="block-view__compact-tip block-view__compact-tip--featured" (click)="openLatestBlock()">
+                Tip #{{ tip.index }}
+              </button>
+            }
+            <span class="block-view__compact-count">{{ rawTextLength() }}/500</span>
+          </div>
         </div>
-      </div>
+      }
 
-      <label class="block-view__compact-field block-view__compact-field--full" for="from-address">
-        <span class="block-view__compact-label">From</span>
-        <input
-          id="from-address"
-          class="dock-view__input block-view__compact-input"
-          type="text"
-          formControlName="fromAddress"
-          placeholder="Adresse expéditeur"
-          autocomplete="off"
-          spellcheck="false"
-        />
-      </label>
+      <div class="block-view__compact-scroll">
+        @if (!showCompactToolbar && !hideCompactTip && latestBlock(); as tip) {
+          <button
+            type="button"
+            class="block-view__compact-tip block-view__compact-tip--featured"
+            (click)="openLatestBlock()"
+            [attr.aria-label]="'Ouvrir le bloc tip #' + tip.index"
+          >
+            Tip #{{ tip.index }}
+          </button>
+        }
 
-      <div class="block-view__compact-row">
-        <label class="block-view__compact-field block-view__compact-field--grow" for="to-address">
-          <span class="block-view__compact-label">To</span>
+        <section class="block-view__compact-section">
+          <span class="block-view__compact-label" id="from-address-label">From</span>
+          <input
+            id="from-address"
+            class="dock-view__input block-view__compact-input block-view__compact-input--address"
+            type="text"
+            formControlName="fromAddress"
+            placeholder="Adresse expéditeur"
+            autocomplete="off"
+            spellcheck="false"
+            aria-labelledby="from-address-label"
+          />
+        </section>
+
+        <section class="block-view__compact-section">
+          <span class="block-view__compact-label" id="to-address-label">To</span>
           <input
             id="to-address"
-            class="dock-view__input block-view__compact-input"
+            class="dock-view__input block-view__compact-input block-view__compact-input--address"
             type="text"
             formControlName="toAddress"
             placeholder="Destinataire"
             autocomplete="off"
             spellcheck="false"
+            aria-labelledby="to-address-label"
           />
-        </label>
-        <label class="block-view__compact-field block-view__compact-field--amount" for="amount">
-          <span class="block-view__compact-label">Amount</span>
+        </section>
+
+        <section class="block-view__compact-section block-view__compact-section--amount">
+          <span class="block-view__compact-label" id="amount-label">Amount</span>
           <input
             id="amount"
-            class="dock-view__input block-view__compact-input"
+            class="dock-view__input block-view__compact-input block-view__compact-input--amount"
             type="number"
             inputmode="decimal"
             step="any"
             min="0"
             formControlName="amount"
             placeholder="0.00"
+            aria-labelledby="amount-label"
           />
+        </section>
+
+        <label class="block-view__compact-section block-view__compact-section--message" for="block-data-compact">
+          <span class="block-view__compact-label">Message</span>
+          <textarea
+            id="block-data-compact"
+            class="dock-view__textarea block-view__compact-textarea"
+            formControlName="data"
+            rows="3"
+            maxlength="500"
+            [attr.placeholder]="messagePlaceholder()"
+          ></textarea>
         </label>
+
+        @if (errorMessage()) {
+          <p class="block-view__compact-feedback block-view__compact-feedback--error">{{ errorMessage() }}</p>
+        } @else if (successMessage()) {
+          <p class="block-view__compact-feedback block-view__compact-feedback--success">{{ successMessage() }}</p>
+        } @else if (data.pendingError() && !embedded) {
+          <p class="block-view__compact-feedback block-view__compact-feedback--warn">{{ data.pendingError() }}</p>
+        }
       </div>
 
-      @if (errorMessage()) {
-        <p class="block-view__compact-feedback block-view__compact-feedback--error">{{ errorMessage() }}</p>
-      } @else if (successMessage()) {
-        <p class="block-view__compact-feedback block-view__compact-feedback--success">{{ successMessage() }}</p>
-      } @else if (data.pendingError() && !embedded) {
-        <p class="block-view__compact-feedback block-view__compact-feedback--warn">{{ data.pendingError() }}</p>
+      @if (!externalSubmit) {
+        <button
+          type="submit"
+          class="dock-view__cta block-view__compact-submit"
+          [disabled]="loading()"
+          [attr.aria-busy]="loading()"
+        >
+          {{ submitButtonLabel() }}
+        </button>
       }
-
-      <button
-        type="submit"
-        class="dock-view__cta block-view__compact-submit"
-        [disabled]="loading()"
-        [attr.aria-busy]="loading()"
-      >
-        {{ submitButtonLabel() }}
-      </button>
     </form>
   } @else {
     <header class="dock-view__head">

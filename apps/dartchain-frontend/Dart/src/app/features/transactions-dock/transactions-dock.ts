@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild, effect, inject, untracked } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  computed,
+  effect,
+  inject,
+  untracked,
+} from '@angular/core';
 
 import { LocaleService } from '../../core/i18n/locale.service';
 import { TransactionsDataService } from '../../core/services/transactions-data.service';
@@ -16,10 +25,13 @@ import { PendingTransactionsComponent } from '../pending-transactions/pending-tr
 })
 export class TransactionsDockComponent implements OnInit {
   @ViewChild('mempoolPanel') mempoolPanelRef?: ElementRef<HTMLElement>;
+  @ViewChild('composerRef') composerRef?: BlockComposerComponent;
 
   protected readonly locale = inject(LocaleService);
   protected readonly dock = inject(TransactionsDockService);
   private readonly data = inject(TransactionsDataService);
+
+  protected readonly latestBlock = computed(() => this.data.latestBlock());
 
   constructor() {
     effect(() => {
@@ -51,6 +63,25 @@ export class TransactionsDockComponent implements OnInit {
   protected refreshAll(): void {
     this.data.init();
     this.data.scheduleRefresh(true);
+  }
+
+  protected openLatestBlock(): void {
+    const block = this.latestBlock();
+    if (!block) {
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent('open-block-drawer', { detail: { block } })
+    );
+  }
+
+  protected resetForm(): void {
+    this.composerRef?.clearForm();
+  }
+
+  protected composerLoading(): boolean {
+    return this.composerRef?.loading() ?? false;
   }
 
   private focusMempool(highlightId?: string | null): void {

@@ -53,7 +53,7 @@
   }
 
   <div class="pending-view__content">
-    @if (compact) {
+    @if (compact && !hideCompactBar) {
       <div class="pending-view__compact-bar">
         <p class="pending-view__center pending-view__center--inline" aria-live="polite">
           <span
