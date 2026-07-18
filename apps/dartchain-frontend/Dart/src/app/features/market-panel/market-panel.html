@@ -1,164 +1,105 @@
-<section class="market-panel" aria-label="Marché" tabindex="0">
-  @if (tradeHint()) {
-    <p class="market-panel__toast" role="status">{{ tradeHint() }}</p>
-  }
-
-  @if (errorBanner()) {
-    <div class="market-panel__error" role="alert">
-      <span>{{ errorBanner() }}</span>
-      <button type="button" class="market-panel__error-dismiss" (click)="dismissErrorBanner()" aria-label="Fermer">
-        ×
-      </button>
-    </div>
-  }
-
-  <header class="market-panel__strip">
-    <button
-      type="button"
-      class="market-panel__ticker"
-      (click)="selectFeaturedConfig(featuredAsset())"
-      [attr.aria-label]="'Actif vedette ' + featuredAsset().displaySymbol"
-    >
-      <span class="market-panel__ticker-pair">{{ pairLabel(featuredAsset()) }}</span>
-      <span class="market-panel__ticker-price">{{ featuredChart()?.price ?? '—' }}</span>
-      <span
-        class="market-panel__ticker-change"
-        [class.is-up]="featuredChart()?.positive !== false"
-        [class.is-down]="featuredChart()?.positive === false"
-      >
-        {{ featuredChangeLabel() }}
-      </span>
-    </button>
-
-    <div class="market-panel__chart-mini" [class.is-loading]="loadingChart()">
-      <div class="market-panel__timeframes" role="tablist" aria-label="Période">
-        @for (frame of timeframes; track frame.range) {
-          <button
-            type="button"
-            class="market-panel__timeframe"
-            role="tab"
-            [class.is-active]="isTimeframeActive(frame.range)"
-            [attr.aria-selected]="isTimeframeActive(frame.range)"
-            (click)="setChartRange(frame.range)"
-          >
-            {{ frame.label }}
-          </button>
-        }
-      </div>
-      @if (featuredCandles().length) {
-        <svg class="market-panel__sparkline" viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true">
-          @for (candle of featuredCandles(); track $index) {
-            <g [class.is-up]="candle.bullish" [class.is-down]="!candle.bullish">
-              <line
-                class="market-panel__wick"
-                [attr.x1]="candle.x"
-                [attr.x2]="candle.x"
-                [attr.y1]="candle.wickTop * 0.55"
-                [attr.y2]="candle.wickBottom * 0.55"
-              />
-              <rect
-                class="market-panel__body"
-                [attr.x]="candle.x - candle.bodyWidth / 2"
-                [attr.y]="candle.bodyY * 0.55"
-                [attr.width]="candle.bodyWidth"
-                [attr.height]="candle.bodyHeight * 0.55"
-              />
-            </g>
-          }
-        </svg>
-      } @else {
-        <div class="market-panel__sparkline-skeleton" aria-hidden="true"></div>
-      }
-    </div>
-
-    <button
-      type="button"
-      class="market-panel__refresh"
-      (click)="refreshMarket()"
-      [disabled]="loadingRows() || loadingChart()"
-      aria-label="Actualiser les cours"
-    >
-      ↻
-    </button>
-  </header>
-
-  <div class="market-panel__controls">
+<section class="market-panel ds-surface ds-surface--showcase-body" aria-label="Marché" tabindex="0">
+  <header class="market-panel__toolbar">
     <label class="market-panel__search">
       <span class="market-panel__search-icon" aria-hidden="true">⌕</span>
       <input
         type="search"
         class="market-panel__search-input"
-        placeholder="Filtrer"
+        [attr.placeholder]="searchPlaceholder()"
         [ngModel]="searchQuery()"
         (ngModelChange)="onSearchInput($event)"
         autocomplete="off"
         spellcheck="false"
-        aria-label="Filtrer les actifs"
+        aria-label="Rechercher des tokens"
       />
+      <button
+        type="button"
+        class="market-panel__search-reset"
+        (click)="resetMarket()"
+        aria-label="Réinitialiser"
+      >
+        Reset
+      </button>
+      <button
+        type="button"
+        class="market-panel__search-refresh"
+        (click)="refreshMarket()"
+        [disabled]="loadingRows() || loadingChart()"
+        aria-label="Actualiser"
+      >
+        ↻
+      </button>
+      <button
+        type="button"
+        class="market-panel__menu-btn"
+        (click)="toggleActionsMenu($event)"
+        [attr.aria-expanded]="actionsMenuOpen()"
+        aria-haspopup="menu"
+        aria-label="Actions marché"
+      >
+        ⋯
+      </button>
     </label>
-    <div class="market-panel__filters" role="tablist" aria-label="Filtres">
-      @for (option of filterOptions; track option.id) {
-        <button
-          type="button"
-          class="market-panel__filter"
-          role="tab"
-          [class.is-active]="filter() === option.id"
-          [attr.aria-selected]="filter() === option.id"
-          (click)="setFilter(option.id)"
-        >
-          {{ option.label }}
-        </button>
-      }
-    </div>
-    <button
-      type="button"
-      class="market-panel__fav-btn"
-      [class.is-active]="filter() === 'fav'"
-      aria-label="Favoris"
-      (click)="toggleFavoritesShortcut()"
-    >
-      ★
-    </button>
-  </div>
 
-  @if (historyExpanded()) {
-    <div class="market-panel__history" aria-label="Historique des trades">
-      @if (recentTrades().length === 0) {
-        <p class="market-panel__history-empty">Aucun trade récent.</p>
-      } @else {
-        @for (trade of recentTrades(); track trade.id) {
-          <div class="market-panel__history-row">
-            <span class="market-panel__history-time">{{ formatTradeTime(trade) }}</span>
-            <span class="market-panel__history-label">{{ formatTrade(trade) }}</span>
-          </div>
+    @if (actionsMenuOpen()) {
+      <div class="market-panel__menu" role="menu" (click)="$event.stopPropagation()">
+        <button type="button" role="menuitem" (click)="openHistoryFromMenu()">
+          Historique
+          @if (historyExpanded()) {
+            <span class="market-panel__menu-check" aria-hidden="true">✓</span>
+          }
+        </button>
+        <button type="button" role="menuitem" (click)="openTradeFromMenu()">Trade</button>
+        <button type="button" role="menuitem" (click)="toggleLiveFromMenu()">
+          Live
+          @if (liveFilter()) {
+            <span class="market-panel__menu-check" aria-hidden="true">✓</span>
+          }
+        </button>
+      </div>
+    }
+
+    @if (statusBanner(); as banner) {
+      <div
+        class="market-panel__banner"
+        [class.market-panel__banner--error]="banner.tone === 'error'"
+        [class.market-panel__banner--warn]="banner.tone === 'warn'"
+        [class.market-panel__banner--info]="banner.tone === 'info'"
+        role="status"
+      >
+        <span>{{ banner.message }}</span>
+        <button type="button" class="market-panel__banner-dismiss" (click)="dismissStatusBanner()" aria-label="Fermer">
+          ×
+        </button>
+      </div>
+    }
+  </header>
+
+  <div class="market-panel__content">
+    @if (loadingRows() && sortedRows().length === 0) {
+      <div class="market-panel__list" aria-hidden="true">
+        @for (slot of skeletonSlots(); track slot) {
+          <div class="market-panel__row market-panel__row--skeleton"></div>
         }
-      }
-    </div>
-  } @else {
-    <div class="market-panel__list" role="list" aria-label="Actifs disponibles">
-      @if (loadingRows()) {
-        @for (_ of [0, 1, 2, 3, 4]; track $index) {
-          <div class="market-panel__row market-panel__row--skeleton" aria-hidden="true"></div>
-        }
-      } @else if (filteredRows().length === 0) {
-        <p class="market-panel__empty">Aucun actif.</p>
-      } @else {
-        @for (row of filteredRows(); track row.config.exchangeToken; let i = $index) {
+      </div>
+    } @else if (sortedRows().length === 0) {
+      <p class="market-panel__empty">{{ emptyStateMessage() }}</p>
+    } @else {
+      <div class="market-panel__list" role="list" aria-label="Tokens disponibles">
+        @for (row of sortedRows(); track row.config.exchangeToken; let i = $index) {
           <article
             class="market-panel__row"
             role="listitem"
-            [class.is-featured]="isFeatured(row)"
+            [class.is-selected]="isSelected(row)"
             [class.is-focused]="focusedRowIndex() === i"
+            [class.is-pinned]="row.config.native"
+            [style.--token-accent]="row.config.accent"
             [tabindex]="rowTabIndex(i)"
-            (click)="selectFeatured(row)"
+            (click)="openTokenDrawer(row)"
             [attr.aria-label]="row.config.displaySymbol + ' ' + row.price"
           >
-            <span class="market-panel__row-icon" [style.--asset-accent]="row.config.accent">
-              {{ row.config.iconLabel }}
-            </span>
-            <span class="market-panel__row-symbol" [title]="row.config.name">
-              {{ row.config.displaySymbol }}
-            </span>
+            <span class="market-panel__row-icon" aria-hidden="true">{{ row.config.iconLabel }}</span>
+            <strong class="market-panel__row-symbol">{{ row.config.displaySymbol }}</strong>
             <span class="market-panel__row-price" [class.is-unavailable]="row.priceUnavailable">
               {{ row.price }}
             </span>
@@ -169,102 +110,50 @@
             >
               {{ formatChange(row) }}
             </span>
-            <div class="market-panel__row-actions">
-              <button
-                type="button"
-                class="market-panel__row-fav"
-                [class.is-active]="row.favorite"
-                [attr.aria-label]="row.favorite ? 'Retirer favori' : 'Ajouter favori'"
-                (click)="toggleFavorite(row, $event)"
-              >
-                {{ row.favorite ? '★' : '☆' }}
-              </button>
-              @if (row.favorite) {
-                <button
-                  type="button"
-                  class="market-panel__row-alert"
-                  [class.is-active]="isAlertEnabled(row)"
-                  [attr.aria-label]="isAlertEnabled(row) ? 'Désactiver alerte prix' : 'Activer alerte prix'"
-                  (click)="togglePriceAlert(row, $event)"
-                >
-                  {{ isAlertEnabled(row) ? '🔔' : '🔕' }}
-                </button>
-              }
-              @if (row.config.native) {
-                <button
-                  type="button"
-                  class="market-panel__trade market-panel__trade--swap"
-                  aria-label="Ouvrir swap R4V3"
-                  (click)="openNativeSwap($event)"
-                >
-                  SWAP
-                </button>
-              } @else {
-                <button
-                  type="button"
-                  class="market-panel__trade market-panel__trade--buy"
-                  [attr.aria-label]="'Acheter ' + row.config.displaySymbol"
-                  (click)="onBuy(row, $event)"
-                >
-                  +
-                </button>
-                <button
-                  type="button"
-                  class="market-panel__trade market-panel__trade--sell"
-                  [attr.aria-label]="'Vendre ' + row.config.displaySymbol"
-                  (click)="onSell(row, $event)"
-                >
-                  −
+            <span class="market-panel__row-stat">V&nbsp;{{ compactMetric(row.metrics.volumeLabel) }}</span>
+            <span class="market-panel__row-stat">L&nbsp;{{ compactMetric(row.metrics.liquidityLabel) }}</span>
+            <span class="market-panel__row-stat">M&nbsp;{{ compactMetric(row.metrics.marketCapLabel) }}</span>
+            <span
+              class="market-panel__row-momentum"
+              [class.is-hot]="row.metrics.momentum === 'hot'"
+              [class.is-warm]="row.metrics.momentum === 'warm'"
+            >
+              {{ momentumShort(row) }}
+            </span>
+          </article>
+        }
+      </div>
+    }
+
+    @if (historyExpanded()) {
+      <div class="market-panel__history" aria-label="Historique des trades">
+        @if (filteredTrades().length === 0) {
+          <p class="market-panel__history-empty">Aucun trade récent.</p>
+        } @else {
+          @for (trade of filteredTrades(); track trade.id) {
+            <div class="market-panel__history-row">
+              <span class="market-panel__history-time">{{ formatTradeTime(trade) }}</span>
+              <span class="market-panel__history-label">{{ formatTrade(trade) }}</span>
+              @if (trade.txHash) {
+                <button type="button" class="market-panel__history-tx" (click)="openTradeExplorer(trade, $event)">
+                  tx
                 </button>
               }
             </div>
-          </article>
+          }
         }
-      }
-    </div>
-  }
+      </div>
+    }
+  </div>
 
-  <footer class="market-panel__foot" aria-live="polite">
-    <button type="button" class="market-panel__history-toggle" (click)="toggleHistory()" [attr.aria-expanded]="historyExpanded()">
-      {{ historyExpanded() ? 'Liste' : 'Historique' }}
-    </button>
-    <span class="market-panel__foot-summary">{{ listSummary() }}</span>
-  </footer>
-
-  @if (quickTrade() || quickTradeLoading()) {
-    <div class="market-panel__quick" role="dialog" aria-modal="true" aria-label="Trade rapide">
-      @if (quickTradeLoading()) {
-        <p class="market-panel__quick-loading">Chargement…</p>
-      } @else if (quickTrade(); as trade) {
-        <header class="market-panel__quick-head">
-          <strong>{{ trade.side === 'buy' ? 'Achat' : 'Vente' }} {{ trade.config.displaySymbol }}</strong>
-          <button type="button" class="market-panel__quick-close" (click)="closeQuickTrade()" aria-label="Fermer">×</button>
-        </header>
-        <p class="market-panel__quick-meta">
-          Solde {{ trade.fromToken }} : {{ trade.fromBalance | number: '1.0-4' }}
-        </p>
-        <div class="market-panel__quick-percents">
-          @for (percent of quickPercents; track percent) {
-            <button type="button" class="market-panel__quick-percent" (click)="applyQuickPercent(percent)">
-              {{ percent === 100 ? 'MAX' : percent + '%' }}
-            </button>
-          }
-        </div>
-        <p class="market-panel__quick-amount">
-          Montant : {{ trade.amountPreset | number: '1.0-6' }} {{ trade.fromToken }}
-          @if (trade.amountPreset > 0 && trade.rate > 0) {
-            → {{ trade.amountPreset * trade.rate | number: '1.0-6' }} {{ trade.toToken }}
-          }
-        </p>
-        <button
-          type="button"
-          class="market-panel__quick-confirm"
-          [disabled]="quickTradeSubmitting() || trade.amountPreset <= 0"
-          (click)="confirmQuickTrade()"
-        >
-          {{ quickTradeSubmitting() ? '…' : 'Confirmer' }}
-        </button>
-      }
-    </div>
-  }
+  <app-market-token-drawer
+    [row]="drawerRow()"
+    [recentTrades]="recentTrades()"
+    [alertEnabled]="drawerRow() ? isAlertEnabled(drawerRow()!) : false"
+    (closed)="closeTokenDrawer()"
+    (swapped)="onDrawerSwapped($event)"
+    (favoriteToggle)="onDrawerFavoriteToggle()"
+    (alertToggle)="onDrawerAlertToggle()"
+    (exchangeOpen)="onDrawerExchangeOpen()"
+  />
 </section>

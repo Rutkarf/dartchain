@@ -9,6 +9,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class ProductConfigService {
   readonly commercial = environment.commercial ?? false;
-  readonly faucetEnabled = environment.faucetEnabled ?? true;
+  /** Toujours actif (dev, prod, déploiement Cloudflare/Render). */
+  readonly faucetEnabled = true;
   readonly showcaseEnabled = environment.showcaseEnabled ?? true;
 }

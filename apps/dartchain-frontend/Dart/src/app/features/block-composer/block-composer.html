@@ -20,7 +20,7 @@
           <div class="block-view__compact-meta">
             @if (latestBlock(); as tip) {
               <button type="button" class="block-view__compact-tip block-view__compact-tip--featured" (click)="openLatestBlock()">
-                Tip #{{ tip.index }}
+                BLOCK #{{ tip.index }}
               </button>
             }
             <span class="block-view__compact-count">{{ rawTextLength() }}/500</span>
@@ -34,73 +34,75 @@
             type="button"
             class="block-view__compact-tip block-view__compact-tip--featured"
             (click)="openLatestBlock()"
-            [attr.aria-label]="'Ouvrir le bloc tip #' + tip.index"
+            [attr.aria-label]="'Ouvrir le bloc #' + tip.index"
           >
-            Tip #{{ tip.index }}
+            BLOCK #{{ tip.index }}
           </button>
         }
 
-        <section class="block-view__compact-section">
-          <span class="block-view__compact-label" id="from-address-label">From</span>
-          <input
-            id="from-address"
-            class="dock-view__input block-view__compact-input block-view__compact-input--address"
-            type="text"
-            formControlName="fromAddress"
-            placeholder="Adresse expéditeur"
-            autocomplete="off"
-            spellcheck="false"
-            aria-labelledby="from-address-label"
-          />
-        </section>
+        <div class="block-view__compact-grid">
+          <div class="block-view__compact-inline block-view__compact-inline--from">
+            <span class="block-view__compact-label" id="from-address-label">From</span>
+            <input
+              id="from-address"
+              class="dock-view__input block-view__compact-input block-view__compact-input--address"
+              type="text"
+              formControlName="fromAddress"
+              placeholder="Adresse expéditeur"
+              autocomplete="off"
+              spellcheck="false"
+              aria-labelledby="from-address-label"
+            />
+          </div>
 
-        <section class="block-view__compact-section">
-          <span class="block-view__compact-label" id="to-address-label">To</span>
-          <input
-            id="to-address"
-            class="dock-view__input block-view__compact-input block-view__compact-input--address"
-            type="text"
-            formControlName="toAddress"
-            placeholder="Destinataire"
-            autocomplete="off"
-            spellcheck="false"
-            aria-labelledby="to-address-label"
-          />
-        </section>
+          <div class="block-view__compact-inline block-view__compact-inline--amount">
+            <span class="block-view__compact-label" id="amount-label">Amount</span>
+            <input
+              id="amount"
+              class="dock-view__input block-view__compact-input block-view__compact-input--amount"
+              type="number"
+              inputmode="decimal"
+              step="any"
+              min="0"
+              formControlName="amount"
+              placeholder="0.00"
+              aria-labelledby="amount-label"
+            />
+          </div>
 
-        <section class="block-view__compact-section block-view__compact-section--amount">
-          <span class="block-view__compact-label" id="amount-label">Amount</span>
-          <input
-            id="amount"
-            class="dock-view__input block-view__compact-input block-view__compact-input--amount"
-            type="number"
-            inputmode="decimal"
-            step="any"
-            min="0"
-            formControlName="amount"
-            placeholder="0.00"
-            aria-labelledby="amount-label"
-          />
-        </section>
+          <div class="block-view__compact-inline block-view__compact-inline--to">
+            <span class="block-view__compact-label" id="to-address-label">To</span>
+            <input
+              id="to-address"
+              class="dock-view__input block-view__compact-input block-view__compact-input--address"
+              type="text"
+              formControlName="toAddress"
+              placeholder="Destinataire"
+              autocomplete="off"
+              spellcheck="false"
+              aria-labelledby="to-address-label"
+            />
+          </div>
 
-        <label class="block-view__compact-section block-view__compact-section--message" for="block-data-compact">
-          <span class="block-view__compact-label">Message</span>
           <textarea
             id="block-data-compact"
             class="dock-view__textarea block-view__compact-textarea"
             formControlName="data"
-            rows="3"
+            rows="1"
             maxlength="500"
             [attr.placeholder]="messagePlaceholder()"
+            aria-label="Message optionnel"
           ></textarea>
-        </label>
+        </div>
 
-        @if (errorMessage()) {
-          <p class="block-view__compact-feedback block-view__compact-feedback--error">{{ errorMessage() }}</p>
-        } @else if (successMessage()) {
-          <p class="block-view__compact-feedback block-view__compact-feedback--success">{{ successMessage() }}</p>
-        } @else if (data.pendingError() && !embedded) {
-          <p class="block-view__compact-feedback block-view__compact-feedback--warn">{{ data.pendingError() }}</p>
+        @if (!externalSubmit) {
+          @if (errorMessage()) {
+            <p class="block-view__compact-feedback block-view__compact-feedback--error">{{ errorMessage() }}</p>
+          } @else if (successMessage()) {
+            <p class="block-view__compact-feedback block-view__compact-feedback--success">{{ successMessage() }}</p>
+          } @else if (data.pendingError() && !embedded) {
+            <p class="block-view__compact-feedback block-view__compact-feedback--warn">{{ data.pendingError() }}</p>
+          }
         }
       </div>
 

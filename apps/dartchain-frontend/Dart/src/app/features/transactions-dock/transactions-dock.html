@@ -1,24 +1,23 @@
-<section class="transactions-dock" aria-label="Transactions dock">
+<section class="transactions-dock ds-surface ds-surface--showcase-body" aria-label="Transaction dock">
   <header class="transactions-dock__head">
-    <div class="transactions-dock__actions">
-      <button type="button" class="transactions-dock__mini-btn" (click)="resetForm()">
-        Reset
+    @if (latestBlock(); as block) {
+      <button
+        type="button"
+        class="transactions-dock__block"
+        (click)="openLatestBlock()"
+        [attr.aria-label]="'Ouvrir le bloc #' + block.index"
+      >
+        BLOCK #{{ block.index }}
       </button>
-    </div>
+    } @else {
+      <span class="transactions-dock__block transactions-dock__block--static">BLOCK —</span>
+    }
 
-    <div class="transactions-dock__meta-wrap" aria-live="polite">
-      <span class="transactions-dock__meta">
-        {{ mempoolSummary() }}
-      </span>
-      @if (latestBlock(); as tip) {
-        <button
-          type="button"
-          class="transactions-dock__tip"
-          (click)="openLatestBlock()"
-          [attr.aria-label]="'Ouvrir le bloc tip #' + tip.index"
-        >
-          Tip #{{ tip.index }}
-        </button>
+    <div class="transactions-dock__alert" aria-live="polite">
+      @if (composerError(); as error) {
+        <p class="transactions-dock__alert-text transactions-dock__alert-text--error">{{ error }}</p>
+      } @else if (composerSuccess(); as success) {
+        <p class="transactions-dock__alert-text transactions-dock__alert-text--success">{{ success }}</p>
       }
     </div>
 
@@ -35,7 +34,6 @@
   <div class="transactions-dock__scroll">
     <div class="transactions-dock__composer" #composerPanel>
       <app-block-composer
-        #composerRef
         [embedded]="true"
         [compact]="true"
         [showCompactToolbar]="false"

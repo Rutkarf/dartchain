@@ -1,7 +1,9 @@
 import { ChartRange } from '../../core/models/showcase.model';
 import { ExchangeFromToken } from '../../core/services/brand-crypto-selection.service';
 
-export type MarketFilter = 'all' | 'r4v3' | 'fav';
+export type MarketFilter = 'all' | 'r4v3' | 'fav' | 'gainers' | 'losers' | 'tradable';
+
+export type MarketSortMode = 'fav' | 'change' | 'price' | 'name';
 
 export interface MarketAssetConfig {
   /** Clé exchange LaunchLab / R4V3 */
@@ -73,6 +75,8 @@ export const MARKET_ASSETS: readonly MarketAssetConfig[] = [
 export const MARKET_FAVORITES_STORAGE_KEY = 'dart_market_favorites_v1';
 export const MARKET_TRADES_STORAGE_KEY = 'dart_market_recent_trades_v1';
 export const MARKET_ALERTS_STORAGE_KEY = 'dart_market_price_alerts_v1';
+export const MARKET_SESSION_STORAGE_KEY = 'dart_market_session_v1';
 export const MARKET_DEFAULT_ALERT_THRESHOLD = 5;
-export const MARKET_MAX_RECENT_TRADES = 3;
+export const MARKET_ALERT_THRESHOLDS = [1, 3, 5, 10] as const;
+export const MARKET_MAX_RECENT_TRADES = 20;
 export const MARKET_AUTO_REFRESH_MS = 45_000;

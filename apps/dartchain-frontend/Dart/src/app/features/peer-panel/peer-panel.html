@@ -1,4 +1,4 @@
-<section class="peer-panel" [attr.aria-label]="locale.t('peers.title')" tabindex="0">
+<section class="peer-panel ds-surface ds-surface--showcase-body" [attr.aria-label]="locale.t('peers.title')" tabindex="0">
   @if (successMessage()) {
     <div class="peer-panel__toast peer-panel__toast--success" role="status">
       {{ successMessage() }}
@@ -19,9 +19,8 @@
     </div>
   }
 
-  <header class="peer-panel__strip">
-    <h2 class="peer-panel__title">{{ locale.t('peers.title') }}</h2>
-    <div class="peer-panel__kpis" [attr.aria-label]="locale.t('peers.title')">
+  <header class="peer-panel__strip" [attr.aria-label]="locale.t('peers.title')">
+    <div class="peer-panel__kpis">
       <span class="peer-panel__kpi" [title]="locale.t('peers.networkPeers')">
         <span class="peer-panel__kpi-label">{{ locale.t('peers.networkPeers') }}</span>
         <span class="peer-panel__kpi-value peer-panel__kpi-value--cyan">{{ networkStats().networkPeers }}</span>
@@ -36,90 +35,79 @@
         <span class="peer-panel__kpi-label">{{ locale.t('peers.networkLoad') }}</span>
         <span class="peer-panel__kpi-value peer-panel__kpi-value--cyan">{{ networkStats().networkLoadPercent }}%</span>
       </span>
-      <button
-        type="button"
-        class="peer-panel__refresh"
-        (click)="refreshAll()"
-        [disabled]="loading() || submitting()"
-        [class.is-spinning]="loading()"
-        [attr.aria-label]="locale.t('peers.refresh')"
-      >
-        ↻
-      </button>
     </div>
-  </header>
-
-  <div class="peer-panel__toolbar">
-    <label class="peer-panel__search">
-      <span class="peer-panel__search-icon" aria-hidden="true">⌕</span>
-      <input
-        class="peer-panel__search-input"
-        type="search"
-        [placeholder]="locale.t('peers.search')"
-        [ngModel]="searchQuery()"
-        (ngModelChange)="onSearchInput($event)"
-        autocomplete="off"
-        spellcheck="false"
-        [attr.aria-label]="locale.t('peers.search')"
-      />
-    </label>
-
-    <div class="peer-panel__filters" role="tablist" [attr.aria-label]="locale.t('peers.search')">
-      @for (option of filterOptions(); track option.id) {
-        <button
-          type="button"
-          class="peer-panel__filter"
-          role="tab"
-          [class.is-active]="activeFilter() === option.id"
-          [attr.aria-selected]="activeFilter() === option.id"
-          (click)="setFilter(option.id)"
-        >
-          {{ option.label }}
-        </button>
-      }
-    </div>
-
     <button
       type="button"
-      class="peer-panel__connect-toggle"
-      [class.is-active]="showConnectForm()"
-      (click)="toggleConnectForm()"
+      class="peer-panel__refresh"
+      (click)="refreshAll()"
+      [disabled]="loading() || submitting()"
+      [class.is-spinning]="loading()"
+      [attr.aria-label]="locale.t('peers.refresh')"
+    >
+      ↻
+    </button>
+  </header>
+
+  <form class="peer-panel__connect" (ngSubmit)="addPeer()">
+    <button
+      type="button"
+      class="peer-panel__connect-add"
+      (click)="focusConnectInput()"
       [attr.aria-label]="locale.t('peers.connectPeer')"
       [title]="locale.t('peers.connectPeer')"
     >
       +
     </button>
-  </div>
+    <input
+      #peerInputRef
+      id="peer-input"
+      name="peer"
+      type="text"
+      class="peer-panel__connect-input"
+      [placeholder]="locale.t('peers.connectPlaceholder')"
+      [ngModel]="peerInput()"
+      (ngModelChange)="onPeerInput($event)"
+      [disabled]="submitting()"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+    />
+    <button
+      type="submit"
+      class="peer-panel__connect-btn"
+      [disabled]="submitting() || !normalizedPeerInput()"
+    >
+      {{ connectButtonLabel() }}
+    </button>
+  </form>
 
-  @if (showConnectForm()) {
-    <form class="peer-panel__connect" (ngSubmit)="addPeer()">
-      <input
-        #peerInputRef
-        id="peer-input"
-        name="peer"
-        type="text"
-        class="peer-panel__connect-input"
-        [placeholder]="locale.t('peers.connectPlaceholder')"
-        [ngModel]="peerInput()"
-        (ngModelChange)="onPeerInput($event)"
-        [disabled]="submitting()"
-        autocomplete="off"
-        autocapitalize="off"
-        spellcheck="false"
-      />
-      <button
-        type="submit"
-        class="peer-panel__connect-btn"
-        [disabled]="submitting() || !normalizedPeerInput()"
-      >
-        {{ connectButtonLabel() }}
-      </button>
-    </form>
-  }
+  <label class="peer-panel__search">
+    <span class="peer-panel__search-icon" aria-hidden="true">⌕</span>
+    <input
+      class="peer-panel__search-input"
+      type="search"
+      [placeholder]="locale.t('peers.search')"
+      [ngModel]="searchQuery()"
+      (ngModelChange)="onSearchInput($event)"
+      autocomplete="off"
+      spellcheck="false"
+      [attr.aria-label]="locale.t('peers.search')"
+    />
+    <button
+      type="button"
+      class="peer-panel__search-fav"
+      [class.is-active]="favoritesOnly()"
+      (click)="toggleFavoritesFilter()"
+      [attr.aria-pressed]="favoritesOnly()"
+      [attr.aria-label]="locale.t('peers.filterFavorites')"
+    >
+      FAV
+    </button>
+  </label>
 
   <ul class="peer-panel__list" role="list" [attr.aria-label]="locale.t('peers.title')">
     @if (loading() && peerCount() === 0) {
-      @for (row of [1, 2, 3, 4, 5]; track row) {
+      @for (row of [1, 2, 3, 4]; track row) {
         <li class="peer-panel__row peer-panel__row--skeleton" aria-hidden="true"></li>
       }
     } @else if (filteredRows().length === 0) {
@@ -153,53 +141,29 @@
           >
             <span class="peer-panel__node-name" [title]="row.url">{{ row.nodeName }}</span>
             <span class="peer-panel__node-endpoint" [title]="row.url">{{ row.endpoint }}</span>
-            @if (row.status === 'ERROR' && row.message) {
-              <span class="peer-panel__node-error" [title]="row.message">{{ row.message }}</span>
-            }
           </button>
 
           <span class="peer-panel__status" [ngClass]="statusClass(row.status)">
             {{ statusLabel(row.status) }}
           </span>
 
-          <span class="peer-panel__metric" [class.is-estimated]="row.latencyEstimated">
-            {{ row.latencyLabel }}
-          </span>
-
-          <span class="peer-panel__metric" [class.is-estimated]="row.syncEstimated">
-            {{ row.syncLabel }}
-          </span>
-
-          <svg class="peer-panel__sparkline" [class.is-estimated]="row.activityEstimated" viewBox="0 0 34 14" preserveAspectRatio="none" aria-hidden="true">
-            <path [attr.d]="activityPath(row)" />
-          </svg>
-
           <div class="peer-panel__row-actions">
             <button
               type="button"
-              class="peer-panel__action"
+              class="peer-panel__action peer-panel__action--copy"
               (click)="copyPeerUrl(row.url, $event)"
               [attr.aria-label]="locale.t('peers.copy')"
+              [title]="locale.t('peers.copy')"
             >
               ⎘
             </button>
-            @if (row.status !== 'CONNECTED') {
-              <button
-                type="button"
-                class="peer-panel__action peer-panel__action--retry"
-                (click)="reconnectPeer(row.url, $event)"
-                [disabled]="submitting()"
-                [attr.aria-label]="locale.t('peers.retry')"
-              >
-                ↻
-              </button>
-            }
             <button
               type="button"
               class="peer-panel__action peer-panel__action--disconnect"
               (click)="disconnectPeer(row.url, $event)"
               [disabled]="submitting()"
               [attr.aria-label]="locale.t('peers.disconnect')"
+              [title]="locale.t('peers.disconnect')"
             >
               ✕
             </button>

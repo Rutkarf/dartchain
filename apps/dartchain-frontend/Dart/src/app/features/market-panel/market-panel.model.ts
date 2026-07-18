@@ -1,4 +1,25 @@
-import { MarketAssetConfig } from './market-panel.constants';
+import { ChartRange } from '../../core/models/showcase.model';
+import { LaunchProject } from '../../core/models/showcase.model';
+import { MarketAssetConfig, MarketFilter, MarketSortMode } from './market-panel.constants';
+
+export type MarketMomentum = 'hot' | 'warm' | 'neutral' | 'cool';
+
+export interface MarketAssetMetrics {
+  volumeLabel: string;
+  liquidityLabel: string;
+  marketCapLabel: string;
+  momentum: MarketMomentum;
+  momentumLabel: string;
+  holdersLabel: string;
+  tokenAgeLabel: string;
+  recentActivityLabel: string;
+  progressPercent: number | null;
+  creatorLabel: string;
+  statusLabel: string;
+  logoUrl?: string | null;
+  description?: string | null;
+  launchDate?: string | null;
+}
 
 export interface MarketAssetRow {
   config: MarketAssetConfig;
@@ -8,7 +29,15 @@ export interface MarketAssetRow {
   volume: string;
   favorite: boolean;
   priceUnavailable?: boolean;
+  walletBalance?: number;
+  rate?: number | null;
+  metrics: MarketAssetMetrics;
+  launchProject?: LaunchProject | null;
+  /** Timestamp de création / lancement pour tri chronologique */
+  createdAtMs: number;
 }
+
+export type MarketAssetRowCore = Omit<MarketAssetRow, 'metrics' | 'launchProject' | 'createdAtMs'>;
 
 export interface MarketFeaturedChart {
   price: string;
@@ -24,6 +53,7 @@ export interface MarketRecentTrade {
   amountIn: number;
   amountOut: number;
   at: number;
+  txHash?: string;
 }
 
 export interface MarketPriceAlert {
@@ -47,4 +77,16 @@ export interface MarketSwapCompleteDetail {
   toToken: string;
   amountIn: number;
   amountOut: number;
+  txHash?: string;
+}
+
+export interface MarketSessionState {
+  featuredToken?: string;
+  chartRange?: ChartRange;
+  filter?: MarketFilter;
+  sort?: MarketSortMode;
+  historyExpanded?: boolean;
+  alertThreshold?: number;
+  searchQuery?: string;
+  liveFilter?: boolean;
 }

@@ -28,9 +28,24 @@ export class DockQuestsStateService {
     () => this.taskViews().filter((task) => !task.complete).length
   );
 
-  readonly claimableCount = computed(
-    () => this.taskViews().filter((task) => task.claimable).length
-  );
+  readonly claimableCount = computed(() => {
+    const snapshot = this.state();
+    if (!snapshot) {
+      return 0;
+    }
+
+    let count = this.taskViews().filter((task) => task.claimable || task.pendingWallet).length;
+
+    if (this.quests.missionProgress(snapshot) >= 100 && !snapshot.missionClaimed) {
+      count += 1;
+    }
+
+    if (this.quests.allDailyClaimed(snapshot) && !snapshot.weeklyClaimed) {
+      count += 1;
+    }
+
+    return count;
+  });
 
   readonly missionProgress = computed(() => {
     const snapshot = this.state();

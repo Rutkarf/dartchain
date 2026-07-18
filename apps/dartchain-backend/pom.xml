@@ -134,9 +134,9 @@
 					<environmentVariables>
 						<SPRING_PROFILES_ACTIVE>postgres</SPRING_PROFILES_ACTIVE>
 						<DARTCHAIN_PERSISTENCE_MODE>postgres</DARTCHAIN_PERSISTENCE_MODE>
-						<DATABASE_URL>jdbc:postgresql://localhost:5432/dartchain</DATABASE_URL>
-						<DATABASE_USERNAME>dartchain</DATABASE_USERNAME>
-						<DATABASE_PASSWORD>dartchain</DATABASE_PASSWORD>
+						<DATABASE_URL>${env.DATABASE_URL}</DATABASE_URL>
+						<DATABASE_USERNAME>${env.DATABASE_USERNAME}</DATABASE_USERNAME>
+						<DATABASE_PASSWORD>${env.DATABASE_PASSWORD}</DATABASE_PASSWORD>
 					</environmentVariables>
 				</configuration>
 			</plugin>

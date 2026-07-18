@@ -20,13 +20,13 @@
   overflow-x: auto;
   overflow-y: hidden;
   max-width: 100%;
-  padding: 4px 2px;
+  padding: 2px 1px;
   scrollbar-width: thin;
 }
 
 .chain-graph__svg {
   display: block;
-  height: clamp(56px, 18cqw, 72px);
+  height: clamp(68px, 22cqw, 88px);
   min-width: 100%;
 }
 

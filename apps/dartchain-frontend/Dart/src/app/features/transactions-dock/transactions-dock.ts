@@ -8,6 +8,7 @@ import {
   effect,
   inject,
   untracked,
+  viewChild,
 } from '@angular/core';
 
 import { LocaleService } from '../../core/i18n/locale.service';
@@ -25,7 +26,14 @@ import { PendingTransactionsComponent } from '../pending-transactions/pending-tr
 })
 export class TransactionsDockComponent implements OnInit {
   @ViewChild('mempoolPanel') mempoolPanelRef?: ElementRef<HTMLElement>;
-  @ViewChild('composerRef') composerRef?: BlockComposerComponent;
+  private readonly composer = viewChild(BlockComposerComponent);
+
+  protected readonly composerError = computed(
+    () => this.composer()?.errorMessage() ?? null
+  );
+  protected readonly composerSuccess = computed(
+    () => this.composer()?.successMessage() ?? null
+  );
 
   protected readonly locale = inject(LocaleService);
   protected readonly dock = inject(TransactionsDockService);
@@ -76,12 +84,8 @@ export class TransactionsDockComponent implements OnInit {
     );
   }
 
-  protected resetForm(): void {
-    this.composerRef?.clearForm();
-  }
-
   protected composerLoading(): boolean {
-    return this.composerRef?.loading() ?? false;
+    return this.composer()?.loading() ?? false;
   }
 
   private focusMempool(highlightId?: string | null): void {

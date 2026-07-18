@@ -39,39 +39,58 @@
   display: flex !important;
   flex-flow: row nowrap !important;
   align-items: stretch !important;
-  gap: 2px !important;
+  gap: 1px !important;
   width: 100% !important;
   min-width: 0 !important;
   height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   overflow-y: visible !important;
-}
-
-.app-bottom-stack .showcase-header-tabs .showcase-tab:has(.showcase-tab__unread-toast),
-.app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface:has(.showcase-tab__unread-toast) {
-  overflow: visible !important;
-  z-index: 2 !important;
+  container-type: inline-size;
+  container-name: dock-tabs;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab,
 .app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface {
-  flex: 0 0 auto !important;
-  min-width: max-content !important;
+  flex: var(--dock-tab-flex, 6) 1 0 !important;
+  min-width: 0 !important;
   max-width: none !important;
+  padding: 0 2px !important;
+  font-size: clamp(4.5px, calc(100cqw / 52), 7px) !important;
+  letter-spacing: 0.02em !important;
+  overflow: visible !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface.ds-surface--showcase-tab {
+  overflow: visible !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab__label {
-  display: inline-block !important;
+  display: block !important;
   width: auto !important;
-  min-width: max-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
   overflow: visible !important;
   text-overflow: unset !important;
+  white-space: nowrap !important;
   text-align: center !important;
 }
 
 .app-bottom-stack .showcase-header-actions {
   flex: 0 0 auto !important;
   flex-shrink: 0 !important;
+}
+
+/* Docks : carbone plus opaque (showcase-body dans le bottom stack) */
+.app-bottom-stack .app-bottom-stack__panel .quests-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .market-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .peer-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .chain-dock.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .transactions-dock.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .faucet-panel.ds-surface {
+  --ds-surface-carbon-opacity: 0.46;
+  --ds-surface-sheen-opacity: 0.3;
+  background-color: rgba(var(--ds-surface-base-deep-rgb, 6, 7, 10), 0.62);
+  background-image: var(--ds-surface-metallic), var(--ds-surface-bg), var(--ds-surface-veil);
 }

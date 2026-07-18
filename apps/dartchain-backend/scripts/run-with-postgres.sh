@@ -3,10 +3,13 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$ROOT_DIR/../.." && pwd)"
 cd "$ROOT_DIR"
 
 # shellcheck source=scripts/lib/dev-env.sh
 source "$ROOT_DIR/scripts/lib/dev-env.sh"
+
+dev_load_repo_env "$REPO_ROOT"
 
 echo "==> Vérification PostgreSQL"
 if dev_postgres_ready; then

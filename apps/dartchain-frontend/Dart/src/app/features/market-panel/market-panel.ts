@@ -26,28 +26,24 @@ import {
   filterLaunchpadTokenList,
 } from '../../core/constants/exchange-launchpad.constants';
 import {
-  buildOhlcFromPriceSeries,
-  layoutCandlesForSvg,
-  CandleSvgLayout,
-} from '../showcase-chart/chart-display.util';
-import {
   MARKET_ASSETS,
-  MARKET_DEFAULT_ALERT_THRESHOLD,
-  MARKET_TIMEFRAMES,
   MarketAssetConfig,
   MarketFilter,
+  MarketSortMode,
 } from './market-panel.constants';
 import {
   MarketAssetRow,
-  MarketQuickTradeContext,
   MarketRecentTrade,
 } from './market-panel.model';
 import { MarketPanelService } from './market-panel.service';
+import { MarketTokenDrawerComponent } from './market-token-drawer';
+
+type StatusBannerTone = 'error' | 'warn' | 'info';
 
 @Component({
   selector: 'app-market-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MarketTokenDrawerComponent],
   templateUrl: './market-panel.html',
   styleUrls: ['./market-panel.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,27 +57,36 @@ export class MarketPanelComponent implements OnDestroy {
   private readonly walletSession = inject(WalletSessionService);
   private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly timeframes = MARKET_TIMEFRAMES;
   protected readonly filterOptions: ReadonlyArray<{ id: MarketFilter; label: string }> = [
     { id: 'all', label: 'TOUS' },
+    { id: 'tradable', label: 'TRAD' },
     { id: 'r4v3', label: 'R4V3' },
     { id: 'fav', label: 'FAV' },
+    { id: 'gainers', label: '↑' },
+    { id: 'losers', label: '↓' },
   ];
-  protected readonly quickPercents = [10, 25, 50, 100] as const;
+  protected readonly sortOptions: ReadonlyArray<{ id: MarketSortMode; label: string }> = [
+    { id: 'fav', label: '★' },
+    { id: 'change', label: 'Δ%' },
+    { id: 'price', label: '€' },
+    { id: 'name', label: 'A-Z' },
+  ];
 
   protected readonly featuredAsset = signal<MarketAssetConfig>(MARKET_ASSETS[0]);
   protected readonly chartRange = signal<ChartRange>('24h');
   protected readonly filter = signal<MarketFilter>('all');
+  protected readonly sortMode = signal<MarketSortMode>('fav');
   protected readonly searchQuery = signal('');
   protected readonly favorites = signal<Set<string>>(new Set());
-  protected readonly showFavoritesOnly = signal(false);
+  protected readonly alertThreshold = signal<number>(5);
   protected readonly tradeHint = signal<string | null>(null);
   protected readonly availableTokens = signal<string[]>([...EXCHANGE_LAUNCHPAD_FALLBACK_TOKENS]);
-  protected readonly quickTrade = signal<MarketQuickTradeContext | null>(null);
-  protected readonly quickTradeLoading = signal(false);
-  protected readonly quickTradeSubmitting = signal(false);
   protected readonly historyExpanded = signal(false);
+  protected readonly historyFilterFeatured = signal(false);
   protected readonly focusedRowIndex = signal(0);
+  protected readonly drawerRow = signal<MarketAssetRow | null>(null);
+  protected readonly liveFilter = signal(false);
+  protected readonly actionsMenuOpen = signal(false);
 
   protected readonly rows = this.marketData.rows;
   protected readonly featuredChart = this.marketData.featuredChart;
@@ -90,6 +95,7 @@ export class MarketPanelComponent implements OnDestroy {
   protected readonly marketError = this.marketData.error;
   protected readonly recentTrades = this.marketData.recentTrades;
   protected readonly alertNotifications = this.marketData.alertNotifications;
+  protected readonly lastUpdatedAt = this.marketData.lastUpdatedAt;
 
   protected readonly tradableAssets = computed(() => {
     const allowed = new Set(this.availableTokens().map((token) => token.toUpperCase()));
@@ -97,72 +103,99 @@ export class MarketPanelComponent implements OnDestroy {
   });
 
   protected readonly filteredRows = computed(() => {
-    const query = this.searchQuery().trim().toLowerCase();
-    const activeFilter = this.filter();
+    const query = this.searchQuery().trim();
 
     return this.rows().filter((row) => {
       if (!this.tradableAssets().some((asset) => asset.exchangeToken === row.config.exchangeToken)) {
         return false;
       }
 
-      if (activeFilter === 'r4v3' && !row.config.native) {
-        return false;
+      if (this.liveFilter()) {
+        const status = row.launchProject?.status ?? row.metrics.statusLabel;
+        if (status !== 'LIVE' && !row.config.native) {
+          return false;
+        }
       }
 
-      if (activeFilter === 'fav' && !row.favorite) {
-        return false;
-      }
-
-      if (!query) {
-        return true;
-      }
-
-      return (
-        row.config.displaySymbol.toLowerCase().includes(query) ||
-        row.config.name.toLowerCase().includes(query) ||
-        row.config.exchangeToken.toLowerCase().includes(query) ||
-        (row.config.unitLabel?.toLowerCase().includes(query) ?? false)
-      );
+      return this.matchesSearch(row, query);
     });
   });
 
-  protected readonly featuredCandles = computed((): CandleSvgLayout[] => {
-    const chart = this.featuredChart();
-    if (!chart?.prices?.length) {
-      return [];
-    }
+  protected readonly sortedRows = computed(() => {
+    const rows = [...this.filteredRows()];
+    const pinned = rows.filter((row) => row.config.native);
+    const others = rows
+      .filter((row) => !row.config.native)
+      .sort((left, right) => right.createdAtMs - left.createdAtMs);
 
-    const ohlc = buildOhlcFromPriceSeries(chart.prices);
-    return layoutCandlesForSvg(ohlc, 100, 36);
+    return [...pinned, ...others];
   });
 
-  protected readonly featuredChangeLabel = computed(() => {
-    const chart = this.featuredChart();
-    if (!chart) {
-      return '—';
-    }
+  protected readonly skeletonCount = computed(() =>
+    Math.max(3, Math.min(this.tradableAssets().length, 5))
+  );
 
-    const sign = chart.positive ? '+' : '';
-    return `${sign}${chart.changePercent.toFixed(2)}%`;
+  protected readonly skeletonSlots = computed(() =>
+    Array.from({ length: this.skeletonCount() }, (_, index) => index)
+  );
+
+  protected readonly sortModeLabel = computed(
+    () => this.sortOptions.find((option) => option.id === this.sortMode())?.label ?? '★'
+  );
+
+  protected readonly searchPlaceholder = computed(() => {
+    const count = this.filteredRows().length;
+    return `${count} résultat${count > 1 ? 's' : ''}`;
   });
 
-  protected readonly errorBanner = computed(() => {
+  protected readonly statusBanner = computed((): { message: string; tone: StatusBannerTone } | null => {
     const error = this.marketError();
     if (error) {
-      return error;
+      return { message: error, tone: 'error' };
     }
 
     const alerts = this.alertNotifications();
     if (alerts.length) {
-      return `Alerte : ${alerts.join(' · ')}`;
+      return { message: `Alerte : ${alerts.join(' · ')}`, tone: 'warn' };
+    }
+
+    const hint = this.tradeHint();
+    if (hint) {
+      return { message: hint, tone: 'info' };
     }
 
     return null;
   });
 
+  protected readonly emptyStateMessage = computed(() => {
+    if (this.liveFilter()) {
+      return 'Aucun token live pour le moment';
+    }
+
+    if (this.searchQuery().trim()) {
+      return 'Aucun actif ne correspond à la recherche';
+    }
+
+    return 'Aucun actif disponible';
+  });
+
+  protected readonly filteredTrades = computed(() => {
+    let trades = this.recentTrades();
+    if (this.historyFilterFeatured()) {
+      const token = this.featuredAsset().exchangeToken;
+      trades = trades.filter(
+        (trade) => trade.fromToken === token || trade.toToken === token
+      );
+    }
+
+    return trades;
+  });
+
   constructor() {
+    this.restoreSession();
     this.favorites.set(this.marketService.readFavorites());
     this.marketData.init();
+    this.marketData.resumePolling();
     this.loadAvailableTokens();
     this.syncMarketDataContext();
     void this.marketData.refreshAll(true);
@@ -174,6 +207,19 @@ export class MarketPanelComponent implements OnDestroy {
       this.chartRange();
       this.syncMarketDataContext();
       this.marketData.scheduleRefresh(true);
+    });
+
+    effect(() => {
+      this.persistSession({
+        featuredToken: this.featuredAsset().exchangeToken,
+        chartRange: this.chartRange(),
+        filter: this.filter(),
+        sort: this.sortMode(),
+        historyExpanded: this.historyExpanded(),
+        alertThreshold: this.alertThreshold(),
+        searchQuery: this.searchQuery(),
+        liveFilter: this.liveFilter(),
+      });
     });
 
     effect(() => {
@@ -197,10 +243,28 @@ export class MarketPanelComponent implements OnDestroy {
       }
     });
 
-    this.destroyRef.onDestroy(() => this.marketData.destroy());
+    effect(() => {
+      const drawer = this.drawerRow();
+      if (!drawer) {
+        return;
+      }
+
+      const updated = this.rows().find(
+        (entry) => entry.config.exchangeToken === drawer.config.exchangeToken
+      );
+      if (updated && updated !== drawer) {
+        this.drawerRow.set(updated);
+      }
+    });
+
+    this.destroyRef.onDestroy(() => {
+      this.marketData.pausePolling();
+      this.marketData.destroy();
+    });
   }
 
   ngOnDestroy(): void {
+    this.marketData.pausePolling();
     this.marketData.destroy();
   }
 
@@ -222,8 +286,107 @@ export class MarketPanelComponent implements OnDestroy {
     this.focusedRowIndex.set(0);
   }
 
-  protected setChartRange(range: ChartRange): void {
-    this.chartRange.set(range);
+  protected setSortMode(next: MarketSortMode): void {
+    this.sortMode.set(next);
+    this.focusedRowIndex.set(0);
+  }
+
+  protected cycleSort(): void {
+    const order = this.sortOptions.map((option) => option.id);
+    const current = this.sortMode();
+    const index = order.indexOf(current);
+    this.setSortMode(order[(index + 1) % order.length] ?? 'fav');
+  }
+
+  protected openTokenDrawer(row: MarketAssetRow): void {
+    this.selectFeatured(row);
+    this.drawerRow.set(row);
+    this.focusedRowIndex.set(this.sortedRows().findIndex(
+      (entry) => entry.config.exchangeToken === row.config.exchangeToken
+    ));
+  }
+
+  protected closeTokenDrawer(): void {
+    this.drawerRow.set(null);
+  }
+
+  protected openFocusedTrade(): void {
+    const rows = this.sortedRows();
+    const row = rows[this.focusedRowIndex()] ?? rows[0];
+    if (!row) {
+      this.showTradeHint('Aucun token disponible');
+      return;
+    }
+
+    this.openTokenDrawer(row);
+  }
+
+  protected toggleLiveFilter(): void {
+    this.liveFilter.update((value) => !value);
+    this.focusedRowIndex.set(0);
+  }
+
+  protected toggleActionsMenu(event: MouseEvent): void {
+    event.stopPropagation();
+    this.actionsMenuOpen.update((open) => !open);
+  }
+
+  protected closeActionsMenu(): void {
+    this.actionsMenuOpen.set(false);
+  }
+
+  protected openHistoryFromMenu(): void {
+    this.toggleHistory();
+    this.closeActionsMenu();
+  }
+
+  protected openTradeFromMenu(): void {
+    this.openFocusedTrade();
+    this.closeActionsMenu();
+  }
+
+  protected toggleLiveFromMenu(): void {
+    this.toggleLiveFilter();
+    this.closeActionsMenu();
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.actionsMenuOpen()) {
+      this.closeActionsMenu();
+    }
+  }
+
+  protected onDrawerSwapped(event: { message: string }): void {
+    this.showTradeHint(event.message);
+    void this.marketData.refreshAll(true);
+  }
+
+  protected onDrawerFavoriteToggle(): void {
+    const row = this.drawerRow();
+    if (!row) {
+      return;
+    }
+
+    this.toggleFavorite(row, { stopPropagation: () => undefined } as MouseEvent);
+  }
+
+  protected onDrawerAlertToggle(): void {
+    const row = this.drawerRow();
+    if (!row) {
+      return;
+    }
+
+    this.togglePriceAlert(row, { stopPropagation: () => undefined } as MouseEvent);
+  }
+
+  protected onDrawerExchangeOpen(): void {
+    const row = this.drawerRow();
+    if (!row) {
+      return;
+    }
+
+    this.openInExchange(row, { stopPropagation: () => undefined } as MouseEvent);
   }
 
   protected selectFeatured(row: MarketAssetRow): void {
@@ -232,25 +395,17 @@ export class MarketPanelComponent implements OnDestroy {
     this.publishHubPairForAsset(row.config);
   }
 
-  protected selectFeaturedConfig(config: MarketAssetConfig): void {
-    this.featuredAsset.set(config);
-    this.brandCrypto.select(config.native ? 'R4V3' : config.exchangeToken, config.coinId);
-    this.publishHubPairForAsset(config);
-  }
-
   protected toggleFavorite(row: MarketAssetRow, event: MouseEvent): void {
     event.stopPropagation();
 
     const next = new Set(this.favorites());
     const key = row.config.exchangeToken;
-    const wasFavorite = next.has(key);
 
-    if (wasFavorite) {
+    if (next.has(key)) {
       next.delete(key);
       this.marketData.togglePriceAlert(key, false);
     } else {
       next.add(key);
-      this.marketData.togglePriceAlert(key, true, MARKET_DEFAULT_ALERT_THRESHOLD);
     }
 
     this.favorites.set(next);
@@ -260,40 +415,36 @@ export class MarketPanelComponent implements OnDestroy {
         entry.config.exchangeToken === key ? { ...entry, favorite: next.has(key) } : entry
       )
     );
+
+    const drawer = this.drawerRow();
+    if (drawer?.config.exchangeToken === key) {
+      this.drawerRow.set({ ...drawer, favorite: next.has(key) });
+    }
   }
 
   protected togglePriceAlert(row: MarketAssetRow, event: MouseEvent): void {
     event.stopPropagation();
-    if (!row.favorite) {
-      return;
-    }
 
     const enabled = !this.marketData.isAlertEnabled(row.config.exchangeToken);
-    this.marketData.togglePriceAlert(row.config.exchangeToken, enabled, MARKET_DEFAULT_ALERT_THRESHOLD);
+    const threshold = this.alertThreshold();
+    this.marketData.togglePriceAlert(row.config.exchangeToken, enabled, threshold);
     this.showTradeHint(
       enabled
-        ? `Alerte ±${MARKET_DEFAULT_ALERT_THRESHOLD}% sur ${row.config.displaySymbol}`
+        ? `Alerte ±${threshold}% sur ${row.config.displaySymbol}`
         : `Alerte désactivée pour ${row.config.displaySymbol}`
     );
   }
 
+  protected setAlertThreshold(value: number): void {
+    this.alertThreshold.set(value);
+    const token = this.featuredAsset().exchangeToken;
+    if (this.marketData.isAlertEnabled(token)) {
+      this.marketData.updateAlertThreshold(token, value);
+    }
+  }
+
   protected isAlertEnabled(row: MarketAssetRow): boolean {
-    return row.favorite && this.marketData.isAlertEnabled(row.config.exchangeToken);
-  }
-
-  protected toggleFavoritesShortcut(): void {
-    this.showFavoritesOnly.update((value) => !value);
-    this.filter.set(this.showFavoritesOnly() ? 'fav' : 'all');
-  }
-
-  protected onBuy(row: MarketAssetRow, event: MouseEvent): void {
-    event.stopPropagation();
-    void this.openQuickTrade(row, 'buy');
-  }
-
-  protected onSell(row: MarketAssetRow, event: MouseEvent): void {
-    event.stopPropagation();
-    void this.openQuickTrade(row, 'sell');
+    return this.marketData.isAlertEnabled(row.config.exchangeToken);
   }
 
   protected openNativeSwap(event: MouseEvent): void {
@@ -310,36 +461,68 @@ export class MarketPanelComponent implements OnDestroy {
     this.scrollToSwap();
   }
 
+  protected openInExchange(row: MarketAssetRow, event: MouseEvent): void {
+    event.stopPropagation();
+    this.selectFeatured(row);
+    this.scrollToSwap();
+    this.showTradeHint(`Exchange : ${this.pairLabel(row.config)}`);
+  }
+
   protected formatChange(row: MarketAssetRow): string {
     const sign = row.positive ? '+' : '';
-    return `${sign}${row.changePercent.toFixed(2)}%`;
+    return `${sign}${row.changePercent.toFixed(1)}%`;
   }
 
-  protected isFeatured(row: MarketAssetRow): boolean {
+  protected compactMetric(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed || trimmed === '—') {
+      return '—';
+    }
+
+    return trimmed
+      .replace('LaunchLab', 'LL')
+      .replace('Peg CHF/GBP', 'Peg')
+      .replace(/\s+/g, ' ');
+  }
+
+  protected momentumShort(row: MarketAssetRow): string {
+    switch (row.metrics.momentum) {
+      case 'hot':
+        return 'HOT';
+      case 'warm':
+        return '↑';
+      case 'cool':
+        return '↓';
+      default:
+        return '—';
+    }
+  }
+
+  protected balanceLabel(row: MarketAssetRow): string | null {
+    if (row.walletBalance == null || row.walletBalance <= 0) {
+      return null;
+    }
+
+    const share = this.portfolioShare(row);
+    const shareLabel = share != null ? ` · ${share.toFixed(0)}%` : '';
+    return `${row.walletBalance.toLocaleString('fr-FR', { maximumFractionDigits: 4 })}${shareLabel}`;
+  }
+
+  protected portfolioShare(row: MarketAssetRow): number | null {
+    if (row.walletBalance == null || row.walletBalance <= 0) {
+      return null;
+    }
+
+    const total = this.rows().reduce((sum, entry) => sum + (entry.walletBalance ?? 0), 0);
+    if (total <= 0) {
+      return null;
+    }
+
+    return (row.walletBalance / total) * 100;
+  }
+
+  protected isSelected(row: MarketAssetRow): boolean {
     return row.config.exchangeToken === this.featuredAsset().exchangeToken;
-  }
-
-  protected isTimeframeActive(range: ChartRange): boolean {
-    return this.chartRange() === range;
-  }
-
-  protected listSummary(): string {
-    if (this.historyExpanded()) {
-      return `${this.recentTrades().length} trade(s) récent(s)`;
-    }
-
-    const count = this.filteredRows().length;
-    const total = this.tradableAssets().length;
-    const countdown = this.marketData.rateLimitCountdownLabel();
-    if (countdown) {
-      return countdown;
-    }
-
-    if (count === total) {
-      return `${count} actifs LaunchLab · R4V3 / m4t3r`;
-    }
-
-    return `${count}/${total} actifs affichés`;
   }
 
   protected refreshMarket(): void {
@@ -348,68 +531,30 @@ export class MarketPanelComponent implements OnDestroy {
     void this.marketData.refreshAll(true);
   }
 
-  protected dismissErrorBanner(): void {
+  protected resetMarket(): void {
+    this.searchQuery.set('');
+    this.filter.set('all');
+    this.sortMode.set('fav');
+    this.liveFilter.set(false);
+    this.historyFilterFeatured.set(false);
+    this.marketData.clearAlertNotifications();
+    this.marketData.error.set(null);
+    this.loadAvailableTokens();
+    void this.marketData.refreshAll(true);
+  }
+
+  protected dismissStatusBanner(): void {
     this.marketData.error.set(null);
     this.marketData.clearAlertNotifications();
+    this.tradeHint.set(null);
   }
 
   protected toggleHistory(): void {
     this.historyExpanded.update((value) => !value);
   }
 
-  protected closeQuickTrade(): void {
-    this.quickTrade.set(null);
-    this.quickTradeSubmitting.set(false);
-  }
-
-  protected async applyQuickPercent(percent: number): Promise<void> {
-    const context = this.quickTrade();
-    if (!context || context.fromBalance <= 0) {
-      return;
-    }
-
-    const amount = (context.fromBalance * percent) / 100;
-    this.quickTrade.set({ ...context, amountPreset: amount });
-  }
-
-  protected async confirmQuickTrade(): Promise<void> {
-    const context = this.quickTrade();
-    const address = this.walletSession.address();
-    if (!context || !address || context.amountPreset <= 0) {
-      return;
-    }
-
-    this.quickTradeSubmitting.set(true);
-    this.api
-      .swapExchangeTokens({
-        fromToken: context.fromToken,
-        toToken: context.toToken,
-        amount: context.amountPreset,
-        walletAddress: address,
-      })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          window.dispatchEvent(
-            new CustomEvent('market-swap-complete', {
-              detail: {
-                fromToken: response.fromToken,
-                toToken: response.toToken,
-                amountIn: response.amountIn,
-                amountOut: response.amountOut,
-              },
-            })
-          );
-          this.walletSession.requestBalanceRefresh();
-          this.showTradeHint(`Swap OK : ${response.amountOut} ${response.toToken}`);
-          this.closeQuickTrade();
-          void this.marketData.refreshAll(true);
-        },
-        error: () => {
-          this.showTradeHint('Swap impossible — vérifiez solde et connexion');
-          this.quickTradeSubmitting.set(false);
-        },
-      });
+  protected toggleHistoryFeaturedFilter(): void {
+    this.historyFilterFeatured.update((value) => !value);
   }
 
   protected formatTrade(trade: MarketRecentTrade): string {
@@ -423,21 +568,30 @@ export class MarketPanelComponent implements OnDestroy {
     });
   }
 
+  protected openTradeExplorer(trade: MarketRecentTrade, event: MouseEvent): void {
+    event.stopPropagation();
+    if (!trade.txHash) {
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent('open-transaction-drawer', {
+        detail: { hash: trade.txHash },
+      })
+    );
+  }
+
   protected rowTabIndex(index: number): number {
     return index === this.focusedRowIndex() ? 0 : -1;
   }
 
   @HostListener('keydown', ['$event'])
   protected onPanelKeydown(event: KeyboardEvent): void {
-    if (this.quickTrade()) {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        this.closeQuickTrade();
-      }
+    if (this.drawerRow()) {
       return;
     }
 
-    const rows = this.filteredRows();
+    const rows = this.sortedRows();
     if (!rows.length) {
       return;
     }
@@ -456,9 +610,108 @@ export class MarketPanelComponent implements OnDestroy {
       const row = rows[this.focusedRowIndex()];
       if (row) {
         event.preventDefault();
-        this.selectFeatured(row);
+        this.openTokenDrawer(row);
       }
     }
+
+    if (event.key.toLowerCase() === 't') {
+      event.preventDefault();
+      this.openFocusedTrade();
+    }
+  }
+
+  private matchesSearch(row: MarketAssetRow, query: string): boolean {
+    if (!query) {
+      return true;
+    }
+
+    const normalized = query.toLowerCase();
+
+    const changeMatch = normalized.match(/^([<>]=?)\s*([+-]?\d+(?:[.,]\d+)?)\s*%?$/);
+    if (changeMatch) {
+      const operator = changeMatch[1];
+      const value = Number.parseFloat(changeMatch[2].replace(',', '.'));
+      if (!Number.isFinite(value)) {
+        return false;
+      }
+
+      if (operator.startsWith('>')) {
+        return row.changePercent > value;
+      }
+
+      return row.changePercent < value;
+    }
+
+    const priceMatch = normalized.match(/^price\s*([<>]=?)\s*([\d.,]+)/);
+    if (priceMatch) {
+      const operator = priceMatch[1];
+      const value = Number.parseFloat(priceMatch[2].replace(',', '.'));
+      const price = this.parsePriceValue(row.price);
+      if (!Number.isFinite(value)) {
+        return false;
+      }
+
+      if (operator.startsWith('>')) {
+        return price > value;
+      }
+
+      return price < value;
+    }
+
+    return (
+      row.config.displaySymbol.toLowerCase().includes(normalized) ||
+      row.config.name.toLowerCase().includes(normalized) ||
+      row.config.exchangeToken.toLowerCase().includes(normalized) ||
+      (row.config.unitLabel?.toLowerCase().includes(normalized) ?? false)
+    );
+  }
+
+  private parsePriceValue(price: string): number {
+    const normalized = price.replace(/[^\d,.-]/g, '').replace(',', '.');
+    const parsed = Number.parseFloat(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  private restoreSession(): void {
+    const session = this.marketService.readSession();
+    if (session.featuredToken) {
+      const config = MARKET_ASSETS.find((asset) => asset.exchangeToken === session.featuredToken);
+      if (config) {
+        this.featuredAsset.set(config);
+      }
+    }
+
+    if (session.chartRange) {
+      this.chartRange.set(session.chartRange);
+    }
+
+    if (session.filter) {
+      this.filter.set(session.filter);
+    }
+
+    if (session.sort) {
+      this.sortMode.set(session.sort);
+    }
+
+    if (session.historyExpanded != null) {
+      this.historyExpanded.set(session.historyExpanded);
+    }
+
+    if (session.alertThreshold != null) {
+      this.alertThreshold.set(session.alertThreshold);
+    }
+
+    if (session.searchQuery != null) {
+      this.searchQuery.set(session.searchQuery);
+    }
+
+    if (session.liveFilter != null) {
+      this.liveFilter.set(session.liveFilter);
+    }
+  }
+
+  private persistSession(partial: Parameters<MarketPanelService['writeSession']>[0]): void {
+    this.marketService.writeSession(partial);
   }
 
   private syncMarketDataContext(): void {
@@ -483,50 +736,6 @@ export class MarketPanelComponent implements OnDestroy {
       });
   }
 
-  private async openQuickTrade(row: MarketAssetRow, side: 'buy' | 'sell'): Promise<void> {
-    if (row.config.native) {
-      this.openNativeSwap({ stopPropagation: () => undefined } as MouseEvent);
-      return;
-    }
-
-    const fromToken = side === 'buy' ? EXCHANGE_NATIVE_TOKEN : row.config.exchangeToken;
-    const toToken = side === 'buy' ? row.config.exchangeToken : EXCHANGE_NATIVE_TOKEN;
-    const guard = this.ensureTradeReady(fromToken);
-    if (guard) {
-      this.showTradeHint(guard);
-      return;
-    }
-
-    this.quickTradeLoading.set(true);
-    this.api
-      .getExchangePanel({
-        walletAddress: this.walletSession.address(),
-        fromToken,
-        toToken,
-      })
-      .pipe(
-        catchError(() => of(null)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((panel) => {
-        this.quickTradeLoading.set(false);
-        if (!panel) {
-          this.showTradeHint('Impossible de charger la paire');
-          return;
-        }
-
-        this.quickTrade.set({
-          config: row.config,
-          side,
-          fromToken,
-          toToken,
-          fromBalance: panel.fromBalance,
-          rate: panel.rate,
-          amountPreset: 0,
-        });
-      });
-  }
-
   private ensureTradeReady(fromToken: string): string | null {
     if (!this.walletSession.address()) {
       window.dispatchEvent(new CustomEvent('dock-open-panel', { detail: { panel: 'wallet' } }));
@@ -538,6 +747,7 @@ export class MarketPanelComponent implements OnDestroy {
       return 'Connexion requise pour trader';
     }
 
+    void fromToken;
     return null;
   }
 

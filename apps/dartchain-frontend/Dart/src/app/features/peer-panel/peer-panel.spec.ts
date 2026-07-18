@@ -101,10 +101,13 @@ describe('PeerPanelComponent', () => {
     expect(peersData.init).toHaveBeenCalled();
   });
 
-  it('renders Peers title and summary footer', () => {
+  it('renders compact header without title and always-visible connect row', () => {
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.textContent).toContain('Peers');
+    expect(element.querySelector('.peer-panel__title')).toBeNull();
+    expect(element.querySelector('.peer-panel__connect')).toBeTruthy();
+    expect(element.querySelector('.peer-panel__connect-input')).toBeTruthy();
     expect(element.textContent).toContain('1/1');
+    expect(element.querySelector('.peer-panel.ds-surface')).toBeTruthy();
   });
 
   it('shows error banner when peers data service reports load error', () => {
@@ -115,18 +118,18 @@ describe('PeerPanelComponent', () => {
     expect(element.textContent).toContain('Impossible de charger les peers');
   });
 
-  it('filters connected peers only', () => {
+  it('filters favorites from integrated search bar', () => {
     peersData.peers.set([
       { url: 'ws://a.test/ws', status: 'CONNECTED', message: '' },
       { url: 'ws://b.test/ws', status: 'DISCONNECTED', message: '' },
     ]);
     fixture.detectChanges();
 
-    const buttons = Array.from(
-      (fixture.nativeElement as HTMLElement).querySelectorAll('.peer-panel__filter')
-    ) as HTMLButtonElement[];
-    const connectedButton = buttons.find((button) => button.textContent?.includes('OK'));
-    connectedButton?.click();
+    const favButton = (fixture.nativeElement as HTMLElement).querySelector(
+      '.peer-panel__search-fav'
+    ) as HTMLButtonElement;
+    fixture.componentInstance['favorites'].set(new Set(['ws://a.test/ws']));
+    favButton.click();
     fixture.detectChanges();
 
     const rows = (fixture.nativeElement as HTMLElement).querySelectorAll('.peer-panel__row');

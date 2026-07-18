@@ -22,16 +22,13 @@ import {
 } from '../../core/services/blockchain-api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { LocaleService } from '../../core/i18n/locale.service';
-import { LocaleKey } from '../../core/i18n/locale.messages';
 import { PeersDataService } from '../../core/services/peers-data.service';
 import { PeerDetailDrawerComponent } from '../peer-detail-drawer/peer-detail-drawer';
 import {
   PEER_FAVORITES_STORAGE_KEY,
-  PEER_FILTER_IDS,
 } from './peer-panel.constants';
-import { PeerFilter, PeerRowView } from './peer-panel.model';
+import { PeerRowView } from './peer-panel.model';
 import {
-  activityPolyline,
   buildNetworkStats,
   buildPeerRowView,
   statusToneClass,
@@ -58,24 +55,39 @@ export class PeerPanelComponent implements OnDestroy {
 
   protected readonly peerInput = signal('ws://localhost:8080/ws/peers');
   protected readonly searchQuery = signal('');
-  protected readonly activeFilter = signal<PeerFilter>('all');
+  protected readonly favoritesOnly = signal(false);
   protected readonly favorites = signal<ReadonlySet<string>>(new Set());
   protected readonly submitting = signal(false);
   protected readonly successMessage = signal<string | null>(null);
   protected readonly actionErrorMessage = signal<string | null>(null);
-  protected readonly showConnectForm = signal(false);
   protected readonly selectedPeer = signal<PeerRowView | null>(null);
   protected readonly detailOpen = signal(false);
 
   protected readonly loading = this.peersData.loading;
   protected readonly peers = this.peersData.peers;
 
-  protected readonly filterOptions = computed(() =>
-    PEER_FILTER_IDS.map((id) => ({
-      id,
-      label: this.filterLabel(id),
-    }))
-  );
+  protected readonly filteredRows = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+    const favoritesOnly = this.favoritesOnly();
+
+    return this.peerRows().filter((row) => {
+      if (favoritesOnly && !row.isFavorite) {
+        return false;
+      }
+
+      if (!query) {
+        return true;
+      }
+
+      return (
+        row.nodeName.toLowerCase().includes(query) ||
+        row.endpoint.toLowerCase().includes(query) ||
+        row.url.toLowerCase().includes(query) ||
+        row.status.toLowerCase().includes(query) ||
+        row.message.toLowerCase().includes(query)
+      );
+    });
+  });
 
   protected readonly normalizedPeerInput = computed(() => this.peerInput().trim());
   protected readonly peerCount = computed(() => this.peers().length);
@@ -96,33 +108,6 @@ export class PeerPanelComponent implements OnDestroy {
   protected readonly peerRows = computed(() =>
     this.peers().map((peer) => buildPeerRowView(peer, this.favorites()))
   );
-
-  protected readonly filteredRows = computed(() => {
-    const query = this.searchQuery().trim().toLowerCase();
-    const filter = this.activeFilter();
-
-    return this.peerRows().filter((row) => {
-      if (filter === 'connected' && row.status !== 'CONNECTED') {
-        return false;
-      }
-
-      if (filter === 'favorites' && !row.isFavorite) {
-        return false;
-      }
-
-      if (!query) {
-        return true;
-      }
-
-      return (
-        row.nodeName.toLowerCase().includes(query) ||
-        row.endpoint.toLowerCase().includes(query) ||
-        row.url.toLowerCase().includes(query) ||
-        row.status.toLowerCase().includes(query) ||
-        row.message.toLowerCase().includes(query)
-      );
-    });
-  });
 
   protected readonly connectButtonLabel = computed(() => {
     if (this.submitting()) {
@@ -176,10 +161,6 @@ export class PeerPanelComponent implements OnDestroy {
     this.peersData.scheduleRefresh(true);
   }
 
-  protected activityPath(row: PeerRowView): string {
-    return activityPolyline(row.activityPoints);
-  }
-
   protected statusLabel(status: PeerStatus): string {
     switch (status) {
       case 'CONNECTED':
@@ -197,16 +178,16 @@ export class PeerPanelComponent implements OnDestroy {
     return statusToneClass(status);
   }
 
-  protected setFilter(filter: PeerFilter): void {
-    this.activeFilter.set(filter);
+  protected toggleFavoritesFilter(): void {
+    this.favoritesOnly.update((value) => !value);
+  }
+
+  protected focusConnectInput(): void {
+    this.peerInputRef?.nativeElement.focus();
   }
 
   protected onSearchInput(value: string): void {
     this.searchQuery.set(value);
-  }
-
-  protected toggleConnectForm(): void {
-    this.showConnectForm.update((visible) => !visible);
   }
 
   protected dismissError(): void {
@@ -397,17 +378,6 @@ export class PeerPanelComponent implements OnDestroy {
     return isFavorite ? this.locale.t('peers.favRemove') : this.locale.t('peers.favAdd');
   }
 
-  private filterLabel(filter: PeerFilter): string {
-    const key: LocaleKey =
-      filter === 'connected'
-        ? 'peers.filterConnected'
-        : filter === 'favorites'
-          ? 'peers.filterFavorites'
-          : 'peers.filterAll';
-
-    return this.locale.t(key);
-  }
-
   private handlePeerActionSuccess(
     response: AddPeerResponse,
     peer: string,
@@ -418,7 +388,6 @@ export class PeerPanelComponent implements OnDestroy {
 
     this.successMessage.set(`${prefix} : ${peer}${statusLabel}`);
     this.peerInput.set(this.locale.t('peers.connectPlaceholder'));
-    this.showConnectForm.set(false);
     void this.peersData.refreshAll(true);
 
     queueMicrotask(() => {

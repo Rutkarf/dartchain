@@ -99,7 +99,7 @@ export class BlockComposerComponent implements OnInit {
   });
 
   readonly messagePlaceholder = computed(
-    () => `${this.rawTextLength()}/500`
+    () => `Message ${this.rawTextLength()}/500`
   );
 
   readonly walletAddress = computed(() => this.walletSession.address());

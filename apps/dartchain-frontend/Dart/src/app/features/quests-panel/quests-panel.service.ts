@@ -444,8 +444,28 @@ export class QuestsPanelService {
     const fresh = this.createDefaultState(dayKey);
     fresh.totalXp = state.totalXp;
     fresh.pendingMts = state.pendingMts;
+
+    if (this.isoWeekKey(state.dayKey) === this.isoWeekKey(dayKey)) {
+      fresh.weeklyClaimed = state.weeklyClaimed;
+    }
+
     this.persist(fresh);
     return fresh;
+  }
+
+  private isoWeekKey(dayKey: string): string {
+    const parsed = Date.parse(`${dayKey}T12:00:00`);
+    if (!Number.isFinite(parsed)) {
+      return dayKey.slice(0, 7);
+    }
+
+    const date = new Date(parsed);
+    const day = (date.getUTCDay() + 6) % 7;
+    date.setUTCDate(date.getUTCDate() - day + 3);
+    const weekYear = date.getUTCFullYear();
+    const weekStart = Date.UTC(weekYear, 0, 4);
+    const weekNumber = Math.ceil(((date.getTime() - weekStart) / 86_400_000 + 1) / 7);
+    return `${weekYear}-W${String(weekNumber).padStart(2, '0')}`;
   }
 
   private loadState(): QuestPersistedState {

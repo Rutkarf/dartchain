@@ -10,57 +10,72 @@
 }
 
 .chain-dock {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: 100%;
   height: 100%;
   min-height: 0;
-  gap: 4px;
-  padding: 4px;
+  gap: 2px;
+  padding: 2px;
   box-sizing: border-box;
   overflow: hidden;
   container-type: inline-size;
-  position: relative;
-  border-radius: 10px;
+  border-radius: var(--ds-surface-radius, 10px);
+  background-color: var(--ds-surface-tint);
+  background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
+  backdrop-filter: var(--ds-surface-backdrop);
+  -webkit-backdrop-filter: var(--ds-surface-backdrop);
   border: 1px solid rgba(0, 229, 255, 0.28);
-  background:
-    linear-gradient(180deg, rgba(2, 14, 24, 0.96), rgba(2, 10, 18, 0.98)) padding-box,
-    linear-gradient(165deg, rgba(0, 229, 255, 0.32), rgba(0, 168, 255, 0.1)) border-box;
   box-shadow:
-    0 0 14px rgba(0, 229, 255, 0.1),
-    inset 0 1px 0 rgba(130, 230, 255, 0.12);
+    var(--ds-surface-shadow),
+    0 0 12px rgba(0, 229, 255, 0.08);
 }
 
 .chain-dock__head {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 6px;
-  min-height: 0;
+  gap: 4px;
+  min-height: clamp(18px, 5cqw, 24px);
   padding: 0 1px;
 }
 
-.chain-dock__title {
-  font-size: clamp(8px, 2.4cqw, 11px);
-  font-weight: 800;
-  letter-spacing: 0.1em;
+.chain-dock__head-left {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chain-dock__head-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+  line-height: 1;
+}
+
+.chain-dock__blocks-count {
+  margin: 0;
+  font-size: clamp(11px, 3.4cqw, 16px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(216, 244, 255, 0.95);
+  color: rgba(216, 244, 255, 0.98);
   white-space: nowrap;
 }
 
-.chain-dock__meta {
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: clamp(7px, 2.1cqw, 10px);
-  font-weight: 600;
-  color: rgba(167, 209, 228, 0.9);
+.chain-dock__sync-label {
+  margin-top: 1px;
+  font-size: clamp(5px, 1.5cqw, 7px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: rgba(167, 209, 228, 0.72);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .chain-dock__badge {
@@ -71,6 +86,7 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  line-height: 1.3;
 }
 
 .chain-dock__badge--valid {
@@ -85,33 +101,40 @@
   background: rgba(255, 96, 96, 0.1);
 }
 
-.chain-dock__refresh {
-  flex-shrink: 0;
-  width: clamp(18px, 5cqw, 22px);
-  height: clamp(18px, 5cqw, 22px);
-  border-radius: 6px;
+.chain-dock__badge--sync {
+  color: rgba(188, 240, 255, 0.92);
   border: 1px solid rgba(0, 229, 255, 0.35);
   background: rgba(0, 229, 255, 0.1);
+}
+
+.chain-dock__reset {
+  flex-shrink: 0;
+  min-height: clamp(14px, 4cqw, 18px);
+  padding: 0 6px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 229, 255, 0.32);
+  background: rgba(0, 229, 255, 0.08);
   color: rgba(188, 240, 255, 0.95);
-  font-size: clamp(10px, 2.8cqw, 12px);
+  font-family: inherit;
+  font-size: clamp(6px, 1.8cqw, 8px);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   line-height: 1;
   cursor: pointer;
-  padding: 0;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
 }
 
-.chain-dock__refresh--spinning {
-  animation: chain-dock-spin 0.8s linear infinite;
-}
-
-@keyframes chain-dock-spin {
-  to {
-    transform: rotate(360deg);
-  }
+.chain-dock__reset:hover {
+  border-color: rgba(0, 229, 255, 0.52);
+  background: rgba(0, 229, 255, 0.16);
 }
 
 .chain-dock__toast {
   position: absolute;
-  top: 6px;
+  top: 4px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
@@ -144,9 +167,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
-  padding: 4px 6px;
+  padding: 3px 5px;
   border-radius: 6px;
   font-size: clamp(6px, 1.8cqw, 8px);
   font-weight: 600;
@@ -165,8 +188,7 @@
   white-space: nowrap;
 }
 
-.chain-dock__alert-btn,
-.chain-dock__clear {
+.chain-dock__alert-btn {
   flex-shrink: 0;
   border: none;
   background: transparent;
@@ -182,7 +204,7 @@
 .chain-dock__main {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-height: 0;
   overflow: hidden;
 }
@@ -190,9 +212,9 @@
 .chain-dock__toolbar {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-height: 0;
-  padding: 4px;
+  padding: 2px;
   border-radius: 8px;
   border: 1px solid rgba(0, 229, 255, 0.14);
   background: rgba(0, 12, 22, 0.55);
@@ -200,28 +222,31 @@
 
 .chain-dock__toolbar-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
 }
 
+.chain-dock__toolbar-row--controls {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
 .chain-dock__toolbar-row--filters {
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) clamp(36px, 14%, 48px) clamp(36px, 14%, 48px) auto;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.65fr) minmax(0, 0.65fr);
 }
 
 .chain-dock__view-toggle {
   display: inline-flex;
   gap: 1px;
-  border-radius: 6px;
+  border-radius: 5px;
   overflow: hidden;
   border: 1px solid rgba(0, 229, 255, 0.2);
   flex-shrink: 0;
 }
 
 .chain-dock__view-btn {
-  min-height: clamp(16px, 4.5cqw, 20px);
-  padding: 0 6px;
+  min-height: clamp(14px, 4cqw, 18px);
+  padding: 0 5px;
   border: 0;
   background: rgba(0, 12, 22, 0.8);
   color: rgba(167, 209, 228, 0.85);
@@ -239,17 +264,6 @@
   background: rgba(0, 229, 255, 0.18);
 }
 
-.chain-dock__results {
-  min-width: 0;
-  font-size: clamp(6px, 1.8cqw, 8px);
-  font-weight: 700;
-  color: rgba(167, 209, 228, 0.8);
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .chain-dock__actions {
   display: inline-flex;
   align-items: center;
@@ -257,8 +271,42 @@
   flex-shrink: 0;
 }
 
+.chain-dock__block-label {
+  min-height: clamp(14px, 4cqw, 18px);
+  padding: 0 5px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 229, 255, 0.42);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 229, 255, 0.16),
+    rgba(0, 229, 255, 0.06)
+  );
+  color: rgba(188, 240, 255, 0.98);
+  font-family: inherit;
+  font-size: clamp(5px, 1.5cqw, 7px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow:
+    0 0 8px rgba(0, 229, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.chain-dock__block-label:hover {
+  border-color: rgba(0, 229, 255, 0.62);
+  box-shadow:
+    0 0 12px rgba(0, 229, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
 .chain-dock__action {
-  min-height: clamp(16px, 4.5cqw, 20px);
+  min-height: clamp(14px, 4cqw, 18px);
   padding: 0 5px;
   border-radius: 5px;
   border: 1px solid rgba(0, 229, 255, 0.28);
@@ -276,8 +324,8 @@
 .chain-dock__input {
   width: 100%;
   min-width: 0;
-  height: clamp(16px, 4.5cqw, 20px);
-  padding: 0 5px;
+  height: clamp(14px, 4cqw, 18px);
+  padding: 0 4px;
   border-radius: 5px;
   border: 1px solid rgba(0, 229, 255, 0.18);
   background: rgba(0, 8, 16, 0.85);
@@ -289,9 +337,30 @@
   box-sizing: border-box;
 }
 
+.chain-dock__input--search {
+  text-align: center;
+}
+
 .chain-dock__input--index {
   text-align: center;
   font-variant-numeric: tabular-nums;
+  padding-right: 0;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.chain-dock__input--index::-webkit-inner-spin-button,
+.chain-dock__input--index::-webkit-outer-spin-button {
+  opacity: 1;
+  height: 12px;
+  margin-left: 1px;
+  background: rgba(0, 229, 255, 0.12);
+  border-left: 1px solid rgba(0, 229, 255, 0.28);
+}
+
+.chain-dock__input--index:hover::-webkit-inner-spin-button,
+.chain-dock__input--index:hover::-webkit-outer-spin-button {
+  background: rgba(0, 229, 255, 0.22);
 }
 
 .chain-dock__input::placeholder {
@@ -301,7 +370,8 @@
 .chain-dock__input:focus-visible,
 .chain-dock__view-btn:focus-visible,
 .chain-dock__action:focus-visible,
-.chain-dock__refresh:focus-visible {
+.chain-dock__block-label:focus-visible,
+.chain-dock__reset:focus-visible {
   outline: none;
   border-color: rgba(0, 229, 255, 0.55);
   box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.25);
@@ -321,10 +391,10 @@
 .chain-dock__list {
   list-style: none;
   margin: 0;
-  padding: 3px;
+  padding: 2px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   flex: 1 1 0;
   min-height: 0;
   overflow-y: auto;
@@ -333,12 +403,12 @@
 }
 
 .chain-dock__item {
-  border-radius: 5px;
+  border-radius: 4px;
   border: 1px solid rgba(0, 229, 255, 0.12);
   background: rgba(0, 8, 16, 0.65);
 }
 
-.chain-dock__item.is-tip {
+.chain-dock__item.is-head {
   border-color: rgba(0, 229, 255, 0.45);
   background: rgba(0, 229, 255, 0.08);
   box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.18);
@@ -348,10 +418,10 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   width: 100%;
-  min-height: clamp(16px, 4.5cqw, 20px);
-  padding: 0 5px;
+  min-height: clamp(13px, 3.8cqw, 17px);
+  padding: 0 4px;
   border: 0;
   background: transparent;
   color: inherit;
@@ -400,8 +470,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 8px;
+  gap: 3px;
+  padding: 4px;
   font-size: clamp(7px, 2.1cqw, 10px);
   color: rgba(167, 209, 228, 0.75);
   text-align: center;
@@ -412,14 +482,14 @@
 }
 
 .chain-dock__list--skeleton {
-  padding: 4px;
-  gap: 3px;
+  padding: 2px;
+  gap: 2px;
   overflow: hidden;
 }
 
 .chain-dock__skeleton {
-  height: clamp(14px, 4cqw, 18px);
-  border-radius: 5px;
+  height: clamp(13px, 3.8cqw, 17px);
+  border-radius: 4px;
   border: 1px solid rgba(0, 229, 255, 0.08);
   background: rgba(0, 229, 255, 0.06);
   animation: chain-dock-pulse 1.2s ease-in-out infinite;
@@ -451,14 +521,13 @@
     grid-column: 1 / -1;
   }
 
-  .chain-dock__clear {
-    grid-column: 1 / -1;
-    justify-self: end;
+  .chain-dock__actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chain-dock__refresh--spinning,
   .chain-dock__skeleton {
     animation: none;
   }

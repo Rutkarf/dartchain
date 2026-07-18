@@ -25,8 +25,9 @@ public class ProductProperties {
     private boolean allowServerWalletCreate = true;
 
     /**
-     * Active le faucet (tokens gratuits).
+     * Réservé compatibilité config — le faucet reste toujours actif (dev et prod).
      */
+    @SuppressWarnings("unused")
     private boolean faucetEnabled = true;
 
     /**
@@ -64,7 +65,7 @@ public class ProductProperties {
     }
 
     public boolean isFaucetEnabled() {
-        return faucetEnabled;
+        return true;
     }
 
     public void setFaucetEnabled(boolean faucetEnabled) {

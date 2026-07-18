@@ -77,6 +77,7 @@ describe('QuestsPanel', () => {
         progressTarget: 100,
       })),
       getWeeklyReward: vi.fn(() => ({ rewardMts: 1, xpBoostPercent: 20 })),
+      claimWeekly: vi.fn(async () => ({ ok: false, error: 'locked' })),
     } as unknown as QuestsPanelService;
   }
 
@@ -122,17 +123,24 @@ describe('QuestsPanel', () => {
     expect(questsDataMock.init).toHaveBeenCalled();
   });
 
-  it('renders localized quest panel title', async () => {
+  it('renders compact header with Network Guardian, countdown and refresh', async () => {
     await setup();
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('.quests-panel__title')?.textContent).toContain('Quêtes');
-    expect(element.querySelector('.quests-panel__section-title')?.textContent).toContain('Quotidiennes');
+    expect(element.querySelector('.quests-panel__title')).toBeNull();
+    expect(element.querySelector('.quests-panel__guardian')?.textContent).toContain('Network Guardian');
+    expect(element.querySelector('.quests-panel__guardian-rank')?.textContent).toContain('Rôle actif');
+    expect(element.querySelector('.quests-panel__guardian-line')).toBeTruthy();
+    expect(element.querySelector('.quests-panel__countdown-value')?.textContent).toContain('11:59:59');
+    expect(element.querySelector('.quests-panel__section-title')).toBeNull();
+    expect(element.querySelector('.quests-panel__stat-stack')).toBeNull();
+    expect(element.querySelector('.quests-panel__refresh')).toBeTruthy();
+    expect(element.querySelector('.quests-panel.ds-surface')).toBeTruthy();
   });
 
-  it('shows server auto badge when authenticated', async () => {
+  it('does not render auto badge in header', async () => {
     await setup(true);
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('.quests-panel__auto-badge')?.textContent).toContain('AUTO');
+    expect(element.querySelector('.quests-panel__auto')).toBeNull();
   });
 
   it('opens wallet dock when pending wallet button is clicked', async () => {
@@ -154,11 +162,13 @@ describe('QuestsPanel', () => {
     expect(loginBtn?.textContent).toContain('Connexion');
   });
 
-  it('renders refresh button and weekly footer', async () => {
+  it('renders compact progress strip and disabled weekly button when locked', async () => {
     await setup();
     const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector('.quests-panel__progress-inline')).toBeTruthy();
     expect(element.querySelector('.quests-panel__refresh')).toBeTruthy();
-    expect(element.querySelector('.quests-panel__weekly')).toBeTruthy();
+    const weeklyBtn = element.querySelector('.quests-panel__weekly-btn') as HTMLButtonElement;
+    expect(weeklyBtn.disabled).toBe(true);
     expect(element.querySelector('.quests-panel__list')).toBeTruthy();
   });
 });

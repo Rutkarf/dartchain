@@ -13,6 +13,34 @@ import { MarketPanelComponent } from './market-panel';
 import { MARKET_ASSETS } from './market-panel.constants';
 import { MarketAssetRow } from './market-panel.model';
 
+const mockMetrics = {
+  volumeLabel: 'LaunchLab',
+  liquidityLabel: '25k R4V3',
+  marketCapLabel: '12k / 50k',
+  momentum: 'warm' as const,
+  momentumLabel: 'Momentum',
+  holdersLabel: '420',
+  tokenAgeLabel: '14j',
+  recentActivityLabel: 'Calme',
+  progressPercent: 24,
+  creatorLabel: 'LaunchLab · R4V3',
+  statusLabel: 'LIVE',
+};
+
+function mockRow(overrides: Partial<MarketAssetRow> = {}): MarketAssetRow {
+  return {
+    config: MARKET_ASSETS[1],
+    price: '0,05 €',
+    changePercent: 1.2,
+    positive: true,
+    volume: 'LaunchLab',
+    favorite: true,
+    createdAtMs: Date.now(),
+    metrics: mockMetrics,
+    ...overrides,
+  };
+}
+
 describe('MarketPanelComponent', () => {
   let fixture: ComponentFixture<MarketPanelComponent>;
   let marketService: {
@@ -20,6 +48,8 @@ describe('MarketPanelComponent', () => {
     loadFeaturedChart: ReturnType<typeof vi.fn>;
     readFavorites: ReturnType<typeof vi.fn>;
     writeFavorites: ReturnType<typeof vi.fn>;
+    readSession: ReturnType<typeof vi.fn>;
+    writeSession: ReturnType<typeof vi.fn>;
   };
   let marketData: {
     init: ReturnType<typeof vi.fn>;
@@ -31,6 +61,12 @@ describe('MarketPanelComponent', () => {
     isAlertEnabled: ReturnType<typeof vi.fn>;
     clearAlertNotifications: ReturnType<typeof vi.fn>;
     rateLimitCountdownLabel: ReturnType<typeof vi.fn>;
+    pausePolling: ReturnType<typeof vi.fn>;
+    resumePolling: ReturnType<typeof vi.fn>;
+    freshnessLabel: ReturnType<typeof vi.fn>;
+    getAlertThreshold: ReturnType<typeof vi.fn>;
+    updateAlertThreshold: ReturnType<typeof vi.fn>;
+    lastUpdatedAt: ReturnType<typeof signal<number>>;
     rows: ReturnType<typeof signal<MarketAssetRow[]>>;
     featuredChart: ReturnType<typeof signal>;
     loadingRows: ReturnType<typeof signal>;
@@ -45,6 +81,8 @@ describe('MarketPanelComponent', () => {
   beforeEach(async () => {
     marketService = {
       readFavorites: vi.fn(() => new Set(['PXD'])),
+      readSession: vi.fn(() => ({})),
+      writeSession: vi.fn(),
       loadAssetRows: vi.fn(),
       loadFeaturedChart: vi.fn(),
       writeFavorites: vi.fn(),
@@ -59,17 +97,14 @@ describe('MarketPanelComponent', () => {
       togglePriceAlert: vi.fn(),
       isAlertEnabled: vi.fn(() => false),
       clearAlertNotifications: vi.fn(),
+      pausePolling: vi.fn(),
+      resumePolling: vi.fn(),
+      freshnessLabel: vi.fn(() => null),
+      getAlertThreshold: vi.fn(() => 5),
+      updateAlertThreshold: vi.fn(),
+      lastUpdatedAt: signal(0),
       rateLimitCountdownLabel: vi.fn(() => null),
-      rows: signal<MarketAssetRow[]>([
-        {
-          config: MARKET_ASSETS[1],
-          price: '0,05 €',
-          changePercent: 1.2,
-          positive: true,
-          volume: 'LaunchLab',
-          favorite: true,
-        },
-      ]),
+      rows: signal<MarketAssetRow[]>([mockRow()]),
       featuredChart: signal({
         price: '0,12 €',
         changePercent: 1.2,
@@ -144,11 +179,21 @@ describe('MarketPanelComponent', () => {
     fixture.destroy();
   });
 
-  it('should create and render market filters', () => {
+  it('should create and render compact market toolbar', () => {
     expect(fixture.componentInstance).toBeTruthy();
-    expect(fixture.nativeElement.textContent).toContain('TOUS');
-    expect(fixture.nativeElement.textContent).toContain('R4V3');
-    expect(fixture.nativeElement.textContent).toContain('FAV');
+    expect(fixture.nativeElement.querySelector('.market-panel__search-input')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.market-panel__menu-btn')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).not.toContain('TOUS');
+    expect(fixture.nativeElement.textContent).not.toContain('TRAD');
+  });
+
+  it('should expose secondary actions from compact menu', () => {
+    const menuBtn = fixture.nativeElement.querySelector('.market-panel__menu-btn') as HTMLButtonElement;
+    menuBtn.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Historique');
+    expect(fixture.nativeElement.textContent).toContain('Trade');
+    expect(fixture.nativeElement.textContent).toContain('Live');
   });
 
   it('should initialize market data service', () => {
@@ -156,18 +201,42 @@ describe('MarketPanelComponent', () => {
     expect(marketData.refreshAll).toHaveBeenCalledWith(true);
   });
 
-  it('should block quick trade when wallet is missing', async () => {
-    const row = marketData.rows()[0];
-    await fixture.componentInstance['openQuickTrade'](row, 'buy');
-    expect(fixture.componentInstance['tradeHint']()).toContain('Créez un wallet');
+  it('should open token drawer when a card is clicked', () => {
+    const card = fixture.nativeElement.querySelector('.market-panel__row') as HTMLElement;
+    card.click();
+    fixture.detectChanges();
+    expect(fixture.componentInstance['drawerRow']()?.config.exchangeToken).toBe('PXD');
+    expect(fixture.nativeElement.querySelector('.market-token-drawer')).toBeTruthy();
   });
 
-  it('should toggle history panel', () => {
+  it('should toggle history panel without hiding asset list', () => {
     expect(fixture.componentInstance['historyExpanded']()).toBe(false);
     fixture.componentInstance['toggleHistory']();
     fixture.detectChanges();
     expect(fixture.componentInstance['historyExpanded']()).toBe(true);
-    expect(fixture.nativeElement.textContent).toContain('Liste');
+    expect(fixture.nativeElement.querySelector('.market-panel__list')).toBeTruthy();
+  });
+
+  it('should pin R4V3 first and sort others by creation date', () => {
+    const r4v3 = mockRow({
+      config: MARKET_ASSETS[0],
+      createdAtMs: 1,
+    });
+    const older = mockRow({
+      config: MARKET_ASSETS[1],
+      createdAtMs: 100,
+    });
+    const newer = mockRow({
+      config: MARKET_ASSETS[2],
+      createdAtMs: 200,
+    });
+    marketData.rows.set([older, newer, r4v3]);
+    fixture.detectChanges();
+
+    const sorted = fixture.componentInstance['sortedRows']();
+    expect(sorted[0]?.config.native).toBe(true);
+    expect(sorted[1]?.config.exchangeToken).toBe('NVFI');
+    expect(sorted[2]?.config.exchangeToken).toBe('PXD');
   });
 
   it('should sync featured asset when hub pair changes', () => {

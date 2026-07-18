@@ -1,23 +1,27 @@
-<div class="chain-dock" aria-labelledby="blocks-panel-title">
+<div class="chain-dock ds-surface ds-surface--showcase-body" [attr.aria-label]="locale.t('chain.title')">
   <header class="chain-dock__head">
-    <span id="blocks-panel-title" class="chain-dock__title">{{ locale.t('chain.title') }}</span>
-    <span class="chain-dock__meta" aria-live="polite">
-      {{ chainStatusLabel() }}
+    <div class="chain-dock__head-left" aria-live="polite">
       @if (chainValid() === true) {
         <span class="chain-dock__badge chain-dock__badge--valid">{{ locale.t('chain.valid') }}</span>
       } @else if (chainValid() === false) {
         <span class="chain-dock__badge chain-dock__badge--invalid">{{ locale.t('chain.invalid') }}</span>
+      } @else if (loading()) {
+        <span class="chain-dock__badge chain-dock__badge--sync">{{ locale.t('chain.syncing') }}</span>
       }
-    </span>
+    </div>
+
+    <div class="chain-dock__head-center" aria-live="polite">
+      <strong class="chain-dock__blocks-count">{{ blocksHeadline() }}</strong>
+      <span class="chain-dock__sync-label">{{ syncSubLabel() }}</span>
+    </div>
+
     <button
       type="button"
-      class="chain-dock__refresh"
-      (click)="refresh()"
-      [disabled]="loading()"
-      [class.chain-dock__refresh--spinning]="loading()"
-      [attr.aria-label]="locale.t('chain.refresh')"
+      class="chain-dock__reset"
+      (click)="clearFilters()"
+      [attr.aria-label]="locale.t('chain.filter.reset')"
     >
-      ↻
+      {{ locale.t('chain.filter.reset') }}
     </button>
   </header>
 
@@ -34,136 +38,135 @@
     </div>
   } @else if (loading() && !hasBlocks()) {
     <ul class="chain-dock__list chain-dock__list--skeleton" aria-hidden="true">
-      @for (row of [1, 2, 3, 4]; track row) {
+      @for (row of [1, 2, 3, 4, 5]; track row) {
         <li class="chain-dock__skeleton"></li>
       }
     </ul>
   } @else if (hasBlocks()) {
     <div class="chain-dock__main">
-    <div class="chain-dock__toolbar">
-      <div class="chain-dock__toolbar-row">
-        <div class="chain-dock__view-toggle" role="group" [attr.aria-label]="locale.t('chain.viewMode')">
-          <button
-            type="button"
-            class="chain-dock__view-btn"
-            [class.is-active]="viewMode() === 'list'"
-            [attr.aria-pressed]="viewMode() === 'list'"
-            (click)="setViewMode('list')"
-          >
-            {{ locale.t('chain.view.list') }}
-          </button>
-          <button
-            type="button"
-            class="chain-dock__view-btn"
-            [class.is-active]="viewMode() === 'graph'"
-            [attr.aria-pressed]="viewMode() === 'graph'"
-            (click)="setViewMode('graph')"
-          >
-            {{ locale.t('chain.view.graph') }}
-          </button>
-        </div>
-
-        <span class="chain-dock__results">{{ resultsLabel() }}</span>
-
-        <div class="chain-dock__actions">
-          <button type="button" class="chain-dock__action" (click)="exportFilteredBlocks()">
-            {{ locale.t('chain.export') }}
-          </button>
-          @if (latestBlock(); as tip) {
-            <button type="button" class="chain-dock__action" (click)="copyTipHash(tip.hash)">
-              {{ locale.t('chain.copyTip') }}
+      <div class="chain-dock__toolbar">
+        <div class="chain-dock__toolbar-row chain-dock__toolbar-row--controls">
+          <div class="chain-dock__view-toggle" role="group" [attr.aria-label]="locale.t('chain.viewMode')">
+            <button
+              type="button"
+              class="chain-dock__view-btn"
+              [class.is-active]="viewMode() === 'list'"
+              [attr.aria-pressed]="viewMode() === 'list'"
+              (click)="setViewMode('list')"
+            >
+              {{ locale.t('chain.view.list') }}
             </button>
-          }
-        </div>
-      </div>
+            <button
+              type="button"
+              class="chain-dock__view-btn"
+              [class.is-active]="viewMode() === 'graph'"
+              [attr.aria-pressed]="viewMode() === 'graph'"
+              (click)="setViewMode('graph')"
+            >
+              {{ locale.t('chain.view.graph') }}
+            </button>
+          </div>
 
-      <div class="chain-dock__toolbar-row chain-dock__toolbar-row--filters">
-        <input
-          type="search"
-          class="chain-dock__input"
-          [attr.placeholder]="locale.t('chain.filter.search')"
-          [attr.aria-label]="locale.t('chain.filter.search')"
-          [value]="searchQuery()"
-          (input)="onSearchInput($any($event.target).value)"
-        />
-        <input
-          type="text"
-          class="chain-dock__input"
-          [attr.placeholder]="locale.t('chain.filter.wallet')"
-          [attr.aria-label]="locale.t('chain.filter.wallet')"
-          [value]="walletFilter()"
-          (input)="onWalletInput($any($event.target).value)"
-        />
-        <input
-          type="number"
-          class="chain-dock__input chain-dock__input--index"
-          [attr.placeholder]="locale.t('chain.filter.from')"
-          [attr.aria-label]="locale.t('chain.filter.from')"
-          [value]="fromIndex()"
-          (input)="onFromIndexInput($any($event.target).value)"
-        />
-        <input
-          type="number"
-          class="chain-dock__input chain-dock__input--index"
-          [attr.placeholder]="locale.t('chain.filter.to')"
-          [attr.aria-label]="locale.t('chain.filter.to')"
-          [value]="toIndex()"
-          (input)="onToIndexInput($any($event.target).value)"
-        />
-        @if (hasActiveFilters()) {
-          <button type="button" class="chain-dock__clear" (click)="clearFilters()">
-            {{ locale.t('chain.filter.reset') }}
-          </button>
-        }
-      </div>
-    </div>
-
-    <div class="chain-dock__body">
-      @if (hasFilteredBlocks()) {
-        @if (viewMode() === 'graph') {
-          <app-chain-graph
-            [blocks]="filteredBlocks()"
-            [tipIndex]="tipBlockIndex()"
-            [maxNodes]="graphMaxNodes()"
-            (selectBlock)="openBlock($event)"
+          <input
+            type="search"
+            class="chain-dock__input chain-dock__input--search"
+            [attr.placeholder]="searchPlaceholder()"
+            [attr.aria-label]="locale.t('chain.filter.search')"
+            [value]="searchQuery()"
+            (input)="onSearchInput($any($event.target).value)"
           />
-        } @else {
-          <ul class="chain-dock__list" aria-label="Blocs de la blockchain">
-            @for (block of filteredBlocks(); track block.index) {
-              <li class="chain-dock__item" [class.is-tip]="latestBlock() && block.index === latestBlock()!.index">
-                <button
-                  type="button"
-                  class="chain-dock__item-btn"
-                  (click)="openBlock(block)"
-                  [attr.aria-label]="'Ouvrir le bloc #' + block.index"
-                  [attr.aria-current]="latestBlock() && block.index === latestBlock()!.index ? 'true' : null"
-                >
-                  <span class="chain-dock__cell chain-dock__cell--index">#{{ block.index }}</span>
-                  <span class="chain-dock__cell chain-dock__cell--hash" [title]="block.hash || 'Hash indisponible'">
-                    {{ shortHash(block.hash) }}
-                  </span>
-                  <span class="chain-dock__cell chain-dock__cell--tx">{{ blockTxCount(block) }} tx</span>
-                  <span class="chain-dock__cell chain-dock__cell--time">
-                    @if (block.timestamp) {
-                      {{ block.timestamp | date:'dd/MM HH:mm' }}
-                    } @else {
-                      —
-                    }
-                  </span>
-                </button>
-              </li>
+
+          <div class="chain-dock__actions">
+            @if (latestBlock(); as head) {
+              <button
+                type="button"
+                class="chain-dock__block-label"
+                (click)="openBlock(head)"
+                [attr.aria-label]="'Ouvrir le bloc #' + head.index"
+              >
+                BLOCK #{{ head.index }}
+              </button>
             }
-          </ul>
-        }
-      } @else {
-        <div class="chain-dock__empty">
-          <p>{{ locale.t('chain.noMatch') }}</p>
-          <button type="button" class="chain-dock__alert-btn" (click)="clearFilters()">
-            {{ locale.t('chain.filter.reset') }}
-          </button>
+            <button type="button" class="chain-dock__action" (click)="exportFilteredBlocks()">
+              {{ locale.t('chain.export') }}
+            </button>
+          </div>
         </div>
-      }
-    </div>
+
+        <div class="chain-dock__toolbar-row chain-dock__toolbar-row--filters">
+          <input
+            type="text"
+            class="chain-dock__input"
+            [attr.placeholder]="locale.t('chain.filter.wallet')"
+            [attr.aria-label]="locale.t('chain.filter.wallet')"
+            [value]="walletFilter()"
+            (input)="onWalletInput($any($event.target).value)"
+          />
+          <input
+            type="number"
+            class="chain-dock__input chain-dock__input--index"
+            [attr.placeholder]="locale.t('chain.filter.from')"
+            [attr.aria-label]="locale.t('chain.filter.from')"
+            [value]="fromIndex()"
+            (input)="onFromIndexInput($any($event.target).value)"
+          />
+          <input
+            type="number"
+            class="chain-dock__input chain-dock__input--index"
+            [attr.placeholder]="locale.t('chain.filter.to')"
+            [attr.aria-label]="locale.t('chain.filter.to')"
+            [value]="toIndex()"
+            (input)="onToIndexInput($any($event.target).value)"
+          />
+        </div>
+      </div>
+
+      <div class="chain-dock__body">
+        @if (hasFilteredBlocks()) {
+          @if (viewMode() === 'graph') {
+            <app-chain-graph
+              [blocks]="filteredBlocks()"
+              [tipIndex]="tipBlockIndex()"
+              [maxNodes]="graphMaxNodes()"
+              (selectBlock)="openBlock($event)"
+            />
+          } @else {
+            <ul class="chain-dock__list" aria-label="Blocs de la blockchain">
+              @for (block of filteredBlocks(); track block.index) {
+                <li class="chain-dock__item" [class.is-head]="latestBlock() && block.index === latestBlock()!.index">
+                  <button
+                    type="button"
+                    class="chain-dock__item-btn"
+                    (click)="openBlock(block)"
+                    [attr.aria-label]="'Ouvrir le bloc #' + block.index"
+                    [attr.aria-current]="latestBlock() && block.index === latestBlock()!.index ? 'true' : null"
+                  >
+                    <span class="chain-dock__cell chain-dock__cell--index">#{{ block.index }}</span>
+                    <span class="chain-dock__cell chain-dock__cell--hash" [title]="block.hash || 'Hash indisponible'">
+                      {{ shortHash(block.hash) }}
+                    </span>
+                    <span class="chain-dock__cell chain-dock__cell--tx">{{ blockTxCount(block) }} tx</span>
+                    <span class="chain-dock__cell chain-dock__cell--time">
+                      @if (block.timestamp) {
+                        {{ block.timestamp | date:'dd/MM HH:mm' }}
+                      } @else {
+                        —
+                      }
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        } @else {
+          <div class="chain-dock__empty">
+            <p>{{ locale.t('chain.noMatch') }}</p>
+            <button type="button" class="chain-dock__alert-btn" (click)="clearFilters()">
+              {{ locale.t('chain.filter.reset') }}
+            </button>
+          </div>
+        }
+      </div>
     </div>
   } @else {
     <div class="chain-dock__empty">

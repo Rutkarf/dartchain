@@ -8,25 +8,12 @@ echo "==> Health v1 (contrat commercial)"
 body="$(curl -fsS "${BASE_URL}/api/v1/health")"
 echo "${body}" | grep -q '"ok":true'
 echo "${body}" | grep -q '"commercial":true'
-echo "${body}" | grep -q '"faucet":false'
+echo "${body}" | grep -q '"faucet":true'
 echo "${body}" | grep -q '"legacyPrivateKey":false'
 echo "${body}" | grep -q '"serverWalletCreate":false'
 
-faucet_enabled="$(echo "${body}" | grep -o '"faucet":[^,}]*' | head -1 | cut -d: -f2 | tr -d ' ')"
-if [[ "${faucet_enabled}" == "true" ]]; then
-  echo "==> Faucet activé (config)"
-  curl -fsS "${BASE_URL}/api/faucet/config" | grep -q '"amount"'
-else
-  echo "==> Faucet bloqué"
-  faucet_status="$(curl -sS -o /dev/null -w "%{http_code}" \
-    -X POST "${BASE_URL}/api/faucet/claim" \
-    -H "Content-Type: application/json" \
-    -d '{"walletAddress":"0xverify"}' || true)"
-  if [[ "${faucet_status}" != "403" && "${faucet_status}" != "401" ]]; then
-    echo "FAIL: POST /api/faucet/claim devrait être 403/401, reçu ${faucet_status}" >&2
-    exit 1
-  fi
-fi
+echo "==> Faucet activé"
+curl -fsS "${BASE_URL}/api/faucet/config" | grep -q '"amount"'
 
 echo "==> Wallet serveur bloqué"
 wallet_status="$(curl -sS -o /dev/null -w "%{http_code}" \

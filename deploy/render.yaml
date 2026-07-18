@@ -28,6 +28,8 @@ services:
         value: postgres,prod
       - key: DARTCHAIN_PERSISTENCE_MODE
         value: postgres
+      - key: DARTCHAIN_PRODUCT_FAUCET_ENABLED
+        value: "true"
       - key: JAVA_TOOL_OPTIONS
         value: -Xmx384m
       - key: DATABASE_HOST

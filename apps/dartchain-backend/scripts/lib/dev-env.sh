@@ -57,11 +57,25 @@ dev_free_backend_port() {
   fi
 }
 
+dev_load_repo_env() {
+  local repo_root="${1:-}"
+  if [[ -z "$repo_root" ]]; then
+    return 0
+  fi
+
+  if [[ -f "${repo_root}/.env" ]]; then
+    set -a
+    # shellcheck disable=SC1091
+    source "${repo_root}/.env"
+    set +a
+  fi
+}
+
 dev_export_postgres_env() {
   export SPRING_PROFILES_ACTIVE=postgres
   export DARTCHAIN_PERSISTENCE_MODE=postgres
-  export DATABASE_URL="${DATABASE_URL:-jdbc:postgresql://localhost:5432/dartchain}"
-  export DATABASE_USERNAME="${DATABASE_USERNAME:-dartchain}"
-  export DATABASE_PASSWORD="${DATABASE_PASSWORD:-dartchain}"
+  export DATABASE_URL="${DATABASE_URL:-jdbc:postgresql://localhost:5432/${POSTGRES_DB:-dartchain}}"
+  export DATABASE_USERNAME="${DATABASE_USERNAME:-${POSTGRES_USER:-dartchain}}"
+  export DATABASE_PASSWORD="${DATABASE_PASSWORD:-${POSTGRES_PASSWORD:-dartchain}}"
   export DARTCHAIN_JWT_SECRET="${DARTCHAIN_JWT_SECRET:-dev-local-jwt-secret-for-cursor-development-only-32}"
 }

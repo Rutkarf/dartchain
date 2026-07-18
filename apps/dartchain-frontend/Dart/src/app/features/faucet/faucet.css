@@ -793,7 +793,6 @@
 :host-context(.app-bottom-stack__panel) .faucet-panel {
   border: none;
   border-radius: 0;
-  background: transparent;
   box-shadow: none;
   padding: 2px 3px 3px;
   gap: 1px;

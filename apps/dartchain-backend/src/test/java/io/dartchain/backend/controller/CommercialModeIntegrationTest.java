@@ -22,8 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {
         "dartchain.product.commercial=false",
         "dartchain.product.allow-legacy-private-key=false",
-        "dartchain.product.allow-server-wallet-create=false",
-        "dartchain.product.faucet-enabled=false"
+        "dartchain.product.allow-server-wallet-create=false"
 })
 class CommercialModeIntegrationTest {
 
@@ -36,7 +35,7 @@ class CommercialModeIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.ok").value(true))
                 .andExpect(jsonPath("$.commercial").value(false))
-                .andExpect(jsonPath("$.features.faucet").value(false))
+                .andExpect(jsonPath("$.features.faucet").value(true))
                 .andExpect(jsonPath("$.features.legacyPrivateKey").value(false));
     }
 
@@ -69,23 +68,15 @@ class CommercialModeIntegrationTest {
     }
 
     @Test
-    void removedServerWalletCreate_returnsNotFound() throws Exception {
-        mockMvc.perform(post("/api/wallets/create"))
-                .andExpect(status().isNotFound());
+    void faucetConfig_isAccessible() throws Exception {
+        mockMvc.perform(get("/api/faucet/config"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.defaultClaimAmount").exists());
     }
 
     @Test
-    void faucetClaim_isForbidden() throws Exception {
-        Session session = MockMvcIntegrationSupport.register(mockMvc);
-        WalletInfo wallet = MockMvcIntegrationSupport.createLocalWallet();
-
-        mockMvc.perform(post("/api/faucet/claim")
-                        .header("Authorization", session.authHeader())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"walletAddress": "%s"}
-                                """.formatted(wallet.address())))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status").value(403));
+    void removedServerWalletCreate_returnsNotFound() throws Exception {
+        mockMvc.perform(post("/api/wallets/create"))
+                .andExpect(status().isNotFound());
     }
 }

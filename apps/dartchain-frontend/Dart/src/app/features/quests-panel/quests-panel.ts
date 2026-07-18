@@ -64,11 +64,40 @@ export class QuestsPanelComponent implements OnDestroy {
 
   protected readonly tasksSummary = computed(() => {
     const tasks = this.tasks();
-    const complete = tasks.filter((task) => task.complete).length;
-    return `${complete}/${tasks.length}`;
+    const state = this.state();
+    const claimed = tasks.filter((task) => state.tasks[task.id]?.claimed === true).length;
+    return `${claimed}/${tasks.length}`;
   });
 
-  protected readonly usesServerAutoClaim = computed(() => this.questsService.isAuthenticated());
+  protected readonly dailyProgressPercent = computed(() => {
+    const tasks = this.tasks();
+    if (!tasks.length) {
+      return 0;
+    }
+
+    const state = this.state();
+    const claimed = tasks.filter((task) => state.tasks[task.id]?.claimed === true).length;
+    return Math.round((claimed / tasks.length) * 100);
+  });
+
+  protected readonly dailyComplete = computed(() => {
+    const tasks = this.tasks();
+    const state = this.state();
+    return tasks.length > 0 && tasks.every((task) => state.tasks[task.id]?.claimed === true);
+  });
+
+  protected readonly countdownUrgent = computed(() => {
+    return this.questsService.msUntilDailyReset() <= 3_600_000;
+  });
+
+  private readonly questAccentPalette = [
+    '#00d9ff',
+    '#ff6bcb',
+    '#00ff88',
+    '#ffb347',
+    '#b48cff',
+    '#ff5c7a',
+  ] as const;
 
   protected readonly errorBanner = computed(() => {
     const code = this.questsData.error();
@@ -102,6 +131,8 @@ export class QuestsPanelComponent implements OnDestroy {
 
   protected readonly toastMessage = signal('');
   protected readonly toastKind = signal<'success' | 'info' | 'error'>('success');
+  protected readonly celebrateTaskId = signal<string | null>(null);
+  protected readonly weeklyClaiming = signal(false);
 
   constructor() {
     this.questsData.init();
@@ -120,6 +151,10 @@ export class QuestsPanelComponent implements OnDestroy {
     return `${mts.toFixed(2)} R4V3`;
   }
 
+  protected questAccent(index: number): string {
+    return this.questAccentPalette[index % this.questAccentPalette.length];
+  }
+
   protected goButtonLabel(task: QuestTaskView): string {
     if (task.action === 'login') {
       return this.locale.t('quests.login');
@@ -134,6 +169,11 @@ export class QuestsPanelComponent implements OnDestroy {
     }
 
     return `${this.locale.t('quests.go')} — ${task.title}`;
+  }
+
+  protected weeklyLockedLabel(): string {
+    const summary = this.tasksSummary();
+    return this.locale.t('quests.weeklyLockedHint').replace('{progress}', summary);
   }
 
   protected refreshQuests(): void {
@@ -156,6 +196,7 @@ export class QuestsPanelComponent implements OnDestroy {
       this.locale.t('quests.claimSuccess').replace('{reward}', this.rewardLabel(task.rewardMts)),
       'success'
     );
+    this.triggerCelebrate(task.id);
     this.walletSession.requestBalanceRefresh();
     this.questsData.scheduleRefresh(true);
   }
@@ -197,12 +238,21 @@ export class QuestsPanelComponent implements OnDestroy {
         .replace('{xp}', String(this.mission().rewardXp)),
       'success'
     );
+    this.triggerCelebrate('mission');
     this.walletSession.requestBalanceRefresh();
     this.questsData.scheduleRefresh(true);
   }
 
   protected async onClaimWeekly(): Promise<void> {
+    if (!this.weeklyClaimable() || this.weeklyClaiming()) {
+      this.toast(this.locale.t('quests.weeklyFailed'), 'info');
+      return;
+    }
+
+    this.weeklyClaiming.set(true);
     const result = await this.questsService.claimWeekly();
+    this.weeklyClaiming.set(false);
+
     if (!result.ok) {
       this.toast(result.error ?? this.locale.t('quests.weeklyFailed'), 'error');
       return;
@@ -212,8 +262,14 @@ export class QuestsPanelComponent implements OnDestroy {
       this.locale.t('quests.weeklySuccess').replace('{mts}', this.weekly().rewardMts.toFixed(2)),
       'success'
     );
+    this.triggerCelebrate('weekly');
     this.walletSession.requestBalanceRefresh();
     this.questsData.scheduleRefresh(true);
+  }
+
+  private triggerCelebrate(id: string): void {
+    this.celebrateTaskId.set(id);
+    window.setTimeout(() => this.celebrateTaskId.set(null), 900);
   }
 
   private toast(message: string, kind: 'success' | 'info' | 'error'): void {

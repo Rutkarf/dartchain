@@ -400,15 +400,19 @@ body {
 }
 
 .app-bottom-stack .app-bottom-stack__panel .wallet-display:not(.ds-surface),
-.app-bottom-stack .app-bottom-stack__panel .peer-panel,
-.app-bottom-stack .app-bottom-stack__panel .quests-panel,
-.app-bottom-stack .app-bottom-stack__panel .faucet-panel {
+.app-bottom-stack .app-bottom-stack__panel .faucet-panel:not(.ds-surface) {
   border: none !important;
   border-radius: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
 }
 
+.app-bottom-stack .app-bottom-stack__panel .quests-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .market-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .peer-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .chain-dock.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .transactions-dock.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .faucet-panel.ds-surface,
 .app-bottom-stack .app-bottom-stack__panel .wallet-display.ds-surface {
   border: none !important;
   border-radius: 0 !important;

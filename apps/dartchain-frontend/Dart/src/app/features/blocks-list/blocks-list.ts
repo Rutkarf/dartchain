@@ -91,6 +91,25 @@ export class BlocksListComponent implements OnInit {
     return this.locale.t('chain.filter.results').replace('{count}', String(total));
   });
 
+  readonly searchPlaceholder = computed(() => this.resultsLabel());
+
+  readonly blocksHeadline = computed(() => {
+    const count = this.stats()?.totalBlocks ?? this.blockCount();
+    return `${count} BLOCKS`;
+  });
+
+  readonly syncSubLabel = computed(() => {
+    if (this.loading()) {
+      return this.locale.t('chain.syncingLabel');
+    }
+
+    if (this.error()) {
+      return this.locale.t('chain.errorSync');
+    }
+
+    return this.locale.t('chain.syncedLabel');
+  });
+
   readonly chainStatusLabel = computed(() => {
     if (this.loading()) {
       return this.locale.t('chain.syncing');
@@ -110,7 +129,7 @@ export class BlocksListComponent implements OnInit {
     }
 
     const tip = this.latestBlock();
-    return tip ? `Tip #${tip.index}` : 'Synced';
+    return tip ? `BLOCK #${tip.index}` : 'Synced';
   });
 
   readonly selectBlock = output<Block>();

@@ -109,6 +109,8 @@ export type LocaleKey =
   | 'chain.refresh'
   | 'chain.viewMode'
   | 'chain.blocksLabel'
+  | 'chain.syncedLabel'
+  | 'chain.syncingLabel'
   | 'quests.title'
   | 'quests.xp'
   | 'quests.pendingRewards'
@@ -141,6 +143,12 @@ export type LocaleKey =
   | 'quests.weeklyFailed'
   | 'quests.autoDone'
   | 'quests.done'
+  | 'quests.completed'
+  | 'quests.newQuestsIn'
+  | 'quests.guardianRole'
+  | 'quests.guardianTagline'
+  | 'quests.weeklyClaimBtn'
+  | 'quests.weeklyLockedHint'
   | 'wallet.title'
   | 'wallet.network'
   | 'wallet.refresh'
@@ -242,7 +250,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'dock.faucet': 'Faucet',
     'dock.pending': 'Transactions en attente',
     'dock.block': 'Composeur de bloc',
-    'dock.transactions': 'Transactions',
+    'dock.transactions': 'Transaction',
     'transactions.composer': 'Composer',
     'transactions.mempool': 'Mempool',
     'transactions.viewMempool': 'Voir mempool',
@@ -276,7 +284,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'chain.filter.to': 'À',
     'chain.filter.search': 'Rechercher',
     'chain.filter.reset': 'Reset',
-    'chain.filter.results': '{count} résultat(s)',
+    'chain.filter.results': '{count} résultats',
     'chain.export': 'Export',
     'chain.copyTip': 'Tip',
     'chain.copySuccess': 'Hash tip copié.',
@@ -292,6 +300,8 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'chain.refresh': 'Actualiser la blockchain',
     'chain.viewMode': 'Mode d\'affichage',
     'chain.blocksLabel': 'blocs',
+    'chain.syncedLabel': 'synced',
+    'chain.syncingLabel': 'syncing',
     'quests.title': 'Quêtes',
     'quests.xp': 'XP',
     'quests.pendingRewards': 'R4V3',
@@ -324,6 +334,12 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'quests.weeklyFailed': 'Récompense hebdo indisponible.',
     'quests.autoDone': 'Crédité automatiquement',
     'quests.done': 'Terminé',
+    'quests.completed': 'complétées',
+    'quests.newQuestsIn': 'Dans',
+    'quests.guardianRole': 'Rôle actif',
+    'quests.guardianTagline': 'Vigile · Intégrité · Récompenses',
+    'quests.weeklyClaimBtn': 'Réclamer',
+    'quests.weeklyLockedHint': '{progress}',
     'wallet.title': 'Wallet / Explorer',
     'wallet.network': 'Réseau',
     'wallet.refresh': 'Actualiser le wallet',
@@ -476,7 +492,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'dock.faucet': 'Faucet',
     'dock.pending': 'Pending transactions',
     'dock.block': 'Block composer',
-    'dock.transactions': 'Transactions',
+    'dock.transactions': 'Transaction',
     'transactions.composer': 'Composer',
     'transactions.mempool': 'Mempool',
     'transactions.viewMempool': 'View mempool',
@@ -510,7 +526,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'chain.filter.to': 'To',
     'chain.filter.search': 'Search',
     'chain.filter.reset': 'Reset',
-    'chain.filter.results': '{count} result(s)',
+    'chain.filter.results': '{count} results',
     'chain.export': 'Export',
     'chain.copyTip': 'Tip',
     'chain.copySuccess': 'Tip hash copied.',
@@ -526,6 +542,8 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'chain.refresh': 'Refresh blockchain',
     'chain.viewMode': 'View mode',
     'chain.blocksLabel': 'blocks',
+    'chain.syncedLabel': 'synced',
+    'chain.syncingLabel': 'syncing',
     'quests.title': 'Quests',
     'quests.xp': 'XP',
     'quests.pendingRewards': 'R4V3',
@@ -558,6 +576,12 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'quests.weeklyFailed': 'Weekly reward unavailable.',
     'quests.autoDone': 'Auto-credited',
     'quests.done': 'Done',
+    'quests.completed': 'completed',
+    'quests.newQuestsIn': 'In',
+    'quests.guardianRole': 'Active role',
+    'quests.guardianTagline': 'Sentinel · Integrity · Rewards',
+    'quests.weeklyClaimBtn': 'Claim',
+    'quests.weeklyLockedHint': '{progress}',
     'wallet.title': 'Wallet / Explorer',
     'wallet.network': 'Network',
     'wallet.refresh': 'Refresh wallet',

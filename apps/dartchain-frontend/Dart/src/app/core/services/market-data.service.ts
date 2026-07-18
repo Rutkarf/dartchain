@@ -36,9 +36,11 @@ export class MarketDataService {
   readonly recentTrades = signal<MarketRecentTrade[]>([]);
   readonly priceAlerts = signal<MarketPriceAlert[]>([]);
   readonly alertNotifications = signal<string[]>([]);
+  readonly lastUpdatedAt = signal(0);
 
   private refreshTimerId: number | null = null;
   private pollTimerId: number | null = null;
+  private pollingPaused = false;
   private rowsInflight: Promise<void> | null = null;
   private chartInflight: Promise<void> | null = null;
   private lastRowsFetchMs = 0;
@@ -61,6 +63,7 @@ export class MarketDataService {
       amountIn: detail.amountIn,
       amountOut: detail.amountOut,
       at: Date.now(),
+      txHash: detail.txHash,
     });
     void this.refreshRows(true);
   };
@@ -76,8 +79,37 @@ export class MarketDataService {
     window.addEventListener('market-swap-complete', this.onSwapComplete);
 
     this.pollTimerId = window.setInterval(() => {
+      if (this.pollingPaused) {
+        return;
+      }
       void this.refreshAll(false);
     }, MARKET_AUTO_REFRESH_MS);
+  }
+
+  pausePolling(): void {
+    this.pollingPaused = true;
+  }
+
+  resumePolling(): void {
+    this.pollingPaused = false;
+  }
+
+  freshnessLabel(): string | null {
+    const at = this.lastUpdatedAt();
+    if (!at) {
+      return null;
+    }
+
+    const seconds = Math.max(0, Math.floor((Date.now() - at) / 1000));
+    if (seconds < 5) {
+      return 'live';
+    }
+
+    if (seconds < 60) {
+      return `${seconds}s`;
+    }
+
+    return `${Math.floor(seconds / 60)}m`;
   }
 
   destroy(): void {
@@ -138,12 +170,18 @@ export class MarketDataService {
     this.rowsInflight = (async () => {
       try {
         const previous = this.rows();
+        const tradeCounts = this.recentTradeCountsByToken();
         const next = await firstValueFrom(
-          this.marketService.loadAssetRows(this.favorites, this.walletAddress || undefined)
+          this.marketService.loadAssetRows(
+            this.favorites,
+            this.walletAddress || undefined,
+            tradeCounts
+          )
         );
         this.rows.set(next);
         this.checkPriceAlerts(previous, next);
         this.error.set(null);
+        this.lastUpdatedAt.set(Date.now());
         this.lastRowsFetchMs = Date.now();
       } catch (error) {
         this.handleRateLimit(error);
@@ -184,6 +222,7 @@ export class MarketDataService {
           this.marketService.loadFeaturedChart(this.featuredAsset!, this.chartRange)
         );
         this.featuredChart.set(chart);
+        this.lastUpdatedAt.set(Date.now());
         this.lastChartFetchMs = Date.now();
       } catch (error) {
         this.handleRateLimit(error);
@@ -220,6 +259,22 @@ export class MarketDataService {
     return this.priceAlerts().some(
       (entry) => entry.token === token.trim().toUpperCase() && entry.enabled
     );
+  }
+
+  getAlertThreshold(token: string): number {
+    const entry = this.priceAlerts().find(
+      (item) => item.token === token.trim().toUpperCase()
+    );
+    return entry?.thresholdPercent ?? 5;
+  }
+
+  updateAlertThreshold(token: string, thresholdPercent: number): void {
+    const normalized = token.trim().toUpperCase();
+    const current = this.priceAlerts().map((entry) =>
+      entry.token === normalized ? { ...entry, thresholdPercent } : entry
+    );
+    this.priceAlerts.set(current);
+    this.writePriceAlerts(current);
   }
 
   clearAlertNotifications(): void {
@@ -277,6 +332,17 @@ export class MarketDataService {
       this.rateLimitedUntil.set(Date.now() + MarketDataService.RATE_LIMIT_BACKOFF_MS);
       this.error.set(this.rateLimitMessage());
     }
+  }
+
+  private recentTradeCountsByToken(): Record<string, number> {
+    const counts: Record<string, number> = {};
+
+    for (const trade of this.recentTrades()) {
+      counts[trade.fromToken] = (counts[trade.fromToken] ?? 0) + 1;
+      counts[trade.toToken] = (counts[trade.toToken] ?? 0) + 1;
+    }
+
+    return counts;
   }
 
   private readRecentTrades(): MarketRecentTrade[] {

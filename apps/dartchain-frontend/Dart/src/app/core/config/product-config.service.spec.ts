@@ -11,7 +11,7 @@ describe('ProductConfigService', () => {
     const service = TestBed.inject(ProductConfigService);
 
     expect(typeof service.commercial).toBe('boolean');
-    expect(typeof service.faucetEnabled).toBe('boolean');
+    expect(service.faucetEnabled).toBe(true);
     expect(typeof service.showcaseEnabled).toBe('boolean');
   });
 });
