@@ -1,11 +1,17 @@
 package io.dartchain.backend.showcase.service;
 
+import io.dartchain.backend.blockchain.BlockchainSnapshot;
+import io.dartchain.backend.blockchain.store.BlockchainStateStore;
+import io.dartchain.backend.model.Block;
+import io.dartchain.backend.model.Transaction;
 import io.dartchain.backend.showcase.dto.ChartPointDto;
 import io.dartchain.backend.showcase.dto.ChartResponse;
 import io.dartchain.backend.showcase.model.PriceSample;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -23,9 +29,13 @@ public class MarketChartService {
     private static final double BASE_PRICE = 1.248;
     private static final int MAX_SAMPLES = 2_000;
 
+    private final BlockchainStateStore blockchainStateStore;
     private final CopyOnWriteArrayList<PriceSample> samples = new CopyOnWriteArrayList<>();
     private volatile double lastPrice = BASE_PRICE;
-    private volatile long totalVolumeUnits = 48_200;
+
+    public MarketChartService(BlockchainStateStore blockchainStateStore) {
+        this.blockchainStateStore = blockchainStateStore;
+    }
 
     @PostConstruct
     public void seedHistory() {
@@ -50,7 +60,6 @@ public class MarketChartService {
         double bump = ThreadLocalRandom.current().nextDouble(0.002, 0.018);
         lastPrice = Math.max(0.85, Math.min(1.55, lastPrice * (1 + bump)));
         samples.add(new PriceSample(System.currentTimeMillis(), lastPrice));
-        totalVolumeUnits += ThreadLocalRandom.current().nextInt(120, 480);
         trimSamples();
     }
 
@@ -78,6 +87,7 @@ public class MarketChartService {
         double changePercent = first == 0 ? 0 : ((current - first) / first) * 100;
 
         List<ChartPointDto> points = normalizeForSvg(sampled);
+        long volumeUnits = computeVolumeUnits(cutoff);
 
         return new ChartResponse(
                 resolvedPair,
@@ -87,9 +97,47 @@ public class MarketChartService {
                 changePercent >= 0,
                 formatPrice(high),
                 formatPrice(low),
-                formatVolume(totalVolumeUnits),
+                formatVolume(volumeUnits),
                 points
         );
+    }
+
+    /** Volume réel : somme des montants R4V3 échangés on-chain sur la fenêtre temporelle. */
+    private long computeVolumeUnits(long cutoffMs) {
+        BlockchainSnapshot snapshot = blockchainStateStore.load();
+        List<Block> blocks = snapshot != null ? snapshot.getBlocks() : List.of();
+        if (blocks == null || blocks.isEmpty()) {
+            return 0L;
+        }
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (Block block : blocks) {
+            long blockTimestamp = block.getTimestamp();
+
+            for (Transaction transaction : block.getTransactions()) {
+                Long transactionTimestamp = transaction.getTimestamp();
+                long effectiveTimestamp =
+                        transactionTimestamp != null && transactionTimestamp > 0
+                                ? transactionTimestamp
+                                : blockTimestamp;
+
+                if (effectiveTimestamp < cutoffMs) {
+                    continue;
+                }
+
+                if (Boolean.TRUE.equals(transaction.getSystemReward())) {
+                    continue;
+                }
+
+                BigDecimal amount = transaction.getAmount();
+                if (amount != null && amount.compareTo(BigDecimal.ZERO) > 0) {
+                    total = total.add(amount);
+                }
+            }
+        }
+
+        return total.setScale(0, RoundingMode.HALF_UP).longValue();
     }
 
     private List<ChartPointDto> normalizeForSvg(List<PriceSample> sampled) {
@@ -176,9 +224,14 @@ public class MarketChartService {
     }
 
     private String formatVolume(long value) {
+        if (value <= 0) {
+            return "0";
+        }
+
         if (value >= 1_000) {
             return String.format(Locale.FRANCE, "%.1fk", value / 1_000.0);
         }
+
         return String.valueOf(value);
     }
 

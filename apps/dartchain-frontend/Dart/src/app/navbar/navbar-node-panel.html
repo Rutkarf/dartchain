@@ -1,35 +1,94 @@
-<div class="navbar-node-panel" aria-label="État de synchronisation du nœud">
-  <div class="navbar-node-panel__box" role="status">
-    <div class="navbar-node-panel__meta">
-      <div class="navbar-node-panel__head">
+<div #panelRoot class="navbar-node-panel">
+  <div class="navbar-node-panel__anchor">
+    <button
+      type="button"
+      class="navbar-node-panel__box"
+      [class.is-panel-open]="popoverOpen()"
+      [attr.aria-expanded]="popoverOpen()"
+      [attr.aria-label]="'Market Pulse · ' + chartSummary.symbolLabel() + ' ' + pulseDeltaLabel() + ' ' + pulseRangeLabel()"
+      aria-haspopup="dialog"
+      (click)="togglePopover($event)"
+    >
+      <span class="navbar-node-panel__led-wrap nv-drawer-led-anchor" aria-hidden="true">
         <span
           class="navbar-node-panel__led"
-          [class.is-online]="networkOnline"
-          aria-hidden="true"
+          [class.is-positive]="chartSummary.positive() && chartSummary.phase() === 'ready'"
+          [class.is-negative]="!chartSummary.positive() && chartSummary.phase() === 'ready'"
+          [class.is-loading]="chartSummary.phase() === 'loading'"
         ></span>
-        <span class="navbar-node-panel__title">NODE</span>
-      </div>
-      <p class="navbar-node-panel__sync">
-        SYNC
-        <strong class="navbar-node-panel__pct">{{ syncPercentLabel }}</strong>
-      </p>
-    </div>
-    <div class="navbar-node-panel__chart" aria-hidden="true">
-      <svg
-        class="navbar-node-panel__spark"
-        viewBox="0 0 48 16"
-        preserveAspectRatio="none"
-        focusable="false"
+      </span>
+      <span
+        class="navbar-node-panel__pct"
+        [class.is-positive]="chartSummary.positive() && chartSummary.phase() === 'ready'"
+        [class.is-negative]="!chartSummary.positive() && chartSummary.phase() === 'ready'"
       >
-        <polyline
-          [attr.points]="chartSummary.sparklinePolyline()"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-    </div>
+        @switch (chartSummary.phase()) {
+          @case ('loading') { … }
+          @case ('error') { N/A }
+          @default { {{ pulseDeltaLabel() }} }
+        }
+      </span>
+      <span class="navbar-node-panel__range">{{ pulseRangeLabel() }}</span>
+    </button>
+
+    @if (popoverOpen()) {
+      <aside
+        class="nv-anchor-drawer nv-anchor-drawer--cyan nv-anchor-drawer--node"
+        role="dialog"
+        aria-label="Market Pulse"
+        [appFocusTrap]="true"
+        (click)="onDrawerClick($event)"
+      >
+        <section class="status-drawer status-drawer--market" aria-label="Market Pulse">
+          <div class="status-drawer__toolbar">
+            <div class="status-drawer__actions">
+              <button
+                type="button"
+                class="status-drawer__refresh"
+                (click)="refreshMarket($event)"
+                [disabled]="chartSummary.phase() === 'loading'"
+                [class.is-spinning]="chartSummary.phase() === 'loading'"
+                aria-label="Rafraîchir Market Pulse"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+                  <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+                  <path d="M17 4v4h-4" />
+                  <path d="M7 20v-4h4" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="status-drawer__close"
+                (click)="closePopover($event)"
+                aria-label="Fermer Market Pulse"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+
+          <div class="status-drawer__metrics status-drawer__metrics--market" role="list">
+            <div class="status-drawer__cell" role="listitem">
+              <span class="status-drawer__label">Prix</span>
+              <span class="status-drawer__value">{{ displayPrice() }}</span>
+            </div>
+            <div
+              class="status-drawer__cell"
+              role="listitem"
+              [class.status-drawer__cell--positive]="chartSummary.positive() && chartSummary.phase() === 'ready'"
+              [class.status-drawer__cell--negative]="!chartSummary.positive() && chartSummary.phase() === 'ready'"
+            >
+              <span class="status-drawer__label">Delta</span>
+              <span class="status-drawer__value">{{ displayDelta() }}</span>
+            </div>
+            <div class="status-drawer__cell" role="listitem">
+              <span class="status-drawer__label">Volume</span>
+              <span class="status-drawer__value">{{ displayVolume() }}</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+    }
   </div>
 </div>

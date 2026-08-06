@@ -1,96 +1,100 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  HostBinding,
+  HostListener,
+  ViewChild,
+  afterNextRender,
+  effect,
+  inject,
+} from '@angular/core';
 
-import { BlockchainApiService } from '../core/services/blockchain-api.service';
-import { NavbarHintDirective } from './navbar-hint.directive';
-
-interface HealthCheck {
-  ok: boolean;
-  latencyMs: number | null;
-}
+import { FocusTrapDirective } from '../core/directives/focus-trap.directive';
+import { NetworkTrustService } from '../core/services/network-trust.service';
+import { ShellFeedbackService } from '../core/services/shell-feedback.service';
+import { StatusOverlayComponent } from '../features/status-overlay/status-overlay';
+import {
+  scheduleNavbarDrawerPin,
+  unpinNavbarDrawer,
+} from './navbar-drawer-viewport.util';
 
 @Component({
   selector: 'app-navbar-network-status',
   standalone: true,
-  imports: [CommonModule, NavbarHintDirective],
+  imports: [CommonModule, FocusTrapDirective, StatusOverlayComponent],
   templateUrl: './navbar-network-status.html',
-  styleUrls: ['./navbar-network-status.css', './navbar-hint.css'],
+  styleUrls: ['./navbar-network-status.css', './navbar-brand-chip.css', './navbar-anchor-drawer.css'],
 })
-export class NavbarNetworkStatusComponent implements OnInit {
-  private readonly api = inject(BlockchainApiService);
+export class NavbarNetworkStatusComponent {
+  readonly trust = inject(NetworkTrustService);
+  private readonly shell = inject(ShellFeedbackService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly health = signal<HealthCheck>({ ok: true, latencyMs: null });
-  readonly loading = signal(false);
+  readonly panelOpen = this.shell.statusPanelOpen;
 
-  readonly latencyLabel = computed(() => {
-    const value = this.health().latencyMs;
-
-    if (this.loading()) {
-      return '…';
-    }
-
-    if (value === null || value === undefined || Number.isNaN(value)) {
-      return 'N/A';
-    }
-
-    return `${value}ms`;
-  });
-
-  readonly statusAriaLabel = computed(() => {
-    const state = this.health().ok ? 'en ligne' : 'hors ligne';
-    return `Réseau ${state}, latence ${this.latencyLabel()}`;
-  });
-
-  readonly syncPercentLabel = computed(() => {
-    if (this.loading()) {
-      return '…';
-    }
-
-    if (!this.health().ok) {
-      return '0%';
-    }
-
-    const latency = this.health().latencyMs;
-    if (latency === null || latency === undefined || Number.isNaN(latency)) {
-      return '98%';
-    }
-
-    const score = Math.max(0, Math.min(99, 100 - Math.round(latency / 25)));
-    return `${score}%`;
-  });
-
-  ngOnInit(): void {
-    void this.loadHealth();
+  @HostBinding('class.is-drawer-open')
+  get drawerOpen(): boolean {
+    return this.panelOpen();
   }
 
-  refresh(): void {
-    void this.loadHealth();
+  @ViewChild('anchorRoot') anchorRoot?: ElementRef<HTMLElement>;
+
+  constructor() {
+    effect(() => {
+      if (this.panelOpen()) {
+        afterNextRender(() => this.syncDrawerViewport());
+      } else {
+        this.clearDrawerViewport();
+      }
+    });
+
+    this.destroyRef.onDestroy(() => this.clearDrawerViewport());
   }
 
-  private async loadHealth(): Promise<void> {
-    if (this.loading()) {
-      return;
+  openDetails(event: MouseEvent): void {
+    event.stopPropagation();
+    const wasOpen = this.panelOpen();
+    this.shell.toggleStatusPanel();
+    if (!wasOpen) {
+      void this.trust.refresh();
+      this.syncDrawerViewport();
     }
+  }
 
-    this.loading.set(true);
-    const startedAt = performance.now();
+  onDrawerClick(event: MouseEvent): void {
+    event.stopPropagation();
+  }
 
-    try {
-      const response = await firstValueFrom(this.api.getHealth());
-      const latencyMs = Math.round(performance.now() - startedAt);
+  @HostListener('window:resize')
+  @HostListener('window:scroll')
+  onViewportChange(): void {
+    if (this.panelOpen()) {
+      this.syncDrawerViewport();
+    }
+  }
 
-      this.health.set({
-        ok: response.ok,
-        latencyMs,
-      });
-    } catch {
-      this.health.set({
-        ok: false,
-        latencyMs: null,
-      });
-    } finally {
-      this.loading.set(false);
+  private syncDrawerViewport(): void {
+    scheduleNavbarDrawerPin(
+      () => ({
+        anchor:
+          this.anchorRoot?.nativeElement?.querySelector('.nv-drawer-led-anchor') ??
+          null,
+        drawer:
+          this.anchorRoot?.nativeElement?.querySelector('.nv-anchor-drawer--live') ??
+          null,
+      }),
+      { align: 'anchor-left', fitContent: true, contentKind: 'network' }
+    );
+  }
+
+  private clearDrawerViewport(): void {
+    const drawer = this.anchorRoot?.nativeElement?.querySelector(
+      '.nv-anchor-drawer--live'
+    ) as HTMLElement | null;
+    if (drawer) {
+      unpinNavbarDrawer(drawer);
     }
   }
 }

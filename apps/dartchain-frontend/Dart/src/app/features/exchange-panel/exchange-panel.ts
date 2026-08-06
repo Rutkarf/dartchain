@@ -284,7 +284,7 @@ export class ExchangePanelComponent {
       return '—';
     }
 
-    return `$${this.formatUsd(totalUsd, 2)} USD`;
+    return `${this.formatUsd(totalUsd, 2)} CHF`;
   });
 
   protected readonly prixSubline = computed(() => {
@@ -293,7 +293,7 @@ export class ExchangePanelComponent {
       return 'LaunchLab testnet';
     }
 
-    return `$${this.formatUsd(usd, 4)} USD`;
+    return `${this.formatUsd(usd, 4)} CHF`;
   });
 
   protected readonly unitUsdPriceFrom = computed(() => {

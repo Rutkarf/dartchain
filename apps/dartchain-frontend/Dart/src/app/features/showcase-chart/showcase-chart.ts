@@ -22,7 +22,14 @@ import {
   isExchangeNativeToken,
   isLaunchpadSwapToken,
 } from '../../core/constants/exchange-launchpad.constants';
-import { R4V3_PEG_DISPLAY_PRICE } from '../../core/constants/r4v3-token.constants';
+import {
+  R4V3_PEG_DISPLAY_DELTA,
+  R4V3_PEG_DISPLAY_PRICE,
+} from '../../core/constants/r4v3-token.constants';
+import {
+  formatMarketDelta,
+  stripUsdFromMarketLabel,
+} from '../../core/utils/market-display.util';
 import { LaunchProject, ChartRange } from '../../core/models/showcase.model';
 import { MarketDataService } from '../../core/services/market-data.service';
 import { RatePanelPreferencesService } from '../../core/services/rate-panel-preferences.service';
@@ -111,7 +118,6 @@ const CHART_TYPES: ReadonlyArray<{ id: ChartDisplayType; label: string }> = [
 
 const CURRENCIES: ReadonlyArray<{ id: ChartCurrency; label: string }> = [
   { id: 'eur', label: 'EUR' },
-  { id: 'usd', label: 'USD' },
   { id: 'r4v3', label: 'R4V3' },
 ];
 
@@ -140,7 +146,7 @@ const R4V3_VIEW_PILLS: readonly { id: R4v3ChartView; badge: string }[] = [
 ];
 
 const R4V3_PEG_PRICE = R4V3_PEG_DISPLAY_PRICE;
-const R4V3_PEG_DELTA = '0,00 %';
+const R4V3_PEG_DELTA = R4V3_PEG_DISPLAY_DELTA;
 
 function formatCompactMetric(value: number): string {
   if (!Number.isFinite(value) || value <= 0) {
@@ -248,6 +254,11 @@ export class ShowcaseChartComponent {
   readonly chartPrice = signal('—');
   readonly chartDelta = signal('—');
   readonly chartPositive = signal(true);
+  /** Valeurs marché réelles partagées avec la navbar (sans peg pédagogique R4V3). */
+  readonly marketSummaryPrice = signal('—');
+  readonly marketSummaryDelta = signal('—');
+  readonly marketSummaryPositive = signal(true);
+  readonly marketSummaryVolume = signal('—');
   readonly seriesVolumeLabel = signal('');
   private readonly baseSeries = signal<ChartSeriesPayload | null>(null);
   readonly chartPoints = signal<number[]>([50, 50, 50, 50, 50, 50]);
@@ -279,9 +290,13 @@ export class ShowcaseChartComponent {
 
     return isLaunchpadSwapToken(this.pairBase());
   });
-  readonly currencyLabel = computed(
-    () => this.currencies.find((entry) => entry.id === this.chartCurrency())?.label ?? 'EUR'
-  );
+  readonly currencyLabel = computed(() => {
+    const id = this.chartCurrency();
+    if (id === 'usd') {
+      return 'CHF';
+    }
+    return this.currencies.find((entry) => entry.id === id)?.label ?? 'EUR';
+  });
 
   readonly chartHeight = 100;
   readonly volumeHeight = 14;
@@ -375,8 +390,9 @@ export class ShowcaseChartComponent {
     if (!label || label === '—') {
       return '—';
     }
+    const cleaned = stripUsdFromMarketLabel(label);
     const unit = this.currencyLabel();
-    return label.toUpperCase().includes(unit.toUpperCase()) ? label : `${label} ${unit}`;
+    return cleaned.toUpperCase().includes(unit.toUpperCase()) ? cleaned : `${cleaned} ${unit}`;
   });
 
   readonly hubYAxisTitle = computed(() => {
@@ -1004,8 +1020,8 @@ export class ShowcaseChartComponent {
       if (!this.hubLayout()) {
         return;
       }
-      if (this.chartCurrency() !== 'usd') {
-        this.chartCurrency.set('usd');
+      if (this.chartCurrency() !== 'eur') {
+        this.chartCurrency.set('eur');
       }
       this.showVolume.set(false);
     });
@@ -1061,11 +1077,11 @@ export class ShowcaseChartComponent {
       this.chartSummary.sync({
         title: 'Graphique',
         pairLabel: `${this.pairBase()} / ${this.currencyLabel()}`,
-        price: this.chartPrice(),
-        delta: this.chartDelta(),
-        positive: this.chartPositive(),
+        price: this.marketSummaryPrice(),
+        delta: this.marketSummaryDelta(),
+        positive: this.marketSummaryPositive(),
         rangeBadge: this.activeTimeframeBadge(),
-        volume: this.hubFooterVol(),
+        volume: this.marketSummaryVolume(),
         high: this.chartHigh(),
         low: this.chartLow(),
         loading: this.loading(),
@@ -1853,12 +1869,15 @@ export class ShowcaseChartComponent {
     }
 
     const chart = transformSeriesForTimeframe(base, this.activeTimeframeId(), this.activeRange());
+    const marketDelta = formatMarketDelta(chart.changePercent);
+
+    this.marketSummaryPrice.set(stripUsdFromMarketLabel(chart.currentPrice));
+    this.marketSummaryDelta.set(marketDelta);
+    this.marketSummaryPositive.set(chart.positive);
+    this.marketSummaryVolume.set(this.formatSummaryVolume(chart.volume));
+
     this.chartPrice.set(chart.currentPrice);
-    this.chartDelta.set(
-      chart.changePercent !== undefined
-        ? `${chart.changePercent >= 0 ? '+' : ''}${chart.changePercent.toFixed(2)}%`
-        : '—'
-    );
+    this.chartDelta.set(marketDelta);
     this.chartPositive.set(chart.positive);
     this.seriesVolumeLabel.set(chart.volume);
     this.chartPoints.set(chart.points);
@@ -1868,6 +1887,9 @@ export class ShowcaseChartComponent {
     this.checkAlertThreshold();
 
     if (this.isR4v3Chart()) {
+      this.marketSummaryPrice.set(R4V3_PEG_PRICE);
+      this.marketSummaryDelta.set(R4V3_PEG_DELTA);
+      this.marketSummaryPositive.set(true);
       this.chartPrice.set(R4V3_PEG_PRICE);
       this.chartDelta.set(R4V3_PEG_DELTA);
       this.chartPositive.set(true);
@@ -2098,10 +2120,34 @@ export class ShowcaseChartComponent {
     return stored === 'candles' ? 'candles' : 'line';
   }
 
+  private formatSummaryVolume(volume: string): string {
+    const cleaned = stripUsdFromMarketLabel(volume);
+    if (!cleaned || cleaned === '—') {
+      return '—';
+    }
+
+    const normalized = cleaned.trim().toLowerCase().replace(/\s/g, '');
+    if (
+      normalized === '0' ||
+      normalized === '0k' ||
+      normalized === '0,0k' ||
+      normalized === '0.0k'
+    ) {
+      return `0 ${this.pairBase()}`;
+    }
+
+    const base = this.pairBase();
+    return cleaned.toUpperCase().includes(base.toUpperCase()) ? cleaned : `${cleaned} ${base}`;
+  }
+
   private loadCurrency(): ChartCurrency {
     const stored = localStorage.getItem(CHART_CURRENCY_STORAGE_KEY);
-    if (stored === 'usd' || stored === 'r4v3') {
+    if (stored === 'r4v3') {
       return stored;
+    }
+    if (stored === 'usd') {
+      localStorage.setItem(CHART_CURRENCY_STORAGE_KEY, 'eur');
+      return 'eur';
     }
     return 'eur';
   }

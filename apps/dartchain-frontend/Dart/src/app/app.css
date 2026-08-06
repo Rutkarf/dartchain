@@ -309,6 +309,15 @@ app-three-floor {
   padding: 0;
   line-height: 1;
   background: transparent;
+  overflow: visible;
+  isolation: isolate;
+}
+
+/* Menu token R4V3 : le panneau déborde sous la navbar — le remonter au-dessus du hub */
+.app-navbar-zone:has(.is-token-menu-open),
+.app-navbar-zone:has([data-token-menu-open='true']) {
+  z-index: 120;
+  overflow: visible;
 }
 
 .app-bottom-stack {
@@ -1623,7 +1632,6 @@ app-three-floor {
 
 app-navbar,
 app-bandeau-accueil,
-app-status-overlay,
 app-pending-transactions,
 app-block-composer,
 app-blocks-list,
@@ -1732,12 +1740,12 @@ app-dock-tabs {
   margin: 0;
 }
 
-app-status-overlay,
 app-pending-transactions,
 app-peer-panel,
 app-block-composer,
 app-blocks-list {
-  height: 100%;
+  height: auto;
+  max-height: none;
 }
 
 .showcase-header-tabs app-showcase-tabs {
@@ -1777,48 +1785,27 @@ app-block-detail-drawer {
   z-index: 130;
   display: flex;
   flex-direction: column;
-  width: min(92vw, 320px);
-  max-height: min(52vh, 380px);
-  border-radius: 14px;
-  border: 1px solid rgba(var(--ui-accent-rgb), 0.35);
-  background: rgba(4, 13, 24, 0.96);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  width: min(88vw, 220px);
+  max-height: none;
+  border-radius: 10px;
+  border: 1px solid rgba(var(--ui-accent-rgb), 0.28);
+  background: rgba(4, 13, 24, 0.97);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(var(--ui-accent-rgb), 0.06);
   overflow: hidden;
 }
 
-.app-status-drawer__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(var(--ui-accent-rgb), 0.2);
-}
-
+.app-status-drawer__close,
+.app-status-drawer__head,
 .app-status-drawer__title {
-  margin: 0;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(205, 231, 245, 0.88);
-}
-
-.app-status-drawer__close {
-  width: 24px;
-  height: 24px;
-  border: 0;
-  border-radius: 8px;
-  background: rgba(var(--ui-accent-rgb), 0.12);
-  color: rgba(205, 231, 245, 0.9);
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
+  display: none;
 }
 
 .app-status-drawer app-status-overlay {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
-  overflow: auto;
+  overflow: visible;
 }
 
 .app-shell-error-banner {

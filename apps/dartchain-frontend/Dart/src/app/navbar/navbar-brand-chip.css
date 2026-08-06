@@ -1,0 +1,49 @@
+/* Alignement LED + texte partagé (LIVE + Node Sync) */
+.network-trust-chip,
+.navbar-node-panel__box {
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.network-trust-chip__led-wrap,
+.navbar-node-panel__led-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  align-self: center;
+  width: var(--nv-brand-led-size, 5px);
+  min-width: var(--nv-brand-led-size, 5px);
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+}
+
+.network-trust-chip__led,
+.navbar-node-panel__led {
+  display: block;
+  width: var(--nv-brand-led-size, 5px);
+  height: var(--nv-brand-led-size, 5px);
+  min-width: var(--nv-brand-led-size, 5px);
+  min-height: var(--nv-brand-led-size, 5px);
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transform-origin: center center;
+}
+
+.network-trust-chip__label,
+.network-trust-chip__detail,
+.navbar-node-panel__pct,
+.navbar-node-panel__range {
+  display: inline-block;
+  align-self: center;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  vertical-align: middle;
+}

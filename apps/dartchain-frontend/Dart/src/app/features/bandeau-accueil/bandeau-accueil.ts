@@ -18,6 +18,7 @@ import {
   LiveUpdateMessage,
 } from '../../core/services/blockchain-api.service';
 import { NavbarTickerStateService } from '../../core/services/navbar-ticker-state.service';
+import { NavbarTickerDrawerService } from '../../core/services/navbar-ticker-drawer.service';
 
 @Component({
   selector: 'app-bandeau-accueil',
@@ -31,7 +32,11 @@ export class BandeauAccueilComponent
 {
   private readonly api = inject(BlockchainApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly tickerDrawer = inject(NavbarTickerDrawerService);
   readonly ticker = inject(NavbarTickerStateService);
+
+  /** Exposé au template pour l'état actif des chips. */
+  protected readonly drawer = this.tickerDrawer;
 
   @ViewChild('track', { read: ElementRef }) trackRef?: ElementRef<HTMLElement>;
   @ViewChild('viewport', { read: ElementRef })
@@ -56,6 +61,8 @@ export class BandeauAccueilComponent
   private dragPointerId: number | null = null;
   private dragStartClientX = 0;
   private dragStartOffsetPx = 0;
+  private dragMoved = false;
+  private readonly clickMoveThresholdPx = 6;
 
   constructor() {
     effect(() => {
@@ -100,6 +107,7 @@ export class BandeauAccueilComponent
     if (!viewport) return;
 
     this.isDragging = true;
+    this.dragMoved = false;
     this.dragPointerId = event.pointerId;
     this.dragStartClientX = event.clientX;
     this.dragStartOffsetPx = this.offsetPx;
@@ -108,10 +116,22 @@ export class BandeauAccueilComponent
     event.preventDefault();
   }
 
+  onChipClick(segmentId: string, event: MouseEvent): void {
+    if (this.dragMoved) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    this.tickerDrawer.show(segmentId);
+  }
+
   onPointerMove(event: PointerEvent): void {
     if (!this.isDragging || this.dragPointerId !== event.pointerId) return;
 
     const dx = event.clientX - this.dragStartClientX;
+    if (Math.abs(dx) > this.clickMoveThresholdPx) {
+      this.dragMoved = true;
+    }
     this.offsetPx = this.dragStartOffsetPx + dx;
     this.applyTransform();
     event.preventDefault();
@@ -137,6 +157,9 @@ export class BandeauAccueilComponent
     this.dragPointerId = null;
     this.normalizeOffset();
     this.applyTransform();
+    queueMicrotask(() => {
+      this.dragMoved = false;
+    });
   }
 
   private onResize = (): void => {

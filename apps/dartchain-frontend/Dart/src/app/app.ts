@@ -41,7 +41,6 @@ import { ShellFeedbackService } from './core/services/shell-feedback.service';
 import { LocaleService } from './core/i18n/locale.service';
 import { OverlayPanel } from './features/dock-tabs/dock-tabs';
 import { ErrorBannerComponent } from './features/error-banner/error-banner';
-import { StatusOverlayComponent } from './features/status-overlay/status-overlay';
 import { R4v3SceneComponent } from './r4v3-scene/r4v3-scene';
 import { BlockDetailDrawerComponent } from './features/block-detail-drawer/block-detail-drawer';
 import { LaunchFormDrawerComponent } from './features/launch-form-drawer/launch-form-drawer';
@@ -78,7 +77,6 @@ import { FaucetRuntimeService } from './core/services/faucet-runtime.service';
     TransactionsDockComponent,
     BlocksListComponent,
     ErrorBannerComponent,
-    StatusOverlayComponent,
     R4v3SceneComponent,
     BlockDetailDrawerComponent,
     LaunchFormDrawerComponent,
@@ -117,7 +115,6 @@ export class AppComponent {
   readonly selectedBlock = signal<Block | null>(null);
   readonly questFeedback = this.questProgress.feedback;
   readonly shellBannerError = this.shell.bannerError;
-  readonly statusPanelOpen = this.shell.statusPanelOpen;
   readonly r4v3SceneVisible = this.shell.r4v3SceneVisible;
 
   selectedPaletteIndex: number | null = null;
@@ -273,10 +270,6 @@ export class AppComponent {
     return this.showcaseCollapsed()
       ? `Déplier le panneau ${name}`
       : `Replier le panneau ${name}`;
-  }
-
-  closeStatusPanel(): void {
-    this.shell.statusPanelOpen.set(false);
   }
 
   openBlockDrawer(block: Block): void {

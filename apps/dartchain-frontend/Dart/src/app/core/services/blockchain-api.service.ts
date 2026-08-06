@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import {
   Observable,
@@ -266,6 +266,7 @@ export class BlockchainApiService {
   private liveReconnectAttempt = 0;
   private liveUpdatesWanted = false;
   private readonly liveUpdatesSubject = new Subject<LiveUpdateMessage>();
+  readonly liveSocketOpen = signal(false);
 
   public readonly liveUpdates = this.liveUpdatesSubject.asObservable();
 
@@ -743,6 +744,7 @@ export class BlockchainApiService {
 
     this.liveSocket.onopen = () => {
       this.liveReconnectAttempt = 0;
+      this.liveSocketOpen.set(true);
     };
 
     this.liveSocket.onmessage = (event: MessageEvent<string>) => {
@@ -759,6 +761,7 @@ export class BlockchainApiService {
 
     this.liveSocket.onclose = () => {
       this.liveSocket = null;
+      this.liveSocketOpen.set(false);
       this.scheduleLiveReconnect();
     };
   }
@@ -806,6 +809,7 @@ export class BlockchainApiService {
     }
 
     this.liveSocket = null;
+    this.liveSocketOpen.set(false);
   }
 
   private parseLiveUpdate(raw: string): LiveUpdateMessage | null {

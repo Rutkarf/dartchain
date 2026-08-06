@@ -26,3 +26,6 @@ export const R4V3_CHART_PAIR = 'R4V3-CHF';
 
 /** Valeur peg affichée dans le graphique hub. */
 export const R4V3_PEG_DISPLAY_PRICE = '1,00 CHF';
+
+/** Variation peg affichée (R4V3 indexé 1:1 sur CHF). */
+export const R4V3_PEG_DISPLAY_DELTA = '0,00 %';

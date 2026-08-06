@@ -2,51 +2,53 @@
   <div class="navbar-top-shell">
     <nav class="navbar-top ds-surface ds-surface--strip" aria-label="Navigation principale">
       <div class="navbar-brand-stack">
-        <div class="navbar-brand-head">
-          <div class="navbar-brand-row">
-            <div
-              class="logo-shell"
-              role="button"
-              tabindex="0"
-              aria-label="Interagir avec le logo R4V3"
-              appNavbarHint="Double-clic rapide pour basculer la scène 3D R4V3"
-              [class.logo-clicked]="logoClicked"
-              (keydown.enter)="onLogoPulse()"
-              (keydown.space)="$event.preventDefault(); onLogoPulse()"
-            >
-              <div class="logo-frame">
-                <app-r4v3-three
-                  #logoThree
-                  class="navbar-logo-three"
-                  presentation="navbar"
-                  [modelTargetSize]="28"
-                  [cameraFitFactor]="1.148"
-                  [frameBiasX]="0"
-                  [frameBiasY]="-0.12"
-                  [enableOrbit]="true"
-                  (logoTapped)="onLogoPulse()"
-                />
+        <div class="navbar-brand-head" #brandHead>
+          <div class="navbar-brand-track" #brandTrack>
+            <div class="navbar-brand-row" #brandRow>
+              <div
+                class="logo-shell"
+                role="button"
+                tabindex="0"
+                aria-label="Interagir avec le logo R4V3"
+                appNavbarHint="Double-clic rapide pour basculer la scène 3D R4V3"
+                [class.logo-clicked]="logoClicked"
+                (keydown.enter)="onLogoPulse()"
+                (keydown.space)="$event.preventDefault(); onLogoPulse()"
+              >
+                <div class="logo-frame">
+                  <app-r4v3-three
+                    #logoThree
+                    class="navbar-logo-three"
+                    presentation="navbar"
+                    [modelTargetSize]="38"
+                    [cameraFitFactor]="1.148"
+                    [frameBiasX]="0"
+                    [frameBiasY]="-0.12"
+                    [enableOrbit]="true"
+                    (logoTapped)="onLogoPulse()"
+                  />
+                </div>
               </div>
+
+              <app-brand-crypto-select class="navbar-brand-select" />
+
+              <app-navbar-network-status
+                #networkStatus
+                class="navbar-brand-row__network"
+              />
+
+              <app-navbar-node-panel class="navbar-brand-row__node" />
             </div>
 
-            <app-brand-crypto-select class="navbar-brand-select" />
-
-            <app-navbar-network-status
-              #networkStatus
-              class="navbar-brand-row__network"
-            />
+            <div class="navbar-ticker-slot">
+              <div class="navbar-ticker" aria-live="polite">
+                <ng-content />
+              </div>
+              <app-navbar-ticker-drawer />
+            </div>
           </div>
         </div>
-
-        <div class="navbar-ticker" aria-live="polite">
-          <ng-content />
-        </div>
       </div>
-
-      <app-navbar-node-panel
-        [networkOnline]="networkOnline()"
-        [syncPercentLabel]="networkSyncLabel()"
-      />
 
       @switch (authStripMode()) {
         @case ('logout') {

@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: max-content;
+  min-width: min(248px, calc(100vw - 20px));
+  max-width: min(280px, calc(100vw - 16px));
+  z-index: calc(var(--nv-layer-ticker-drawer, 60) + 20);
+  pointer-events: none;
+  line-height: 1.2;
+}
+
+:host:empty {
+  display: none;
+}
+
+:host.is-drawer-open {
+  pointer-events: auto;
+}
+
+:host .nv-anchor-drawer {
+  position: relative;
+  top: auto;
+  left: auto;
+}

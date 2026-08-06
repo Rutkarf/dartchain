@@ -23,6 +23,8 @@ describe('BandeauAccueil', () => {
                 userCount: 1,
               }),
             connectLiveUpdates: () => of(),
+            getPeerStats: () => of({ active: 1, total: 2 }),
+            getHealth: () => of({ ok: true }),
           },
         },
       ],

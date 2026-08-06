@@ -73,6 +73,7 @@
   height: var(--ticker-chip-h);
   max-height: var(--ticker-chip-h);
   padding: 0 0.3rem 0 0.26rem;
+  border: none;
   border-radius: 3px;
   background: linear-gradient(
     180deg,
@@ -84,6 +85,45 @@
     inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.62));
   line-height: 1;
   flex-shrink: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  touch-action: manipulation;
+  transition:
+    transform 160ms ease,
+    filter 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.bandeau-accueil__chip--active {
+  background: rgba(0, 0, 0, 0.38);
+  transform: scale(1.02);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.92)),
+    0 0 0 1px color-mix(in srgb, var(--ticker-chip-accent, #00f5ff) 22%, transparent);
+}
+
+.bandeau-accueil__chip:hover {
+  transform: scale(1.04);
+  filter: brightness(1.12);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.85)),
+    0 0 8px color-mix(in srgb, var(--ticker-chip-accent, #00f5ff) 24%, transparent);
+}
+
+.bandeau-accueil__chip:active {
+  transform: scale(0.98);
+}
+
+.bandeau-accueil__chip:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.85)),
+    0 0 0 2px rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.35);
 }
 
 .bandeau-accueil__chip--network {
@@ -172,6 +212,15 @@
 @media (prefers-reduced-motion: reduce) {
   .bandeau-accueil {
     cursor: grab;
+  }
+
+  .bandeau-accueil__chip {
+    transition: none;
+  }
+
+  .bandeau-accueil__chip:hover {
+    transform: none;
+    filter: brightness(1.08);
   }
 
   .bandeau-accueil__value {

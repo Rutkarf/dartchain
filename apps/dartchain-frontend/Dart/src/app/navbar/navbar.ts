@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Output, ViewChild, computed, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef,
+  ElementRef,
+  EventEmitter,
+  Output,
+  ViewChild,
+  computed,
+  inject,
+} from '@angular/core';
 import { Block } from '../core/models/block.model';
 import { CommonModule } from '@angular/common';
 import { NavbarNetworkStatusComponent } from './navbar-network-status';
@@ -12,6 +22,7 @@ import { ShellFeedbackService } from '../core/services/shell-feedback.service';
 import { LocaleService } from '../core/i18n/locale.service';
 import { NavbarNodePanelComponent } from './navbar-node-panel';
 import { NavbarHintDirective } from './navbar-hint.directive';
+import { NavbarTickerDrawerComponent } from '../features/navbar-ticker-drawer/navbar-ticker-drawer';
 
 @Component({
   selector: 'app-navbar',
@@ -25,15 +36,26 @@ import { NavbarHintDirective } from './navbar-hint.directive';
     SearchbarComponent,
     R4v3ThreeComponent,
     NavbarNodePanelComponent,
+    NavbarTickerDrawerComponent,
     NavbarHintDirective,
   ],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css', './navbar-chrome.css', './navbar-viewport-compact.css', './navbar-hint.css'],
 })
-export class NavbarComponent {
+export class NavbarComponent implements AfterViewInit {
   readonly auth = inject(AuthService);
   readonly locale = inject(LocaleService);
   private readonly shell = inject(ShellFeedbackService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  @ViewChild('brandHead', { read: ElementRef })
+  brandHeadRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('brandTrack', { read: ElementRef })
+  brandTrackRef?: ElementRef<HTMLElement>;
+
+  @ViewChild('brandRow', { read: ElementRef })
+  brandRowRef?: ElementRef<HTMLElement>;
 
   /** Une seule variante auth visible : logout OU (connexion + inscription), jamais les deux. */
   readonly authStripMode = computed(() => {
@@ -46,9 +68,6 @@ export class NavbarComponent {
 
   @ViewChild('logoThree')
   logoThree?: R4v3ThreeComponent;
-
-  @ViewChild('networkStatus')
-  networkStatus!: NavbarNetworkStatusComponent;
 
   @Output() exploreBlock = new EventEmitter<Block>();
   @Output() explorePending = new EventEmitter<void>();
@@ -92,16 +111,36 @@ export class NavbarComponent {
     this.locale.toggle();
   }
 
-  /** Compatibilité — le panneau NODE gère désormais l’ouverture réseau en secondaire. */
-  onNodePanelToggle(): void {
-    this.shell.toggleStatusPanel();
-  }
+  ngAfterViewInit(): void {
+    const track = this.brandTrackRef?.nativeElement;
+    const row = this.brandRowRef?.nativeElement;
+    if (!track || !row) {
+      return;
+    }
 
-  networkOnline(): boolean {
-    return this.networkStatus?.health().ok ?? true;
-  }
+    const syncBrandTrackWidth = (): void => {
+      track.style.removeProperty('width');
+      track.style.removeProperty('max-width');
 
-  networkSyncLabel(): string {
-    return this.networkStatus?.syncPercentLabel() ?? '…';
+      requestAnimationFrame(() => {
+        const width = Math.ceil(row.getBoundingClientRect().width);
+        if (width > 0) {
+          track.style.width = `${width}px`;
+          track.style.maxWidth = `${width}px`;
+        }
+      });
+    };
+
+    syncBrandTrackWidth();
+
+    const observer = new ResizeObserver(() => syncBrandTrackWidth());
+    observer.observe(row);
+
+    window.addEventListener('resize', syncBrandTrackWidth);
+
+    this.destroyRef.onDestroy(() => {
+      observer.disconnect();
+      window.removeEventListener('resize', syncBrandTrackWidth);
+    });
   }
 }

@@ -6,6 +6,8 @@
   :host {
     --nv-margin-top: max(clamp(5px, 1.4vh, 10px), env(safe-area-inset-top, 0px));
     --nv-wrap-pad-x: 8px;
+    --nv-wrap-pad-left: 0px;
+    --nv-wrap-pad-right: var(--nv-wrap-pad-x);
     --nv-pad-x: 8px;
     --nv-pad-top: clamp(2px, 0.8vh, 4px);
     --nv-pad-y: clamp(2px, 0.6vh, 3px);
@@ -16,39 +18,50 @@
     --nv-shell-radius: clamp(7px, 2.2vw, 10px);
     --nv-logo: 24px;
     --nv-logo-h: 22px;
-    --nv-logo-shift-y: -7px;
+    --nv-brand-chip-h: calc(var(--nv-logo-h) - 1px);
+    --nv-logo-shift-y: -6px;
   }
 
   .navbar-wrap {
-    padding: var(--nv-margin-top) var(--nv-wrap-pad-x) 0;
+    padding: var(--nv-margin-top) var(--nv-wrap-pad-right) 0 var(--nv-wrap-pad-left);
   }
 
   .navbar-top {
-    column-gap: 6px;
+    column-gap: 4px;
     min-height: var(--nv-shell-min-h);
     padding: var(--nv-pad-top) var(--nv-pad-x) var(--nv-pad-y);
-    grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(0, max-content);
-    grid-template-areas: 'stack node auth';
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'stack auth';
     align-items: start;
     row-gap: 0;
   }
 
   .navbar-auth-strip {
     gap: 3px;
+    align-self: start;
+    height: var(--nv-logo-h);
+    min-height: var(--nv-logo-h);
+    max-height: var(--nv-logo-h);
   }
 
   .navbar-auth-btn {
-    width: var(--nv-action-btn, 24px);
-    height: var(--nv-action-btn, 24px);
-    min-width: var(--nv-action-btn, 24px);
-    min-height: var(--nv-action-btn, 24px);
+    width: var(--nv-logo-h, 22px);
+    height: var(--nv-logo-h, 22px);
+    min-width: var(--nv-logo-h, 22px);
+    min-height: var(--nv-logo-h, 22px);
+    max-height: var(--nv-logo-h, 22px);
+  }
+
+  .navbar-brand-row .navbar-brand-row__node {
+    max-width: var(--nv-node-panel-max-w, 4.75rem);
   }
 
   .navbar-brand-row {
-    gap: 4px;
+    gap: 3px;
     height: var(--nv-logo-h);
     min-height: 0;
     max-height: var(--nv-logo-h);
+    margin-inline-start: 0;
   }
 
   .navbar-brand-row .navbar-brand-select {
@@ -57,6 +70,11 @@
 
   .navbar-brand-head {
     padding-inline-end: 4px;
+    margin-inline-start: calc((var(--nv-pad-x) + var(--nv-wrap-pad-left)) * -1);
+  }
+
+  .navbar-brand-row {
+    margin-inline-start: 0;
   }
 
   .navbar-ticker ::ng-deep .bandeau-accueil__chip,
@@ -64,18 +82,6 @@
     box-shadow:
       inset 0 0 0 1px rgba(255, 255, 255, 0.04),
       inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--nv-cyan-rgb), 0.5));
-  }
-
-  .navbar-node-panel__chart {
-    display: none;
-  }
-
-  .navbar-node-panel__title {
-    font-size: 0.5rem;
-  }
-
-  .navbar-node-panel__sync {
-    font-size: 0.5rem;
   }
 
   .navbar-auth-btn svg {
@@ -110,14 +116,15 @@
 }
 
 html.vp-compact app-navbar .navbar-wrap {
-  padding: var(--ds-navbar-top-inset, max(clamp(5px, 1.4vh, 10px), env(safe-area-inset-top, 0px))) 8px 0;
+  padding: var(--ds-navbar-top-inset, max(clamp(5px, 1.4vh, 10px), env(safe-area-inset-top, 0px))) var(--nv-wrap-pad-right, 8px) 0 var(--nv-wrap-pad-left, 0px);
 }
 
 html.vp-compact app-navbar .navbar-top {
-  column-gap: 6px;
+  column-gap: 5px;
   padding: var(--nv-pad-top, clamp(2px, 0.8vh, 4px)) 8px var(--nv-pad-y, clamp(2px, 0.6vh, 3px));
   min-height: var(--nv-shell-min-h);
-  grid-template-areas: 'stack node auth';
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'stack auth';
   align-items: start;
   row-gap: 0;
 }
@@ -126,8 +133,4 @@ html.vp-compact app-navbar .navbar-brand-row {
   gap: 4px;
   height: var(--nv-logo-h, 22px);
   max-height: var(--nv-logo-h, 22px);
-}
-
-html.vp-compact app-navbar .navbar-node-panel__chart {
-  display: none;
 }

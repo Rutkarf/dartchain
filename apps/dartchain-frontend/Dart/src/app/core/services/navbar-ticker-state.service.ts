@@ -8,11 +8,19 @@ import { BlockchainApiService, PendingTransaction } from './blockchain-api.servi
 import { DockChainStateService } from './dock-chain-state.service';
 import { formatDockRelativeTime } from '../utils/dock-time.util';
 
+export interface NavbarTickerDrawerDetail {
+  eyebrow: string;
+  title: string;
+  summary: string;
+  bullets?: string[];
+  metrics?: { label: string; value: string }[];
+}
+
 export interface NavbarTickerSegment {
   id: string;
   label: string;
   value: string;
-  detail?: string;
+  detail?: NavbarTickerDrawerDetail;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -36,35 +44,112 @@ export class NavbarTickerStateService {
         ? `${this.peersConnected()}/${this.peersTotal()}`
         : String(this.peersConnected());
 
+    const networkValue = this.networkLabel();
+    const tokenValue = this.activeToken();
+    const txValue = this.lastTransactionShort();
+    const tip = this.blockTip();
+    const ageLabel = this.updatedAgeLabel();
+
     const segments: NavbarTickerSegment[] = [
       {
         id: 'network',
         label: 'Net',
-        value: this.networkLabel(),
+        value: networkValue,
+        detail: {
+          eyebrow: 'Infrastructure',
+          title: networkValue,
+          summary:
+            'DartChain s’appuie sur un réseau distribué optimisé pour la latence et la disponibilité des nœuds.',
+          bullets: [
+            'Consensus synchronisé en temps réel avec les pairs actifs.',
+            'Launch prévu Q4 — accès anticipé via le LaunchLab R4V3.',
+            'Compatible avec les flux live WebSocket de l’explorateur.',
+          ],
+          metrics: [
+            { label: 'Réseau', value: 'DartChain P2P' },
+            { label: 'Statut', value: this.loading() ? 'Synchronisation…' : 'Opérationnel' },
+            { label: 'Mise à jour', value: ageLabel },
+          ],
+        },
       },
       {
         id: 'token',
         label: 'Token',
-        value: this.activeToken(),
+        value: tokenValue,
+        detail: {
+          eyebrow: 'Actif sélectionné',
+          title: tokenValue,
+          summary:
+            'Le token actif pilote le graphique, l’échange et les métriques affichées dans le hub marché.',
+          bullets: [
+            'R4V3 — jeton natif de l’écosystème DartChain.',
+            'Tokens LaunchLab disponibles dans le menu déroulant adjacent.',
+            'Rewards distribués aux participants actifs du réseau.',
+          ],
+          metrics: [
+            { label: 'TVL', value: '12.4M' },
+            { label: 'Launch', value: 'Q4 2026' },
+            { label: 'Rewards', value: 'Actifs' },
+          ],
+        },
       },
       {
         id: 'tx',
         label: 'Tx',
-        value: this.lastTransactionShort(),
+        value: txValue,
+        detail: {
+          eyebrow: 'Mempool',
+          title: 'Dernière transaction',
+          summary:
+            'Flux des transactions en attente de validation, mis à jour via le canal live du nœud.',
+          bullets: [
+            'Hash tronqué dans le ticker pour la lisibilité compacte.',
+            'Ouvrez le dock Transactions pour l’historique complet.',
+            'Rafraîchissement automatique à chaque snapshot réseau.',
+          ],
+          metrics: [{ label: 'Hash', value: txValue }],
+        },
       },
       {
         id: 'peers',
         label: 'Peers',
         value: peersLabel,
+        detail: {
+          eyebrow: 'Topologie P2P',
+          title: `${peersLabel} pairs`,
+          summary:
+            'Nombre de nœuds connectés au réseau DartChain, mesuré via les statistiques peers du backend.',
+          bullets: [
+            'Les pairs actifs contribuent à la propagation des blocs.',
+            'Consultez le dock Peers pour le détail de chaque connexion.',
+            'Actualisation automatique toutes les 30 secondes.',
+          ],
+          metrics: [
+            { label: 'Connectés', value: String(this.peersConnected()) },
+            { label: 'Total', value: String(this.peersTotal() || this.peersConnected()) },
+            { label: 'Mise à jour', value: ageLabel },
+          ],
+        },
       },
     ];
 
-    const tip = this.blockTip();
     if (tip) {
       segments.push({
         id: 'tip',
         label: 'Bloc',
         value: tip,
+        detail: {
+          eyebrow: 'Chaîne',
+          title: `Bloc ${tip}`,
+          summary:
+            'Index du dernier bloc confirmé sur la chaîne DartChain, rafraîchi toutes les 5 secondes.',
+          bullets: [
+            'Pointe de chaîne synchronisée avec le dock Chain.',
+            'Cliquez sur un bloc dans l’explorateur pour ouvrir le détail.',
+            'Indicateur de progression du nœud local.',
+          ],
+          metrics: [{ label: 'Tip', value: tip }],
+        },
       });
     }
 

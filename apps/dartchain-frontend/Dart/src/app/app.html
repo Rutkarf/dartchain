@@ -296,23 +296,6 @@
     }
   }
 
-  @if (statusPanelOpen()) {
-    <aside class="app-status-drawer" aria-label="État réseau détaillé" [appFocusTrap]="true">
-      <header class="app-status-drawer__head">
-        <h2 class="app-status-drawer__title">Réseau</h2>
-        <button
-          type="button"
-          class="app-status-drawer__close"
-          aria-label="Fermer le panneau réseau"
-          (click)="closeStatusPanel()"
-        >
-          ×
-        </button>
-      </header>
-      <app-status-overlay />
-    </aside>
-  }
-
   @if (shellBannerError(); as bannerError) {
     <div class="app-shell-error-banner">
       <app-error-banner [message]="bannerError" />
