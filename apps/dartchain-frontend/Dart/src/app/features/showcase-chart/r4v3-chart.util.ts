@@ -536,6 +536,24 @@ export function r4v3ViewLabel(view: R4v3ChartView): string {
   }
 }
 
+/** Description courte affichée au survol des modes du graphique R4V3. */
+export function r4v3ViewHint(view: R4v3ChartView): string {
+  switch (view) {
+    case 'auto':
+      return 'Choisit automatiquement le mode le plus adapté à l’activité du réseau.';
+    case 'flow':
+      return 'Vue Flux — pression nette des achats et ventes R4V3 sur la période.';
+    case 'pulse':
+      return 'Pulse — swaps récents et événements on-chain du réseau.';
+    case 'fuel':
+      return 'Fuel LaunchLab — volume et momentum des projets listés.';
+    case 'health':
+      return 'Santé — niveau d’activité global quand le réseau est calme.';
+    default:
+      return '';
+  }
+}
+
 export function r4v3ResolvedViewLabel(view: R4v3ChartView, ctx: R4v3ChartContext): string {
   if (view !== 'auto') {
     return r4v3ViewLabel(view);

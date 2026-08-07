@@ -78,8 +78,9 @@
   box-shadow: 0 0 4px color-mix(in srgb, var(--network-trust-led, #39ff14) 65%, transparent);
 }
 
+.network-trust-chip.is-live .network-trust-chip__led,
 .network-trust-chip.is-stream-live .network-trust-chip__led {
-  animation: network-trust-pulse 2.8s ease-in-out infinite;
+  animation: network-trust-pulse 2s ease-in-out infinite;
 }
 
 .network-trust-chip__label {
@@ -164,6 +165,7 @@
     transform: none;
   }
 
+  .network-trust-chip.is-live .network-trust-chip__led,
   .network-trust-chip.is-stream-live .network-trust-chip__led,
   .network-trust-chip.is-checking .network-trust-chip__led {
     animation: none;
@@ -212,6 +214,7 @@
     transform: none;
   }
 
+  .network-trust-chip.is-live .network-trust-chip__led,
   .network-trust-chip.is-stream-live .network-trust-chip__led,
   .network-trust-chip.is-checking .network-trust-chip__led {
     animation: none;

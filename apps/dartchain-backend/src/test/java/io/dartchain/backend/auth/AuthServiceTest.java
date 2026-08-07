@@ -27,10 +27,11 @@ class AuthServiceTest {
     Path tempDir;
 
     private AuthService authService;
+    private JsonUserAccountStore userStore;
 
     @BeforeEach
     void setUp() {
-        JsonUserAccountStore userStore = new JsonUserAccountStore(
+        userStore = new JsonUserAccountStore(
                 new ObjectMapper(),
                 tempDir.resolve("auth-users.json").toString()
         );
@@ -87,6 +88,26 @@ class AuthServiceTest {
 
         var profile = authService.me("Bearer " + refreshed.accessToken());
         assertThat(profile.username()).isEqualTo("refreshuser");
+    }
+
+    @Test
+    void rejectsPasswordLoginForOAuthOnlyAccount() {
+        UserAccount oauthAccount = new UserAccount(
+                java.util.UUID.randomUUID().toString(),
+                "oauth-user",
+                "oauth@dartchain.dev",
+                "$OAUTH$",
+                "",
+                System.currentTimeMillis()
+        );
+        userStore.create(oauthAccount);
+
+        assertThatThrownBy(() ->
+                authService.login(new LoginRequest("oauth@dartchain.dev", "password123"), "127.0.0.1")
+        )
+                .isInstanceOf(AuthException.class)
+                .extracting("statusCode")
+                .isEqualTo(401);
     }
 
     @Test

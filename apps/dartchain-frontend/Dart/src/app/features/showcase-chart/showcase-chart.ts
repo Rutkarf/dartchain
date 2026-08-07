@@ -108,6 +108,8 @@ import {
   resampleActivitySeries,
   r4v3AxisHint,
   r4v3ResolvedViewLabel,
+  r4v3ViewHint,
+  r4v3ViewLabel,
   resolveR4v3AutoView,
 } from './r4v3-chart.util';
 
@@ -137,12 +139,12 @@ const HUB_PERIOD_PILLS: readonly HubPeriodPill[] = [
   { range: '30d', badge: '30D' },
 ];
 
-const R4V3_VIEW_PILLS: readonly { id: R4v3ChartView; badge: string }[] = [
-  { id: 'auto', badge: 'AUTO' },
-  { id: 'flow', badge: 'VUE' },
-  { id: 'pulse', badge: 'PULSE' },
-  { id: 'fuel', badge: 'FUEL' },
-  { id: 'health', badge: 'SANTÉ' },
+const R4V3_VIEW_PILLS: readonly { id: R4v3ChartView; badge: string; hint: string }[] = [
+  { id: 'auto', badge: 'AUTO', hint: r4v3ViewHint('auto') },
+  { id: 'flow', badge: 'VUE', hint: r4v3ViewHint('flow') },
+  { id: 'pulse', badge: 'PULSE', hint: r4v3ViewHint('pulse') },
+  { id: 'fuel', badge: 'FUEL', hint: r4v3ViewHint('fuel') },
+  { id: 'health', badge: 'SANTÉ', hint: r4v3ViewHint('health') },
 ];
 
 const R4V3_PEG_PRICE = R4V3_PEG_DISPLAY_PRICE;
@@ -196,6 +198,9 @@ export class ShowcaseChartComponent {
 
   @ViewChild('chartSvg') chartSvg?: ElementRef<SVGSVGElement>;
   @ViewChild('timeframeMenu') timeframeMenu?: ElementRef<HTMLElement>;
+  @ViewChild('r4v3PeriodMenuRoot') r4v3PeriodMenuRoot?: ElementRef<HTMLElement>;
+  @ViewChild('r4v3ViewMenuRoot') r4v3ViewMenuRoot?: ElementRef<HTMLElement>;
+  @ViewChild(ChartTokenSearchComponent) chartTokenSearch?: ChartTokenSearchComponent;
 
   readonly timeframeMenuSections = computed(() =>
     buildTimeframeMenuSections(this.activeRange())
@@ -233,6 +238,8 @@ export class ShowcaseChartComponent {
   readonly alertAbove = signal('');
   readonly alertBelow = signal('');
   readonly r4v3ViewMode = signal<R4v3ChartView>('auto');
+  readonly r4v3ViewMenuOpen = signal(false);
+  readonly r4v3PeriodMenuOpen = signal(false);
   readonly r4v3LivePulse = signal(false);
   readonly showLaunchCurve = signal(true);
   readonly showR4v3OverlayCurve = signal(true);
@@ -301,10 +308,14 @@ export class ShowcaseChartComponent {
   readonly chartHeight = 100;
   readonly volumeHeight = 14;
   readonly rsiHeight = 16;
-  /** Marge SVG gauche (%) — évite que grille / courbe chevauchent les prix. */
-  readonly chartPlotInset = 2;
+  /** Marge SVG gauche (%) — hub : bord gauche du tracé ; desktop : marge prix. */
+  get chartPlotInset(): number {
+    return this.hubLayout() || this.compactLayout() ? 0 : 2;
+  }
   readonly chartPlotRight = 100;
-  readonly chartPlotWidth = this.chartPlotRight - this.chartPlotInset;
+  get chartPlotWidth(): number {
+    return this.chartPlotRight - this.chartPlotInset;
+  }
   private readonly chartWidth = 100;
 
   /** Coordonnées SVG (0–100) dérivées des prix visibles — source unique pour courbe / bougies. */
@@ -598,6 +609,18 @@ export class ShowcaseChartComponent {
     r4v3ResolvedViewLabel(this.r4v3ViewMode(), this.r4v3Context())
   );
 
+  /** Libellé court du mode actif (sans préfixe Auto ·). */
+  readonly r4v3ViewMenuLabel = computed(() => {
+    const view = this.r4v3ViewMode();
+    const resolved = view === 'auto' ? resolveR4v3AutoView(this.r4v3Context()) : view;
+    return r4v3ViewLabel(resolved);
+  });
+
+  readonly hubActivePeriodBadge = computed(() => {
+    const range = this.activeRange();
+    return HUB_PERIOD_PILLS.find((pill) => pill.range === range)?.badge ?? range.toUpperCase();
+  });
+
   readonly r4v3AxisTitle = computed(() =>
     r4v3AxisHint(this.r4v3ViewMode(), this.r4v3Context())
   );
@@ -609,6 +632,29 @@ export class ShowcaseChartComponent {
       !this.loading() &&
       !this.error()
   );
+
+  readonly r4v3InsightLine = computed(() => {
+    if (this.loading() || this.error() || !this.isR4v3Chart()) {
+      return '';
+    }
+
+    if (this.isChartCalm()) {
+      return 'Aucun swap — convertir pour alimenter le réseau';
+    }
+
+    return '';
+  });
+
+  readonly r4v3InsightHasAction = computed(
+    () => this.isChartCalm() || this.r4v3FlowStats().swaps === 0
+  );
+
+  readonly r4v3InsightHint = computed(() => {
+    if (this.isChartCalm()) {
+      return 'Ouvrir le panneau de conversion R4V3';
+    }
+    return this.r4v3InsightLine();
+  });
 
   readonly hubCompareTrendSegments = computed(() => {
     const compare = this.visibleCompare();
@@ -627,53 +673,56 @@ export class ShowcaseChartComponent {
     return this.getChartEndPoint(compare);
   });
 
-  readonly r4v3FooterPrimary = computed(() => {
-    const view = this.r4v3EffectiveView();
+  readonly r4v3FooterStats = computed((): Array<{
+    label: string;
+    value: string;
+    tone?: 'up' | 'down';
+  }> => {
     const flow = this.r4v3FlowStats();
+
+    if (this.isChartCalm()) {
+      return [
+        { label: 'Santé', value: `${this.r4v3HealthScore()}/100`, tone: 'up' },
+        { label: 'Liq.', value: `${Math.round(this.r4v3LiquidityProxy())}%` },
+        { label: 'Swaps', value: String(flow.swaps) },
+      ];
+    }
+
+    const view = this.r4v3EffectiveView();
 
     switch (view) {
       case 'flow':
         return [
-          { label: 'Net', value: flow.netLabel },
-          { label: 'Buys', value: flow.buys > 0 ? formatCompactMetric(flow.buys) : '0' },
-          { label: 'Sells', value: flow.sells > 0 ? formatCompactMetric(flow.sells) : '0' },
+          { label: 'Net', value: flow.netLabel, tone: flow.buys >= flow.sells ? 'up' : 'down' },
+          { label: 'Achats', value: flow.buys > 0 ? formatCompactMetric(flow.buys) : '0' },
+          { label: 'Ventes', value: flow.sells > 0 ? formatCompactMetric(flow.sells) : '0' },
         ];
       case 'pulse':
         return [
-          { label: 'Events', value: String(flow.swaps) },
-          { label: 'Vol 24h', value: this.hubFooterVol() },
-          { label: 'Live', value: this.r4v3LastSwapSummary() !== '—' ? 'On' : 'Calme' },
+          { label: 'Évén.', value: String(flow.swaps) },
+          { label: 'Vol.', value: this.hubFooterVol() },
+          { label: 'Live', value: flow.swaps > 0 ? 'On' : '—', tone: flow.swaps > 0 ? 'up' : undefined },
         ];
       case 'fuel':
         return [
           { label: 'Fuel', value: this.r4v3FuelTotal() },
-          { label: 'Target', value: this.hubLaunchTarget() },
-          { label: 'Raised', value: this.hubLaunchRaised() },
+          { label: 'Cible', value: this.hubLaunchTarget() },
+          { label: 'Levé', value: this.hubLaunchRaised() },
         ];
       case 'health':
         return [
-          { label: 'Score', value: `${this.r4v3HealthScore()}/100` },
+          { label: 'Santé', value: `${this.r4v3HealthScore()}/100`, tone: 'up' },
           { label: 'Liq.', value: `${Math.round(this.r4v3LiquidityProxy())}%` },
           { label: 'Swaps', value: String(flow.swaps) },
         ];
       default:
         return [
-          { label: 'Vol 24h', value: this.hubFooterVol() },
-          { label: 'Net', value: flow.netLabel },
+          { label: 'Vol.', value: this.hubFooterVol() },
+          { label: 'Net', value: flow.netLabel, tone: flow.buys >= flow.sells ? 'up' : 'down' },
           { label: 'Swaps', value: String(flow.swaps) },
         ];
     }
   });
-
-  readonly r4v3FooterSecondary = computed(() => [
-    { label: 'Fuel', value: this.r4v3FuelTotal(), tone: undefined as 'up' | undefined },
-    { label: 'Santé', value: `${this.r4v3HealthScore()}/100`, tone: 'up' as const },
-    {
-      label: 'Liq.',
-      value: `${Math.round(this.r4v3LiquidityProxy())}%`,
-      tone: undefined as 'up' | undefined,
-    },
-  ]);
 
   readonly hubLinePath = computed(() => this.buildChartLine(this.displayPlotPoints()));
 
@@ -792,7 +841,6 @@ export class ShowcaseChartComponent {
       if (points.length) {
         const min = Math.min(...points);
         const max = Math.max(...points);
-        const mid = (min + max) / 2;
         const toTopPercent = (coord: number) =>
           plotHeight > 0 ? (chartYFromNormalizedCoord(coord, plotHeight) / plotHeight) * 100 : 50;
 
@@ -802,12 +850,6 @@ export class ShowcaseChartComponent {
             label: this.formatActivityTick(max),
             topPercent: toTopPercent(max),
             align: 'start' as const,
-          },
-          {
-            id: 'act-mid',
-            label: this.formatActivityTick(mid),
-            topPercent: toTopPercent(mid),
-            align: 'center' as const,
           },
           {
             id: 'act-bot',
@@ -822,15 +864,17 @@ export class ShowcaseChartComponent {
     const levels = this.priceGridLevels();
 
     if (!levels.length) {
-      const count = hub ? 3 : 10;
+      const count = hub && this.isR4v3Chart() ? 2 : hub ? 3 : 10;
       const fallbackLabels =
         hub && this.isR4v3Chart()
-          ? (['Fort', 'Neutre', 'Calme'] as const)
-          : null;
+          ? (['Fort', 'Faible'] as const)
+          : hub
+            ? (['Fort', 'Moyen', 'Faible'] as const)
+            : null;
       return Array.from({ length: count }, (_, index) => ({
         id: `y-fallback-${index}`,
         label: fallbackLabels
-          ? fallbackLabels[index === 0 ? 0 : index === count - 1 ? 2 : 1]
+          ? fallbackLabels[index === 0 ? 0 : fallbackLabels.length - 1]
           : '—',
         topPercent: index === 0 ? 0 : index === count - 1 ? 100 : (index / (count - 1)) * 100,
         align: tickAlign(index, count - 1),
@@ -908,7 +952,7 @@ export class ShowcaseChartComponent {
       label,
       price:
         this.isR4v3Chart()
-          ? `${Math.round(value)} · ${this.r4v3AxisTitle()}`
+          ? `${label ? `${label} · ` : ''}${this.formatActivityTick(value)} · ${Math.round(value)} · ${this.r4v3AxisTitle()}`
           : price !== null
             ? this.formatAxisPrice(price, bounds?.reference ?? '')
             : '—',
@@ -927,11 +971,25 @@ export class ShowcaseChartComponent {
       return [];
     }
 
-    return buildHorizontalAxisTicks(
+    const ticks = buildHorizontalAxisTicks(
       timestamps,
       this.chartGridProfile(),
       this.activeTimeframe().coingeckoGranularity
     );
+
+    if (!this.hubLayout() || !this.isR4v3Chart() || ticks.length <= 4) {
+      return ticks;
+    }
+
+    const last = ticks.length - 1;
+    const picks = new Set([
+      0,
+      Math.floor(last / 3),
+      Math.floor((last * 2) / 3),
+      last,
+    ]);
+
+    return ticks.filter((_, index) => picks.has(index));
   });
 
   readonly plotPointIndices = computed(() => this.plotPoints().map((_, index) => index));
@@ -1108,12 +1166,50 @@ export class ShowcaseChartComponent {
     this.selectRange(pill.range);
   }
 
+  toggleR4v3PeriodMenu(event: Event): void {
+    event.stopPropagation();
+    this.r4v3PeriodMenuOpen.update((open) => !open);
+    if (this.r4v3PeriodMenuOpen()) {
+      this.r4v3ViewMenuOpen.set(false);
+    }
+  }
+
+  selectHubPeriodFromMenu(pill: HubPeriodPill, event?: Event): void {
+    event?.stopPropagation();
+    this.r4v3PeriodMenuOpen.set(false);
+    this.selectHubPeriod(pill);
+  }
+
   selectR4v3View(view: R4v3ChartView): void {
     if (this.r4v3ViewMode() === view) {
       return;
     }
     this.triggerChartTransition();
     this.r4v3ViewMode.set(view);
+  }
+
+  toggleR4v3ViewMenu(event: Event): void {
+    event.stopPropagation();
+    this.r4v3ViewMenuOpen.update((open) => !open);
+    if (this.r4v3ViewMenuOpen()) {
+      this.r4v3PeriodMenuOpen.set(false);
+    }
+  }
+
+  selectR4v3ViewFromMenu(view: R4v3ChartView, event?: Event): void {
+    event?.stopPropagation();
+    this.r4v3ViewMenuOpen.set(false);
+    if (this.r4v3ViewMode() !== view) {
+      this.selectR4v3View(view);
+    }
+  }
+
+  onR4v3InsightAction(): void {
+    if (!this.r4v3InsightHasAction()) {
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent('exchange-panel-open'));
   }
 
   onChartTokenSelected(result: ChartSearchResult): void {
@@ -1170,7 +1266,7 @@ export class ShowcaseChartComponent {
       return 'Fort';
     }
     if (value <= 30) {
-      return 'Calme';
+      return 'Faible';
     }
     return 'Moyen';
   }
@@ -1242,19 +1338,35 @@ export class ShowcaseChartComponent {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (!this.timeframeMenuOpen()) {
-      return;
+    const target = event.target as Node;
+
+    if (this.timeframeMenuOpen()) {
+      const root = this.timeframeMenu?.nativeElement;
+      if (root && !root.contains(target)) {
+        this.timeframeMenuOpen.set(false);
+      }
     }
 
-    const root = this.timeframeMenu?.nativeElement;
-    if (root && !root.contains(event.target as Node)) {
-      this.timeframeMenuOpen.set(false);
+    if (this.r4v3PeriodMenuOpen()) {
+      const periodRoot = this.r4v3PeriodMenuRoot?.nativeElement;
+      if (periodRoot && !periodRoot.contains(target)) {
+        this.r4v3PeriodMenuOpen.set(false);
+      }
+    }
+
+    if (this.r4v3ViewMenuOpen()) {
+      const menuRoot = this.r4v3ViewMenuRoot?.nativeElement;
+      if (menuRoot && !menuRoot.contains(target)) {
+        this.r4v3ViewMenuOpen.set(false);
+      }
     }
   }
 
   @HostListener('document:keydown.escape')
   closeTimeframeMenu(): void {
     this.timeframeMenuOpen.set(false);
+    this.r4v3PeriodMenuOpen.set(false);
+    this.r4v3ViewMenuOpen.set(false);
   }
 
   setChartType(type: ChartDisplayType): void {
@@ -1508,6 +1620,8 @@ export class ShowcaseChartComponent {
   }
 
   onPlotClick(event: MouseEvent): void {
+    this.chartTokenSearch?.closeMenu();
+
     const now = Date.now();
     if (now - this.lastPlotTapAt < 320) {
       this.resetZoom();

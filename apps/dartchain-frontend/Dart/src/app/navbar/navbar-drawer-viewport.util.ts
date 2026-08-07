@@ -218,6 +218,10 @@ export function pinNavbarDrawerToViewport(
   drawer.style.setProperty('width', `${width}px`);
   drawer.style.setProperty('max-width', `${width}px`);
   drawer.style.setProperty('min-width', contentKind === 'market' ? `${width}px` : '0');
+  drawer.style.setProperty(
+    'z-index',
+    'var(--nv-layer-ticker-drawer-overlay, 200)'
+  );
   drawer.style.setProperty('--nv-drawer-max-w', `${width}px`);
   drawer.style.setProperty('--nv-drawer-shift-x', '0');
 
@@ -239,6 +243,7 @@ export function unpinNavbarDrawer(drawer: HTMLElement): void {
   drawer.style.removeProperty('max-width');
   drawer.style.removeProperty('min-width');
   drawer.style.removeProperty('margin-left');
+  drawer.style.removeProperty('z-index');
   drawer.style.removeProperty('--nv-drawer-max-w');
   drawer.style.removeProperty('--nv-drawer-shift-x');
   drawer.style.removeProperty('--nv-drawer-caret-x');

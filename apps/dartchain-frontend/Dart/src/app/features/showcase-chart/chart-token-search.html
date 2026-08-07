@@ -1,4 +1,9 @@
-<div class="chart-token-search" [class.chart-token-search--compact]="compact()">
+<div
+  class="chart-token-search"
+  [class.chart-token-search--compact]="compact()"
+  [class.chart-token-search--icon-only]="iconOnly()"
+  [class.chart-token-search--open]="searchFocused() || searchMenuOpen()"
+>
   <form class="chart-token-search__form" (submit)="onSearchSubmit($event)">
     <span class="chart-token-search__icon" aria-hidden="true">
       <svg viewBox="0 0 16 16" focusable="false">
@@ -7,13 +12,14 @@
       </svg>
     </span>
     <input
+      #searchInput
       class="chart-token-search__input"
       type="search"
       [value]="searchQuery()"
       placeholder="Token…"
       autocomplete="off"
       spellcheck="false"
-      aria-label="Rechercher un token CoinGecko ou GeckoTerminal"
+      aria-label="Rechercher un token (R4V3, LaunchLab, CoinGecko…)"
       (input)="onSearchInput($any($event.target).value)"
       (focus)="onSearchFocus()"
       (blur)="onSearchBlur()"
@@ -23,30 +29,27 @@
     }
   </form>
 
-  @if (searchMenuOpen()) {
-    <div class="chart-token-search__panel" role="listbox" aria-label="Résultats de recherche">
+  @if (searchMenuOpen() && searchQuery().trim().length >= 2) {
+    <div
+      class="chart-token-search__panel"
+      role="listbox"
+      aria-label="Résultats de recherche"
+    >
       @if (searchError(); as errorMessage) {
         <p class="chart-token-search__empty">{{ errorMessage }}</p>
-      } @else if (searchQuery().trim().length < 2 && watchlist().length) {
-        <p class="chart-token-search__section">Watchlist</p>
-        @for (item of watchlist(); track item.id) {
-          <button type="button" class="chart-token-search__item" role="option" (click)="pickResult(item)">
-            @if (item.thumb) {
-              <img class="chart-token-search__logo" [src]="item.thumb" alt="" />
-            } @else {
-              <span class="chart-token-search__logo chart-token-search__logo--fallback">{{ item.symbol.slice(0, 1) }}</span>
-            }
-            <span class="chart-token-search__copy">
-              <span class="chart-token-search__name">{{ item.name }}</span>
-              <span class="chart-token-search__meta">{{ item.symbol }} · {{ sourceLabel(item.source, item.network) }}</span>
-            </span>
-          </button>
-        }
-      } @else if (searchResults().length === 0 && !searchLoading()) {
+      } @else if (searchLoading()) {
+        <p class="chart-token-search__empty">Recherche…</p>
+      } @else if (searchResults().length === 0) {
         <p class="chart-token-search__empty">Aucun token trouvé.</p>
       } @else {
         @for (item of searchResults(); track item.id + item.symbol) {
-          <button type="button" class="chart-token-search__item" role="option" (click)="pickResult(item)">
+          <button
+            type="button"
+            class="chart-token-search__item"
+            role="option"
+            (mousedown)="$event.preventDefault()"
+            (click)="pickResult(item)"
+          >
             @if (item.thumb) {
               <img class="chart-token-search__logo" [src]="item.thumb" alt="" />
             } @else {

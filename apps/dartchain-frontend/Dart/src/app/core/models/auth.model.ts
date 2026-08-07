@@ -35,6 +35,16 @@ export interface LoginRequest {
 
 export type AuthMode = 'login' | 'register';
 
+export interface OAuthProviderInfo {
+  id: string;
+  label: string;
+  enabled: boolean;
+}
+
+export interface OAuthProvidersResponse {
+  providers: OAuthProviderInfo[];
+}
+
 export interface ApiErrorBody {
   error?: string;
   message?: string;

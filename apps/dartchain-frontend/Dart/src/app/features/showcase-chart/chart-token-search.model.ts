@@ -1,4 +1,4 @@
-export type ChartSearchSource = 'coingecko' | 'geckoterminal' | 'launchlab';
+export type ChartSearchSource = 'coingecko' | 'geckoterminal' | 'launchlab' | 'dartchain';
 
 export interface ChartSearchResult {
   id: string;
@@ -15,6 +15,8 @@ export function chartSearchSourceLabel(source?: ChartSearchSource, network?: str
       return network?.trim() || 'DEX';
     case 'launchlab':
       return 'LaunchLab';
+    case 'dartchain':
+      return 'R4V3';
     default:
       return 'CoinGecko';
   }

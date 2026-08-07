@@ -3,16 +3,19 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostBinding,
   HostListener,
   inject,
   input,
   output,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 
 import { isLaunchpadSwapToken } from '../../core/constants/exchange-launchpad.constants';
+import { BRAND_DEFAULT_CRYPTO } from '../../core/constants/rate-panel-symbols';
 import { CryptoRatesService } from '../../core/services/crypto-rate.service';
 import { RatePanelPreferencesService } from '../../core/services/rate-panel-preferences.service';
 import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-state.service';
@@ -28,6 +31,7 @@ import { readChartWatchlist, upsertChartWatchlist } from './chart-watchlist.util
 })
 export class ChartTokenSearchComponent {
   readonly compact = input(false);
+  readonly iconOnly = input(false);
 
   readonly tokenSelected = output<ChartSearchResult>();
 
@@ -36,6 +40,8 @@ export class ChartTokenSearchComponent {
   private readonly launchState = inject(ShowcaseLaunchStateService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly host = inject(ElementRef<HTMLElement>);
+
+  @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
 
   readonly searchQuery = signal('');
   readonly searchResults = signal<ChartSearchResult[]>([]);
@@ -46,6 +52,16 @@ export class ChartTokenSearchComponent {
   readonly watchlist = signal<ChartSearchResult[]>(readChartWatchlist());
 
   readonly sourceLabel = chartSearchSourceLabel;
+
+  @HostBinding('class.chart-token-search--icon-only')
+  get iconOnlyHostClass(): boolean {
+    return this.iconOnly();
+  }
+
+  @HostBinding('class.chart-token-search--open')
+  get searchOpenHostClass(): boolean {
+    return this.searchFocused() || this.searchMenuOpen();
+  }
 
   constructor() {
     this.launchState.loadProjects();
@@ -85,24 +101,48 @@ export class ChartTokenSearchComponent {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.host.nativeElement.contains(event.target as Node)) {
-      this.searchMenuOpen.set(false);
+      this.closeMenu(false);
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.closeMenu(true);
+    }
+  }
+
+  closeMenu(blurInput = true): void {
+    this.searchMenuOpen.set(false);
+    this.searchFocused.set(false);
+    if (blurInput) {
+      this.searchInput?.nativeElement.blur();
     }
   }
 
   onSearchInput(value: string): void {
     this.searchQuery.set(value);
-    this.searchMenuOpen.set(value.trim().length >= 2);
+    const trimmed = value.trim();
+    if (trimmed.length >= 2) {
+      this.searchMenuOpen.set(true);
+      return;
+    }
+    this.searchMenuOpen.set(false);
   }
 
   onSearchFocus(): void {
     this.searchFocused.set(true);
-    if (this.searchQuery().trim().length >= 2 || this.watchlist().length) {
+    if (this.searchQuery().trim().length >= 2) {
       this.searchMenuOpen.set(true);
     }
   }
 
   onSearchBlur(): void {
-    this.searchFocused.set(false);
+    window.setTimeout(() => {
+      if (!this.searchMenuOpen()) {
+        this.searchFocused.set(false);
+      }
+    }, 120);
   }
 
   onSearchSubmit(event: Event): void {
@@ -123,25 +163,23 @@ export class ChartTokenSearchComponent {
     this.tokenSelected.emit(result);
     this.searchQuery.set('');
     this.searchResults.set([]);
-    this.searchMenuOpen.set(false);
     this.searchError.set(null);
+    this.closeMenu(true);
   }
 
-  private mergeResults(query: string, remote: ChartSearchResult[]): ChartSearchResult[] {
-    const needle = query.trim().toLowerCase();
-    const local = this.launchState
+  private buildDartchainCatalog(): ChartSearchResult[] {
+    const r4v3: ChartSearchResult = {
+      id: 'r4v3',
+      symbol: BRAND_DEFAULT_CRYPTO,
+      name: 'R4V3 · Réseau DartChain',
+      thumb: '',
+      source: 'dartchain',
+      network: 'DartChain',
+    };
+
+    const launch = this.launchState
       .projects()
-      .filter((project) => {
-        const symbol = project.symbol.trim().toUpperCase();
-        if (!isLaunchpadSwapToken(symbol)) {
-          return false;
-        }
-        return (
-          symbol.toLowerCase().includes(needle) ||
-          project.name.trim().toLowerCase().includes(needle)
-        );
-      })
-      .slice(0, 2)
+      .filter((project) => isLaunchpadSwapToken(project.symbol))
       .map(
         (project): ChartSearchResult => ({
           id: project.symbol.trim().toLowerCase(),
@@ -149,9 +187,35 @@ export class ChartTokenSearchComponent {
           name: project.name,
           thumb: project.logoUrl?.trim() || '',
           source: 'launchlab',
-          network: 'DartChain',
+          network: 'LaunchLab',
         })
       );
+
+    return [r4v3, ...launch];
+  }
+
+  private matchesCatalogEntry(entry: ChartSearchResult, needle: string): boolean {
+    if (!needle) {
+      return true;
+    }
+
+    const haystack = [
+      entry.symbol,
+      entry.name,
+      entry.network ?? '',
+      chartSearchSourceLabel(entry.source, entry.network),
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    return haystack.includes(needle);
+  }
+
+  private mergeResults(query: string, remote: ChartSearchResult[]): ChartSearchResult[] {
+    const needle = query.trim().toLowerCase();
+    const local = this.buildDartchainCatalog()
+      .filter((entry) => this.matchesCatalogEntry(entry, needle))
+      .slice(0, 5);
 
     const seen = new Set<string>();
     const merged: ChartSearchResult[] = [];

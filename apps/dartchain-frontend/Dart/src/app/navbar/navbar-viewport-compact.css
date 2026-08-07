@@ -16,10 +16,11 @@
     --nv-action-row-h: 0.75rem;
     --nv-action-btn: 24px;
     --nv-shell-radius: clamp(7px, 2.2vw, 10px);
-    --nv-logo: 24px;
-    --nv-logo-h: 22px;
+    --nv-logo: 26px;
+    --nv-logo-h: 24px;
     --nv-brand-chip-h: calc(var(--nv-logo-h) - 1px);
-    --nv-logo-shift-y: -6px;
+    --nv-logo-shift-y: -7px;
+    --nv-logo-scale: 1.34;
   }
 
   .navbar-wrap {
@@ -37,11 +38,11 @@
   }
 
   .navbar-auth-strip {
-    gap: 3px;
-    align-self: start;
-    height: var(--nv-logo-h);
-    min-height: var(--nv-logo-h);
-    max-height: var(--nv-logo-h);
+    gap: 4px;
+  }
+
+  .navbar-auth-sep {
+    height: calc(var(--nv-logo-h) - 5px);
   }
 
   .navbar-auth-btn {
@@ -50,6 +51,13 @@
     min-width: var(--nv-logo-h, 22px);
     min-height: var(--nv-logo-h, 22px);
     max-height: var(--nv-logo-h, 22px);
+  }
+
+  .navbar-auth-btn--labeled {
+    width: var(--nv-logo-h, 22px);
+    min-width: var(--nv-logo-h, 22px);
+    padding: 0;
+    gap: 0;
   }
 
   .navbar-brand-row .navbar-brand-row__node {
@@ -90,7 +98,11 @@
   }
 
   .navbar-auth-user__name {
-    display: none;
+    max-width: min(30vw, 5.5rem);
+    height: var(--nv-logo-h, 22px);
+    padding: 0 0.22rem 0 0.26rem;
+    font-size: 0.5625rem;
+    letter-spacing: 0.01em;
   }
 }
 

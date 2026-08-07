@@ -3,6 +3,11 @@
   flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
+  overflow: visible;
+}
+
+.chart-token-search--open {
+  z-index: 50;
 }
 
 .chart-token-search--compact {
@@ -68,13 +73,16 @@
 .chart-token-search__panel {
   position: absolute;
   top: calc(100% + 3px);
-  left: 0;
-  right: 0;
-  z-index: 30;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  z-index: 50;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: 168px;
+  width: max(100%, 9rem);
+  min-width: 9rem;
+  max-height: min(168px, 40vh);
   overflow: auto;
   padding: 3px;
   border: 1px solid rgba(var(--chart-hub-cyan-rgb, 0, 255, 255), 0.18);
@@ -161,6 +169,55 @@
 
 .chart-token-search--compact .chart-token-search__input {
   font-size: calc(var(--chart-hub-fs, 8px) - 0.5px);
+}
+
+.chart-token-search--icon-only {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+}
+
+.chart-token-search--icon-only .chart-token-search__form {
+  width: clamp(16px, 4.5cqw, 20px);
+  min-width: clamp(16px, 4.5cqw, 20px);
+  padding: 0 clamp(3px, 1cqw, 5px);
+  gap: 0;
+  overflow: hidden;
+  transition:
+    width 180ms ease,
+    min-width 180ms ease,
+    gap 180ms ease,
+    padding 180ms ease;
+}
+
+.chart-token-search--icon-only.chart-token-search--open .chart-token-search__form,
+.chart-token-search--icon-only:focus-within .chart-token-search__form {
+  width: min(38cqw, 4.75rem);
+  min-width: min(38cqw, 4.75rem);
+  gap: 3px;
+  padding: 0 5px;
+}
+
+.chart-token-search--icon-only .chart-token-search__input {
+  flex: 1 1 auto;
+  width: 0;
+  min-width: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+}
+
+.chart-token-search--icon-only.chart-token-search--open .chart-token-search__input,
+.chart-token-search--icon-only:focus-within .chart-token-search__input {
+  width: auto;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.chart-token-search--icon-only .chart-token-search__panel {
+  min-width: min(52cqw, 9rem);
+  right: 0;
+  left: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

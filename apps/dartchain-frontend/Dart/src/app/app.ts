@@ -129,6 +129,8 @@ export class AppComponent {
 
     this.questProgress.recordDailyLogin();
 
+    void this.auth.handleOAuthCallbackOnLoad();
+
     this.nav.newsAction$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((action) => this.handleNewsAction(action));
@@ -317,10 +319,12 @@ export class AppComponent {
         this.onBottomTabChange('peers');
         break;
       case 'OPEN_WALLET':
+        this.dockCollapsed.set(false);
         this.onBottomTabChange('wallet');
         break;
       case 'OPEN_FAUCET':
         if (this.product.faucetEnabled) {
+          this.dockCollapsed.set(false);
           this.onBottomTabChange('faucet');
         }
         break;

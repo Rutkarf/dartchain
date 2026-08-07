@@ -13,46 +13,51 @@
       [appFocusTrap]="true"
       (click)="$event.stopPropagation()"
     >
+      <div class="auth-drawer__glow auth-drawer__glow--top" aria-hidden="true"></div>
+
       <header class="auth-drawer__head">
-        <div class="auth-drawer__head-copy">
-          <p class="auth-drawer__eyebrow">Compte R4V3</p>
-          <h2 id="authDrawerTitle">
-            {{ auth.drawerMode() === 'login' ? 'Connexion' : 'Inscription' }}
-          </h2>
-        </div>
+        <h2 id="authDrawerTitle" class="auth-drawer__sr-title">
+          {{ auth.drawerMode() === 'login' ? locale.t('auth.loginTitle') : locale.t('auth.registerTitle') }}
+        </h2>
         <button
           type="button"
           class="auth-drawer__close"
-          aria-label="Fermer"
+          [attr.aria-label]="locale.t('auth.close')"
           [disabled]="auth.loading()"
           (click)="close()"
         >
-          ✕
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
         </button>
-      </header>
 
-      <div class="auth-drawer__tabs" role="tablist" aria-label="Mode authentification">
-        <button
-          type="button"
-          role="tab"
-          class="auth-drawer__tab"
-          [class.is-active]="auth.drawerMode() === 'login'"
-          [attr.aria-selected]="auth.drawerMode() === 'login'"
-          (click)="switchMode('login')"
+        <div
+          class="auth-drawer__tabs"
+          role="tablist"
+          [attr.aria-label]="locale.t('auth.tabListLabel')"
         >
-          Connexion
-        </button>
-        <button
-          type="button"
-          role="tab"
-          class="auth-drawer__tab"
-          [class.is-active]="auth.drawerMode() === 'register'"
-          [attr.aria-selected]="auth.drawerMode() === 'register'"
-          (click)="switchMode('register')"
-        >
-          Inscription
-        </button>
-      </div>
+          <button
+            type="button"
+            role="tab"
+            class="auth-drawer__tab"
+            [class.is-active]="auth.drawerMode() === 'login'"
+            [attr.aria-selected]="auth.drawerMode() === 'login'"
+            (click)="switchMode('login')"
+          >
+            <span class="auth-drawer__tab-label">{{ locale.t('auth.tabLogin') }}</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class="auth-drawer__tab"
+            [class.is-active]="auth.drawerMode() === 'register'"
+            [attr.aria-selected]="auth.drawerMode() === 'register'"
+            (click)="switchMode('register')"
+          >
+            <span class="auth-drawer__tab-label">{{ locale.t('auth.tabRegister') }}</span>
+          </button>
+        </div>
+      </header>
 
       <div class="auth-drawer__body">
         @if (auth.error(); as errorMessage) {
@@ -61,101 +66,240 @@
 
         @if (auth.drawerMode() === 'login') {
           <form class="auth-drawer__form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
-            <label class="auth-drawer__field">
-              <span class="auth-drawer__label">Nom d'utilisateur ou email</span>
-              <input
-                class="auth-drawer__input"
-                type="text"
-                formControlName="identifier"
-                autocomplete="username"
-                placeholder="rutkarf ou vous@exemple.com"
-              />
-            </label>
+            <div class="auth-drawer__fields">
+              <label class="auth-drawer__field">
+                <span class="auth-drawer__label">{{ locale.t('auth.identifier') }}</span>
+                <div class="auth-drawer__input-shell">
+                  <input
+                    class="auth-drawer__input"
+                    type="text"
+                    formControlName="identifier"
+                    autocomplete="username"
+                    [placeholder]="locale.t('auth.identifierPlaceholder')"
+                    [class.is-invalid]="showFieldError(loginForm.controls.identifier)"
+                  />
+                </div>
+                @if (showFieldError(loginForm.controls.identifier)) {
+                  <span class="auth-drawer__field-error" role="alert">
+                    {{ fieldError(loginForm.controls.identifier, 'identifier') }}
+                  </span>
+                }
+              </label>
 
-            <label class="auth-drawer__field">
-              <span class="auth-drawer__label">Mot de passe</span>
-              <div class="auth-drawer__password-wrap">
-                <input
-                  class="auth-drawer__input"
-                  [type]="showPassword() ? 'text' : 'password'"
-                  formControlName="password"
-                  autocomplete="current-password"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  class="auth-drawer__password-toggle"
-                  (click)="togglePassword()"
-                  [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
-                >
-                  {{ showPassword() ? 'Masquer' : 'Voir' }}
-                </button>
-              </div>
-            </label>
+              <label class="auth-drawer__field">
+                <span class="auth-drawer__label">{{ locale.t('auth.password') }}</span>
+                <div class="auth-drawer__input-shell auth-drawer__input-shell--password">
+                  <input
+                    class="auth-drawer__input"
+                    [type]="showPassword() ? 'text' : 'password'"
+                    formControlName="password"
+                    autocomplete="current-password"
+                    [placeholder]="locale.t('auth.passwordPlaceholder')"
+                    [class.is-invalid]="showFieldError(loginForm.controls.password)"
+                  />
+                  <button
+                    type="button"
+                    class="auth-drawer__password-toggle"
+                    (click)="togglePassword()"
+                    [attr.aria-label]="showPassword() ? locale.t('auth.hidePassword') : locale.t('auth.showPassword')"
+                    [attr.aria-pressed]="showPassword()"
+                  >
+                    @if (showPassword()) {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 3l18 18" />
+                        <path d="M10.58 10.58A2 2 0 0 0 12 16a2 2 0 0 0 1.42-3.42" />
+                        <path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c5 0 9.27 3.11 11 7.5a11.62 11.62 0 0 1-2.12 3.24" />
+                        <path d="M6.61 6.61A11.86 11.86 0 0 0 1 12.5C2.73 16.39 7 19.5 12 19.5a11.5 11.5 0 0 0 4.22-.79" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 12.5C3.73 8.11 8 5 13 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S3.73 16.89 2 12.5Z" />
+                        <circle cx="12" cy="12.5" r="3" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+                @if (showFieldError(loginForm.controls.password)) {
+                  <span class="auth-drawer__field-error" role="alert">
+                    {{ fieldError(loginForm.controls.password, 'password') }}
+                  </span>
+                }
+              </label>
+            </div>
 
-            <button
-              type="submit"
-              class="auth-drawer__submit"
-              [disabled]="auth.loading()"
-            >
-              {{ auth.loading() ? 'Connexion…' : 'Se connecter' }}
-            </button>
+            <ng-container *ngTemplateOutlet="oauthGrid"></ng-container>
+
+            <div class="auth-drawer__actions">
+              <button
+                type="submit"
+                class="auth-drawer__submit cta cta--md cta--primary"
+                [disabled]="auth.loading() || auth.oauthRedirecting()"
+              >
+                {{ auth.loading() ? locale.t('auth.submitLoginLoading') : locale.t('auth.submitLogin') }}
+              </button>
+            </div>
           </form>
         } @else {
           <form class="auth-drawer__form" [formGroup]="registerForm" (ngSubmit)="submitRegister()">
-            <label class="auth-drawer__field">
-              <span class="auth-drawer__label">Nom d'utilisateur</span>
-              <input
-                class="auth-drawer__input"
-                type="text"
-                formControlName="username"
-                autocomplete="username"
-                placeholder="rutkarf"
-              />
-            </label>
+            <div class="auth-drawer__fields">
+              <label class="auth-drawer__field">
+                <span class="auth-drawer__label">{{ locale.t('auth.username') }}</span>
+                <div class="auth-drawer__input-shell">
+                  <input
+                    class="auth-drawer__input"
+                    type="text"
+                    formControlName="username"
+                    autocomplete="username"
+                    [placeholder]="locale.t('auth.usernamePlaceholder')"
+                    [class.is-invalid]="showFieldError(registerForm.controls.username)"
+                  />
+                </div>
+                @if (showFieldError(registerForm.controls.username)) {
+                  <span class="auth-drawer__field-error" role="alert">
+                    {{ fieldError(registerForm.controls.username, 'username') }}
+                  </span>
+                }
+              </label>
 
-            <label class="auth-drawer__field">
-              <span class="auth-drawer__label">Email</span>
-              <input
-                class="auth-drawer__input"
-                type="email"
-                formControlName="email"
-                autocomplete="email"
-                placeholder="vous@exemple.com"
-              />
-            </label>
+              <label class="auth-drawer__field">
+                <span class="auth-drawer__label">{{ locale.t('auth.email') }}</span>
+                <div class="auth-drawer__input-shell">
+                  <input
+                    class="auth-drawer__input"
+                    type="email"
+                    formControlName="email"
+                    autocomplete="email"
+                    [placeholder]="locale.t('auth.emailPlaceholder')"
+                    [class.is-invalid]="showFieldError(registerForm.controls.email)"
+                  />
+                </div>
+                @if (showFieldError(registerForm.controls.email)) {
+                  <span class="auth-drawer__field-error" role="alert">
+                    {{ fieldError(registerForm.controls.email, 'email') }}
+                  </span>
+                }
+              </label>
 
-            <label class="auth-drawer__field">
-              <span class="auth-drawer__label">Mot de passe</span>
-              <div class="auth-drawer__password-wrap">
-                <input
-                  class="auth-drawer__input"
-                  [type]="showPassword() ? 'text' : 'password'"
-                  formControlName="password"
-                  autocomplete="new-password"
-                  placeholder="8 caractères minimum"
-                />
-                <button
-                  type="button"
-                  class="auth-drawer__password-toggle"
-                  (click)="togglePassword()"
-                  [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
-                >
-                  {{ showPassword() ? 'Masquer' : 'Voir' }}
-                </button>
-              </div>
-            </label>
+              <label class="auth-drawer__field">
+                <span class="auth-drawer__label">{{ locale.t('auth.password') }}</span>
+                <div class="auth-drawer__input-shell auth-drawer__input-shell--password">
+                  <input
+                    class="auth-drawer__input"
+                    [type]="showPassword() ? 'text' : 'password'"
+                    formControlName="password"
+                    autocomplete="new-password"
+                    [placeholder]="locale.t('auth.passwordRegisterPlaceholder')"
+                    [class.is-invalid]="showFieldError(registerForm.controls.password)"
+                  />
+                  <button
+                    type="button"
+                    class="auth-drawer__password-toggle"
+                    (click)="togglePassword()"
+                    [attr.aria-label]="showPassword() ? locale.t('auth.hidePassword') : locale.t('auth.showPassword')"
+                    [attr.aria-pressed]="showPassword()"
+                  >
+                    @if (showPassword()) {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 3l18 18" />
+                        <path d="M10.58 10.58A2 2 0 0 0 12 16a2 2 0 0 0 1.42-3.42" />
+                        <path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c5 0 9.27 3.11 11 7.5a11.62 11.62 0 0 1-2.12 3.24" />
+                        <path d="M6.61 6.61A11.86 11.86 0 0 0 1 12.5C2.73 16.39 7 19.5 12 19.5a11.5 11.5 0 0 0 4.22-.79" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 12.5C3.73 8.11 8 5 13 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S3.73 16.89 2 12.5Z" />
+                        <circle cx="12" cy="12.5" r="3" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+                @if (showFieldError(registerForm.controls.password)) {
+                  <span class="auth-drawer__field-error" role="alert">
+                    {{ fieldError(registerForm.controls.password, 'password') }}
+                  </span>
+                }
+              </label>
+            </div>
 
-            <button
-              type="submit"
-              class="auth-drawer__submit"
-              [disabled]="auth.loading()"
-            >
-              {{ auth.loading() ? 'Création…' : 'Créer mon compte' }}
-            </button>
+            <ng-container *ngTemplateOutlet="oauthGrid"></ng-container>
+
+            <div class="auth-drawer__actions">
+              <button
+                type="submit"
+                class="auth-drawer__submit cta cta--md cta--primary"
+                [disabled]="auth.loading() || auth.oauthRedirecting()"
+              >
+                {{ auth.loading() ? locale.t('auth.submitRegisterLoading') : locale.t('auth.submitRegister') }}
+              </button>
+            </div>
           </form>
         }
       </div>
     </aside>
   </div>
 }
+
+<ng-template #oauthGrid>
+  <div class="auth-drawer__oauth">
+    <p class="auth-drawer__oauth-divider">
+      <span>{{ locale.t('auth.orContinueWith') }}</span>
+    </p>
+    <div class="auth-drawer__oauth-grid">
+      @for (provider of oauthProviders; track provider.id) {
+        <button
+          type="button"
+          [class]="'auth-drawer__oauth-btn auth-drawer__oauth-btn--' + provider.id"
+          [disabled]="auth.loading() || auth.oauthRedirecting() || !auth.isOAuthProviderEnabled(provider.id)"
+          [attr.title]="auth.isOAuthProviderEnabled(provider.id) ? locale.t(provider.labelKey) : locale.t('auth.oauthUnavailable')"
+          [attr.aria-label]="locale.t(provider.labelKey)"
+          (click)="startOAuth(provider.id)"
+        >
+          @switch (provider.id) {
+            @case ('google') {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M22 12.24c0-.82-.07-1.42-.22-2.05H12v3.72h5.76c-.11.9-.72 2.26-2.07 3.17l-.02.13 3.01 2.34.21.02c1.9-1.75 3-4.33 3-7.33Z" />
+                <path fill="#34A853" d="M12 22c2.7 0 4.97-.89 6.62-2.43l-3.15-2.45c-.85.58-1.98.98-3.47.98-2.65 0-4.9-1.79-5.7-4.21l-.12.01-3.08 2.39-.04.11C4.06 19.54 7.76 22 12 22Z" />
+                <path fill="#FBBC05" d="M6.3 14.89c-.2-.58-.32-1.2-.32-1.89s.12-1.31.31-1.89l-.01-.13-3.12-2.43-.1.05C2.57 10.28 2 11.58 2 12.99s.57 2.71 1.36 3.89l3.94-2.99Z" />
+                <path fill="#EA4335" d="M12 5.38c1.88 0 3.14.81 3.86 1.49l2.82-2.75C16.95 2.89 14.69 2 12 2 7.76 2 4.06 4.46 2.36 8.01l3.94 2.99C7.1 8.78 9.35 5.38 12 5.38Z" />
+              </svg>
+            }
+            @case ('meta') {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M13.5 3C9.9 3 7.5 5.4 7.5 8.7c0 2.1 1 3.9 2.6 5.1-.9 1.1-2.3 1.8-3.9 1.8-.3 0-.6 0-.9-.1.6 2.3 2.7 4 5.2 4 2.8 0 5.1-1.8 5.9-4.3.2 0 .4.1.7.1 3.3 0 6-2.7 6-6.1C22.5 5.7 18.3 3 13.5 3Z" />
+              </svg>
+            }
+            @case ('apple') {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M16.8 12.7c.02 2.2 1.93 2.94 1.96 2.96-.02.06-.31 1.05-1.02 2.08-.62.9-1.26 1.79-2.27 1.81-.99.02-1.31-.58-2.44-.58-1.13 0-1.48.56-2.42.6-1 .04-1.76-.98-2.39-1.88-1.3-1.88-2.29-5.3-.96-7.6.66-1.14 1.84-1.86 3.12-1.88 .97-.02 1.89.65 2.48.65.59 0 1.7-.8 2.87-.68.49.02 1.86.2 2.74 1.48-.07.04-1.64.96-1.62 2.84Z" />
+                <path fill="currentColor" d="M14.9 4.3c.53-.64.89-1.53.79-2.42-.76.03-1.68.5-2.23 1.14-.49.57-.92 1.48-.8 2.35.85.07 1.72-.43 2.24-1.07Z" />
+              </svg>
+            }
+            @case ('microsoft') {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="3" width="8.2" height="8.2" fill="#F25022" />
+                <rect x="12.8" y="3" width="8.2" height="8.2" fill="#7FBA00" />
+                <rect x="3" y="12.8" width="8.2" height="8.2" fill="#00A4EF" />
+                <rect x="12.8" y="12.8" width="8.2" height="8.2" fill="#FFB900" />
+              </svg>
+            }
+            @case ('github') {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.56 9.56 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" />
+              </svg>
+            }
+            @case ('x') {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M16.3 3h3.1l-6.8 7.8L20.5 21h-6.2l-4.9-6.4-5.6 6.4H.7l7.3-8.4L3.5 3h6.3l4.4 5.8L16.3 3Zm-1.1 16.2h1.7L7.9 4.8H6.1l9.1 14.4Z" />
+              </svg>
+            }
+            @case ('discord') {
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M18.9 5.7A15.4 15.4 0 0 0 14.8 4l-.2.4a17.2 17.2 0 0 1 4.1 1.6l-.1-.3ZM7.4 4.4 7.2 4a15.4 15.4 0 0 0-4.1 1.7l.1.3A17.2 17.2 0 0 1 7.4 4.4ZM3.5 7.2C2.2 9.6 1.5 12.1 1.8 15c1.8 1.3 3.5 2.1 5.2 2.6l1.2-1.9a5.6 5.6 0 0 1-2.6-1.3c.4.3.9.6 1.4.8 2.2 1 4.6 1 6.8 0 .5-.2 1-.5 1.4-.8-.8.5-1.7.9-2.6 1.3l1.2 1.9c1.7-.5 3.4-1.3 5.2-2.6.4-3.4-.2-6.1-1.5-8.8a16.8 16.8 0 0 0-5.2 2.5 11.7 11.7 0 0 0-6.8 0A16.8 16.8 0 0 0 3.5 7.2Zm5.1 3.3c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Zm6.8 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Z" />
+              </svg>
+            }
+          }
+        </button>
+      }
+    </div>
+  </div>
+</ng-template>

@@ -78,4 +78,7 @@ dev_export_postgres_env() {
   export DATABASE_USERNAME="${DATABASE_USERNAME:-${POSTGRES_USER:-dartchain}}"
   export DATABASE_PASSWORD="${DATABASE_PASSWORD:-${POSTGRES_PASSWORD:-dartchain}}"
   export DARTCHAIN_JWT_SECRET="${DARTCHAIN_JWT_SECRET:-dev-local-jwt-secret-for-cursor-development-only-32}"
+  export OAUTH_DEV_MOCK_ENABLED="${OAUTH_DEV_MOCK_ENABLED:-true}"
+  export OAUTH_BACKEND_BASE_URL="${OAUTH_BACKEND_BASE_URL:-http://localhost:8080}"
+  export OAUTH_FRONTEND_CALLBACK_URL="${OAUTH_FRONTEND_CALLBACK_URL:-http://localhost:4200/}"
 }

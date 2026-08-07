@@ -20,6 +20,10 @@ public final class PasswordHasher {
         return hash != null && hash.startsWith("$2");
     }
 
+    public static boolean isOAuthAccount(String hash) {
+        return "$OAUTH$".equals(hash);
+    }
+
     public static String hashBcrypt(String password) {
         return BCRYPT.encode(password);
     }

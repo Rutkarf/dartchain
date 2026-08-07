@@ -1,6 +1,10 @@
 dartchain:
   persistence:
     mode: postgres
+  oauth:
+    dev-mock-enabled: ${OAUTH_DEV_MOCK_ENABLED:true}
+    backend-base-url: ${OAUTH_BACKEND_BASE_URL:http://localhost:8080}
+    frontend-callback-url: ${OAUTH_FRONTEND_CALLBACK_URL:http://localhost:4200/}
 
 spring:
   datasource:

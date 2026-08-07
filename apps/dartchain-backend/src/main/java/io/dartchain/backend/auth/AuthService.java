@@ -109,6 +109,11 @@ public class AuthService {
                     return new AuthException(401, "Identifiants invalides");
                 });
 
+        if (PasswordHasher.isOAuthAccount(account.getPasswordHash())) {
+            authAuditService.loginFailure(identifier, ipAddress);
+            throw new AuthException(401, "Ce compte utilise une connexion sociale. Utilisez Google ou Meta.");
+        }
+
         if (!PasswordHasher.verify(request.password(), account.getPasswordSalt(), account.getPasswordHash())) {
             authAuditService.loginFailure(identifier, ipAddress);
             throw new AuthException(401, "Identifiants invalides");
@@ -123,6 +128,14 @@ public class AuthService {
         }
         authAuditService.loginSuccess(account.getId(), ipAddress);
 
+        return buildAuthResponse(account);
+    }
+
+    public AuthResponse loginOAuth(UserAccount account, String ipAddress) {
+        if (metricsCollector != null) {
+            metricsCollector.recordAuthLogin(account.getUsername());
+        }
+        authAuditService.loginSuccess(account.getId(), ipAddress);
         return buildAuthResponse(account);
     }
 

@@ -315,7 +315,8 @@ app-three-floor {
 
 /* Menu token R4V3 : le panneau déborde sous la navbar — le remonter au-dessus du hub */
 .app-navbar-zone:has(.is-token-menu-open),
-.app-navbar-zone:has([data-token-menu-open='true']) {
+.app-navbar-zone:has([data-token-menu-open='true']),
+.app-navbar-zone:has(app-navbar-ticker-drawer.is-drawer-open) {
   z-index: 120;
   overflow: visible;
 }

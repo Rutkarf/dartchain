@@ -11,11 +11,12 @@
     <span class="token-select__chevron" aria-hidden="true"></span>
   </button>
 
+  @if (menuOpen) {
   <ul
-    *ngIf="menuOpen"
     class="token-select__menu"
     role="listbox"
     aria-label="Tokens plateforme"
+    (click)="$event.stopPropagation()"
   >
     <li class="token-select__section" role="presentation">Natif</li>
     <li
@@ -25,15 +26,15 @@
       [class.token-select__option--active]="nativeToken === selection.selected()"
       (click)="selectSymbol(nativeToken)"
     >
-      <span class="token-select__option-label">{{ nativeToken }}</span>
-      <span class="token-select__option-tag">Natif</span>
+      <span class="token-select__option-symbol">{{ nativeToken }}</span>
+      <span class="token-select__option-name">Token natif</span>
     </li>
 
     <li class="token-select__section token-select__section--launch" role="presentation">
       LaunchLab
-      <span class="token-select__section-count" *ngIf="hasLaunchProjects()">
-        {{ platformLaunchProjects().length }}
-      </span>
+      @if (hasLaunchProjects()) {
+        <span class="token-select__section-count">{{ platformLaunchProjects().length }}</span>
+      }
     </li>
 
     @if (launchState.loading()) {
@@ -43,18 +44,16 @@
     } @else if (!hasLaunchProjects()) {
       <li class="token-select__empty" role="presentation">Aucun token lancé pour le moment</li>
     } @else {
+      @for (project of platformLaunchProjects(); track project.id) {
       <li
-        *ngFor="let project of platformLaunchProjects()"
         role="option"
         [attr.aria-selected]="project.symbol === selection.selected()"
         class="token-select__option token-select__option--launch"
         [class.token-select__option--active]="project.symbol === selection.selected()"
         (click)="selectLaunchProject(project, $event)"
       >
-        <span class="token-select__option-main">
-          <span class="token-select__option-label">{{ project.symbol }}</span>
-          <span class="token-select__option-name">{{ project.name }}</span>
-        </span>
+        <span class="token-select__option-symbol">{{ project.symbol }}</span>
+        <span class="token-select__option-name">{{ project.name }}</span>
         <span
           class="token-select__option-tag"
           [class.token-select__option-tag--live]="project.status === 'LIVE'"
@@ -62,6 +61,8 @@
           {{ launchStatusLabel(project.status) }}
         </span>
       </li>
+      }
     }
   </ul>
+  }
 </div>

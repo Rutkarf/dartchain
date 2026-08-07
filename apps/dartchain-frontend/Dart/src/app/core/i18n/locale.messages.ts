@@ -240,7 +240,46 @@ export type LocaleKey =
   | 'faucet.error.walletInvalid'
   | 'faucet.error.rateLimited'
   | 'faucet.error.featureDisabled'
-  | 'faucet.error.offline';
+  | 'faucet.error.offline'
+  | 'auth.eyebrow'
+  | 'auth.loginTitle'
+  | 'auth.registerTitle'
+  | 'auth.tabLogin'
+  | 'auth.tabRegister'
+  | 'auth.tabListLabel'
+  | 'auth.identifier'
+  | 'auth.username'
+  | 'auth.email'
+  | 'auth.password'
+  | 'auth.identifierPlaceholder'
+  | 'auth.usernamePlaceholder'
+  | 'auth.emailPlaceholder'
+  | 'auth.passwordPlaceholder'
+  | 'auth.passwordRegisterPlaceholder'
+  | 'auth.showPassword'
+  | 'auth.hidePassword'
+  | 'auth.submitLogin'
+  | 'auth.submitLoginLoading'
+  | 'auth.submitRegister'
+  | 'auth.submitRegisterLoading'
+  | 'auth.orContinueWith'
+  | 'auth.google'
+  | 'auth.meta'
+  | 'auth.apple'
+  | 'auth.microsoft'
+  | 'auth.github'
+  | 'auth.x'
+  | 'auth.discord'
+  | 'auth.oauthUnavailable'
+  | 'auth.oauthRedirecting'
+  | 'auth.close'
+  | 'auth.validation.required'
+  | 'auth.validation.identifierMin'
+  | 'auth.validation.usernamePattern'
+  | 'auth.validation.email'
+  | 'auth.validation.passwordMin'
+  | 'auth.switchToRegister'
+  | 'auth.switchToLogin';
 
 const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
   fr: {
@@ -484,6 +523,45 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'peers.detailLastSync': 'Dernière sync',
     'peers.detailChainHeight': 'Hauteur chaîne',
     'peers.openDetail': 'Voir le détail du peer',
+    'auth.eyebrow': 'Compte R4V3',
+    'auth.loginTitle': 'Connexion',
+    'auth.registerTitle': 'Inscription',
+    'auth.tabLogin': 'Connexion',
+    'auth.tabRegister': 'Inscription',
+    'auth.tabListLabel': 'Connexion ou inscription',
+    'auth.identifier': 'Identifiant',
+    'auth.username': 'Nom d\'utilisateur',
+    'auth.email': 'Email',
+    'auth.password': 'Mot de passe',
+    'auth.identifierPlaceholder': 'rutkarf ou vous@exemple.com',
+    'auth.usernamePlaceholder': 'rutkarf',
+    'auth.emailPlaceholder': 'vous@exemple.com',
+    'auth.passwordPlaceholder': '••••••••',
+    'auth.passwordRegisterPlaceholder': '8 caractères minimum',
+    'auth.showPassword': 'Voir',
+    'auth.hidePassword': 'Masquer',
+    'auth.submitLogin': 'Se connecter',
+    'auth.submitLoginLoading': 'Connexion…',
+    'auth.submitRegister': 'Créer mon compte',
+    'auth.submitRegisterLoading': 'Création…',
+    'auth.orContinueWith': 'ou continuer avec',
+    'auth.google': 'Google',
+    'auth.meta': 'Meta',
+    'auth.apple': 'Apple',
+    'auth.microsoft': 'Microsoft',
+    'auth.github': 'GitHub',
+    'auth.x': 'X',
+    'auth.discord': 'Discord',
+    'auth.oauthUnavailable': 'Non configuré sur ce serveur',
+    'auth.oauthRedirecting': 'Redirection…',
+    'auth.close': 'Fermer',
+    'auth.validation.required': 'Champ requis',
+    'auth.validation.identifierMin': '3 caractères minimum',
+    'auth.validation.usernamePattern': 'Lettres, chiffres et _ uniquement',
+    'auth.validation.email': 'Email invalide',
+    'auth.validation.passwordMin': '8 caractères minimum',
+    'auth.switchToRegister': 'Pas encore de compte ? Inscription',
+    'auth.switchToLogin': 'Déjà un compte ? Connexion',
   },
   en: {
     'skip.main': 'Skip to main content',
@@ -726,6 +804,45 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'peers.detailLastSync': 'Last sync',
     'peers.detailChainHeight': 'Chain height',
     'peers.openDetail': 'View peer details',
+    'auth.eyebrow': 'R4V3 account',
+    'auth.loginTitle': 'Sign in',
+    'auth.registerTitle': 'Sign up',
+    'auth.tabLogin': 'Sign in',
+    'auth.tabRegister': 'Sign up',
+    'auth.tabListLabel': 'Sign in or sign up',
+    'auth.identifier': 'Identifier',
+    'auth.username': 'Username',
+    'auth.email': 'Email',
+    'auth.password': 'Password',
+    'auth.identifierPlaceholder': 'rutkarf or you@example.com',
+    'auth.usernamePlaceholder': 'rutkarf',
+    'auth.emailPlaceholder': 'you@example.com',
+    'auth.passwordPlaceholder': '••••••••',
+    'auth.passwordRegisterPlaceholder': 'At least 8 characters',
+    'auth.showPassword': 'Show',
+    'auth.hidePassword': 'Hide',
+    'auth.submitLogin': 'Sign in',
+    'auth.submitLoginLoading': 'Signing in…',
+    'auth.submitRegister': 'Create account',
+    'auth.submitRegisterLoading': 'Creating…',
+    'auth.orContinueWith': 'or continue with',
+    'auth.google': 'Google',
+    'auth.meta': 'Meta',
+    'auth.apple': 'Apple',
+    'auth.microsoft': 'Microsoft',
+    'auth.github': 'GitHub',
+    'auth.x': 'X',
+    'auth.discord': 'Discord',
+    'auth.oauthUnavailable': 'Not configured on this server',
+    'auth.oauthRedirecting': 'Redirecting…',
+    'auth.close': 'Close',
+    'auth.validation.required': 'Required field',
+    'auth.validation.identifierMin': 'At least 3 characters',
+    'auth.validation.usernamePattern': 'Letters, numbers and _ only',
+    'auth.validation.email': 'Invalid email',
+    'auth.validation.passwordMin': 'At least 8 characters',
+    'auth.switchToRegister': 'No account yet? Sign up',
+    'auth.switchToLogin': 'Already have an account? Sign in',
   },
 };
 

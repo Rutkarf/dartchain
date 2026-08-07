@@ -27,173 +27,129 @@
           </span>
         }
       </div>
-    } @else if (hubLayout() && isR4v3Chart()) {
-      <div
-        class="showcase-chart__hub-bar showcase-chart__hub-hero showcase-chart__hub-hero--r4v3"
-        aria-label="Graphique activité R4V3"
-      >
-        <div class="showcase-chart__hub-hero-top">
-          <div class="showcase-chart__hub-hero-main">
-            <app-r4v3-three
-              class="showcase-chart__hub-logo-three"
-              presentation="navbar"
-              [modelTargetSize]="10"
-              [cameraFitFactor]="1.35"
-              [frameBiasY]="-0.06"
-              [enableOrbit]="true"
-              (logoTapped)="onR4v3LogoTap()"
-            />
-            <div class="showcase-chart__hub-hero-copy">
-              <span class="showcase-chart__hub-symbol">R4V3</span>
-              @if (!loading() && !error()) {
-                <span
-                  class="showcase-chart__hub-price showcase-chart__hub-price--peg"
-                  [class.showcase-chart__hub-price--pulse]="pricePulse()"
-                  title="R4V3 — token indexé sur 1 CHF / 1 GBP (peg stable)"
-                >
-                  {{ chartPrice() }}
-                </span>
-                <span class="showcase-chart__hub-delta showcase-chart__hub-delta--peg">{{ chartDelta() }}</span>
-              }
-              <span
-                class="showcase-chart__hub-status"
-                [class.showcase-chart__hub-status--live]="!isChartCalm()"
-                [class.showcase-chart__hub-status--soon]="isChartCalm()"
-                [class.showcase-chart__hub-status--pulse]="r4v3LivePulse()"
-              >
-                {{ isChartCalm() ? 'Calme' : 'Live' }}
-              </span>
-            </div>
-          </div>
-          <div class="showcase-chart__hub-hero-search">
-            <app-chart-token-search [compact]="true" (tokenSelected)="onChartTokenSelected($event)" />
-          </div>
-        </div>
-        <div class="showcase-chart__hub-toolbar" aria-label="Contrôles du graphique">
-          <div class="showcase-chart__hub-periods" role="group" aria-label="Période du graphique">
-            @for (pill of hubPeriodPills; track pill.range) {
-              <button
-                type="button"
-                class="showcase-chart__hub-period"
-                [class.showcase-chart__hub-period--active]="activeRange() === pill.range"
-                [attr.aria-pressed]="activeRange() === pill.range"
-                (click)="selectHubPeriod(pill)"
-              >
-                {{ pill.badge }}
-              </button>
-            }
-          </div>
-          <span class="showcase-chart__hub-toolbar-gap" aria-hidden="true"></span>
-          <div class="showcase-chart__hub-modes" role="group" aria-label="Mode d'affichage">
-            @for (pill of r4v3ViewPills; track pill.id) {
-              <button
-                type="button"
-                class="showcase-chart__hub-period showcase-chart__r4v3-view"
-                [class.showcase-chart__hub-period--active]="r4v3ViewMode() === pill.id"
-                [attr.aria-pressed]="r4v3ViewMode() === pill.id"
-                (click)="selectR4v3View(pill.id)"
-              >
-                {{ pill.badge }}
-              </button>
-            }
-          </div>
-        </div>
-        @if (!loading() && !error()) {
-          <p class="showcase-chart__r4v3-view-caption">
-            <span class="showcase-chart__r4v3-view-caption-label">{{ r4v3ViewBadge() }}</span>
-            <span class="showcase-chart__r4v3-view-caption-axis">{{ r4v3AxisTitle() }}</span>
-            @if (isChartCalm()) {
-              <span class="showcase-chart__calm-hint">Aucune activité sur la période</span>
-            }
-          </p>
-        }
-      </div>
     } @else if (hubLayout()) {
       <div
         class="showcase-chart__hub-bar showcase-chart__hub-hero"
+        [class.showcase-chart__hub-hero--r4v3]="isR4v3Chart()"
         [class.showcase-chart__hub-hero--overlay]="hubLaunchOverlay()"
-        aria-label="Graphique marché"
+        [attr.aria-label]="isR4v3Chart() ? 'Graphique activité R4V3' : 'Graphique marché'"
       >
-        <div class="showcase-chart__hub-hero-top">
-          <div class="showcase-chart__hub-hero-main">
-            @if (tokenLogoUrl(pairBase()); as logoUrl) {
-              <img
-                class="showcase-chart__hub-logo"
-                [src]="logoUrl"
-                alt=""
-                (error)="onTokenLogoError(pairBase())"
+        <div class="showcase-chart__hub-hero-top showcase-chart__hub-hero-top--unified">
+          <div class="showcase-chart__hub-hero-brand">
+            @if (isR4v3Chart()) {
+              <app-r4v3-three
+                class="showcase-chart__hub-logo-three"
+                presentation="navbar"
+                [modelTargetSize]="10"
+                [cameraFitFactor]="1.35"
+                [frameBiasY]="-0.06"
+                [enableOrbit]="true"
+                (logoTapped)="onR4v3LogoTap()"
               />
+              <span class="showcase-chart__hub-symbol">R4V3</span>
             } @else {
-              <span class="showcase-chart__hub-logo showcase-chart__hub-logo--fallback" aria-hidden="true">
-                {{ pairBase().slice(0, 1) }}
-              </span>
-            }
-            <div class="showcase-chart__hub-hero-copy">
+              @if (tokenLogoUrl(pairBase()); as logoUrl) {
+                <img
+                  class="showcase-chart__hub-logo"
+                  [src]="logoUrl"
+                  alt=""
+                  (error)="onTokenLogoError(pairBase())"
+                />
+              } @else {
+                <span class="showcase-chart__hub-logo showcase-chart__hub-logo--fallback" aria-hidden="true">
+                  {{ pairBase().slice(0, 1) }}
+                </span>
+              }
               <span class="showcase-chart__hub-symbol">{{ pairBase() }}</span>
-              @if (!loading() && !error()) {
-                <span
-                  class="showcase-chart__hub-price"
-                  [class.showcase-chart__hub-price--pulse]="pricePulse()"
-                >
-                  {{ chartPrice() }}
-                </span>
-                <span
-                  class="showcase-chart__hub-delta"
-                  [class.showcase-chart__hub-delta--up]="chartPositive()"
-                  [class.showcase-chart__hub-delta--down]="!chartPositive()"
-                >
-                  {{ chartDelta() }}
-                </span>
-              }
-              @if (hubLaunchStatusLabel(); as statusLabel) {
-                <span
-                  class="showcase-chart__hub-status"
-                  [class.showcase-chart__hub-status--live]="hubLaunchStatusClass() === 'live'"
-                  [class.showcase-chart__hub-status--soon]="hubLaunchStatusClass() === 'soon'"
-                  [class.showcase-chart__hub-status--ended]="hubLaunchStatusClass() === 'ended'"
-                >
-                  {{ statusLabel }}
-                </span>
-              }
-              @if (hubLaunchOverlay() && !loading() && !error()) {
-                <span class="showcase-chart__hub-peg-chip" aria-label="R4V3 peg fixe">R4V3 1,00 CHF</span>
-              }
-            </div>
+            }
           </div>
-          <div class="showcase-chart__hub-hero-search">
+
+          <div class="showcase-chart__hub-hero-search showcase-chart__hub-hero-search--center">
             <app-chart-token-search [compact]="true" (tokenSelected)="onChartTokenSelected($event)" />
           </div>
-        </div>
-        <div class="showcase-chart__hub-toolbar" aria-label="Contrôles du graphique">
-          <div class="showcase-chart__hub-periods" role="group" aria-label="Période du graphique">
-            @for (pill of hubPeriodPills; track pill.range) {
+
+          <div class="showcase-chart__hub-hero-actions" aria-label="Contrôles du graphique">
+            <div
+              #r4v3PeriodMenuRoot
+              class="showcase-chart__hub-menu-row showcase-chart__hub-menu-row--period"
+            >
               <button
                 type="button"
-                class="showcase-chart__hub-period"
-                [class.showcase-chart__hub-period--active]="activeRange() === pill.range"
-                [attr.aria-pressed]="activeRange() === pill.range"
-                (click)="selectHubPeriod(pill)"
+                class="showcase-chart__hub-dropdown showcase-chart__hub-dropdown--period"
+                [class.showcase-chart__hub-dropdown--open]="r4v3PeriodMenuOpen()"
+                (click)="toggleR4v3PeriodMenu($event)"
+                [attr.aria-expanded]="r4v3PeriodMenuOpen()"
+                aria-haspopup="listbox"
+                aria-label="Choisir la période du graphique"
               >
-                {{ pill.badge }}
+                <span class="showcase-chart__hub-dropdown-label">{{ hubActivePeriodBadge() }}</span>
+                <span class="showcase-chart__hub-dropdown-chevron" aria-hidden="true"></span>
               </button>
-            }
-          </div>
-          @if (hubLaunchOverlay()) {
-            <span class="showcase-chart__hub-toolbar-gap" aria-hidden="true"></span>
-            <div class="showcase-chart__hub-modes" role="group" aria-label="Mode d'affichage R4V3">
-              @for (pill of r4v3ViewPills; track pill.id) {
-                <button
-                  type="button"
-                  class="showcase-chart__hub-period showcase-chart__r4v3-view"
-                  [class.showcase-chart__hub-period--active]="r4v3ViewMode() === pill.id"
-                  [attr.aria-pressed]="r4v3ViewMode() === pill.id"
-                  (click)="selectR4v3View(pill.id)"
+              @if (r4v3PeriodMenuOpen()) {
+                <div
+                  class="showcase-chart__hub-dropdown-panel"
+                  role="listbox"
+                  aria-label="Périodes du graphique"
+                  (click)="$event.stopPropagation()"
                 >
-                  {{ pill.badge }}
-                </button>
+                  @for (pill of hubPeriodPills; track pill.range) {
+                    <button
+                      type="button"
+                      role="option"
+                      class="showcase-chart__hub-dropdown-option"
+                      [class.showcase-chart__hub-dropdown-option--active]="activeRange() === pill.range"
+                      [attr.aria-selected]="activeRange() === pill.range"
+                      (click)="selectHubPeriodFromMenu(pill, $event)"
+                    >
+                      {{ pill.badge }}
+                    </button>
+                  }
+                </div>
               }
             </div>
-          }
+            @if (isR4v3Chart() || hubLaunchOverlay()) {
+              <div
+                #r4v3ViewMenuRoot
+                class="showcase-chart__hub-menu-row showcase-chart__hub-menu-row--view"
+              >
+                <button
+                  type="button"
+                  class="showcase-chart__hub-dropdown showcase-chart__hub-dropdown--view"
+                  [class.showcase-chart__hub-dropdown--open]="r4v3ViewMenuOpen()"
+                  (click)="toggleR4v3ViewMenu($event)"
+                  [attr.aria-expanded]="r4v3ViewMenuOpen()"
+                  aria-haspopup="listbox"
+                  aria-label="Choisir le mode d'affichage"
+                >
+                  <span class="showcase-chart__hub-dropdown-label">{{ r4v3ViewBadge() }}</span>
+                  <span class="showcase-chart__hub-dropdown-chevron" aria-hidden="true"></span>
+                </button>
+                @if (r4v3ViewMenuOpen()) {
+                  <div
+                    class="showcase-chart__hub-dropdown-panel"
+                    role="listbox"
+                    aria-label="Modes graphique R4V3"
+                    (click)="$event.stopPropagation()"
+                  >
+                    @for (pill of r4v3ViewPills; track pill.id) {
+                      <button
+                        type="button"
+                        role="option"
+                        class="showcase-chart__hub-dropdown-option"
+                        [class.showcase-chart__hub-dropdown-option--active]="r4v3ViewMode() === pill.id"
+                        [attr.aria-selected]="r4v3ViewMode() === pill.id"
+                        [attr.aria-label]="pill.badge + ' — ' + pill.hint"
+                        (click)="selectR4v3ViewFromMenu(pill.id, $event)"
+                      >
+                        <span class="showcase-chart__hub-dropdown-option-label">{{ pill.badge }}</span>
+                        <span class="showcase-chart__hub-dropdown-tip" aria-hidden="true">{{ pill.hint }}</span>
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
         </div>
         @if (hubLaunchOverlay() && !loading() && !error()) {
           <div class="showcase-chart__dual-legend" aria-label="Légende des courbes">
@@ -337,6 +293,7 @@
         class="showcase-chart__chart-row"
         [class.showcase-chart__chart-row--hub]="hubLayout()"
         [class.showcase-chart__chart-row--compact]="compactLayout()"
+        [class.showcase-chart__chart-row--calm]="isR4v3Chart() && isChartCalm()"
         [class.showcase-chart__chart-row--transition]="chartTransition()"
         [class.showcase-chart__chart-row--loading]="loading()"
       >
@@ -412,6 +369,7 @@
         <div
           class="showcase-chart__stage"
           [class.showcase-chart__stage--hub]="hubLayout()"
+          [class.showcase-chart__stage--calm]="isR4v3Chart() && isChartCalm()"
           (mouseleave)="clearHover()"
         >
         <div
@@ -569,15 +527,14 @@
                         </g>
                       }
                     }
-                    @if (!hubLayout()) {
-                      @for (seg of renderTrendSegments(); track $index) {
-                        <path
-                          class="showcase-chart__area-segment showcase-chart__r4v3-area-segment"
-                          [class.showcase-chart__area-segment--up]="seg.up"
-                          [class.showcase-chart__area-segment--down]="!seg.up"
-                          [attr.d]="seg.areaD"
-                        ></path>
-                      }
+                    @for (seg of renderTrendSegments(); track $index) {
+                      <path
+                        class="showcase-chart__area-segment showcase-chart__r4v3-area-segment"
+                        [class.showcase-chart__area-segment--up]="seg.up"
+                        [class.showcase-chart__area-segment--down]="!seg.up"
+                        [class.showcase-chart__area-segment--calm]="isChartCalm()"
+                        [attr.d]="seg.areaD"
+                      ></path>
                     }
                     @for (seg of renderTrendSegments(); track $index) {
                       <path
@@ -818,21 +775,28 @@
       class="showcase-chart__hub-footer showcase-chart__hub-footer--r4v3 showcase-chart__hub-footer--stacked"
       aria-label="Statistiques activité R4V3"
     >
-      <div class="showcase-chart__hub-footer-tier showcase-chart__hub-footer-tier--primary">
-        @for (stat of r4v3FooterPrimary(); track stat.label) {
-          <div class="showcase-chart__hub-stat">
-            <span class="showcase-chart__hub-stat-label">{{ stat.label }}</span>
-            <span class="showcase-chart__hub-stat-value">{{ stat.value }}</span>
-          </div>
-        }
-      </div>
-      <div class="showcase-chart__hub-footer-tier showcase-chart__hub-footer-tier--secondary">
-        @for (stat of r4v3FooterSecondary(); track stat.label) {
-          <div class="showcase-chart__hub-stat">
+      @if (r4v3InsightLine(); as insight) {
+        <button
+          type="button"
+          class="showcase-chart__hub-insight"
+          [class.showcase-chart__hub-insight--action]="r4v3InsightHasAction()"
+          [title]="r4v3InsightHint()"
+          (click)="onR4v3InsightAction()"
+        >
+          <span class="showcase-chart__hub-insight-text">{{ insight }}</span>
+          @if (r4v3InsightHasAction()) {
+            <span class="showcase-chart__hub-insight-action" aria-hidden="true">→</span>
+          }
+        </button>
+      }
+      <div class="showcase-chart__hub-footer-grid" role="list">
+        @for (stat of r4v3FooterStats(); track stat.label) {
+          <div class="showcase-chart__hub-stat showcase-chart__hub-stat--cell" role="listitem">
             <span class="showcase-chart__hub-stat-label">{{ stat.label }}</span>
             <span
               class="showcase-chart__hub-stat-value"
               [class.showcase-chart__hub-stat-value--up]="stat.tone === 'up'"
+              [class.showcase-chart__hub-stat-value--down]="stat.tone === 'down'"
             >
               {{ stat.value }}
             </span>

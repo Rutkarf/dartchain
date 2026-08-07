@@ -42,8 +42,11 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/login",
-                                "/api/v1/auth/refresh"
+                                "/api/v1/auth/refresh",
+                                "/api/v1/auth/oauth/exchange"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/oauth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/oauth/connect/apple/callback").permitAll()
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/wallets/create",

@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
@@ -40,6 +41,7 @@ import { ShowcaseNavigationService } from '../../core/services/showcase-navigati
 import { QuestsProgressService } from '../../core/services/quests-progress.service';
 import { WalletSessionService } from '../../core/services/wallet-session.service';
 import { AuthService } from '../../core/services/auth.service';
+import { R4v3ThreeComponent } from '../r4v3-three/r4v3-three';
 
 type SwapAction =
   | 'create-wallet'
@@ -64,7 +66,7 @@ const LAUNCH_TOKEN_DISPLAY: Record<string, string> = {
 @Component({
   selector: 'app-exchange-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, R4v3ThreeComponent],
   templateUrl: './exchange-panel.html',
   styleUrls: ['./exchange-panel.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -72,7 +74,7 @@ const LAUNCH_TOKEN_DISPLAY: Record<string, string> = {
     '[class.exchange-panel--collapsed]': 'exchangeCollapsed()',
   },
 })
-export class ExchangePanelComponent {
+export class ExchangePanelComponent implements AfterViewInit {
   private readonly api = inject(BlockchainApiService);
   private readonly auth = inject(AuthService);
   private readonly walletSession = inject(WalletSessionService);
@@ -113,9 +115,17 @@ export class ExchangePanelComponent {
   protected readonly brokenTokenLogos = signal<ReadonlySet<string>>(new Set());
   protected readonly tokenGridOpen = signal(false);
   protected readonly tokenMenuOpen = signal(false);
+  protected readonly funnelIntroPulse = signal(false);
+  protected readonly validFlash = signal(false);
+  protected readonly socialProofIndex = signal(0);
 
   private estimatePulseTimer: ReturnType<typeof setTimeout> | null = null;
   private pairFlipTimer: ReturnType<typeof setTimeout> | null = null;
+  private validFlashTimer: ReturnType<typeof setTimeout> | null = null;
+  private funnelIntroTimer: ReturnType<typeof setTimeout> | null = null;
+  private socialProofTimer: ReturnType<typeof setInterval> | null = null;
+  private funnelIntroPlayed = false;
+  private lastAmountInputState: AmountInputState = 'neutral';
 
   protected readonly launchpadSwapTokens = signal<string[]>([
     ...EXCHANGE_LAUNCHPAD_SWAP_TOKENS,
@@ -142,17 +152,17 @@ export class ExchangePanelComponent {
 
     switch (this.swapAction()) {
       case 'create-wallet':
-        return 'Wallet';
+        return 'Créer wallet';
       case 'login-required':
-        return 'Connexion';
+        return 'Se connecter';
       case 'enter-amount':
-        return 'Swap';
+        return 'Convertir';
       case 'insufficient':
-        return this.fromBalance() <= 0 ? 'Faucet' : 'Insuffisant';
+        return this.fromBalance() <= 0 ? 'Obtenir R4V3' : 'Insuffisant';
       case 'swapping':
-        return '…';
+        return 'Conv…';
       default:
-        return 'Swap';
+        return 'Convertir';
     }
   }
 
@@ -209,6 +219,125 @@ export class ExchangePanelComponent {
     this.formatBalance(this.estimatedTo())
   );
 
+  protected readonly estimateFiatLine = computed(() => {
+    if (this.parsedAmount() <= 0) {
+      return null;
+    }
+
+    const unitUsd = this.unitUsdPriceTo();
+    if (unitUsd == null) {
+      return null;
+    }
+
+    const total = this.estimatedTo() * unitUsd;
+    if (!Number.isFinite(total) || total <= 0) {
+      return null;
+    }
+
+    return `${this.formatUsd(total, 2)} CHF`;
+  });
+
+  protected readonly showInlineEstimate = computed(
+    () => this.parsedAmount() > 0 && !this.exchangeCollapsed()
+  );
+
+  protected readonly showQuickAmounts = computed(
+    () =>
+      !this.exchangeCollapsed() &&
+      this.auth.isAuthenticated() &&
+      this.hasWallet() &&
+      this.fromBalance() > 0
+  );
+
+  protected readonly showFooter = computed(() => !this.exchangeCollapsed());
+
+  protected readonly conversionProgress = computed(() => {
+    if (!this.auth.isAuthenticated()) {
+      return 33;
+    }
+
+    if (!this.hasWallet()) {
+      return 66;
+    }
+
+    return 100;
+  });
+
+  protected readonly showConversionProgress = computed(
+    () => this.showFooter() && this.conversionProgress() < 100
+  );
+
+  protected readonly conversionStepLabel = computed(() => {
+    if (!this.auth.isAuthenticated()) {
+      return 'Compte';
+    }
+
+    if (!this.hasWallet()) {
+      return 'Wallet';
+    }
+
+    return 'Convertir';
+  });
+
+  protected readonly trustLine = computed(
+    () => 'Slippage max 0,5 % · Frais réseau 0 %'
+  );
+
+  protected readonly socialProofLines = computed(() => {
+    const lines: string[] = [];
+
+    if (this.rateLine()) {
+      lines.push(`${this.rateLine()} · Taux garanti 30 s`);
+    }
+
+    const change = this.change24hLabel();
+    if (change !== '—' && change !== 'LaunchLab') {
+      lines.push(`${this.toToken()} ${change} · 24 h`);
+    }
+
+    lines.push(this.trustLine());
+    lines.push('Flux LaunchLab actif');
+
+    return lines;
+  });
+
+  protected readonly socialProofLine = computed(() => {
+    const lines = this.socialProofLines();
+    if (!lines.length) {
+      return '';
+    }
+
+    return lines[this.socialProofIndex() % lines.length];
+  });
+
+  protected readonly footerMetaLine = computed(() => {
+    switch (this.swapAction()) {
+      case 'create-wallet':
+        return 'Wallet requis pour convertir · ~30 s';
+      case 'login-required':
+        return 'Connectez-vous pour valider la conversion';
+      default:
+        break;
+    }
+
+    if (this.parsedAmount() > 0) {
+      const estimate = this.compactEstimateLabel();
+      const fiat = this.estimateFiatLine();
+      if (estimate && fiat) {
+        return `${estimate} · ${fiat}`;
+      }
+      if (estimate) {
+        return estimate;
+      }
+    }
+
+    if (this.rateLine()) {
+      return `${this.rateLine()} · Taux garanti 30 s`;
+    }
+
+    return this.socialProofLine();
+  });
+
   protected readonly rateLine = computed(() => {
     const r = this.rate();
     if (!Number.isFinite(r) || r <= 0) {
@@ -235,7 +364,7 @@ export class ExchangePanelComponent {
 
   protected readonly maxButtonTitle = computed(
     () =>
-      `Utiliser le solde maximum (${this.formatBalance(this.fromBalance())} ${this.tokenUnitLabel(this.fromToken())})`
+      `Utiliser le solde maximum (${this.formatBalance(this.fromBalance())} ${this.amountUnitDisplay(this.fromToken())})`
   );
 
   protected readonly amountInputState = computed((): AmountInputState => {
@@ -264,8 +393,25 @@ export class ExchangePanelComponent {
     );
   });
 
-  protected readonly amountPlaceholder = EXCHANGE_AMOUNT_VALUE_PLACEHOLDER;
-  protected readonly amountInputMinWidth = `${EXCHANGE_AMOUNT_VALUE_PLACEHOLDER.length}ch`;
+  protected readonly amountPlaceholder = '0';
+  protected readonly amountInputHint = EXCHANGE_AMOUNT_VALUE_PLACEHOLDER;
+
+  protected readonly compactEstimateLabel = computed(() => {
+    if (this.parsedAmount() <= 0) {
+      return '';
+    }
+
+    return `≈ ${this.formattedEstimatedTo()} ${this.toToken()}`;
+  });
+
+  protected readonly amountInputTitle = computed(() => {
+    const current = this.amountValue().trim();
+    if (current) {
+      return `${current} ${this.amountUnitDisplay(this.fromToken())}`;
+    }
+
+    return `Ex. ${this.amountInputHint} ${this.amountUnitDisplay(this.fromToken())}`;
+  });
 
   protected readonly pairSubtitle = computed(
     () =>
@@ -348,13 +494,13 @@ export class ExchangePanelComponent {
       case 'enter-amount':
         return 'Convertir →';
       case 'insufficient':
-        return this.fromBalance() <= 0 ? 'Obtenir des R4V3' : 'Solde insuffisant';
+        return this.fromBalance() <= 0 ? 'Obtenir R4V3' : 'Solde insuffisant';
       case 'swapping':
         return 'Conversion…';
       default: {
         const amountIn = this.formatBalance(this.parsedAmount());
         const amountOut = this.formattedEstimatedTo();
-        const fromUnit = this.tokenUnitLabel(this.fromToken());
+        const fromUnit = this.amountUnitDisplay(this.fromToken());
         const toSymbol = this.toToken();
         return `Convertir ${amountIn} ${fromUnit} → ${amountOut} ${toSymbol}`;
       }
@@ -364,13 +510,13 @@ export class ExchangePanelComponent {
   protected readonly swapButtonLabelCompact = computed(() => {
     switch (this.swapAction()) {
       case 'create-wallet':
-        return 'Wallet';
+        return 'Créer';
       case 'login-required':
         return 'Connexion';
       case 'enter-amount':
-        return 'Swap';
+        return 'Convertir';
       case 'insufficient':
-        return this.fromBalance() <= 0 ? 'Faucet' : 'Insuffisant';
+        return this.fromBalance() <= 0 ? 'R4V3' : 'Insuffisant';
       case 'swapping':
         return '…';
       default: {
@@ -429,6 +575,28 @@ export class ExchangePanelComponent {
       if (this.pairFlipTimer != null) {
         clearTimeout(this.pairFlipTimer);
       }
+      if (this.validFlashTimer != null) {
+        clearTimeout(this.validFlashTimer);
+      }
+      if (this.funnelIntroTimer != null) {
+        clearTimeout(this.funnelIntroTimer);
+      }
+      if (this.socialProofTimer != null) {
+        clearInterval(this.socialProofTimer);
+      }
+    });
+
+    this.socialProofTimer = setInterval(() => {
+      this.socialProofIndex.update((index) => index + 1);
+    }, 8000);
+
+    effect(() => {
+      const state = this.amountInputState();
+      if (state === 'valid' && this.lastAmountInputState !== 'valid') {
+        this.triggerValidFlash();
+      }
+
+      this.lastAmountInputState = state;
     });
 
     effect(() => {
@@ -497,8 +665,19 @@ export class ExchangePanelComponent {
     });
   }
 
+  ngAfterViewInit(): void {
+    if (this.isFunnelCta() && !this.funnelIntroPlayed) {
+      this.funnelIntroPlayed = true;
+      requestAnimationFrame(() => this.triggerFunnelIntroPulse());
+    }
+  }
+
   protected tokenUnitLabel(symbol: string): string {
     return tokenUnitLabel(symbol);
+  }
+
+  protected amountUnitDisplay(symbol: string): string {
+    return isExchangeNativeToken(symbol) ? EXCHANGE_NATIVE_TOKEN : symbol.trim().toUpperCase();
   }
 
   protected displayTokenSymbol(symbol: string): string {
@@ -718,18 +897,6 @@ export class ExchangePanelComponent {
     this.onSwapClick();
   }
 
-  protected setPercentAmount(percent: number): void {
-    const balance = this.fromBalance();
-    if (balance <= 0 || percent <= 0) {
-      return;
-    }
-
-    const amount = (balance * percent) / 100;
-    this.amountForm.patchValue({ amount: this.formatAmount(amount) });
-    this.amountValue.set(this.formatAmount(amount));
-    this.markInteraction();
-  }
-
   protected setMaxAmount(): void {
     const balance = this.fromBalance();
     if (balance <= 0) {
@@ -746,7 +913,7 @@ export class ExchangePanelComponent {
     this.markInteraction();
 
     if (this.swapAction() === 'create-wallet') {
-      this.nav.dispatchNewsAction('OPEN_WALLET');
+      this.openWalletDock();
       return;
     }
 
@@ -758,7 +925,7 @@ export class ExchangePanelComponent {
     }
 
     if (this.swapAction() === 'insufficient' && this.fromBalance() <= 0) {
-      this.nav.dispatchNewsAction('OPEN_FAUCET');
+      this.openFaucetDock();
       return;
     }
 
@@ -774,15 +941,32 @@ export class ExchangePanelComponent {
   }
 
   protected formatBalance(value: number): string {
-    if (value >= 1) {
+    if (!Number.isFinite(value)) {
+      return '0';
+    }
+
+    if (value === 0) {
+      return '0';
+    }
+
+    const abs = Math.abs(value);
+
+    if (abs >= 1) {
       return value.toLocaleString('fr-FR', {
         maximumFractionDigits: 4,
       });
     }
 
+    if (abs >= 0.0001) {
+      return value.toLocaleString('fr-FR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6,
+      });
+    }
+
     return value.toLocaleString('fr-FR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 8,
+      notation: 'scientific',
+      maximumSignificantDigits: 4,
     });
   }
 
@@ -951,7 +1135,7 @@ export class ExchangePanelComponent {
 
   private formatAmount(value: number): string {
     const rounded = Math.round(value * 1e8) / 1e8;
-    return rounded.toString();
+    return rounded.toString().replace('.', ',');
   }
 
   private formatRate(value: number): string {
@@ -1034,6 +1218,52 @@ export class ExchangePanelComponent {
         this.estimatePulse.set(false);
         this.estimatePulseTimer = null;
       }, 180);
+    });
+  }
+
+  private triggerValidFlash(): void {
+    this.validFlash.set(false);
+
+    if (this.validFlashTimer != null) {
+      clearTimeout(this.validFlashTimer);
+    }
+
+    queueMicrotask(() => {
+      this.validFlash.set(true);
+      this.validFlashTimer = setTimeout(() => {
+        this.validFlash.set(false);
+        this.validFlashTimer = null;
+      }, 300);
+    });
+  }
+
+  private openWalletDock(): void {
+    window.dispatchEvent(
+      new CustomEvent('dock-open-panel', { detail: { panel: 'wallet' } })
+    );
+    this.nav.dispatchNewsAction('OPEN_WALLET');
+  }
+
+  private openFaucetDock(): void {
+    window.dispatchEvent(
+      new CustomEvent('dock-open-panel', { detail: { panel: 'faucet' } })
+    );
+    this.nav.dispatchNewsAction('OPEN_FAUCET');
+  }
+
+  private triggerFunnelIntroPulse(): void {
+    this.funnelIntroPulse.set(false);
+
+    if (this.funnelIntroTimer != null) {
+      clearTimeout(this.funnelIntroTimer);
+    }
+
+    queueMicrotask(() => {
+      this.funnelIntroPulse.set(true);
+      this.funnelIntroTimer = setTimeout(() => {
+        this.funnelIntroPulse.set(false);
+        this.funnelIntroTimer = null;
+      }, 900);
     });
   }
 }

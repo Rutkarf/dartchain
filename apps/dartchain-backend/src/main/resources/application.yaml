@@ -23,6 +23,40 @@ dartchain:
     legacy-session-enabled: false
     bootstrap-admin-username: ${DARTCHAIN_BOOTSTRAP_ADMIN:}
     password-min-length: 8
+  oauth:
+    dev-mock-enabled: ${OAUTH_DEV_MOCK_ENABLED:false}
+    frontend-callback-url: ${OAUTH_FRONTEND_CALLBACK_URL:http://localhost:4200/}
+    backend-base-url: ${OAUTH_BACKEND_BASE_URL:http://localhost:8080}
+    google:
+      enabled: ${OAUTH_GOOGLE_ENABLED:false}
+      client-id: ${OAUTH_GOOGLE_CLIENT_ID:}
+      client-secret: ${OAUTH_GOOGLE_CLIENT_SECRET:}
+    meta:
+      enabled: ${OAUTH_META_ENABLED:false}
+      client-id: ${OAUTH_META_CLIENT_ID:}
+      client-secret: ${OAUTH_META_CLIENT_SECRET:}
+    apple:
+      enabled: ${OAUTH_APPLE_ENABLED:false}
+      client-id: ${OAUTH_APPLE_CLIENT_ID:}
+      team-id: ${OAUTH_APPLE_TEAM_ID:}
+      key-id: ${OAUTH_APPLE_KEY_ID:}
+      private-key: ${OAUTH_APPLE_PRIVATE_KEY:}
+    microsoft:
+      enabled: ${OAUTH_MICROSOFT_ENABLED:false}
+      client-id: ${OAUTH_MICROSOFT_CLIENT_ID:}
+      client-secret: ${OAUTH_MICROSOFT_CLIENT_SECRET:}
+    github:
+      enabled: ${OAUTH_GITHUB_ENABLED:false}
+      client-id: ${OAUTH_GITHUB_CLIENT_ID:}
+      client-secret: ${OAUTH_GITHUB_CLIENT_SECRET:}
+    x:
+      enabled: ${OAUTH_X_ENABLED:false}
+      client-id: ${OAUTH_X_CLIENT_ID:}
+      client-secret: ${OAUTH_X_CLIENT_SECRET:}
+    discord:
+      enabled: ${OAUTH_DISCORD_ENABLED:false}
+      client-id: ${OAUTH_DISCORD_CLIENT_ID:}
+      client-secret: ${OAUTH_DISCORD_CLIENT_SECRET:}
   rate-limit:
     max-requests: 60
     window-ms: 60000

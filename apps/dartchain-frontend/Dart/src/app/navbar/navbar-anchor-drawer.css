@@ -60,7 +60,12 @@
 }
 
 .nv-anchor-drawer--ticker {
-  min-width: min(248px, calc(100vw - 20px));
+  min-width: min(232px, calc(100vw - 24px));
+  z-index: var(--nv-layer-ticker-drawer-overlay, 200);
+}
+
+.nv-anchor-drawer--ticker::before {
+  left: var(--nv-drawer-caret-x, 12px);
 }
 
 .nv-anchor-drawer--node {

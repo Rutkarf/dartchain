@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
+  AbstractControl,
   FormBuilder,
   ReactiveFormsModule,
   Validators,
@@ -14,6 +15,10 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { AuthMode } from '../../core/models/auth.model';
 import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
+import { LocaleService } from '../../core/i18n/locale.service';
+import { AUTH_OAUTH_PROVIDERS } from './auth-drawer.oauth';
+
+type AuthFieldKind = 'identifier' | 'username' | 'email' | 'password';
 
 @Component({
   selector: 'app-auth-drawer',
@@ -26,6 +31,8 @@ import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
 export class AuthDrawerComponent {
   private readonly fb = inject(FormBuilder);
   readonly auth = inject(AuthService);
+  readonly locale = inject(LocaleService);
+  readonly oauthProviders = AUTH_OAUTH_PROVIDERS;
 
   readonly showPassword = signal(false);
 
@@ -58,6 +65,42 @@ export class AuthDrawerComponent {
 
   togglePassword(): void {
     this.showPassword.update((value) => !value);
+  }
+
+  startOAuth(providerId: string): void {
+    this.auth.startOAuth(providerId);
+  }
+
+  showFieldError(control: AbstractControl | null): boolean {
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  fieldError(control: AbstractControl | null, kind: AuthFieldKind): string {
+    if (!control || !control.errors) {
+      return this.locale.t('auth.validation.required');
+    }
+
+    if (control.errors['required']) {
+      return this.locale.t('auth.validation.required');
+    }
+
+    if (kind === 'identifier' && control.errors['minlength']) {
+      return this.locale.t('auth.validation.identifierMin');
+    }
+
+    if (kind === 'username' && control.errors['pattern']) {
+      return this.locale.t('auth.validation.usernamePattern');
+    }
+
+    if (kind === 'email' && control.errors['email']) {
+      return this.locale.t('auth.validation.email');
+    }
+
+    if (kind === 'password' && control.errors['minlength']) {
+      return this.locale.t('auth.validation.passwordMin');
+    }
+
+    return this.locale.t('auth.validation.required');
   }
 
   async submitLogin(): Promise<void> {

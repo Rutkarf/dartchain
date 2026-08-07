@@ -58,12 +58,36 @@ export class NavbarComponent implements AfterViewInit {
   brandRowRef?: ElementRef<HTMLElement>;
 
   /** Une seule variante auth visible : logout OU (connexion + inscription), jamais les deux. */
-  readonly authStripMode = computed(() => {
-    if (this.auth.drawerOpen()) {
-      return 'hidden' as const;
+  readonly authStripMode = computed(() =>
+    this.auth.isAuthenticated() ? ('logout' as const) : ('guest' as const)
+  );
+
+  readonly authLoginActive = computed(
+    () => this.auth.drawerOpen() && this.auth.drawerMode() === 'login'
+  );
+
+  readonly authRegisterActive = computed(
+    () => this.auth.drawerOpen() && this.auth.drawerMode() === 'register'
+  );
+
+  readonly authDisplayName = computed(() => {
+    const user = this.auth.user();
+    if (!user) {
+      return '';
     }
 
-    return this.auth.isAuthenticated() ? ('logout' as const) : ('guest' as const);
+    const username = user.username?.trim();
+    if (username) {
+      return username.startsWith('@') ? username : `@${username}`;
+    }
+
+    const email = user.email?.trim();
+    if (email) {
+      const localPart = email.split('@')[0]?.trim();
+      return localPart ? `@${localPart}` : email;
+    }
+
+    return 'Compte';
   });
 
   @ViewChild('logoThree')

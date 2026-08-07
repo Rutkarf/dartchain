@@ -3,6 +3,7 @@ import {
   buildR4v3HealthSeries,
   computeR4v3FlowStats,
   resolveR4v3AutoView,
+  r4v3ViewHint,
   type R4v3ChartContext,
 } from './r4v3-chart.util';
 
@@ -92,5 +93,13 @@ describe('r4v3-chart.util', () => {
     );
 
     expect(series.every((value) => value >= 8 && value <= 92)).toBe(true);
+  });
+
+  it('exposes hover hints for each R4V3 chart view mode', () => {
+    expect(r4v3ViewHint('auto')).toContain('automatiquement');
+    expect(r4v3ViewHint('flow')).toContain('Flux');
+    expect(r4v3ViewHint('pulse')).toContain('Pulse');
+    expect(r4v3ViewHint('fuel')).toContain('LaunchLab');
+    expect(r4v3ViewHint('health')).toContain('Santé');
   });
 });

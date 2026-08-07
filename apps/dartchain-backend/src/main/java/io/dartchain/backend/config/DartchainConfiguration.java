@@ -12,7 +12,8 @@ import org.springframework.context.annotation.Configuration;
         OpsProperties.class,
         ProductProperties.class,
         AuthProperties.class,
-        ChainProperties.class
+        ChainProperties.class,
+        OAuthProperties.class
 })
 public class DartchainConfiguration {
 }

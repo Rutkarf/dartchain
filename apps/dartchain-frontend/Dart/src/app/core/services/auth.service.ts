@@ -8,6 +8,8 @@ import {
   AuthResponse,
   LoginRequest,
   LinkWalletRequest,
+  OAuthProviderInfo,
+  OAuthProvidersResponse,
   RegisterRequest,
   UserProfile,
 } from '../models/auth.model';
@@ -33,6 +35,8 @@ export class AuthService {
   private readonly errorSignal = signal<string | null>(null);
   private readonly drawerOpenSignal = signal(false);
   private readonly drawerModeSignal = signal<AuthMode>('login');
+  private readonly oauthProvidersSignal = signal<OAuthProviderInfo[]>([]);
+  private readonly oauthRedirectingSignal = signal(false);
 
   readonly user = this.userSignal.asReadonly();
   readonly token = this.tokenSignal.asReadonly();
@@ -40,17 +44,21 @@ export class AuthService {
   readonly error = this.errorSignal.asReadonly();
   readonly drawerOpen = this.drawerOpenSignal.asReadonly();
   readonly drawerMode = this.drawerModeSignal.asReadonly();
+  readonly oauthProviders = this.oauthProvidersSignal.asReadonly();
+  readonly oauthRedirecting = this.oauthRedirectingSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.userSignal() !== null && !!this.tokenSignal());
   readonly isAdmin = computed(() => this.userSignal()?.role === 'ADMIN');
 
   constructor() {
     void this.restoreSession();
+    void this.loadOAuthProviders();
   }
 
   openDrawer(mode: AuthMode = 'login'): void {
     this.errorSignal.set(null);
     this.drawerModeSignal.set(mode);
     this.drawerOpenSignal.set(true);
+    void this.loadOAuthProviders();
   }
 
   /** Ouvre le drawer login si la session est absente. Retourne true si déjà authentifié. */
@@ -90,7 +98,7 @@ export class AuthService {
       try {
         await firstValueFrom(
           this.http.post<void>(
-            `${environment.apiUrl}/v1/auth/logout`,
+            this.authV1('/logout'),
             refreshToken ? { refreshToken } : null,
             {
               headers: this.buildAuthHeaders(token),
@@ -122,12 +130,16 @@ export class AuthService {
 
     try {
       const user = await firstValueFrom(
-        this.http.put<UserProfile>(`${environment.apiUrl}/auth/me/wallet`, {
-          walletAddress,
-          publicKey,
-        }, {
-          headers: this.buildAuthHeaders(token),
-        })
+        this.http.put<UserProfile>(
+          this.authV1('/me/wallet'),
+          {
+            walletAddress,
+            publicKey,
+          } satisfies LinkWalletRequest,
+          {
+            headers: this.buildAuthHeaders(token),
+          }
+        )
       );
       this.userSignal.set(user);
       localStorage.setItem('dartchain_auth_user', JSON.stringify(user));
@@ -150,7 +162,7 @@ export class AuthService {
 
     try {
       const user = await firstValueFrom(
-        this.http.get<UserProfile>(`${environment.apiUrl}/auth/me`, {
+        this.http.get<UserProfile>(this.authV1('/me'), {
           headers: this.buildAuthHeaders(token),
         })
       );
@@ -158,6 +170,66 @@ export class AuthService {
       localStorage.setItem('dartchain_auth_user', JSON.stringify(user));
     } catch {
       await this.tryRefreshSession();
+    }
+  }
+
+  async loadOAuthProviders(): Promise<void> {
+    try {
+      const response = await firstValueFrom(
+        this.http.get<OAuthProvidersResponse>(this.authV1('/oauth/providers'))
+      );
+      this.oauthProvidersSignal.set(response.providers ?? []);
+    } catch {
+      this.oauthProvidersSignal.set([]);
+    }
+  }
+
+  isOAuthProviderEnabled(providerId: string): boolean {
+    return this.oauthProvidersSignal().some(
+      (provider) => provider.id === providerId && provider.enabled
+    );
+  }
+
+  startOAuth(providerId: string): void {
+    if (!this.isOAuthProviderEnabled(providerId)) {
+      return;
+    }
+
+    const redirectUri = `${window.location.origin}${window.location.pathname}`;
+    const url = `${this.authV1(`/oauth/connect/${providerId}`)}?redirect_uri=${encodeURIComponent(redirectUri)}`;
+    this.oauthRedirectingSignal.set(true);
+    window.location.assign(url);
+  }
+
+  async handleOAuthCallbackOnLoad(): Promise<void> {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('oauth_code');
+    if (!code) {
+      return;
+    }
+
+    params.delete('oauth_code');
+    const query = params.toString();
+    const cleanUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`;
+    window.history.replaceState({}, '', cleanUrl);
+
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
+
+    try {
+      const response = await firstValueFrom(
+        this.http.post<AuthResponse>(this.authV1('/oauth/exchange'), { code })
+      );
+      this.applySession(response);
+      await this.questsProgress.mergeGuestProgressOnLogin();
+      this.questsProgress.recordDailyLogin();
+      this.closeDrawer();
+    } catch (error) {
+      this.errorSignal.set(this.extractErrorMessage(error));
+      this.openDrawer('login');
+    } finally {
+      this.loadingSignal.set(false);
+      this.oauthRedirectingSignal.set(false);
     }
   }
 
@@ -169,11 +241,7 @@ export class AuthService {
     this.errorSignal.set(null);
 
     try {
-      const url =
-        kind === 'register'
-          ? `${environment.apiUrl}/auth/register`
-          : `${environment.apiUrl}/auth/login`;
-
+      const url = kind === 'register' ? this.authV1('/register') : this.authV1('/login');
       const response = await firstValueFrom(this.http.post<AuthResponse>(url, payload));
       this.applySession(response);
       await this.questsProgress.mergeGuestProgressOnLogin();
@@ -196,7 +264,7 @@ export class AuthService {
 
     try {
       const user = await firstValueFrom(
-        this.http.get<UserProfile>(`${environment.apiUrl}/auth/me`, {
+        this.http.get<UserProfile>(this.authV1('/me'), {
           headers: this.buildAuthHeaders(token),
         })
       );
@@ -219,7 +287,7 @@ export class AuthService {
 
     try {
       const response = await firstValueFrom(
-        this.http.post<AuthResponse>(`${environment.apiUrl}/v1/auth/refresh`, { refreshToken })
+        this.http.post<AuthResponse>(this.authV1('/refresh'), { refreshToken })
       );
       this.applySession(response);
       this.questsProgress.syncFromServer();
@@ -241,6 +309,12 @@ export class AuthService {
     this.userSignal.set(null);
     this.closeDrawer();
     clearAuthSession();
+  }
+
+  private authV1(path: string): string {
+    const base = environment.apiUrl.replace(/\/+$/, '');
+    const suffix = path.startsWith('/') ? path : `/${path}`;
+    return `${base}/v1/auth${suffix}`;
   }
 
   private buildAuthHeaders(token: string): HttpHeaders {

@@ -5,6 +5,7 @@ import { signal } from '@angular/core';
 
 import { AuthDrawerComponent } from './auth-drawer';
 import { AuthService } from '../../core/services/auth.service';
+import { LocaleService } from '../../core/i18n/locale.service';
 
 describe('AuthDrawer', () => {
   let fixture: ComponentFixture<AuthDrawerComponent>;
@@ -13,10 +14,13 @@ describe('AuthDrawer', () => {
     setDrawerMode: ReturnType<typeof vi.fn>;
     login: ReturnType<typeof vi.fn>;
     register: ReturnType<typeof vi.fn>;
+    startOAuth: ReturnType<typeof vi.fn>;
+    isOAuthProviderEnabled: ReturnType<typeof vi.fn>;
     drawerMode: ReturnType<typeof signal<'login' | 'register'>>;
     drawerOpen: ReturnType<typeof signal<boolean>>;
     loading: ReturnType<typeof signal<boolean>>;
     error: ReturnType<typeof signal<string | null>>;
+    oauthRedirecting: ReturnType<typeof signal<boolean>>;
   };
 
   beforeEach(async () => {
@@ -27,10 +31,13 @@ describe('AuthDrawer', () => {
       setDrawerMode: vi.fn((mode: 'login' | 'register') => authService.drawerMode.set(mode)),
       login: vi.fn().mockResolvedValue(true),
       register: vi.fn().mockResolvedValue(true),
+      startOAuth: vi.fn(),
+      isOAuthProviderEnabled: vi.fn().mockReturnValue(false),
       drawerMode: signal<'login' | 'register'>('login'),
       drawerOpen: signal(true),
       loading: signal(false),
       error: signal<string | null>(null),
+      oauthRedirecting: signal(false),
     };
 
     await TestBed.configureTestingModule({
@@ -38,6 +45,7 @@ describe('AuthDrawer', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
+        LocaleService,
         { provide: AuthService, useValue: authService },
       ],
     }).compileComponents();
@@ -54,6 +62,10 @@ describe('AuthDrawer', () => {
     const element = fixture.nativeElement as HTMLElement;
     expect(element.querySelector('input[formcontrolname="identifier"]')).toBeTruthy();
     expect(element.querySelector('input[formcontrolname="password"]')).toBeTruthy();
+    expect(element.querySelector('.auth-drawer__oauth-grid')).toBeTruthy();
+    expect(element.querySelectorAll('.auth-drawer__oauth-btn').length).toBe(7);
+    expect(element.querySelector('.auth-drawer__switch')).toBeFalsy();
+    expect(element.querySelector('.auth-drawer__title')).toBeFalsy();
   });
 
   it('renders register form after switching mode', () => {
