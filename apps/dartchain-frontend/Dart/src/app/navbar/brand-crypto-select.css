@@ -252,15 +252,6 @@
   overflow-y: auto;
 }
 
-.token-select__menu::-webkit-scrollbar {
-  width: 4px;
-}
-
-.token-select__menu::-webkit-scrollbar-thumb {
-  background: rgba(var(--token-select-cyan-rgb), 0.28);
-  border-radius: 4px;
-}
-
 .token-select__option {
   display: flex;
   align-items: baseline;

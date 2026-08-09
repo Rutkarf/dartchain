@@ -39,11 +39,11 @@ export class DockFaucetSummaryComponent implements OnInit, OnDestroy {
   readonly loading = this.state.loading;
 
   ngOnInit(): void {
-    window.addEventListener('naivechain-refresh', this.onGlobalRefresh);
+    window.addEventListener('dartchain-refresh-dock', this.onGlobalRefresh);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('naivechain-refresh', this.onGlobalRefresh);
+    window.removeEventListener('dartchain-refresh-dock', this.onGlobalRefresh);
   }
 
   private onGlobalRefresh = (): void => {

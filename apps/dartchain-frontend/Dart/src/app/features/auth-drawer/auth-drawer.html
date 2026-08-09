@@ -40,21 +40,21 @@
             type="button"
             role="tab"
             class="auth-drawer__tab"
-            [class.is-active]="auth.drawerMode() === 'login'"
-            [attr.aria-selected]="auth.drawerMode() === 'login'"
-            (click)="switchMode('login')"
-          >
-            <span class="auth-drawer__tab-label">{{ locale.t('auth.tabLogin') }}</span>
-          </button>
-          <button
-            type="button"
-            role="tab"
-            class="auth-drawer__tab"
             [class.is-active]="auth.drawerMode() === 'register'"
             [attr.aria-selected]="auth.drawerMode() === 'register'"
             (click)="switchMode('register')"
           >
             <span class="auth-drawer__tab-label">{{ locale.t('auth.tabRegister') }}</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class="auth-drawer__tab"
+            [class.is-active]="auth.drawerMode() === 'login'"
+            [attr.aria-selected]="auth.drawerMode() === 'login'"
+            (click)="switchMode('login')"
+          >
+            <span class="auth-drawer__tab-label">{{ locale.t('auth.tabLogin') }}</span>
           </button>
         </div>
       </header>

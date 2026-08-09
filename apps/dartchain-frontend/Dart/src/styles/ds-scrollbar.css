@@ -1,0 +1,47 @@
+/**
+ * Scrollbars globales — charte DartChain (néon cyan, track carbone, pill fin).
+ * Spécificité basse (:where) pour laisser les opt-out (scrollbar-width: none) gagner.
+ */
+
+:where(app-root) :where(*) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-scrollbar-thumb) var(--ds-scrollbar-track);
+}
+
+:where(app-root) :where(*::-webkit-scrollbar) {
+  width: var(--ds-scrollbar-size);
+  height: var(--ds-scrollbar-size);
+}
+
+:where(app-root) :where(*::-webkit-scrollbar-track) {
+  background: var(--ds-scrollbar-track);
+  border-radius: var(--ds-radius-pill, 999px);
+  margin: 1px 0;
+}
+
+:where(app-root) :where(*::-webkit-scrollbar-thumb) {
+  background: var(--ds-scrollbar-thumb-gradient);
+  border-radius: var(--ds-radius-pill, 999px);
+  border: 1px solid var(--ds-scrollbar-border);
+  box-shadow: 0 0 4px var(--ds-scrollbar-glow);
+}
+
+:where(app-root) :where(*::-webkit-scrollbar-thumb:hover) {
+  background: var(--ds-scrollbar-thumb-gradient-hover);
+  box-shadow: 0 0 6px var(--ds-scrollbar-glow);
+}
+
+:where(app-root) :where(*::-webkit-scrollbar-thumb:active) {
+  background: var(--ds-scrollbar-thumb-active);
+}
+
+:where(app-root) :where(*::-webkit-scrollbar-corner) {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(app-root) :where(*::-webkit-scrollbar-thumb),
+  :where(app-root) :where(*::-webkit-scrollbar-thumb:hover) {
+    box-shadow: none;
+  }
+}

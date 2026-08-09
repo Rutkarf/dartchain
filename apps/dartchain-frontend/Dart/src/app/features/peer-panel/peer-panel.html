@@ -36,16 +36,6 @@
         <span class="peer-panel__kpi-value peer-panel__kpi-value--cyan">{{ networkStats().networkLoadPercent }}%</span>
       </span>
     </div>
-    <button
-      type="button"
-      class="peer-panel__refresh"
-      (click)="refreshAll()"
-      [disabled]="loading() || submitting()"
-      [class.is-spinning]="loading()"
-      [attr.aria-label]="locale.t('peers.refresh')"
-    >
-      ↻
-    </button>
   </header>
 
   <form class="peer-panel__connect" (ngSubmit)="addPeer()">

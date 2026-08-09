@@ -17,23 +17,9 @@
   <header class="faucet-panel__head">
     <div class="faucet-panel__title-wrap">
       <h2>{{ locale.t('faucet.title') }}</h2>
-      <button
-        type="button"
-        class="faucet-panel__refresh"
-        (click)="refreshPanel()"
-        [attr.aria-label]="locale.t('faucet.refresh')"
-      >
-        ↻
-      </button>
     </div>
 
-    @if (runtime.faucetDisabled()) {
-      <p class="faucet-panel__banner faucet-panel__banner--disabled" role="alert">
-        {{ t('faucet.disabled') }}
-      </p>
-    }
-
-    @if (runtime.offlineMode() && !runtime.faucetDisabled()) {
+    @if (runtime.offlineMode()) {
       <p class="faucet-panel__banner faucet-panel__banner--offline" role="status">
         {{ t('faucet.offline') }}
         <button type="button" class="faucet-panel__retry" (click)="retryConnection()">

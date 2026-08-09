@@ -23,6 +23,10 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { PeersDataService } from '../../core/services/peers-data.service';
+import {
+  DOCK_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 import { PeerDetailDrawerComponent } from '../peer-detail-drawer/peer-detail-drawer';
 import {
   PEER_FAVORITES_STORAGE_KEY,
@@ -156,9 +160,11 @@ export class PeerPanelComponent implements OnDestroy {
     this.peersData.destroy();
   }
 
-  @HostListener('window:naivechain-refresh')
-  onGlobalRefresh(): void {
-    this.peersData.scheduleRefresh(true);
+  @HostListener(`window:${DOCK_REFRESH_EVENT}`, ['$event'])
+  onGlobalRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'peers')) {
+      this.peersData.scheduleRefresh(true);
+    }
   }
 
   protected statusLabel(status: PeerStatus): string {

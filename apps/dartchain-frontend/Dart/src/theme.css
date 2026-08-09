@@ -458,8 +458,9 @@
   --surface-raised: rgba(var(--brand-porcelain-rgb), 0.04);
   --surface-sunken: rgba(0, 0, 0, 0.4);
   --surface-sunken-hover: rgba(0, 0, 0, 0.5);
-  --surface-scrollbar-thumb: rgba(var(--brand-porcelain-rgb), 0.2);
-  --surface-scrollbar-thumb-hover: rgba(var(--brand-porcelain-rgb), 0.32);
+  --surface-scrollbar-track: var(--ds-scrollbar-track, rgba(var(--brand-black-rgb), 0.72));
+  --surface-scrollbar-thumb: var(--ds-scrollbar-thumb, rgba(var(--accent-primary-rgb), 0.28));
+  --surface-scrollbar-thumb-hover: var(--ds-scrollbar-thumb-hover, rgba(var(--accent-primary-rgb), 0.46));
   --surface-scrim: rgba(var(--bg-base-rgb), 0.72);
   --surface-scrim-heavy: rgba(0, 0, 0, 0.78);
   --gradient-surface-header: linear-gradient(180deg, rgba(var(--brand-porcelain-rgb), 0.05), transparent);

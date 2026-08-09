@@ -668,7 +668,7 @@ public class CryptoRatesProxyService {
     ) {}
 
     /**
-     * Prix unitaire en EUR pour le calcul des taux de swap (R4V3 = 1 CHF / 1 GBP).
+     * Prix unitaire en EUR pour le calcul des taux de swap (R4V3 = 1 CHF).
      */
     public BigDecimal getEurUnitPrice(String symbol) {
         if (symbol == null || symbol.isBlank()) {

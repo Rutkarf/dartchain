@@ -49,7 +49,7 @@ public class CommunityFaqService {
                         "seed-user-1",
                         "NovaTrader",
                         "Le peg CHF est-il garanti on-chain ?",
-                        "Je vois 1 R4V3 = 1 CHF / 1 GBP partout. Est-ce enforce on-chain ou seulement UI ?",
+                        "Je vois 1 R4V3 = 1 CHF partout. Est-ce enforce on-chain ou seulement UI ?",
                         now.minusSeconds(86_400 * 2),
                         FaqQuestionStatus.ACTIVE,
                         8,

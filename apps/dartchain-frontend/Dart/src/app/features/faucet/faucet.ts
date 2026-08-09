@@ -3,6 +3,7 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  HostListener,
   OnDestroy,
   ViewChild,
   inject,
@@ -11,6 +12,10 @@ import {
 
 import { FaucetRuntimeService } from '../../core/services/faucet-runtime.service';
 import { LocaleService } from '../../core/i18n/locale.service';
+import {
+  DOCK_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 
 @Component({
   selector: 'app-faucet',
@@ -45,6 +50,13 @@ export class FaucetComponent implements AfterViewInit, OnDestroy {
 
   protected refreshPanel(): void {
     this.runtime.refreshPanel();
+  }
+
+  @HostListener(`window:${DOCK_REFRESH_EVENT}`, ['$event'])
+  onDockRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'faucet')) {
+      this.refreshPanel();
+    }
   }
 
   protected retryConnection(): void {

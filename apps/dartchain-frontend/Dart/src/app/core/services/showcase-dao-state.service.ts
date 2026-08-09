@@ -19,6 +19,7 @@ export class ShowcaseDaoStateService {
   readonly error = signal(false);
   readonly lastUpdatedAt = signal<Date | null>(null);
   readonly searchQuery = signal('');
+  private readonly lastSelectedDao = signal<DaoShowcaseCard | null>(null);
 
   readonly cards = computed(() => this.buildCards());
 
@@ -45,6 +46,43 @@ export class ShowcaseDaoStateService {
   });
 
   readonly collapsedHeadline = computed(() => this.activeCountLabel());
+
+  readonly collapsedDaoCard = computed(() => {
+    const selected = this.lastSelectedDao();
+    if (!selected) {
+      return null;
+    }
+
+    const fresh = this.cards().find((card) => card.id === selected.id);
+    return fresh ?? selected;
+  });
+
+  readonly collapsedDaoHeadline = computed(() => {
+    const card = this.collapsedDaoCard();
+    if (!card) {
+      return '';
+    }
+
+    return `${card.symbol} · ${card.name}`;
+  });
+
+  readonly collapsedDaoStats = computed(() => {
+    const card = this.collapsedDaoCard();
+    if (!card) {
+      return '';
+    }
+
+    return `${card.proposalsCount}P · ${card.votesCount}V · ${card.membersActive}M · PWR ${this.daoPowerPercent(card)}%`;
+  });
+
+  readonly collapsedDaoSummary = computed(() => {
+    const card = this.collapsedDaoCard();
+    if (!card) {
+      return '';
+    }
+
+    return card.summary;
+  });
 
   readonly updatedAgeLabel = computed(() => {
     const updated = this.lastUpdatedAt();
@@ -107,6 +145,15 @@ export class ShowcaseDaoStateService {
 
   setSearchQuery(value: string): void {
     this.searchQuery.set(value);
+  }
+
+  setLastSelectedDao(card: DaoShowcaseCard): void {
+    this.lastSelectedDao.set(card);
+  }
+
+  daoPowerPercent(card: DaoShowcaseCard): number {
+    const raw = Math.round((card.membersActive / 40) * 100 + card.proposalsCount * 4);
+    return Math.max(8, Math.min(100, raw));
   }
 
   questionsForDao(symbol: string): CommunityFaqQuestion[] {

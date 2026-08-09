@@ -48,16 +48,19 @@ public class ChatSocketHandler extends TextWebSocketHandler {
         JsonNode payload = objectMapper.readTree(message.getPayload());
         String type = payload.path("type").asText("message");
 
+        if ("clear".equals(type)) {
+            String roomId = payload.path("roomId").asText(ChatService.DEFAULT_ROOM);
+            String resolvedRoom = chatService.clearRoom(roomId);
+            broadcastClear(resolvedRoom);
+            return;
+        }
+
         if (!"message".equals(type)) {
             return;
         }
 
         Optional<AuthenticatedUser> user = webSocketAuthSupport.resolveFromSession(session);
-        if (user.isEmpty()) {
-            sendError(session, "Authentification requise pour envoyer un message.");
-            return;
-        }
-
+        String authorHint = payload.path("author").asText("").trim();
         String text = payload.path("text").asText("").trim();
         String clientId = payload.path("clientId").asText(null);
         String roomId = payload.path("roomId").asText(ChatService.DEFAULT_ROOM);
@@ -71,14 +74,33 @@ public class ChatSocketHandler extends TextWebSocketHandler {
         String highlightColor = textOrNull(payload, "highlightColor");
         String textAlign = textOrNull(payload, "textAlign");
         String styleKey = textOrNull(payload, "styleKey");
+        Boolean anonymousFlag = boolOrNull(payload, "anonymous");
+
+        boolean wantsAnonymous;
+        if (Boolean.FALSE.equals(anonymousFlag)) {
+            wantsAnonymous = false;
+        } else if (Boolean.TRUE.equals(anonymousFlag)) {
+            wantsAnonymous = true;
+        } else {
+            wantsAnonymous = ChatService.isAnonymousAuthor(authorHint);
+        }
+
+        if (user.isEmpty() && !wantsAnonymous) {
+            sendError(session, "Authentification requise pour envoyer un message, ou activez Anonymous.");
+            return;
+        }
 
         if (text.isEmpty()) {
             return;
         }
 
+        String author = wantsAnonymous
+                ? ChatService.ANONYMOUS_AUTHOR
+                : user.map(AuthenticatedUser::getUsername).orElse(ChatService.ANONYMOUS_AUTHOR);
+
         ChatMessageResponse created = chatService.postMessage(
                 new ChatMessageRequest(
-                        user.get().getUsername(),
+                        author,
                         text,
                         clientId,
                         roomId,
@@ -91,9 +113,10 @@ public class ChatSocketHandler extends TextWebSocketHandler {
                         fontColor,
                         highlightColor,
                         textAlign,
-                        styleKey
+                        styleKey,
+                        wantsAnonymous ? Boolean.TRUE : Boolean.FALSE
                 ),
-                user.get().getUsername()
+                author
         );
 
         broadcastChat(created);
@@ -150,6 +173,18 @@ public class ChatSocketHandler extends TextWebSocketHandler {
         envelope.put("type", "chat");
         envelope.put("data", message);
 
+        broadcastEnvelope(envelope);
+    }
+
+    public void broadcastClear(String roomId) throws Exception {
+        Map<String, Object> envelope = new LinkedHashMap<>();
+        envelope.put("type", "clear");
+        envelope.put("roomId", roomId != null && !roomId.isBlank() ? roomId : ChatService.DEFAULT_ROOM);
+
+        broadcastEnvelope(envelope);
+    }
+
+    private void broadcastEnvelope(Map<String, Object> envelope) throws Exception {
         String payload = objectMapper.writeValueAsString(envelope);
         TextMessage textMessage = new TextMessage(payload);
 

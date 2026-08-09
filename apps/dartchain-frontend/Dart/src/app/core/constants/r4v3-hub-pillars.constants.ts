@@ -3,21 +3,21 @@ import { R4v3HubPillar } from '../models/r4v3-hub.model';
 export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
   {
     id: 'peg-chf',
-    label: 'CHF / GBP',
+    label: 'CHF',
     detail: 'Parité de référence affichée en temps réel',
     icon: '₣',
     accent: 'cyan',
-    drawerTitle: '1 R4V3 = 1 franc suisse ou 1 livre sterling',
+    drawerTitle: '1 R4V3 = 1 franc suisse',
     drawerSummary:
-      'Le R4V3 est présenté avec une parité pédagogique à 1 CHF / 1 GBP pour simplifier la lecture des montants.',
+      'Le R4V3 est présenté avec une parité pédagogique à 1 CHF pour simplifier la lecture des montants.',
     sections: [
       {
-        title: 'Pourquoi CHF et GBP ?',
-        body: 'Le franc suisse et la livre sterling offrent des références stables et familières. Sur testnet, cette double parité permet de comprendre instantanément l’ordre de grandeur d’un montant sans conversion mentale.',
+        title: 'Pourquoi le CHF ?',
+        body: 'Le franc suisse offre une référence stable et familière. Sur testnet, cette parité permet de comprendre instantanément l’ordre de grandeur d’un montant sans conversion mentale.',
       },
       {
         title: 'Mécanisme de stabilité',
-        body: 'L’ancrage est d’abord un mécanisme d’affichage : le hub, le graphique et l’exchange panel synchronisent la cotation R4V3/CHF et R4V3/GBP. Les tokens LaunchLab restent exprimés relativement au R4V3.',
+        body: 'L’ancrage est d’abord un mécanisme d’affichage : le hub, le graphique et l’exchange panel synchronisent la cotation R4V3/CHF. Les tokens LaunchLab restent exprimés relativement au R4V3.',
       },
       {
         title: 'Garanties affichées',

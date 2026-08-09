@@ -136,16 +136,18 @@ class ApiSecurityIntegrationTest {
     }
 
     @Test
-    void showcaseChatPost_withoutAuth_isRejected() throws Exception {
+    void showcaseChatPost_withoutAuth_isAcceptedAsAnonymous() throws Exception {
         mockMvc.perform(post("/api/showcase/chat/messages")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
                                   "author": "guest",
-                                  "text": "hello"
+                                  "text": "hello-anon"
                                 }
                                 """))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.author").value("Anonymous"))
+                .andExpect(jsonPath("$.text").value("hello-anon"));
     }
 
     @Test

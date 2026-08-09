@@ -141,7 +141,7 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
       case 'community':
         return item.question.title;
       case 'official-wiki':
-        return 'Base officielle';
+        return 'Wiki';
       case 'community-form':
         return 'Proposer une question';
     }

@@ -1745,14 +1745,6 @@
   height: 100%;
 }
 
-:host.showcase-chart--hub .showcase-chart__hub-hero-search:not(.showcase-chart__hub-hero-search--center) {
-  flex: 0 0 auto;
-  width: min(24vw, 5.75rem);
-  min-width: 4.25rem;
-  max-width: 5.75rem;
-  align-self: center;
-}
-
 :host.showcase-chart--hub .showcase-chart__hub-hero-search app-chart-token-search {
   display: block;
   width: 100%;
@@ -2244,7 +2236,11 @@
   :host.showcase-chart--hub .showcase-chart__hub-bar,
   :host.showcase-chart--hub .showcase-chart__hub-hero {
     gap: 3px;
-    padding: 1px 1px 2px;
+    padding: 1px 0 2px;
+  }
+
+  :host.showcase-chart--hub .showcase-chart__hub-hero-top--unified {
+    padding-inline-end: 0;
   }
 
   :host.showcase-chart--hub .showcase-chart__hub-logo {
@@ -2361,26 +2357,30 @@
   flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
-  gap: 3px;
+  gap: 2px;
   position: relative;
   width: 100%;
   min-width: 0;
   min-height: var(--chart-hub-head-h);
   max-height: none;
   padding: 0;
+  box-sizing: border-box;
   overflow: visible;
 }
 
 :host.showcase-chart--hub .showcase-chart__hub-hero-brand {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  flex: 0 0 auto;
+  gap: 4px;
+  flex: 1 1 auto;
   min-width: 0;
+  max-width: calc(100% - 7.5rem);
   z-index: 2;
+  overflow: visible;
 }
 
 :host.showcase-chart--hub .showcase-chart__hub-hero-brand .showcase-chart__hub-symbol {
+  flex: 0 0 auto;
   font-size: var(--chart-hub-fs);
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -2407,34 +2407,48 @@
   font-weight: 800;
 }
 
-:host.showcase-chart--hub .showcase-chart__hub-hero-search--center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: clamp(4.25rem, 36cqw, 6.75rem);
-  min-width: 0;
-  max-width: min(36cqw, 6.75rem);
+:host.showcase-chart--hub .showcase-chart__hub-hero-brand .showcase-chart__hub-hero-search {
+  position: relative;
+  flex: 1 1 auto;
+  width: clamp(4.5rem, 22cqw, 7.5rem);
+  min-width: 4.25rem;
+  max-width: 7.5rem;
+  margin-inline-start: 2px;
   z-index: 5;
   overflow: visible;
-  pointer-events: none;
 }
 
-:host.showcase-chart--hub .showcase-chart__hub-hero-search--center app-chart-token-search {
+:host.showcase-chart--hub .showcase-chart__hub-hero-brand .showcase-chart__hub-hero-search app-chart-token-search {
   display: block;
   width: 100%;
-  pointer-events: auto;
 }
 
 :host.showcase-chart--hub .showcase-chart__hub-hero-actions {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  flex: 0 0 auto;
-  gap: 3px;
+  flex: 0 1 auto;
+  gap: 1px;
   min-width: 0;
   margin-left: auto;
   z-index: 2;
+}
+
+:host.showcase-chart--hub .showcase-chart__hub-collapse {
+  --cba-h: var(--panel-action-menu-h, 14px);
+  --cba-item-w: var(--panel-action-item-w, 14px);
+  position: relative;
+  z-index: 6;
+  flex: 0 0 var(--panel-action-menu-w, 34px);
+  align-self: center;
+  width: var(--panel-action-menu-w, 34px);
+  min-width: var(--panel-action-menu-w, 34px);
+  max-width: var(--panel-action-menu-w, 34px);
+  height: var(--panel-action-menu-h, 14px);
+  min-height: var(--panel-action-menu-h, 14px);
+  max-height: var(--panel-action-menu-h, 14px);
+  margin: 0;
+  pointer-events: auto;
 }
 
 :host.showcase-chart--hub .showcase-chart__hub-menu-row--view {
@@ -2551,17 +2565,20 @@
   right: 0;
 }
 
-:host.showcase-chart--hub .showcase-chart__hub-hero-search--center .chart-token-search--compact {
+:host.showcase-chart--hub .showcase-chart__hub-hero-brand .chart-token-search--compact {
   width: 100%;
   max-width: 100%;
   overflow: visible;
 }
 
-:host.showcase-chart--hub .showcase-chart__hub-hero-search--center .chart-token-search--compact .chart-token-search__panel {
+:host.showcase-chart--hub .showcase-chart__hub-hero-brand .chart-token-search--compact .chart-token-search__panel {
   z-index: 60;
+  left: 0;
+  right: auto;
+  min-width: max(100%, 10rem);
 }
 
-:host.showcase-chart--hub .showcase-chart__hub-hero-search--center .chart-token-search__form {
+:host.showcase-chart--hub .showcase-chart__hub-hero-brand .chart-token-search__form {
   min-height: calc(var(--chart-tool-h) - 1px);
   width: 100%;
 }
@@ -2673,12 +2690,11 @@
   box-shadow: none;
 }
 
-:host.showcase-chart--r4v3 .showcase-chart__hub-hero-search {
-  flex: 0 0 auto;
-  width: auto;
-  min-width: 0;
-  max-width: none;
-  justify-self: end;
+:host.showcase-chart--r4v3 .showcase-chart__hub-hero-brand .showcase-chart__hub-hero-search {
+  flex: 1 1 auto;
+  width: clamp(4.5rem, 22cqw, 7.5rem);
+  min-width: 4.25rem;
+  max-width: 7.5rem;
 }
 
 :host.showcase-chart--r4v3 .showcase-chart__hub-toolbar,

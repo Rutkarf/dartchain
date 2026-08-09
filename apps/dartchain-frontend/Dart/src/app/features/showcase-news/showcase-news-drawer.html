@@ -17,20 +17,22 @@
       <header class="news-insight-panel__head">
         <div class="news-insight-panel__head-row">
           <div class="news-insight-panel__identity">
-            <span class="news-insight-panel__icon" aria-hidden="true">{{
-              categoryIcon(news.category)
-            }}</span>
-            <div class="news-insight-panel__identity-copy">
-              <p class="news-insight-panel__eyebrow">
-                <span>{{ categoryLabel(news.category) }}</span>
-                <span class="news-insight-panel__eyebrow-sep" aria-hidden="true">·</span>
-                <span>{{ sourceLabel(news.source) }}</span>
-                @if (news.featured) {
-                  <span class="news-insight-panel__featured">À la une</span>
-                }
-              </p>
-            </div>
+            <span
+              class="news-insight-panel__badge"
+              [attr.data-category]="categorySlug(news.category)"
+              [attr.title]="categoryLabel(news.category) + ' · ' + sourceLabel(news.source)"
+            >
+              {{ categoryAbbrev(news) }}
+            </span>
           </div>
+
+          <h3
+            class="news-insight-panel__title"
+            [id]="'newsDrawerTitle-' + news.id"
+            [attr.title]="news.title"
+          >
+            {{ drawerTitle(news) }}
+          </h3>
 
           <div class="news-insight-panel__head-actions">
             <div class="news-insight-panel__nav" aria-label="Navigation entre articles">
@@ -68,87 +70,36 @@
             </button>
           </div>
         </div>
-
-        <h3 class="news-insight-panel__title" [id]="'newsDrawerTitle-' + news.id">
-          {{ news.title }}
-        </h3>
       </header>
 
       <div class="news-insight-panel__body">
         @if (loading()) {
-          <div class="news-insight-panel__layout news-insight-panel__layout--loading" aria-hidden="true">
-            <div class="news-insight-panel__metrics ds-surface ds-surface--panel">
-              <div class="news-insight-panel__metric-grid">
-                @for (cell of [1, 2, 3, 4]; track cell) {
-                  <div class="news-insight-panel__metric-cell news-insight-panel__skeleton-cell"></div>
-                }
-              </div>
-            </div>
-            <div class="news-insight-panel__content ds-surface ds-surface--panel">
-              <span class="news-insight-panel__skeleton-line"></span>
-              <span class="news-insight-panel__skeleton-line"></span>
-              <span class="news-insight-panel__skeleton-line news-insight-panel__skeleton-line--short"></span>
-            </div>
+          <div class="news-insight-panel__fields" aria-hidden="true">
+            @for (row of skeletonRows; track row) {
+              <div class="news-insight-panel__field news-insight-panel__field--skeleton"></div>
+            }
           </div>
         } @else {
-          <div class="news-insight-panel__layout">
-            <section
-              class="news-insight-panel__metrics ds-surface ds-surface--panel"
-              aria-label="Métriques de l'actualité"
-            >
-              <div class="news-insight-panel__metric-grid">
-                <div class="news-insight-panel__metric-cell">
-                  <span class="news-insight-panel__metric-label">Fraîcheur</span>
-                  <span class="news-insight-panel__metric-value">{{ news.relativeTime }}</span>
-                </div>
-                <div class="news-insight-panel__metric-cell">
-                  <span class="news-insight-panel__metric-label">Source</span>
-                  <span class="news-insight-panel__metric-value">{{ sourceLabel(news.source) }}</span>
-                </div>
-                <div class="news-insight-panel__metric-cell">
-                  <span class="news-insight-panel__metric-label">Publié le</span>
-                  <span class="news-insight-panel__metric-value">{{
-                    formatPublishedAt(news.publishedAt)
-                  }}</span>
-                </div>
-                <div class="news-insight-panel__metric-cell">
-                  <span class="news-insight-panel__metric-label">Cible</span>
-                  <span
-                    class="news-insight-panel__metric-value news-insight-panel__metric-value--mono"
-                    [attr.title]="targetLabel(news)"
-                  >
-                    {{ targetLabel(news) }}
-                  </span>
-                </div>
+          <div class="news-insight-panel__fields" aria-label="Informations">
+            @for (field of metaFields(); track field.id) {
+              <div class="news-insight-panel__field" [class.news-insight-panel__field--mono]="field.mono">
+                <span class="news-insight-panel__field-label">{{ field.label }}</span>
+                <span class="news-insight-panel__field-value" [attr.title]="field.value">{{
+                  field.displayValue
+                }}</span>
               </div>
-            </section>
+            }
+          </div>
 
-            <section
-              class="news-insight-panel__content ds-surface ds-surface--panel"
-              aria-label="Contenu de l'actualité"
-            >
-              <div class="news-insight-panel__content-block">
-                <span class="news-insight-panel__content-label">Résumé</span>
-                <p
-                  class="news-insight-panel__content-text"
-                  [attr.title]="summaryText(news)"
-                >
-                  {{ summaryText(news) }}
-                </p>
+          <div class="news-insight-panel__fields news-insight-panel__fields--content" aria-label="Contenu">
+            @for (field of contentFields(); track field.id) {
+              <div class="news-insight-panel__field" [class.news-insight-panel__field--mono]="field.mono">
+                <span class="news-insight-panel__field-label">{{ field.label }}</span>
+                <span class="news-insight-panel__field-value" [attr.title]="field.value">{{
+                  field.displayValue
+                }}</span>
               </div>
-
-              @if (showDetailSection(news)) {
-                <div class="news-insight-panel__content-block">
-                  <span class="news-insight-panel__content-label">Détail</span>
-                  <p
-                    class="news-insight-panel__content-text news-insight-panel__content-text--detail"
-                    [attr.title]="news.body"
-                  >
-                    {{ news.body }}
-                  </p>
-                </div>
-              }
-            </section>
+            }
           </div>
         }
       </div>

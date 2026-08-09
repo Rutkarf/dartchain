@@ -41,17 +41,18 @@
 }
 
 .showcase-chat-main--preview .showcase-chat__live-led--active {
-  background: var(--chart-trend-up, #3dd68c);
-  box-shadow: 0 0 6px rgba(var(--chart-trend-up-rgb, 61, 214, 140), 0.5);
+  background: #39ff14;
+  box-shadow: 0 0 6px rgba(57, 255, 20, 0.55);
 }
 
 .showcase-chat-main--preview .showcase-chat__live-led--pending {
-  background: #ffb347;
-  box-shadow: 0 0 6px rgba(255, 179, 71, 0.45);
+  background: #f1fa8c;
+  box-shadow: 0 0 6px rgba(241, 250, 140, 0.45);
 }
 
 .showcase-chat-main--preview .showcase-chat__live-led--offline {
-  background: rgba(255, 120, 100, 0.85);
+  background: #ff5555;
+  box-shadow: 0 0 4px rgba(255, 85, 85, 0.4);
 }
 
 .unread-badge {
@@ -73,10 +74,11 @@
 
 .showcase-chat-preview__author {
   flex: 0 0 auto;
+  font-family: 'DejaVu Sans Mono', 'Liberation Mono', 'Share Tech Mono', monospace;
   font-size: clamp(0.4375rem, 2.35vw, 0.625rem);
   font-weight: 800;
   line-height: 1.1;
-  color: var(--text-primary);
+  color: #b8bcc4;
   white-space: nowrap;
 }
 

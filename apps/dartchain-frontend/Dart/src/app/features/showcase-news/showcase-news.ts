@@ -6,7 +6,9 @@ import {
   HostBinding,
   HostListener,
   Input,
+  afterNextRender,
   computed,
+  effect,
   inject,
   signal,
   viewChild,
@@ -23,7 +25,6 @@ import {
 } from 'rxjs';
 
 import {
-  NewsDensity,
   NewsItem,
   NewsSource,
 } from '../../core/models/showcase.model';
@@ -33,6 +34,17 @@ import { ShowcaseNewsStateService } from '../../core/services/showcase-news-stat
 import { BlockchainApiService } from '../../core/services/blockchain-api.service';
 import { ShowcaseNewsDrawerComponent } from './showcase-news-drawer';
 import { buildNewsCopyText, copyTextToClipboard } from '../../core/utils/clipboard.util';
+import {
+  SHOWCASE_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
+import {
+  abbreviateHashesInText,
+  formatNewsDisplayTitle,
+  newsCategoryAbbrev,
+  newsDisplayTitleTooltip,
+  normalizeNewsCategorySlug,
+} from './showcase-news-display.util';
 
 const NEWS_PAGE_SIZE = 10;
 
@@ -68,7 +80,9 @@ export class ShowcaseNewsComponent {
 
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private readonly contentPanel = viewChild<ElementRef<HTMLElement>>('contentPanel');
+  private readonly loadSentinel = viewChild<ElementRef<HTMLElement>>('loadSentinel');
   private readonly searchInput$ = new Subject<string>();
+  private loadObserver: IntersectionObserver | null = null;
 
   readonly loading = signal(true);
   readonly loadingMore = signal(false);
@@ -82,16 +96,45 @@ export class ShowcaseNewsComponent {
   readonly lastUpdatedAt = signal<Date | null>(null);
   readonly featuredId = signal<string | null>(null);
   readonly keyboardFocusIndex = signal(-1);
-  readonly searchExpanded = signal(false);
-  readonly ageTick = signal(0);
 
   readonly chainLiveClickable = computed(() => this.newsState.latestBlockIndex() !== null);
+
+  readonly chainBlockLabel = computed(() => {
+    const index = this.newsState.latestBlockIndex();
+    return index !== null ? `#${index}` : null;
+  });
+
+  readonly chainToneLabel = computed(() => {
+    if (this.newsState.latestBlockIndex() === null) {
+      return null;
+    }
+
+    switch (this.newsState.chainLiveTone()) {
+      case 'pending':
+        return 'attente';
+      case 'offline':
+        return 'off';
+      default:
+        return 'sync';
+    }
+  });
+
+  readonly chainFallbackLabel = computed(() => {
+    if (this.newsState.latestBlockIndex() !== null) {
+      return null;
+    }
+
+    const activity = this.newsState.liveActivity();
+    if (activity) {
+      return activity.length > 14 ? `${activity.slice(0, 12)}…` : activity;
+    }
+
+    return 'off';
+  });
 
   readonly selectedItem = signal<NewsItem | null>(null);
   readonly detailItem = signal<NewsItem | null>(null);
   readonly detailLoading = signal(false);
-
-  readonly density = this.newsState.density;
 
   readonly filteredItems = computed(() => {
     const query = this.debouncedSearchQuery().trim().toLowerCase();
@@ -142,10 +185,6 @@ export class ShowcaseNewsComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.loadFeed(false));
 
-    interval(5_000)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.ageTick.update((value) => value + 1));
-
     this.blockchain
       .connectLiveUpdates()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -158,6 +197,18 @@ export class ShowcaseNewsComponent {
           this.loadFeed(false);
         }
       });
+
+    effect(() => {
+      this.filteredItems();
+      this.loading();
+      this.hasMore();
+      this.loadingMore();
+      queueMicrotask(() => this.bindLoadObserver());
+    });
+
+    afterNextRender(() => this.bindLoadObserver());
+
+    this.destroyRef.onDestroy(() => this.loadObserver?.disconnect());
   }
 
   protected refreshAriaLabel(): string {
@@ -202,17 +253,22 @@ export class ShowcaseNewsComponent {
       });
   }
 
-  protected openSearch(): void {
-    this.searchExpanded.set(true);
-    queueMicrotask(() => this.searchInput()?.nativeElement.focus());
+  protected categorySlug(category: string): string {
+    return normalizeNewsCategorySlug(category);
   }
 
-  protected closeSearch(event?: Event): void {
-    event?.preventDefault();
-    if (this.searchQuery().trim()) {
-      return;
-    }
-    this.searchExpanded.set(false);
+  protected categoryAbbrev(item: NewsItem): string {
+    return newsCategoryAbbrev(item.category, item.source);
+  }
+
+  protected itemLineTitle(item: NewsItem): string {
+    return formatNewsDisplayTitle(item);
+  }
+
+  protected itemLineTooltip(item: NewsItem): string {
+    const time = item.relativeTime?.trim();
+    const full = newsDisplayTitleTooltip(item);
+    return time ? `${full} · ${time}` : full;
   }
 
   protected isUnread(item: NewsItem): boolean {
@@ -223,68 +279,15 @@ export class ShowcaseNewsComponent {
     return item.featured || item.id === this.featuredId();
   }
 
-  protected categoryIcon(category: string): string {
-    switch (category.toLowerCase()) {
-      case 'réseau':
-        return '⛓';
-      case 'r4v3':
-        return '◆';
-      case 'peers':
-        return '◎';
-      case 'écosystème':
-        return '✦';
-      case 'd.a.o':
-        return '✦';
-      default:
-        return '•';
-    }
-  }
-
-  protected categoryLabel(category: string): string {
-    return this.newsState.categoryLabel(category);
-  }
-
-  protected selectCategory(category: string): void {
-    this.newsState.selectCategory(category);
-  }
-
-  protected toggleSourceFilter(): void {
-    const order: Array<NewsSource | 'all'> = ['all', 'CHAIN', 'EDITORIAL'];
-    const index = order.indexOf(this.sourceFilter());
-    this.sourceFilter.set(order[(index + 1) % order.length]);
-    this.closeItem();
-    this.loadFeed();
-  }
-
-  protected sourceFilterLabel(): string {
-    switch (this.sourceFilter()) {
-      case 'CHAIN':
-        return 'On-chain';
-      case 'EDITORIAL':
-        return 'Édito';
-      default:
-        return 'Toutes';
-    }
-  }
-
-  protected sourceFilterIcon(): string {
-    switch (this.sourceFilter()) {
-      case 'CHAIN':
-        return '⛓';
-      case 'EDITORIAL':
-        return '✎';
-      default:
-        return '⛓✎';
-    }
-  }
-
-  protected toggleDensity(): void {
-    const next: NewsDensity = this.density() === 'compact' ? 'comfort' : 'compact';
-    this.newsState.setDensity(next);
-  }
-
   protected refresh(): void {
     this.loadFeed();
+  }
+
+  @HostListener(`window:${SHOWCASE_REFRESH_EVENT}`, ['$event'])
+  onShowcaseRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'tours')) {
+      this.refresh();
+    }
   }
 
   protected markAllRead(): void {
@@ -497,12 +500,39 @@ export class ShowcaseNewsComponent {
   }
 
   private itemMatchesQuery(item: NewsItem, query: string): boolean {
+    const normalized = abbreviateHashesInText(item.title).toLowerCase();
     return (
+      normalized.includes(query) ||
       item.title.toLowerCase().includes(query) ||
       item.summary.toLowerCase().includes(query) ||
       item.category.toLowerCase().includes(query) ||
       item.body.toLowerCase().includes(query)
     );
+  }
+
+  private bindLoadObserver(): void {
+    this.loadObserver?.disconnect();
+    this.loadObserver = null;
+
+    if (this.loading() || !this.hasMore() || this.loadingMore()) {
+      return;
+    }
+
+    const sentinel = this.loadSentinel()?.nativeElement;
+    const root = this.contentPanel()?.nativeElement;
+    if (!sentinel || !root) {
+      return;
+    }
+
+    this.loadObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          this.loadMore(Boolean(this.debouncedSearchQuery().trim()));
+        }
+      },
+      { root, rootMargin: '64px 0px', threshold: 0 }
+    );
+    this.loadObserver.observe(sentinel);
   }
 
   private loadDetail(id: string): void {

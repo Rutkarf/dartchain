@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,17 +31,18 @@ class ShowcaseChatControllerIntegrationTest {
     }
 
     @Test
-    void postMessage_withoutAuth_isUnauthorized() throws Exception {
+    void postMessage_withoutAuth_asAnonymous_isCreated() throws Exception {
         mockMvc.perform(post("/api/showcase/chat/messages")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "author": "guest",
-                                  "text": "hello"
+                                  "author": "Anonymous",
+                                  "text": "hello-anon"
                                 }
                                 """))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.status").value(401));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.text").value("hello-anon"))
+                .andExpect(jsonPath("$.author").value("Anonymous"));
     }
 
     @Test
@@ -59,5 +61,63 @@ class ShowcaseChatControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.text").value("phase-o-chat"))
                 .andExpect(jsonPath("$.author").value(session.username()));
+    }
+
+    @Test
+    void postMessage_withAuth_asAnonymous_usesAnonymousAuthor() throws Exception {
+        Session session = MockMvcIntegrationSupport.register(mockMvc);
+
+        mockMvc.perform(post("/api/showcase/chat/messages")
+                        .header("Authorization", session.authHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "author": "Anonymous",
+                                  "text": "secret-anon",
+                                  "anonymous": true
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.text").value("secret-anon"))
+                .andExpect(jsonPath("$.author").value("Anonymous"));
+    }
+
+    @Test
+    void postMessage_withAuth_explicitNonAnonymous_usesUsername() throws Exception {
+        Session session = MockMvcIntegrationSupport.register(mockMvc);
+
+        mockMvc.perform(post("/api/showcase/chat/messages")
+                        .header("Authorization", session.authHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "author": "%s",
+                                  "text": "signed-as-user",
+                                  "anonymous": false
+                                }
+                                """.formatted(session.username())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.text").value("signed-as-user"))
+                .andExpect(jsonPath("$.author").value(session.username()));
+    }
+
+    @Test
+    void clearMessages_isPublicAndEmptiesRoom() throws Exception {
+        mockMvc.perform(post("/api/showcase/chat/messages")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "author": "Anonymous",
+                                  "text": "to-clear"
+                                }
+                                """))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(delete("/api/showcase/chat/messages"))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/showcase/chat/messages"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.messages").isEmpty());
     }
 }

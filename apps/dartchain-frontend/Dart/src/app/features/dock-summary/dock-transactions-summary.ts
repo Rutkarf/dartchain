@@ -78,11 +78,11 @@ export class DockTransactionsSummaryComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     void this.pendingState.load();
     void this.blockState.load();
-    window.addEventListener('naivechain-refresh', this.onGlobalRefresh);
+    window.addEventListener('dartchain-refresh-dock', this.onGlobalRefresh);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('naivechain-refresh', this.onGlobalRefresh);
+    window.removeEventListener('dartchain-refresh-dock', this.onGlobalRefresh);
   }
 
   private onGlobalRefresh = (): void => {

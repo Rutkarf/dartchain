@@ -31,7 +31,7 @@ describe('Phase 1 — UI structure manifest', () => {
 
   it('preserves showcase chevron and dual tab layers in manifest', () => {
     const showcase = getZoneById('showcase')!;
-    expect(showcase.notes?.some((n) => n.includes('Chevron'))).toBe(true);
+    expect(showcase.notes?.some((n) => n.includes('collapse/expand'))).toBe(true);
     expect(showcase.notes?.some((n) => n.includes('niveau A'))).toBe(true);
     expect(showcase.notes?.some((n) => n.includes('niveau B'))).toBe(true);
     expect(showcase.components.some((c) => c.selector === 'showcase-toggle')).toBe(true);

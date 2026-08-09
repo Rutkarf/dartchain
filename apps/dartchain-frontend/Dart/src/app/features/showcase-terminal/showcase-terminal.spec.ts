@@ -74,7 +74,7 @@ describe('ShowcaseTerminalComponent (Phase V)', () => {
     expect(fixture.nativeElement.querySelector('.showcase-terminal-reseau')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.showcase-news__meta-bar')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.showcase-terminal-reseau__led')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('.showcase-meta__refresh')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-meta__refresh')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-terminal__title')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-news__list')).toBeTruthy();
   });
@@ -90,7 +90,7 @@ describe('ShowcaseTerminalComponent (Phase V)', () => {
     expect(root.querySelector('.showcase-news__meta-bar')).toBeTruthy();
     expect(root.querySelector('.showcase-terminal-reseau__led')).toBeTruthy();
     expect(root.querySelector('.showcase-meta__live-text')?.textContent?.trim()).toBe('2');
-    expect(root.querySelector('.showcase-meta__refresh')).toBeTruthy();
+    expect(root.querySelector('.showcase-meta__refresh')).toBeFalsy();
     expect(root.querySelector('.showcase-terminal__title')).toBeFalsy();
     expect(root.querySelector('.showcase-terminal__icon-btn')).toBeFalsy();
     expect(root.querySelector('.showcase-news__list')).toBeTruthy();

@@ -58,6 +58,23 @@ export class ShowcaseDaoDrawerComponent {
     () => this.questions().filter((question) => question.status === 'open').length
   );
 
+  readonly visibleQuestions = computed(() => {
+    const expandedId = this.expandedQuestionId();
+    const all = this.questions();
+    if (expandedId) {
+      const expanded = all.find((question) => question.id === expandedId);
+      return expanded ? [expanded] : all.slice(0, 4);
+    }
+    return all.slice(0, 4);
+  });
+
+  readonly hiddenQuestionCount = computed(() => {
+    if (this.expandedQuestionId()) {
+      return Math.max(0, this.questions().length - 1);
+    }
+    return Math.max(0, this.questions().length - 4);
+  });
+
   readonly submitMessage = this.community.submitMessage;
 
   constructor() {
@@ -88,6 +105,11 @@ export class ShowcaseDaoDrawerComponent {
   protected initials(card: DaoShowcaseCard): string {
     const symbol = card.symbol?.trim() || card.name?.trim() || '?';
     return symbol.slice(0, 2).toUpperCase();
+  }
+
+  protected xpPercent(card: DaoShowcaseCard): number {
+    const raw = Math.round((card.membersActive / 40) * 100 + card.proposalsCount * 4);
+    return Math.max(8, Math.min(100, raw));
   }
 
   protected toggleQuestion(question: CommunityFaqQuestion): void {
@@ -127,6 +149,13 @@ export class ShowcaseDaoDrawerComponent {
 
   protected canAsk(): boolean {
     return this.auth.isAuthenticated();
+  }
+
+  protected submitLabel(): string {
+    if (this.formSuccess()) {
+      return 'Question publiée';
+    }
+    return this.submitMessage() || 'Publier';
   }
 
   private resetForm(): void {

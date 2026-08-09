@@ -15,14 +15,6 @@
       <span class="chain-dock__sync-label">{{ syncSubLabel() }}</span>
     </div>
 
-    <button
-      type="button"
-      class="chain-dock__reset"
-      (click)="clearFilters()"
-      [attr.aria-label]="locale.t('chain.filter.reset')"
-    >
-      {{ locale.t('chain.filter.reset') }}
-    </button>
   </header>
 
   @if (feedback()) {

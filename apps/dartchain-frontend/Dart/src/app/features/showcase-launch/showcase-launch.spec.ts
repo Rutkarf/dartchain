@@ -99,7 +99,7 @@ describe('ShowcaseLaunchComponent (Phase V)', () => {
     expect(root.textContent).toContain('Pixel DAO');
     expect(root.querySelector('.showcase-launch__live-led')).toBeTruthy();
     expect(root.querySelector('.showcase-meta__live-text')?.textContent?.trim()).toBe('1 LIVE');
-    expect(root.querySelector('.showcase-meta__refresh')).toBeTruthy();
+    expect(root.querySelector('.showcase-meta__refresh')).toBeFalsy();
     expect(root.querySelector('.showcase-meta__filter-select')).toBeFalsy();
     expect(root.querySelector('.showcase-launch__whitepaper')).toBeTruthy();
     expect(root.querySelector('.showcase-launch__cta')).toBeTruthy();

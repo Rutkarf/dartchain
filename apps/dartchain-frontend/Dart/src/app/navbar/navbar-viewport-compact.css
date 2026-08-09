@@ -53,13 +53,6 @@
     max-height: var(--nv-logo-h, 22px);
   }
 
-  .navbar-auth-btn--labeled {
-    width: var(--nv-logo-h, 22px);
-    min-width: var(--nv-logo-h, 22px);
-    padding: 0;
-    gap: 0;
-  }
-
   .navbar-brand-row .navbar-brand-row__node {
     max-width: var(--nv-node-panel-max-w, 4.75rem);
   }

@@ -14,63 +14,31 @@
       [class]="systemStatusClass(systemStatus())"
       aria-hidden="true"
     ></span>
-    <span class="r4v3-summary-bar__peg">{{ pegDisplayLabel() }}</span>
+    <span class="r4v3-summary-bar__peg" aria-label="1 R4V3 = 1 CHF">
+      <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--token">1 R4V3</span>
+      <span class="r4v3-summary-bar__peg-eq" aria-hidden="true">=</span>
+      <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--fiat">1 CHF</span>
+    </span>
   </span>
-
-  <div
-    class="r4v3-summary-bar__ticker"
-    role="button"
-    tabindex="0"
-    [attr.aria-label]="tickerAriaLabel()"
-    (click)="onTickerClick($event)"
-    (keydown.enter)="onTickerClick($event)"
-    (keydown.space)="onTickerClick($event)"
-  >
-    @if (tickerQuestion(); as question) {
-      <div
-        #tickerViewport
-        class="r4v3-summary-bar__ticker-viewport"
-        [class.r4v3-summary-bar__ticker-viewport--draggable]="tickerOverflow()"
-        [class.r4v3-summary-bar__ticker-viewport--dragging]="tickerDragging()"
-        (pointerdown)="onTickerPointerDown($event)"
-      >
-        <span class="r4v3-summary-bar__ticker-text">{{ question.title }}</span>
-      </div>
-    } @else if (headerBusy()) {
-      <span class="r4v3-summary-bar__ticker-fallback">Chargement FAQ…</span>
-    } @else {
-      <span class="r4v3-summary-bar__ticker-fallback">Posez la première question communautaire</span>
-    }
-  </div>
 
   <button
     type="button"
-    class="r4v3-summary-bar__whitepaper"
+    class="r4v3-summary-bar__wp-btn"
     (click)="onWhitepaper($event)"
     [attr.aria-label]="whitepaperAriaLabel()"
     [attr.aria-busy]="whitepaperLoading()"
-    title="White paper"
+    [attr.title]="whitepaperLoading() ? 'Téléchargement…' : 'Télécharger le white paper R4V3'"
   >
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
-    </svg>
-  </button>
-
-  <button
-    type="button"
-    class="r4v3-summary-bar__refresh"
-    (click)="onRefresh($event)"
-    [class.r4v3-summary-bar__refresh--loading]="headerBusy()"
-    [class.r4v3-summary-bar__refresh--pulse]="refreshPulse()"
-    [attr.aria-busy]="headerBusy()"
-    aria-label="Actualiser le hub R4V3"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path d="M21 12a9 9 0 0 1-15.5 6.36" />
-      <path d="M3 12a9 9 0 0 1 15.5-6.36" />
-      <path d="M17 4v4h-4" />
-      <path d="M7 20v-4h4" />
-    </svg>
+    <span class="r4v3-summary-bar__wp-btn-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <path d="M14 2v6h6" />
+        <path d="M12 11v7" />
+        <path d="M9 15l3 3 3-3" />
+      </svg>
+    </span>
+    <span class="r4v3-summary-bar__wp-btn-label">
+      {{ whitepaperLoading() ? 'Ouverture…' : 'White paper' }}
+    </span>
   </button>
 </div>

@@ -6,6 +6,7 @@ public record ChatMessageResponse(
         String author,
         String text,
         String sentAt,
+        String clientId,
         String fontKey,
         String fontSize,
         boolean bold,

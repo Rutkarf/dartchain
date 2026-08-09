@@ -16,7 +16,7 @@ export const R4V3_FAQ_CATEGORIES: readonly R4v3FaqCategory[] = [
 export const R4V3_FAQ_HIGHLIGHTS: readonly R4v3FaqHighlight[] = [
   {
     id: 'peg-chf',
-    label: 'CHF / GBP',
+    label: 'CHF',
     detail: 'Ancrage de parité affiché dans l’application',
     icon: '₣',
   },
@@ -55,9 +55,9 @@ Contrairement aux tokens LaunchLab (PXD, NVFI, etc.), le R4V3 n’est pas un mem
   {
     id: 'peg-chf',
     categoryId: 'essentiel',
-    title: 'Pourquoi le R4V3 vaut-il 1 franc suisse ou 1 livre sterling ?',
-    summary: 'Parité pédagogique à 1 CHF / 1 GBP pour simplifier la lecture des montants dans l’interface.',
-    body: `Dans DartChain, le R4V3 est présenté avec une parité de référence de **1 R4V3 = 1 franc suisse ou 1 livre sterling** (CHF / GBP).
+    title: 'Pourquoi le R4V3 vaut-il 1 franc suisse ?',
+    summary: 'Parité pédagogique à 1 CHF pour simplifier la lecture des montants dans l’interface.',
+    body: `Dans DartChain, le R4V3 est présenté avec une parité de référence de **1 R4V3 = 1 franc suisse** (CHF).
 
 Ce n’est pas une promesse financière régulée : c’est un ancrage d’affichage qui permet de lire les montants sans conversion mentale compliquée. Sur testnet, cette parité facilite les démonstrations, les swaps LaunchLab et la comparaison des valeurs entre tokens.
 
@@ -65,7 +65,7 @@ Le graphique et le hub R4V3 affichent cette référence pour que tout utilisateu
     popular: true,
     isNew: true,
     updatedAt: '2026-07-01',
-    tags: ['peg', 'chf', 'gbp', 'parité'],
+    tags: ['peg', 'chf', 'parité'],
   },
   {
     id: 'role-dartchain',
@@ -146,11 +146,11 @@ Vous pouvez aussi sélectionner un token LaunchLab depuis la navbar : le graphiq
     id: 'stability-mechanism',
     categoryId: 'stabilite',
     title: 'Comment fonctionne la stabilité du R4V3 ?',
-    summary: 'Mécanisme de peg pédagogique et affichage constant à 1 CHF / 1 GBP sur testnet.',
-    body: `Sur testnet, la « stabilité » du R4V3 est **pédagogique** : l’interface maintient une parité d’affichage à 1 CHF / 1 GBP pour éviter la volatilité visuelle des demos.
+    summary: 'Mécanisme de peg pédagogique et affichage constant à 1 CHF sur testnet.',
+    body: `Sur testnet, la « stabilité » du R4V3 est **pédagogique** : l’interface maintient une parité d’affichage à 1 CHF pour éviter la volatilité visuelle des demos.
 
 Le mécanisme repose sur :
-• un **ancrage d’affichage** (1 R4V3 = 1 franc suisse ou 1 livre sterling)
+• un **ancrage d’affichage** (1 R4V3 = 1 franc suisse)
 • des **quotes LaunchLab** exprimées vs R4V3
 • un **white paper** décrivant le modèle visé
 
@@ -161,8 +161,8 @@ Ce n’est pas un stablecoin régulé mainnet : c’est un utility token testnet
     id: 'peg-explained',
     categoryId: 'stabilite',
     title: 'Comment fonctionne le peg ?',
-    summary: 'Référence fixe à 1 CHF / 1 GBP pour l’affichage, distincte des tokens LaunchLab volatils.',
-    body: `Le **peg** (ancrage) du R4V3 signifie que l’application présente le token comme valant **1 franc suisse ou 1 livre sterling** en référence.
+    summary: 'Référence fixe à 1 CHF pour l’affichage, distincte des tokens LaunchLab volatils.',
+    body: `Le **peg** (ancrage) du R4V3 signifie que l’application présente le token comme valant **1 franc suisse** en référence.
 
 Les tokens LaunchLab, eux, fluctuent relativement au R4V3 selon l’activité testnet et les scénarios de démo. Cette séparation permet de comprendre :
 • le R4V3 = unité stable de lecture
@@ -194,7 +194,7 @@ Pour toute utilisation au-delà du testnet, consultez la documentation officiell
     categoryId: 'ecosysteme',
     title: 'Quels sont les avantages pour les utilisateurs ?',
     summary: 'Simplicité, prévisibilité des montants, accès LaunchLab et onboarding rapide.',
-    body: `• **Lisibilité** — 1 R4V3 = 1 CHF / 1 GBP, pas de surprise sur l’ordre de grandeur
+    body: `• **Lisibilité** — 1 R4V3 = 1 CHF, pas de surprise sur l’ordre de grandeur
 • **Onboarding** — faucet + FAQ intégrée pour démarrer sans doc externe
 • **Interopérabilité** — swap direct avec les tokens LaunchLab
 • **Cohérence UI** — navbar, graphique et exchange synchronisés

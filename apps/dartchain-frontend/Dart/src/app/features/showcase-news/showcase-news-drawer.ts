@@ -18,6 +18,16 @@ import { NewsItem, NewsSource } from '../../core/models/showcase.model';
 import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
 import { ShowcaseNewsStateService } from '../../core/services/showcase-news-state.service';
 import { buildNewsCopyText, copyTextToClipboard } from '../../core/utils/clipboard.util';
+import {
+  formatNewsDisplayTitle,
+  newsCategoryAbbrev,
+  normalizeNewsCategorySlug,
+} from './showcase-news-display.util';
+import {
+  NewsDrawerField,
+  buildNewsDrawerFields,
+  drawerSourceLabel,
+} from './showcase-news-drawer.fields.util';
 
 @Component({
   selector: 'app-showcase-news-drawer',
@@ -49,6 +59,8 @@ export class ShowcaseNewsDrawerComponent implements OnDestroy {
   readonly runAction = output<NewsItem>();
   readonly copySummary = output<NewsItem>();
 
+  readonly skeletonRows = [1, 2, 3, 4, 5, 6, 7, 8];
+
   readonly positionLabel = computed(() => {
     const index = this.itemIndex();
     const total = this.itemTotal();
@@ -57,6 +69,22 @@ export class ShowcaseNewsDrawerComponent implements OnDestroy {
     }
     return `${index + 1}/${total}`;
   });
+
+  readonly drawerFields = computed(() => {
+    const news = this.item();
+    if (!news) {
+      return [] as NewsDrawerField[];
+    }
+    return buildNewsDrawerFields(news);
+  });
+
+  readonly metaFields = computed(() =>
+    this.drawerFields().filter((field) => field.section === 'meta')
+  );
+
+  readonly contentFields = computed(() =>
+    this.drawerFields().filter((field) => field.section === 'content')
+  );
 
   constructor() {
     effect(() => {
@@ -99,86 +127,49 @@ export class ShowcaseNewsDrawerComponent implements OnDestroy {
     this.closeDrawer.emit();
   }
 
-  protected actionLabel(item: NewsItem): string | null {
-    switch (item.actionType) {
-      case 'VIEW_BLOCK':
-        return 'Voir le bloc';
-      case 'VIEW_PENDING':
-        return 'Voir les pending';
-      case 'OPEN_PENDING':
-        return 'Voir les pending';
-      case 'OPEN_PEERS':
-        return 'Ouvrir Peers';
-      case 'OPEN_FAUCET':
-        return 'Ouvrir Faucet';
-      case 'OPEN_SWAP':
-        return 'Ouvrir Swap';
-      case 'OPEN_WALLET':
-        return 'Ouvrir Wallet';
-      default:
-        return null;
-    }
+  protected drawerTitle(item: NewsItem): string {
+    return formatNewsDisplayTitle(item);
   }
 
-  protected formatPublishedAt(value: string): string {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
+  protected categorySlug(category: string): string {
+    return normalizeNewsCategorySlug(category);
+  }
 
-    return date.toLocaleString('fr-FR', {
-      day: '2-digit',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  protected categoryAbbrev(item: NewsItem): string {
+    return newsCategoryAbbrev(item.category, item.source);
   }
 
   protected categoryLabel(category: string): string {
     return this.newsState.categoryLabel(category);
   }
 
-  protected categoryIcon(category: string): string {
-    return this.newsState.categoryIcon(category);
-  }
-
   protected sourceLabel(source: NewsSource): string {
-    switch (source) {
-      case 'CHAIN':
-        return 'On-chain';
-      case 'EDITORIAL':
-        return 'Édito';
-      default:
-        return source;
-    }
+    return drawerSourceLabel(source);
   }
 
-  protected targetLabel(item: NewsItem): string {
-    if (!item.actionTarget) {
-      return '—';
-    }
-
+  protected actionLabel(item: NewsItem): string | null {
     switch (item.actionType) {
       case 'VIEW_BLOCK':
-        return `Bloc #${item.actionTarget}`;
+        return 'Voir bloc';
+      case 'VIEW_PENDING':
+      case 'OPEN_PENDING':
+        return 'Pending';
+      case 'OPEN_PEERS':
+        return 'Peers';
+      case 'OPEN_FAUCET':
+        return 'Faucet';
+      case 'OPEN_SWAP':
+        return 'Swap';
+      case 'OPEN_WALLET':
+        return 'Wallet';
       default:
-        return item.actionTarget;
+        return null;
     }
-  }
-
-  protected summaryText(item: NewsItem): string {
-    return item.summary?.trim() || item.body?.trim() || 'Aucun résumé disponible.';
-  }
-
-  protected showDetailSection(item: NewsItem): boolean {
-    const summary = item.summary?.trim() ?? '';
-    const body = item.body?.trim() ?? '';
-    return body.length > 0 && body !== summary;
   }
 
   protected copyButtonLabel(): string {
     if (this.copied()) {
-      return 'Copié ✓';
+      return 'Copié';
     }
     if (this.copyFailed()) {
       return 'Échec';
@@ -188,8 +179,14 @@ export class ShowcaseNewsDrawerComponent implements OnDestroy {
 
   protected async onCopy(news: NewsItem, event: Event): Promise<void> {
     event.stopPropagation();
-
     const text = buildNewsCopyText(news);
+    const ok = await this.copyPlainText(text);
+    if (ok) {
+      this.copySummary.emit(news);
+    }
+  }
+
+  private async copyPlainText(text: string): Promise<boolean> {
     const ok = await copyTextToClipboard(text);
 
     if (this.copyResetTimer !== null) {
@@ -200,12 +197,11 @@ export class ShowcaseNewsDrawerComponent implements OnDestroy {
     if (ok) {
       this.copied.set(true);
       this.copyFailed.set(false);
-      this.copySummary.emit(news);
       this.copyResetTimer = window.setTimeout(() => {
         this.copied.set(false);
         this.copyResetTimer = null;
       }, 2_000);
-      return;
+      return true;
     }
 
     this.copied.set(false);
@@ -214,5 +210,6 @@ export class ShowcaseNewsDrawerComponent implements OnDestroy {
       this.copyFailed.set(false);
       this.copyResetTimer = null;
     }, 2_000);
+    return false;
   }
 }

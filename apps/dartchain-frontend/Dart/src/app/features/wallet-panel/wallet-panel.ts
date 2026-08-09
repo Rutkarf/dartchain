@@ -37,6 +37,10 @@ import {
   displayR4v3Address,
   normalizeAddressForApi,
 } from '../../core/utils/wallet-address.util';
+import {
+  DOCK_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 
 @Component({
   selector: 'app-wallet-panel',
@@ -325,6 +329,13 @@ export class WalletPanelComponent implements OnInit {
     this.fetchBalance(address, true);
   }
 
+  @HostListener(`window:${DOCK_REFRESH_EVENT}`, ['$event'])
+  onDockRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'wallet')) {
+      this.refreshAll();
+    }
+  }
+
   protected refreshMyBalance(): void {
     const address = this.balanceWatchAddress();
 
@@ -556,10 +567,7 @@ export class WalletPanelComponent implements OnInit {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(r4v3Amount);
-    return this.locale
-      .t('wallet.fiatApprox')
-      .replace('{chf}', amount)
-      .replace('{gbp}', amount);
+    return this.locale.t('wallet.fiatApprox').replace('{chf}', amount);
   }
 
   protected sendAction(): void {

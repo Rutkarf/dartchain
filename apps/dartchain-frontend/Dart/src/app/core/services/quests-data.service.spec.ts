@@ -50,7 +50,7 @@ describe('QuestsDataService', () => {
 
   it('should schedule refresh on external events', async () => {
     service.init();
-    window.dispatchEvent(new CustomEvent('naivechain-refresh'));
+    window.dispatchEvent(new CustomEvent('dartchain-refresh-dock'));
     await new Promise((resolve) => window.setTimeout(resolve, 600));
     expect(questsPanelService.loadCatalogAsync).toHaveBeenCalled();
     service.destroy();

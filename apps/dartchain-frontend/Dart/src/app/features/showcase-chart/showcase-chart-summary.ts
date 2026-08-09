@@ -2,23 +2,28 @@ import {
   ChangeDetectionStrategy,
   Component,
   HostBinding,
-  OnDestroy,
-  OnInit,
   inject,
+  input,
+  output,
 } from '@angular/core';
 
 import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
 import { ChartSummaryStateService } from '../../core/services/chart-summary-state.service';
+import { CollapsedBarActionsComponent } from '../collapsed-bar-actions/collapsed-bar-actions';
 
 @Component({
   selector: 'app-showcase-chart-summary',
   standalone: true,
+  imports: [CollapsedBarActionsComponent],
   templateUrl: './showcase-chart-summary.html',
   styleUrls: ['./showcase-chart-summary.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ShowcaseChartSummaryComponent implements OnInit, OnDestroy {
+export class ShowcaseChartSummaryComponent {
   protected readonly state = inject(ChartSummaryStateService);
+
+  readonly collapseAriaLabel = input('Déplier le graphique');
+  readonly collapseToggle = output<void>();
 
   @HostBinding('class')
   readonly hostClasses = `${COLLAPSED_SUMMARY_BAR_CLASS} chart-summary-bar__host is-chart`;
@@ -38,20 +43,9 @@ export class ShowcaseChartSummaryComponent implements OnInit, OnDestroy {
   readonly loading = this.state.loading;
   readonly error = this.state.error;
 
-  ngOnInit(): void {
-    window.addEventListener('naivechain-refresh', this.onGlobalRefresh);
-  }
-
-  ngOnDestroy(): void {
-    window.removeEventListener('naivechain-refresh', this.onGlobalRefresh);
-  }
-
-  private onGlobalRefresh = (): void => {
-    this.state.refresh();
-  };
-
   onRefresh(event: Event): void {
     event.stopPropagation();
+    // Refresh Graph uniquement (pas de broadcast global).
     this.state.refresh();
   }
 }

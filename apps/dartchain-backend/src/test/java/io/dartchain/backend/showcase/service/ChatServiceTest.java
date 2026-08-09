@@ -47,7 +47,8 @@ class ChatServiceTest {
                         "#ff4d6d",
                         "transparent",
                         "center",
-                        "neon"
+                        "neon",
+                        null
                 )
         );
 
@@ -63,7 +64,7 @@ class ChatServiceTest {
         chatService.postMessage(new ChatMessageRequest(
                 "Bob", "Hi", null, null,
                 null, null, null, null, null, null,
-                null, null, null, null
+                null, null, null, null, null
         ));
 
         List<ChatMessageResponse> messages = chatService.getRecentMessages(null, 10);
@@ -78,7 +79,7 @@ class ChatServiceTest {
                 chatService.postMessage(new ChatMessageRequest(
                         "Alice", "  ", null, null,
                         null, null, null, null, null, null,
-                        null, null, null, null
+                        null, null, null, null, null
                 ))
         ).isInstanceOf(IllegalArgumentException.class);
     }

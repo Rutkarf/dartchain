@@ -1,97 +1,129 @@
 <div class="showcase-view showcase-view--r4v3" role="region" aria-label="Hub d'information R4V3">
   @if (isExpanded) {
-    <div class="showcase-r4v3__peg-banner" [attr.aria-label]="liveAriaLabel()">
-      <span
-        class="showcase-r4v3__status-led showcase-r4v3__status-led--banner"
-        [class]="systemStatusClass(systemStatus())"
-        aria-hidden="true"
-      ></span>
-      <span class="showcase-r4v3__peg showcase-r4v3__peg--hero">{{ pegDisplayLabel() }}</span>
-      <button
-        type="button"
-        class="showcase-r4v3__doc-icon showcase-r4v3__doc-icon--peg"
-        (click)="openWhitepaper($event)"
-        [attr.aria-label]="whitepaperLoading() ? 'Ouverture…' : 'White paper R4V3'"
-        [attr.aria-busy]="whitepaperLoading()"
-        title="White paper"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+    <button
+      type="button"
+      class="showcase-r4v3__rail-btn showcase-r4v3__rail-btn--left"
+      [class.showcase-r4v3__rail-btn--active]="isWikiDrawerOpen()"
+      (click)="toggleOfficialWiki()"
+      aria-haspopup="dialog"
+      [attr.aria-expanded]="isWikiDrawerOpen()"
+      [attr.aria-label]="
+        isWikiDrawerOpen() ? 'Fermer le wiki' : 'Wiki — ' + faqCountLabel()
+      "
+      [attr.title]="isWikiDrawerOpen() ? 'Fermer le wiki' : 'Ouvrir le wiki R4V3'"
+    >
+      <span class="showcase-r4v3__rail-btn-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          <path d="M8 7h8M8 11h6" />
         </svg>
-      </button>
-    </div>
+      </span>
+      <span class="showcase-r4v3__rail-btn-label">Wiki</span>
+    </button>
 
-    @if (whitepaperFeedback()) {
-      <p class="showcase-r4v3__doc-feedback" role="status">{{ whitepaperFeedback() }}</p>
-    }
-
-    <div #contentPanel class="showcase-r4v3__content">
-      <div class="showcase-r4v3__dashboard">
-        <section class="showcase-r4v3__hero" aria-label="Piliers R4V3">
-          <div class="showcase-r4v3__pillar-grid">
-            @for (column of pillarColumns; track column[0].id; let colIndex = $index) {
-              <div class="showcase-r4v3__pillar-column" [attr.aria-label]="'Colonne ' + (colIndex + 1)">
-                @for (pillar of column; track pillar.id) {
-                  <button
-                    type="button"
-                    class="showcase-r4v3__pillar"
-                    [class]="pillarAccentClass(pillar)"
-                    (click)="openPillar(pillar)"
-                    [attr.aria-label]="pillar.label + ' — ' + pillar.detail"
-                  >
-                    <span class="showcase-r4v3__pillar-glow" aria-hidden="true"></span>
-                    <span class="showcase-r4v3__pillar-icon" aria-hidden="true">{{ pillar.icon }}</span>
-                    <span class="showcase-r4v3__pillar-copy">
-                      <strong class="showcase-r4v3__pillar-label">{{ pillar.label }}</strong>
-                      <span class="showcase-r4v3__pillar-detail">{{ pillar.detail }}</span>
-                    </span>
-                    <span class="showcase-r4v3__pillar-chevron" aria-hidden="true">›</span>
-                  </button>
-                }
-              </div>
-            }
-          </div>
-        </section>
-
-        <nav class="showcase-r4v3__section-nav" aria-label="Wiki et FAQ communautaire">
-          <button
-            type="button"
-            class="showcase-r4v3__section-link showcase-r4v3__section-link--official"
-            (click)="openOfficialWiki()"
-            aria-haspopup="dialog"
-            [attr.aria-label]="'Base officielle — ' + faqCountLabel()"
-          >
-            <span class="showcase-r4v3__section-link-label">Base officielle</span>
-          </button>
-
-          <button
-            type="button"
-            class="showcase-r4v3__section-link showcase-r4v3__section-link--community"
-            (click)="openCommunityFormDrawer()"
-            aria-haspopup="dialog"
-            [attr.aria-label]="'FAQ communautaire — ' + communityCountLabel()"
-          >
-            <span class="showcase-r4v3__section-link-label">FAQ communautaire</span>
-          </button>
-        </nav>
+    <div class="showcase-r4v3__main">
+      <div class="showcase-r4v3__peg-banner" [attr.aria-label]="liveAriaLabel()">
+        <div class="showcase-r4v3__peg-banner-main">
+          <span
+            class="showcase-r4v3__status-led showcase-r4v3__status-led--banner"
+            [class]="systemStatusClass(systemStatus())"
+            aria-hidden="true"
+          ></span>
+          <span class="showcase-r4v3__peg showcase-r4v3__peg--hero" aria-label="1 R4V3 = 1 CHF">
+            <span class="showcase-r4v3__peg-part showcase-r4v3__peg-part--token">1 R4V3</span>
+            <span class="showcase-r4v3__peg-eq" aria-hidden="true">=</span>
+            <span class="showcase-r4v3__peg-part showcase-r4v3__peg-part--fiat">1 CHF</span>
+          </span>
+        </div>
       </div>
+
+      @if (whitepaperFeedback()) {
+        <p class="showcase-r4v3__doc-feedback" role="status">{{ whitepaperFeedback() }}</p>
+      }
+
+      <div #contentPanel class="showcase-r4v3__content">
+        <div class="showcase-r4v3__dashboard">
+          <section class="showcase-r4v3__hero" aria-label="Piliers R4V3">
+            <div class="showcase-r4v3__pillar-grid">
+              @for (column of pillarColumns; track column[0].id; let colIndex = $index) {
+                <div class="showcase-r4v3__pillar-column" [attr.aria-label]="'Colonne ' + (colIndex + 1)">
+                  @for (pillar of column; track pillar.id) {
+                    <button
+                      type="button"
+                      class="showcase-r4v3__pillar"
+                      [class]="pillarAccentClass(pillar)"
+                      (click)="openPillar(pillar)"
+                      [attr.aria-label]="pillar.label + ' — ' + pillar.detail"
+                    >
+                      <span class="showcase-r4v3__pillar-glow" aria-hidden="true"></span>
+                      <span class="showcase-r4v3__pillar-icon" aria-hidden="true">{{ pillar.icon }}</span>
+                      <span class="showcase-r4v3__pillar-copy">
+                        <strong class="showcase-r4v3__pillar-label">{{ pillar.label }}</strong>
+                        <span class="showcase-r4v3__pillar-detail">{{ pillar.detail }}</span>
+                      </span>
+                      <span class="showcase-r4v3__pillar-chevron" aria-hidden="true">›</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+
+          <nav class="showcase-r4v3__section-nav" aria-label="FAQ communautaire">
+            <button
+              type="button"
+              class="showcase-r4v3__section-link showcase-r4v3__section-link--community"
+              (click)="openCommunityFormDrawer()"
+              aria-haspopup="dialog"
+              [attr.aria-label]="'FAQ communautaire — ' + communityCountLabel()"
+            >
+              <span class="showcase-r4v3__section-link-label">FAQ communautaire</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <app-showcase-r4v3-hub-drawer
+        [payload]="drawerPayload()"
+        [showBackToWiki]="drawerOpenedFromWiki() && drawerPayload()?.kind === 'faq'"
+        [canPrev]="canNavigatePrev()"
+        [canNext]="canNavigateNext()"
+        [itemIndex]="drawerNavIndex()"
+        [itemTotal]="drawerNavTotal()"
+        (closeDrawer)="closeDrawer()"
+        (backToWiki)="backToOfficialWiki()"
+        (navigatePrev)="navigatePrev()"
+        (navigateNext)="navigateNext()"
+        (runAction)="runDrawerAction($event)"
+        (selectOfficialEntry)="openEntry($event, true)"
+        (communityQuestionSubmitted)="onCommunityQuestionSubmitted()"
+      />
     </div>
 
-    <app-showcase-r4v3-hub-drawer
-      [payload]="drawerPayload()"
-      [showBackToWiki]="drawerOpenedFromWiki() && drawerPayload()?.kind === 'faq'"
-      [canPrev]="canNavigatePrev()"
-      [canNext]="canNavigateNext()"
-      [itemIndex]="drawerNavIndex()"
-      [itemTotal]="drawerNavTotal()"
-      (closeDrawer)="closeDrawer()"
-      (backToWiki)="backToOfficialWiki()"
-      (navigatePrev)="navigatePrev()"
-      (navigateNext)="navigateNext()"
-      (runAction)="runDrawerAction($event)"
-      (selectOfficialEntry)="openEntry($event, true)"
-      (communityQuestionSubmitted)="onCommunityQuestionSubmitted()"
-    />
+    <button
+      type="button"
+      class="showcase-r4v3__rail-btn showcase-r4v3__rail-btn--right showcase-r4v3__wp-btn"
+      (click)="openWhitepaper($event)"
+      [attr.aria-label]="
+        whitepaperLoading() ? 'Téléchargement du white paper…' : 'Télécharger le white paper R4V3'
+      "
+      [attr.aria-busy]="whitepaperLoading()"
+      [attr.title]="
+        whitepaperLoading() ? 'Téléchargement…' : 'Télécharger le white paper R4V3'
+      "
+    >
+      <span class="showcase-r4v3__rail-btn-icon showcase-r4v3__wp-btn-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <path d="M14 2v6h6" />
+          <path d="M12 11v7" />
+          <path d="M9 15l3 3 3-3" />
+        </svg>
+      </span>
+      <span class="showcase-r4v3__rail-btn-label showcase-r4v3__wp-btn-label">
+        {{ whitepaperLoading() ? 'Ouverture…' : 'White paper' }}
+      </span>
+    </button>
   }
 </div>

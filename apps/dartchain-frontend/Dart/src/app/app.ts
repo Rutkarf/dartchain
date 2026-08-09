@@ -56,6 +56,25 @@ import { AdminPanelComponent } from './features/admin-panel/admin-panel';
 import { DockBottomSummaryComponent } from './features/dock-summary/dock-bottom-summary';
 import { AuthDrawerComponent } from './features/auth-drawer/auth-drawer';
 import { FaucetRuntimeService } from './core/services/faucet-runtime.service';
+import { CollapsedBarActionsComponent } from './features/collapsed-bar-actions/collapsed-bar-actions';
+import { ChartSummaryStateService } from './core/services/chart-summary-state.service';
+import { ShowcaseR4v3StateService } from './core/services/showcase-r4v3-state.service';
+import { ShowcaseTerminalStateService } from './core/services/showcase-terminal-state.service';
+import { ShowcaseChatStateService } from './core/services/showcase-chat-state.service';
+import { ShowcaseLaunchStateService } from './core/services/showcase-launch-state.service';
+import { ShowcaseDaoStateService } from './core/services/showcase-dao-state.service';
+import {
+  DOCK_REFRESH_EVENT,
+  SHOWCASE_REFRESH_EVENT,
+  TERMINAL_REFRESH_EVENT,
+} from './core/constants/panel-refresh.constants';
+import { DockWalletStateService } from './core/services/dock-wallet-state.service';
+import { TransactionsDataService } from './core/services/transactions-data.service';
+import { DockChainStateService } from './core/services/dock-chain-state.service';
+import { ChainDataService } from './core/services/chain-data.service';
+import { MarketDataService } from './core/services/market-data.service';
+import { QuestsDataService } from './core/services/quests-data.service';
+import { PeersDataService } from './core/services/peers-data.service';
 
 @Component({
   selector: 'app-root',
@@ -85,6 +104,7 @@ import { FaucetRuntimeService } from './core/services/faucet-runtime.service';
     AdminPanelComponent,
     DockBottomSummaryComponent,
     AuthDrawerComponent,
+    CollapsedBarActionsComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -104,6 +124,19 @@ export class AppComponent {
   private readonly blockchain = inject(BlockchainApiService);
   private readonly newsState = inject(ShowcaseNewsStateService);
   private readonly showcaseHubUi = inject(ShowcaseHubUiService);
+  private readonly chartSummary = inject(ChartSummaryStateService);
+  private readonly r4v3State = inject(ShowcaseR4v3StateService);
+  private readonly terminalState = inject(ShowcaseTerminalStateService);
+  private readonly chatState = inject(ShowcaseChatStateService);
+  private readonly launchState = inject(ShowcaseLaunchStateService);
+  private readonly daoState = inject(ShowcaseDaoStateService);
+  private readonly dockWalletState = inject(DockWalletStateService);
+  private readonly transactionsData = inject(TransactionsDataService);
+  private readonly dockChainState = inject(DockChainStateService);
+  private readonly chainData = inject(ChainDataService);
+  private readonly marketData = inject(MarketDataService);
+  private readonly questsData = inject(QuestsDataService);
+  private readonly peersData = inject(PeersDataService);
 
   readonly activeShowcaseTab = signal<ShowcaseTab>('tours');
   readonly activeBottomTab = signal<BottomDockTab>('wallet');
@@ -123,9 +156,8 @@ export class AppComponent {
     const unbindViewport = bindViewportCompactClass();
     this.destroyRef.onDestroy(() => unbindViewport());
 
-    if (this.product.faucetEnabled) {
-      this.faucetRuntime.start();
-    }
+    // Faucet toujours démarré — feature vedette, tous environnements.
+    this.faucetRuntime.start();
 
     this.questProgress.recordDailyLogin();
 
@@ -244,6 +276,128 @@ export class AppComponent {
 
   toggleDockCollapsed(): void {
     this.dockCollapsed.update((collapsed) => !collapsed);
+  }
+
+  /** Refresh isolé Graph — n’impacte ni showcase ni dock. */
+  refreshGraphPanel(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.chartSummary.refresh();
+  }
+
+  /** Refresh isolé Showcase — onglet actif (barre repliée + panneau déplié). */
+  refreshShowcasePanel(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const tab = this.activeShowcaseTab();
+    this.refreshShowcaseSummaryState(tab);
+    window.dispatchEvent(
+      new CustomEvent(SHOWCASE_REFRESH_EVENT, { detail: { tab } })
+    );
+    if (tab === 'reseau' || tab === 'peers') {
+      window.dispatchEvent(new CustomEvent(TERMINAL_REFRESH_EVENT));
+    }
+  }
+
+  private refreshShowcaseSummaryState(tab: ShowcaseTab): void {
+    switch (tab) {
+      case 'tours':
+        this.newsState.refreshFeed(true);
+        break;
+      case 'r4v3':
+        this.r4v3State.refresh();
+        break;
+      case 'reseau':
+      case 'peers':
+        this.terminalState.setMode(tab === 'peers' ? 'peers' : 'reseau');
+        this.terminalState.refresh();
+        break;
+      case 'rv23':
+        this.chatState.requestRefresh();
+        break;
+      case 'dao':
+        this.launchState.requestRefresh();
+        break;
+      case 'daonews':
+        this.daoState.refresh();
+        break;
+    }
+  }
+
+  /** Refresh isolé Dock — onglet actif (barre repliée + panneau déplié). */
+  refreshDockPanel(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const tab = this.activeBottomTab();
+    this.refreshDockSummaryState(tab);
+    window.dispatchEvent(new CustomEvent(DOCK_REFRESH_EVENT, { detail: { tab } }));
+  }
+
+  private refreshDockSummaryState(tab: BottomDockTab): void {
+    switch (tab) {
+      case 'wallet':
+        this.dockWalletState.refresh();
+        break;
+      case 'faucet':
+        this.faucetRuntime.refreshPanel();
+        break;
+      case 'transactions':
+        this.transactionsData.scheduleRefresh(true);
+        break;
+      case 'chain':
+        this.dockChainState.refresh(true);
+        this.chainData.scheduleRefresh(true);
+        break;
+      case 'market':
+        void this.marketData.refreshAll(true);
+        break;
+      case 'quests':
+        this.questsData.scheduleRefresh(true);
+        break;
+      case 'peers':
+        this.peersData.scheduleRefresh(true);
+        break;
+    }
+  }
+
+  showcaseRefreshBusy(): boolean {
+    switch (this.activeShowcaseTab()) {
+      case 'tours':
+      case 'daonews':
+        return this.newsState.loading();
+      case 'r4v3':
+        return this.r4v3State.refreshing() || this.r4v3State.loading();
+      case 'reseau':
+      case 'peers':
+        return this.terminalState.loading();
+      case 'rv23':
+        return this.chatState.refreshing();
+      case 'dao':
+        return this.launchState.loading();
+      default:
+        return false;
+    }
+  }
+
+  dockRefreshBusy(): boolean {
+    switch (this.activeBottomTab()) {
+      case 'wallet':
+        return this.dockWalletState.loading();
+      case 'faucet':
+        return this.faucetRuntime.loading();
+      case 'transactions':
+        return this.transactionsData.pendingLoading() || this.transactionsData.tipLoading();
+      case 'chain':
+        return this.dockChainState.loading();
+      case 'market':
+        return this.marketData.loadingRows() || this.marketData.loadingChart();
+      case 'quests':
+        return this.questsData.loading();
+      case 'peers':
+        return this.peersData.loading();
+      default:
+        return false;
+    }
   }
 
   chartCollapseLabel(): string {

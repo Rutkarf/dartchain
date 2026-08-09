@@ -133,7 +133,7 @@ describe('QuestsPanel', () => {
     expect(element.querySelector('.quests-panel__countdown-value')?.textContent).toContain('11:59:59');
     expect(element.querySelector('.quests-panel__section-title')).toBeNull();
     expect(element.querySelector('.quests-panel__stat-stack')).toBeNull();
-    expect(element.querySelector('.quests-panel__refresh')).toBeTruthy();
+    expect(element.querySelector('.quests-panel__refresh')).toBeFalsy();
     expect(element.querySelector('.quests-panel.ds-surface')).toBeTruthy();
   });
 
@@ -166,7 +166,7 @@ describe('QuestsPanel', () => {
     await setup();
     const element = fixture.nativeElement as HTMLElement;
     expect(element.querySelector('.quests-panel__progress-inline')).toBeTruthy();
-    expect(element.querySelector('.quests-panel__refresh')).toBeTruthy();
+    expect(element.querySelector('.quests-panel__refresh')).toBeFalsy();
     const weeklyBtn = element.querySelector('.quests-panel__weekly-btn') as HTMLButtonElement;
     expect(weeklyBtn.disabled).toBe(true);
     expect(element.querySelector('.quests-panel__list')).toBeTruthy();

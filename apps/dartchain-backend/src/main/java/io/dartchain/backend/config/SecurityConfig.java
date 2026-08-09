@@ -60,6 +60,8 @@ public class SecurityConfig {
                                 "/actuator/info"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/showcase/chat/messages").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/showcase/chat/messages").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

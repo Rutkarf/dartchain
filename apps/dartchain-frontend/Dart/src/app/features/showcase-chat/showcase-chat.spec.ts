@@ -30,6 +30,7 @@ describe('ShowcaseChatComponent (Phase V)', () => {
             disconnect: vi.fn(),
             sendMessage: vi.fn(),
             refreshMessages: vi.fn(() => Promise.resolve()),
+            clearChat: vi.fn(() => Promise.resolve()),
           },
         },
         {
@@ -66,7 +67,7 @@ describe('ShowcaseChatComponent (Phase V)', () => {
     expect(fixture.nativeElement.querySelector('.showcase-chat__live-led')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.showcase-meta__room')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-meta__rail')).toBeFalsy();
-    expect(fixture.nativeElement.querySelector('.showcase-meta__refresh')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-meta__refresh')).toBeFalsy();
     expect(fixture.nativeElement.textContent).toContain('Envoyer');
   });
 });

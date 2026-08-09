@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   HostBinding,
+  HostListener,
   Input,
   ViewChild,
   computed,
@@ -18,10 +19,13 @@ import {
   isExchangeNativeToken,
   isLaunchpadSwapToken,
 } from '../../core/constants/exchange-launchpad.constants';
-import { AuthService } from '../../core/services/auth.service';
 import { BrandCryptoSelectionService } from '../../core/services/brand-crypto-selection.service';
 import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-state.service';
 import { ShowcaseLaunchProjectDrawerComponent } from './showcase-launch-project-drawer';
+import {
+  SHOWCASE_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 
 @Component({
   selector: 'app-showcase-launch',
@@ -51,7 +55,6 @@ export class ShowcaseLaunchComponent {
   }
 
   private readonly brandCrypto = inject(BrandCryptoSelectionService);
-  protected readonly auth = inject(AuthService);
   protected readonly launchState = inject(ShowcaseLaunchStateService);
 
   readonly loading = this.launchState.loading;
@@ -93,10 +96,6 @@ export class ShowcaseLaunchComponent {
     });
   });
 
-  readonly launchCtaLabel = computed(() =>
-    this.auth.isAuthenticated() ? 'Lancer un projet' : 'Connexion requise'
-  );
-
   constructor() {
     if (this.launchState.projects().length === 0 && !this.launchState.loading()) {
       this.launchState.loadProjects();
@@ -119,6 +118,13 @@ export class ShowcaseLaunchComponent {
 
   protected refresh(): void {
     this.launchState.requestRefresh();
+  }
+
+  @HostListener(`window:${SHOWCASE_REFRESH_EVENT}`, ['$event'])
+  onShowcaseRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'dao')) {
+      this.refresh();
+    }
   }
 
   protected onSearchInput(value: string): void {

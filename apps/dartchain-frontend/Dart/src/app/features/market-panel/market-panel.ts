@@ -37,6 +37,10 @@ import {
 } from './market-panel.model';
 import { MarketPanelService } from './market-panel.service';
 import { MarketTokenDrawerComponent } from './market-token-drawer';
+import {
+  DOCK_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 
 type StatusBannerTone = 'error' | 'warn' | 'info';
 
@@ -481,7 +485,7 @@ export class MarketPanelComponent implements OnDestroy {
 
     return trimmed
       .replace('LaunchLab', 'LL')
-      .replace('Peg CHF/GBP', 'Peg')
+      .replace('Peg CHF', 'Peg')
       .replace(/\s+/g, ' ');
   }
 
@@ -529,6 +533,13 @@ export class MarketPanelComponent implements OnDestroy {
     this.marketData.clearAlertNotifications();
     this.loadAvailableTokens();
     void this.marketData.refreshAll(true);
+  }
+
+  @HostListener(`window:${DOCK_REFRESH_EVENT}`, ['$event'])
+  onDockRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'market')) {
+      this.refreshMarket();
+    }
   }
 
   protected resetMarket(): void {

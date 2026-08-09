@@ -62,10 +62,9 @@
               }
               <span class="showcase-chart__hub-symbol">{{ pairBase() }}</span>
             }
-          </div>
-
-          <div class="showcase-chart__hub-hero-search showcase-chart__hub-hero-search--center">
-            <app-chart-token-search [compact]="true" (tokenSelected)="onChartTokenSelected($event)" />
+            <div class="showcase-chart__hub-hero-search">
+              <app-chart-token-search [compact]="true" (tokenSelected)="onChartTokenSelected($event)" />
+            </div>
           </div>
 
           <div class="showcase-chart__hub-hero-actions" aria-label="Contrôles du graphique">
@@ -150,6 +149,15 @@
               </div>
             }
           </div>
+          <app-collapsed-bar-actions
+            class="showcase-chart__hub-collapse"
+            [collapsed]="chartCollapsed()"
+            [collapseAriaLabel]="collapseAriaLabel()"
+            refreshAriaLabel="Actualiser le graphique"
+            [refreshBusy]="loading()"
+            (refresh)="refresh()"
+            (collapseToggle)="collapseToggle.emit()"
+          />
         </div>
         @if (hubLaunchOverlay() && !loading() && !error()) {
           <div class="showcase-chart__dual-legend" aria-label="Légende des courbes">
@@ -255,14 +263,6 @@
         </button>
       </div>
 
-      <button
-        type="button"
-        class="cta cta--swap cta--sm showcase-chart__tool-btn showcase-chart__tool-btn--icon showcase-chart__refresh-btn"
-        title="Actualiser"
-        (click)="refresh()"
-      >
-        ↻
-      </button>
     </div>
     }
 

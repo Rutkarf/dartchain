@@ -14,23 +14,6 @@
       />
       <button
         type="button"
-        class="market-panel__search-reset"
-        (click)="resetMarket()"
-        aria-label="Réinitialiser"
-      >
-        Reset
-      </button>
-      <button
-        type="button"
-        class="market-panel__search-refresh"
-        (click)="refreshMarket()"
-        [disabled]="loadingRows() || loadingChart()"
-        aria-label="Actualiser"
-      >
-        ↻
-      </button>
-      <button
-        type="button"
         class="market-panel__menu-btn"
         (click)="toggleActionsMenu($event)"
         [attr.aria-expanded]="actionsMenuOpen()"

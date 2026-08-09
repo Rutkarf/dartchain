@@ -125,7 +125,7 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
         template: 'features/auth-drawer/auth-drawer.html',
         styles: ['features/auth-drawer/auth-drawer.css'],
         elements: [
-          { id: 'auth-tabs', label: 'Connexion | Inscription', kind: 'tab' },
+          { id: 'auth-tabs', label: 'Inscription | Connexion', kind: 'tab' },
           { id: 'login-form', label: 'identifier, password', kind: 'input' },
           { id: 'register-form', label: 'username, email, password', kind: 'input' },
         ],
@@ -205,11 +205,11 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
   {
     id: 'showcase',
     readingOrder: 2,
-    label: 'Showcase (tabs + chevron + panel)',
+    label: 'Showcase (tabs + seam collapse + panel)',
     notes: [
       'Tabs niveau A : TOUS RÉSEAU CHAT PEERS LAUNCH (showcase-tabs)',
       'Tabs niveau B : filtres catégories news (showcase-news) — logique distincte, rendu à différencier Phase 8–9',
-      'Chevron showcase-toggle : collapse/expand — ne pas supprimer',
+      'Chevron discret haut-droite (showcase-toggle / app-panel-collapse-control) : collapse/expand — ne pas supprimer',
     ],
     components: [
       {
@@ -228,9 +228,15 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'showcase-toggle',
-        template: 'app.html (inline)',
-        styles: ['app.css'],
-        elements: [{ id: 'showcase-chevron', label: 'Chevron remontée panel', kind: 'button' }],
+        template: 'features/panel-collapse-control/panel-collapse-control.html',
+        styles: ['features/panel-collapse-control/panel-collapse-control.css'],
+        elements: [
+          {
+            id: 'showcase-chevron',
+            label: 'Chevron collapse haut-droite (header tabs)',
+            kind: 'button',
+          },
+        ],
         interactions: ['toggleShowcaseCollapsed', 'aria-expanded'],
         dataFields: ['showcaseCollapsed', 'showcaseCollapseLabel'],
       },

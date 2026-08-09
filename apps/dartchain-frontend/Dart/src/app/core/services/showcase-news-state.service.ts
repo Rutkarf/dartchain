@@ -93,11 +93,20 @@ export class ShowcaseNewsStateService {
 
     if (index !== null) {
       const toneLabel =
-        tone === 'pending' ? 'pending' : tone === 'offline' ? 'offline' : 'active';
-      return `Bloc #${index} · ${toneLabel}`;
+        tone === 'pending'
+          ? 'attente'
+          : tone === 'offline'
+            ? 'off'
+            : 'sync';
+      return `#${index} · ${toneLabel}`;
     }
 
-    return this.liveActivity() || 'Hors ligne';
+    const activity = this.liveActivity();
+    if (activity) {
+      return activity.length > 18 ? `${activity.slice(0, 16)}…` : activity;
+    }
+
+    return 'Hors ligne';
   });
 
   readonly chainStatusTooltip = computed(() => {
@@ -268,6 +277,7 @@ export class ShowcaseNewsStateService {
   refreshFeed(showLoading = true, source?: NewsSource | 'all'): void {
     if (showLoading) {
       this.setLoading(true);
+      this.triggerRefreshPulse();
     }
     this.feedError.set(false);
 

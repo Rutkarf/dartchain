@@ -82,7 +82,10 @@
 
   <div class="rate-panel-chart" [class.rate-panel-chart--collapsed]="hubGraphOnly() && chartCollapsed()" aria-label="Graphique marché">
     @if (hubGraphOnly() && chartCollapsed()) {
-      <app-showcase-chart-summary />
+      <app-showcase-chart-summary
+        [collapseAriaLabel]="collapseAriaLabel()"
+        (collapseToggle)="collapseToggle.emit()"
+      />
     }
     <app-showcase-chart
       class="showcase-chart--rate-panel"
@@ -90,6 +93,8 @@
       [class.rate-panel-chart__engine--hidden]="hubGraphOnly() && chartCollapsed()"
       [hubLayout]="hubGraphOnly()"
       [chartCollapsed]="chartCollapsed()"
+      [collapseAriaLabel]="collapseAriaLabel()"
+      (collapseToggle)="collapseToggle.emit()"
     />
   </div>
   </div>

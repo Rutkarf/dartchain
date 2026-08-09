@@ -30,18 +30,6 @@
               </select>
               <span class="showcase-chat__font-chevron" aria-hidden="true"></span>
             </div>
-
-            <button
-              type="button"
-              class="showcase-chat__tool-btn showcase-chat__icon-btn showcase-chat__layout-btn"
-              [attr.aria-label]="bubbleStyleTitle()"
-              [title]="bubbleStyleTitle()"
-              (click)="prefs.cycleBubbleStyle()"
-            >
-              <span class="showcase-chat__layout-glyph" aria-hidden="true">{{
-                bubbleStylePreview()
-              }}</span>
-            </button>
           </div>
 
           <div class="showcase-chat__ribbon-group showcase-chat__ribbon-group--chars">
@@ -87,24 +75,6 @@
                 <span class="showcase-chat__strike">S</span>
               </button>
             </div>
-          </div>
-
-          <div
-            class="showcase-chat__ribbon-group showcase-chat__ribbon-group--styles"
-            role="group"
-            aria-label="Styles rapides"
-          >
-            @for (preset of stylePresets; track preset.label) {
-              <button
-                type="button"
-                class="showcase-chat__tool-btn showcase-chat__icon-btn showcase-chat__style-preset-btn"
-                [title]="preset.title"
-                [attr.aria-label]="preset.title"
-                (click)="applyStylePreset(preset.patch)"
-              >
-                {{ preset.label }}
-              </button>
-            }
           </div>
 
           <div class="showcase-chat__ribbon-group showcase-chat__ribbon-group--colors">
@@ -239,18 +209,15 @@
 
           <button
             type="button"
-            class="showcase-meta__refresh"
-            [class.showcase-meta__refresh--loading]="chatState.refreshing()"
-            (click)="refreshMessages()"
-            [attr.aria-busy]="chatState.refreshing()"
-            [attr.aria-label]="refreshAriaLabel()"
-            title="Actualiser le chat"
+            class="showcase-meta__search-toggle showcase-chat__clear-btn"
+            (click)="clearChat($event)"
+            aria-label="Vider le chat"
+            title="Vider le chat"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M21 12a9 9 0 0 1-15.5 6.36" />
-              <path d="M3 12a9 9 0 0 1 15.5-6.36" />
-              <path d="M17 4v4h-4" />
-              <path d="M7 20v-4h4" />
+              <path d="M4 7h16" />
+              <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              <path d="M7 7l1 12a1 1 0 0 0 1 .9h6a1 1 0 0 0 1-.9l1-12" />
             </svg>
           </button>
         </div>
@@ -275,7 +242,7 @@
       <ul class="showcase-chat__messages" aria-live="polite">
         @for (msg of filteredMessages(); track msg.id) {
           <li [ngClass]="lineNgClass(msg)">
-            <div class="showcase-chat__line-inner">
+            <div class="showcase-chat__line-inner" [ngStyle]="lineStyle(msg)">
               @if (messageTime(msg)) {
                 <span class="showcase-chat__time">{{ messageTime(msg) }}</span>
               } @else {
@@ -301,27 +268,71 @@
     </div>
 
     <form class="showcase-chat__composer" (submit)="onComposerSubmit($event)">
-      @if (!auth.isAuthenticated()) {
+      @if (!auth.isAuthenticated() && !postAsAnonymous()) {
         <p class="showcase-chat__auth-hint" role="note">
-          Connectez-vous pour envoyer un message dans le salon.
+          Connectez-vous, ou activez Anonymous pour poster sans compte.
         </p>
       }
       <div [ngClass]="composerBubbleClass()">
-        <input
-          type="text"
-          class="showcase-chat__input"
-          [placeholder]="auth.isAuthenticated() ? 'Tape ton message…' : 'Connexion requise pour écrire…'"
-          [formControl]="messageControl"
-          [ngStyle]="composerTextStyle()"
-          (keydown)="onKeydown($event)"
-          aria-label="Message chat"
-        />
+        <div
+          class="showcase-chat__identity"
+          role="group"
+          aria-label="Publier en tant que"
+        >
+          <button
+            type="button"
+            class="showcase-chat__identity-btn"
+            [class.is-active]="!postAsAnonymous()"
+            [attr.title]="postIdentityTitle()"
+            [attr.aria-pressed]="!postAsAnonymous()"
+            [attr.aria-label]="postIdentityTitle()"
+            (click)="setPostMode(false, $event)"
+          >
+            {{ postIdentityLabel() }}
+          </button>
+          <button
+            type="button"
+            class="showcase-chat__identity-btn showcase-chat__identity-btn--anon"
+            [class.is-active]="postAsAnonymous()"
+            [attr.title]="postAnonymousTitle()"
+            [attr.aria-pressed]="postAsAnonymous()"
+            [attr.aria-label]="postAnonymousTitle()"
+            (click)="setPostMode(true, $event)"
+          >
+            <span class="showcase-chat__identity-anon-label">Anon</span>
+            <svg class="showcase-chat__anon-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                fill="currentColor"
+                d="M12 2C8.1 2 5 4.6 4 8.1 3.2 9.1 3 10.1 3 11.2V13c0 .6.4 1 1 1h.5v5.8C4.5 21.2 7.8 23 12 23s7.5-1.8 7.5-3.2V14H20c.6 0 1-.4 1-1v-1.8c0-1.1-.2-2.1-.8-3.1C19 4.6 15.9 2 12 2Zm-4.2 8.3a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2Zm8.4 0a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2ZM8.6 15.1c.9-1.2 2.3-1.9 3.9-1.9 1.6 0 3 .7 3.9 1.9.4.5 1 .6 1.5.2.5-.4.6-1.1.2-1.6-1.3-1.7-3.4-2.7-5.6-2.7s-4.3 1-5.6 2.7c-.4.5-.3 1.2.2 1.6.5.4 1.1.3 1.5-.2Z"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="showcase-chat__input-field">
+          @if (!messageControl.value) {
+            <span class="showcase-chat__input-hint" aria-hidden="true">{{
+              composerPlaceholder()
+            }}</span>
+          }
+          <input
+            type="text"
+            class="showcase-chat__input"
+            [formControl]="messageControl"
+            [ngStyle]="composerTextStyle()"
+            (keydown)="onKeydown($event)"
+            aria-label="Message chat"
+          />
+        </div>
         <button
           type="submit"
           class="showcase-chat__send"
-          [disabled]="auth.isAuthenticated() && messageControl.invalid"
+          [disabled]="
+            (auth.isAuthenticated() || postAsAnonymous()) && messageControl.invalid
+          "
+          [attr.title]="sendButtonLabel()"
+          [attr.aria-label]="sendButtonLabel()"
         >
-          {{ sendButtonLabel() }}
+          Envoyer
         </button>
       </div>
     </form>

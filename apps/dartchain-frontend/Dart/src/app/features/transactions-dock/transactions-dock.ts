@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
+  HostListener,
   OnInit,
   ViewChild,
   computed,
@@ -14,6 +15,10 @@ import {
 import { LocaleService } from '../../core/i18n/locale.service';
 import { TransactionsDataService } from '../../core/services/transactions-data.service';
 import { TransactionsDockService } from '../../core/services/transactions-dock.service';
+import {
+  DOCK_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 import { BlockComposerComponent } from '../block-composer/block-composer';
 import { PendingTransactionsComponent } from '../pending-transactions/pending-transactions';
 
@@ -71,6 +76,13 @@ export class TransactionsDockComponent implements OnInit {
   protected refreshAll(): void {
     this.data.init();
     this.data.scheduleRefresh(true);
+  }
+
+  @HostListener(`window:${DOCK_REFRESH_EVENT}`, ['$event'])
+  onDockRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'transactions')) {
+      this.refreshAll();
+    }
   }
 
   protected openLatestBlock(): void {

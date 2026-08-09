@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostListener,
   OnDestroy,
   computed,
   inject,
@@ -24,6 +25,10 @@ import { QuestsDataService } from '../../core/services/quests-data.service';
 import { WalletSessionService } from '../../core/services/wallet-session.service';
 import { QuestTaskView } from './quests-panel.model';
 import { QuestsPanelService } from './quests-panel.service';
+import {
+  DOCK_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 
 @Component({
   selector: 'app-quests-panel',
@@ -179,6 +184,13 @@ export class QuestsPanelComponent implements OnDestroy {
   protected refreshQuests(): void {
     this.questsData.error.set(null);
     void this.questsData.refreshAll(true);
+  }
+
+  @HostListener(`window:${DOCK_REFRESH_EVENT}`, ['$event'])
+  onDockRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'quests')) {
+      this.refreshQuests();
+    }
   }
 
   protected dismissError(): void {

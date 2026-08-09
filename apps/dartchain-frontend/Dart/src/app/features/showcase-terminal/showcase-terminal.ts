@@ -23,6 +23,11 @@ import {
   PeerView,
 } from '../../core/services/blockchain-api.service';
 import { ShowcaseNewsStateService } from '../../core/services/showcase-news-state.service';
+import {
+  SHOWCASE_REFRESH_EVENT,
+  TERMINAL_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 
 export type TerminalStatusKind = 'confirmed' | 'validated' | 'info' | 'sync';
 
@@ -167,8 +172,15 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
     }
   }
 
-  @HostListener('window:naivechain-refresh')
-  onGlobalRefresh(): void {
+  @HostListener(`window:${TERMINAL_REFRESH_EVENT}`)
+  @HostListener(`window:${SHOWCASE_REFRESH_EVENT}`, ['$event'])
+  onGlobalRefresh(event?: Event): void {
+    if (event?.type === SHOWCASE_REFRESH_EVENT) {
+      const tab = this.modeValue();
+      if (!refreshEventMatchesTab(event, tab)) {
+        return;
+      }
+    }
     void this.refresh();
   }
 

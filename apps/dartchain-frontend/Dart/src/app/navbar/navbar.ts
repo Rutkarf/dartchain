@@ -57,7 +57,7 @@ export class NavbarComponent implements AfterViewInit {
   @ViewChild('brandRow', { read: ElementRef })
   brandRowRef?: ElementRef<HTMLElement>;
 
-  /** Une seule variante auth visible : logout OU (connexion + inscription), jamais les deux. */
+  /** Invité : inscription + connexion. Connecté : pseudo + déconnexion uniquement. */
   readonly authStripMode = computed(() =>
     this.auth.isAuthenticated() ? ('logout' as const) : ('guest' as const)
   );

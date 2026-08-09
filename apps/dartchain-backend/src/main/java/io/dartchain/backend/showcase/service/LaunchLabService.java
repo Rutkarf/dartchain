@@ -46,7 +46,7 @@ public class LaunchLabService {
                         "8100",
                         "25000",
                         null,
-                        "Token natif de l'écosystème DartChain, indexé CHF/GBP.",
+                        "Token natif de l'écosystème DartChain, indexé CHF.",
                         "https://dartchain.io/whitepaper/r4v3.pdf",
                         "https://dartchain.io",
                         "2026-Q1"

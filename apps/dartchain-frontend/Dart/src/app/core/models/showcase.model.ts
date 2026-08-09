@@ -72,6 +72,7 @@ export interface ChatMessage {
   author: string;
   text: string;
   sentAt: string;
+  clientId?: string;
   fontKey?: string;
   fontSize?: string;
   bold?: boolean;
@@ -105,6 +106,7 @@ export interface PostChatMessageRequest {
   highlightColor?: string;
   textAlign?: string;
   styleKey?: string;
+  anonymous?: boolean;
 }
 
 export type ChartRange = '1h' | '24h' | '7d' | '30d' | '90d' | '365d';

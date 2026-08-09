@@ -1,0 +1,15 @@
+<button
+  type="button"
+  class="panel-collapse-control showcase-toggle"
+  [class.is-collapsed]="collapsed()"
+  [attr.aria-label]="ariaLabel()"
+  [attr.title]="ariaLabel()"
+  [attr.aria-expanded]="!collapsed()"
+  (click)="onActivate($event)"
+>
+  <span
+    class="panel-collapse-control__chevron"
+    [class.is-collapsed]="collapsed()"
+    aria-hidden="true"
+  ></span>
+</button>

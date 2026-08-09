@@ -300,7 +300,7 @@ export class MarketPanelService {
         ? `${launchProject.raised} / ${launchProject.target}`
         : launchProject.raised
       : row.config.native
-        ? 'Peg CHF/GBP'
+        ? 'Peg CHF'
         : '—';
 
     const holdersLabel = this.estimateHolders(row.config.exchangeToken, launchProject);
@@ -523,7 +523,7 @@ export class MarketPanelService {
         price: '1,00 CHF',
         changePercent: 0,
         positive: true,
-        volume: 'Peg CHF/GBP',
+        volume: 'Peg CHF',
         priceUnavailable: false,
         rate: 1,
       },

@@ -45,7 +45,7 @@ export class PeersDataService {
     }
 
     this.started = true;
-    window.addEventListener('naivechain-refresh', this.onExternalRefresh);
+    window.addEventListener('dartchain-refresh-dock', this.onExternalRefresh);
     this.startLiveUpdates();
 
     this.pollTimerId = window.setInterval(() => {
@@ -56,7 +56,7 @@ export class PeersDataService {
   }
 
   destroy(): void {
-    window.removeEventListener('naivechain-refresh', this.onExternalRefresh);
+    window.removeEventListener('dartchain-refresh-dock', this.onExternalRefresh);
 
     if (this.pollTimerId !== null) {
       window.clearInterval(this.pollTimerId);

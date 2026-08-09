@@ -1,202 +1,308 @@
-.dao-drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1200;
-  display: flex;
-  justify-content: flex-end;
-  background: rgba(0, 0, 0, 0.42);
-  backdrop-filter: blur(2px);
+/* Drawer DAO — viewport 300×600 px, sans scroll */
+:host {
+  display: contents;
+
+  --drawer-label: 6px;
+  --drawer-value: 7px;
+  --drawer-title: 8px;
+  --drawer-head-h: 13px;
+  --drawer-control: 11px;
+  --drawer-row-h: 10px;
+  --drawer-field-label-w: 44px;
+  --drawer-form-h: 21px;
+
+  --dao-drawer-cyan: 92, 225, 255;
+  --dao-drawer-green: 61, 214, 140;
+  --dao-drawer-purple: 168, 85, 247;
 }
 
-.dao-drawer {
+.dao-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
   display: flex;
-  flex-direction: column;
-  width: min(100%, 360px);
+  padding: 1px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: dao-drawer-backdrop-in 140ms ease-out both;
+}
+
+.dao-drawer.news-insight-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
   max-height: 100%;
-  margin-left: auto;
-  border-left: 1px solid rgba(var(--accent-primary-rgb), 0.18);
-  animation: dao-drawer-slide-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: grid;
+  grid-template-rows: var(--drawer-head-h) minmax(0, 1fr);
+  overflow: hidden;
+  outline: none;
+  border-radius: 3px;
+  isolation: isolate;
+  background-color: rgba(6, 10, 16, 0.98);
+  border: 1px solid rgba(var(--dao-drawer-cyan), 0.28);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  animation: dao-drawer-panel-in 160ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dao-drawer.ds-surface::before,
+.dao-drawer.ds-surface::after {
+  opacity: 0.1;
 }
 
 .dao-drawer__head {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 10px 8px;
-  border-bottom: 1px solid rgba(var(--accent-primary-rgb), 0.12);
+  align-items: center;
+  min-height: 0;
+  padding: 0 2px;
+  border-bottom: 1px solid rgba(var(--dao-drawer-cyan), 0.14);
+  background: rgba(var(--dao-drawer-cyan), 0.05);
+  overflow: hidden;
 }
 
-.dao-drawer__identity {
-  display: flex;
+.dao-drawer__head-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto var(--drawer-control);
   align-items: center;
-  gap: 8px;
+  gap: 3px;
+  width: 100%;
   min-width: 0;
+  height: var(--drawer-head-h);
 }
 
 .dao-drawer__logo {
-  width: 28px;
-  height: 28px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid rgba(var(--accent-primary-rgb), 0.22);
+  border: 1px solid rgba(var(--dao-drawer-cyan), 0.35);
 }
 
 .dao-drawer__logo--placeholder {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.625rem;
-  font-weight: 800;
-  color: var(--text-bright);
+  display: inline-grid;
+  place-items: center;
+  font-size: 5px;
+  font-weight: 900;
+  color: #fff;
   background: linear-gradient(
     135deg,
-    rgba(var(--accent-primary-rgb), 0.35),
-    rgba(var(--accent-primary-rgb), 0.18)
+    rgba(var(--dao-drawer-cyan), 0.35),
+    rgba(var(--dao-drawer-purple), 0.28)
   );
-}
-
-.dao-drawer__identity-copy {
-  min-width: 0;
-}
-
-.dao-drawer__eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 0 2px;
-}
-
-.dao-drawer__status {
-  padding: 1px 5px;
-  border-radius: 999px;
-  font-size: 0.5rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.dao-drawer__status--active {
-  color: #7dffb2;
-  background: rgba(61, 214, 140, 0.12);
-  border: 1px solid rgba(61, 214, 140, 0.28);
-}
-
-.dao-drawer__status--creating {
-  color: var(--text-primary);
-  background: rgba(var(--tab-accent-rgb), 0.12);
-  border: 1px solid rgba(var(--tab-accent-rgb), 0.22);
-}
-
-.dao-drawer__status--closed {
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dao-drawer__chain {
-  font-size: 0.5rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .dao-drawer__title {
   margin: 0;
-  font-size: 0.875rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1.2;
+  font-size: var(--drawer-title);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.94);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .dao-drawer__symbol {
-  margin-left: 4px;
-  font-size: 0.625rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
+  font-weight: 700;
+  color: rgba(var(--dao-drawer-cyan), 0.78);
+}
+
+.dao-drawer__status {
+  padding: 0 3px;
+  border-radius: 999px;
+  font-size: 5.5px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.dao-drawer__status--active {
+  color: #9dffd0;
+  background: rgba(var(--dao-drawer-green), 0.14);
+  border: 1px solid rgba(var(--dao-drawer-green), 0.3);
+}
+
+.dao-drawer__status--creating {
+  color: rgba(var(--dao-drawer-cyan), 0.95);
+  background: rgba(var(--dao-drawer-cyan), 0.1);
+}
+
+.dao-drawer__status--closed {
+  color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dao-drawer__chain {
+  font-size: 5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+  white-space: nowrap;
 }
 
 .dao-drawer__close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
+  display: inline-grid;
+  place-items: center;
+  width: var(--drawer-control);
+  height: var(--drawer-control);
   padding: 0;
-  border: none;
-  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 2px;
   background: rgba(255, 255, 255, 0.06);
-  color: var(--text-soft);
+  color: rgba(255, 255, 255, 0.88);
   cursor: pointer;
 }
 
 .dao-drawer__close svg {
-  width: 12px;
-  height: 12px;
+  width: 7px;
+  height: 7px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
   stroke-linecap: round;
 }
 
+/* Corps — grille fixe sans scroll */
 .dao-drawer__body {
-  flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
-  padding: 8px 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.dao-drawer__section-title {
-  margin: 0 0 4px;
-  font-size: 0.5625rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(var(--accent-primary-rgb), 0.78);
-}
-
-.dao-drawer__metrics {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  margin: 0;
+  grid-template-rows:
+    var(--drawer-row-h)
+    var(--drawer-row-h)
+    var(--drawer-row-h)
+    minmax(0, 1fr)
+    var(--drawer-form-h);
+  gap: 0;
+  padding: 1px 2px 2px;
+  overflow: hidden;
 }
 
-.dao-drawer__metric {
-  padding: 4px 6px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.dao-drawer__recap-line {
+  display: grid;
+  grid-template-columns: auto auto 24px minmax(0, 1fr);
+  align-items: center;
+  gap: 3px;
+  height: var(--drawer-row-h);
+  min-height: var(--drawer-row-h);
+  max-height: var(--drawer-row-h);
+  padding: 0 2px;
+  border-left: 2px solid rgba(var(--dao-drawer-cyan), 0.35);
+  background: rgba(var(--dao-drawer-cyan), 0.06);
+  overflow: hidden;
 }
 
-.dao-drawer__metric dt {
-  margin: 0;
-  font-size: 0.4375rem;
+.dao-drawer__recap-stats,
+.dao-drawer__recap-pwr {
+  font-size: var(--drawer-value);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.dao-drawer__recap-pwr {
+  font-size: 5.5px;
+  color: rgba(var(--dao-drawer-cyan), 0.85);
+}
+
+.dao-drawer__recap-bar {
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.dao-drawer__recap-bar-fill {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--dao-drawer-purple), 0.55),
+    rgba(var(--dao-drawer-cyan), 0.95)
+  );
+}
+
+.dao-drawer__recap-summary {
+  font-size: var(--drawer-value);
   font-weight: 600;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.52);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Lignes type news-insight / R4V3 */
+.dao-drawer__field {
+  display: grid;
+  grid-template-columns: var(--drawer-field-label-w) minmax(0, 1fr);
+  align-items: center;
+  gap: 2px;
+  height: var(--drawer-row-h);
+  min-height: var(--drawer-row-h);
+  max-height: var(--drawer-row-h);
+  padding: 0 1px;
+  border-left: 2px solid rgba(var(--dao-drawer-cyan), 0.12);
+  background: rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+}
+
+.dao-drawer__field:nth-child(even) {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.dao-drawer__field-label {
+  font-size: var(--drawer-label);
+  font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.38);
+  white-space: nowrap;
 }
 
-.dao-drawer__metric dd {
-  margin: 2px 0 0;
-  font-size: 0.6875rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
+.dao-drawer__field-value {
+  min-width: 0;
+  font-size: var(--drawer-value);
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.dao-drawer__copy,
-.dao-drawer__empty,
-.dao-drawer__hint {
-  margin: 0;
-  font-size: 0.625rem;
-  line-height: 1.45;
-  color: var(--text-soft);
+.dao-drawer__field-value--muted {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+/* Zone gouvernance — remplit l'espace restant, sans scroll */
+.dao-drawer__gov {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  border-left: 2px solid rgba(var(--dao-drawer-purple), 0.2);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.dao-drawer__field--gov {
+  flex: 0 0 var(--drawer-row-h);
+  border-left: none;
 }
 
 .dao-drawer__questions {
@@ -205,142 +311,232 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .dao-drawer__question {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.02);
+  flex: 0 0 auto;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.12);
 }
 
 .dao-drawer__question-head {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  padding: 6px 8px;
+  height: var(--drawer-row-h);
+  min-height: var(--drawer-row-h);
+  max-height: var(--drawer-row-h);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 3px;
+  padding: 0 3px;
   border: none;
   background: transparent;
   color: inherit;
   text-align: left;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .dao-drawer__question-title {
-  font-size: 0.625rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1.3;
+  font-size: var(--drawer-value);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dao-drawer__question-meta {
-  font-size: 0.5rem;
-  color: var(--text-muted);
+  font-size: 5.5px;
+  color: rgba(255, 255, 255, 0.42);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .dao-drawer__question-body {
-  padding: 0 8px 8px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px;
+  height: var(--drawer-row-h);
+  min-height: var(--drawer-row-h);
+  max-height: var(--drawer-row-h);
+  padding: 0 3px;
+  overflow: hidden;
 }
 
-.dao-drawer__question-body p {
-  margin: 0 0 6px;
-  font-size: 0.5625rem;
-  line-height: 1.4;
-  color: var(--text-soft);
+.dao-drawer__question-copy {
+  margin: 0;
+  font-size: var(--drawer-label);
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .dao-drawer__votes {
-  display: flex;
-  gap: 4px;
+  display: inline-flex;
+  gap: 1px;
 }
 
 .dao-drawer__vote-btn {
-  padding: 2px 6px;
+  width: var(--drawer-control);
+  height: calc(var(--drawer-control) - 2px);
+  padding: 0;
   border-radius: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-soft);
-  font-size: 0.5rem;
-  font-weight: 700;
+  border: 1px solid rgba(var(--dao-drawer-cyan), 0.14);
+  background: rgba(0, 0, 0, 0.28);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 6px;
+  font-weight: 800;
+  line-height: 1;
   cursor: pointer;
 }
 
 .dao-drawer__vote-btn--active {
-  border-color: rgba(var(--accent-primary-rgb), 0.35);
-  color: var(--text-primary);
-  background: rgba(var(--accent-primary-rgb), 0.12);
+  border-color: rgba(var(--dao-drawer-cyan), 0.42);
+  background: rgba(var(--dao-drawer-cyan), 0.1);
+  color: rgba(var(--dao-drawer-cyan), 0.95);
+}
+
+.dao-drawer__more {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0 3px;
+  height: 8px;
+  font-size: 5.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 8px;
+  color: rgba(var(--dao-drawer-purple), 0.75);
+  text-align: center;
+}
+
+/* Formulaire — 2 lignes pleine largeur */
+.dao-drawer__form-foot {
+  min-height: 0;
+  height: var(--drawer-form-h);
+  max-height: var(--drawer-form-h);
+  overflow: hidden;
+  border-top: 1px solid rgba(var(--dao-drawer-cyan), 0.1);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.dao-drawer__form-hint {
+  margin: 0;
+  height: var(--drawer-form-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--drawer-value);
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
 }
 
 .dao-drawer__form {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-rows: var(--drawer-row-h) var(--drawer-row-h);
+  gap: 1px;
+  height: 100%;
 }
 
-.dao-drawer__field {
-  display: flex;
-  flex-direction: column;
+.dao-drawer__form-row {
+  display: grid;
+  grid-template-columns: var(--drawer-field-label-w) minmax(0, 1fr);
+  align-items: center;
   gap: 2px;
-  font-size: 0.5rem;
-  color: var(--text-muted);
+  height: var(--drawer-row-h);
+  min-height: var(--drawer-row-h);
+  max-height: var(--drawer-row-h);
+  padding: 0 1px;
+  border-left: 2px solid rgba(var(--dao-drawer-cyan), 0.12);
+  background: rgba(0, 0, 0, 0.14);
+  overflow: hidden;
 }
 
-.dao-drawer__field input,
-.dao-drawer__field textarea {
+.dao-drawer__form-row--details {
+  grid-template-columns: var(--drawer-field-label-w) minmax(0, 1fr) var(--drawer-control);
+}
+
+.dao-drawer__form-row-label {
+  font-size: var(--drawer-label);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.38);
+  white-space: nowrap;
+}
+
+.dao-drawer__form-row-input {
   width: 100%;
-  padding: 6px 8px;
-  border-radius: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.22);
-  color: var(--text-primary);
-  font-size: 0.625rem;
+  min-width: 0;
+  height: 9px;
+  padding: 0 2px;
+  border: none;
+  border-radius: 1px;
+  background: rgba(0, 0, 0, 0.28);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: var(--drawer-value);
+  font-family: inherit;
+  line-height: 1;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+.dao-drawer__form-row-input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(var(--dao-drawer-cyan), 0.35);
 }
 
 .dao-drawer__submit {
-  align-self: flex-start;
-  padding: 5px 10px;
-  border: 1px solid rgba(var(--accent-primary-rgb), 0.28);
+  width: var(--drawer-control);
+  height: var(--drawer-control);
+  padding: 0;
+  border: 1px solid rgba(var(--dao-drawer-cyan), 0.28);
   border-radius: 2px;
-  background: rgba(var(--accent-primary-rgb), 0.14);
-  color: var(--text-primary);
-  font-size: 0.5625rem;
-  font-weight: 700;
+  background: rgba(var(--dao-drawer-cyan), 0.12);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 7px;
+  font-weight: 900;
+  line-height: 1;
   cursor: pointer;
 }
 
-.dao-drawer__feedback {
-  margin: 0;
-  font-size: 0.5625rem;
-  color: #ff9b8a;
-}
-
-.dao-drawer__feedback--success {
-  color: #7dffb2;
-}
-
-@keyframes dao-drawer-slide-in {
+@keyframes dao-drawer-backdrop-in {
   from {
     opacity: 0;
-    transform: translateX(12px);
   }
+
   to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
-@media (max-width: 390px) {
-  .dao-drawer {
-    width: 100%;
+@keyframes dao-drawer-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dao-drawer {
+  .dao-drawer-backdrop,
+  .dao-drawer.news-insight-panel {
     animation: none;
   }
 }

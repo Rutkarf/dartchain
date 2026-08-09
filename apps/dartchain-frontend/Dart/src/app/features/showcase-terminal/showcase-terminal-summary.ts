@@ -70,7 +70,6 @@ export class ShowcaseTerminalSummaryComponent implements OnInit, OnChanges, OnDe
   ngOnInit(): void {
     this.state.setMode(this.mode);
     void this.state.load();
-    window.addEventListener('naivechain-refresh', this.onGlobalRefresh);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -80,13 +79,7 @@ export class ShowcaseTerminalSummaryComponent implements OnInit, OnChanges, OnDe
     }
   }
 
-  ngOnDestroy(): void {
-    window.removeEventListener('naivechain-refresh', this.onGlobalRefresh);
-  }
-
-  private onGlobalRefresh = (): void => {
-    this.state.refresh();
-  };
+  ngOnDestroy(): void {}
 
   statusClass(phase: ShowcaseTerminalPhase): string {
     const map: Record<ShowcaseTerminalPhase, string> = {

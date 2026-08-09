@@ -169,6 +169,25 @@
 
   --ds-glow-active: 0 0 12px rgba(var(--ds-neon-cyan-rgb), 0.18);
 
+  /* —— Scrollbars (viewport 300px, néon cyan + fond carbone) —— */
+  --ds-scrollbar-size: 3px;
+  --ds-scrollbar-track: rgba(var(--ds-bg-deep-rgb), 0.72);
+  --ds-scrollbar-thumb: rgba(var(--ds-neon-cyan-rgb), 0.28);
+  --ds-scrollbar-thumb-hover: rgba(var(--ds-neon-cyan-rgb), 0.46);
+  --ds-scrollbar-thumb-active: rgba(var(--ds-neon-cyan-rgb), 0.58);
+  --ds-scrollbar-border: rgba(var(--ds-neon-cyan-rgb), 0.16);
+  --ds-scrollbar-glow: rgba(var(--ds-neon-cyan-rgb), 0.24);
+  --ds-scrollbar-thumb-gradient: linear-gradient(
+    180deg,
+    rgba(var(--ds-neon-cyan-rgb), 0.44) 0%,
+    rgba(var(--accent-primary-rgb), 0.3) 100%
+  );
+  --ds-scrollbar-thumb-gradient-hover: linear-gradient(
+    180deg,
+    rgba(var(--ds-neon-cyan-rgb), 0.6) 0%,
+    rgba(var(--accent-primary-rgb), 0.44) 100%
+  );
+
   /* —— Tabs : différenciation niveau A (vue) vs B (filtre) —— */
   --ds-tab-a-height: 26px;
   --ds-tab-a-bg-active: rgba(var(--ds-neon-cyan-rgb), 0.12);

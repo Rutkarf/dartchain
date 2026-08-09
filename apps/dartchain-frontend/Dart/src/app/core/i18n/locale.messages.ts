@@ -3,6 +3,8 @@ export type AppLocale = 'fr' | 'en';
 export type LocaleKey =
   | 'skip.main'
   | 'locale.toggle'
+  | 'panel.collapse'
+  | 'panel.expand'
   | 'dock.wallet'
   | 'dock.faucet'
   | 'dock.pending'
@@ -285,6 +287,8 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
   fr: {
     'skip.main': 'Aller au contenu principal',
     'locale.toggle': 'Changer la langue',
+    'panel.collapse': 'Replier',
+    'panel.expand': 'Déplier',
     'dock.wallet': 'Wallet',
     'dock.faucet': 'Faucet',
     'dock.pending': 'Transactions en attente',
@@ -385,7 +389,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.create': 'Créer un wallet',
     'wallet.noWallet': 'Aucun wallet actif.',
     'wallet.totalBalance': 'Solde total',
-    'wallet.fiatApprox': '{chf} CHF · {gbp} GBP',
+    'wallet.fiatApprox': '{chf} CHF',
     'wallet.available': 'Disponible',
     'wallet.networkMetric': 'Réseau',
     'wallet.account': 'Compte',
@@ -528,7 +532,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'auth.registerTitle': 'Inscription',
     'auth.tabLogin': 'Connexion',
     'auth.tabRegister': 'Inscription',
-    'auth.tabListLabel': 'Connexion ou inscription',
+    'auth.tabListLabel': 'Inscription ou connexion',
     'auth.identifier': 'Identifiant',
     'auth.username': 'Nom d\'utilisateur',
     'auth.email': 'Email',
@@ -566,6 +570,8 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
   en: {
     'skip.main': 'Skip to main content',
     'locale.toggle': 'Switch language',
+    'panel.collapse': 'Collapse',
+    'panel.expand': 'Expand',
     'dock.wallet': 'Wallet',
     'dock.faucet': 'Faucet',
     'dock.pending': 'Pending transactions',
@@ -666,7 +672,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.create': 'Create wallet',
     'wallet.noWallet': 'No active wallet.',
     'wallet.totalBalance': 'Total balance',
-    'wallet.fiatApprox': '{chf} CHF · {gbp} GBP',
+    'wallet.fiatApprox': '{chf} CHF',
     'wallet.available': 'Available',
     'wallet.networkMetric': 'Network',
     'wallet.account': 'Account',
@@ -809,7 +815,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'auth.registerTitle': 'Sign up',
     'auth.tabLogin': 'Sign in',
     'auth.tabRegister': 'Sign up',
-    'auth.tabListLabel': 'Sign in or sign up',
+    'auth.tabListLabel': 'Sign up or sign in',
     'auth.identifier': 'Identifier',
     'auth.username': 'Username',
     'auth.email': 'Email',

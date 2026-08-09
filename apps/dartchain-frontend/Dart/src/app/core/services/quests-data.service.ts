@@ -32,7 +32,7 @@ export class QuestsDataService {
     }
 
     this.started = true;
-    window.addEventListener('naivechain-refresh', this.onExternalRefresh);
+    window.addEventListener('dartchain-refresh-dock', this.onExternalRefresh);
     window.addEventListener('market-swap-complete', this.onExternalRefresh);
 
     this.pollTimerId = window.setInterval(() => {
@@ -43,7 +43,7 @@ export class QuestsDataService {
   }
 
   destroy(): void {
-    window.removeEventListener('naivechain-refresh', this.onExternalRefresh);
+    window.removeEventListener('dartchain-refresh-dock', this.onExternalRefresh);
     window.removeEventListener('market-swap-complete', this.onExternalRefresh);
 
     if (this.pollTimerId !== null) {

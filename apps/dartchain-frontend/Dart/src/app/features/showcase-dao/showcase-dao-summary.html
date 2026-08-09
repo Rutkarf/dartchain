@@ -2,26 +2,37 @@
   class="dao-summary-bar"
   role="status"
   aria-live="polite"
-  aria-label="Résumé gouvernance D.A.O"
+  [attr.aria-label]="barAriaLabel()"
 >
   <div class="dao-summary-main dao-summary-main--dynamic">
     <span
       class="dao-summary-status dao-summary-status--cluster"
       [ngClass]="badgeClass()"
-      [attr.aria-label]="'Statut : ' + collapsedHeadline()"
-      [attr.title]="collapsedHeadline()"
+      [attr.aria-label]="statusAriaLabel()"
+      [attr.title]="statusAriaLabel()"
     >
       <span
         class="dao-summary-status__led"
-        [class.dao-summary-status__led--dim]="daoState.activeCount() === 0"
+        [class.dao-summary-status__led--dim]="statusLedDim()"
         aria-hidden="true"
       ></span>
-      {{ collapsedHeadline() }}
+      {{ statusLabel() }}
     </span>
   </div>
 
   <div class="dao-summary-ticker" aria-live="polite">
-    @if (carouselCard(); as card) {
+    @if (collapsedDaoCard(); as card) {
+      <div class="dao-summary-ticker__viewport">
+        <div class="dao-summary-ticker__slide dao-summary-ticker__slide--selected">
+          <span class="dao-summary-ticker__symbol">{{ card.symbol }}</span>
+          <span class="dao-summary-ticker__name">{{ card.name }}</span>
+          <span class="dao-summary-ticker__stats">{{ collapsedDaoStats() }}</span>
+          <span class="dao-summary-ticker__summary" [attr.title]="collapsedDaoSummary()">
+            {{ collapsedDaoSummary() }}
+          </span>
+        </div>
+      </div>
+    } @else if (carouselCard(); as card) {
       <div class="dao-summary-ticker__viewport">
         <div
           class="dao-summary-ticker__slide"
@@ -42,23 +53,5 @@
     @if (updatedAgeLabel()) {
       <span class="dao-summary-meta__time">{{ updatedAgeLabel() }}</span>
     }
-  </div>
-
-  <div class="dao-summary-actions">
-    <button
-      type="button"
-      class="dao-summary-actions__refresh"
-      [class.dao-summary-actions__refresh--loading]="loading()"
-      (click)="onRefresh($event)"
-      [attr.aria-busy]="loading()"
-      aria-label="Actualiser les DAO"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M21 12a9 9 0 0 1-15.5 6.36" />
-        <path d="M3 12a9 9 0 0 1 15.5-6.36" />
-        <path d="M17 4v4h-4" />
-        <path d="M7 20v-4h4" />
-      </svg>
-    </button>
   </div>
 </div>

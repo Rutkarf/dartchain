@@ -242,14 +242,13 @@ export class FaucetRuntimeService {
   }
 
   start(): void {
-    if (this.started || !this.product.faucetEnabled) {
+    if (this.started) {
       return;
     }
 
     this.started = true;
-    if (!this.product.faucetEnabled) {
-      this.faucetDisabled.set(true);
-    }
+    // Feature vedette : le faucet reste toujours actif (dev / staging / prod).
+    this.faucetDisabled.set(false);
 
     void this.chainConfig.load().catch(() => undefined);
     this.loadConfig();
@@ -818,9 +817,16 @@ export class FaucetRuntimeService {
   }
 
   private handleFeatureDisabled(error: HttpErrorResponse): boolean {
+    // Ne jamais désactiver le faucet côté UI : un 403 vient plutôt d’un auth/ACL
+    // ponctuel, pas d’un flag produit. On remonte une erreur actionnable.
     if (error.status === 403) {
-      this.faucetDisabled.set(true);
-      this.errorMessage.set(this.t('faucet.error.featureDisabled'));
+      this.faucetDisabled.set(false);
+      const message =
+        typeof error.error?.message === 'string' && error.error.message.trim()
+          ? error.error.message
+          : this.t('faucet.error.loginRequired');
+      this.errorMessage.set(message);
+      this.showToast(message, 'error');
       return true;
     }
     return false;

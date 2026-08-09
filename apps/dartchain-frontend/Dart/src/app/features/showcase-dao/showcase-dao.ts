@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   HostBinding,
+  HostListener,
   Input,
   ViewChild,
   computed,
@@ -17,6 +18,10 @@ import { R4v3CommunityFaqService } from '../../core/services/r4v3-community-faq.
 import { ShowcaseDaoStateService } from '../../core/services/showcase-dao-state.service';
 import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-state.service';
 import { ShowcaseDaoDrawerComponent } from './showcase-dao-drawer';
+import {
+  SHOWCASE_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 
 @Component({
   selector: 'app-showcase-dao',
@@ -113,6 +118,13 @@ export class ShowcaseDaoComponent {
     this.daoState.refresh();
   }
 
+  @HostListener(`window:${SHOWCASE_REFRESH_EVENT}`, ['$event'])
+  onShowcaseRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'daonews')) {
+      this.refresh();
+    }
+  }
+
   protected onSearchInput(value: string): void {
     this.searchQuery.set(value);
   }
@@ -139,12 +151,24 @@ export class ShowcaseDaoComponent {
     return daoStatusLabel(card.status);
   }
 
+  protected statusShortLabel(card: DaoShowcaseCard): string {
+    switch (card.status) {
+      case 'active':
+        return 'ON';
+      case 'closed':
+        return 'OFF';
+      default:
+        return '…';
+    }
+  }
+
   protected cardInitials(card: DaoShowcaseCard): string {
     const symbol = card.symbol?.trim() || card.name?.trim() || '?';
     return symbol.slice(0, 2).toUpperCase();
   }
 
   protected openDao(card: DaoShowcaseCard): void {
+    this.daoState.setLastSelectedDao(card);
     this.selectedCard.set(card);
   }
 
@@ -154,5 +178,10 @@ export class ShowcaseDaoComponent {
 
   protected statusClass(card: DaoShowcaseCard): string {
     return `showcase-dao__status--${card.status}`;
+  }
+
+  protected xpPercent(card: DaoShowcaseCard): number {
+    const raw = Math.round((card.membersActive / 40) * 100 + card.proposalsCount * 4);
+    return Math.max(8, Math.min(100, raw));
   }
 }

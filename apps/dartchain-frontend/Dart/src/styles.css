@@ -1,5 +1,6 @@
 @import './theme.css';
 @import './styles/design-system-tokens.css';
+@import './styles/ds-scrollbar.css';
 @import './styles/ds-surface.css';
 @import './styles/showcase-tabs-global.css';
 @import './styles/showcase-meta-shared.css';

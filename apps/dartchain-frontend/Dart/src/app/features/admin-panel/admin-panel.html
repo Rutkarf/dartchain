@@ -10,16 +10,6 @@
       <h2 class="admin-panel__title">{{ locale.t('admin.title') }}</h2>
       <p class="admin-panel__subtitle">{{ locale.t('admin.subtitle') }}</p>
     </div>
-    <button
-      type="button"
-      class="admin-panel__refresh"
-      (click)="refresh()"
-      [disabled]="loading()"
-      [class.is-spinning]="loading()"
-      [attr.aria-label]="locale.t('admin.refresh')"
-    >
-      ↻
-    </button>
   </header>
 
   @if (snapshot(); as data) {

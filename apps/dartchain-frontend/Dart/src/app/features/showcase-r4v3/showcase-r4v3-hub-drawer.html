@@ -2,7 +2,7 @@
   <div class="r4v3-hub-drawer__backdrop" (click)="dismiss()" aria-hidden="true">
     <aside
       #drawerPanel
-      class="r4v3-hub-drawer"
+      class="r4v3-hub-drawer news-insight-panel ds-surface ds-surface--card ds-surface--drawer"
       [class]="drawerShellClass(content.kind)"
       role="dialog"
       aria-modal="true"
@@ -11,8 +11,57 @@
       [attr.aria-labelledby]="'r4v3HubDrawerTitle'"
       (click)="$event.stopPropagation()"
     >
-      <header class="r4v3-hub-drawer__head">
-        <div class="r4v3-hub-drawer__head-top">
+      <header
+        class="r4v3-hub-drawer__head"
+        [class.r4v3-hub-drawer__head--wiki]="content.kind === 'official-wiki'"
+      >
+        @if (content.kind === 'official-wiki') {
+          <h3 class="sr-only" id="r4v3HubDrawerTitle">{{ drawerTitle() }}</h3>
+
+          <div class="r4v3-hub-drawer__filters" role="toolbar" aria-label="Filtrer le wiki">
+            <button
+              type="button"
+              class="r4v3-hub-drawer__filter"
+              [class.r4v3-hub-drawer__filter--active]="isWikiCategoryActive('all')"
+              (click)="selectWikiCategory('all')"
+            >
+              Toutes
+            </button>
+            @for (category of wikiCategories; track category.id) {
+              <button
+                type="button"
+                class="r4v3-hub-drawer__filter"
+                [class.r4v3-hub-drawer__filter--active]="isWikiCategoryActive(category.id)"
+                (click)="selectWikiCategory(category.id)"
+              >
+                {{ category.label }}
+              </button>
+            }
+          </div>
+
+          <div class="r4v3-hub-drawer__head-row r4v3-hub-drawer__head-row--wiki">
+            <label class="r4v3-hub-drawer__search r4v3-hub-drawer__search--inline">
+              <input
+                type="search"
+                placeholder="…"
+                aria-label="Recherche wiki"
+                [value]="wikiSearchQuery()"
+                (input)="onWikiSearchInput($any($event.target).value)"
+              />
+            </label>
+
+            <button
+              type="button"
+              class="r4v3-hub-drawer__icon-btn r4v3-hub-drawer__icon-btn--close"
+              aria-label="Fermer"
+              (click)="dismiss()"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </div>
+        } @else {
           @if (showBackToWiki()) {
             <button
               type="button"
@@ -24,14 +73,22 @@
             </button>
           }
 
-          <div class="r4v3-hub-drawer__head-main">
+          <div class="r4v3-hub-drawer__head-row">
             <div class="r4v3-hub-drawer__identity">
-              <span class="r4v3-hub-drawer__icon" aria-hidden="true">{{ drawerIcon() }}</span>
-              <div class="r4v3-hub-drawer__identity-copy">
-                <p class="r4v3-hub-drawer__eyebrow">{{ drawerEyebrow() }}</p>
-                <h3 class="r4v3-hub-drawer__title" id="r4v3HubDrawerTitle">{{ drawerTitle() }}</h3>
-              </div>
+              <span
+                class="r4v3-hub-drawer__mark"
+                [attr.title]="drawerEyebrow()"
+                aria-hidden="true"
+              >{{ drawerIcon() }}</span>
             </div>
+
+            <h3
+              class="r4v3-hub-drawer__title"
+              id="r4v3HubDrawerTitle"
+              [attr.title]="drawerTitle()"
+            >
+              {{ drawerTitle() }}
+            </h3>
 
             <div class="r4v3-hub-drawer__head-actions">
               @if (showNavigation()) {
@@ -71,18 +128,6 @@
               </button>
             </div>
           </div>
-        </div>
-
-        @if (content.kind === 'official-wiki') {
-          <label class="r4v3-hub-drawer__search">
-            <span class="sr-only">Rechercher dans le wiki</span>
-            <input
-              type="search"
-              placeholder="Rechercher un article…"
-              [value]="wikiSearchQuery()"
-              (input)="onWikiSearchInput($any($event.target).value)"
-            />
-          </label>
         }
       </header>
 
@@ -194,42 +239,23 @@
           }
           @case ('official-wiki') {
             <div class="r4v3-hub-drawer__wiki">
-              <p class="r4v3-hub-drawer__wiki-lead">
-                Articles validés par l’équipe — sélectionnez une entrée pour lire le détail.
-              </p>
-              <div class="r4v3-hub-drawer__filters" role="toolbar" aria-label="Filtrer le wiki">
-                <button
-                  type="button"
-                  class="r4v3-hub-drawer__filter"
-                  [class.r4v3-hub-drawer__filter--active]="isWikiCategoryActive('all')"
-                  (click)="selectWikiCategory('all')"
-                >
-                  Toutes
-                </button>
-                @for (category of wikiCategories; track category.id) {
-                  <button
-                    type="button"
-                    class="r4v3-hub-drawer__filter"
-                    [class.r4v3-hub-drawer__filter--active]="isWikiCategoryActive(category.id)"
-                    (click)="selectWikiCategory(category.id)"
-                  >
-                    {{ category.label }}
-                  </button>
-                }
-              </div>
               <ul class="r4v3-hub-drawer__wiki-list" aria-label="Articles wiki officiels">
                 @if (filteredWikiEntries().length === 0) {
                   <li class="r4v3-hub-drawer__empty">Aucun article ne correspond à votre recherche.</li>
                 } @else {
                   @for (entry of filteredWikiEntries(); track entry.id) {
                     <li>
-                      <button type="button" class="r4v3-hub-drawer__wiki-item" (click)="openWikiEntry(entry)">
+                      <button
+                        type="button"
+                        class="r4v3-hub-drawer__wiki-item"
+                        [attr.title]="entry.summary"
+                        (click)="openWikiEntry(entry)"
+                      >
                         <span class="r4v3-hub-drawer__wiki-icon" aria-hidden="true">{{
                           wikiCategoryIcon(entry.categoryId)
                         }}</span>
                         <span class="r4v3-hub-drawer__wiki-copy">
                           <strong>{{ entry.title }}</strong>
-                          <span>{{ entry.summary }}</span>
                         </span>
                         <span class="r4v3-hub-drawer__wiki-chevron" aria-hidden="true">›</span>
                       </button>
@@ -320,13 +346,17 @@
       @if (showFooterActions()) {
         <footer class="r4v3-hub-drawer__foot">
           @if (actionLabel(); as label) {
-            <button type="button" class="r4v3-hub-drawer__action r4v3-hub-drawer__action--primary" (click)="onPrimaryAction()">
+            <button
+              type="button"
+              class="r4v3-hub-drawer__action r4v3-hub-drawer__action--primary ds-surface ds-surface--showcase-tab"
+              (click)="onPrimaryAction()"
+            >
               {{ label }}
             </button>
           }
           <button
             type="button"
-            class="r4v3-hub-drawer__action"
+            class="r4v3-hub-drawer__action ds-surface ds-surface--showcase-tab"
             [class.r4v3-hub-drawer__action--copied]="copied()"
             [class.r4v3-hub-drawer__action--failed]="copyFailed()"
             (click)="onCopy($event)"
@@ -340,7 +370,7 @@
         <footer class="r4v3-hub-drawer__foot r4v3-hub-drawer__foot--sticky">
           <button
             type="button"
-            class="r4v3-hub-drawer__submit"
+            class="r4v3-hub-drawer__submit ds-surface ds-surface--showcase-tab"
             [disabled]="!canSubmitForm()"
             (click)="submitCommunityForm($event)"
           >

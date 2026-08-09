@@ -41,6 +41,10 @@ import { ShowcaseNavigationService } from '../../core/services/showcase-navigati
 import { ShowcaseR4v3StateService } from '../../core/services/showcase-r4v3-state.service';
 import { ShowcaseHubUiService } from '../../core/services/showcase-hub-ui.service';
 import { ShowcaseR4v3HubDrawerComponent } from './showcase-r4v3-hub-drawer';
+import {
+  SHOWCASE_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 
 @Component({
   selector: 'app-showcase-r4v3',
@@ -267,6 +271,18 @@ export class ShowcaseR4v3Component {
     this.keyboardFocusZone.set('community');
   }
 
+  protected isWikiDrawerOpen(): boolean {
+    return this.drawerPayload()?.kind === 'official-wiki';
+  }
+
+  protected toggleOfficialWiki(): void {
+    if (this.isWikiDrawerOpen()) {
+      this.closeDrawer();
+      return;
+    }
+    this.openOfficialWiki();
+  }
+
   protected openOfficialWiki(): void {
     this.drawerOpenedFromWiki.set(false);
     this.drawerPayload.set({ kind: 'official-wiki' });
@@ -416,6 +432,13 @@ export class ShowcaseR4v3Component {
 
   protected isKeyboardFocused(index: number, zone: 'official' | 'community'): boolean {
     return !this.drawerPayload() && this.keyboardFocusZone() === zone && this.keyboardFocusIndex() === index;
+  }
+
+  @HostListener(`window:${SHOWCASE_REFRESH_EVENT}`, ['$event'])
+  onShowcaseRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'r4v3')) {
+      this.state.refresh();
+    }
   }
 
   @HostListener('document:keydown', ['$event'])

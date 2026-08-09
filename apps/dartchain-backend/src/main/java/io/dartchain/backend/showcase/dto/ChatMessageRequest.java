@@ -17,5 +17,6 @@ public record ChatMessageRequest(
         @Size(max = 16) String fontColor,
         @Size(max = 16) String highlightColor,
         @Size(max = 12) String textAlign,
-        @Size(max = 16) String styleKey
+        @Size(max = 16) String styleKey,
+        Boolean anonymous
 ) {}

@@ -378,7 +378,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(var(--quest-cyan-rgb), 0.35) transparent;
+  scrollbar-color: var(--ds-scrollbar-thumb) var(--ds-scrollbar-track);
 }
 
 .quests-panel__row {

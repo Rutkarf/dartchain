@@ -16,6 +16,10 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { Block } from '../../core/models/block.model';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { ChainDataService } from '../../core/services/chain-data.service';
+import {
+  DOCK_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 import { ChainGraphComponent } from '../chain-graph/chain-graph';
 import {
   applyChainFilters,
@@ -158,9 +162,11 @@ export class BlocksListComponent implements OnInit {
     this.data.init();
   }
 
-  @HostListener('window:naivechain-refresh')
-  onGlobalRefresh(): void {
-    void this.refresh();
+  @HostListener(`window:${DOCK_REFRESH_EVENT}`, ['$event'])
+  onGlobalRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'chain')) {
+      void this.refresh();
+    }
   }
 
   @HostListener('window:chain-filter-query', ['$event'])

@@ -10,10 +10,10 @@ export const R4V3_WHITEPAPER_TXT_FILENAME = 'R4V3-whitepaper.txt';
 export const R4V3_ACTIVITY_PREVIEW = 3;
 
 /** Parité officielle affichée dans l'application. */
-export const R4V3_PEG_LABEL = '1 R4V3 = 1 CHF / 1 GBP';
+export const R4V3_PEG_LABEL = '1 R4V3 = 1 CHF';
 
 /** Libellé long pour contenus pédagogiques. */
-export const R4V3_PEG_LABEL_LONG = '1 R4V3 = 1 franc suisse ou 1 livre sterling';
+export const R4V3_PEG_LABEL_LONG = '1 R4V3 = 1 franc suisse';
 
 /** Libellé court (franc suisse). */
 export const R4V3_PEG_LABEL_SHORT = '1 R4V3 = 1 franc suisse';

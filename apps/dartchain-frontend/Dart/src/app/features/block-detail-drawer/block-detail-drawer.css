@@ -131,24 +131,7 @@
   padding: 8px;
   min-width: 0;
   scrollbar-width: thin;
-  scrollbar-color: rgba(var(--ui-accent-rgb), 0.16) transparent;
-}
-
-.drawer-body::-webkit-scrollbar {
-  width: 5px;
-}
-
-.drawer-body::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.drawer-body::-webkit-scrollbar-thumb {
-  background: rgba(var(--ui-accent-rgb), 0.14);
-  border-radius: 999px;
-}
-
-.drawer-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--ui-accent-rgb), 0.22);
+  scrollbar-color: var(--ds-scrollbar-thumb) var(--ds-scrollbar-track);
 }
 
 .detail-grid {

@@ -2,7 +2,11 @@ import { Injectable, inject, signal } from '@angular/core';
 import { catchError, firstValueFrom, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ChatMessage } from '../models/showcase.model';
-import { formatChatDisplayName, isGuestChatAuthor } from '../constants/chat-display.constants';
+import {
+  CHAT_ANONYMOUS_AUTHOR,
+  formatChatDisplayName,
+  isGuestChatAuthor,
+} from '../constants/chat-display.constants';
 import { ChatTextFormat, formatFromMessage } from '../constants/chat-format.constants';
 import { ShowcaseApiService } from './showcase-api.service';
 import { ChatStylePreferencesService } from './chat-style-preferences.service';
@@ -14,6 +18,7 @@ const CLIENT_ID_KEY = 'dart_chat_client_id';
 type ChatWsEnvelope =
   | { type: 'history'; data: ChatMessage[] }
   | { type: 'chat'; data: ChatMessage }
+  | { type: 'clear'; roomId?: string }
   | { type: 'error'; message: string };
 
 @Injectable({
@@ -40,16 +45,10 @@ export class ShowcaseChatService {
 
   getUsername(): string {
     const stored = localStorage.getItem(USERNAME_KEY)?.trim();
-    if (stored) {
-      if (isGuestChatAuthor(stored)) {
-        localStorage.setItem(USERNAME_KEY, 'Anonymous');
-        return 'Anonymous';
-      }
-      return stored;
+    if (!stored || isGuestChatAuthor(stored)) {
+      return '';
     }
-
-    localStorage.setItem(USERNAME_KEY, 'Anonymous');
-    return 'Anonymous';
+    return stored;
   }
 
   setUsername(username: string): void {
@@ -110,6 +109,11 @@ export class ShowcaseChatService {
 
       if (envelope.type === 'chat') {
         this.appendMessage(envelope.data);
+        return;
+      }
+
+      if (envelope.type === 'clear') {
+        this.applyClear(envelope.roomId);
         return;
       }
 
@@ -188,7 +192,7 @@ export class ShowcaseChatService {
     }
   }
 
-  sendMessage(text: string): void {
+  sendMessage(text: string, options?: { author?: string; anonymous?: boolean }): void {
     const trimmed = text.trim();
     if (!trimmed) {
       return;
@@ -196,7 +200,18 @@ export class ShowcaseChatService {
 
     this.sendErrorSignal.set(null);
 
-    const author = this.getUsername();
+    const anonymous = options?.anonymous === true;
+    const override = options?.author?.trim();
+    const author = anonymous
+      ? CHAT_ANONYMOUS_AUTHOR
+      : override || this.getUsername();
+    if (!anonymous && !author) {
+      this.sendErrorSignal.set('Connectez-vous pour envoyer un message, ou activez Anonymous.');
+      return;
+    }
+    if (!anonymous && override) {
+      this.setUsername(override);
+    }
     const clientId = this.getClientId();
     const format = this.chatStyle.snapshot();
     const payload = {
@@ -205,6 +220,7 @@ export class ShowcaseChatService {
       text: trimmed,
       clientId,
       roomId: 'global',
+      anonymous,
       ...format,
     };
 
@@ -222,6 +238,7 @@ export class ShowcaseChatService {
         text: trimmed,
         clientId,
         roomId: 'global',
+        anonymous,
         ...format,
       })
       .subscribe({
@@ -238,6 +255,22 @@ export class ShowcaseChatService {
 
   clearSendError(): void {
     this.sendErrorSignal.set(null);
+  }
+
+  async clearChat(roomId = 'global'): Promise<void> {
+    this.sendErrorSignal.set(null);
+
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify({ type: 'clear', roomId }));
+      return;
+    }
+
+    try {
+      await firstValueFrom(this.api.clearChatMessages(roomId));
+      this.applyClear(roomId);
+    } catch (error: unknown) {
+      this.sendErrorSignal.set(this.resolveSendError(error));
+    }
   }
 
   setSendError(message: string | null): void {
@@ -261,6 +294,7 @@ export class ShowcaseChatService {
       author,
       text,
       sentAt: new Date().toISOString(),
+      clientId: this.getClientId(),
       self: true,
       ...format,
     };
@@ -274,6 +308,13 @@ export class ShowcaseChatService {
         }
       },
     });
+  }
+
+  private applyClear(roomId?: string): void {
+    const resolvedRoom = roomId?.trim() || 'global';
+    this.messagesSignal.update((current) =>
+      current.filter((message) => (message.roomId ?? 'global') !== resolvedRoom)
+    );
   }
 
   private removeMessageById(id: string): void {
@@ -313,12 +354,28 @@ export class ShowcaseChatService {
   }
 
   private markSelf(messages: ChatMessage[]): ChatMessage[] {
-    const username = this.getUsername();
+    const username = formatChatDisplayName(this.getUsername());
+    const clientId = this.getClientId();
 
-    return messages.map((message) => ({
-      ...this.normalizeIncoming(message),
-      self: formatChatDisplayName(message.author) === username,
-    }));
+    return messages.map((message) => {
+      const normalized = this.normalizeIncoming(message);
+      const displayAuthor = formatChatDisplayName(message.author);
+      const sameClient = !!message.clientId && message.clientId === clientId;
+      const isLocal = typeof message.id === 'string' && message.id.startsWith('local-');
+
+      // Anonymous : self via clientId (nom partagé), pas via le pseudo
+      if (isGuestChatAuthor(message.author)) {
+        return {
+          ...normalized,
+          self: sameClient || (isLocal && Boolean(message.self)),
+        };
+      }
+
+      return {
+        ...normalized,
+        self: displayAuthor === username || sameClient,
+      };
+    });
   }
 
   private normalizeIncoming(message: ChatMessage): ChatMessage {

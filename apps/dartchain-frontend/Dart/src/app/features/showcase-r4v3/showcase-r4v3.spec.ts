@@ -144,10 +144,14 @@ describe('ShowcaseR4v3Component', () => {
 
     expect(fixture.nativeElement.querySelectorAll('.showcase-r4v3__pillar').length).toBe(6);
     expect(fixture.nativeElement.querySelectorAll('.showcase-r4v3__pillar-column').length).toBe(3);
-    expect(fixture.nativeElement.querySelector('.showcase-r4v3__peg--hero')?.textContent).toContain(
-      '1 R4V3 = 1 CHF / 1 GBP'
-    );
-    expect(fixture.nativeElement.querySelector('.showcase-r4v3__doc-icon--peg')).toBeTruthy();
+    const pegText = fixture.nativeElement.querySelector('.showcase-r4v3__peg--hero')?.textContent ?? '';
+    expect(pegText.replace(/\s+/g, ' ').trim()).toContain('1 R4V3 = 1 CHF');
+    expect(pegText).not.toContain('GBP');
+    expect(fixture.nativeElement.querySelector('.showcase-r4v3__wp-btn')).toBeTruthy();
+    expect(
+      fixture.nativeElement.querySelector('.showcase-r4v3__wp-btn-label')?.textContent?.trim()
+    ).toBe('White paper');
+    expect(fixture.nativeElement.querySelector('.showcase-r4v3__wp-btn-hint')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-meta__refresh')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__live-quote')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__status-led--banner')).toBeTruthy();
@@ -169,7 +173,7 @@ describe('ShowcaseR4v3Component', () => {
     expect(fixture.nativeElement.querySelector('.r4v3-hub-drawer')).toBeTruthy();
   });
 
-  it('should render official and community section links', async () => {
+  it('should render wiki rail and community section link', async () => {
     fixture.detectChanges();
 
     http.expectOne((r) => r.url.includes('/showcase/r4v3')).flush(mockR4v3Dashboard);
@@ -178,9 +182,9 @@ describe('ShowcaseR4v3Component', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.showcase-r4v3__section-link--official')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-r4v3__rail-btn--left')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__section-link--community')).toBeTruthy();
-    expect(fixture.nativeElement.textContent).toContain('Base officielle');
+    expect(fixture.nativeElement.textContent).toContain('Wiki');
     expect(fixture.nativeElement.textContent).toContain('FAQ communautaire');
   });
 });

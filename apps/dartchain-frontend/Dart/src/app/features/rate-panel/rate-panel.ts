@@ -8,6 +8,7 @@ import {
   computed,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
@@ -64,6 +65,8 @@ export class RatePanelComponent {
   /** Hub marché : graphique seul (maquette), sans grille de cartes ni recherche. */
   readonly hubGraphOnly = input(false, { transform: booleanAttribute });
   readonly chartCollapsed = input(false, { transform: booleanAttribute });
+  readonly collapseAriaLabel = input('Replier le graphique');
+  readonly collapseToggle = output<void>();
 
   private readonly rates = inject(CryptoRatesService);
   private readonly preferences = inject(RatePanelPreferencesService);

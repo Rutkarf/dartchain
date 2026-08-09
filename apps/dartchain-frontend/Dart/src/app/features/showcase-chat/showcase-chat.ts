@@ -17,7 +17,6 @@ import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ChatMessage } from '../../core/models/showcase.model';
 import {
-  CHAT_FORMAT_STYLE_PRESETS,
   CHAT_THEME_COLOR_GRID,
   CHAT_THEME_HIGHLIGHT_GRID,
   ChatTextFormat,
@@ -26,11 +25,12 @@ import {
   textNgStyleForLine,
 } from '../../core/constants/chat-format.constants';
 import {
-  CHAT_BUBBLE_STYLE_OPTIONS,
   CHAT_FONT_OPTIONS,
   ChatFontKey,
 } from '../../core/constants/chat-style.constants';
 import {
+  CHAT_ANONYMOUS_AUTHOR,
+  chatLineGradientStyle,
   formatChatDisplayName,
   formatChatMessageTime,
 } from '../../core/constants/chat-display.constants';
@@ -39,6 +39,10 @@ import { ChatStylePreferencesService } from '../../core/services/chat-style-pref
 import { AuthService } from '../../core/services/auth.service';
 import { ShowcaseChatService } from '../../core/services/showcase-chat.service';
 import { ShowcaseChatStateService } from '../../core/services/showcase-chat-state.service';
+import {
+  SHOWCASE_REFRESH_EVENT,
+  refreshEventMatchesTab,
+} from '../../core/constants/panel-refresh.constants';
 
 type ChatMenuId = 'colors' | null;
 
@@ -76,12 +80,13 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly fontOptions = CHAT_FONT_OPTIONS;
   readonly fontColorGrid = CHAT_THEME_COLOR_GRID;
   readonly highlightGrid = CHAT_THEME_HIGHLIGHT_GRID;
-  readonly stylePresets = CHAT_FORMAT_STYLE_PRESETS;
 
   readonly messages = this.chat.messages;
   readonly openMenu = signal<ChatMenuId>(null);
   readonly searchQuery = signal('');
   readonly searchExpanded = signal(false);
+  /** Poster sans compte sous le pseudonyme Anonymous. */
+  readonly postAsAnonymous = signal(false);
 
   readonly filteredMessages = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
@@ -103,11 +108,45 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
     validators: [Validators.required, Validators.maxLength(500)],
   });
 
-  readonly sendButtonLabel = computed(() =>
-    this.auth.isAuthenticated() ? 'Envoyer' : 'CONNEXION REQUISE'
-  );
+  readonly postIdentityLabel = computed(() => {
+    const username = this.auth.user()?.username?.trim();
+    if (username) {
+      return formatChatDisplayName(username);
+    }
+    return 'Compte';
+  });
+
+  readonly postIdentityTitle = computed(() => {
+    const username = this.auth.user()?.username?.trim();
+    if (username) {
+      return `Poster en tant que ${formatChatDisplayName(username)}`;
+    }
+    return 'Poster avec votre compte (connexion requise)';
+  });
+
+  readonly postAnonymousTitle = computed(() => 'Poster en Anonymous (sans compte)');
+
+  readonly sendButtonLabel = computed(() => {
+    const author = this.postAsAnonymous()
+      ? CHAT_ANONYMOUS_AUTHOR
+      : this.postIdentityLabel();
+    return `Envoyer le message en tant que ${author}`;
+  });
+
+  readonly composerPlaceholder = computed(() => {
+    if (this.postAsAnonymous()) {
+      return 'Message anonyme…';
+    }
+    return this.auth.isAuthenticated()
+      ? 'Tape ton message…'
+      : 'Connexion requise pour écrire…';
+  });
 
   ngOnInit(): void {
+    const username = this.auth.user()?.username?.trim();
+    if (username) {
+      this.chat.setUsername(username);
+    }
     this.chat.connect();
     if (this.isExpanded) {
       this.chatState.markAsRead();
@@ -169,6 +208,19 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chat.clearSendError();
   }
 
+  protected clearChat(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!globalThis.confirm('Vider tout le chat ?')) {
+      return;
+    }
+
+    void this.chat.clearChat();
+    this.searchQuery.set('');
+    this.searchExpanded.set(false);
+  }
+
   protected composerTextStyle(): Record<string, string> {
     return textNgStyle(this.prefs.format());
   }
@@ -200,6 +252,10 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
       'showcase-chat__line--self': !!msg.self,
       [`showcase-chat__line--font-${format.fontKey}`]: true,
     };
+  }
+
+  protected lineStyle(msg: ChatMessage): Record<string, string> {
+    return chatLineGradientStyle(msg.id);
   }
 
   protected composerBubbleClass(): Record<string, boolean> {
@@ -235,10 +291,6 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.prefs.setFont((event.target as HTMLSelectElement).value as ChatFontKey);
   }
 
-  protected applyStylePreset(patch: Partial<ChatTextFormat>): void {
-    this.prefs.patchFormat(patch);
-  }
-
   protected pickFontColor(value: string, event: Event): void {
     event.stopPropagation();
     this.prefs.patchFormat({ fontColor: value });
@@ -258,6 +310,13 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
     void this.chatState.refreshMessages();
   }
 
+  @HostListener(`window:${SHOWCASE_REFRESH_EVENT}`, ['$event'])
+  onShowcaseRefresh(event: Event): void {
+    if (refreshEventMatchesTab(event, 'rv23')) {
+      this.refreshMessages();
+    }
+  }
+
   protected refreshAriaLabel(): string {
     return this.chatState.refreshing() ? 'Actualisation du chat…' : 'Actualiser le chat';
   }
@@ -273,9 +332,22 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sendMessage();
   }
 
+  protected setPostMode(anonymous: boolean, event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.postAsAnonymous.set(anonymous);
+    this.chat.clearSendError();
+  }
+
+  protected togglePostAsAnonymous(event?: Event): void {
+    this.setPostMode(!this.postAsAnonymous(), event);
+  }
+
   protected sendMessage(): void {
-    if (!this.auth.promptLogin()) {
-      this.chat.setSendError('Connectez-vous pour envoyer un message.');
+    const asAnonymous = this.postAsAnonymous();
+
+    if (!asAnonymous && !this.auth.promptLogin()) {
+      this.chat.setSendError('Connectez-vous pour envoyer un message, ou activez Anonymous.');
       return;
     }
 
@@ -288,7 +360,18 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.chat.sendMessage(text);
+    if (asAnonymous) {
+      this.chat.sendMessage(text, { anonymous: true, author: CHAT_ANONYMOUS_AUTHOR });
+    } else {
+      const username = this.auth.user()?.username?.trim();
+      if (!username) {
+        this.chat.setSendError('Connectez-vous pour envoyer un message, ou activez Anonymous.');
+        return;
+      }
+      this.chat.setUsername(username);
+      this.chat.sendMessage(text, { anonymous: false, author: username });
+    }
+
     this.messageControl.reset();
     queueMicrotask(() => this.scrollToBottom());
   }
@@ -302,17 +385,6 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   protected isTransparentHighlight(value: string): boolean {
     return value === 'transparent';
-  }
-
-  protected bubbleStylePreview(): string {
-    const key = this.prefs.bubbleStyleKey();
-    return CHAT_BUBBLE_STYLE_OPTIONS.find((o) => o.key === key)?.preview ?? '◆';
-  }
-
-  protected bubbleStyleTitle(): string {
-    const key = this.prefs.bubbleStyleKey();
-    const opt = CHAT_BUBBLE_STYLE_OPTIONS.find((o) => o.key === key);
-    return opt ? `Style de message : ${opt.label}` : 'Style de message';
   }
 
   private scrollToBottom(): void {

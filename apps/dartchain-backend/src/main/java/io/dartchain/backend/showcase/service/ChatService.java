@@ -21,6 +21,29 @@ import java.util.stream.Collectors;
 public class ChatService {
 
     public static final String DEFAULT_ROOM = "global";
+    public static final String ANONYMOUS_AUTHOR = "Anonymous";
+
+    public static boolean isAnonymousAuthor(String author) {
+        if (author == null || author.isBlank()) {
+            return false;
+        }
+        String value = author.trim();
+        return value.equalsIgnoreCase(ANONYMOUS_AUTHOR)
+                || value.matches("(?i)guest(-\\d+)?");
+    }
+
+    public static boolean wantsAnonymousPost(ChatMessageRequest request) {
+        if (request == null) {
+            return false;
+        }
+        if (Boolean.FALSE.equals(request.anonymous())) {
+            return false;
+        }
+        if (Boolean.TRUE.equals(request.anonymous())) {
+            return true;
+        }
+        return isAnonymousAuthor(request.author());
+    }
 
     private static final Set<String> FONT_KEYS = Set.of(
             "orbit", "arial", "calibri", "times", "georgia", "verdana",
@@ -63,6 +86,13 @@ public class ChatService {
         return roomMessages.subList(fromIndex, roomMessages.size()).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public String clearRoom(String roomId) {
+        String resolvedRoom = resolveRoom(roomId);
+        messages.removeIf(message -> resolvedRoom.equals(message.getRoomId()));
+        chatMessageStore.replaceAll(List.copyOf(messages));
+        return resolvedRoom;
     }
 
     public ChatMessageResponse postMessage(ChatMessageRequest request) {
@@ -125,6 +155,7 @@ public class ChatService {
                 message.getAuthor(),
                 message.getText(),
                 message.getSentAt().toString(),
+                message.getClientId(),
                 message.getFontKey(),
                 message.getFontSize(),
                 message.isBold(),

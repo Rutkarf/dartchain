@@ -32,25 +32,17 @@
       class="app-market-stack app-market-stack--rate"
       [class.is-chart-collapsed]="chartCollapsed()"
     >
-      <header class="chart-stack-header" aria-label="Contrôle graphique">
-        <div class="chart-stack-header__actions">
-          <button
-            type="button"
-            class="chart-toggle showcase-toggle"
-            [attr.aria-label]="chartCollapseLabel()"
-            [attr.aria-expanded]="!chartCollapsed()"
-            (click)="toggleChartCollapsed()"
-          >
-            <span
-              class="showcase-toggle__chevron"
-              [class.is-collapsed]="chartCollapsed()"
-              aria-hidden="true"
-            ></span>
-          </button>
-        </div>
-      </header>
-      <div class="app-market-card app-market-card--rate">
-        <app-rate-panel hubGraphOnly [chartCollapsed]="chartCollapsed()"></app-rate-panel>
+      <div
+        class="app-market-card app-market-card--rate"
+        [class.is-summary-expandable]="chartCollapsed()"
+        (click)="chartCollapsed() && toggleChartCollapsed()"
+      >
+        <app-rate-panel
+          hubGraphOnly
+          [chartCollapsed]="chartCollapsed()"
+          [collapseAriaLabel]="chartCollapseLabel()"
+          (collapseToggle)="toggleChartCollapsed()"
+        ></app-rate-panel>
       </div>
     </div>
 
@@ -59,23 +51,6 @@
       class="app-hub-showcase-block"
       [class.is-showcase-collapsed]="showcaseCollapsed()"
     >
-      <header class="chart-stack-header showcase-stack-header" aria-label="Contrôle showcase">
-        <div class="chart-stack-header__actions">
-          <button
-            type="button"
-            class="chart-toggle showcase-toggle"
-            [attr.aria-label]="showcaseCollapseLabel()"
-            [attr.aria-expanded]="!showcaseCollapsed()"
-            (click)="toggleShowcaseCollapsed()"
-          >
-            <span
-              class="showcase-toggle__chevron"
-              [class.is-collapsed]="showcaseCollapsed()"
-              aria-hidden="true"
-            ></span>
-          </button>
-        </div>
-      </header>
       <div class="showcase-block__shell ds-surface ds-surface--card">
         <header class="showcase-header showcase-header--tabs" aria-label="Showcase">
           <div class="showcase-header-tabs">
@@ -84,12 +59,24 @@
               (tabChange)="onShowcaseTabChange($event)"
             />
           </div>
+          <div class="showcase-header-actions">
+            <app-collapsed-bar-actions
+              [collapsed]="showcaseCollapsed()"
+              [collapseAriaLabel]="showcaseCollapseLabel()"
+              refreshAriaLabel="Actualiser le showcase"
+              [refreshBusy]="showcaseRefreshBusy()"
+              (refresh)="refreshShowcasePanel($event)"
+              (collapseToggle)="toggleShowcaseCollapsed()"
+            />
+          </div>
         </header>
 
         <div
           class="app-showcase-band"
           [class.is-collapsed]="showcaseCollapsed()"
+          [class.is-summary-expandable]="showcaseCollapsed()"
           [attr.data-active-tab]="activeShowcaseTab()"
+          (click)="showcaseCollapsed() && toggleShowcaseCollapsed()"
         >
           <app-showcase-panel
             [activeTab]="activeShowcaseTab()"
@@ -107,23 +94,6 @@
     [class.is-dock-collapsed]="dockCollapsed()"
     aria-label="Dock navigation"
   >
-    <header class="chart-stack-header dock-stack-header" aria-label="Contrôle dock">
-      <div class="chart-stack-header__actions">
-        <button
-          type="button"
-          class="chart-toggle showcase-toggle"
-          [attr.aria-label]="dockCollapseLabel()"
-          [attr.aria-expanded]="!dockCollapsed()"
-          (click)="toggleDockCollapsed()"
-        >
-          <span
-            class="showcase-toggle__chevron"
-            [class.is-collapsed]="dockCollapsed()"
-            aria-hidden="true"
-          ></span>
-        </button>
-      </div>
-    </header>
     <div
       class="showcase-block__shell bottom-stack__shell ds-surface ds-surface--card"
     >
@@ -224,13 +194,25 @@
             }
           </nav>
         </div>
+        <div class="showcase-header-actions">
+          <app-collapsed-bar-actions
+            [collapsed]="dockCollapsed()"
+            [collapseAriaLabel]="dockCollapseLabel()"
+            refreshAriaLabel="Actualiser le dock"
+            [refreshBusy]="dockRefreshBusy()"
+            (refresh)="refreshDockPanel($event)"
+            (collapseToggle)="toggleDockCollapsed()"
+          />
+        </div>
       </header>
 
       <div
         class="app-bottom-stack__content app-bottom-stack__band"
         [class.is-collapsed]="dockCollapsed()"
         [class.is-smart-collapsed]="dockCollapsed()"
+        [class.is-summary-expandable]="dockCollapsed()"
         [attr.data-active-tab]="activeBottomTab()"
+        (click)="dockCollapsed() && toggleDockCollapsed()"
       >
       @if (dockCollapsed()) {
         <div class="app-bottom-stack__summary">

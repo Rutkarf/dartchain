@@ -91,16 +91,30 @@ describe('ShowcaseDaoComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should render DAO header LED and cards', () => {
+  it('should render DAO cards', () => {
     const root = fixture.nativeElement as HTMLElement;
-    expect(root.querySelector('.showcase-dao__live-led')).toBeTruthy();
     expect(root.querySelector('.showcase-dao__list')).toBeTruthy();
     expect(root.querySelectorAll('.showcase-dao__card').length).toBe(1);
   });
 
-  it('should expose search and refresh controls', () => {
+  it('should open drawer with close button when a card is clicked', () => {
     const root = fixture.nativeElement as HTMLElement;
-    expect(root.querySelector('.showcase-meta__search-toggle')).toBeTruthy();
-    expect(root.querySelector('.showcase-meta__refresh')).toBeTruthy();
+    const card = root.querySelector('.showcase-dao__card') as HTMLButtonElement;
+    card.click();
+    fixture.detectChanges();
+
+    expect(root.querySelector('.dao-drawer')).toBeTruthy();
+    expect(root.querySelector('.dao-drawer__close')).toBeTruthy();
+  });
+
+  it('should remember last selected DAO in state service', () => {
+    const daoState = TestBed.inject(ShowcaseDaoStateService);
+    const root = fixture.nativeElement as HTMLElement;
+    const cardBtn = root.querySelector('.showcase-dao__card') as HTMLButtonElement;
+    cardBtn.click();
+    fixture.detectChanges();
+
+    expect(daoState.collapsedDaoCard()?.symbol).toBe('PXD');
+    expect(daoState.collapsedDaoHeadline()).toContain('Pixel DAO');
   });
 });

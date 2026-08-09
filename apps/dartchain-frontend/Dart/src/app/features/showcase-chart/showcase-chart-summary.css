@@ -11,14 +11,33 @@
 
 .chart-summary-bar {
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto auto minmax(0, 1fr) auto var(--panel-action-menu-w, 34px);
   align-items: center;
-  gap: clamp(4px, 1.2vw, 8px);
+  gap: clamp(3px, 1vw, 6px);
+  position: relative;
   width: 100%;
   min-width: 0;
   height: 100%;
-  padding: 0 clamp(4px, 1vw, 6px) 0 clamp(6px, 1.4vw, 8px);
+  padding: 0 0 0 clamp(4px, 1vw, 6px);
   box-sizing: border-box;
+}
+
+.chart-summary-bar__actions {
+  --cba-h: var(--panel-action-menu-h, 14px);
+  --cba-item-w: var(--panel-action-item-w, 14px);
+  grid-column: 5;
+  position: relative;
+  z-index: 6;
+  align-self: center;
+  justify-self: end;
+  width: var(--panel-action-menu-w, 34px);
+  min-width: var(--panel-action-menu-w, 34px);
+  max-width: var(--panel-action-menu-w, 34px);
+  height: var(--panel-action-menu-h, 14px);
+  min-height: var(--panel-action-menu-h, 14px);
+  max-height: var(--panel-action-menu-h, 14px);
+  margin: 0;
+  pointer-events: auto;
 }
 
 .chart-summary-bar__identity {
@@ -196,36 +215,6 @@
   color: rgba(255, 255, 255, 0.42);
 }
 
-.chart-summary-bar__refresh {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  width: clamp(18px, 5vw, 22px);
-  height: clamp(18px, 5vw, 22px);
-  padding: 0;
-  border: 1px solid rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.16);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.62);
-  cursor: pointer;
-}
-
-.chart-summary-bar__refresh:hover {
-  border-color: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.35);
-  color: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.95);
-}
-
-.chart-summary-bar__refresh svg {
-  width: 11px;
-  height: 11px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 @media (max-width: 420px) {
   .chart-summary-bar {
     grid-template-columns: auto auto minmax(0, 1fr) auto;
@@ -234,6 +223,12 @@
 
   .chart-summary-bar__metrics {
     display: none;
+  }
+
+  .chart-summary-bar__actions {
+    grid-column: 5;
+    height: var(--panel-action-menu-h, 14px);
+    max-height: var(--panel-action-menu-h, 14px);
   }
 }
 

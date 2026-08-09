@@ -64,7 +64,7 @@ export class ShowcaseR4v3StateService {
 
   readonly pegDisplayLabel = computed(() => {
     const panel = this.panel();
-    if (panel?.pair?.toUpperCase().includes('CHF') || panel?.pair?.toUpperCase().includes('GBP')) {
+    if (panel?.pair?.toUpperCase().includes('CHF')) {
       return R4V3_PEG_LABEL;
     }
 

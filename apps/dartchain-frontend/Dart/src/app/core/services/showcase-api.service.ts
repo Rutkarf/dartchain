@@ -125,6 +125,12 @@ export class ShowcaseApiService {
       .pipe(map((msg) => this.normalizeChatMessage(msg)));
   }
 
+  clearChatMessages(roomId = 'global'): Observable<void> {
+    const params = new HttpParams().set('roomId', roomId);
+
+    return this.http.delete<void>(`${this.baseUrl}/chat/messages`, { params });
+  }
+
   getLaunchProjects(): Observable<LaunchProject[]> {
     return this.http
       .get<LaunchProject[]>(`${this.baseUrl}/launch/projects`)

@@ -9,10 +9,12 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
   booleanAttribute,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CollapsedBarActionsComponent } from '../collapsed-bar-actions/collapsed-bar-actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
@@ -166,7 +168,12 @@ function formatCompactMetric(value: number): string {
 @Component({
   selector: 'app-showcase-chart',
   standalone: true,
-  imports: [CommonModule, R4v3ThreeComponent, ChartTokenSearchComponent],
+  imports: [
+    CommonModule,
+    R4v3ThreeComponent,
+    ChartTokenSearchComponent,
+    CollapsedBarActionsComponent,
+  ],
   templateUrl: './showcase-chart.html',
   styleUrls: ['./showcase-chart.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -183,6 +190,8 @@ export class ShowcaseChartComponent {
   readonly chartCollapsed = input(false, { transform: booleanAttribute });
   /** Bandeau R4V3 : graphique compact avec pills 1H/24H/7J. */
   readonly compactLayout = input(false, { transform: booleanAttribute });
+  readonly collapseAriaLabel = input('Replier le graphique');
+  readonly collapseToggle = output<void>();
 
   private readonly api = inject(ShowcaseApiService);
   private readonly rates = inject(CryptoRatesService);
