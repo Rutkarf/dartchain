@@ -5,6 +5,7 @@ import {
   ElementRef,
   HostListener,
   OnInit,
+  AfterViewInit,
   ViewChild,
   computed,
   effect,
@@ -41,17 +42,21 @@ import {
   DOCK_REFRESH_EVENT,
   refreshEventMatchesTab,
 } from '../../core/constants/panel-refresh.constants';
+import { WalletFaucetEmbedComponent } from './wallet-faucet-embed';
+import { R4v3ThreeComponent } from '../r4v3-three/r4v3-three';
 
 @Component({
   selector: 'app-wallet-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, WalletFaucetEmbedComponent, R4v3ThreeComponent],
   templateUrl: './wallet-panel.html',
   styleUrls: ['./wallet-panel.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WalletPanelComponent implements OnInit {
+export class WalletPanelComponent implements OnInit, AfterViewInit {
   @ViewChild('bodyScrollRef') private bodyScrollRef?: ElementRef<HTMLElement>;
+  @ViewChild('tetrisPlayfieldRef') private tetrisPlayfieldRef?: ElementRef<HTMLElement>;
+  @ViewChild('tetrisRef') private tetrisRef?: ElementRef<HTMLElement>;
   @ViewChild('sendPanelRef') private sendPanelRef?: ElementRef<HTMLElement>;
   @ViewChild('receivePanelRef') private receivePanelRef?: ElementRef<HTMLElement>;
 
@@ -79,6 +84,8 @@ export class WalletPanelComponent implements OnInit {
   protected readonly successMessage = signal('');
   protected readonly copiedAddress = signal(false);
   protected readonly copiedLookupAddress = signal(false);
+  protected readonly copiedPublicKey = signal(false);
+  protected readonly copiedPrivateKey = signal(false);
   protected readonly showSendPanel = signal(false);
   protected readonly showReceivePanel = signal(false);
   protected readonly qrDataUrl = signal<string | null>(null);
@@ -97,6 +104,8 @@ export class WalletPanelComponent implements OnInit {
 
   private copiedTimer: ReturnType<typeof setTimeout> | null = null;
   private copiedLookupTimer: ReturnType<typeof setTimeout> | null = null;
+  private copiedPublicKeyTimer: ReturnType<typeof setTimeout> | null = null;
+  private copiedPrivateKeyTimer: ReturnType<typeof setTimeout> | null = null;
   private messageTimer: ReturnType<typeof setTimeout> | null = null;
   private lastBalanceFetchAddress = '';
 
@@ -120,11 +129,54 @@ export class WalletPanelComponent implements OnInit {
   protected readonly formattedTotalBalance = computed(() =>
     formatR4v3Amount(this.totalBalance())
   );
+  protected readonly stackedBalanceLines = computed(() => {
+    const normalized = normalizeR4v3Amount(this.totalBalance());
+    const negative = normalized.startsWith('-');
+    const unsigned = negative ? normalized.slice(1) : normalized;
+    const [wholeRaw, fractionRaw = ''] = unsigned.split('.');
+    const whole = wholeRaw || '0';
+    const fraction = `${fractionRaw}${'0'.repeat(R4V3_DECIMALS)}`.slice(0, R4V3_DECIMALS);
+    const prefix = negative ? '-' : '';
+
+    return {
+      whole: `${prefix}${whole}`,
+      line1: fraction.slice(0, 3),
+      line2: fraction.slice(3, 13),
+      line3: fraction.slice(13, 23),
+      line4: fraction.slice(23, 26),
+    };
+  });
+
+  private static readonly TETRIS_CELL_PX = 4;
+  private static readonly TETRIS_GAP_PX = 1;
+  private static readonly TETRIS_PAD_PX = 2;
+  private static readonly TETRIS_MIN_COLS = 5;
+  private static readonly TETRIS_MIN_ROWS = 6;
+
+  protected readonly tetrisColCount = signal(WalletPanelComponent.TETRIS_MIN_COLS);
+  protected readonly tetrisRowCount = signal(WalletPanelComponent.TETRIS_MIN_ROWS);
+  protected readonly tetrisBoard = signal<boolean[][]>([]);
+  protected readonly tetrisCols = computed(() =>
+    Array.from({ length: this.tetrisColCount() }, (_, index) => index)
+  );
+  protected readonly tetrisRows = computed(() =>
+    Array.from({ length: this.tetrisRowCount() }, (_, index) => index)
+  );
+  protected readonly tetrisCol = signal(2);
+  protected readonly tetrisRow = signal(0);
+  private tetrisFallTimer: ReturnType<typeof setInterval> | null = null;
+  private tetrisResizeObserver: ResizeObserver | null = null;
+  private tetrisGridReady = false;
+  protected readonly formattedChfValue = computed(() => {
+    const bal = Number.parseFloat(this.totalBalance()) || 0;
+    const localeId = this.locale.locale() === 'fr' ? 'fr-FR' : 'en-GB';
+    return new Intl.NumberFormat(localeId, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(bal);
+  });
   protected readonly formattedAvailableBalance = computed(() =>
     formatR4v3Amount(this.availableBalance())
-  );
-  protected readonly formattedBalanceDisplay = computed(
-    () => `${this.nativeToken()} ${this.formattedTotalBalance()} m4t3r`
   );
 
   protected readonly nativeToken = computed(
@@ -160,6 +212,25 @@ export class WalletPanelComponent implements OnInit {
     return displayed.length > 20
       ? `${displayed.slice(0, 12)}...${displayed.slice(-6)}`
       : displayed;
+  });
+
+  protected readonly accountDisplayName = computed(() => {
+    const username = this.auth.user()?.username?.trim();
+    if (username) {
+      return username;
+    }
+
+    return '—';
+  });
+
+  protected readonly balanceAddressPrefix = computed(() => {
+    const address = this.displayWalletAddress();
+    const displayed = displayR4v3Address(address);
+    if (!address) {
+      return '—';
+    }
+
+    return displayed.length > 14 ? `${displayed.slice(0, 12)}…` : displayed;
   });
 
   protected readonly maskedPublicKey = computed(() => {
@@ -214,6 +285,14 @@ export class WalletPanelComponent implements OnInit {
       return 'Synchronisation…';
     }
     return 'Wallet actif';
+  });
+
+  protected readonly shouldShowStatusLine = computed(() => {
+    if (this.hasWallet() && this.centerTone() === 'idle' && !this.refreshingBalance()) {
+      return false;
+    }
+
+    return Boolean(this.centerMessage());
   });
 
   constructor() {
@@ -287,6 +366,188 @@ export class WalletPanelComponent implements OnInit {
           this.fetchBalance(address, true, false);
         }
       });
+
+    this.tetrisFallTimer = setInterval(() => this.tickTetrisFall(), 650);
+    this.destroyRef.onDestroy(() => {
+      if (this.tetrisFallTimer) {
+        clearInterval(this.tetrisFallTimer);
+        this.tetrisFallTimer = null;
+      }
+      if (this.tetrisResizeObserver) {
+        this.tetrisResizeObserver.disconnect();
+        this.tetrisResizeObserver = null;
+      }
+    });
+  }
+
+  ngAfterViewInit(): void {
+    const playfield = this.tetrisPlayfieldRef?.nativeElement;
+    if (!playfield) {
+      return;
+    }
+
+    const applySize = (): void => {
+      const rect = playfield.getBoundingClientRect();
+      this.syncTetrisGridSize(rect.width, rect.height);
+    };
+
+    applySize();
+    this.tetrisResizeObserver = new ResizeObserver(() => applySize());
+
+    this.tetrisResizeObserver.observe(playfield);
+    const tetrisHost = this.tetrisRef?.nativeElement;
+    if (tetrisHost) {
+      this.tetrisResizeObserver.observe(tetrisHost);
+    }
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(applySize);
+    });
+  }
+
+  protected isTetrisCellLocked(col: number, row: number): boolean {
+    return this.tetrisBoard()[row]?.[col] ?? false;
+  }
+
+  protected isTetrisCellActive(col: number, row: number): boolean {
+    return this.tetrisCol() === col && this.tetrisRow() === row;
+  }
+
+  private syncTetrisGridSize(width: number, height: number): void {
+    const cell = WalletPanelComponent.TETRIS_CELL_PX;
+    const gap = WalletPanelComponent.TETRIS_GAP_PX;
+    const pad = WalletPanelComponent.TETRIS_PAD_PX;
+    const innerWidth = Math.max(0, width - pad * 2);
+    const innerHeight = Math.max(0, height - pad * 2);
+    const nextCols = Math.max(
+      WalletPanelComponent.TETRIS_MIN_COLS,
+      Math.floor((innerWidth + gap) / (cell + gap))
+    );
+    const nextRows = Math.max(
+      WalletPanelComponent.TETRIS_MIN_ROWS,
+      Math.floor((innerHeight + gap) / (cell + gap))
+    );
+    const sizeChanged =
+      nextCols !== this.tetrisColCount() || nextRows !== this.tetrisRowCount();
+
+    if (sizeChanged) {
+      this.tetrisColCount.set(nextCols);
+      this.tetrisRowCount.set(nextRows);
+      this.resizeTetrisBoard(nextCols, nextRows);
+    }
+
+    if (!this.tetrisGridReady && nextCols > 0 && nextRows > 0) {
+      this.tetrisGridReady = true;
+      this.resetTetrisGame(nextCols, nextRows);
+    }
+  }
+
+  private createEmptyTetrisBoard(cols: number, rows: number): boolean[][] {
+    return Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => false)
+    );
+  }
+
+  private resetTetrisGame(cols: number, rows: number): void {
+    this.tetrisBoard.set(this.createEmptyTetrisBoard(cols, rows));
+    this.spawnTetrisPiece();
+  }
+
+  private resizeTetrisBoard(nextCols: number, nextRows: number): void {
+    const previous = this.tetrisBoard();
+    const nextBoard = Array.from({ length: nextRows }, (_, row) =>
+      Array.from({ length: nextCols }, (_, col) => previous[row]?.[col] ?? false)
+    );
+    this.tetrisBoard.set(nextBoard);
+
+    const col = Math.min(this.tetrisCol(), nextCols - 1);
+    const row = Math.min(this.tetrisRow(), nextRows - 1);
+    this.tetrisCol.set(col);
+    this.tetrisRow.set(row);
+
+    if (!this.canMoveTo(this.tetrisCol(), this.tetrisRow())) {
+      this.spawnTetrisPiece();
+    }
+  }
+
+  private canMoveTo(col: number, row: number): boolean {
+    if (col < 0 || col >= this.tetrisColCount()) {
+      return false;
+    }
+    if (row < 0 || row >= this.tetrisRowCount()) {
+      return false;
+    }
+
+    return !this.tetrisBoard()[row]?.[col];
+  }
+
+  private spawnTetrisPiece(): void {
+    const cols = this.tetrisColCount();
+    const col = Math.floor(cols / 2);
+
+    if (!this.canMoveTo(col, 0)) {
+      this.resetTetrisGame(cols, this.tetrisRowCount());
+      return;
+    }
+
+    this.tetrisCol.set(col);
+    this.tetrisRow.set(0);
+  }
+
+  private lockTetrisPiece(): void {
+    const col = this.tetrisCol();
+    const row = this.tetrisRow();
+    const board = this.tetrisBoard().map((line) => [...line]);
+    board[row][col] = true;
+    this.tetrisBoard.set(board);
+    this.clearTetrisLines();
+    this.spawnTetrisPiece();
+  }
+
+  private clearTetrisLines(): void {
+    const cols = this.tetrisColCount();
+    const rows = this.tetrisRowCount();
+    const board = this.tetrisBoard();
+    const remaining = board.filter((line) => !line.every(Boolean));
+    const clearedCount = rows - remaining.length;
+
+    if (clearedCount <= 0) {
+      return;
+    }
+
+    const emptyRows = Array.from({ length: clearedCount }, () =>
+      Array.from({ length: cols }, () => false)
+    );
+    this.tetrisBoard.set([...emptyRows, ...remaining]);
+  }
+
+  protected moveTetrisHorizontal(delta: number, event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    const nextCol = this.tetrisCol() + delta;
+    if (this.canMoveTo(nextCol, this.tetrisRow())) {
+      this.tetrisCol.set(nextCol);
+    }
+  }
+
+  protected moveTetrisDown(event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    this.advanceTetrisRow();
+  }
+
+  private tickTetrisFall(): void {
+    this.advanceTetrisRow();
+  }
+
+  private advanceTetrisRow(): void {
+    const nextRow = this.tetrisRow() + 1;
+    if (this.canMoveTo(this.tetrisCol(), nextRow)) {
+      this.tetrisRow.set(nextRow);
+      return;
+    }
+
+    this.lockTetrisPiece();
   }
 
   protected createWallet(): void {
@@ -391,10 +652,96 @@ export class WalletPanelComponent implements OnInit {
     this.publicKeyVisible.update((value) => !value);
   }
 
+  protected copyPublicKey(event: Event): void {
+    event.stopPropagation();
+    const label = this.locale.t('wallet.keys.public');
+    const value = this.walletPublicKey();
+    if (!value) {
+      this.errorMessage.set(`Aucune donnée ${label}.`);
+      this.pushToast(`Aucune donnée ${label}.`, 'error');
+      return;
+    }
+
+    void this.copyText(value)
+      .then(() => {
+        this.successMessage.set(`${label} copié.`);
+        this.pushToast(`${label} copié`, 'success');
+        this.copiedPublicKey.set(true);
+        if (this.copiedPublicKeyTimer) {
+          clearTimeout(this.copiedPublicKeyTimer);
+        }
+        this.copiedPublicKeyTimer = setTimeout(() => this.copiedPublicKey.set(false), 1500);
+      })
+      .catch(() => {
+        this.errorMessage.set(`Copie ${label} impossible.`);
+        this.pushToast(`Copie ${label} impossible`, 'error');
+      });
+  }
+
+  protected copyPrivateKey(event: Event): void {
+    event.stopPropagation();
+    const label = this.locale.t('wallet.keys.private');
+    const value = this.walletPrivateKey();
+    if (!value) {
+      this.errorMessage.set(`Aucune donnée ${label}.`);
+      this.pushToast(`Aucune donnée ${label}.`, 'error');
+      return;
+    }
+
+    void this.copyText(value)
+      .then(() => {
+        this.successMessage.set(`${label} copié.`);
+        this.pushToast(`${label} copié`, 'success');
+        this.copiedPrivateKey.set(true);
+        if (this.copiedPrivateKeyTimer) {
+          clearTimeout(this.copiedPrivateKeyTimer);
+        }
+        this.copiedPrivateKeyTimer = setTimeout(() => this.copiedPrivateKey.set(false), 1500);
+      })
+      .catch(() => {
+        this.errorMessage.set(`Copie ${label} impossible.`);
+        this.pushToast(`Copie ${label} impossible`, 'error');
+      });
+  }
+
+  protected onTogglePublicKeyVisibility(event: Event): void {
+    event.stopPropagation();
+    this.togglePublicKeyVisibility();
+  }
+
+  protected onTogglePrivateKeyVisibility(event: Event): void {
+    event.stopPropagation();
+    this.togglePrivateKeyVisibility();
+  }
+
   @HostListener('keydown', ['$event'])
   protected onScrollKeydown(event: KeyboardEvent): void {
     if (this.isEditableTarget(event.target)) {
       return;
+    }
+
+    if (
+      this.hasWallet() &&
+      !this.showSendPanel() &&
+      !this.showReceivePanel() &&
+      this.tetrisGridReady
+    ) {
+      switch (event.key) {
+        case 'ArrowLeft':
+          this.moveTetrisHorizontal(-1);
+          event.preventDefault();
+          return;
+        case 'ArrowRight':
+          this.moveTetrisHorizontal(1);
+          event.preventDefault();
+          return;
+        case 'ArrowDown':
+          this.moveTetrisDown();
+          event.preventDefault();
+          return;
+        default:
+          break;
+      }
     }
 
     const container = this.findScrollContainer(event.target as Node | null);

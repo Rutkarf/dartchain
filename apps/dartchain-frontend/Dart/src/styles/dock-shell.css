@@ -53,11 +53,11 @@
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab,
 .app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface {
-  flex: var(--dock-tab-flex, 6) 1 0 !important;
+  flex: 1 1 0 !important;
   min-width: 0 !important;
   max-width: none !important;
-  padding: 0 2px !important;
-  font-size: clamp(4.5px, calc(100cqw / 52), 7px) !important;
+  padding: 0 calc(2px * var(--bottom-stack-scale, 1.106)) !important;
+  font-size: calc(clamp(4.5px, calc(100cqw / 52), 7px) * var(--bottom-stack-scale, 1.106)) !important;
   letter-spacing: 0.02em !important;
   overflow: visible !important;
 }

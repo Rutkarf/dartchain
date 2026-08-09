@@ -3,33 +3,38 @@
   [class.is-wallet-active]="hasWallet()"
   aria-label="Wallet"
 >
-  <header class="wallet-display__toolbar">
-    <button
-      type="button"
-      class="wallet-display__icon-btn wallet-display__icon-btn--create"
-      (click)="createWallet()"
-      [disabled]="creatingWallet()"
-      [attr.aria-label]="locale.t('wallet.create')"
-      title="{{ locale.t('wallet.create') }}"
-    >
-      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-        <path d="M8 3v10M3 8h10" />
-      </svg>
-    </button>
+  @if (!hasWallet()) {
+    <div class="wallet-display__hero">
+      <button
+        type="button"
+        class="wallet-display__create-cta"
+        [class.wallet-display__create-cta--loading]="creatingWallet()"
+        (click)="createWallet()"
+        [disabled]="creatingWallet()"
+      >
+        @if (creatingWallet()) {
+          <span class="wallet-display__create-cta-spinner" aria-hidden="true"></span>
+        }
+        <span class="wallet-display__create-cta-label">
+          {{ creatingWallet() ? 'CRÉATION…' : 'CRÉER UN WALLET' }}
+        </span>
+      </button>
+    </div>
+  }
 
-    <div
-      class="wallet-display__center"
-      [class.wallet-display__center--error]="centerTone() === 'error'"
-      [class.wallet-display__center--success]="centerTone() === 'success'"
-      [class.wallet-display__center--info]="centerTone() === 'info'"
-      [class.wallet-display__center--idle]="centerTone() === 'idle' && !hasWallet()"
+  @if (shouldShowStatusLine()) {
+    <p
+      class="wallet-display__status-line"
+      [class.wallet-display__status-line--error]="centerTone() === 'error'"
+      [class.wallet-display__status-line--success]="centerTone() === 'success'"
+      [class.wallet-display__status-line--info]="centerTone() === 'info'"
+      [class.wallet-display__status-line--idle]="centerTone() === 'idle' && !hasWallet()"
       aria-live="polite"
       role="status"
     >
       {{ centerMessage() }}
-    </div>
-
-  </header>
+    </p>
+  }
 
   <div
     #bodyScrollRef
@@ -39,37 +44,227 @@
     role="region"
     [attr.aria-label]="hasWallet() ? 'Contenu wallet' : null"
   >
-    <section class="wallet-display__balance-block" aria-label="Solde R4V3">
-      <p class="wallet-display__balance-line">{{ formattedBalanceDisplay() }}</p>
-      <p class="wallet-display__fiat">{{ formattedTotalFiat() }}</p>
-    </section>
-
-    <section class="wallet-display__identity" aria-label="Identité wallet">
-      @if (auth.isAuthenticated()) {
-        <p class="wallet-display__account">{{ locale.t('wallet.account') }} : {{ auth.user()?.username }}</p>
-      }
-      @if (hasWallet() || displayWalletAddress()) {
-        <button
-          type="button"
-          class="wallet-display__address"
-          [title]="displayR4v3Address(displayWalletAddress())"
-          (click)="copyWalletAddress()"
-        >
-          <span
-            class="wallet-display__address-led"
-            [class.is-active]="hasWallet()"
-            aria-hidden="true"
-          ></span>
-          {{ shortDisplayAddress() }}
-          <span class="wallet-display__address-icon" [class.is-copied]="copiedAddress()" aria-hidden="true">
-            @if (copiedAddress()) {
-              ✓
-            } @else {
-              ⧉
+    <section class="wallet-display__holdings wallet-display__holdings--split" aria-label="Solde wallet">
+      <div class="wallet-display__balance-col">
+        <article class="wallet-display__balance-cyber" [attr.aria-label]="formattedTotalBalance()">
+          <span class="wallet-display__balance-cyber-scanlines" aria-hidden="true"></span>
+          <span class="wallet-display__balance-cyber-corner wallet-display__balance-cyber-corner--tl" aria-hidden="true"></span>
+          <header class="wallet-display__balance-cyber-head">
+            <span
+              class="wallet-display__balance-cyber-account"
+              [class.wallet-display__balance-cyber-account--guest]="!auth.isAuthenticated()"
+            >
+              {{ accountDisplayName() }}
+            </span>
+            @if (hasWallet() || displayWalletAddress()) {
+              <button
+                type="button"
+                class="wallet-display__balance-cyber-address"
+                [title]="displayR4v3Address(displayWalletAddress())"
+                (click)="copyWalletAddress()"
+              >
+                <span
+                  class="wallet-display__balance-cyber-address-led"
+                  [class.is-active]="hasWallet()"
+                  aria-hidden="true"
+                ></span>
+                <span class="wallet-display__balance-cyber-address-text">{{ balanceAddressPrefix() }}</span>
+                <span
+                  class="wallet-display__balance-cyber-address-icon"
+                  [class.is-copied]="copiedAddress()"
+                  aria-hidden="true"
+                >
+                  @if (copiedAddress()) {
+                    ✓
+                  } @else {
+                    ⧉
+                  }
+                </span>
+              </button>
             }
-          </span>
-        </button>
-      }
+          </header>
+          <span class="wallet-display__balance-brand">{{ nativeToken() }}</span>
+          <span class="wallet-display__balance-divider" aria-hidden="true"></span>
+          <div class="wallet-display__holding-stack">
+            <span class="wallet-display__holding-stack-line wallet-display__holding-stack-line--lead">
+              <span class="wallet-display__holding-stack-whole">{{ stackedBalanceLines().whole }}</span><span class="wallet-display__holding-stack-comma">,</span>{{ stackedBalanceLines().line1 }}
+            </span>
+            <span class="wallet-display__holding-stack-line">{{ stackedBalanceLines().line2 }}</span>
+            <span class="wallet-display__holding-stack-line">{{ stackedBalanceLines().line3 }}</span>
+            <span class="wallet-display__holding-stack-line wallet-display__holding-stack-line--tail">
+              <span class="wallet-display__holding-stack-tail-digits">{{ stackedBalanceLines().line4 }}</span>
+            </span>
+          </div>
+
+          <div #tetrisRef class="wallet-display__tetris" aria-hidden="true">
+            <div #tetrisPlayfieldRef class="wallet-display__tetris-playfield">
+              <div class="wallet-display__tetris-logo-layer" aria-hidden="true">
+                <app-r4v3-three
+                  class="wallet-display__tetris-logo-three"
+                  presentation="navbar"
+                  [modelTargetSize]="10"
+                  [cameraFitFactor]="1.38"
+                  [frameBiasY]="-0.04"
+                  [enableOrbit]="true"
+                />
+              </div>
+              <div
+                class="wallet-display__tetris-grid"
+                [style.--tetris-cols]="tetrisColCount()"
+                [style.--tetris-rows]="tetrisRowCount()"
+              >
+                @for (row of tetrisRows(); track row) {
+                  @for (col of tetrisCols(); track col) {
+                    <span
+                      class="wallet-display__tetris-cell"
+                      [class.wallet-display__tetris-cell--locked]="isTetrisCellLocked(col, row)"
+                      [class.wallet-display__tetris-cell--active]="isTetrisCellActive(col, row)"
+                    ></span>
+                  }
+                }
+              </div>
+            </div>
+            <div class="wallet-display__tetris-controls">
+              <button
+                type="button"
+                class="wallet-display__tetris-btn"
+                (click)="moveTetrisHorizontal(-1, $event)"
+                aria-label="Gauche"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                class="wallet-display__tetris-btn"
+                (click)="moveTetrisDown($event)"
+                aria-label="Bas"
+              >
+                ↓
+              </button>
+              <button
+                type="button"
+                class="wallet-display__tetris-btn"
+                (click)="moveTetrisHorizontal(1, $event)"
+                aria-label="Droite"
+              >
+                →
+              </button>
+            </div>
+          </div>
+
+          <div class="wallet-display__balance-chf" aria-label="Conversion CHF">
+            <span class="wallet-display__balance-chf-label">CHF</span>
+            <span class="wallet-display__balance-chf-value">{{ formattedChfValue() }}</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="wallet-display__faucet-col">
+        <app-wallet-faucet-embed />
+
+        @if (hasWallet()) {
+          <section
+            class="wallet-display__keys wallet-display__keys--dual wallet-display__keys--faucet-col"
+            [attr.aria-label]="locale.t('wallet.keys.title')"
+          >
+              <article class="wallet-display__key-strip">
+                <span class="wallet-display__key-strip-label">
+                  {{ locale.t('wallet.keys.public') }}
+                </span>
+                <code class="wallet-display__key-strip-value">{{ publicKeyVisible() ? walletPublicKey() : maskedPublicKey() }}</code>
+                <div class="wallet-display__key-strip-actions">
+                  <button
+                    type="button"
+                    class="wallet-display__key-icon-btn"
+                    [class.is-active]="publicKeyVisible()"
+                    (click)="onTogglePublicKeyVisibility($event)"
+                    [attr.aria-label]="publicKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')"
+                    [title]="publicKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')"
+                  >
+                    @if (publicKeyVisible()) {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M2 2l12 12" />
+                        <path d="M1 8s2.5-4 7-4c1.6 0 3 .4 4.2 1" />
+                        <path d="M15 8s-2.5 4-7 4c-1.6 0-3-.4-4.2-1" />
+                        <circle cx="8" cy="8" r="2" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" />
+                        <circle cx="8" cy="8" r="2" />
+                      </svg>
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    class="wallet-display__key-icon-btn wallet-display__key-icon-btn--copy"
+                    [class.is-copied]="copiedPublicKey()"
+                    (click)="copyPublicKey($event)"
+                    [attr.aria-label]="locale.t('wallet.keys.copy')"
+                    [title]="locale.t('wallet.keys.copy')"
+                  >
+                    @if (copiedPublicKey()) {
+                      ✓
+                    } @else {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <rect x="5" y="5" width="8" height="8" rx="1" />
+                        <path d="M5 9H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+              </article>
+
+              <article class="wallet-display__key-strip">
+                <span class="wallet-display__key-strip-label">
+                  {{ locale.t('wallet.keys.private') }}
+                </span>
+                <code class="wallet-display__key-strip-value">{{ privateKeyVisible() ? walletPrivateKey() : maskedPrivateKey() }}</code>
+                <div class="wallet-display__key-strip-actions">
+                  <button
+                    type="button"
+                    class="wallet-display__key-icon-btn"
+                    [class.is-active]="privateKeyVisible()"
+                    (click)="onTogglePrivateKeyVisibility($event)"
+                    [attr.aria-label]="privateKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')"
+                    [title]="privateKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')"
+                  >
+                    @if (privateKeyVisible()) {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M2 2l12 12" />
+                        <path d="M1 8s2.5-4 7-4c1.6 0 3 .4 4.2 1" />
+                        <path d="M15 8s-2.5 4-7 4c-1.6 0-3-.4-4.2-1" />
+                        <circle cx="8" cy="8" r="2" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" />
+                        <circle cx="8" cy="8" r="2" />
+                      </svg>
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    class="wallet-display__key-icon-btn wallet-display__key-icon-btn--copy"
+                    [class.is-copied]="copiedPrivateKey()"
+                    (click)="copyPrivateKey($event)"
+                    [attr.aria-label]="locale.t('wallet.keys.copy')"
+                    [title]="locale.t('wallet.keys.copy')"
+                  >
+                    @if (copiedPrivateKey()) {
+                      ✓
+                    } @else {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <rect x="5" y="5" width="8" height="8" rx="1" />
+                        <path d="M5 9H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1" />
+                      </svg>
+                    }
+                  </button>
+                </div>
+              </article>
+            </section>
+        }
+      </div>
     </section>
 
     <section class="wallet-display__explorer" [attr.aria-label]="locale.t('wallet.explorer.address')">
@@ -128,38 +323,6 @@
           }
         </div>
       }
-
-      <section class="wallet-display__keys" [attr.aria-label]="locale.t('wallet.keys.public')">
-        <article class="wallet-display__key-row">
-          <div class="wallet-display__key-head">
-            <span>{{ locale.t('wallet.keys.public') }}</span>
-            <div class="wallet-display__key-actions">
-              <button type="button" class="wallet-display__mini-btn" (click)="togglePublicKeyVisibility()">
-                {{ publicKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show') }}
-              </button>
-              <button type="button" class="wallet-display__mini-btn" (click)="copyToClipboard(walletPublicKey(), locale.t('wallet.keys.public'))">
-                {{ locale.t('wallet.keys.copy') }}
-              </button>
-            </div>
-          </div>
-          <code class="wallet-display__key-value">{{ maskedPublicKey() }}</code>
-        </article>
-
-        <article class="wallet-display__key-row">
-          <div class="wallet-display__key-head">
-            <span>{{ locale.t('wallet.keys.private') }}</span>
-            <div class="wallet-display__key-actions">
-              <button type="button" class="wallet-display__mini-btn" (click)="togglePrivateKeyVisibility()">
-                {{ privateKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show') }}
-              </button>
-              <button type="button" class="wallet-display__mini-btn" (click)="copyToClipboard(walletPrivateKey(), locale.t('wallet.keys.private'))">
-                {{ locale.t('wallet.keys.copy') }}
-              </button>
-            </div>
-          </div>
-          <code class="wallet-display__key-value">{{ maskedPrivateKey() }}</code>
-        </article>
-      </section>
     }
   </div>
 

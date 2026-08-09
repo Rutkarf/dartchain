@@ -96,7 +96,12 @@
   --market-exchange-collapsed-h: var(--swap-smart-bar-h);
   --showcase-panel-handle-h: clamp(12px, 3.2vw, 16px);
   --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
-  --showcase-hub-tab-h: clamp(22px, 5.2vw, 28px);
+  --bottom-stack-scale: 1.106;
+  --dock-stack-share-dock: calc(
+    var(--bottom-stack-scale) / (1 + var(--bottom-stack-scale))
+  );
+  --dock-stack-share-hub: calc(1 / (1 + var(--bottom-stack-scale)));
+  --showcase-hub-tab-h: calc(clamp(22px, 5.2vw, 28px) * var(--bottom-stack-scale));
   --showcase-hub-chevron-row-h: 0px;
   --showcase-hub-header-h: var(--showcase-hub-tab-h);
   --hub-showcase-block-height-collapsed: calc(
@@ -118,7 +123,7 @@
   --dock-hub-tab-w: clamp(2rem, 10vw, 2.75rem);
   --dock-panel-height: var(--dock-tab-rail-height);
   --dock-panel-handle-h: clamp(12px, 3.2vw, 16px);
-  --dock-smart-bar-h: clamp(28px, 7vw, 34px);
+  --dock-smart-bar-h: calc(clamp(28px, 7vw, 34px) * var(--bottom-stack-scale));
   --dock-toggle-w: clamp(22px, 6vw, 28px);
   --dock-collapsed-band-h: var(--dock-panel-handle-h);
   --app-dock-stack-height: calc(
@@ -171,7 +176,7 @@
   );
   --dock-tab-slot: var(--showcase-tab-slot);
   --paired-panel-block-height: var(--hub-showcase-block-height);
-  --bottom-stack-panel-height: var(--paired-panel-block-height);
+  --bottom-stack-panel-height: calc(var(--paired-panel-block-height) * var(--bottom-stack-scale));
   --wallet-display-height: calc(var(--bottom-stack-panel-height) + var(--showcase-hub-tab-h));
   --bottom-dock-height: clamp(48px, 8vh, 58px);
   --dock-stack-header-h: clamp(18px, 4.5vw, 22px);
@@ -456,11 +461,25 @@ app-three-floor {
   flex: 1 1 auto;
   height: 100%;
   min-height: 0;
+  max-height: 100%;
   border-radius: 0;
   overflow: hidden;
   border: none;
   background: transparent;
   box-shadow: none;
+}
+
+.app-bottom-stack__panel--faucet,
+.app-bottom-stack__panel--transactions,
+.app-bottom-stack__panel--chain,
+.app-bottom-stack__panel--market,
+.app-bottom-stack__panel--quests,
+.app-bottom-stack__panel--peers,
+.app-bottom-stack__panel--admin {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
 }
 
 .app-bottom-stack__panel app-wallet-panel,
@@ -1827,7 +1846,7 @@ app-block-detail-drawer {
     --section-stack-gap: clamp(4px, 1vw, 6px);
     --showcase-band-height: min(calc(90px * var(--showcase-tab-scale)), 17.5vh);
     --market-height: clamp(168px, 28vh, 208px);
-    --showcase-hub-tab-h: clamp(13px, 3.6vw, 16px);
+    --showcase-hub-tab-h: calc(clamp(13px, 3.6vw, 16px) * var(--bottom-stack-scale));
     --faucet-band-height: auto;
     --floor-peek-height: clamp(24px, 4.5vh, 36px);
   }
@@ -1847,18 +1866,18 @@ app-block-detail-drawer {
     --hub-showcase-block-height-base: calc(
       var(--showcase-hub-header-h) + var(--showcase-band-height-base) - var(--showcase-tab-fusion-overlap)
     );
-    --paired-panel-block-height: calc(
-      (
-        100svh - var(--navbar-stack-estimate) - var(--navbar-hub-gap) -
-          var(--market-height) - var(--band-air-gap) - var(--hub-market-showcase-gap) -
-          var(--bottom-dock-height) - var(--shell-vertical-gaps, 0px)
-      ) / 2
+    --viewport-pair-budget: calc(
+      100svh - var(--navbar-stack-estimate) - var(--navbar-hub-gap) -
+        var(--market-height) - var(--band-air-gap) - var(--hub-market-showcase-gap) -
+        var(--shell-vertical-gaps, 0px)
     );
+    --paired-panel-block-height: calc(var(--viewport-pair-budget) * var(--dock-stack-share-hub));
+    --bottom-stack-panel-height: calc(var(--viewport-pair-budget) * var(--dock-stack-share-dock));
+    --hub-showcase-block-height: var(--paired-panel-block-height);
     --showcase-band-height: calc(
       var(--paired-panel-block-height) - var(--showcase-hub-header-h) +
         var(--showcase-tab-fusion-overlap)
     );
-    --bottom-stack-panel-height: var(--paired-panel-block-height);
     --showcase-band-slack: max(
       0px,
       calc(var(--showcase-band-height) - var(--showcase-band-height-base))
@@ -2224,29 +2243,29 @@ app-block-detail-drawer {
     --wallet-display-extra: 0px;
     --floor-peek-height: 0px;
     --shell-vertical-gaps: 6px;
-    --showcase-hub-tab-h: clamp(16px, 4.2vw, 20px);
+    --showcase-hub-tab-h: calc(clamp(16px, 4.2vw, 20px) * var(--bottom-stack-scale));
     --showcase-band-height-base: clamp(88px, 14vh, 108px);
     --navbar-stack-estimate: calc(var(--ds-zone-navbar, 56px) + var(--ds-navbar-top-inset, 0px));
     --hub-showcase-block-height-base: calc(
       var(--showcase-hub-header-h) + var(--showcase-band-height-base) - var(--showcase-tab-fusion-overlap)
     );
-    --paired-panel-block-height: calc(
-      (
-        100svh - var(--navbar-stack-estimate) - var(--navbar-hub-gap) -
-          var(--market-height) - var(--band-air-gap) - var(--hub-market-showcase-gap) -
-          var(--bottom-dock-height) - var(--shell-vertical-gaps, 0px)
-      ) / 2
+    --viewport-pair-budget: calc(
+      100svh - var(--navbar-stack-estimate) - var(--navbar-hub-gap) -
+        var(--market-height) - var(--band-air-gap) - var(--hub-market-showcase-gap) -
+        var(--shell-vertical-gaps, 0px)
     );
+    --paired-panel-block-height: calc(var(--viewport-pair-budget) * var(--dock-stack-share-hub));
+    --bottom-stack-panel-height: calc(var(--viewport-pair-budget) * var(--dock-stack-share-dock));
+    --hub-showcase-block-height: var(--paired-panel-block-height);
     --showcase-band-height: calc(
       var(--paired-panel-block-height) - var(--showcase-hub-header-h) +
         var(--showcase-tab-fusion-overlap)
     );
-    --bottom-stack-panel-height: var(--paired-panel-block-height);
     --showcase-band-slack: max(
       0px,
       calc(var(--showcase-band-height) - var(--showcase-band-height-base))
     );
-    --wallet-display-height: calc(var(--bottom-stack-panel-height) + var(--bottom-dock-height) + var(--wallet-display-extra));
+    --wallet-display-height: calc(var(--bottom-stack-panel-height) + var(--showcase-hub-tab-h) + var(--wallet-display-extra));
     --bottom-dock-height: clamp(42px, 6.9vh, 50px);
     --bandeau-slot-h: auto !important;
     --market-after-ticker-gap: var(--stack-gap-navbar-market);
