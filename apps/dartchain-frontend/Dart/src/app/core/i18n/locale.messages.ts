@@ -15,6 +15,10 @@ export type LocaleKey =
   | 'transactions.viewMempool'
   | 'transactions.createTx'
   | 'transactions.refreshAll'
+  | 'transactions.refreshPending'
+  | 'transactions.filter'
+  | 'transactions.mineAll'
+  | 'transactions.miningAll'
   | 'transactions.mempoolEmpty'
   | 'transactions.mempoolCount'
   | 'dock.chain'
@@ -163,6 +167,7 @@ export type LocaleKey =
   | 'wallet.account'
   | 'wallet.noAddress'
   | 'wallet.send'
+  | 'wallet.swap'
   | 'wallet.receive'
   | 'wallet.mine'
   | 'wallet.mining'
@@ -172,6 +177,8 @@ export type LocaleKey =
   | 'wallet.explorer.lookup'
   | 'wallet.explorer.useMine'
   | 'wallet.explorer.result'
+  | 'wallet.recent.title'
+  | 'wallet.recent.empty'
   | 'wallet.keys.title'
   | 'wallet.keys.public'
   | 'wallet.keys.private'
@@ -184,6 +191,10 @@ export type LocaleKey =
   | 'wallet.send.memo'
   | 'wallet.send.confirm'
   | 'wallet.send.sending'
+  | 'wallet.send.confirmTitle'
+  | 'wallet.send.confirmHint'
+  | 'wallet.send.confirmYes'
+  | 'wallet.send.confirmCancel'
   | 'wallet.receive.title'
   | 'wallet.receive.addressLabel'
   | 'wallet.receive.copy'
@@ -293,12 +304,16 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'dock.faucet': 'Faucet',
     'dock.pending': 'Transactions en attente',
     'dock.block': 'Composeur de bloc',
-    'dock.transactions': 'Transaction',
+    'dock.transactions': 'Mempool',
     'transactions.composer': 'Composer',
     'transactions.mempool': 'Mempool',
     'transactions.viewMempool': 'Voir mempool',
     'transactions.createTx': 'CRÉER TX',
-    'transactions.refreshAll': 'Actualiser composer et mempool',
+    'transactions.refreshAll': 'Actualiser le mempool',
+    'transactions.refreshPending': 'Actualiser',
+    'transactions.filter': 'Filtrer',
+    'transactions.mineAll': 'Mine tout',
+    'transactions.miningAll': 'Minage…',
     'transactions.mempoolEmpty': 'Mempool vide',
     'transactions.mempoolCount': '{count} tx en attente',
     'dock.chain': 'Explorateur de chaîne',
@@ -395,6 +410,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.account': 'Compte',
     'wallet.noAddress': 'Aucun wallet',
     'wallet.send': 'Envoyer',
+    'wallet.swap': 'Swap',
     'wallet.receive': 'Recevoir',
     'wallet.mine': 'Miner',
     'wallet.mining': 'Minage…',
@@ -404,6 +420,8 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.explorer.lookup': 'Consulter',
     'wallet.explorer.useMine': 'Mon wallet',
     'wallet.explorer.result': 'Solde exploré',
+    'wallet.recent.title': 'Consultations récentes',
+    'wallet.recent.empty': 'Aucune consultation récente',
     'wallet.keys.title': 'Clés du wallet',
     'wallet.keys.public': 'Clef publique',
     'wallet.keys.private': 'Clef privée',
@@ -411,13 +429,17 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.keys.hide': 'Masquer',
     'wallet.keys.copy': 'Copier clef',
     'wallet.send.title': 'Envoyer',
-    'wallet.send.recipient': 'Adresse destinataire',
-    'wallet.send.amount': 'Montant (R4V3)',
-    'wallet.send.memo': 'Mémo (optionnel)',
+    'wallet.send.recipient': 'Destinataire',
+    'wallet.send.amount': 'Montant',
+    'wallet.send.memo': 'Mémo',
     'wallet.send.confirm': 'Confirmer envoi',
     'wallet.send.sending': 'Envoi…',
+    'wallet.send.confirmTitle': 'Confirmer la transaction',
+    'wallet.send.confirmHint': 'Vérifiez le destinataire et le montant avant validation.',
+    'wallet.send.confirmYes': 'Oui, envoyer',
+    'wallet.send.confirmCancel': 'Annuler',
     'wallet.receive.title': 'Recevoir',
-    'wallet.receive.addressLabel': 'Adresse de réception',
+    'wallet.receive.addressLabel': 'Réception',
     'wallet.receive.copy': "Copier l'adresse",
     'wallet.validation.recipient': 'Adresse destinataire invalide.',
     'wallet.validation.amount': 'Montant minimum 0.0001 R4V3.',
@@ -576,12 +598,16 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'dock.faucet': 'Faucet',
     'dock.pending': 'Pending transactions',
     'dock.block': 'Block composer',
-    'dock.transactions': 'Transaction',
+    'dock.transactions': 'Mempool',
     'transactions.composer': 'Composer',
     'transactions.mempool': 'Mempool',
     'transactions.viewMempool': 'View mempool',
     'transactions.createTx': 'Create tx',
-    'transactions.refreshAll': 'Refresh composer and mempool',
+    'transactions.refreshAll': 'Refresh mempool',
+    'transactions.refreshPending': 'Refresh',
+    'transactions.filter': 'Filter',
+    'transactions.mineAll': 'Mine all',
+    'transactions.miningAll': 'Mining…',
     'transactions.mempoolEmpty': 'Mempool empty',
     'transactions.mempoolCount': '{count} pending tx',
     'dock.chain': 'Chain explorer',
@@ -678,6 +704,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.account': 'Account',
     'wallet.noAddress': 'No wallet',
     'wallet.send': 'Send',
+    'wallet.swap': 'Swap',
     'wallet.receive': 'Receive',
     'wallet.mine': 'Mine',
     'wallet.mining': 'Mining…',
@@ -687,6 +714,8 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.explorer.lookup': 'Lookup',
     'wallet.explorer.useMine': 'My wallet',
     'wallet.explorer.result': 'Explored balance',
+    'wallet.recent.title': 'Recent lookups',
+    'wallet.recent.empty': 'No recent lookups',
     'wallet.keys.title': 'Wallet keys',
     'wallet.keys.public': 'Public key',
     'wallet.keys.private': 'Private key',
@@ -694,13 +723,17 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.keys.hide': 'Hide',
     'wallet.keys.copy': 'Copy key',
     'wallet.send.title': 'Send',
-    'wallet.send.recipient': 'Recipient address',
-    'wallet.send.amount': 'Amount (R4V3)',
-    'wallet.send.memo': 'Memo (optional)',
+    'wallet.send.recipient': 'Recipient',
+    'wallet.send.amount': 'Amount',
+    'wallet.send.memo': 'Memo',
     'wallet.send.confirm': 'Confirm send',
     'wallet.send.sending': 'Sending…',
+    'wallet.send.confirmTitle': 'Confirm transaction',
+    'wallet.send.confirmHint': 'Double-check recipient and amount before sending.',
+    'wallet.send.confirmYes': 'Yes, send',
+    'wallet.send.confirmCancel': 'Cancel',
     'wallet.receive.title': 'Receive',
-    'wallet.receive.addressLabel': 'Receiving address',
+    'wallet.receive.addressLabel': 'Receive',
     'wallet.receive.copy': 'Copy address',
     'wallet.validation.recipient': 'Invalid recipient address.',
     'wallet.validation.amount': 'Minimum amount 0.0001 R4V3.',

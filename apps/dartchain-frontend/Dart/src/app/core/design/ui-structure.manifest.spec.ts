@@ -47,10 +47,19 @@ describe('Phase 1 — UI structure manifest', () => {
     expect(ids).toContain('dock-pending');
     expect(ids).toContain('dock-block');
     expect(ids).toContain('dock-chain');
-    expect(ids).toContain('dock-market');
     expect(ids).toContain('dock-quests');
     expect(ids).toContain('dock-peers');
+    expect(ids).not.toContain('dock-market');
     expect(ids).toContain('dock-admin');
+  });
+
+  it('lists marché as rightmost showcase tab', () => {
+    const showcase = getZoneById('showcase')!;
+    const tabs = showcase.components.find((c) => c.selector === 'app-showcase-tabs')!;
+    const ids = tabs.elements.map((e) => e.id);
+    expect(ids).toContain('tab-market');
+    expect(ids.at(-1)).toBe('tab-market');
+    expect(ids).not.toContain('tab-peers');
   });
 
   it('documents particle background and three-floor', () => {

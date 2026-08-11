@@ -27,7 +27,6 @@ import { ShowcasePanelComponent } from './features/showcase-panel/showcase-panel
 import { WalletPanelComponent } from './features/wallet-panel/wallet-panel';
 import { FaucetComponent } from './features/faucet/faucet';
 import { PeerPanelComponent } from './features/peer-panel/peer-panel';
-import { MarketPanelComponent } from './features/market-panel/market-panel';
 import { QuestsPanelComponent } from './features/quests-panel/quests-panel';
 import { TransactionsDockComponent } from './features/transactions-dock/transactions-dock';
 import { BlocksListComponent } from './features/blocks-list/blocks-list';
@@ -91,7 +90,6 @@ import { PeersDataService } from './core/services/peers-data.service';
     WalletPanelComponent,
     FaucetComponent,
     PeerPanelComponent,
-    MarketPanelComponent,
     QuestsPanelComponent,
     TransactionsDockComponent,
     BlocksListComponent,
@@ -223,7 +221,13 @@ export class AppComponent {
       return;
     }
 
-    if (panel === 'faucet' || panel === 'market' || panel === 'quests') {
+    if (panel === 'market') {
+      this.showcaseCollapsed.set(false);
+      this.onShowcaseTabChange('market');
+      return;
+    }
+
+    if (panel === 'faucet' || panel === 'quests') {
       this.onBottomTabChange(panel);
     }
   };
@@ -294,7 +298,7 @@ export class AppComponent {
     window.dispatchEvent(
       new CustomEvent(SHOWCASE_REFRESH_EVENT, { detail: { tab } })
     );
-    if (tab === 'reseau' || tab === 'peers') {
+    if (tab === 'reseau') {
       window.dispatchEvent(new CustomEvent(TERMINAL_REFRESH_EVENT));
     }
   }
@@ -308,8 +312,7 @@ export class AppComponent {
         this.r4v3State.refresh();
         break;
       case 'reseau':
-      case 'peers':
-        this.terminalState.setMode(tab === 'peers' ? 'peers' : 'reseau');
+        this.terminalState.setMode('reseau');
         this.terminalState.refresh();
         break;
       case 'rv23':
@@ -320,6 +323,9 @@ export class AppComponent {
         break;
       case 'daonews':
         this.daoState.refresh();
+        break;
+      case 'market':
+        void this.marketData.refreshAll(true);
         break;
     }
   }
@@ -348,9 +354,6 @@ export class AppComponent {
         this.dockChainState.refresh(true);
         this.chainData.scheduleRefresh(true);
         break;
-      case 'market':
-        void this.marketData.refreshAll(true);
-        break;
       case 'quests':
         this.questsData.scheduleRefresh(true);
         break;
@@ -368,12 +371,13 @@ export class AppComponent {
       case 'r4v3':
         return this.r4v3State.refreshing() || this.r4v3State.loading();
       case 'reseau':
-      case 'peers':
         return this.terminalState.loading();
       case 'rv23':
         return this.chatState.refreshing();
       case 'dao':
         return this.launchState.loading();
+      case 'market':
+        return this.marketData.loadingRows() || this.marketData.loadingChart();
       default:
         return false;
     }
@@ -389,8 +393,6 @@ export class AppComponent {
         return this.transactionsData.pendingLoading() || this.transactionsData.tipLoading();
       case 'chain':
         return this.dockChainState.loading();
-      case 'market':
-        return this.marketData.loadingRows() || this.marketData.loadingChart();
       case 'quests':
         return this.questsData.loading();
       case 'peers':
@@ -418,9 +420,9 @@ export class AppComponent {
       r4v3: 'R4V3',
       reseau: 'RÉSEAU',
       rv23: 'CHAT',
-      peers: 'PEERS',
       dao: 'LAUNCH',
       daonews: 'D.A.O',
+      market: 'MARCHÉ',
     };
     const name = labels[this.activeShowcaseTab()];
     return this.showcaseCollapsed()
@@ -552,7 +554,8 @@ export class AppComponent {
         }
         break;
       case 'market':
-        this.onBottomTabChange('market');
+        this.showcaseCollapsed.set(false);
+        this.onShowcaseTabChange('market');
         break;
       case 'peers':
         this.onBottomTabChange('peers');

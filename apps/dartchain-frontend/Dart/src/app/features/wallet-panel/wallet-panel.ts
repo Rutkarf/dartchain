@@ -5,7 +5,6 @@ import {
   ElementRef,
   HostListener,
   OnInit,
-  AfterViewInit,
   ViewChild,
   computed,
   effect,
@@ -19,6 +18,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { take } from 'rxjs/operators';
 
 import {
   BalanceResponse,
@@ -36,27 +36,37 @@ import {
 } from '../../core/utils/r4v3-amount.util';
 import {
   displayR4v3Address,
+  formatUserWalletAddress,
   normalizeAddressForApi,
+  toDisplayWalletAddress,
 } from '../../core/utils/wallet-address.util';
 import {
   DOCK_REFRESH_EVENT,
   refreshEventMatchesTab,
 } from '../../core/constants/panel-refresh.constants';
 import { WalletFaucetEmbedComponent } from './wallet-faucet-embed';
-import { R4v3ThreeComponent } from '../r4v3-three/r4v3-three';
+import { DockNavigationService } from '../../core/services/dock-navigation.service';
+
+const RECENT_LOOKUPS_STORAGE_KEY = 'dartchain_wallet_recent_lookups_v1';
+const RECENT_LOOKUPS_MAX = 6;
+
+interface RecentWalletLookup {
+  address: string;
+  display: string;
+  balance: string;
+  at: number;
+}
 
 @Component({
   selector: 'app-wallet-panel',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, WalletFaucetEmbedComponent, R4v3ThreeComponent],
+  imports: [CommonModule, ReactiveFormsModule, WalletFaucetEmbedComponent],
   templateUrl: './wallet-panel.html',
   styleUrls: ['./wallet-panel.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WalletPanelComponent implements OnInit, AfterViewInit {
+export class WalletPanelComponent implements OnInit {
   @ViewChild('bodyScrollRef') private bodyScrollRef?: ElementRef<HTMLElement>;
-  @ViewChild('tetrisPlayfieldRef') private tetrisPlayfieldRef?: ElementRef<HTMLElement>;
-  @ViewChild('tetrisRef') private tetrisRef?: ElementRef<HTMLElement>;
   @ViewChild('sendPanelRef') private sendPanelRef?: ElementRef<HTMLElement>;
   @ViewChild('receivePanelRef') private receivePanelRef?: ElementRef<HTMLElement>;
 
@@ -68,6 +78,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
   private readonly chainConfig = inject(ChainConfigService);
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly dockNav = inject(DockNavigationService);
 
   protected readonly wallet = signal<WalletResponse | null>(
     this.walletSession.wallet()
@@ -75,6 +86,8 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
   protected readonly balance = signal<string>('0');
   protected readonly lookedUpBalance = signal<string | null>(null);
   protected readonly lookedUpAddress = signal('');
+  protected readonly lookedUpDisplay = signal('');
+  protected readonly recentLookups = signal<RecentWalletLookup[]>(this.readRecentLookups());
 
   protected readonly creatingWallet = signal(false);
   protected readonly refreshingBalance = signal(false);
@@ -88,6 +101,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
   protected readonly copiedPrivateKey = signal(false);
   protected readonly showSendPanel = signal(false);
   protected readonly showReceivePanel = signal(false);
+  protected readonly showSendConfirm = signal(false);
   protected readonly qrDataUrl = signal<string | null>(null);
 
   protected readonly privateKeyVisible = signal(false);
@@ -129,44 +143,6 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
   protected readonly formattedTotalBalance = computed(() =>
     formatR4v3Amount(this.totalBalance())
   );
-  protected readonly stackedBalanceLines = computed(() => {
-    const normalized = normalizeR4v3Amount(this.totalBalance());
-    const negative = normalized.startsWith('-');
-    const unsigned = negative ? normalized.slice(1) : normalized;
-    const [wholeRaw, fractionRaw = ''] = unsigned.split('.');
-    const whole = wholeRaw || '0';
-    const fraction = `${fractionRaw}${'0'.repeat(R4V3_DECIMALS)}`.slice(0, R4V3_DECIMALS);
-    const prefix = negative ? '-' : '';
-
-    return {
-      whole: `${prefix}${whole}`,
-      line1: fraction.slice(0, 3),
-      line2: fraction.slice(3, 13),
-      line3: fraction.slice(13, 23),
-      line4: fraction.slice(23, 26),
-    };
-  });
-
-  private static readonly TETRIS_CELL_PX = 4;
-  private static readonly TETRIS_GAP_PX = 1;
-  private static readonly TETRIS_PAD_PX = 2;
-  private static readonly TETRIS_MIN_COLS = 5;
-  private static readonly TETRIS_MIN_ROWS = 6;
-
-  protected readonly tetrisColCount = signal(WalletPanelComponent.TETRIS_MIN_COLS);
-  protected readonly tetrisRowCount = signal(WalletPanelComponent.TETRIS_MIN_ROWS);
-  protected readonly tetrisBoard = signal<boolean[][]>([]);
-  protected readonly tetrisCols = computed(() =>
-    Array.from({ length: this.tetrisColCount() }, (_, index) => index)
-  );
-  protected readonly tetrisRows = computed(() =>
-    Array.from({ length: this.tetrisRowCount() }, (_, index) => index)
-  );
-  protected readonly tetrisCol = signal(2);
-  protected readonly tetrisRow = signal(0);
-  private tetrisFallTimer: ReturnType<typeof setInterval> | null = null;
-  private tetrisResizeObserver: ResizeObserver | null = null;
-  private tetrisGridReady = false;
   protected readonly formattedChfValue = computed(() => {
     const bal = Number.parseFloat(this.totalBalance()) || 0;
     const localeId = this.locale.locale() === 'fr' ? 'fr-FR' : 'en-GB';
@@ -202,16 +178,13 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
     return this.formatFiatApprox(amount);
   });
 
-  protected readonly shortDisplayAddress = computed(() => {
-    const address = this.displayWalletAddress();
-    const displayed = displayR4v3Address(address);
-    if (!address) {
-      return '—';
+  protected readonly friendlyLookedUpAddress = computed(() => {
+    const display = this.lookedUpDisplay().trim();
+    if (display) {
+      return toDisplayWalletAddress(display, this.accountDisplayName());
     }
 
-    return displayed.length > 20
-      ? `${displayed.slice(0, 12)}...${displayed.slice(-6)}`
-      : displayed;
+    return toDisplayWalletAddress(this.lookedUpAddress(), this.accountDisplayName());
   });
 
   protected readonly accountDisplayName = computed(() => {
@@ -220,18 +193,30 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
       return username;
     }
 
-    return '—';
+    return '';
   });
 
-  protected readonly balanceAddressPrefix = computed(() => {
+  /** Affichage: `usernameR4V3hash` — hash crypto inchangé sous le capot. */
+  protected readonly friendlyWalletAddress = computed(() => {
     const address = this.displayWalletAddress();
-    const displayed = displayR4v3Address(address);
     if (!address) {
       return '—';
     }
 
-    return displayed.length > 14 ? `${displayed.slice(0, 12)}…` : displayed;
+    return formatUserWalletAddress(this.accountDisplayName(), address);
   });
+
+  protected readonly recentLookupRows = computed(() =>
+    this.recentLookups().map((entry) => {
+      const amount = Number.parseFloat(entry.balance) || 0;
+      return {
+        ...entry,
+        shortDisplay: this.shorten(toDisplayWalletAddress(entry.display, this.accountDisplayName())),
+        formattedBalance: formatR4v3Amount(entry.balance),
+        formattedFiat: this.formatFiatApprox(amount),
+      };
+    })
+  );
 
   protected readonly maskedPublicKey = computed(() => {
     const value = this.walletPublicKey();
@@ -305,7 +290,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
       if (sessionWallet.address !== this.wallet()?.address) {
         this.wallet.set(sessionWallet);
         this.balanceForm.patchValue(
-          { address: displayR4v3Address(sessionWallet.address) },
+          { address: this.ownDisplayAddress(sessionWallet.address) },
           { emitEvent: false }
         );
         this.fetchBalance(sessionWallet.address, true, false);
@@ -323,6 +308,22 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
         this.fetchBalance(linked, true, false);
       }
     });
+
+    effect(() => {
+      const username = this.accountDisplayName();
+      const address = this.displayWalletAddress();
+      if (!username || !address) {
+        return;
+      }
+
+      const next = this.ownDisplayAddress(address);
+      const current = this.balanceForm.getRawValue().address.trim();
+      const currentHash = normalizeAddressForApi(current);
+      const ownHash = normalizeAddressForApi(address);
+      if (currentHash === ownHash && current !== next) {
+        this.balanceForm.patchValue({ address: next }, { emitEvent: false });
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -332,7 +333,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
     if (sessionWallet) {
       this.wallet.set(sessionWallet);
       this.balanceForm.patchValue(
-        { address: displayR4v3Address(sessionWallet.address) },
+        { address: this.ownDisplayAddress(sessionWallet.address) },
         { emitEvent: false }
       );
       this.fetchBalance(sessionWallet.address, true, false);
@@ -366,188 +367,6 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
           this.fetchBalance(address, true, false);
         }
       });
-
-    this.tetrisFallTimer = setInterval(() => this.tickTetrisFall(), 650);
-    this.destroyRef.onDestroy(() => {
-      if (this.tetrisFallTimer) {
-        clearInterval(this.tetrisFallTimer);
-        this.tetrisFallTimer = null;
-      }
-      if (this.tetrisResizeObserver) {
-        this.tetrisResizeObserver.disconnect();
-        this.tetrisResizeObserver = null;
-      }
-    });
-  }
-
-  ngAfterViewInit(): void {
-    const playfield = this.tetrisPlayfieldRef?.nativeElement;
-    if (!playfield) {
-      return;
-    }
-
-    const applySize = (): void => {
-      const rect = playfield.getBoundingClientRect();
-      this.syncTetrisGridSize(rect.width, rect.height);
-    };
-
-    applySize();
-    this.tetrisResizeObserver = new ResizeObserver(() => applySize());
-
-    this.tetrisResizeObserver.observe(playfield);
-    const tetrisHost = this.tetrisRef?.nativeElement;
-    if (tetrisHost) {
-      this.tetrisResizeObserver.observe(tetrisHost);
-    }
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(applySize);
-    });
-  }
-
-  protected isTetrisCellLocked(col: number, row: number): boolean {
-    return this.tetrisBoard()[row]?.[col] ?? false;
-  }
-
-  protected isTetrisCellActive(col: number, row: number): boolean {
-    return this.tetrisCol() === col && this.tetrisRow() === row;
-  }
-
-  private syncTetrisGridSize(width: number, height: number): void {
-    const cell = WalletPanelComponent.TETRIS_CELL_PX;
-    const gap = WalletPanelComponent.TETRIS_GAP_PX;
-    const pad = WalletPanelComponent.TETRIS_PAD_PX;
-    const innerWidth = Math.max(0, width - pad * 2);
-    const innerHeight = Math.max(0, height - pad * 2);
-    const nextCols = Math.max(
-      WalletPanelComponent.TETRIS_MIN_COLS,
-      Math.floor((innerWidth + gap) / (cell + gap))
-    );
-    const nextRows = Math.max(
-      WalletPanelComponent.TETRIS_MIN_ROWS,
-      Math.floor((innerHeight + gap) / (cell + gap))
-    );
-    const sizeChanged =
-      nextCols !== this.tetrisColCount() || nextRows !== this.tetrisRowCount();
-
-    if (sizeChanged) {
-      this.tetrisColCount.set(nextCols);
-      this.tetrisRowCount.set(nextRows);
-      this.resizeTetrisBoard(nextCols, nextRows);
-    }
-
-    if (!this.tetrisGridReady && nextCols > 0 && nextRows > 0) {
-      this.tetrisGridReady = true;
-      this.resetTetrisGame(nextCols, nextRows);
-    }
-  }
-
-  private createEmptyTetrisBoard(cols: number, rows: number): boolean[][] {
-    return Array.from({ length: rows }, () =>
-      Array.from({ length: cols }, () => false)
-    );
-  }
-
-  private resetTetrisGame(cols: number, rows: number): void {
-    this.tetrisBoard.set(this.createEmptyTetrisBoard(cols, rows));
-    this.spawnTetrisPiece();
-  }
-
-  private resizeTetrisBoard(nextCols: number, nextRows: number): void {
-    const previous = this.tetrisBoard();
-    const nextBoard = Array.from({ length: nextRows }, (_, row) =>
-      Array.from({ length: nextCols }, (_, col) => previous[row]?.[col] ?? false)
-    );
-    this.tetrisBoard.set(nextBoard);
-
-    const col = Math.min(this.tetrisCol(), nextCols - 1);
-    const row = Math.min(this.tetrisRow(), nextRows - 1);
-    this.tetrisCol.set(col);
-    this.tetrisRow.set(row);
-
-    if (!this.canMoveTo(this.tetrisCol(), this.tetrisRow())) {
-      this.spawnTetrisPiece();
-    }
-  }
-
-  private canMoveTo(col: number, row: number): boolean {
-    if (col < 0 || col >= this.tetrisColCount()) {
-      return false;
-    }
-    if (row < 0 || row >= this.tetrisRowCount()) {
-      return false;
-    }
-
-    return !this.tetrisBoard()[row]?.[col];
-  }
-
-  private spawnTetrisPiece(): void {
-    const cols = this.tetrisColCount();
-    const col = Math.floor(cols / 2);
-
-    if (!this.canMoveTo(col, 0)) {
-      this.resetTetrisGame(cols, this.tetrisRowCount());
-      return;
-    }
-
-    this.tetrisCol.set(col);
-    this.tetrisRow.set(0);
-  }
-
-  private lockTetrisPiece(): void {
-    const col = this.tetrisCol();
-    const row = this.tetrisRow();
-    const board = this.tetrisBoard().map((line) => [...line]);
-    board[row][col] = true;
-    this.tetrisBoard.set(board);
-    this.clearTetrisLines();
-    this.spawnTetrisPiece();
-  }
-
-  private clearTetrisLines(): void {
-    const cols = this.tetrisColCount();
-    const rows = this.tetrisRowCount();
-    const board = this.tetrisBoard();
-    const remaining = board.filter((line) => !line.every(Boolean));
-    const clearedCount = rows - remaining.length;
-
-    if (clearedCount <= 0) {
-      return;
-    }
-
-    const emptyRows = Array.from({ length: clearedCount }, () =>
-      Array.from({ length: cols }, () => false)
-    );
-    this.tetrisBoard.set([...emptyRows, ...remaining]);
-  }
-
-  protected moveTetrisHorizontal(delta: number, event?: Event): void {
-    event?.stopPropagation();
-    event?.preventDefault();
-    const nextCol = this.tetrisCol() + delta;
-    if (this.canMoveTo(nextCol, this.tetrisRow())) {
-      this.tetrisCol.set(nextCol);
-    }
-  }
-
-  protected moveTetrisDown(event?: Event): void {
-    event?.stopPropagation();
-    event?.preventDefault();
-    this.advanceTetrisRow();
-  }
-
-  private tickTetrisFall(): void {
-    this.advanceTetrisRow();
-  }
-
-  private advanceTetrisRow(): void {
-    const nextRow = this.tetrisRow() + 1;
-    if (this.canMoveTo(this.tetrisCol(), nextRow)) {
-      this.tetrisRow.set(nextRow);
-      return;
-    }
-
-    this.lockTetrisPiece();
   }
 
   protected createWallet(): void {
@@ -560,7 +379,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
         this.walletSession.setWallet(wallet);
         this.wallet.set(wallet);
         this.balanceForm.patchValue(
-          { address: displayR4v3Address(wallet.address) },
+          { address: this.ownDisplayAddress(wallet.address) },
           { emitEvent: false }
         );
         this.creatingWallet.set(false);
@@ -611,14 +430,30 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
   protected fetchBalanceFromForm(): void {
     this.clearMessages();
 
-    if (this.balanceForm.invalid) {
+    const rawAddress = this.balanceForm.getRawValue().address.trim();
+    if (!rawAddress || this.balanceForm.controls.address.invalid) {
       this.balanceForm.markAllAsTouched();
       this.errorMessage.set(this.locale.t('wallet.validation.recipient'));
+      this.pushToast(this.locale.t('wallet.validation.recipient'), 'error');
       return;
     }
 
-    const address = normalizeAddressForApi(this.balanceForm.getRawValue().address.trim());
-    this.fetchBalance(address, false);
+    const address = normalizeAddressForApi(rawAddress);
+    if (!address) {
+      this.errorMessage.set(this.locale.t('wallet.validation.recipient'));
+      this.pushToast(this.locale.t('wallet.validation.recipient'), 'error');
+      return;
+    }
+
+    this.fetchBalance(address, false, true, rawAddress);
+  }
+
+  protected consultRecentLookup(entry: RecentWalletLookup): void {
+    this.balanceForm.patchValue(
+      { address: toDisplayWalletAddress(entry.display, this.accountDisplayName()) },
+      { emitEvent: false }
+    );
+    this.fetchBalance(entry.address, false, true, entry.display);
   }
 
   protected explorerAddressInvalid(): boolean {
@@ -720,30 +555,6 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    if (
-      this.hasWallet() &&
-      !this.showSendPanel() &&
-      !this.showReceivePanel() &&
-      this.tetrisGridReady
-    ) {
-      switch (event.key) {
-        case 'ArrowLeft':
-          this.moveTetrisHorizontal(-1);
-          event.preventDefault();
-          return;
-        case 'ArrowRight':
-          this.moveTetrisHorizontal(1);
-          event.preventDefault();
-          return;
-        case 'ArrowDown':
-          this.moveTetrisDown();
-          event.preventDefault();
-          return;
-        default:
-          break;
-      }
-    }
-
     const container = this.findScrollContainer(event.target as Node | null);
     if (!container || container.scrollHeight <= container.clientHeight) {
       return;
@@ -837,7 +648,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const value = displayR4v3Address(normalizeAddressForApi(raw));
+    const value = toDisplayWalletAddress(raw, this.accountDisplayName());
     this.copyText(value)
       .then(() => {
         this.copiedLookupAddress.set(true);
@@ -858,19 +669,25 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
   private fetchBalance(
     address: string,
     fromCurrentWallet: boolean,
-    announce = true
+    announce = true,
+    displayHint?: string
   ): void {
     const normalizedAddress = normalizeAddressForApi(address);
     if (!normalizedAddress) {
       return;
     }
 
+    const displayAddress = toDisplayWalletAddress(
+      displayHint || address,
+      this.accountDisplayName()
+    );
+
     this.lastBalanceFetchAddress = normalizedAddress;
     this.refreshingBalance.set(true);
 
     this.api
       .getBalance(normalizedAddress)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response: BalanceResponse) => {
           const normalized = normalizeR4v3Amount(response.balance);
@@ -878,15 +695,23 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
             this.balance.set(normalized);
             this.lookedUpBalance.set(null);
             this.lookedUpAddress.set('');
+            this.lookedUpDisplay.set('');
           } else {
             this.lookedUpBalance.set(normalized);
             this.lookedUpAddress.set(normalizedAddress);
+            this.lookedUpDisplay.set(displayAddress);
+            const own = normalizeAddressForApi(this.displayWalletAddress());
+            if (own && own === normalizedAddress) {
+              this.balance.set(normalized);
+            } else {
+              this.pushRecentLookup(normalizedAddress, normalized, displayAddress);
+            }
           }
           if (announce) {
             this.successMessage.set(
               fromCurrentWallet
                 ? 'Solde mis à jour.'
-                : `Solde ${this.shorten(displayR4v3Address(normalizedAddress))} chargé.`
+                : `Solde ${this.shorten(displayAddress)} chargé.`
             );
           }
           this.refreshingBalance.set(false);
@@ -925,6 +750,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
     }
 
     this.showReceivePanel.set(false);
+    this.showSendConfirm.set(false);
     this.showSendPanel.update((open) => !open);
     if (this.showSendPanel()) {
       this.sendForm.patchValue({
@@ -938,6 +764,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
 
   protected receiveAction(): void {
     this.showSendPanel.set(false);
+    this.showSendConfirm.set(false);
     this.showReceivePanel.update((open) => !open);
     if (this.showReceivePanel()) {
       void this.generateReceiveQr();
@@ -947,6 +774,66 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
     }
   }
 
+  protected swapAction(): void {
+    this.closeActionPanels();
+    this.dockNav.requestQuestAction('swap');
+  }
+
+  protected nudgeSendAmount(delta: number): void {
+    const current = Number(this.sendForm.controls.amount.value) || 0;
+    const next = Math.max(0.0001, Math.round((current + delta) * 10000) / 10000);
+    this.sendForm.controls.amount.setValue(next);
+    this.sendForm.controls.amount.markAsDirty();
+  }
+
+  protected requestSendConfirm(): void {
+    this.clearMessages();
+
+    if (!this.auth.promptLogin()) {
+      this.errorMessage.set('Connectez-vous pour envoyer des fonds.');
+      this.pushToast('Connexion requise pour envoyer', 'error');
+      return;
+    }
+
+    if (!this.hasWallet()) {
+      this.errorMessage.set(this.locale.t('wallet.noWallet'));
+      this.pushToast('Créez un wallet avant envoi', 'error');
+      return;
+    }
+
+    if (this.sendForm.invalid) {
+      this.sendForm.markAllAsTouched();
+      this.errorMessage.set('Formulaire envoi invalide.');
+      this.pushToast('Vérifiez le destinataire et le montant', 'error');
+      return;
+    }
+
+    this.showSendConfirm.set(true);
+  }
+
+  protected cancelSendConfirm(): void {
+    this.showSendConfirm.set(false);
+  }
+
+  protected confirmSend(): void {
+    this.showSendConfirm.set(false);
+    this.submitSend();
+  }
+
+  protected sendConfirmRecipient(): string {
+    const raw = this.sendForm.getRawValue().recipient.trim();
+    return this.shorten(toDisplayWalletAddress(raw, this.accountDisplayName()));
+  }
+
+  protected sendConfirmAmount(): string {
+    const amount = Number(this.sendForm.getRawValue().amount) || 0;
+    return `${formatR4v3Amount(amount)} ${this.nativeToken()}`;
+  }
+
+  protected sendConfirmMemo(): string {
+    return this.sendForm.getRawValue().memo.trim();
+  }
+
   protected copyWalletAddress(): void {
     const address = this.displayWalletAddress();
     if (!address) {
@@ -954,7 +841,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.copyToClipboard(displayR4v3Address(address), 'adresse');
+    this.copyToClipboard(this.friendlyWalletAddress(), 'adresse');
     this.copiedAddress.set(true);
     if (this.copiedTimer) {
       clearTimeout(this.copiedTimer);
@@ -1011,6 +898,7 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
       )
       .then(() => {
         this.sending.set(false);
+        this.showSendConfirm.set(false);
         this.showSendPanel.set(false);
         this.successMessage.set('Transaction signée et envoyée.');
         this.pushToast('Transaction envoyée', 'success');
@@ -1027,21 +915,22 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
   protected closeActionPanels(): void {
     this.showSendPanel.set(false);
     this.showReceivePanel.set(false);
+    this.showSendConfirm.set(false);
     this.qrDataUrl.set(null);
   }
 
   private async generateReceiveQr(): Promise<void> {
-    const address = this.walletAddress();
-    if (!address) {
-      this.qrDataUrl.set(null);
-      return;
-    }
+    const payload =
+      this.friendlyWalletAddress() !== '—'
+        ? this.friendlyWalletAddress()
+        : `demoR4V3${Date.now().toString(16)}`;
 
     try {
       const { default: QRCode } = await import('qrcode');
-      const url = await QRCode.toDataURL(displayR4v3Address(address), {
+      const url = await QRCode.toDataURL(payload, {
         margin: 1,
-        width: 168,
+        width: 256,
+        errorCorrectionLevel: 'M',
         color: {
           dark: '#00e5ff',
           light: '#021425',
@@ -1049,8 +938,35 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
       });
       this.qrDataUrl.set(url);
     } catch {
-      this.qrDataUrl.set(null);
+      this.qrDataUrl.set(this.buildDemoQrDataUrl(payload));
     }
+  }
+
+  private buildDemoQrDataUrl(seed: string): string {
+    const cells = 11;
+    const size = 192;
+    const cell = size / cells;
+    let rects = '';
+    let hash = 0;
+    for (let i = 0; i < seed.length; i += 1) {
+      hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+    }
+
+    for (let y = 0; y < cells; y += 1) {
+      for (let x = 0; x < cells; x += 1) {
+        const corner =
+          (x < 3 && y < 3) ||
+          (x > cells - 4 && y < 3) ||
+          (x < 3 && y > cells - 4);
+        const bit = ((hash >> ((x * 3 + y) % 31)) & 1) === 1;
+        if (corner || bit) {
+          rects += `<rect x="${x * cell}" y="${y * cell}" width="${cell}" height="${cell}" fill="#00e5ff"/>`;
+        }
+      }
+    }
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="100%" height="100%" fill="#021425"/>${rects}</svg>`;
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   }
 
   protected recipientInvalid(): boolean {
@@ -1135,5 +1051,73 @@ export class WalletPanelComponent implements OnInit, AfterViewInit {
     }
 
     void this.auth.linkWallet(wallet.address, wallet.publicKey);
+  }
+
+  private ownDisplayAddress(address: string): string {
+    return formatUserWalletAddress(this.accountDisplayName(), address);
+  }
+
+  private pushRecentLookup(address: string, balance: string, displayHint?: string): void {
+    const own = normalizeAddressForApi(this.displayWalletAddress());
+    if (own && own === address) {
+      return;
+    }
+
+    const display = toDisplayWalletAddress(displayHint || address, this.accountDisplayName());
+    const next: RecentWalletLookup[] = [
+      { address, display, balance, at: Date.now() },
+      ...this.recentLookups().filter((entry) => entry.address !== address),
+    ].slice(0, RECENT_LOOKUPS_MAX);
+
+    this.recentLookups.set(next);
+    this.writeRecentLookups(next);
+  }
+
+  private readRecentLookups(): RecentWalletLookup[] {
+    if (typeof localStorage === 'undefined') {
+      return [];
+    }
+
+    try {
+      const raw = localStorage.getItem(RECENT_LOOKUPS_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw) as unknown;
+      if (!Array.isArray(parsed)) {
+        return [];
+      }
+
+      return parsed
+        .filter((entry): entry is RecentWalletLookup => {
+          if (!entry || typeof entry !== 'object') {
+            return false;
+          }
+
+          const row = entry as Partial<RecentWalletLookup>;
+          return (
+            typeof row.address === 'string' &&
+            typeof row.display === 'string' &&
+            typeof row.balance === 'string' &&
+            typeof row.at === 'number'
+          );
+        })
+        .slice(0, RECENT_LOOKUPS_MAX);
+    } catch {
+      return [];
+    }
+  }
+
+  private writeRecentLookups(entries: RecentWalletLookup[]): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    try {
+      localStorage.setItem(RECENT_LOOKUPS_STORAGE_KEY, JSON.stringify(entries));
+    } catch {
+      // ignore quota / private mode
+    }
   }
 }

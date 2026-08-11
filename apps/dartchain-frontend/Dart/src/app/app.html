@@ -124,7 +124,7 @@
             }
             <button
               type="button"
-              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              class="showcase-tab showcase-tab--mempool ds-surface ds-surface--showcase-tab"
               role="tab"
               [attr.aria-selected]="activeBottomTab() === 'transactions'"
               [class.is-active]="activeBottomTab() === 'transactions'"
@@ -141,16 +141,6 @@
               (click)="onBottomTabChange('chain')"
             >
               <span class="showcase-tab__label">{{ locale.t('chain.title') }}</span>
-            </button>
-            <button
-              type="button"
-              class="showcase-tab ds-surface ds-surface--showcase-tab"
-              role="tab"
-              [attr.aria-selected]="activeBottomTab() === 'market'"
-              [class.is-active]="activeBottomTab() === 'market'"
-              (click)="onBottomTabChange('market')"
-            >
-              <span class="showcase-tab__label">{{ locale.t('dock.market') }}</span>
             </button>
             <button
               type="button"
@@ -232,11 +222,6 @@
         @case ('chain') {
           <div class="app-bottom-stack__panel app-bottom-stack__panel--chain">
             <app-blocks-list (selectBlock)="openBlockDrawer($event)"></app-blocks-list>
-          </div>
-        }
-        @case ('market') {
-          <div class="app-bottom-stack__panel app-bottom-stack__panel--market">
-            <app-market-panel></app-market-panel>
           </div>
         }
         @case ('quests') {

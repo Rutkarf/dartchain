@@ -11,10 +11,77 @@
     </div>
 
     <div class="chain-dock__head-center" aria-live="polite">
-      <strong class="chain-dock__blocks-count">{{ blocksHeadline() }}</strong>
+      @if (latestBlock(); as head) {
+        <button
+          type="button"
+          class="chain-dock__block-pill"
+          (click)="openBlock(head)"
+          [attr.aria-label]="'Ouvrir le bloc #' + head.index"
+        >
+          BLOCK #{{ head.index }}
+        </button>
+      } @else {
+        <span class="chain-dock__block-pill chain-dock__block-pill--static">BLOCK —</span>
+      }
       <span class="chain-dock__sync-label">{{ syncSubLabel() }}</span>
     </div>
 
+    <div class="chain-dock__head-right">
+      <div class="chain-dock__view-toggle" role="group" [attr.aria-label]="locale.t('chain.viewMode')">
+        <button
+          type="button"
+          class="chain-dock__view-btn"
+          [class.is-active]="viewMode() === 'list'"
+          [attr.aria-pressed]="viewMode() === 'list'"
+          (click)="setViewMode('list')"
+        >
+          {{ locale.t('chain.view.list') }}
+        </button>
+        <button
+          type="button"
+          class="chain-dock__view-btn"
+          [class.is-active]="viewMode() === 'graph'"
+          [attr.aria-pressed]="viewMode() === 'graph'"
+          (click)="setViewMode('graph')"
+        >
+          {{ locale.t('chain.view.graph') }}
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="chain-dock__export"
+        (click)="exportFilteredBlocks()"
+        [attr.aria-label]="locale.t('chain.export')"
+        [title]="locale.t('chain.export')"
+      >
+        <svg viewBox="0 0 16 16" focusable="false" aria-hidden="true">
+          <path
+            d="M3.2 1.6h6.1L12.8 5v9.4H3.2z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.2"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M9.2 1.6V5h3.6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.2"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M8 7.2v4.2M6.2 9.8 8 11.6l1.8-1.8"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span>.Json</span>
+      </button>
+    </div>
   </header>
 
   @if (feedback()) {
@@ -36,83 +103,6 @@
     </ul>
   } @else if (hasBlocks()) {
     <div class="chain-dock__main">
-      <div class="chain-dock__toolbar">
-        <div class="chain-dock__toolbar-row chain-dock__toolbar-row--controls">
-          <div class="chain-dock__view-toggle" role="group" [attr.aria-label]="locale.t('chain.viewMode')">
-            <button
-              type="button"
-              class="chain-dock__view-btn"
-              [class.is-active]="viewMode() === 'list'"
-              [attr.aria-pressed]="viewMode() === 'list'"
-              (click)="setViewMode('list')"
-            >
-              {{ locale.t('chain.view.list') }}
-            </button>
-            <button
-              type="button"
-              class="chain-dock__view-btn"
-              [class.is-active]="viewMode() === 'graph'"
-              [attr.aria-pressed]="viewMode() === 'graph'"
-              (click)="setViewMode('graph')"
-            >
-              {{ locale.t('chain.view.graph') }}
-            </button>
-          </div>
-
-          <input
-            type="search"
-            class="chain-dock__input chain-dock__input--search"
-            [attr.placeholder]="searchPlaceholder()"
-            [attr.aria-label]="locale.t('chain.filter.search')"
-            [value]="searchQuery()"
-            (input)="onSearchInput($any($event.target).value)"
-          />
-
-          <div class="chain-dock__actions">
-            @if (latestBlock(); as head) {
-              <button
-                type="button"
-                class="chain-dock__block-label"
-                (click)="openBlock(head)"
-                [attr.aria-label]="'Ouvrir le bloc #' + head.index"
-              >
-                BLOCK #{{ head.index }}
-              </button>
-            }
-            <button type="button" class="chain-dock__action" (click)="exportFilteredBlocks()">
-              {{ locale.t('chain.export') }}
-            </button>
-          </div>
-        </div>
-
-        <div class="chain-dock__toolbar-row chain-dock__toolbar-row--filters">
-          <input
-            type="text"
-            class="chain-dock__input"
-            [attr.placeholder]="locale.t('chain.filter.wallet')"
-            [attr.aria-label]="locale.t('chain.filter.wallet')"
-            [value]="walletFilter()"
-            (input)="onWalletInput($any($event.target).value)"
-          />
-          <input
-            type="number"
-            class="chain-dock__input chain-dock__input--index"
-            [attr.placeholder]="locale.t('chain.filter.from')"
-            [attr.aria-label]="locale.t('chain.filter.from')"
-            [value]="fromIndex()"
-            (input)="onFromIndexInput($any($event.target).value)"
-          />
-          <input
-            type="number"
-            class="chain-dock__input chain-dock__input--index"
-            [attr.placeholder]="locale.t('chain.filter.to')"
-            [attr.aria-label]="locale.t('chain.filter.to')"
-            [value]="toIndex()"
-            (input)="onToIndexInput($any($event.target).value)"
-          />
-        </div>
-      </div>
-
       <div class="chain-dock__body">
         @if (hasFilteredBlocks()) {
           @if (viewMode() === 'graph') {

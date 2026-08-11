@@ -31,4 +31,29 @@ describe('ChainGraphComponent', () => {
     expect(component.layoutNodes()).toHaveLength(2);
     expect(component.linkSegments()).toHaveLength(1);
   });
+
+  it('emits selectBlock when a node bubble is clicked', () => {
+    const fixture: ComponentFixture<ChainGraphComponent> = TestBed.createComponent(ChainGraphComponent);
+    const component = fixture.componentInstance;
+    const emitted: number[] = [];
+    component.selectBlock.subscribe((block) => emitted.push(block.index));
+
+    fixture.componentRef.setInput('blocks', [
+      {
+        index: 3,
+        previousHash: 'hash-2',
+        timestamp: 3,
+        data: 'block-3',
+        nonce: 0,
+        hash: 'hash-3',
+      },
+    ]);
+    fixture.detectChanges();
+
+    const node = fixture.nativeElement.querySelector('.chain-graph__node') as SVGGElement;
+    expect(node).toBeTruthy();
+    node.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(emitted).toEqual([3]);
+  });
 });

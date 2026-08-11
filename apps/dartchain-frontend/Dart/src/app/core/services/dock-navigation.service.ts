@@ -9,7 +9,6 @@ export type BottomDockTab =
   | 'faucet'
   | 'transactions'
   | 'chain'
-  | 'market'
   | 'quests'
   | 'peers'
   | 'admin';

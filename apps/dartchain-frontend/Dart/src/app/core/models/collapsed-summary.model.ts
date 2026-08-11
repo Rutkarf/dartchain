@@ -38,12 +38,6 @@ export const SHOWCASE_COLLAPSED_SUMMARY_TABS: Readonly<
     summarySelector: 'app-showcase-chat-summary',
     metrics: ['connected', 'unread', 'lastMessage'],
   },
-  peers: {
-    id: 'peers',
-    title: 'PEERS',
-    summarySelector: 'app-showcase-terminal-summary',
-    metrics: ['connected', 'total', 'latestEndpoint'],
-  },
   dao: {
     id: 'dao',
     title: 'LAUNCH',
@@ -55,6 +49,12 @@ export const SHOWCASE_COLLAPSED_SUMMARY_TABS: Readonly<
     title: 'D.A.O',
     summarySelector: 'app-showcase-dao-summary',
     metrics: ['activeDaos', 'proposals', 'votes', 'relativeTime'],
+  },
+  market: {
+    id: 'market',
+    title: 'MARCHÉ',
+    summarySelector: 'app-dock-market-summary',
+    metrics: ['price', 'change', 'volume'],
   },
 };
 
@@ -75,21 +75,15 @@ export const DOCK_COLLAPSED_SUMMARY_TABS: Readonly<
   },
   transactions: {
     id: 'transactions',
-    title: 'TRANSACTION',
+    title: 'MEMPOOL',
     summarySelector: 'app-dock-transactions-summary',
-    metrics: ['pendingCount', 'latestTx', 'composerTip'],
+    metrics: ['pendingCount', 'totalAmount', 'latestTx'],
   },
   chain: {
     id: 'chain',
     title: 'CHAIN',
     summarySelector: 'app-dock-chain-summary',
     metrics: ['tipBlock', 'blockCount', 'sync'],
-  },
-  market: {
-    id: 'market',
-    title: 'MARCHE',
-    summarySelector: 'app-dock-market-summary',
-    metrics: ['price', 'change', 'volume'],
   },
   quests: {
     id: 'quests',

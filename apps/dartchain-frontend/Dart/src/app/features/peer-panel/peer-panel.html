@@ -38,21 +38,12 @@
     </div>
   </header>
 
-  <form class="peer-panel__connect" (ngSubmit)="addPeer()">
-    <button
-      type="button"
-      class="peer-panel__connect-add"
-      (click)="focusConnectInput()"
-      [attr.aria-label]="locale.t('peers.connectPeer')"
-      [title]="locale.t('peers.connectPeer')"
-    >
-      +
-    </button>
+  <form class="peer-panel__connect" (ngSubmit)="onConnectSubmit($event)">
     <input
       #peerInputRef
       id="peer-input"
       name="peer"
-      type="text"
+      type="url"
       class="peer-panel__connect-input"
       [placeholder]="locale.t('peers.connectPlaceholder')"
       [ngModel]="peerInput()"
@@ -61,11 +52,13 @@
       autocomplete="off"
       autocapitalize="off"
       spellcheck="false"
+      [attr.aria-label]="locale.t('peers.connectPeer')"
     />
     <button
       type="submit"
       class="peer-panel__connect-btn"
       [disabled]="submitting() || !normalizedPeerInput()"
+      [attr.aria-busy]="submitting()"
     >
       {{ connectButtonLabel() }}
     </button>

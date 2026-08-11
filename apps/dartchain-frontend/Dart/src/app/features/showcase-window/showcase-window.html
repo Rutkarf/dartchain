@@ -82,7 +82,7 @@
           } @else {
             @defer (on idle) {
               <app-showcase-terminal
-                [mode]="activeTab"
+                mode="reseau"
                 [expanded]="true"
                 (selectBlock)="onSelectBlock($event)"
               />
@@ -92,17 +92,13 @@
           }
         </div>
       }
-      @case ('peers') {
-        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--terminal">
+      @case ('market') {
+        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--market">
           @if (collapsed) {
-            <app-showcase-terminal-summary mode="peers" />
+            <app-dock-market-summary />
           } @else {
             @defer (on idle) {
-              <app-showcase-terminal
-                [mode]="activeTab"
-                [expanded]="true"
-                (selectBlock)="onSelectBlock($event)"
-              />
+              <app-market-panel />
             } @placeholder {
               <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
             }

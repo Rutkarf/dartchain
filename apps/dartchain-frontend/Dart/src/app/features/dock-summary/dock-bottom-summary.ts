@@ -7,7 +7,6 @@ import { DockWalletSummaryComponent } from './dock-wallet-summary';
 import { DockFaucetSummaryComponent } from './dock-faucet-summary';
 import { DockTransactionsSummaryComponent } from './dock-transactions-summary';
 import { DockChainSummaryComponent } from './dock-chain-summary';
-import { DockMarketSummaryComponent } from './dock-market-summary';
 import { DockQuestsSummaryComponent } from './dock-quests-summary';
 import { DockPeersSummaryComponent } from './dock-peers-summary';
 
@@ -19,7 +18,6 @@ import { DockPeersSummaryComponent } from './dock-peers-summary';
     DockFaucetSummaryComponent,
     DockTransactionsSummaryComponent,
     DockChainSummaryComponent,
-    DockMarketSummaryComponent,
     DockQuestsSummaryComponent,
     DockPeersSummaryComponent,
   ],

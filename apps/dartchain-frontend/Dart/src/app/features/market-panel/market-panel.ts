@@ -39,6 +39,7 @@ import { MarketPanelService } from './market-panel.service';
 import { MarketTokenDrawerComponent } from './market-token-drawer';
 import {
   DOCK_REFRESH_EVENT,
+  SHOWCASE_REFRESH_EVENT,
   refreshEventMatchesTab,
 } from '../../core/constants/panel-refresh.constants';
 
@@ -90,7 +91,6 @@ export class MarketPanelComponent implements OnDestroy {
   protected readonly focusedRowIndex = signal(0);
   protected readonly drawerRow = signal<MarketAssetRow | null>(null);
   protected readonly liveFilter = signal(false);
-  protected readonly actionsMenuOpen = signal(false);
 
   protected readonly rows = this.marketData.rows;
   protected readonly featuredChart = this.marketData.featuredChart;
@@ -330,37 +330,6 @@ export class MarketPanelComponent implements OnDestroy {
     this.focusedRowIndex.set(0);
   }
 
-  protected toggleActionsMenu(event: MouseEvent): void {
-    event.stopPropagation();
-    this.actionsMenuOpen.update((open) => !open);
-  }
-
-  protected closeActionsMenu(): void {
-    this.actionsMenuOpen.set(false);
-  }
-
-  protected openHistoryFromMenu(): void {
-    this.toggleHistory();
-    this.closeActionsMenu();
-  }
-
-  protected openTradeFromMenu(): void {
-    this.openFocusedTrade();
-    this.closeActionsMenu();
-  }
-
-  protected toggleLiveFromMenu(): void {
-    this.toggleLiveFilter();
-    this.closeActionsMenu();
-  }
-
-  @HostListener('document:click')
-  onDocumentClick(): void {
-    if (this.actionsMenuOpen()) {
-      this.closeActionsMenu();
-    }
-  }
-
   protected onDrawerSwapped(event: { message: string }): void {
     this.showTradeHint(event.message);
     void this.marketData.refreshAll(true);
@@ -486,7 +455,9 @@ export class MarketPanelComponent implements OnDestroy {
     return trimmed
       .replace('LaunchLab', 'LL')
       .replace('Peg CHF', 'Peg')
-      .replace(/\s+/g, ' ');
+      .replace(/\s*R4V3\b/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   protected momentumShort(row: MarketAssetRow): string {
@@ -536,7 +507,8 @@ export class MarketPanelComponent implements OnDestroy {
   }
 
   @HostListener(`window:${DOCK_REFRESH_EVENT}`, ['$event'])
-  onDockRefresh(event: Event): void {
+  @HostListener(`window:${SHOWCASE_REFRESH_EVENT}`, ['$event'])
+  onPanelRefresh(event: Event): void {
     if (refreshEventMatchesTab(event, 'market')) {
       this.refreshMarket();
     }

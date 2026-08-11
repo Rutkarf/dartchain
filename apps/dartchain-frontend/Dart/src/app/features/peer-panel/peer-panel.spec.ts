@@ -106,8 +106,48 @@ describe('PeerPanelComponent', () => {
     expect(element.querySelector('.peer-panel__title')).toBeNull();
     expect(element.querySelector('.peer-panel__connect')).toBeTruthy();
     expect(element.querySelector('.peer-panel__connect-input')).toBeTruthy();
+    expect(element.querySelector('.peer-panel__connect-add')).toBeNull();
+    expect(element.querySelector('.peer-panel__connect-btn')).toBeTruthy();
     expect(element.textContent).toContain('1/1');
     expect(element.querySelector('.peer-panel.ds-surface')).toBeTruthy();
+  });
+
+  it('connects or reconnects peer via Connecter button', () => {
+    api.reconnectPeer.mockReturnValue(
+      of({
+        ok: true,
+        peer: 'ws://localhost:8080/ws/peers',
+        status: 'CONNECTED',
+      })
+    );
+
+    const form = (fixture.nativeElement as HTMLElement).querySelector(
+      '.peer-panel__connect'
+    ) as HTMLFormElement;
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+
+    expect(api.reconnectPeer).toHaveBeenCalledWith('ws://localhost:8080/ws/peers');
+  });
+
+  it('adds a new peer url via Connecter', () => {
+    api.addPeer.mockReturnValue(
+      of({
+        ok: true,
+        peer: 'wss://peer.example/ws',
+        status: 'CONNECTING',
+      })
+    );
+    fixture.componentInstance['peerInput'].set('wss://peer.example/ws');
+    fixture.detectChanges();
+
+    const form = (fixture.nativeElement as HTMLElement).querySelector(
+      '.peer-panel__connect'
+    ) as HTMLFormElement;
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    fixture.detectChanges();
+
+    expect(api.addPeer).toHaveBeenCalledWith('wss://peer.example/ws');
   });
 
   it('shows error banner when peers data service reports load error', () => {

@@ -108,13 +108,17 @@
             <p class="quests-panel__row-title" [title]="task.description">
               {{ task.title }}
             </p>
-            <div class="quests-panel__row-progress">
-              <span
-                class="quests-panel__row-progress-bar"
-                [class.is-complete]="task.complete"
-                [style.width.%]="(task.progress / task.target) * 100"
-              ></span>
-              <span class="quests-panel__row-progress-label">{{ task.progressLabel }}</span>
+            <div class="quests-panel__row-progress" aria-hidden="true">
+              <span class="quests-panel__row-progress-track">
+                <span
+                  class="quests-panel__row-progress-bar"
+                  [class.is-complete]="task.complete"
+                  [style.width.%]="(task.progress / task.target) * 100"
+                ></span>
+              </span>
+              @if (!task.complete) {
+                <span class="quests-panel__row-progress-label">{{ task.progressLabel }}</span>
+              }
             </div>
           </div>
 
@@ -169,10 +173,8 @@
   <footer class="quests-panel__weekly" [attr.aria-label]="locale.t('quests.weekly')">
     <div class="quests-panel__weekly-main">
       <span class="quests-panel__weekly-icon" aria-hidden="true">◆</span>
-      <div class="quests-panel__weekly-copy">
-        <span class="quests-panel__weekly-title">{{ locale.t('quests.weekly') }}</span>
-        <span class="quests-panel__weekly-reward">{{ weekly().rewardMts.toFixed(2) }} R4V3 · +{{ weekly().xpBoostPercent }}% {{ locale.t('quests.xpBoost') }}</span>
-      </div>
+      <span class="quests-panel__weekly-title">{{ locale.t('quests.weekly') }}</span>
+      <span class="quests-panel__weekly-reward">+{{ weekly().rewardMts.toFixed(2) }} · +{{ weekly().xpBoostPercent }}% {{ locale.t('quests.xpBoost') }}</span>
     </div>
     <button
       type="button"

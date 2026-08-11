@@ -3,9 +3,9 @@ export type ShowcaseTab =
   | 'r4v3'
   | 'reseau'
   | 'rv23'
-  | 'peers'
   | 'dao'
-  | 'daonews';
+  | 'daonews'
+  | 'market';
 
 export const SHOWCASE_TABS: ReadonlyArray<{
   id: ShowcaseTab;
@@ -15,9 +15,9 @@ export const SHOWCASE_TABS: ReadonlyArray<{
   { id: 'r4v3', label: 'R4V3' },
   { id: 'reseau', label: 'RÉSEAU' },
   { id: 'rv23', label: 'CHAT' },
-  { id: 'peers', label: 'PEERS' },
   { id: 'dao', label: 'LAUNCH' },
   { id: 'daonews', label: 'D.A.O' },
+  { id: 'market', label: 'MARCHÉ' },
 ];
 
 /** Anciens identifiants showcase → onglets hub maquette. */
@@ -25,6 +25,7 @@ export const LEGACY_SHOWCASE_TAB_MAP: Readonly<Record<string, ShowcaseTab>> = {
   news: 'tours',
   chat: 'rv23',
   launchlab: 'dao',
+  peers: 'reseau',
 };
 
 export function isNewsShowcaseTab(tab: ShowcaseTab): boolean {
@@ -52,9 +53,9 @@ export function normalizeShowcaseTab(tab: string): ShowcaseTab {
     tab === 'r4v3' ||
     tab === 'reseau' ||
     tab === 'rv23' ||
-    tab === 'peers' ||
     tab === 'dao' ||
-    tab === 'daonews'
+    tab === 'daonews' ||
+    tab === 'market'
   ) {
     return tab;
   }

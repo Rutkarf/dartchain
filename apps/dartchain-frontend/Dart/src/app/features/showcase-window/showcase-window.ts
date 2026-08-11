@@ -13,6 +13,8 @@ import { ShowcaseR4v3SummaryComponent } from '../showcase-r4v3/showcase-r4v3-sum
 import { ShowcaseR4v3Component } from '../showcase-r4v3/showcase-r4v3';
 import { ShowcaseTerminalComponent } from '../showcase-terminal/showcase-terminal';
 import { ShowcaseTerminalSummaryComponent } from '../showcase-terminal/showcase-terminal-summary';
+import { DockMarketSummaryComponent } from '../dock-summary/dock-market-summary';
+import { MarketPanelComponent } from '../market-panel/market-panel';
 
 @Component({
   selector: 'app-showcase-window',
@@ -30,6 +32,8 @@ import { ShowcaseTerminalSummaryComponent } from '../showcase-terminal/showcase-
     ShowcaseR4v3Component,
     ShowcaseR4v3SummaryComponent,
     ShowcaseTerminalSummaryComponent,
+    DockMarketSummaryComponent,
+    MarketPanelComponent,
   ],
   templateUrl: './showcase-window.html',
   styleUrls: ['./showcase-window.css'],
@@ -53,6 +57,8 @@ export class ShowcaseWindowComponent {
         return 'Chat showcase';
       case 'dao':
         return 'LaunchLab showcase';
+      case 'market':
+        return 'Marché — tokens et liquidité';
       default:
         return 'Terminal showcase';
     }

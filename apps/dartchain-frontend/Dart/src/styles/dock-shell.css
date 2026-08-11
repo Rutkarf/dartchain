@@ -45,10 +45,19 @@
   height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
-  overflow-x: hidden !important;
+  overflow-x: auto !important;
   overflow-y: visible !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch;
   container-type: inline-size;
   container-name: dock-tabs;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tabs::-webkit-scrollbar,
+.app-bottom-stack .showcase-header-tabs .app-bottom-stack__tabs::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab,
@@ -57,24 +66,33 @@
   min-width: 0 !important;
   max-width: none !important;
   padding: 0 calc(2px * var(--bottom-stack-scale, 1.106)) !important;
-  font-size: calc(clamp(4.5px, calc(100cqw / 52), 7px) * var(--bottom-stack-scale, 1.106)) !important;
-  letter-spacing: 0.02em !important;
-  overflow: visible !important;
+  font-size: inherit !important;
+  letter-spacing: 0.012em !important;
+  overflow: hidden !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab--mempool {
+  flex: 1.2 1 0 !important;
+  min-width: 0 !important;
+  padding-inline: calc(3px * var(--bottom-stack-scale, 1.106)) !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface.ds-surface--showcase-tab {
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab__label {
   display: block !important;
-  width: auto !important;
+  width: 100% !important;
   min-width: 0 !important;
-  max-width: none !important;
-  overflow: visible !important;
-  text-overflow: unset !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
   white-space: nowrap !important;
   text-align: center !important;
+  font-size: calc(clamp(6px, calc(100cqw / 48), 9px) * var(--bottom-stack-scale, 1.106)) !important;
+  line-height: 1.05 !important;
+  letter-spacing: 0.02em !important;
 }
 
 .app-bottom-stack .showcase-header-actions {

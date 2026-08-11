@@ -149,7 +149,8 @@ export class QuestsPanelComponent implements OnDestroy {
   }
 
   protected rewardLabel(mts: number): string {
-    return `+${mts.toFixed(2)} R4V3`;
+    const value = Number.isInteger(mts) ? String(mts) : mts.toFixed(2);
+    return `+${value}`;
   }
 
   protected formatMts(mts: number): string {

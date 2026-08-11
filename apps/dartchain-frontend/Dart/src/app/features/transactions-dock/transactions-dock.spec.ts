@@ -26,12 +26,14 @@ describe('TransactionsDockComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render composer and mempool together', () => {
+  it('should render mempool dock without composer', () => {
     fixture.detectChanges();
     const root = fixture.nativeElement as HTMLElement;
-    expect(root.querySelector('app-block-composer')).toBeTruthy();
+    expect(root.querySelector('app-block-composer')).toBeFalsy();
     expect(root.querySelector('app-pending-transactions')).toBeTruthy();
-    expect(root.querySelector('.transactions-dock__subnav')).toBeFalsy();
+    expect(root.querySelector('.transactions-dock--mempool')).toBeTruthy();
+    expect(root.querySelector('.transactions-dock__filter')).toBeTruthy();
+    expect(root.querySelector('.transactions-dock__submit')?.textContent).toContain('Mine');
   });
 
   it('should show mempool count in header summary', () => {

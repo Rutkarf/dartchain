@@ -97,6 +97,8 @@
   --showcase-panel-handle-h: clamp(12px, 3.2vw, 16px);
   --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
   --bottom-stack-scale: 1.106;
+  /* Hauteur globale dock (tous panels) : −10% vs baseline 0.9 */
+  --bottom-stack-panel-scale: 0.81;
   --dock-stack-share-dock: calc(
     var(--bottom-stack-scale) / (1 + var(--bottom-stack-scale))
   );
@@ -176,7 +178,9 @@
   );
   --dock-tab-slot: var(--showcase-tab-slot);
   --paired-panel-block-height: var(--hub-showcase-block-height);
-  --bottom-stack-panel-height: calc(var(--paired-panel-block-height) * var(--bottom-stack-scale));
+  --bottom-stack-panel-height: calc(
+    var(--paired-panel-block-height) * var(--bottom-stack-scale) * var(--bottom-stack-panel-scale)
+  );
   --wallet-display-height: calc(var(--bottom-stack-panel-height) + var(--showcase-hub-tab-h));
   --bottom-dock-height: clamp(48px, 8vh, 58px);
   --dock-stack-header-h: clamp(18px, 4.5vw, 22px);
@@ -343,6 +347,10 @@ app-three-floor {
   min-height: var(--bottom-stack-active-height);
   max-height: var(--bottom-stack-active-height);
   height: var(--bottom-stack-active-height);
+  margin-bottom: calc(
+    var(--bottom-stack-panel-height) * (1 - var(--bottom-stack-panel-scale)) /
+      var(--bottom-stack-panel-scale)
+  );
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -353,12 +361,14 @@ app-three-floor {
     height 280ms cubic-bezier(0.22, 1, 0.36, 1),
     min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
     max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin-bottom 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-bottom-stack.is-dock-collapsed {
   --bottom-stack-active-height: var(--bottom-stack-height-collapsed);
   margin-top: 0;
+  margin-bottom: calc(var(--dock-smart-bar-h) * 0.1);
 }
 
 .bottom-stack__shell,
@@ -1872,7 +1882,9 @@ app-block-detail-drawer {
         var(--shell-vertical-gaps, 0px)
     );
     --paired-panel-block-height: calc(var(--viewport-pair-budget) * var(--dock-stack-share-hub));
-    --bottom-stack-panel-height: calc(var(--viewport-pair-budget) * var(--dock-stack-share-dock));
+    --bottom-stack-panel-height: calc(
+      var(--viewport-pair-budget) * var(--dock-stack-share-dock) * var(--bottom-stack-panel-scale)
+    );
     --hub-showcase-block-height: var(--paired-panel-block-height);
     --showcase-band-height: calc(
       var(--paired-panel-block-height) - var(--showcase-hub-header-h) +
@@ -2255,7 +2267,9 @@ app-block-detail-drawer {
         var(--shell-vertical-gaps, 0px)
     );
     --paired-panel-block-height: calc(var(--viewport-pair-budget) * var(--dock-stack-share-hub));
-    --bottom-stack-panel-height: calc(var(--viewport-pair-budget) * var(--dock-stack-share-dock));
+    --bottom-stack-panel-height: calc(
+      var(--viewport-pair-budget) * var(--dock-stack-share-dock) * var(--bottom-stack-panel-scale)
+    );
     --hub-showcase-block-height: var(--paired-panel-block-height);
     --showcase-band-height: calc(
       var(--paired-panel-block-height) - var(--showcase-hub-header-h) +

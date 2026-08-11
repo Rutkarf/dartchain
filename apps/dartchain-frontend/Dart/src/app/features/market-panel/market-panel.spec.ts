@@ -182,18 +182,9 @@ describe('MarketPanelComponent', () => {
   it('should create and render compact market toolbar', () => {
     expect(fixture.componentInstance).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.market-panel__search-input')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('.market-panel__menu-btn')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.market-panel__menu-btn')).toBeNull();
     expect(fixture.nativeElement.textContent).not.toContain('TOUS');
     expect(fixture.nativeElement.textContent).not.toContain('TRAD');
-  });
-
-  it('should expose secondary actions from compact menu', () => {
-    const menuBtn = fixture.nativeElement.querySelector('.market-panel__menu-btn') as HTMLButtonElement;
-    menuBtn.click();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Historique');
-    expect(fixture.nativeElement.textContent).toContain('Trade');
-    expect(fixture.nativeElement.textContent).toContain('Live');
   });
 
   it('should initialize market data service', () => {

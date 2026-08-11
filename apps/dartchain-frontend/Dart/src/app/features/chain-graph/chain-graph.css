@@ -22,29 +22,51 @@
   max-width: 100%;
   padding: 2px 1px;
   scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
 
 .chain-graph__svg {
   display: block;
   height: clamp(68px, 22cqw, 88px);
+  width: auto;
   min-width: 100%;
+  max-height: 100%;
+  overflow: visible;
 }
 
 .chain-graph__link {
   stroke: rgba(var(--accent-primary-rgb), 0.45);
   stroke-width: 1.5;
   stroke-linecap: round;
+  pointer-events: none;
+}
+
+.chain-graph__node {
+  cursor: pointer;
+  outline: none;
+}
+
+.chain-graph__node-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
 }
 
 .chain-graph__node-circle {
   fill: rgba(var(--brand-black-rgb), 0.55);
   stroke: rgba(var(--accent-primary-rgb), 0.55);
   stroke-width: 1.5;
+  pointer-events: none;
 }
 
 .chain-graph__node.is-tip .chain-graph__node-circle {
   fill: rgba(var(--accent-primary-rgb), 0.22);
   stroke: rgba(var(--accent-primary-rgb), 0.95);
+}
+
+.chain-graph__node-index,
+.chain-graph__node-hash {
+  pointer-events: none;
 }
 
 .chain-graph__node-index {
@@ -61,26 +83,15 @@
   text-anchor: middle;
 }
 
-.chain-graph__actions {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+.chain-graph__node:focus-visible .chain-graph__node-circle {
+  stroke: rgba(var(--accent-primary-rgb), 0.98);
+  stroke-width: 2.25;
+  filter: drop-shadow(0 0 4px rgba(var(--accent-primary-rgb), 0.55));
 }
 
-.chain-graph__hit {
-  position: absolute;
-  width: 36px;
-  height: 36px;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.chain-graph__hit:focus-visible {
-  outline: 2px solid rgba(var(--accent-primary-rgb), 0.9);
-  outline-offset: 2px;
+.chain-graph__node:hover .chain-graph__node-circle {
+  stroke: rgba(var(--accent-primary-rgb), 0.9);
+  fill: rgba(var(--accent-primary-rgb), 0.18);
 }
 
 @media (prefers-reduced-motion: reduce) {

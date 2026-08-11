@@ -1,13 +1,12 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  ElementRef,
   HostListener,
   OnInit,
-  ViewChild,
   computed,
   effect,
   inject,
+  signal,
   untracked,
   viewChild,
 } from '@angular/core';
@@ -19,40 +18,49 @@ import {
   DOCK_REFRESH_EVENT,
   refreshEventMatchesTab,
 } from '../../core/constants/panel-refresh.constants';
-import { BlockComposerComponent } from '../block-composer/block-composer';
 import { PendingTransactionsComponent } from '../pending-transactions/pending-transactions';
 
 @Component({
   selector: 'app-transactions-dock',
   standalone: true,
-  imports: [CommonModule, BlockComposerComponent, PendingTransactionsComponent],
+  imports: [CommonModule, PendingTransactionsComponent],
   templateUrl: './transactions-dock.html',
   styleUrl: './transactions-dock.css',
 })
 export class TransactionsDockComponent implements OnInit {
-  @ViewChild('mempoolPanel') mempoolPanelRef?: ElementRef<HTMLElement>;
-  private readonly composer = viewChild(BlockComposerComponent);
-
-  protected readonly composerError = computed(
-    () => this.composer()?.errorMessage() ?? null
-  );
-  protected readonly composerSuccess = computed(
-    () => this.composer()?.successMessage() ?? null
-  );
+  private readonly pending = viewChild(PendingTransactionsComponent);
 
   protected readonly locale = inject(LocaleService);
   protected readonly dock = inject(TransactionsDockService);
   private readonly data = inject(TransactionsDataService);
 
+  protected readonly filterQuery = signal('');
+  /** Rows that fit the dock without scrolling (head + footer reserved). */
+  protected readonly visibleRowBudget = signal(6);
+
   protected readonly latestBlock = computed(() => this.data.latestBlock());
+  protected readonly pendingCount = computed(() => this.dock.pendingCount());
+
+  protected readonly pendingTotalLabel = computed(() => {
+    const panel = this.pending();
+    if (!panel) {
+      return '';
+    }
+    const total = panel.totalAmount();
+    if (!total || total <= 0) {
+      return '';
+    }
+    return `${panel.formatAmount(total)} R4V3`;
+  });
+
+  protected readonly miningAllBusy = computed(() => this.pending()?.miningAll() ?? false);
 
   constructor() {
     effect(() => {
-      const subTab = this.dock.activeSubTab();
       const highlight = this.dock.highlightTransactionId();
       untracked(() => {
-        if (subTab === 'mempool' || highlight) {
-          queueMicrotask(() => this.focusMempool(highlight));
+        if (highlight) {
+          queueMicrotask(() => this.pending()?.refresh());
         }
       });
     });
@@ -63,7 +71,7 @@ export class TransactionsDockComponent implements OnInit {
   }
 
   protected mempoolSummary(): string {
-    const count = this.dock.pendingCount();
+    const count = this.pendingCount();
     if (count <= 0) {
       return this.locale.t('transactions.mempoolEmpty');
     }
@@ -73,9 +81,26 @@ export class TransactionsDockComponent implements OnInit {
       .replace('{count}', String(count));
   }
 
+  protected onFilterInput(value: string): void {
+    this.filterQuery.set(value);
+  }
+
+  protected canMineAll(): boolean {
+    const panel = this.pending();
+    if (!panel) {
+      return false;
+    }
+    return panel.hasTransactions() && !panel.isBusy();
+  }
+
+  protected mineAllPending(): void {
+    void this.pending()?.mineAll();
+  }
+
   protected refreshAll(): void {
     this.data.init();
     this.data.scheduleRefresh(true);
+    void this.pending()?.refresh();
   }
 
   @HostListener(`window:${DOCK_REFRESH_EVENT}`, ['$event'])
@@ -94,24 +119,5 @@ export class TransactionsDockComponent implements OnInit {
     window.dispatchEvent(
       new CustomEvent('open-block-drawer', { detail: { block } })
     );
-  }
-
-  protected composerLoading(): boolean {
-    return this.composer()?.loading() ?? false;
-  }
-
-  private focusMempool(highlightId?: string | null): void {
-    const root = this.mempoolPanelRef?.nativeElement;
-    if (!root) {
-      return;
-    }
-
-    if (highlightId) {
-      const highlighted = root.querySelector('.pending-view__item.is-highlighted');
-      highlighted?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      return;
-    }
-
-    root.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
 }

@@ -13,6 +13,11 @@ import {
   DockMarketPhase,
   DockMarketStateService,
 } from '../../core/services/dock-market-state.service';
+import { ShowcaseNavigationService } from '../../core/services/showcase-navigation.service';
+import {
+  DOCK_REFRESH_EVENT,
+  SHOWCASE_REFRESH_EVENT,
+} from '../../core/constants/panel-refresh.constants';
 
 @Component({
   selector: 'app-dock-market-summary',
@@ -24,6 +29,7 @@ import {
 })
 export class DockMarketSummaryComponent implements OnInit, OnDestroy {
   protected readonly state = inject(DockMarketStateService);
+  private readonly showcaseNav = inject(ShowcaseNavigationService);
 
   @HostBinding('class')
   readonly hostClasses = `${COLLAPSED_SUMMARY_BAR_CLASS} dock-summary-bar__content is-market`;
@@ -40,11 +46,13 @@ export class DockMarketSummaryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     void this.state.load();
-    window.addEventListener('dartchain-refresh-dock', this.onGlobalRefresh);
+    window.addEventListener(DOCK_REFRESH_EVENT, this.onGlobalRefresh);
+    window.addEventListener(SHOWCASE_REFRESH_EVENT, this.onGlobalRefresh);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('dartchain-refresh-dock', this.onGlobalRefresh);
+    window.removeEventListener(DOCK_REFRESH_EVENT, this.onGlobalRefresh);
+    window.removeEventListener(SHOWCASE_REFRESH_EVENT, this.onGlobalRefresh);
   }
 
   private onGlobalRefresh = (): void => {
@@ -67,8 +75,6 @@ export class DockMarketSummaryComponent implements OnInit, OnDestroy {
 
   onOpen(event: Event): void {
     event.stopPropagation();
-    window.dispatchEvent(
-      new CustomEvent('dock-open-panel', { detail: { panel: 'market' } })
-    );
+    this.showcaseNav.requestTab('market');
   }
 }

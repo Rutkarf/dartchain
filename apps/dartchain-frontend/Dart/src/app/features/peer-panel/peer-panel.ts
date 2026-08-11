@@ -190,6 +190,13 @@ export class PeerPanelComponent implements OnDestroy {
 
   protected focusConnectInput(): void {
     this.peerInputRef?.nativeElement.focus();
+    this.peerInputRef?.nativeElement.select();
+  }
+
+  protected onConnectSubmit(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.addPeer();
   }
 
   protected onSearchInput(value: string): void {
@@ -236,11 +243,13 @@ export class PeerPanelComponent implements OnDestroy {
 
     if (!peer) {
       this.actionErrorMessage.set(this.locale.t('peers.errorInvalidUrl'));
+      this.focusConnectInput();
       return;
     }
 
     if (!this.isValidPeerUrl(peer)) {
       this.actionErrorMessage.set(this.locale.t('peers.errorInvalidFormat'));
+      this.focusConnectInput();
       return;
     }
 
@@ -252,6 +261,7 @@ export class PeerPanelComponent implements OnDestroy {
 
     this.submitting.set(true);
     this.clearActionError();
+    this.successMessage.set(null);
 
     this.api
       .addPeer(peer)
@@ -393,7 +403,7 @@ export class PeerPanelComponent implements OnDestroy {
     const statusLabel = normalizedStatus ? ` (${this.statusLabel(normalizedStatus)})` : '';
 
     this.successMessage.set(`${prefix} : ${peer}${statusLabel}`);
-    this.peerInput.set(this.locale.t('peers.connectPlaceholder'));
+    this.peerInput.set(peer);
     void this.peersData.refreshAll(true);
 
     queueMicrotask(() => {
@@ -453,6 +463,10 @@ export class PeerPanelComponent implements OnDestroy {
   }
 
   private extractErrorMessage(error: unknown, fallback: string): string {
+    if (error instanceof Error && error.message.trim()) {
+      return error.message;
+    }
+
     if (typeof error === 'object' && error !== null && 'error' in error) {
       const payload = (error as { error?: unknown }).error;
 

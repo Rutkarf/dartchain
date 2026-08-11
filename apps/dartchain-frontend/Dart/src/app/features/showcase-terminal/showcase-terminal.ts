@@ -16,13 +16,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 
 import { Block, BlockTransaction } from '../../core/models/block.model';
-import { ShowcaseTab } from '../../core/models/showcase-tab.model';
 import {
   BlockchainApiService,
   BlockchainStats,
   PeerView,
 } from '../../core/services/blockchain-api.service';
 import { ShowcaseNewsStateService } from '../../core/services/showcase-news-state.service';
+import {
+  ShowcaseTerminalMode,
+} from '../../core/services/showcase-terminal-state.service';
 import {
   SHOWCASE_REFRESH_EVENT,
   TERMINAL_REFRESH_EVENT,
@@ -55,7 +57,7 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
   private readonly newsState = inject(ShowcaseNewsStateService);
   private readonly destroyRef = inject(DestroyRef);
 
-  @Input({ required: true }) mode: ShowcaseTab = 'tours';
+  @Input({ required: true }) mode: ShowcaseTerminalMode = 'reseau';
   @Input() expanded = true;
 
   readonly selectBlock = output<number>();
@@ -64,7 +66,7 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
   readonly loadingMore = signal(false);
   readonly error = signal<string | null>(null);
   readonly visibleLimit = signal(ShowcaseTerminalComponent.RESEAU_PAGE_SIZE);
-  private readonly modeValue = signal<ShowcaseTab>('tours');
+  private readonly modeValue = signal<ShowcaseTerminalMode>('reseau');
 
   private readonly blocks = signal<Block[]>([]);
   private readonly peers = signal<PeerView[]>([]);
@@ -72,16 +74,11 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
 
   readonly headerTitle = computed(() => {
     switch (this.modeValue()) {
-      case 'reseau':
-        return 'RÉSEAU • NODE';
-      case 'rv23':
-        return 'R4V3 • CORE';
       case 'peers':
         return 'R4V3 • PEERS';
-      case 'dao':
-        return 'R4V3 • D.A.O';
+      case 'reseau':
       default:
-        return 'R4V3 • TERMINAL NODE';
+        return 'RÉSEAU • NODE';
     }
   });
 
@@ -138,16 +135,11 @@ export class ShowcaseTerminalComponent implements OnInit, OnChanges {
 
   readonly allRows = computed(() => {
     switch (this.modeValue()) {
-      case 'reseau':
-        return this.buildReseauRows();
-      case 'rv23':
-        return this.buildRv23Rows();
       case 'peers':
         return this.buildPeersRows();
-      case 'dao':
-        return this.buildDaoRows();
+      case 'reseau':
       default:
-        return this.buildToursRows();
+        return this.buildReseauRows();
     }
   });
 

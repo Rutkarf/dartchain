@@ -68,9 +68,9 @@ export class ShowcasePanelComponent {
       r4v3: 'R4V3',
       reseau: 'RÉSEAU',
       rv23: 'CHAT',
-      peers: 'PEERS',
       dao: 'LAUNCH',
       daonews: 'D.A.O',
+      market: 'MARCHÉ',
     } satisfies Record<ShowcaseTab, string>;
     return match[tab];
   }

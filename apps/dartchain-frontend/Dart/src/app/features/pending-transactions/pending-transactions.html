@@ -94,6 +94,17 @@
       </ul>
     } @else if (hasFilteredTransactions()) {
       <ul class="pending-view__list" [class.pending-view__list--compact]="compact" aria-label="Mempool">
+        @if (compact && hideCompactBar) {
+          <li class="pending-view__item pending-view__item--head" aria-hidden="true">
+            <div class="pending-view__item-row pending-view__item-row--compact pending-view__item-row--head">
+              <span>Âge</span>
+              <span>Hash</span>
+              <span>De → À</span>
+              <span>Montant</span>
+              <span></span>
+            </div>
+          </li>
+        }
         @for (tx of displayTransactions(); track trackTransaction($index, tx)) {
           <li class="pending-view__item" [class.is-highlighted]="isHighlighted(tx)">
             @if (compact) {
@@ -109,7 +120,15 @@
               >
                 {{ shortHash(tx.hash || tx.id) }}
               </button>
-              <span class="pending-view__amount">{{ formatAmount(tx.amount) }} R4V3</span>
+              <span
+                class="pending-view__route"
+                [title]="(resolveFrom(tx) || '—') + ' → ' + (resolveTo(tx) || '—')"
+              >
+                {{ resolveFrom(tx) ? shortHash(resolveFrom(tx)) : '—' }}
+                <span class="pending-view__route-arrow" aria-hidden="true">→</span>
+                {{ resolveTo(tx) ? shortHash(resolveTo(tx)) : '—' }}
+              </span>
+              <span class="pending-view__amount">{{ formatAmount(tx.amount) }}</span>
               <button
                 type="button"
                 class="pending-view__mine"
@@ -188,12 +207,12 @@
       </div>
     } @else {
       @if (compact && embedded) {
-        <p class="pending-view__empty-hint">Aucune transaction en attente</p>
+        <p class="pending-view__empty-hint">{{ locale.t('transactions.mempoolEmpty') }}</p>
       } @else {
       <div class="pending-view__status pending-view__status--compact">
-        <p>Mempool vide</p>
-        <button type="button" class="pending-view__retry" (click)="openComposerDock()">
-          {{ locale.t('transactions.createTx') }}
+        <p>{{ locale.t('transactions.mempoolEmpty') }}</p>
+        <button type="button" class="pending-view__retry" (click)="refresh()">
+          {{ locale.t('transactions.refreshPending') }}
         </button>
       </div>
       }

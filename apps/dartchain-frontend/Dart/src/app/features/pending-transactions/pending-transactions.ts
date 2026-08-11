@@ -27,9 +27,19 @@ type PendingTransactionView = PendingTransaction & {
   styleUrl: './pending-transactions.css',
 })
 export class PendingTransactionsComponent {
+  private static readonly COMPACT_MAX_ROWS = 6;
+
   @Input() embedded = false;
   @Input() compact = false;
   @Input() hideCompactBar = false;
+  /** Caps visible rows in compact mode (dock mempool no-scroll budget). */
+  @Input() maxVisibleRows = PendingTransactionsComponent.COMPACT_MAX_ROWS;
+  /** Optional search controlled by parent (e.g. mempool dock toolbar). */
+  @Input() set externalSearchQuery(value: string | null | undefined) {
+    if (typeof value === 'string') {
+      this.searchQuery.set(value);
+    }
+  }
 
   @HostBinding('class.pending-view--compact')
   get compactHostClass(): boolean {
@@ -40,8 +50,6 @@ export class PendingTransactionsComponent {
   get embeddedHostClass(): boolean {
     return this.embedded;
   }
-
-  private static readonly COMPACT_MAX_ROWS = 3;
 
   private readonly api = inject(BlockchainApiService);
   protected readonly data = inject(TransactionsDataService);
@@ -97,7 +105,8 @@ export class PendingTransactionsComponent {
   readonly displayTransactions = computed(() => {
     const items = this.filteredTransactions();
     if (this.compact) {
-      return items.slice(0, PendingTransactionsComponent.COMPACT_MAX_ROWS);
+      const limit = Math.max(1, this.maxVisibleRows || PendingTransactionsComponent.COMPACT_MAX_ROWS);
+      return items.slice(0, limit);
     }
     return items;
   });
@@ -234,6 +243,10 @@ export class PendingTransactionsComponent {
   shortHash(value?: string | null): string {
     if (!value) {
       return 'N/A';
+    }
+
+    if (this.compact) {
+      return value.length > 10 ? `${value.slice(0, 4)}…${value.slice(-3)}` : value;
     }
 
     return value.length > 14 ? `${value.slice(0, 6)}…${value.slice(-4)}` : value;

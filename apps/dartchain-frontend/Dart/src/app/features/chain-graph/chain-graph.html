@@ -3,9 +3,10 @@
     <svg
       class="chain-graph__svg"
       [attr.viewBox]="'0 0 ' + graphWidth() + ' 88'"
+      [attr.width]="graphWidth()"
+      height="88"
       preserveAspectRatio="xMinYMid meet"
-      aria-hidden="true"
-      focusable="false"
+      aria-hidden="false"
     >
       @for (segment of linkSegments(); track $index) {
         <line
@@ -18,7 +19,22 @@
       }
 
       @for (node of layoutNodes(); track node.block.index) {
-        <g class="chain-graph__node" [class.is-tip]="node.isTip">
+        <g
+          class="chain-graph__node"
+          [class.is-tip]="node.isTip"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Ouvrir le bloc #' + node.block.index"
+          (click)="openBlock(node.block)"
+          (keydown.enter)="openBlock(node.block)"
+          (keydown.space)="$event.preventDefault(); openBlock(node.block)"
+        >
+          <circle
+            class="chain-graph__node-hit"
+            [attr.cx]="node.x"
+            [attr.cy]="node.y"
+            r="20"
+          />
           <circle
             class="chain-graph__node-circle"
             [attr.cx]="node.x"
@@ -34,18 +50,5 @@
         </g>
       }
     </svg>
-
-    <div class="chain-graph__actions" aria-hidden="true">
-      @for (node of layoutNodes(); track node.block.index) {
-        <button
-          type="button"
-          class="chain-graph__hit"
-          [style.left.px]="node.x - 18"
-          [style.top.px]="node.y - 18"
-          [attr.aria-label]="'Ouvrir le bloc #' + node.block.index"
-          (click)="openBlock(node.block)"
-        ></button>
-      }
-    </div>
   </div>
 </div>

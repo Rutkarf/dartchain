@@ -654,11 +654,13 @@
   background: transparent;
 }
 
-:host(.pending-view--compact) .pending-view__list {
-  flex: 0 0 auto;
+:host(.pending-view--compact) .pending-view__list,
+:host(.pending-view--compact.pending-view--embedded) .pending-view__list {
+  flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  padding: 0 4px 4px;
+  overflow-y: hidden;
+  padding: 1px 3px 2px;
 }
 
 .pending-view__inline-error {
@@ -709,27 +711,126 @@
 
 .pending-view__item-row--compact {
   grid-template-columns:
-    clamp(22px, 10%, 28px)
+    22px
+    42px
     minmax(0, 1fr)
-    clamp(36px, 16%, 48px)
-    clamp(30px, 12%, 38px);
+    40px
+    30px;
   column-gap: 3px;
+  align-items: center;
+  line-height: 1;
+}
+
+.pending-view__item-row--compact > .pending-view__time,
+.pending-view__item-row--compact > .pending-view__hash,
+.pending-view__item-row--compact > .pending-view__route,
+.pending-view__item-row--compact > .pending-view__amount,
+.pending-view__item-row--compact > .pending-view__mine {
+  grid-column: auto;
+}
+
+.pending-view__item-row--compact > .pending-view__time {
+  font-size: 5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(167, 209, 228, 0.72);
+}
+
+.pending-view__item-row--compact > .pending-view__hash,
+.pending-view__item-row--compact > .pending-view__copy {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 4.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(186, 220, 240, 0.78);
+  line-height: 1;
+  text-align: left;
+}
+
+.pending-view__item-row--compact > .pending-view__route {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 4.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(186, 220, 240, 0.78);
+  line-height: 1;
+}
+
+.pending-view__item-row--compact > .pending-view__amount {
+  font-size: 5px;
+  font-weight: 800;
+  text-align: right;
+  justify-self: stretch;
+  color: var(--chart-trend-up, #45ffac);
+}
+
+.pending-view__item-row--compact > .pending-view__mine {
+  grid-column: auto;
+  justify-self: stretch;
+  height: 10px;
+  min-height: 10px;
+  font-size: 5px;
+  padding: 0 2px;
+  letter-spacing: 0.02em;
 }
 
 .pending-view__list--compact {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .pending-view__list--compact .pending-view__item-row--compact .pending-view__amount {
   text-align: right;
-  font-size: clamp(6px, 1.8cqw, 8px);
-  font-weight: 800;
-  color: var(--chart-trend-up);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.pending-view__list--compact .pending-view__item-row--compact .pending-view__route {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pending-view--compact.pending-view--embedded .pending-view__content {
+  overflow: hidden;
+}
+
+.pending-view--compact.pending-view--embedded .pending-view__list {
+  overflow: hidden;
+}
+
+.pending-view__item-row--head {
+  font-size: 4.5px;
+  font-family: inherit;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(167, 209, 228, 0.58);
+  border-bottom: 1px solid rgba(0, 229, 255, 0.12);
+  min-height: 10px;
+  height: 10px;
+}
+
+.pending-view__item-row--head > span {
+  font-size: inherit;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pending-view__item-row--head > span:nth-child(4) {
+  text-align: right;
+}
+
+.pending-view__item--head {
+  flex: 0 0 auto;
+  pointer-events: none;
 }
 
 .pending-view__more-hint {

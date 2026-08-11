@@ -175,26 +175,14 @@
 }
 
 .peer-panel__connect {
+  position: relative;
+  z-index: 2;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 3px;
   min-width: 0;
-}
-
-.peer-panel__connect-add {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  border-radius: 5px;
-  border: 1px solid rgba(var(--peer-cyan-rgb), 0.28);
-  background: rgba(2, 14, 24, 0.72);
-  color: #baf3ff;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
+  pointer-events: auto;
 }
 
 .peer-panel__connect-input {
@@ -207,6 +195,7 @@
   color: #eef9ff;
   font-size: 8px;
   outline: none;
+  pointer-events: auto;
 }
 
 .peer-panel__connect-btn {
@@ -224,6 +213,7 @@
   text-transform: uppercase;
   cursor: pointer;
   white-space: nowrap;
+  pointer-events: auto;
 }
 
 .peer-panel__connect-btn:disabled {
