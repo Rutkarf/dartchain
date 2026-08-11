@@ -31,14 +31,17 @@ export interface UiZoneManifest {
   notes?: string[];
 }
 
-export const UI_REDESIGN_PHASE = 4;
+/** Phase 9 — viewport exclusif 250×500, zero-scroll, finition fintech. */
+export const UI_REDESIGN_PHASE = 9;
 
 export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
   {
     id: 'background',
     readingOrder: -1,
     label: 'Fond (particules + floor + scène)',
-    notes: ['Conservé intégralement — signature cyberpunk mature'],
+    notes: [
+      'Conservé intégralement — fond WebGL (Pass 2+ pourra réduire la compétition visuelle via opacity tokens)',
+    ],
     components: [
       {
         selector: 'app-particle-background',
@@ -207,7 +210,7 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
     readingOrder: 2,
     label: 'Showcase (tabs + seam collapse + panel)',
     notes: [
-      'Tabs niveau A : TOUS R4V3 RÉSEAU CHAT LAUNCH D.A.O MARCHÉ (showcase-tabs)',
+      'Tabs niveau A : TOUS R4V3 CHAT LAUNCH D.A.O MARCHÉ (showcase-tabs)',
       'Tabs niveau B : filtres catégories news (showcase-news) — logique distincte, rendu à différencier Phase 8–9',
       'Chevron discret haut-droite (showcase-toggle / app-panel-collapse-control) : collapse/expand — ne pas supprimer',
     ],
@@ -219,7 +222,6 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
         elements: [
           { id: 'tab-tours', label: 'TOUS', kind: 'tab' },
           { id: 'tab-r4v3', label: 'R4V3', kind: 'tab' },
-          { id: 'tab-reseau', label: 'RÉSEAU', kind: 'tab' },
           { id: 'tab-rv23', label: 'CHAT', kind: 'tab' },
           { id: 'tab-dao', label: 'LAUNCH', kind: 'tab' },
           { id: 'tab-daonews', label: 'D.A.O', kind: 'tab' },
@@ -278,19 +280,6 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
         ],
         interactions: ['send message', 'style prefs', 'search filter'],
         dataFields: ['filteredMessages', 'roomLabel', 'connected', 'unreadCount'],
-      },
-      {
-        selector: 'app-showcase-terminal',
-        template: 'features/showcase-terminal/showcase-terminal.html',
-        styles: ['features/showcase-terminal/showcase-terminal.css'],
-        elements: [
-          { id: 'terminal-title', label: 'RÉSEAU / PEERS', kind: 'label' },
-          { id: 'event-badge', label: 'Compteur événements', kind: 'badge' },
-          { id: 'terminal-table', label: '# Heure Action Statut', kind: 'table' },
-          { id: 'load-more-terminal', label: 'Charger plus', kind: 'button' },
-        ],
-        interactions: ['refresh', 'loadMore', 'onRowClick'],
-        dataFields: ['visibleRows', 'eventCount', 'mode'],
       },
       {
         selector: 'app-showcase-launch',
@@ -466,7 +455,7 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
         template: 'features/block-detail-drawer/block-detail-drawer.html',
         styles: ['features/block-detail-drawer/block-detail-drawer.css'],
         elements: [{ id: 'block-detail-grid', label: 'Index Hash Nonce Difficulté…', kind: 'panel' }],
-        interactions: ['closeDrawer', 'open from explorer/blocks/terminal'],
+        interactions: ['closeDrawer', 'open from explorer/blocks'],
         dataFields: ['block', 'open'],
       },
       {

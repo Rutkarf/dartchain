@@ -1,53 +1,41 @@
 :host {
-  /* Charte Parrot OS (Mate Terminal) — viewport 300×600 */
-  --parrot-bg: #0c0c0c;
-  --parrot-bg-panel: #121212;
-  --parrot-bg-raised: #1a1a1a;
-  --parrot-border: #2a2a2a;
-  --parrot-green: #39ff14;
-  --parrot-green-dim: #2bc410;
-  --parrot-green-rgb: 57, 255, 20;
-  --parrot-red: #ff5555;
-  --parrot-red-rgb: 255, 85, 85;
-  --parrot-amber: #f1fa8c;
-  --parrot-fg: #e6e6e6;
-  --parrot-fg-dim: #9a9a9a;
-  --parrot-mono: 'DejaVu Sans Mono', 'Liberation Mono', 'Share Tech Mono', 'Courier New', monospace;
+  /* Charte chat — Pass 3 fintech (aliases Parrot conservés, valeurs sobres) */
+  --parrot-bg: var(--bg-primary, #050a12);
+  --parrot-bg-panel: var(--surface, #0a1220);
+  --parrot-bg-raised: var(--surface-elevated, #0d1828);
+  --parrot-border: var(--border-subtle, rgba(255, 255, 255, 0.06));
+  --parrot-green: var(--success, #2ecc8a);
+  --parrot-green-dim: #249e6c;
+  --parrot-green-rgb: var(--success-rgb, 46, 204, 138);
+  --parrot-red: var(--danger, #e85d75);
+  --parrot-red-rgb: var(--danger-rgb, 232, 93, 117);
+  --parrot-amber: var(--warning, #e6b84d);
+  --parrot-fg: var(--ds-text-primary, #e8eef5);
+  --parrot-fg-dim: var(--ds-text-secondary, #8b9bb0);
+  --parrot-mono: var(--ds-font-mono, 'DejaVu Sans Mono', 'Liberation Mono', 'Share Tech Mono', 'Courier New', monospace);
 
-  /* Shell cyber-glass (terminal néon + glassmorphisme hub) */
-  --chat-glass-fill: linear-gradient(
-    165deg,
-    rgba(8, 10, 14, 0.82) 0%,
-    rgba(255, 255, 255, 0.02) 36%,
-    rgba(var(--brand-baltic-blue-rgb), 0.08) 68%,
-    rgba(var(--brand-ultra-purple-rgb), 0.12) 100%
-  );
+  /* Shell glass subtil (néon désactivé) */
+  --chat-glass-fill: var(--glass-fill-fintech, rgba(10, 18, 32, 0.75));
   --chat-glass-border: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.14),
-    rgba(var(--brand-baltic-blue-rgb), 0.32),
-    rgba(var(--brand-ultra-purple-rgb), 0.28)
+    rgba(255, 255, 255, 0.08),
+    rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.12),
+    rgba(var(--accent-purple-rgb, 123, 108, 255), 0.08)
   );
   --chat-glass-panel: linear-gradient(
     180deg,
-    rgba(16, 20, 26, 0.52) 0%,
-    rgba(8, 10, 14, 0.38) 100%
+    rgba(var(--surface-elevated-rgb, 13, 24, 40), 0.55) 0%,
+    rgba(var(--surface-rgb, 10, 18, 32), 0.42) 100%
   );
   --chat-glass-control: linear-gradient(
     180deg,
-    rgba(12, 16, 20, 0.62) 0%,
-    rgba(8, 10, 14, 0.48) 100%
+    rgba(var(--surface-hover-rgb, 17, 31, 50), 0.55) 0%,
+    rgba(var(--surface-rgb, 10, 18, 32), 0.4) 100%
   );
-  --chat-glass-blur: blur(10px) saturate(145%);
-  --chat-neon-glow:
-    0 0 8px rgba(255, 255, 255, 0.04),
-    0 0 16px rgba(var(--brand-baltic-blue-rgb), 0.08);
-  --chat-glass-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-    0 4px 18px rgba(0, 0, 0, 0.48),
-    var(--chat-neon-glow);
-  --chat-glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --chat-glass-blur: var(--glass-blur-fintech, blur(16px) saturate(120%));
+  --chat-neon-glow: none;
+  --chat-glass-shadow: var(--shadow-card, 0 2px 12px rgba(0, 0, 0, 0.22));
+  --chat-glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   --chat-messages-bg: #000;
   --chat-composer-bg: #000;
 
@@ -65,7 +53,7 @@
   --chat-composer-h: 9px;
   --chat-send-font: max(4px, calc(var(--chat-font) + 0.25px));
   --chat-input-caret-inset: clamp(8px, 4vw, 12px);
-  --chat-identity-w: clamp(20px, 10vw, 29px);
+  --chat-identity-w: clamp(34px, 16vw, 46px);
   --chat-role-w: 10px;
   --chat-led-w: 12px;
   --chat-author-w: clamp(88px, 24%, 124px);
@@ -229,20 +217,18 @@
 
 .showcase-chat__live-led--active {
   background: var(--parrot-green);
-  box-shadow:
-    0 0 6px rgba(var(--parrot-green-rgb), 0.75),
-    0 0 14px rgba(var(--parrot-green-rgb), 0.35);
+  box-shadow: none;
 }
 
 .showcase-chat__live-led--pending {
   background: var(--parrot-amber);
-  box-shadow: 0 0 6px rgba(241, 250, 140, 0.45);
+  box-shadow: none;
   animation: showcase-chat-led-pulse 1.2s ease-in-out infinite;
 }
 
 .showcase-chat__live-led--offline {
   background: var(--parrot-red);
-  box-shadow: 0 0 4px rgba(var(--parrot-red-rgb), 0.45);
+  box-shadow: none;
 }
 
 .showcase-chat__meta-actions {
@@ -1252,14 +1238,12 @@
 
 .showcase-chat__led--online {
   background: var(--parrot-green);
-  box-shadow:
-    0 0 6px rgba(var(--parrot-green-rgb), 0.65),
-    0 0 14px rgba(var(--parrot-green-rgb), 0.25);
+  box-shadow: none;
 }
 
 .showcase-chat__led--offline {
   background: var(--parrot-red);
-  box-shadow: 0 0 5px rgba(var(--parrot-red-rgb), 0.4);
+  box-shadow: none;
 }
 
 .showcase-chat__author {
@@ -1414,7 +1398,7 @@
   background: rgba(255, 255, 255, 0.14);
   transform: translate(-50%, -50%) rotate(-45deg);
   transform-origin: center;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.06);
+  box-shadow: none;
 }
 
 .showcase-chat__identity-btn {
@@ -1503,10 +1487,16 @@
 
 .showcase-chat__identity-btn--anon .showcase-chat__anon-icon {
   flex-shrink: 0;
-  width: calc(var(--chat-composer-h) * 1.1);
-  height: calc(var(--chat-composer-h) * 1.1);
-  min-width: 8px;
-  min-height: 8px;
+  width: calc(var(--chat-composer-h) * 0.95);
+  height: calc(var(--chat-composer-h) * 0.95);
+  min-width: 7px;
+  min-height: 7px;
+}
+
+.showcase-chat__identity-btn--anon:disabled,
+.showcase-chat__identity-btn--anon.is-locked {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .showcase-chat__composer-inner.showcase-chat__bubble--style-neon,

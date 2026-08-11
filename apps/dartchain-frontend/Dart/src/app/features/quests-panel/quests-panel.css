@@ -175,7 +175,7 @@
   color: #baf3ff;
   font-size: 9px;
   line-height: 1;
-  text-shadow: 0 0 8px rgba(var(--quest-cyan-rgb), 0.65);
+  text-shadow: none;
 }
 
 .quests-panel__guardian-body {
@@ -213,7 +213,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 0 10px rgba(var(--quest-cyan-rgb), 0.35);
+  text-shadow: none;
 }
 
 .quests-panel__guardian-track {
@@ -230,7 +230,7 @@
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, rgba(var(--quest-purple-rgb), 0.65), #00d9ff, var(--quest-green));
-  box-shadow: 0 0 6px rgba(var(--quest-cyan-rgb), 0.35);
+  box-shadow: none;
 }
 
 .quests-panel__guardian-pct {
@@ -433,7 +433,7 @@
   border-color: color-mix(in srgb, var(--quest-accent) 70%, transparent);
   background: color-mix(in srgb, var(--quest-accent) 18%, transparent);
   color: var(--quest-accent);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--quest-accent) 45%, transparent);
+  box-shadow: none;
 }
 
 .quests-panel__row-body {
@@ -661,7 +661,7 @@
   color: var(--quest-green);
   cursor: pointer;
   opacity: 1;
-  box-shadow: 0 0 10px rgba(var(--quest-green-rgb), 0.18);
+  box-shadow: none;
   animation: quests-chip-glow 1.4s ease-in-out infinite;
 }
 
@@ -686,10 +686,10 @@
 @keyframes quests-countdown-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 rgba(255, 214, 102, 0);
+    box-shadow: none;
   }
   50% {
-    box-shadow: 0 0 8px rgba(255, 214, 102, 0.35);
+    box-shadow: none;
   }
 }
 
@@ -715,28 +715,24 @@
 @keyframes quests-guardian-ready {
   0%,
   100% {
-    box-shadow:
-      0 0 10px rgba(var(--quest-green-rgb), 0.14),
-      inset 0 0 0 1px rgba(var(--quest-green-rgb), 0.1);
+    box-shadow: inset 0 0 0 1px rgba(var(--quest-green-rgb), 0.1);
   }
   50% {
-    box-shadow:
-      0 0 16px rgba(var(--quest-green-rgb), 0.28),
-      inset 0 0 0 1px rgba(var(--quest-green-rgb), 0.18);
+    box-shadow: inset 0 0 0 1px rgba(var(--quest-green-rgb), 0.18);
   }
 }
 
 @keyframes quests-row-celebrate {
   0% {
-    box-shadow: 0 0 0 color-mix(in srgb, var(--quest-accent) 0%, transparent);
+    box-shadow: none;
     transform: scale(1);
   }
   40% {
-    box-shadow: 0 0 12px color-mix(in srgb, var(--quest-accent) 45%, transparent);
+    box-shadow: none;
     transform: scale(1.01);
   }
   100% {
-    box-shadow: 0 0 0 color-mix(in srgb, var(--quest-accent) 0%, transparent);
+    box-shadow: none;
     transform: scale(1);
   }
 }

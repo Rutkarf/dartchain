@@ -249,35 +249,8 @@ export class ExchangePanelComponent implements AfterViewInit {
       this.fromBalance() > 0
   );
 
-  protected readonly showFooter = computed(() => !this.exchangeCollapsed());
-
-  protected readonly conversionProgress = computed(() => {
-    if (!this.auth.isAuthenticated()) {
-      return 33;
-    }
-
-    if (!this.hasWallet()) {
-      return 66;
-    }
-
-    return 100;
-  });
-
-  protected readonly showConversionProgress = computed(
-    () => this.showFooter() && this.conversionProgress() < 100
-  );
-
-  protected readonly conversionStepLabel = computed(() => {
-    if (!this.auth.isAuthenticated()) {
-      return 'Compte';
-    }
-
-    if (!this.hasWallet()) {
-      return 'Wallet';
-    }
-
-    return 'Convertir';
-  });
+  /** Meta swap déjà sur le CTA (title) — pas de bandeau sous le rail. */
+  protected readonly showFooter = computed(() => false);
 
   protected readonly trustLine = computed(
     () => 'Slippage max 0,5 % · Frais réseau 0 %'

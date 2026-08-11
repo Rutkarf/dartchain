@@ -169,7 +169,7 @@
 
 .faucet-panel__top {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(56px, 0.7fr) 48px;
+  grid-template-columns: minmax(0, 1.7fr) minmax(34px, 0.38fr) 48px;
   gap: 2px;
   align-items: stretch;
   min-height: 0;
@@ -229,7 +229,7 @@
 
 .faucet-panel__value.is-capped {
   color: #ffd56a;
-  text-shadow: 0 0 8px rgba(255, 213, 106, 0.35);
+  text-shadow: none;
 }
 
 .faucet-panel__cap-hint {
@@ -263,9 +263,7 @@
 
 .faucet-panel__value.is-bumping {
   color: #5ce8ff;
-  text-shadow:
-    0 0 10px rgba(23, 217, 255, 0.5),
-    0 0 18px rgba(23, 217, 255, 0.22);
+  text-shadow: none;
 }
 
 .faucet-panel__label {
@@ -786,23 +784,23 @@
   border-radius: 50%;
   flex-shrink: 0;
   background: #ffd56a;
-  box-shadow: 0 0 6px rgba(255, 213, 106, 0.65);
+  box-shadow: none;
 }
 
 .faucet-panel__dot.is-ready {
   background: #2dff90;
-  box-shadow: 0 0 8px rgba(45, 255, 144, 0.85);
+  box-shadow: none;
   animation: faucet-led-pulse 1.4s ease-in-out infinite;
 }
 
 .faucet-panel__dot.is-cooldown {
   background: #ffd56a;
-  box-shadow: 0 0 8px rgba(255, 213, 106, 0.75);
+  box-shadow: none;
 }
 
 .faucet-panel__dot.is-offline {
   background: #ff5c5c;
-  box-shadow: 0 0 8px rgba(255, 92, 92, 0.75);
+  box-shadow: none;
 }
 
 .faucet-panel__dot.is-disabled {
@@ -836,7 +834,7 @@
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__top {
-  grid-template-columns: minmax(0, 1.45fr) minmax(48px, 0.58fr) 40px;
+  grid-template-columns: minmax(0, 1.85fr) minmax(28px, 0.32fr) 40px;
   gap: 2px;
 }
 

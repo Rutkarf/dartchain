@@ -757,7 +757,7 @@
 
 /* Hub marché (maquette) — graphique plein cadre, fond texturé ds-surface */
 :host(.rate-panel--hub-graph) {
-  overflow: hidden;
+  overflow: visible;
 }
 
 :host(.rate-panel--hub-graph) .rate-panel-root--hub-graph {
@@ -785,7 +785,7 @@
   min-width: 0;
   min-height: 0;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
   border-radius: clamp(6px, 1.8vw, 10px);
 }
 
@@ -816,10 +816,7 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  overflow: hidden;
-}
-
-:host(.rate-panel--hub-graph) .rate-panel-graph-zone--hub {
+  overflow: visible;
   position: relative;
 }
 
@@ -852,6 +849,7 @@
   flex: 1 1 0;
   min-height: 0;
   height: auto;
+  overflow: visible;
   /* Pas de padding horizontal : l’inset droit du menu actions est partagé (Graph/Showcase/Dock) */
   padding: 0;
   border-radius: 0;

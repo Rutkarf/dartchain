@@ -11,8 +11,6 @@ import { ShowcaseDaoSummaryComponent } from '../showcase-dao/showcase-dao-summar
 import { ShowcaseDaoComponent } from '../showcase-dao/showcase-dao';
 import { ShowcaseR4v3SummaryComponent } from '../showcase-r4v3/showcase-r4v3-summary';
 import { ShowcaseR4v3Component } from '../showcase-r4v3/showcase-r4v3';
-import { ShowcaseTerminalComponent } from '../showcase-terminal/showcase-terminal';
-import { ShowcaseTerminalSummaryComponent } from '../showcase-terminal/showcase-terminal-summary';
 import { DockMarketSummaryComponent } from '../dock-summary/dock-market-summary';
 import { MarketPanelComponent } from '../market-panel/market-panel';
 
@@ -20,7 +18,6 @@ import { MarketPanelComponent } from '../market-panel/market-panel';
   selector: 'app-showcase-window',
   standalone: true,
   imports: [
-    ShowcaseTerminalComponent,
     ShowcaseNewsComponent,
     ShowcaseNewsSummaryComponent,
     ShowcaseChatComponent,
@@ -31,7 +28,6 @@ import { MarketPanelComponent } from '../market-panel/market-panel';
     ShowcaseDaoSummaryComponent,
     ShowcaseR4v3Component,
     ShowcaseR4v3SummaryComponent,
-    ShowcaseTerminalSummaryComponent,
     DockMarketSummaryComponent,
     MarketPanelComponent,
   ],
@@ -60,7 +56,7 @@ export class ShowcaseWindowComponent {
       case 'market':
         return 'Marché — tokens et liquidité';
       default:
-        return 'Terminal showcase';
+        return 'Showcase';
     }
   }
 

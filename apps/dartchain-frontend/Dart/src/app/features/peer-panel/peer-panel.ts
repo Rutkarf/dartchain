@@ -12,8 +12,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import {
   AddPeerResponse,
@@ -133,9 +132,14 @@ export class PeerPanelComponent implements OnDestroy {
   );
 
   protected readonly errorBanner = computed(() => {
+    const actionError = this.actionErrorMessage();
+    if (actionError) {
+      return actionError;
+    }
+
     const code = this.peersData.error();
     if (!code) {
-      return this.actionErrorMessage();
+      return null;
     }
 
     if (code === 'rate-limit') {
@@ -196,6 +200,12 @@ export class PeerPanelComponent implements OnDestroy {
   protected onConnectSubmit(event?: Event): void {
     event?.preventDefault();
     event?.stopPropagation();
+
+    const liveValue = this.peerInputRef?.nativeElement?.value?.trim() ?? '';
+    if (liveValue) {
+      this.peerInput.set(liveValue);
+    }
+
     this.addPeer();
   }
 
@@ -255,30 +265,11 @@ export class PeerPanelComponent implements OnDestroy {
 
     const existingPeer = this.peers().find((item) => item.url === peer);
     if (existingPeer) {
-      this.reconnectPeer(peer);
+      void this.runReconnect(peer);
       return;
     }
 
-    this.submitting.set(true);
-    this.clearActionError();
-    this.successMessage.set(null);
-
-    this.api
-      .addPeer(peer)
-      .pipe(
-        finalize(() => this.submitting.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (response: AddPeerResponse) => {
-          this.handlePeerActionSuccess(response, peer, this.locale.t('peers.successAdded'));
-        },
-        error: (error) => {
-          this.actionErrorMessage.set(
-            this.extractErrorMessage(error, this.locale.t('peers.errorConnect'))
-          );
-        },
-      });
+    void this.runAddPeer(peer);
   }
 
   protected reconnectPeer(url: string, event?: Event): void {
@@ -293,25 +284,7 @@ export class PeerPanelComponent implements OnDestroy {
       return;
     }
 
-    this.submitting.set(true);
-    this.clearActionError();
-
-    this.api
-      .reconnectPeer(url)
-      .pipe(
-        finalize(() => this.submitting.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (response: AddPeerResponse) => {
-          this.handlePeerActionSuccess(response, url, this.locale.t('peers.successReconnected'));
-        },
-        error: (error) => {
-          this.actionErrorMessage.set(
-            this.extractErrorMessage(error, this.locale.t('peers.errorReconnect'))
-          );
-        },
-      });
+    void this.runReconnect(url);
   }
 
   protected disconnectPeer(url: string, event?: Event): void {
@@ -326,32 +299,7 @@ export class PeerPanelComponent implements OnDestroy {
       return;
     }
 
-    this.submitting.set(true);
-    this.clearActionError();
-
-    this.api
-      .disconnectPeer(url)
-      .pipe(
-        finalize(() => this.submitting.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (response: AddPeerResponse) => {
-          this.handlePeerActionSuccess(
-            response,
-            url,
-            this.locale.t('peers.successDisconnected')
-          );
-          if (this.selectedPeer()?.url === url) {
-            this.closePeerDetail();
-          }
-        },
-        error: (error) => {
-          this.actionErrorMessage.set(
-            this.extractErrorMessage(error, this.locale.t('peers.errorDisconnect'))
-          );
-        },
-      });
+    void this.runDisconnect(url);
   }
 
   protected copyPeerUrl(url: string, event?: Event): void {
@@ -392,6 +340,67 @@ export class PeerPanelComponent implements OnDestroy {
 
   protected favoriteLabel(isFavorite: boolean): string {
     return isFavorite ? this.locale.t('peers.favRemove') : this.locale.t('peers.favAdd');
+  }
+
+  private async runAddPeer(peer: string): Promise<void> {
+    this.submitting.set(true);
+    this.clearActionError();
+    this.successMessage.set(null);
+
+    try {
+      const response = await firstValueFrom(this.api.addPeer(peer));
+      this.handlePeerActionSuccess(response, peer, this.locale.t('peers.successAdded'));
+    } catch (error) {
+      const message = this.extractErrorMessage(error, this.locale.t('peers.errorConnect'));
+      if (/already exists/i.test(message)) {
+        await this.runReconnect(peer);
+        return;
+      }
+      this.actionErrorMessage.set(message);
+    } finally {
+      this.submitting.set(false);
+    }
+  }
+
+  private async runReconnect(url: string): Promise<void> {
+    this.submitting.set(true);
+    this.clearActionError();
+    this.successMessage.set(null);
+
+    try {
+      const response = await firstValueFrom(this.api.reconnectPeer(url));
+      this.handlePeerActionSuccess(response, url, this.locale.t('peers.successReconnected'));
+    } catch (error) {
+      this.actionErrorMessage.set(
+        this.extractErrorMessage(error, this.locale.t('peers.errorReconnect'))
+      );
+    } finally {
+      this.submitting.set(false);
+    }
+  }
+
+  private async runDisconnect(url: string): Promise<void> {
+    this.submitting.set(true);
+    this.clearActionError();
+    this.successMessage.set(null);
+
+    try {
+      const response = await firstValueFrom(this.api.disconnectPeer(url));
+      this.handlePeerActionSuccess(
+        response,
+        url,
+        this.locale.t('peers.successDisconnected')
+      );
+      if (this.selectedPeer()?.url === url) {
+        this.closePeerDetail();
+      }
+    } catch (error) {
+      this.actionErrorMessage.set(
+        this.extractErrorMessage(error, this.locale.t('peers.errorDisconnect'))
+      );
+    } finally {
+      this.submitting.set(false);
+    }
   }
 
   private handlePeerActionSuccess(

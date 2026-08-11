@@ -7,8 +7,9 @@
 @import './styles/dock-shell.css';
 @import './cta-buttons.css';
 @import './styles/dock-view-tokens.css';
+@import './styles/ds-pass3-polish.css';
 
-/* —— Viewport one-page (pas de scroll global) —— */
+/* —— Viewport one-page @ 250×500 (pas de scroll global) —— */
 html,
 body,
 app-root {
@@ -339,13 +340,15 @@ app-faucet {
 
 /* Le layout principal est désormais piloté uniquement par `src/app/app.css`.
    On évite ici toute redéfinition globale de `.app-shell` pour ne pas écraser
-   les hauteurs/rows compactes (300x600). */
+   les hauteurs/rows compactes (250×500 MVP). */
 
 html,
 body {
   width: 100%;
+  height: 100%;
+  max-height: 100%;
   background: var(--bg-base);
-  overflow-x: hidden;
+  overflow: hidden;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -367,7 +370,10 @@ body :where(button, input, textarea, select):disabled {
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
   background: var(--bg-base);
 }
 

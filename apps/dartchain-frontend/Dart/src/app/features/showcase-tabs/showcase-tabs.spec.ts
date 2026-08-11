@@ -25,7 +25,7 @@ describe('ShowcaseTabsComponent', () => {
     component.tabChange.subscribe((tab) => {
       emitted = tab;
     });
-    component.selectTab('reseau');
-    expect(emitted).toBe('reseau');
+    component.selectTab('market');
+    expect(emitted).toBe('market');
   });
 });

@@ -40,7 +40,7 @@
               <app-r4v3-three
                 class="showcase-chart__hub-logo-three"
                 presentation="navbar"
-                [modelTargetSize]="10"
+                [modelTargetSize]="13"
                 [cameraFitFactor]="1.35"
                 [frameBiasY]="-0.06"
                 [enableOrbit]="true"
@@ -118,7 +118,7 @@
                   (click)="toggleR4v3ViewMenu($event)"
                   [attr.aria-expanded]="r4v3ViewMenuOpen()"
                   aria-haspopup="listbox"
-                  aria-label="Choisir le mode d'affichage"
+                  [attr.aria-label]="r4v3ViewTriggerAriaLabel()"
                 >
                   <span class="showcase-chart__hub-dropdown-label">{{ r4v3ViewBadge() }}</span>
                   <span class="showcase-chart__hub-dropdown-chevron" aria-hidden="true"></span>
@@ -758,14 +758,18 @@
               </div>
             </div>
           </div>
-        <div class="showcase-chart__axis" aria-hidden="true">
-            @for (tick of axisTicks(); track tick.id ?? tick.index) {
-              <span class="showcase-chart__axis-tick" [style.left.%]="tick.position">
-                <span class="showcase-chart__axis-tick-label">{{ tick.label }}</span>
-              </span>
-            }
-          </div>
         </div>
+      </div>
+      <div
+        class="showcase-chart__axis"
+        [class.showcase-chart__axis--hub]="hubLayout()"
+        aria-hidden="true"
+      >
+        @for (tick of axisTicks(); track tick.id ?? tick.index) {
+          <span class="showcase-chart__axis-tick" [style.left.%]="tick.position">
+            <span class="showcase-chart__axis-tick-label">{{ tick.label }}</span>
+          </span>
+        }
       </div>
   </div>
   }

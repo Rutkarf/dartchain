@@ -86,7 +86,7 @@
 .chain-graph__node:focus-visible .chain-graph__node-circle {
   stroke: rgba(var(--accent-primary-rgb), 0.98);
   stroke-width: 2.25;
-  filter: drop-shadow(0 0 4px rgba(var(--accent-primary-rgb), 0.55));
+  filter: none;
 }
 
 .chain-graph__node:hover .chain-graph__node-circle {

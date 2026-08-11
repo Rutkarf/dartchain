@@ -75,23 +75,6 @@
           }
         </div>
       }
-      @case ('reseau') {
-        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--terminal">
-          @if (collapsed) {
-            <app-showcase-terminal-summary mode="reseau" />
-          } @else {
-            @defer (on idle) {
-              <app-showcase-terminal
-                mode="reseau"
-                [expanded]="true"
-                (selectBlock)="onSelectBlock($event)"
-              />
-            } @placeholder {
-              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
-            }
-          }
-        </div>
-      }
       @case ('market') {
         <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--market">
           @if (collapsed) {

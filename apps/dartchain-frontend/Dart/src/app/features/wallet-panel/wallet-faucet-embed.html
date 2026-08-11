@@ -1,8 +1,4 @@
-<div class="wallet-faucet wallet-faucet--cyber" aria-label="Faucet">
-  <span class="wallet-faucet__scanlines" aria-hidden="true"></span>
-  <span class="wallet-faucet__corner wallet-faucet__corner--tl" aria-hidden="true"></span>
-  <span class="wallet-faucet__corner wallet-faucet__corner--br" aria-hidden="true"></span>
-
+<div class="wallet-faucet" aria-label="Faucet">
   <div class="wallet-faucet__top">
     <article class="wallet-faucet__tile wallet-faucet__tile--amount">
       <div #valueWrap class="wallet-faucet__value-wrap">
@@ -16,12 +12,11 @@
             [class.is-bumping]="runtime.bump()"
             [class.is-capped]="runtime.atMaxClaim()"
             [attr.aria-label]="runtime.displayLine()"
+            [attr.title]="runtime.displayLine()"
           >
-            <span class="wallet-faucet__value-token">{{ runtime.nativeTokenLabel() }}</span>
             <span class="wallet-faucet__value-whole">{{ runtime.wholePartDisplay() }}</span>
             <span class="wallet-faucet__value-sep">,</span>
             <span class="wallet-faucet__value-decimal">{{ runtime.decimalDigits() }}</span>
-            <span class="wallet-faucet__value-unit">m4t3r</span>
           </span>
         </div>
       </div>
@@ -81,8 +76,11 @@
       </span>
     </button>
 
-    <article class="wallet-faucet__tile wallet-faucet__tile--cooldown">
-      <p class="wallet-faucet__label">{{ locale.t('faucet.cooldown') }}</p>
+    <article
+      class="wallet-faucet__tile wallet-faucet__tile--cooldown"
+      [attr.aria-label]="'Temps restant ' + runtime.cooldownLabel()"
+      [attr.title]="runtime.cooldownLabel()"
+    >
       <div
         class="wallet-faucet__cooldown-ring"
         [style.--cooldown-progress]="runtime.cooldownProgress()"

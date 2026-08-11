@@ -1,4 +1,4 @@
-/* Navbar — Phase 2 : cyberpunk mature, sobre, premium (@ 300×500) */
+/* Navbar — Pass 2 : dark navy fintech (@ 250×550) */
 
 :host {
   display: block;
@@ -7,12 +7,12 @@
   padding: 0;
   line-height: 1;
 
-  /* Alias legacy → design system Phase 2 */
-  --nv-cyan: var(--ds-neon-cyan, #00f5ff);
-  --nv-cyan-rgb: var(--ds-neon-cyan-rgb, 0, 245, 255);
-  --nv-cyan-soft: rgba(var(--nv-cyan-rgb), 0.35);
-  --nv-green: #39ff14;
-  --nv-green-rgb: 57, 255, 20;
+  /* Alias legacy → design system Pass 1/2 */
+  --nv-cyan: var(--accent-cyan, var(--ds-neon-cyan, #2ec4d6));
+  --nv-cyan-rgb: var(--accent-cyan-rgb, var(--ds-neon-cyan-rgb, 46, 196, 214));
+  --nv-cyan-soft: rgba(var(--nv-cyan-rgb), 0.28);
+  --nv-green: var(--success, #2ecc8a);
+  --nv-green-rgb: var(--success-rgb, 46, 204, 138);
   --nv-shell-radius: var(--ds-navbar-shell-radius, clamp(8px, 2.4vw, 12px));
   --nv-shell-border: var(--ds-surface-border-bottom);
   --nv-shell-bg: transparent;
@@ -290,12 +290,10 @@
 }
 
 .navbar-auth-btn--login {
-  border-color: rgba(var(--nv-cyan-rgb), 0.45);
+  border-color: rgba(var(--nv-cyan-rgb), 0.35);
   color: var(--nv-cyan);
   background: rgba(var(--nv-cyan-rgb), 0.08);
-  box-shadow:
-    inset 0 0 0 1px rgba(var(--nv-cyan-rgb), 0.12),
-    0 0 8px rgba(var(--nv-cyan-rgb), 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .navbar-auth-btn--login::before {
@@ -318,43 +316,32 @@
 }
 
 .navbar-auth-btn--login:hover:not(:disabled) {
-  border-color: var(--nv-cyan);
-  color: #b8f8ff;
+  border-color: rgba(var(--nv-cyan-rgb), 0.55);
+  color: var(--ds-text-primary, #e8eef5);
   background: rgba(var(--nv-cyan-rgb), 0.14);
-  animation: nv-auth-glitch 0.42s steps(3, end);
-  box-shadow:
-    0 0 14px rgba(var(--nv-cyan-rgb), 0.55),
-    -2px 0 rgba(var(--brand-ultra-purple-rgb, 111, 45, 189), 0.35),
-    2px 0 rgba(var(--nv-cyan-rgb), 0.45),
-    inset 0 0 12px rgba(var(--nv-cyan-rgb), 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .navbar-auth-btn--login:hover:not(:disabled) svg {
-  filter: drop-shadow(0 0 4px rgba(var(--nv-cyan-rgb), 0.85));
+  filter: none;
 }
 
 .navbar-auth-btn--login.is-active {
-  border-color: var(--nv-cyan);
-  color: #b8f8ff;
+  border-color: rgba(var(--nv-cyan-rgb), 0.55);
+  color: var(--ds-text-primary, #e8eef5);
   background: rgba(var(--nv-cyan-rgb), 0.14);
-  box-shadow:
-    0 0 14px rgba(var(--nv-cyan-rgb), 0.45),
-    -2px 0 rgba(var(--brand-ultra-purple-rgb, 111, 45, 189), 0.28),
-    2px 0 rgba(var(--nv-cyan-rgb), 0.38),
-    inset 0 0 12px rgba(var(--nv-cyan-rgb), 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .navbar-auth-btn--login.is-active svg {
-  filter: drop-shadow(0 0 4px rgba(var(--nv-cyan-rgb), 0.75));
+  filter: none;
 }
 
 .navbar-auth-btn--register {
-  border-color: rgba(var(--nv-green-rgb), 0.45);
-  color: var(--nv-green);
-  background: rgba(var(--nv-green-rgb), 0.06);
-  box-shadow:
-    inset 0 0 0 1px rgba(var(--nv-green-rgb), 0.12),
-    0 0 8px rgba(var(--nv-green-rgb), 0.12);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--ds-text-secondary, #8b9bb0);
+  background: rgba(var(--surface-elevated-rgb, 13, 24, 40), 0.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .navbar-auth-btn--register::before {
@@ -377,34 +364,25 @@
 }
 
 .navbar-auth-btn--register:hover:not(:disabled) {
-  border-color: #39ff14;
-  color: #c8ff9e;
-  background: rgba(var(--nv-green-rgb), 0.14);
-  animation: nv-auth-glitch 0.42s steps(3, end);
-  box-shadow:
-    0 0 14px rgba(var(--nv-green-rgb), 0.55),
-    -2px 0 rgba(255, 45, 154, 0.35),
-    2px 0 rgba(57, 255, 20, 0.45),
-    inset 0 0 12px rgba(var(--nv-green-rgb), 0.2);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--ds-text-primary, #e8eef5);
+  background: rgba(var(--surface-hover-rgb, 17, 31, 50), 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .navbar-auth-btn--register:hover:not(:disabled) svg {
-  filter: drop-shadow(0 0 4px rgba(var(--nv-green-rgb), 0.85));
+  filter: none;
 }
 
 .navbar-auth-btn--register.is-active {
-  border-color: #39ff14;
-  color: #c8ff9e;
-  background: rgba(var(--nv-green-rgb), 0.14);
-  box-shadow:
-    0 0 14px rgba(var(--nv-green-rgb), 0.45),
-    -2px 0 rgba(255, 45, 154, 0.28),
-    2px 0 rgba(57, 255, 20, 0.38),
-    inset 0 0 12px rgba(var(--nv-green-rgb), 0.18);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--ds-text-primary, #e8eef5);
+  background: rgba(var(--surface-hover-rgb, 17, 31, 50), 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .navbar-auth-btn--register.is-active svg {
-  filter: drop-shadow(0 0 4px rgba(var(--nv-green-rgb), 0.75));
+  filter: none;
 }
 
 @keyframes nv-auth-glitch {
@@ -766,7 +744,7 @@
   background: transparent !important;
   transform: translateY(var(--nv-logo-shift-y)) scale(var(--nv-logo-scale));
   transform-origin: center center;
-  filter: drop-shadow(0 0 3px rgba(var(--nv-cyan-rgb), 0.1));
+  filter: none;
 }
 
 .navbar-brand-row .navbar-brand-select {

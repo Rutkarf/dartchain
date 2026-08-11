@@ -111,7 +111,7 @@
 
 .dock-view__live-dot--active {
   background: var(--chart-trend-up);
-  box-shadow: 0 0 4px rgba(var(--chart-trend-up-rgb), 0.65);
+  box-shadow: none;
 }
 
 .dock-view__meta {
@@ -379,7 +379,7 @@ button.dock-view__item-row:focus-visible {
 
 .dock-view__led--online {
   background: var(--chart-trend-up);
-  box-shadow: 0 0 4px rgba(var(--chart-trend-up-rgb), 0.65);
+  box-shadow: none;
 }
 
 .dock-view__led--offline {
@@ -1156,9 +1156,7 @@ button.dock-view__item-row:focus-visible {
     rgba(var(--accent-primary-rgb), 0.16),
     rgba(var(--accent-primary-rgb), 0.06)
   );
-  box-shadow:
-    0 0 10px rgba(var(--accent-primary-rgb), 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: none;
   cursor: pointer;
   transition:
     border-color 160ms ease,
@@ -1168,9 +1166,7 @@ button.dock-view__item-row:focus-visible {
 
 .block-view__compact-tip--featured:hover {
   border-color: rgba(var(--accent-primary-rgb), 0.62);
-  box-shadow:
-    0 0 14px rgba(var(--accent-primary-rgb), 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: none;
 }
 
 .block-view__compact-tip-label {

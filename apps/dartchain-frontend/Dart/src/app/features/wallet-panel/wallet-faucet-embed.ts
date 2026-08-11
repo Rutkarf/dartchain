@@ -6,6 +6,7 @@ import {
   ElementRef,
   OnDestroy,
   ViewChild,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -33,6 +34,14 @@ export class WalletFaucetEmbedComponent implements AfterViewInit, OnDestroy {
   private valueWrapRef!: ElementRef<HTMLElement>;
 
   private resizeObserver: ResizeObserver | null = null;
+
+  constructor() {
+    effect(() => {
+      // Re-fit whenever the displayed amount changes.
+      void this.runtime.displayLine();
+      queueMicrotask(() => this.fitValueToContainer());
+    });
+  }
 
   ngAfterViewInit(): void {
     this.fitValueToContainer();
@@ -68,18 +77,18 @@ export class WalletFaucetEmbedComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
+    // Measure at full size, then apply final scale on both signal + inline style
+    // so OnPush / style binding cannot leave an orphaned scale(1).
     fit.style.transform = 'scale(1)';
-    this.valueFitScale.set(1);
-
-    const available = wrap.clientWidth;
+    const available = Math.max(0, wrap.clientWidth - 1);
     const needed = Math.max(fit.scrollWidth, el.scrollWidth);
-    if (available <= 0 || needed <= 0) {
-      return;
+
+    let scale = 1;
+    if (available > 0 && needed > available) {
+      scale = Math.max(0.16, available / needed);
     }
 
-    if (needed > available) {
-      const scale = Math.max(0.22, available / needed);
-      this.valueFitScale.set(scale);
-    }
+    this.valueFitScale.set(scale);
+    fit.style.transform = `scale(${scale})`;
   }
 }

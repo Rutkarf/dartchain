@@ -117,7 +117,7 @@
   height: 6px;
   border-radius: 999px;
   background: var(--chart-trend-up, #3dd68c);
-  box-shadow: 0 0 6px rgba(var(--chart-trend-up-rgb, 61, 214, 140), 0.55);
+  box-shadow: none;
 }
 
 .showcase-launch__live-led--dim {

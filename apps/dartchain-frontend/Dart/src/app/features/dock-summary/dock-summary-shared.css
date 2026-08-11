@@ -41,7 +41,7 @@
   height: clamp(10px, 3.2vw, 14px);
   border-radius: 1px;
   background: linear-gradient(180deg, var(--tab-accent), var(--tab-accent-2));
-  box-shadow: 0 0 4px rgba(var(--tab-accent-rgb), 0.35);
+  box-shadow: none;
 }
 
 .dock-summary-status {

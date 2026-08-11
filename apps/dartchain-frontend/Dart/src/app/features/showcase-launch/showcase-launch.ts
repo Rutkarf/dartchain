@@ -261,7 +261,7 @@ export class ShowcaseLaunchComponent {
 
   private openExchangePanel(): void {
     globalThis.dispatchEvent(new CustomEvent('exchange-panel-open'));
-    globalThis.document.querySelector('.app-market-card--swap')?.scrollIntoView({
+    globalThis.document.querySelector('.app-hub-swap-stack')?.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
     });

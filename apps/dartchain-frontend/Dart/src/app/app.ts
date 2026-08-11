@@ -58,14 +58,12 @@ import { FaucetRuntimeService } from './core/services/faucet-runtime.service';
 import { CollapsedBarActionsComponent } from './features/collapsed-bar-actions/collapsed-bar-actions';
 import { ChartSummaryStateService } from './core/services/chart-summary-state.service';
 import { ShowcaseR4v3StateService } from './core/services/showcase-r4v3-state.service';
-import { ShowcaseTerminalStateService } from './core/services/showcase-terminal-state.service';
 import { ShowcaseChatStateService } from './core/services/showcase-chat-state.service';
 import { ShowcaseLaunchStateService } from './core/services/showcase-launch-state.service';
 import { ShowcaseDaoStateService } from './core/services/showcase-dao-state.service';
 import {
   DOCK_REFRESH_EVENT,
   SHOWCASE_REFRESH_EVENT,
-  TERMINAL_REFRESH_EVENT,
 } from './core/constants/panel-refresh.constants';
 import { DockWalletStateService } from './core/services/dock-wallet-state.service';
 import { TransactionsDataService } from './core/services/transactions-data.service';
@@ -124,7 +122,6 @@ export class AppComponent {
   private readonly showcaseHubUi = inject(ShowcaseHubUiService);
   private readonly chartSummary = inject(ChartSummaryStateService);
   private readonly r4v3State = inject(ShowcaseR4v3StateService);
-  private readonly terminalState = inject(ShowcaseTerminalStateService);
   private readonly chatState = inject(ShowcaseChatStateService);
   private readonly launchState = inject(ShowcaseLaunchStateService);
   private readonly daoState = inject(ShowcaseDaoStateService);
@@ -298,9 +295,6 @@ export class AppComponent {
     window.dispatchEvent(
       new CustomEvent(SHOWCASE_REFRESH_EVENT, { detail: { tab } })
     );
-    if (tab === 'reseau') {
-      window.dispatchEvent(new CustomEvent(TERMINAL_REFRESH_EVENT));
-    }
   }
 
   private refreshShowcaseSummaryState(tab: ShowcaseTab): void {
@@ -310,10 +304,6 @@ export class AppComponent {
         break;
       case 'r4v3':
         this.r4v3State.refresh();
-        break;
-      case 'reseau':
-        this.terminalState.setMode('reseau');
-        this.terminalState.refresh();
         break;
       case 'rv23':
         this.chatState.requestRefresh();
@@ -370,8 +360,6 @@ export class AppComponent {
         return this.newsState.loading();
       case 'r4v3':
         return this.r4v3State.refreshing() || this.r4v3State.loading();
-      case 'reseau':
-        return this.terminalState.loading();
       case 'rv23':
         return this.chatState.refreshing();
       case 'dao':
@@ -418,7 +406,6 @@ export class AppComponent {
     const labels: Record<ShowcaseTab, string> = {
       tours: 'TOUS',
       r4v3: 'R4V3',
-      reseau: 'RÉSEAU',
       rv23: 'CHAT',
       dao: 'LAUNCH',
       daonews: 'D.A.O',
@@ -485,7 +472,7 @@ export class AppComponent {
         }
         break;
       case 'OPEN_SWAP':
-        this.scrollToSelector('.app-market-card--swap');
+        this.scrollToSelector('.app-hub-swap-stack');
         break;
     }
   }
@@ -542,7 +529,7 @@ export class AppComponent {
   onExchangePanelOpen(): void {
     this.exchangeCollapsed.set(false);
     queueMicrotask(() => {
-      this.scrollToSelector('.app-market-card--swap');
+      this.scrollToSelector('.app-hub-swap-stack');
     });
   }
 
@@ -566,8 +553,7 @@ export class AppComponent {
       case 'explore-blocks':
         this.onBottomTabChange('chain');
         this.focusExplorerSearch();
-        this.activeShowcaseTab.set('reseau');
-        this.showcaseCollapsed.set(false);
+        this.dockCollapsed.set(false);
         break;
       case 'showcase-tours':
         this.activeShowcaseTab.set('tours');
@@ -588,7 +574,7 @@ export class AppComponent {
     this.activeShowcaseTab.set('dao');
     this.showcaseCollapsed.set(false);
     this.exchangeCollapsed.set(false);
-    this.scrollToSelector('.app-market-card--swap');
+    this.scrollToSelector('.app-hub-swap-stack');
     window.dispatchEvent(new CustomEvent('exchange-panel-focus'));
   }
 }

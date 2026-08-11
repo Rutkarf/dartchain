@@ -106,12 +106,12 @@
 }
 
 .bandeau-accueil__chip:hover {
-  transform: scale(1.04);
-  filter: brightness(1.12);
+  transform: none;
+  filter: none;
+  background: rgba(255, 255, 255, 0.04);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
-    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.85)),
-    0 0 8px color-mix(in srgb, var(--ticker-chip-accent, #00f5ff) 24%, transparent);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.75));
 }
 
 .bandeau-accueil__chip:active {
@@ -120,10 +120,7 @@
 
 .bandeau-accueil__chip:focus-visible {
   outline: none;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
-    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.85)),
-    0 0 0 2px rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.35);
+  box-shadow: var(--shadow-focus);
 }
 
 .bandeau-accueil__chip--network {
@@ -166,7 +163,7 @@
   line-height: 1;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 7px color-mix(in srgb, var(--ticker-chip-accent, #00f5ff) 42%, transparent);
+  text-shadow: none;
 }
 
 .bandeau-accueil__chip--network .bandeau-accueil__value {
@@ -175,7 +172,7 @@
 
 .bandeau-accueil__chip--token .bandeau-accueil__value {
   color: var(--ticker-accent-token);
-  text-shadow: 0 0 6px rgba(255, 255, 255, 0.12);
+  text-shadow: none;
 }
 
 .bandeau-accueil__chip--tx .bandeau-accueil__value {

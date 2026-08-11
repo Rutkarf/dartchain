@@ -268,9 +268,9 @@
     </div>
 
     <form class="showcase-chat__composer" (submit)="onComposerSubmit($event)">
-      @if (!auth.isAuthenticated() && !postAsAnonymous()) {
+      @if (!auth.isAuthenticated()) {
         <p class="showcase-chat__auth-hint" role="note">
-          Connectez-vous, ou activez Anonymous pour poster sans compte.
+          Connectez-vous pour poster (Compte ou Anon).
         </p>
       }
       <div [ngClass]="composerBubbleClass()">
@@ -294,6 +294,7 @@
             type="button"
             class="showcase-chat__identity-btn showcase-chat__identity-btn--anon"
             [class.is-active]="postAsAnonymous()"
+            [class.is-locked]="!auth.isAuthenticated()"
             [attr.title]="postAnonymousTitle()"
             [attr.aria-pressed]="postAsAnonymous()"
             [attr.aria-label]="postAnonymousTitle()"
@@ -326,9 +327,7 @@
         <button
           type="submit"
           class="showcase-chat__send"
-          [disabled]="
-            (auth.isAuthenticated() || postAsAnonymous()) && messageControl.invalid
-          "
+          [disabled]="!auth.isAuthenticated() || messageControl.invalid"
           [attr.title]="sendButtonLabel()"
           [attr.aria-label]="sendButtonLabel()"
         >

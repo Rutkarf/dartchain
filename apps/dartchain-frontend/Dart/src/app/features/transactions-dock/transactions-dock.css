@@ -114,7 +114,7 @@
 
 .transactions-dock__live-dot.is-active {
   background: #2dff90;
-  box-shadow: 0 0 6px rgba(45, 255, 144, 0.8);
+  box-shadow: none;
 }
 
 .transactions-dock__tools {

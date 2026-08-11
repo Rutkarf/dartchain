@@ -41,27 +41,25 @@ describe('ShowcasePanelComponent', () => {
     const placeholder = fixture.nativeElement.querySelector('.showcase-window__defer');
     const news = fixture.nativeElement.querySelector('app-showcase-news');
     expect(placeholder || news).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('app-showcase-terminal')).toBeFalsy();
+    expect(fixture.nativeElement.querySelector('app-showcase-chat')).toBeFalsy();
   });
 
-  it('should defer heavy terminal content when reseau tab is expanded', () => {
-    fixture.componentRef.setInput('activeTab', 'reseau');
+  it('should defer heavy market content when market tab is expanded', () => {
+    fixture.componentRef.setInput('activeTab', 'market');
     fixture.componentRef.setInput('collapsed', false);
     fixture.detectChanges();
 
     const placeholder = fixture.nativeElement.querySelector('.showcase-window__defer');
-    const terminal = fixture.nativeElement.querySelector('app-showcase-terminal');
-    expect(placeholder || terminal).toBeTruthy();
+    const market = fixture.nativeElement.querySelector('app-market-panel');
+    expect(placeholder || market).toBeTruthy();
   });
 
-  it('should render collapsed handle when reseau tab is collapsed', () => {
-    fixture.componentRef.setInput('activeTab', 'reseau');
+  it('should render market summary when market tab is collapsed', () => {
+    fixture.componentRef.setInput('activeTab', 'market');
     fixture.componentRef.setInput('collapsed', true);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.showcase-panel__handle--collapsed')).toBeTruthy();
-    const body = fixture.nativeElement.querySelector('.showcase-panel__body');
-    expect(body?.getAttribute('aria-hidden')).toBe('true');
+    expect(fixture.nativeElement.querySelector('app-dock-market-summary')).toBeTruthy();
   });
 
   it('should defer heavy chat content when rv23 tab is expanded', () => {
@@ -72,7 +70,6 @@ describe('ShowcasePanelComponent', () => {
     const placeholder = fixture.nativeElement.querySelector('.showcase-window__defer');
     const chat = fixture.nativeElement.querySelector('app-showcase-chat');
     expect(placeholder || chat).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('app-showcase-terminal')).toBeFalsy();
   });
 
   it('should defer heavy launch content when dao tab is expanded', () => {
@@ -83,7 +80,6 @@ describe('ShowcasePanelComponent', () => {
     const placeholder = fixture.nativeElement.querySelector('.showcase-window__defer');
     const launch = fixture.nativeElement.querySelector('app-showcase-launch');
     expect(placeholder || launch).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('app-showcase-terminal')).toBeFalsy();
   });
 
   it('should render smart summary when rv23 tab is collapsed', () => {

@@ -749,7 +749,7 @@ export class MarketPanelComponent implements OnDestroy {
   }
 
   private scrollToSwap(): void {
-    globalThis.document.querySelector('.app-market-card--swap')?.scrollIntoView({
+    globalThis.document.querySelector('.app-hub-swap-stack')?.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
     });

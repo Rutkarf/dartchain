@@ -10,8 +10,8 @@ import {
 import { READING_ORDER, TARGET_VIEWPORT } from './ui-layout-zones.constants';
 
 describe('Phase 1 — UI structure manifest', () => {
-  it('documents target viewport 300×500', () => {
-    expect(TARGET_VIEWPORT.width).toBe(300);
+  it('documents target viewport 250×500', () => {
+    expect(TARGET_VIEWPORT.width).toBe(250);
     expect(TARGET_VIEWPORT.height).toBe(500);
   });
 
@@ -59,6 +59,7 @@ describe('Phase 1 — UI structure manifest', () => {
     const ids = tabs.elements.map((e) => e.id);
     expect(ids).toContain('tab-market');
     expect(ids.at(-1)).toBe('tab-market');
+    expect(ids).not.toContain('tab-reseau');
     expect(ids).not.toContain('tab-peers');
   });
 

@@ -85,7 +85,7 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly openMenu = signal<ChatMenuId>(null);
   readonly searchQuery = signal('');
   readonly searchExpanded = signal(false);
-  /** Poster sans compte sous le pseudonyme Anonymous. */
+  /** Poster sous le pseudonyme Anonymous (compte connecté requis). */
   readonly postAsAnonymous = signal(false);
 
   readonly filteredMessages = computed(() => {
@@ -124,7 +124,11 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
     return 'Poster avec votre compte (connexion requise)';
   });
 
-  readonly postAnonymousTitle = computed(() => 'Poster en Anonymous (sans compte)');
+  readonly postAnonymousTitle = computed(() =>
+    this.auth.isAuthenticated()
+      ? 'Poster en Anonymous (compte connecté)'
+      : 'Connexion requise pour poster en Anonymous'
+  );
 
   readonly sendButtonLabel = computed(() => {
     const author = this.postAsAnonymous()
@@ -134,12 +138,13 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
   });
 
   readonly composerPlaceholder = computed(() => {
+    if (!this.auth.isAuthenticated()) {
+      return 'Connexion requise pour écrire…';
+    }
     if (this.postAsAnonymous()) {
       return 'Message anonyme…';
     }
-    return this.auth.isAuthenticated()
-      ? 'Tape ton message…'
-      : 'Connexion requise pour écrire…';
+    return 'Tape ton message…';
   });
 
   ngOnInit(): void {
@@ -335,6 +340,12 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
   protected setPostMode(anonymous: boolean, event?: Event): void {
     event?.preventDefault();
     event?.stopPropagation();
+
+    if (anonymous && !this.auth.promptLogin()) {
+      this.chat.setSendError('Connectez-vous pour poster en Anonymous.');
+      return;
+    }
+
     this.postAsAnonymous.set(anonymous);
     this.chat.clearSendError();
   }
@@ -344,10 +355,9 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   protected sendMessage(): void {
-    const asAnonymous = this.postAsAnonymous();
-
-    if (!asAnonymous && !this.auth.promptLogin()) {
-      this.chat.setSendError('Connectez-vous pour envoyer un message, ou activez Anonymous.');
+    if (!this.auth.promptLogin() || !this.auth.isAuthenticated()) {
+      this.postAsAnonymous.set(false);
+      this.chat.setSendError('Connectez-vous pour envoyer un message.');
       return;
     }
 
@@ -360,12 +370,13 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    const asAnonymous = this.postAsAnonymous();
     if (asAnonymous) {
       this.chat.sendMessage(text, { anonymous: true, author: CHAT_ANONYMOUS_AUTHOR });
     } else {
       const username = this.auth.user()?.username?.trim();
       if (!username) {
-        this.chat.setSendError('Connectez-vous pour envoyer un message, ou activez Anonymous.');
+        this.chat.setSendError('Connectez-vous pour envoyer un message.');
         return;
       }
       this.chat.setUsername(username);

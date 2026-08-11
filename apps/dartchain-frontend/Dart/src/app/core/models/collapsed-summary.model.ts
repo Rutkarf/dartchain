@@ -26,12 +26,6 @@ export const SHOWCASE_COLLAPSED_SUMMARY_TABS: Readonly<
     summarySelector: 'app-showcase-r4v3-summary',
     metrics: ['price', 'trend', 'volume', 'unread'],
   },
-  reseau: {
-    id: 'reseau',
-    title: 'RÉSEAU',
-    summarySelector: 'app-showcase-terminal-summary',
-    metrics: ['sync', 'blocks', 'peers', 'pendingTx'],
-  },
   rv23: {
     id: 'rv23',
     title: 'CHAT',

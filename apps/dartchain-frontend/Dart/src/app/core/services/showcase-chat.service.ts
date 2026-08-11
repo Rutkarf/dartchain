@@ -206,7 +206,7 @@ export class ShowcaseChatService {
       ? CHAT_ANONYMOUS_AUTHOR
       : override || this.getUsername();
     if (!anonymous && !author) {
-      this.sendErrorSignal.set('Connectez-vous pour envoyer un message, ou activez Anonymous.');
+      this.sendErrorSignal.set('Connectez-vous pour envoyer un message.');
       return;
     }
     if (!anonymous && override) {

@@ -21,7 +21,7 @@
   border: 1px solid transparent;
   border-radius: clamp(3px, 1vw, 5px);
   background: transparent;
-  color: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.62);
+  color: var(--ds-text-secondary, #8b9bb0);
   cursor: pointer;
   touch-action: manipulation;
   appearance: none;
@@ -54,9 +54,9 @@
 }
 
 .panel-collapse-control:hover {
-  color: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.92);
-  background: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.08);
-  border-color: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.16);
+  color: var(--ds-text-primary, #e8eef5);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .panel-collapse-control:hover .panel-collapse-control__chevron,
@@ -69,15 +69,15 @@
 }
 
 .panel-collapse-control:focus-visible {
-  color: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.95);
-  background: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.1);
-  border-color: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.35);
-  outline: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.45);
-  outline-offset: 1px;
+  color: var(--ds-text-primary, #e8eef5);
+  background: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.08);
+  border-color: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.28);
+  outline: none;
+  box-shadow: var(--shadow-focus);
 }
 
 .panel-collapse-control.is-collapsed {
-  color: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.78);
+  color: var(--ds-text-secondary, #8b9bb0);
 }
 
 /* Replié : le chevron pointe vers le bas et “appelle” à déplier */

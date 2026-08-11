@@ -1,4 +1,4 @@
-/* Showcase TOUS — viewport fixe 300×600 px, header 1 ligne, max de lignes feed */
+/* Showcase TOUS — Pass 2 activity calm (@ 250×500) */
 :host {
   --news-gap: 0;
   --news-pad: 0;
@@ -7,16 +7,16 @@
   --news-live-font: 7px;
   --news-meta-bar-h: 13px;
   --news-meta-inner-h: 11px;
-  --news-row-h: 11px;
-  --news-tag-w: 18px;
-  --news-col-gap: 0;
+  --news-row-h: 14px;
+  --news-tag-w: 22px;
+  --news-col-gap: 2px;
 
-  --news-cat-reseau: 0, 245, 255;
-  --news-cat-peers: 168, 132, 255;
-  --news-cat-r4v3: 255, 176, 32;
-  --news-cat-dao: 255, 120, 180;
+  --news-cat-reseau: var(--accent-cyan-rgb, 46, 196, 214);
+  --news-cat-peers: var(--accent-purple-rgb, 123, 108, 255);
+  --news-cat-r4v3: var(--warning-rgb, 230, 184, 77);
+  --news-cat-dao: 196, 91, 159;
   --news-cat-info: 140, 170, 210;
-  --news-cat-default: 160, 180, 200;
+  --news-cat-default: 139, 155, 176;
 
   display: block;
   width: 100%;
@@ -158,7 +158,7 @@
 
 .showcase-meta__live-dot {
   background: var(--chart-trend-up, #3dd68c);
-  box-shadow: 0 0 3px rgba(var(--chart-trend-up-rgb, 61, 214, 140), 0.45);
+  box-shadow: none;
 }
 
 .showcase-meta__live-dot--active {
@@ -167,7 +167,7 @@
 
 .showcase-meta__live-dot--pending {
   background: #ffb020;
-  box-shadow: 0 0 3px rgba(255, 176, 32, 0.5);
+  box-shadow: none;
 }
 
 .showcase-meta__live-dot--offline {
@@ -257,8 +257,7 @@
   gap: var(--news-col-gap);
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
+  overflow: hidden;
 }
 
 .showcase-news__item {
@@ -340,32 +339,34 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 9px;
-  font-size: 5.5px;
-  font-weight: 900;
+  height: 11px;
+  font-size: 6px;
+  font-weight: 700;
   line-height: 1;
-  border-radius: 1px;
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--ds-badge-radius, 999px);
+  color: var(--ds-text-muted, #5c6b7e);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  letter-spacing: 0.04em;
 }
 
 .showcase-news__tag[data-category='reseau'] .showcase-news__tag-badge {
-  color: rgba(var(--news-cat-reseau), 0.95);
+  color: rgba(var(--news-cat-reseau), 0.78);
 }
 
 .showcase-news__tag[data-category='peers'] .showcase-news__tag-badge {
-  color: rgba(var(--news-cat-peers), 0.95);
+  color: rgba(var(--news-cat-peers), 0.72);
 }
 
 .showcase-news__tag[data-category='r4v3'] .showcase-news__tag-badge {
-  color: rgba(var(--news-cat-r4v3), 0.95);
+  color: rgba(var(--news-cat-r4v3), 0.78);
 }
 
 .showcase-news__item-title {
   min-width: 0;
   font-size: var(--news-font);
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.76);
+  font-weight: 500;
+  color: var(--ds-text-secondary, #8b9bb0);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

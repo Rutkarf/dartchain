@@ -1,0 +1,273 @@
+/**
+ * Pass 3 — Finition MVP (@ 250×500)
+ * a11y focus · empty/loading · micro-interactions · densités · reduced-motion
+ * N’écrase pas la logique ; complète Pass 1 tokens + Pass 2 sections.
+ */
+
+/* ── Focus accessible global (jamais supprimer) ── */
+:where(
+  button,
+  a,
+  input,
+  textarea,
+  select,
+  summary,
+  [role='button'],
+  [role='tab'],
+  [tabindex]:not([tabindex='-1'])
+):focus-visible {
+  outline: none;
+  box-shadow: var(
+    --shadow-focus,
+    0 0 0 2px rgba(5, 10, 18, 0.92),
+    0 0 0 3px rgba(46, 196, 214, 0.45)
+  );
+}
+
+:where(input, textarea, select):focus-visible {
+  border-color: var(--ds-input-border-focus, rgba(46, 196, 214, 0.55));
+}
+
+/* ── Disabled cohérent ── */
+:where(button, input, textarea, select):disabled,
+:where(button, input, textarea, select)[aria-disabled='true'] {
+  opacity: var(--cta-disabled-opacity, 0.48);
+  cursor: not-allowed;
+  filter: grayscale(0.12);
+}
+
+/* ── Empty state (produit) ── */
+.ds-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 12px);
+  text-align: center;
+  min-width: 0;
+}
+
+.ds-empty__title {
+  margin: 0;
+  font-size: var(--ds-text-label, 0.5rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-text-muted, #5c6b7e);
+  line-height: 1.2;
+}
+
+.ds-empty__desc {
+  margin: 0;
+  max-width: 28ch;
+  font-size: var(--ds-text-caption, 0.5625rem);
+  font-weight: 500;
+  color: var(--ds-text-secondary, #8b9bb0);
+  line-height: 1.35;
+}
+
+.ds-empty__action {
+  margin-top: var(--space-1, 4px);
+}
+
+/* Showcase news empty → même langage */
+.showcase-news__empty,
+.showcase-view__empty,
+.wallet-display__recent-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1, 4px);
+  padding: var(--space-2, 8px);
+  text-align: center;
+  color: var(--ds-text-secondary, #8b9bb0);
+  font-size: var(--ds-text-caption, 0.5625rem);
+  line-height: 1.35;
+  border: 1px dashed var(--border-subtle, rgba(255, 255, 255, 0.06));
+  border-radius: var(--radius-sm, 8px);
+  background: rgba(var(--surface-rgb, 10, 18, 32), 0.35);
+}
+
+.showcase-news__empty p,
+.showcase-view__empty p,
+.wallet-display__recent-empty p {
+  margin: 0;
+  color: inherit;
+}
+
+/* ── Skeletons sobres (alignés tokens) ── */
+.showcase-news__skeleton-tag,
+.showcase-news__skeleton-lines span,
+.exchange-panel__skeleton-row,
+.news-insight-panel__field--skeleton,
+.showcase-chart__skeleton-hub-footer,
+[class*='__skeleton']:not(.ds-skeleton) {
+  background: linear-gradient(
+    90deg,
+    var(--ds-skeleton-base, rgba(255, 255, 255, 0.04)) 0%,
+    var(--ds-skeleton-shine, rgba(255, 255, 255, 0.08)) 50%,
+    var(--ds-skeleton-base, rgba(255, 255, 255, 0.04)) 100%
+  );
+  background-size: 200% 100%;
+  animation: ds-skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-sm, 8px);
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* ── Icon buttons tertiaires ── */
+.ds-icon-btn,
+.cta.cta--icon-only,
+.wallet-display__icon-btn,
+.collapsed-bar-actions__btn,
+.panel-collapse-control,
+.showcase-meta__search-toggle,
+.showcase-meta__mark-read--icon {
+  min-width: var(--ds-icon-btn, 28px);
+  min-height: var(--ds-icon-btn, 28px);
+}
+
+@media (max-width: 349px) {
+  .ds-icon-btn,
+  .cta.cta--icon-only,
+  .wallet-display__icon-btn,
+  .collapsed-bar-actions__btn,
+  .panel-collapse-control,
+  .showcase-meta__search-toggle,
+  .showcase-meta__mark-read--icon {
+    min-width: 24px;
+    min-height: 24px;
+  }
+}
+
+/* ── Hover subtil (pas de glow) ── */
+:where(.cta, .showcase-tab, .wallet-display__action-btn, .exchange-panel__cta):hover:not(:disabled) {
+  filter: none;
+}
+
+/* ── Viewport MVP 250×500 — gaps = band-air (4px) ── */
+html.vp-compact {
+  --ds-shell-inline: 0px;
+  --ds-section-gap: var(--ds-band-gap, 4px);
+  --ds-panel-gap: var(--ds-band-gap, 4px);
+}
+
+html.vp-compact,
+html.vp-compact body {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  height: 100%;
+  max-height: none;
+}
+
+html.vp-compact .app-shell,
+html.vp-compact .app-main {
+  overflow-x: hidden !important;
+  overflow-y: visible !important;
+  max-height: none;
+  height: auto;
+  min-height: 100%;
+}
+
+html.vp-compact .app-showcase-band,
+html.vp-compact .app-bottom-stack__panel,
+html.vp-compact .dock-view__scroll,
+html.vp-compact .dock-view__list {
+  overflow: hidden !important;
+}
+
+/* Showcase déplié : listes scrollables pour rester lisibles dans le budget. */
+html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-news__list,
+html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-chat__messages,
+html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-launch__list,
+html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-dao__list {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* Shell sans gouttière globale : alignement via --band-inline-pad / --navbar-inline-pad */
+html.vp-compact .app-shell {
+  padding-inline: 0;
+}
+
+html.vp-compact .app-hub,
+html.vp-compact .app-bottom-stack {
+  gap: var(--ds-section-gap, 4px);
+}
+
+/* Tabs : pas de scroll horizontal non plus @ MVP (contenu clampé) */
+html.vp-compact .showcase-tabs,
+html.vp-compact .app-bottom-stack__tabs {
+  overflow-x: hidden !important;
+  overscroll-behavior: none;
+}
+
+/* Meta controls : contraste secondaire */
+.showcase-meta__search-toggle {
+  border-color: var(--border-subtle, rgba(255, 255, 255, 0.06)) !important;
+  background: rgba(var(--surface-elevated-rgb, 13, 24, 40), 0.65) !important;
+  color: var(--ds-text-secondary, #8b9bb0) !important;
+  border-radius: var(--radius-sm, 8px) !important;
+}
+
+.showcase-meta__search-toggle:hover {
+  border-color: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.28) !important;
+  color: var(--ds-text-primary, #e8eef5) !important;
+  background: rgba(var(--surface-hover-rgb, 17, 31, 50), 0.8) !important;
+}
+
+.showcase-meta__search-toggle:focus-visible {
+  box-shadow: var(--shadow-focus) !important;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .ds-skeleton,
+  .showcase-news__skeleton-tag,
+  .showcase-news__skeleton-lines span,
+  .exchange-panel__skeleton-row,
+  [class*='__skeleton'] {
+    animation: none !important;
+  }
+}
+
+/* ── Contrast helpers ── */
+.ds-tech {
+  color: var(--ds-text-muted, #5c6b7e);
+  font-size: var(--ds-text-caption, 0.5625rem);
+  font-family: var(--ds-font-mono, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-status-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ds-status-live, var(--success, #2ecc8a));
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.ds-status-dot--warn {
+  background: var(--warning, #e6b84d);
+}
+
+.ds-status-dot--danger {
+  background: var(--danger, #e85d75);
+}
+
+.ds-status-dot--muted {
+  background: var(--ds-text-muted, #5c6b7e);
+}

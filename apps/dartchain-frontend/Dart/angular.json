@@ -150,7 +150,6 @@
               "src/app/features/showcase-tabs/**/*.ts",
               "src/app/navbar/brand-crypto-select.ts",
               "src/app/navbar/navbar.ts",
-              "src/app/features/showcase-terminal/**/*.ts",
               "src/app/features/blocks-list/blocks-list.ts",
               "src/app/features/showcase-launch/showcase-launch.ts"
             ],

@@ -66,7 +66,6 @@ export class ShowcasePanelComponent {
     const match = {
       tours: 'TOUS',
       r4v3: 'R4V3',
-      reseau: 'RÉSEAU',
       rv23: 'CHAT',
       dao: 'LAUNCH',
       daonews: 'D.A.O',

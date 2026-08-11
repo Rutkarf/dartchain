@@ -48,7 +48,8 @@ describe('ShowcaseChatComponent (Phase V)', () => {
           provide: AuthService,
           useValue: {
             isAuthenticated: vi.fn(() => true),
-            promptLogin: vi.fn(),
+            promptLogin: vi.fn(() => true),
+            user: vi.fn(() => ({ username: 'alice' })),
           },
         },
       ],

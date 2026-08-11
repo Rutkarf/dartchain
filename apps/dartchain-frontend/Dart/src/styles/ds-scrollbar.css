@@ -1,5 +1,5 @@
 /**
- * Scrollbars globales — charte DartChain (néon cyan, track carbone, pill fin).
+ * Scrollbars globales — charte R4V3 fintech (accent cyan sobre).
  * Spécificité basse (:where) pour laisser les opt-out (scrollbar-width: none) gagner.
  */
 
@@ -23,12 +23,12 @@
   background: var(--ds-scrollbar-thumb-gradient);
   border-radius: var(--ds-radius-pill, 999px);
   border: 1px solid var(--ds-scrollbar-border);
-  box-shadow: 0 0 4px var(--ds-scrollbar-glow);
+  box-shadow: none;
 }
 
 :where(app-root) :where(*::-webkit-scrollbar-thumb:hover) {
   background: var(--ds-scrollbar-thumb-gradient-hover);
-  box-shadow: 0 0 6px var(--ds-scrollbar-glow);
+  box-shadow: none;
 }
 
 :where(app-root) :where(*::-webkit-scrollbar-thumb:active) {

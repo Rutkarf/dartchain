@@ -178,7 +178,7 @@
 
 .pending-view__live-dot--active {
   background: var(--chart-trend-up);
-  box-shadow: 0 0 4px rgba(var(--chart-trend-up-rgb), 0.65);
+  box-shadow: none;
 }
 
 .pending-view__refresh {

@@ -82,13 +82,17 @@
           }
         </ul>
       } @else if (error()) {
-        <div class="showcase-news__status showcase-news__status--error">
-          <p>Impossible de charger les news.</p>
-          <button type="button" class="showcase-news__retry" (click)="retry()">Réessayer</button>
+        <div class="showcase-news__status showcase-news__status--error ds-empty" role="alert">
+          <p class="ds-empty__title">Chargement impossible</p>
+          <p class="ds-empty__desc">Impossible de charger les actualités.</p>
+          <button type="button" class="showcase-news__retry cta cta--sm cta--secondary ds-empty__action" (click)="retry()">
+            Réessayer
+          </button>
         </div>
       } @else if (filteredItems().length === 0) {
-        <div class="showcase-news__status">
-          <p>Aucune actualité pour ce filtre.</p>
+        <div class="showcase-news__status showcase-news__empty ds-empty" role="status">
+          <p class="ds-empty__title">Aucune actualité</p>
+          <p class="ds-empty__desc">Aucun événement pour ce filtre.</p>
         </div>
       } @else {
         <ul class="showcase-news__list">

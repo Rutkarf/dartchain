@@ -1,5 +1,5 @@
 :host {
-  --cba-cyan-rgb: var(--ds-neon-cyan-rgb, 0, 245, 255);
+  --cba-cyan-rgb: var(--accent-cyan-rgb, var(--ds-neon-cyan-rgb, 46, 196, 214));
   --cba-item-w: var(--panel-action-item-w, 14px);
   --cba-h: var(--panel-action-menu-h, 14px);
   --cba-menu-w: var(--panel-action-menu-w, 34px);
@@ -29,34 +29,20 @@
   min-height: inherit;
   margin: 0;
   padding: 0;
-  border-radius: 5px;
-  border: 1px solid rgba(var(--cba-cyan-rgb), 0.48);
-  background:
-    linear-gradient(
-      155deg,
-      rgba(var(--cba-cyan-rgb), 0.22) 0%,
-      rgba(255, 255, 255, 0.08) 28%,
-      rgba(8, 18, 28, 0.28) 62%,
-      rgba(var(--cba-cyan-rgb), 0.08) 100%
-    ),
-    rgba(4, 12, 20, 0.38);
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  background: rgba(var(--surface-elevated-rgb, 13, 24, 40), 0.75);
   background-clip: padding-box;
-  backdrop-filter: blur(12px) saturate(170%);
-  -webkit-backdrop-filter: blur(12px) saturate(170%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(var(--cba-cyan-rgb), 0.14),
-    inset 0 0 10px rgba(var(--cba-cyan-rgb), 0.08),
-    0 0 0 1px rgba(0, 0, 0, 0.45),
-    0 0 10px rgba(var(--cba-cyan-rgb), 0.22),
-    0 2px 8px rgba(0, 0, 0, 0.35);
+  backdrop-filter: var(--glass-blur-fintech, blur(16px) saturate(120%));
+  -webkit-backdrop-filter: var(--glass-blur-fintech, blur(16px) saturate(120%));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   isolation: isolate;
   overflow: visible;
   box-sizing: border-box;
   pointer-events: auto;
 }
 
-/* Liseré néon supérieur */
+/* Liseré discret (legacy ::before conservé, atténué) */
 .collapsed-bar-actions::before {
   content: '';
   position: absolute;
@@ -68,12 +54,10 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.85),
-    rgba(var(--cba-cyan-rgb), 1),
-    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.18),
     transparent
   );
-  opacity: 0.95;
+  opacity: 0.55;
   pointer-events: none;
   z-index: 2;
 }
@@ -100,11 +84,7 @@
       transparent 1px 3px
     );
   opacity: 0.55;
-  box-shadow:
-    inset 5px 0 0 -4px rgba(var(--cba-cyan-rgb), 0.75),
-    inset -5px 0 0 -4px rgba(var(--cba-cyan-rgb), 0.75),
-    inset 0 5px 0 -4px rgba(var(--cba-cyan-rgb), 0.55),
-    inset 0 -5px 0 -4px rgba(var(--cba-cyan-rgb), 0.55);
+  box-shadow: none;
 }
 
 .collapsed-bar-actions__refresh {
@@ -142,17 +122,15 @@
   stroke-width: 2.15;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 3px rgba(var(--cba-cyan-rgb), 0.35));
+  filter: none;
 }
 
 .collapsed-bar-actions__refresh:hover,
 .collapsed-bar-actions__refresh:focus-visible {
-  color: #e8feff;
-  background: rgba(var(--cba-cyan-rgb), 0.2);
-  box-shadow:
-    inset 0 0 0 1px rgba(var(--cba-cyan-rgb), 0.35),
-    inset 0 0 8px rgba(var(--cba-cyan-rgb), 0.18);
-  text-shadow: 0 0 6px rgba(var(--cba-cyan-rgb), 0.55);
+  color: var(--ds-text-primary, #e8eef5);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  text-shadow: none;
 }
 
 .collapsed-bar-actions__refresh:focus {
@@ -160,8 +138,8 @@
 }
 
 .collapsed-bar-actions__refresh:focus-visible {
-  outline: 1px solid rgba(var(--cba-cyan-rgb), 0.65);
-  outline-offset: 0;
+  outline: none;
+  box-shadow: var(--shadow-focus);
 }
 
 .collapsed-bar-actions__refresh.is-busy svg {
@@ -179,13 +157,11 @@
   background: linear-gradient(
     180deg,
     transparent 4%,
-    rgba(255, 255, 255, 0.55) 30%,
-    rgba(var(--cba-cyan-rgb), 0.85) 50%,
-    rgba(255, 255, 255, 0.55) 70%,
+    rgba(255, 255, 255, 0.22) 50%,
     transparent 96%
   );
-  box-shadow: 0 0 6px rgba(var(--cba-cyan-rgb), 0.45);
-  opacity: 0.95;
+  box-shadow: none;
+  opacity: 0.7;
 }
 
 .collapsed-bar-actions__collapse {
@@ -215,12 +191,10 @@
 
 :host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control:hover,
 :host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control:focus-visible {
-  color: #e8feff;
-  background: rgba(var(--cba-cyan-rgb), 0.2);
+  color: var(--ds-text-primary, #e8eef5);
+  background: rgba(255, 255, 255, 0.06);
   border-color: transparent;
-  box-shadow:
-    inset 0 0 0 1px rgba(var(--cba-cyan-rgb), 0.35),
-    inset 0 0 8px rgba(var(--cba-cyan-rgb), 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 :host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control:focus-visible {
@@ -231,7 +205,7 @@
 :host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control__chevron {
   width: 0.3rem;
   height: 0.3rem;
-  filter: drop-shadow(0 0 3px rgba(var(--cba-cyan-rgb), 0.4));
+  filter: none;
 }
 
 @keyframes collapsed-bar-refresh-spin {

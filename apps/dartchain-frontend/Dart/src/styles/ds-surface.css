@@ -1,6 +1,7 @@
 /**
- * ds-surface — carbone métallisé glassmorphisme (R4V3).
- * Tissage fibre de carbone + reflet gunmetal, quasi transparent pour particules Three.js.
+ * ds-surface — glassmorphisme fintech subtil (R4V3 Pass 1).
+ * Trois niveaux : standard / elevated / active.
+ * Couches carbone/sheen conservées mais quasi invisibles (tokens).
  */
 
 .ds-surface {
@@ -16,7 +17,7 @@
   box-sizing: border-box;
 }
 
-/* Tissage carbone fin + grain micro (soft-light = moins opaque que overlay) */
+/* Tissage / grain — conservé, opacité pilotée par tokens (très basse) */
 .ds-surface::before {
   content: '';
   position: absolute;
@@ -30,7 +31,6 @@
   mix-blend-mode: soft-light;
 }
 
-/* Reflet métallique discret */
 .ds-surface::after {
   content: '';
   position: absolute;
@@ -49,11 +49,35 @@
   z-index: 1;
 }
 
+/* —— Card levels —— */
+.ds-surface--standard,
+.ds-surface--card {
+  background-color: var(--ds-card-standard-bg);
+  border-color: var(--ds-card-standard-border);
+  border-radius: var(--ds-card-radius);
+  overflow: hidden;
+}
+
+.ds-surface--elevated {
+  background-color: var(--ds-card-elevated-bg);
+  border-color: var(--ds-card-elevated-border);
+  border-radius: var(--ds-card-radius);
+  box-shadow: var(--shadow-soft, var(--ds-surface-shadow));
+}
+
+.ds-surface--active {
+  background-color: var(--ds-card-active-bg);
+  border-color: var(--ds-card-active-border);
+  border-radius: var(--ds-card-radius);
+  box-shadow: var(--ds-glow-active), var(--ds-surface-shadow);
+}
+
+/* Lisibilité : ombre légère de contraste, pas de glow néon */
 .ds-surface--strip,
 .ds-surface--strip .navbar-brand-row,
 .ds-surface--strip .navbar-node-panel__box,
 .ds-surface--strip .navbar-auth-btn {
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.88);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
 }
 
 .ds-surface--card .exchange-panel__eyebrow,
@@ -71,7 +95,7 @@
 .ds-surface--card .dock-tab,
 .ds-surface--card .dock-tab-label,
 .app-bottom-stack .showcase-tab__label {
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.82);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .ds-surface--strip {
@@ -105,7 +129,7 @@
 }
 
 .ds-surface--showcase-tab {
-  border-radius: var(--ds-radius-pill, 6px);
+  border-radius: var(--ds-radius-sm, 8px);
   overflow: hidden;
   border: 1px solid var(--ds-surface-border);
 }
@@ -126,18 +150,17 @@
 .app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab {
   border: none;
   box-shadow: none;
-  background-color: var(--ds-surface-tint);
-  background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
-  backdrop-filter: var(--ds-surface-backdrop);
-  -webkit-backdrop-filter: var(--ds-surface-backdrop);
+  background-color: transparent;
+  background-image: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .showcase-tab.ds-surface.ds-surface--showcase-tab.is-active,
 .dock-tab.ds-surface.ds-surface--showcase-tab.is-active,
 .app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab.is-active {
-  box-shadow:
-    inset 0 1px 0 rgba(var(--ds-surface-metal-highlight-rgb, 148, 168, 196), 0.08),
-    0 0 10px rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.12);
+  background-color: var(--ds-tab-a-bg-active);
+  box-shadow: inset 0 -2px 0 var(--ds-tab-a-border-active);
 }
 
 .ds-surface--showcase-tab .showcase-tab__label,
@@ -145,13 +168,13 @@
 .ds-surface--showcase-tab .dock-tab-label {
   position: relative;
   z-index: 1;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.82);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .ds-surface--showcase-tab .showcase-tab__unread-toast {
   position: absolute;
   z-index: 3;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.82);
+  text-shadow: none;
 }
 
 .ds-surface--panel {
@@ -167,20 +190,89 @@
 .ds-surface--drawer .showcase-news-drawer__category,
 .ds-surface--drawer .showcase-news-drawer__nav-btn,
 .ds-surface--drawer .showcase-news-drawer__action {
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.82);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+/* Metric / label hierarchy helpers (Pass 1 primitives) */
+.ds-label {
+  color: var(--ds-text-label, var(--ds-text-muted));
+  font-size: var(--ds-text-label, var(--ds-text-xs));
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.ds-value {
+  color: var(--ds-text-value, var(--ds-text-primary));
+  font-size: var(--ds-text-xl);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-caption {
+  color: var(--ds-text-muted);
+  font-size: var(--ds-text-caption, var(--ds-text-xs));
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.ds-recommend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-1) var(--ds-space-2);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-recommend-bg);
+  border: 1px solid var(--ds-recommend-border);
+  color: var(--ds-recommend-fg);
+  font-size: var(--ds-text-caption);
+  line-height: 1.3;
+}
+
+.ds-skeleton {
+  display: block;
+  border-radius: var(--ds-radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--ds-skeleton-base) 0%,
+    var(--ds-skeleton-shine) 50%,
+    var(--ds-skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  animation: ds-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes ds-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-skeleton {
+    animation: none;
+  }
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .ds-surface,
   .ds-surface--strip,
   .ds-surface--card,
+  .ds-surface--standard,
+  .ds-surface--elevated,
+  .ds-surface--active,
   .ds-surface--showcase-header,
   .ds-surface--showcase-body,
   .ds-surface--dock,
   .ds-surface--panel {
     background-color: var(--ds-surface-bg-solid);
-    background-image: var(--ds-surface-carbon-weave), var(--ds-surface-metallic-sheen);
-    background-size: var(--ds-surface-carbon-size), auto;
+    background-image: var(--ds-surface-metallic);
   }
 }
 
@@ -188,6 +280,9 @@
   .ds-surface,
   .ds-surface--strip,
   .ds-surface--card,
+  .ds-surface--standard,
+  .ds-surface--elevated,
+  .ds-surface--active,
   .ds-surface--showcase-header,
   .ds-surface--showcase-body,
   .ds-surface--dock,

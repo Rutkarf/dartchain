@@ -301,8 +301,8 @@
 }
 
 .status-drawer--market .status-drawer__cell--positive .status-drawer__value {
-  color: var(--status-online, #39ff14);
-  text-shadow: 0 0 8px rgba(57, 255, 20, 0.28);
+  color: var(--success, #2ecc8a);
+  text-shadow: none;
 }
 
 .status-drawer--market .status-drawer__cell--negative .status-drawer__value {
@@ -536,13 +536,13 @@
 
 .status-drawer__dot.is-ok,
 .status-drawer__dot.is-live {
-  background: var(--status-online, #39ff14);
-  box-shadow: 0 0 4px rgba(var(--status-online-rgb, 57, 255, 20), 0.45);
+  background: var(--success, #2ecc8a);
+  box-shadow: none;
 }
 
 .status-drawer__dot.is-error {
-  background: #ff6b8a;
-  box-shadow: 0 0 4px rgba(255, 107, 138, 0.4);
+  background: var(--danger, #e85d75);
+  box-shadow: none;
 }
 
 .status-drawer__dot.is-checking {

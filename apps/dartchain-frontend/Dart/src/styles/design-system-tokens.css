@@ -1,105 +1,180 @@
 /**
- * Phase 1 — Design system tokens (refonte cyberpunk mature).
+ * Pass 1 — Design system tokens (dark navy fintech / Web3 premium).
  *
- * Préfixe --ds-* : n’écrase pas theme.css tant que les phases 2–20
- * n’appliquent pas explicitement ces variables aux composants.
+ * Viewport canonique : 250 × 550 px.
+ * Préfixe --ds-* + alias sémantiques (--bg-primary, --surface, …).
+ * Aucune variable legacy n’est retirée : les noms néon / carbone
+ * restent disponibles et pointent vers des valeurs plus sobres.
  *
- * Zones (ordre de lecture @ 300×500) :
+ * Zones (ordre de lecture @ 250×550) :
  *   navbar → exchange → chart → showcase-header → showcase-panel
  *   → bottom-panel → bottom-dock → floor-peek
  */
 
 :root {
-  /* —— Fond & atmosphère (particules + floor conservés) —— */
-  --ds-bg-deep: #0a0612;
-  --ds-bg-deep-rgb: 10, 6, 18;
-  --ds-bg-elevated: #121018;
-  --ds-bg-elevated-rgb: 18, 16, 24;
-  --ds-bg-glass: rgba(var(--ds-bg-deep-rgb), 0.72);
-  --ds-bg-glass-strong: rgba(var(--ds-bg-deep-rgb), 0.88);
+  /* ═══════════════════════════════════════════════════════════
+   * Sémantique fintech (API publique Pass 1)
+   * ═══════════════════════════════════════════════════════════ */
+  --bg-primary: #050a12;
+  --bg-primary-rgb: 5, 10, 18;
+  --bg-secondary: #070e18;
+  --bg-secondary-rgb: 7, 14, 24;
 
-  /* —— Surface carbone métallisé : glass sombre, quasi transparent —— */
-  --ds-surface-base-rgb: 14, 16, 22;
-  --ds-surface-base-deep-rgb: 6, 7, 10;
-  --ds-surface-metal-rgb: 72, 82, 98;
+  --surface: #0a1220;
+  --surface-rgb: 10, 18, 32;
+  --surface-elevated: #0d1828;
+  --surface-elevated-rgb: 13, 24, 40;
+  --surface-hover: #111f32;
+  --surface-hover-rgb: 17, 31, 50;
+
+  --text-primary-ds: #e8eef5;
+  --text-secondary-ds: #8b9bb0;
+  --text-muted-ds: #5c6b7e;
+
+  --accent-cyan: #2ec4d6;
+  --accent-cyan-rgb: 46, 196, 214;
+  --accent-purple: #7b6cff;
+  --accent-purple-rgb: 123, 108, 255;
+
+  --success: #2ecc8a;
+  --success-rgb: 46, 204, 138;
+  --warning: #e6b84d;
+  --warning-rgb: 230, 184, 77;
+  --danger: #e85d75;
+  --danger-rgb: 232, 93, 117;
+
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default-ds: rgba(255, 255, 255, 0.1);
+  --border-active: rgba(var(--accent-cyan-rgb), 0.45);
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 18px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --shadow-soft: 0 4px 18px rgba(0, 0, 0, 0.28);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.22);
+  --shadow-focus:
+    0 0 0 2px rgba(var(--bg-primary-rgb), 0.92),
+    0 0 0 3px rgba(var(--accent-cyan-rgb), 0.45);
+
+  --font-ui: 'Inter', 'Roboto', system-ui, sans-serif;
+  --font-display: 'Orbit', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
+
+  --type-h1: 1.125rem;      /* 18px — rare @ 250 */
+  --type-h2: 0.8125rem;    /* 13px */
+  --type-h3: 0.6875rem;    /* 11px */
+  --type-body: 0.6875rem;  /* 11px */
+  --type-caption: 0.5625rem; /* 9px */
+  --type-label: 0.5rem;    /* 8px */
+  --type-metric: 0.9375rem; /* 15px — KPI values */
+
+  /* Glass subtil (cards premium, pas vitres néon) */
+  --glass-fill-fintech: rgba(var(--surface-rgb), 0.75);
+  --glass-blur-fintech: blur(16px) saturate(120%);
+  --glass-border-fintech: var(--border-subtle);
+  --glass-shadow-fintech: var(--shadow-card);
+
+  /* ═══════════════════════════════════════════════════════════
+   * --ds-* (consommé par ds-surface, tabs, scrollbars, composants)
+   * ═══════════════════════════════════════════════════════════ */
+
+  /* Fond & atmosphère */
+  --ds-bg-deep: var(--bg-primary);
+  --ds-bg-deep-rgb: var(--bg-primary-rgb);
+  --ds-bg-elevated: var(--surface-elevated);
+  --ds-bg-elevated-rgb: var(--surface-elevated-rgb);
+  --ds-bg-glass: rgba(var(--surface-rgb), 0.72);
+  --ds-bg-glass-strong: rgba(var(--surface-rgb), 0.88);
+
+  /* Surfaces sobres (legacy carbon keys conservées, opacités très basses) */
+  --ds-surface-base-rgb: var(--surface-rgb);
+  --ds-surface-base-deep-rgb: var(--bg-primary-rgb);
+  --ds-surface-metal-rgb: 72, 92, 118;
   --ds-surface-metal-highlight-rgb: 148, 168, 196;
 
-  /* Teinte gunmetal ~2.5 % — particules Three.js prioritaires */
-  --ds-surface-tint: rgba(var(--ds-surface-base-deep-rgb), 0.025);
+  --ds-surface-tint: rgba(var(--surface-rgb), 0.55);
 
-  /* Glass léger : blur minimal pour ne pas flouter les particules */
-  --ds-surface-backdrop: blur(1.5px) saturate(1.12);
+  /* Blur lisible, non « vitre gaming » */
+  --ds-surface-backdrop: var(--glass-blur-fintech);
 
-  /* Base métallique sombre (quasi invisible) */
   --ds-surface-bg: linear-gradient(
     168deg,
-    rgba(var(--ds-surface-metal-highlight-rgb), 0.025) 0%,
-    rgba(var(--ds-surface-base-rgb), 0.015) 38%,
-    rgba(var(--ds-surface-base-deep-rgb), 0.008) 72%,
-    rgba(var(--ds-surface-metal-rgb), 0.02) 100%
+    rgba(var(--surface-elevated-rgb), 0.55) 0%,
+    rgba(var(--surface-rgb), 0.42) 48%,
+    rgba(var(--bg-primary-rgb), 0.38) 100%
   );
   --ds-surface-metallic: linear-gradient(
     125deg,
-    rgba(var(--ds-surface-metal-highlight-rgb), 0.03) 0%,
-    rgba(var(--ds-surface-base-deep-rgb), 0.006) 42%,
-    rgba(var(--ds-neon-cyan-rgb), 0.012) 58%,
-    rgba(var(--ds-surface-base-deep-rgb), 0.004) 100%
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(var(--surface-rgb), 0.02) 50%,
+    rgba(var(--accent-cyan-rgb), 0.02) 100%
   );
   --ds-surface-veil: linear-gradient(
     180deg,
-    rgba(var(--ds-surface-base-rgb), 0.04) 0%,
-    rgba(var(--ds-surface-base-deep-rgb), 0.012) 50%,
-    rgba(var(--ds-surface-base-rgb), 0.028) 100%
+    rgba(var(--surface-rgb), 0.08) 0%,
+    rgba(var(--bg-primary-rgb), 0.04) 50%,
+    rgba(var(--surface-rgb), 0.06) 100%
   );
 
-  /* Tissage carbone fin (twill 2×2, maille 4px) */
+  /* Carbon weave — conservé mais quasi invisible */
   --ds-surface-carbon-weave:
     repeating-linear-gradient(
       45deg,
-      rgba(var(--ds-surface-base-deep-rgb), 0.32) 0px,
-      rgba(var(--ds-surface-base-deep-rgb), 0.32) 0.5px,
-      rgba(var(--ds-surface-metal-rgb), 0.16) 0.5px,
-      rgba(var(--ds-surface-metal-rgb), 0.16) 1px,
-      rgba(18, 20, 26, 0.22) 1px,
-      rgba(18, 20, 26, 0.22) 2px
+      rgba(var(--bg-primary-rgb), 0.12) 0px,
+      rgba(var(--bg-primary-rgb), 0.12) 0.5px,
+      rgba(var(--ds-surface-metal-rgb), 0.06) 0.5px,
+      rgba(var(--ds-surface-metal-rgb), 0.06) 1px,
+      rgba(18, 24, 36, 0.08) 1px,
+      rgba(18, 24, 36, 0.08) 2px
     ),
     repeating-linear-gradient(
       -45deg,
-      rgba(var(--ds-surface-base-deep-rgb), 0.28) 0px,
-      rgba(var(--ds-surface-base-deep-rgb), 0.28) 0.5px,
-      rgba(var(--ds-surface-metal-rgb), 0.14) 0.5px,
-      rgba(var(--ds-surface-metal-rgb), 0.14) 1px,
-      rgba(14, 16, 22, 0.2) 1px,
-      rgba(14, 16, 22, 0.2) 2px
+      rgba(var(--bg-primary-rgb), 0.1) 0px,
+      rgba(var(--bg-primary-rgb), 0.1) 0.5px,
+      rgba(var(--ds-surface-metal-rgb), 0.05) 0.5px,
+      rgba(var(--ds-surface-metal-rgb), 0.05) 1px,
+      rgba(14, 20, 30, 0.08) 1px,
+      rgba(14, 20, 30, 0.08) 2px
     );
   --ds-surface-carbon-size: 4px 4px;
 
-  /* Reflet métallique discret */
   --ds-surface-metallic-sheen: linear-gradient(
     180deg,
-    rgba(var(--ds-surface-metal-highlight-rgb), 0.05) 0%,
-    rgba(255, 255, 255, 0.015) 8%,
-    transparent 28%,
-    transparent 72%,
-    rgba(var(--ds-neon-cyan-rgb), 0.018) 100%
+    rgba(255, 255, 255, 0.04) 0%,
+    transparent 22%,
+    transparent 78%,
+    rgba(var(--accent-cyan-rgb), 0.02) 100%
   );
   --ds-surface-metallic-edge: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(var(--ds-surface-metal-highlight-rgb), 0.02) 48%,
-    rgba(var(--ds-surface-metal-highlight-rgb), 0.035) 50%,
-    rgba(var(--ds-surface-metal-highlight-rgb), 0.018) 52%,
+    rgba(255, 255, 255, 0.02) 48%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(255, 255, 255, 0.015) 52%,
     transparent 100%
   );
-  --ds-surface-micro-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.2'/%3E%3C/svg%3E");
+  --ds-surface-micro-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
 
   --ds-surface-bg-header: var(--ds-surface-bg);
   --ds-surface-bg-dock: var(--ds-surface-bg);
-  --ds-surface-bg-solid: rgba(var(--ds-surface-base-deep-rgb), 0.94);
+  --ds-surface-bg-solid: rgba(var(--surface-rgb), 0.94);
   --ds-surface-opacity-solid: 0.94;
 
-  --ds-surface-carbon-opacity: 0.28;
-  --ds-surface-sheen-opacity: 0.22;
+  --ds-surface-carbon-opacity: 0.08;
+  --ds-surface-sheen-opacity: 0.12;
   /* Legacy aliases */
   --ds-surface-noise-opacity: var(--ds-surface-carbon-opacity);
   --ds-surface-grid-opacity: var(--ds-surface-sheen-opacity);
@@ -108,120 +183,364 @@
   --ds-surface-grid-size: var(--ds-surface-carbon-size);
 
   --ds-surface-blur: var(--ds-surface-backdrop);
-  --ds-surface-radius: var(--ds-radius-md, 10px);
-  --ds-surface-border: rgba(var(--ds-surface-metal-highlight-rgb), 0.1);
-  --ds-surface-border-top: rgba(var(--ds-surface-metal-highlight-rgb), 0.12);
-  --ds-surface-border-bottom: rgba(var(--ds-neon-cyan-rgb), 0.12);
+  --ds-surface-radius: var(--radius-lg);
+  --ds-surface-border: var(--border-subtle);
+  --ds-surface-border-top: rgba(255, 255, 255, 0.07);
+  --ds-surface-border-bottom: rgba(var(--accent-cyan-rgb), 0.08);
   --ds-surface-shadow:
-    inset 0 1px 0 rgba(var(--ds-surface-metal-highlight-rgb), 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
-    0 2px 12px rgba(0, 0, 0, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    var(--shadow-card);
   --ds-surface-shadow-strip:
-    inset 0 1px 0 rgba(var(--ds-surface-metal-highlight-rgb), 0.05),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.08),
-    0 3px 10px rgba(0, 0, 0, 0.14);
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.18);
+
+  /* Card levels (Pass 1) */
+  --ds-card-standard-bg: var(--glass-fill-fintech);
+  --ds-card-elevated-bg: rgba(var(--surface-elevated-rgb), 0.82);
+  --ds-card-active-bg: rgba(var(--surface-hover-rgb), 0.88);
+  --ds-card-standard-border: var(--border-subtle);
+  --ds-card-elevated-border: var(--border-default-ds);
+  --ds-card-active-border: rgba(var(--accent-cyan-rgb), 0.28);
+  --ds-card-padding: var(--space-3);
+  --ds-card-radius: var(--radius-lg);
 
   /* Alias legacy → surface */
   --ds-glass-blur: var(--ds-surface-blur);
   --ds-glass-shadow: var(--ds-surface-shadow);
-  --ds-neon-cyan: #00f5ff;
-  --ds-neon-cyan-rgb: 0, 245, 255;
-  --ds-neon-magenta: #ff2d9a;
-  --ds-neon-magenta-rgb: 255, 45, 154;
-  --ds-neon-violet: #7b61ff;
-  --ds-neon-violet-rgb: 123, 97, 255;
 
-  /* —— Texte —— */
-  --ds-text-primary: #e8ecf0;
-  --ds-text-secondary: #8b929e;
-  --ds-text-muted: #5c6370;
-  --ds-text-data: #00f5ff;
+  /* Accents — noms « neon » conservés, valeurs teal sobres (pas gaming) */
+  --ds-neon-cyan: var(--accent-cyan);
+  --ds-neon-cyan-rgb: var(--accent-cyan-rgb);
+  --ds-neon-magenta: #c45b9f;
+  --ds-neon-magenta-rgb: 196, 91, 159;
+  --ds-neon-violet: var(--accent-purple);
+  --ds-neon-violet-rgb: var(--accent-purple-rgb);
 
-  /* —— Bordures & séparateurs —— */
-  --ds-border-subtle: rgba(255, 255, 255, 0.06);
-  --ds-border-default: rgba(255, 255, 255, 0.1);
-  --ds-border-accent: rgba(var(--ds-neon-cyan-rgb), 0.22);
-  --ds-border-accent-active: rgba(var(--ds-neon-cyan-rgb), 0.45);
+  /* Texte */
+  --ds-text-primary: var(--text-primary-ds);
+  --ds-text-secondary: var(--text-secondary-ds);
+  --ds-text-muted: var(--text-muted-ds);
+  --ds-text-data: var(--accent-cyan);
+  --ds-text-label: var(--text-muted-ds);
+  --ds-text-value: var(--text-primary-ds);
 
-  /* —— Rayons —— */
-  --ds-radius-sm: 6px;
-  --ds-radius-md: 10px;
-  --ds-radius-pill: 999px;
+  /* Bordures & séparateurs */
+  --ds-border-subtle: var(--border-subtle);
+  --ds-border-default: var(--border-default-ds);
+  --ds-border-accent: rgba(var(--accent-cyan-rgb), 0.22);
+  --ds-border-accent-active: var(--border-active);
 
-  /* —— Espacement (grille 4px, viewport 300×500) —— */
-  --ds-space-1: 4px;
-  --ds-space-2: 8px;
-  --ds-space-3: 12px;
-  --ds-space-4: 16px;
-  --ds-shell-inline: var(--ds-space-3);
-  --ds-section-gap: var(--ds-space-2);
-  --ds-panel-gap: var(--ds-space-2);
+  /* Rayons */
+  --ds-radius-sm: var(--radius-sm);
+  --ds-radius-md: var(--radius-md);
+  --ds-radius-lg: var(--radius-lg);
+  --ds-radius-xl: var(--radius-xl);
+  --ds-radius-pill: var(--radius-pill);
+  --ds-radius-input: var(--radius-md);
+  --ds-radius-btn: 12px;
 
-  /* —— Typographie —— */
-  --ds-font-ui: 'Inter', 'Roboto', system-ui, sans-serif;
-  --ds-font-display: 'Orbit', 'Inter', sans-serif;
-  --ds-font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
-  --ds-text-xs: 0.5625rem;   /* 9px */
-  --ds-text-sm: 0.6875rem;   /* 11px */
-  --ds-text-md: 0.8125rem;   /* 13px */
-  --ds-text-lg: 1rem;        /* 16px */
-  --ds-text-xl: 1.375rem;    /* 22px — soldes */
+  /* Espacement (grille 4px, viewport 250×500) */
+  --ds-space-1: var(--space-1);
+  --ds-space-2: var(--space-2);
+  --ds-space-3: var(--space-3);
+  --ds-space-4: var(--space-4);
+  --ds-space-6: var(--space-6);
+  --ds-space-8: var(--space-8);
+  --ds-shell-inline: var(--space-2);
+  --ds-section-gap: var(--space-2);
+  --ds-panel-gap: var(--space-2);
 
-  --ds-glow-active: 0 0 12px rgba(var(--ds-neon-cyan-rgb), 0.18);
+  /* Typographie */
+  --ds-font-ui: var(--font-ui);
+  --ds-font-display: var(--font-display);
+  --ds-font-mono: var(--font-mono);
+  --ds-text-xs: var(--type-caption);
+  --ds-text-sm: var(--type-body);
+  --ds-text-md: var(--type-h2);
+  --ds-text-lg: 0.875rem;   /* 14px */
+  --ds-text-xl: var(--type-metric);
+  --ds-text-label: var(--type-label);
+  --ds-text-caption: var(--type-caption);
 
-  /* —— Scrollbars (viewport 300px, néon cyan + fond carbone) —— */
+  /* Glow minimal — guide l’attention uniquement */
+  --ds-glow-active: 0 0 0 1px rgba(var(--accent-cyan-rgb), 0.2);
+
+  /* Sémantique états */
+  --ds-success: var(--success);
+  --ds-success-rgb: var(--success-rgb);
+  --ds-warning: var(--warning);
+  --ds-warning-rgb: var(--warning-rgb);
+  --ds-danger: var(--danger);
+  --ds-danger-rgb: var(--danger-rgb);
+  --ds-info: var(--accent-cyan);
+  --ds-info-rgb: var(--accent-cyan-rgb);
+
+  /* Scrollbars sobres */
   --ds-scrollbar-size: 3px;
-  --ds-scrollbar-track: rgba(var(--ds-bg-deep-rgb), 0.72);
-  --ds-scrollbar-thumb: rgba(var(--ds-neon-cyan-rgb), 0.28);
-  --ds-scrollbar-thumb-hover: rgba(var(--ds-neon-cyan-rgb), 0.46);
-  --ds-scrollbar-thumb-active: rgba(var(--ds-neon-cyan-rgb), 0.58);
-  --ds-scrollbar-border: rgba(var(--ds-neon-cyan-rgb), 0.16);
-  --ds-scrollbar-glow: rgba(var(--ds-neon-cyan-rgb), 0.24);
+  --ds-scrollbar-track: rgba(var(--bg-primary-rgb), 0.72);
+  --ds-scrollbar-thumb: rgba(var(--accent-cyan-rgb), 0.22);
+  --ds-scrollbar-thumb-hover: rgba(var(--accent-cyan-rgb), 0.38);
+  --ds-scrollbar-thumb-active: rgba(var(--accent-cyan-rgb), 0.48);
+  --ds-scrollbar-border: rgba(var(--accent-cyan-rgb), 0.1);
+  --ds-scrollbar-glow: transparent;
   --ds-scrollbar-thumb-gradient: linear-gradient(
     180deg,
-    rgba(var(--ds-neon-cyan-rgb), 0.44) 0%,
-    rgba(var(--accent-primary-rgb), 0.3) 100%
+    rgba(var(--accent-cyan-rgb), 0.32) 0%,
+    rgba(var(--accent-cyan-rgb), 0.18) 100%
   );
   --ds-scrollbar-thumb-gradient-hover: linear-gradient(
     180deg,
-    rgba(var(--ds-neon-cyan-rgb), 0.6) 0%,
-    rgba(var(--accent-primary-rgb), 0.44) 100%
+    rgba(var(--accent-cyan-rgb), 0.44) 0%,
+    rgba(var(--accent-cyan-rgb), 0.28) 100%
   );
 
-  /* —— Tabs : différenciation niveau A (vue) vs B (filtre) —— */
+  /* Tabs : niveau A (vue) vs B (filtre) — underline discret, pas halo */
   --ds-tab-a-height: 26px;
-  --ds-tab-a-bg-active: rgba(var(--ds-neon-cyan-rgb), 0.12);
-  --ds-tab-a-border-active: var(--ds-neon-cyan);
+  --ds-tab-a-bg-active: rgba(var(--accent-cyan-rgb), 0.08);
+  --ds-tab-a-border-active: var(--accent-cyan);
+  --ds-tab-a-underline: 2px solid var(--accent-cyan);
   --ds-tab-b-height: 22px;
   --ds-tab-b-bg: transparent;
   --ds-tab-b-border: var(--ds-border-default);
 
-  /* —— Layout budgets @ 300×500 (réf. ui-layout-zones.constants.ts) —— */
-  --ds-zone-navbar: 56px;
-  --ds-navbar-top-inset: max(clamp(6px, 1.6vh, 12px), env(safe-area-inset-top, 0px));
-  --ds-navbar-shell-radius: clamp(8px, 2.4vw, 12px);
-  --ds-navbar-pad-top: clamp(6px, 1.4vh, 9px);
-  --ds-navbar-pad-bottom: clamp(5px, 1.2vh, 7px);
-  --ds-navbar-inner-gap: clamp(3px, 0.8vh, 5px);
-  --ds-exchange-shell-radius: clamp(8px, 2.4vw, 12px);
-  --ds-exchange-pad: clamp(8px, 1.6vw, 11px);
-  --ds-exchange-gap: clamp(6px, 1.2vw, 9px);
-  --ds-exchange-margin: clamp(2px, 0.5vw, 4px);
-  --ds-exchange-row-gap: clamp(4px, 0.9vw, 6px);
-  --ds-exchange-shell-width: 100%;
-  --ds-exchange-font-min: 0.5625rem; /* 9px — lisibilité mobile Phase 17 */
-  --ds-zone-market: 118px;
-  --ds-zone-showcase-header: 28px;
-  --ds-zone-showcase-body: 90px;
-  --ds-zone-bottom-panel: 130px;
-  --ds-zone-bottom-dock: 48px;
-  --ds-zone-floor-peek: 12px;
+  /* Inputs */
+  --ds-input-bg: rgba(var(--surface-elevated-rgb), 0.65);
+  --ds-input-bg-hover: rgba(var(--surface-hover-rgb), 0.72);
+  --ds-input-border: var(--ds-border-default);
+  --ds-input-border-focus: rgba(var(--accent-cyan-rgb), 0.55);
+  --ds-input-radius: var(--ds-radius-input);
+  --ds-input-padding-y: 6px;
+  --ds-input-padding-x: 10px;
+  --ds-input-font: var(--ds-text-sm);
+  --ds-input-placeholder: var(--ds-text-muted);
 
-  /* —— Hub column ratio 35/65 —— */
+  /* Badges / status */
+  --ds-badge-radius: var(--radius-pill);
+  --ds-badge-font: var(--type-label);
+  --ds-badge-padding: 2px 6px;
+  --ds-status-live: var(--success);
+  --ds-status-live-rgb: var(--success-rgb);
+  --ds-status-secondary-fg: var(--ds-text-secondary);
+  --ds-status-secondary-bg: rgba(255, 255, 255, 0.04);
+
+  /* Recommendation / info contextuelle */
+  --ds-recommend-bg: rgba(var(--accent-cyan-rgb), 0.06);
+  --ds-recommend-border: rgba(var(--accent-cyan-rgb), 0.16);
+  --ds-recommend-fg: var(--ds-text-secondary);
+
+  /* Skeleton loading */
+  --ds-skeleton-base: rgba(255, 255, 255, 0.04);
+  --ds-skeleton-shine: rgba(255, 255, 255, 0.08);
+
+  /* —— Layout budgets @ 250×500 (zero-scroll, hiérarchie spatiale) —— */
+  --ds-viewport-w: 250px;
+  --ds-viewport-h: 500px;
+  --ds-zone-navbar: 36px;
+  --ds-zone-exchange: 28px;
+  --ds-zone-chart: 196px;
+  --ds-zone-showcase-header: 20px;
+  --ds-zone-showcase-body: 128px;
+  --ds-zone-bottom-panel: 176px;
+  --ds-zone-bottom-dock: 20px;
+  --ds-zone-floor-peek: 0px;
+  --ds-band-gap: 4px;
+  --ds-band-inline-pad: 4px;
+  --ds-navbar-inline-overflow: 2px;
+  --ds-navbar-top-inset: max(2px, env(safe-area-inset-top, 0px));
+  --ds-navbar-shell-radius: var(--radius-md);
+  --ds-navbar-pad-top: 2px;
+  --ds-navbar-pad-bottom: 2px;
+  --ds-navbar-inner-gap: 2px;
+  --ds-exchange-shell-radius: var(--radius-lg);
+  --ds-exchange-pad: 8px;
+  --ds-exchange-gap: 6px;
+  --ds-exchange-margin: 0px;
+  --ds-exchange-row-gap: 4px;
+  --ds-exchange-shell-width: 100%;
+  --ds-exchange-font-min: 0.5625rem;
+  --ds-zone-market: var(--ds-zone-chart);
+
+  /* Hub column ratio 35/65 — conservé */
   --ds-hub-exchange-fr: 7;
   --ds-hub-chart-fr: 13;
 
-  /* —— Touch targets mobile —— */
-  --ds-touch-min: 36px;
-  --ds-icon-btn: 32px;
+  /* Touch targets @ 250 — réalistes */
+  --ds-touch-min: 32px;
+  --ds-icon-btn: 28px;
+
+  /* ═══════════════════════════════════════════════════════════
+   * Bridge theme.css (chargé avant) — remap sémantique sans suppression
+   * ═══════════════════════════════════════════════════════════ */
+  --accent-primary: var(--accent-cyan);
+  --accent-primary-rgb: var(--accent-cyan-rgb);
+  --accent-secondary: var(--accent-purple);
+  --accent-secondary-rgb: var(--accent-purple-rgb);
+  --accent-mid: #3d9fb0;
+  --accent-mid-rgb: 61, 159, 176;
+
+  --ui-accent: var(--accent-cyan);
+  --ui-accent-rgb: var(--accent-cyan-rgb);
+  --ui-accent-2: var(--accent-purple);
+  --ui-accent-2-rgb: var(--accent-purple-rgb);
+  --ui-border: var(--border-subtle);
+  --ui-border-hover: rgba(var(--accent-cyan-rgb), 0.28);
+  --ui-border-active: var(--border-active);
+  --ui-glow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --ui-glow-strong: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --ui-glow-accent: 0 0 0 1px rgba(var(--accent-cyan-rgb), 0.18);
+  --ui-glow-accent-strong: 0 0 0 1px rgba(var(--accent-cyan-rgb), 0.28);
+  --ui-glow-magenta: 0 0 0 1px rgba(var(--ds-neon-magenta-rgb), 0.2);
+
+  --electric-cyan: var(--accent-cyan);
+  --electric-cyan-rgb: var(--accent-cyan-rgb);
+  --electric-violet: var(--accent-purple);
+  --electric-violet-rgb: var(--accent-purple-rgb);
+
+  --bg-base: var(--bg-primary);
+  --bg-base-rgb: var(--bg-primary-rgb);
+  --bg-deep: var(--bg-primary);
+  --bg-deep-rgb: var(--bg-primary-rgb);
+  --bg-elevated: var(--surface-elevated);
+  --bg-elevated-rgb: var(--surface-elevated-rgb);
+  --bg-body-top: var(--bg-primary);
+  --bg-body-bottom: var(--bg-secondary);
+
+  --text-primary: var(--text-primary-ds);
+  --text-primary-rgb: 232, 238, 245;
+  --text-bright: #ffffff;
+  --text-soft: #dce4ee;
+  --text-muted: var(--text-secondary-ds);
+  --text-muted-rgb: 139, 155, 176;
+  --text-dim: var(--text-muted-ds);
+  --text-dim-rgb: 92, 107, 126;
+  --text-muted-strong: #b8c4d4;
+  --text-faint: rgba(232, 238, 245, 0.72);
+  --text-ghost: rgba(232, 238, 245, 0.45);
+  --text-placeholder: var(--text-muted-ds);
+  --text-disabled: rgba(232, 238, 245, 0.32);
+  --text-link: var(--accent-cyan);
+
+  --color-positive: var(--success);
+  --color-positive-rgb: var(--success-rgb);
+  --color-positive-bright: #3ee09a;
+  --color-negative: var(--danger);
+  --color-negative-rgb: var(--danger-rgb);
+  --color-negative-soft: #f08a9a;
+  --chart-trend-up: var(--success);
+  --chart-trend-up-rgb: var(--success-rgb);
+  --chart-trend-down: var(--danger);
+  --chart-trend-down-rgb: var(--danger-rgb);
+  --color-warning: var(--warning);
+  --color-warning-rgb: var(--warning-rgb);
+  --electric-green: var(--success);
+  --electric-green-rgb: var(--success-rgb);
+  --status-online: var(--success);
+  --status-online-rgb: var(--success-rgb);
+  --status-online-glow: rgba(var(--success-rgb), 0.35);
+  --navbar-led-online: var(--success);
+  --navbar-led-online-rgb: var(--success-rgb);
+  --navbar-led-online-glow: rgba(var(--success-rgb), 0.35);
+
+  --border-faint: rgba(255, 255, 255, 0.04);
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(var(--accent-cyan-rgb), 0.35);
+  --border-accent-hover: rgba(var(--accent-cyan-rgb), 0.5);
+
+  --surface-info-bg: rgba(var(--accent-cyan-rgb), 0.08);
+  --surface-info-border: rgba(var(--accent-cyan-rgb), 0.22);
+  --surface-success-bg: rgba(var(--success-rgb), 0.1);
+  --surface-success-border: rgba(var(--success-rgb), 0.28);
+  --surface-warning-bg: rgba(var(--warning-rgb), 0.1);
+  --surface-warning-border: rgba(var(--warning-rgb), 0.28);
+  --surface-error-bg: rgba(var(--danger-rgb), 0.1);
+  --surface-error-border: rgba(var(--danger-rgb), 0.28);
+  --surface-focus-ring: rgba(var(--accent-cyan-rgb), 0.4);
+
+  --glass-blur: var(--glass-blur-fintech);
+  --glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    var(--shadow-card);
+
+  --tab-accent: var(--accent-cyan);
+  --tab-accent-rgb: var(--accent-cyan-rgb);
+  --tab-accent-2: var(--accent-purple);
+  --tab-accent-2-rgb: var(--accent-purple-rgb);
+  --glass-tab-tint-active: rgba(var(--accent-cyan-rgb), 0.1);
+  --glass-tab-border-active-color: rgba(var(--accent-cyan-rgb), 0.4);
+  --glass-tab-glow: none;
+
+  --cta-radius-sm: var(--radius-sm);
+  --cta-radius-md: var(--radius-md);
+  --cta-radius-lg: 12px;
+  --cta-height-sm: 24px;
+  --cta-height-md: 30px;
+  --cta-height-lg: 36px;
+  --cta-font-sm: 0.5rem;
+  --cta-font-md: 0.625rem;
+  --cta-font-lg: 0.6875rem;
+  --cta-disabled-opacity: 0.48;
+  --cta-focus-ring: var(--shadow-focus);
+
+  --cta-primary-text: #050a12;
+  --cta-primary-fill: var(--accent-cyan);
+  --cta-primary-fill-hover: #3dd4e6;
+  --cta-primary-border: rgba(var(--accent-cyan-rgb), 0.65);
+  --cta-primary-bg: var(--cta-primary-fill);
+  --cta-primary-bg-hover: var(--cta-primary-fill-hover);
+  --cta-primary-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 1px 4px rgba(0, 0, 0, 0.28);
+  --cta-primary-shadow-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 2px 8px rgba(0, 0, 0, 0.32);
+  --cta-primary-text-glow: none;
+
+  --cta-secondary-text: var(--text-primary-ds);
+  --cta-secondary-fill: rgba(var(--surface-elevated-rgb), 0.92);
+  --cta-secondary-fill-hover: rgba(var(--surface-hover-rgb), 0.95);
+  --cta-secondary-border: var(--border-default-ds);
+  --cta-secondary-bg: var(--cta-secondary-fill);
+  --cta-secondary-bg-hover: var(--cta-secondary-fill-hover);
+  --cta-secondary-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --cta-secondary-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  --cta-tertiary-text: var(--text-secondary-ds);
+  --cta-tertiary-fill: transparent;
+  --cta-tertiary-fill-hover: rgba(255, 255, 255, 0.04);
+  --cta-tertiary-border: transparent;
+  --cta-tertiary-bg: var(--cta-tertiary-fill);
+  --cta-tertiary-bg-hover: var(--cta-tertiary-fill-hover);
+  --cta-tertiary-shadow: none;
+  --cta-tertiary-shadow-hover: none;
+
+  --cta-accent-text: var(--text-primary-ds);
+  --cta-accent-fill: linear-gradient(
+    118deg,
+    rgba(var(--accent-cyan-rgb), 0.85) 0%,
+    rgba(var(--accent-purple-rgb), 0.55) 100%
+  );
+  --cta-accent-fill-hover: linear-gradient(
+    118deg,
+    rgba(var(--accent-cyan-rgb), 0.95) 0%,
+    rgba(var(--accent-purple-rgb), 0.65) 100%
+  );
+  --cta-accent-border: rgba(var(--accent-purple-rgb), 0.35);
+  --cta-accent-bg: var(--cta-accent-fill);
+  --cta-accent-bg-hover: var(--cta-accent-fill-hover);
+  --cta-accent-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --cta-accent-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --cta-accent-text-glow: none;
+
+  --cta-danger-text: var(--text-primary-ds);
+  --cta-danger-fill: rgba(var(--danger-rgb), 0.85);
+  --cta-danger-fill-hover: rgba(var(--danger-rgb), 0.95);
+  --cta-danger-border: rgba(var(--danger-rgb), 0.45);
+  --cta-danger-bg: var(--cta-danger-fill);
+  --cta-danger-bg-hover: var(--cta-danger-fill-hover);
+
+  --dock-tab-cyan: var(--accent-cyan);
+  --showcase-tab-cyan: var(--accent-cyan);
+
+  --glow-primary: rgba(var(--accent-cyan-rgb), 0.12);
+  --glow-warm: rgba(var(--accent-purple-rgb), 0.1);
 }

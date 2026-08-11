@@ -42,7 +42,7 @@
   height: 10px;
   border-radius: 1px;
   background: #00e5ff;
-  box-shadow: 0 0 6px rgba(0, 229, 255, 0.45);
+  box-shadow: none;
 }
 
 .showcase-panel__title {

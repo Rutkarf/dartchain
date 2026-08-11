@@ -614,8 +614,19 @@ export class ShowcaseChartComponent {
     () => this.r4v3State.swapStats()?.lastSwapSummary?.trim() || '—'
   );
 
-  readonly r4v3ViewBadge = computed(() =>
+  /** Badge du mode R4V3 sur le trigger — libellé court uniquement (ex. AUTO, pas « Auto · Santé »). */
+  readonly r4v3ViewBadge = computed(() => {
+    const view = this.r4v3ViewMode();
+    return this.r4v3ViewPills.find((pill) => pill.id === view)?.badge ?? r4v3ViewLabel(view);
+  });
+
+  /** Libellé résolu (Auto · Mode) — réservé aux hints / accessibilité, pas au trigger. */
+  readonly r4v3ViewResolvedBadge = computed(() =>
     r4v3ResolvedViewLabel(this.r4v3ViewMode(), this.r4v3Context())
+  );
+
+  readonly r4v3ViewTriggerAriaLabel = computed(
+    () => `Mode d'affichage : ${this.r4v3ViewResolvedBadge()}`
   );
 
   /** Libellé court du mode actif (sans préfixe Auto ·). */

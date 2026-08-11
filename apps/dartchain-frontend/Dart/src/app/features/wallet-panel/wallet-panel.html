@@ -5,7 +5,7 @@
   aria-label="Wallet"
 >
   @if (!hasWallet()) {
-    <div class="wallet-display__hero">
+    <div class="wallet-display__hero wallet-display__hero--empty ds-empty">
       <button
         type="button"
         class="wallet-display__create-cta"
@@ -17,24 +17,32 @@
           <span class="wallet-display__create-cta-spinner" aria-hidden="true"></span>
         }
         <span class="wallet-display__create-cta-label">
-          {{ creatingWallet() ? 'CRÉATION…' : 'CRÉER UN WALLET' }}
+          {{ creatingWallet() ? 'Création…' : 'Créer wallet' }}
         </span>
       </button>
     </div>
   }
 
   @if (shouldShowStatusLine()) {
-    <p
+    <div
       class="wallet-display__status-line"
       [class.wallet-display__status-line--error]="centerTone() === 'error'"
       [class.wallet-display__status-line--success]="centerTone() === 'success'"
       [class.wallet-display__status-line--info]="centerTone() === 'info'"
-      [class.wallet-display__status-line--idle]="centerTone() === 'idle' && !hasWallet()"
       aria-live="polite"
       role="status"
     >
-      {{ centerMessage() }}
-    </p>
+      <span class="wallet-display__status-line-text">{{ centerMessage() }}</span>
+      <button
+        type="button"
+        class="wallet-display__status-line-close"
+        (click)="dismissStatusLine($event)"
+        aria-label="Fermer la notification"
+        title="Fermer"
+      >
+        ×
+      </button>
+    </div>
   }
 
   <div
@@ -48,17 +56,6 @@
     <section class="wallet-display__holdings wallet-display__holdings--split" aria-label="Solde wallet">
       <div class="wallet-display__balance-col">
         <article class="wallet-display__balance-cyber" [attr.aria-label]="formattedTotalBalance()">
-          <span class="wallet-display__balance-cyber-rail" aria-hidden="true"></span>
-          <span class="wallet-display__balance-cyber-sheen" aria-hidden="true"></span>
-          <span
-            class="wallet-display__balance-cyber-corner wallet-display__balance-cyber-corner--tl"
-            aria-hidden="true"
-          ></span>
-          <span
-            class="wallet-display__balance-cyber-corner wallet-display__balance-cyber-corner--br"
-            aria-hidden="true"
-          ></span>
-
           <header class="wallet-display__balance-cyber-head">
             @if (hasWallet() || displayWalletAddress()) {
               <button
@@ -99,7 +96,11 @@
 
           <div class="wallet-display__balance-glass">
             <span class="wallet-display__balance-brand">{{ nativeToken() }}</span>
-            <span class="wallet-display__balance-amount">{{ formattedTotalBalance() }}</span>
+            <div class="wallet-display__balance-amount" aria-hidden="true">
+              <span class="wallet-display__balance-whole">{{ balanceWholePart() }}</span>
+              <span class="wallet-display__balance-sep">,</span>
+              <span class="wallet-display__balance-frac">{{ balanceFractionPart() }}</span>
+            </div>
             <div class="wallet-display__balance-chf" aria-label="Conversion CHF">
               <span class="wallet-display__balance-chf-label">CHF</span>
               <span class="wallet-display__balance-chf-value">{{ formattedChfValue() }}</span>
@@ -116,51 +117,53 @@
               <span class="wallet-display__key-strip-label">
                 {{ locale.t('wallet.keys.public') }}
               </span>
-              <code class="wallet-display__key-strip-value">{{ maskedPublicKey() }}</code>
-              <div class="wallet-display__key-strip-actions">
-                <button
-                  type="button"
-                  class="wallet-display__key-icon-btn"
-                  [class.is-active]="publicKeyVisible()"
-                  (click)="onTogglePublicKeyVisibility($event)"
-                  [attr.aria-label]="
-                    publicKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
-                  "
-                  [title]="
-                    publicKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
-                  "
-                >
-                  @if (publicKeyVisible()) {
-                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                      <path d="M2 2l12 12" />
-                      <path d="M1 8s2.5-4 7-4c1.6 0 3 .4 4.2 1" />
-                      <path d="M15 8s-2.5 4-7 4c-1.6 0-3-.4-4.2-1" />
-                      <circle cx="8" cy="8" r="2" />
-                    </svg>
-                  } @else {
-                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                      <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" />
-                      <circle cx="8" cy="8" r="2" />
-                    </svg>
-                  }
-                </button>
-                <button
-                  type="button"
-                  class="wallet-display__key-icon-btn wallet-display__key-icon-btn--copy"
-                  [class.is-copied]="copiedPublicKey()"
-                  (click)="copyPublicKey($event)"
-                  [attr.aria-label]="locale.t('wallet.keys.copy')"
-                  [title]="locale.t('wallet.keys.copy')"
-                >
-                  @if (copiedPublicKey()) {
-                    ✓
-                  } @else {
-                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                      <rect x="5" y="5" width="8" height="8" rx="1" />
-                      <path d="M5 9H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1" />
-                    </svg>
-                  }
-                </button>
+              <div class="wallet-display__key-strip-body">
+                <code class="wallet-display__key-strip-value">{{ maskedPublicKey() }}</code>
+                <div class="wallet-display__key-strip-actions">
+                  <button
+                    type="button"
+                    class="wallet-display__key-icon-btn"
+                    [class.is-active]="publicKeyVisible()"
+                    (click)="onTogglePublicKeyVisibility($event)"
+                    [attr.aria-label]="
+                      publicKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
+                    "
+                    [title]="
+                      publicKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
+                    "
+                  >
+                    @if (publicKeyVisible()) {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M2 2l12 12" />
+                        <path d="M1 8s2.5-4 7-4c1.6 0 3 .4 4.2 1" />
+                        <path d="M15 8s-2.5 4-7 4c-1.6 0-3-.4-4.2-1" />
+                        <circle cx="8" cy="8" r="2" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" />
+                        <circle cx="8" cy="8" r="2" />
+                      </svg>
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    class="wallet-display__key-icon-btn wallet-display__key-icon-btn--copy"
+                    [class.is-copied]="copiedPublicKey()"
+                    (click)="copyPublicKey($event)"
+                    [attr.aria-label]="locale.t('wallet.keys.copy')"
+                    [title]="locale.t('wallet.keys.copy')"
+                  >
+                    @if (copiedPublicKey()) {
+                      ✓
+                    } @else {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <rect x="5" y="5" width="8" height="8" rx="1" />
+                        <path d="M5 9H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1" />
+                      </svg>
+                    }
+                  </button>
+                </div>
               </div>
             </article>
 
@@ -168,51 +171,53 @@
               <span class="wallet-display__key-strip-label">
                 {{ locale.t('wallet.keys.private') }}
               </span>
-              <code class="wallet-display__key-strip-value">{{ maskedPrivateKey() }}</code>
-              <div class="wallet-display__key-strip-actions">
-                <button
-                  type="button"
-                  class="wallet-display__key-icon-btn"
-                  [class.is-active]="privateKeyVisible()"
-                  (click)="onTogglePrivateKeyVisibility($event)"
-                  [attr.aria-label]="
-                    privateKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
-                  "
-                  [title]="
-                    privateKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
-                  "
-                >
-                  @if (privateKeyVisible()) {
-                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                      <path d="M2 2l12 12" />
-                      <path d="M1 8s2.5-4 7-4c1.6 0 3 .4 4.2 1" />
-                      <path d="M15 8s-2.5 4-7 4c-1.6 0-3-.4-4.2-1" />
-                      <circle cx="8" cy="8" r="2" />
-                    </svg>
-                  } @else {
-                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                      <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" />
-                      <circle cx="8" cy="8" r="2" />
-                    </svg>
-                  }
-                </button>
-                <button
-                  type="button"
-                  class="wallet-display__key-icon-btn wallet-display__key-icon-btn--copy"
-                  [class.is-copied]="copiedPrivateKey()"
-                  (click)="copyPrivateKey($event)"
-                  [attr.aria-label]="locale.t('wallet.keys.copy')"
-                  [title]="locale.t('wallet.keys.copy')"
-                >
-                  @if (copiedPrivateKey()) {
-                    ✓
-                  } @else {
-                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                      <rect x="5" y="5" width="8" height="8" rx="1" />
-                      <path d="M5 9H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1" />
-                    </svg>
-                  }
-                </button>
+              <div class="wallet-display__key-strip-body">
+                <code class="wallet-display__key-strip-value">{{ maskedPrivateKey() }}</code>
+                <div class="wallet-display__key-strip-actions">
+                  <button
+                    type="button"
+                    class="wallet-display__key-icon-btn"
+                    [class.is-active]="privateKeyVisible()"
+                    (click)="onTogglePrivateKeyVisibility($event)"
+                    [attr.aria-label]="
+                      privateKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
+                    "
+                    [title]="
+                      privateKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
+                    "
+                  >
+                    @if (privateKeyVisible()) {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M2 2l12 12" />
+                        <path d="M1 8s2.5-4 7-4c1.6 0 3 .4 4.2 1" />
+                        <path d="M15 8s-2.5 4-7 4c-1.6 0-3-.4-4.2-1" />
+                        <circle cx="8" cy="8" r="2" />
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z" />
+                        <circle cx="8" cy="8" r="2" />
+                      </svg>
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    class="wallet-display__key-icon-btn wallet-display__key-icon-btn--copy"
+                    [class.is-copied]="copiedPrivateKey()"
+                    (click)="copyPrivateKey($event)"
+                    [attr.aria-label]="locale.t('wallet.keys.copy')"
+                    [title]="locale.t('wallet.keys.copy')"
+                  >
+                    @if (copiedPrivateKey()) {
+                      ✓
+                    } @else {
+                      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <rect x="5" y="5" width="8" height="8" rx="1" />
+                        <path d="M5 9H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1" />
+                      </svg>
+                    }
+                  </button>
+                </div>
               </div>
             </article>
           </section>
@@ -237,7 +242,7 @@
             />
             <button
               type="button"
-              class="wallet-display__icon-btn wallet-display__icon-btn--copy"
+              class="wallet-display__icon-btn wallet-display__icon-btn--copy wallet-display__icon-btn--explorer"
               (click)="copyLookupAddress()"
               [attr.aria-label]="locale.t('wallet.keys.copy')"
               [title]="locale.t('wallet.keys.copy')"
@@ -254,11 +259,20 @@
             </button>
             <button
               type="button"
-              class="wallet-display__mini-btn wallet-display__mini-btn--primary wallet-display__mini-btn--lookup"
+              class="wallet-display__icon-btn wallet-display__icon-btn--lookup wallet-display__icon-btn--explorer"
               [disabled]="refreshingBalance()"
               (click)="fetchBalanceFromForm()"
+              [attr.aria-label]="locale.t('wallet.explorer.lookup')"
+              [attr.title]="locale.t('wallet.explorer.lookup')"
             >
-              {{ refreshingBalance() ? '…' : locale.t('wallet.explorer.lookup') }}
+              @if (refreshingBalance()) {
+                <span class="wallet-display__icon-btn-ellipsis" aria-hidden="true">…</span>
+              } @else {
+                <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <circle cx="7" cy="7" r="4.5" />
+                  <path d="m10.5 10.5 3.2 3.2" />
+                </svg>
+              }
             </button>
           </form>
 

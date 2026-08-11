@@ -95,6 +95,7 @@ export class WalletPanelComponent implements OnInit {
 
   protected readonly errorMessage = signal('');
   protected readonly successMessage = signal('');
+  protected readonly statusDismissed = signal(false);
   protected readonly copiedAddress = signal(false);
   protected readonly copiedLookupAddress = signal(false);
   protected readonly copiedPublicKey = signal(false);
@@ -143,6 +144,16 @@ export class WalletPanelComponent implements OnInit {
   protected readonly formattedTotalBalance = computed(() =>
     formatR4v3Amount(this.totalBalance())
   );
+  protected readonly balanceWholePart = computed(() => {
+    const formatted = this.formattedTotalBalance();
+    const sep = formatted.lastIndexOf(',');
+    return sep >= 0 ? formatted.slice(0, sep) : formatted;
+  });
+  protected readonly balanceFractionPart = computed(() => {
+    const formatted = this.formattedTotalBalance();
+    const sep = formatted.lastIndexOf(',');
+    return sep >= 0 ? formatted.slice(sep + 1) : '';
+  });
   protected readonly formattedChfValue = computed(() => {
     const bal = Number.parseFloat(this.totalBalance()) || 0;
     const localeId = this.locale.locale() === 'fr' ? 'fr-FR' : 'en-GB';
@@ -263,24 +274,33 @@ export class WalletPanelComponent implements OnInit {
     if (this.successMessage()) {
       return this.successMessage();
     }
-    if (!this.hasWallet()) {
-      return this.locale.t('wallet.noWallet');
-    }
     if (this.refreshingBalance()) {
       return 'Synchronisation…';
     }
-    return 'Wallet actif';
+    return '';
   });
 
   protected readonly shouldShowStatusLine = computed(() => {
-    if (this.hasWallet() && this.centerTone() === 'idle' && !this.refreshingBalance()) {
+    if (this.statusDismissed()) {
       return false;
     }
-
     return Boolean(this.centerMessage());
   });
 
+  protected dismissStatusLine(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.clearMessages();
+    this.statusDismissed.set(true);
+  }
+
   constructor() {
+    effect(() => {
+      if (this.errorMessage() || this.successMessage() || this.creatingWallet() || this.refreshingBalance()) {
+        this.statusDismissed.set(false);
+      }
+    });
+
     effect(() => {
       const sessionWallet = this.walletSession.wallet();
       if (!sessionWallet) {
@@ -703,9 +723,8 @@ export class WalletPanelComponent implements OnInit {
             const own = normalizeAddressForApi(this.displayWalletAddress());
             if (own && own === normalizedAddress) {
               this.balance.set(normalized);
-            } else {
-              this.pushRecentLookup(normalizedAddress, normalized, displayAddress);
             }
+            this.pushRecentLookup(normalizedAddress, normalized, displayAddress);
           }
           if (announce) {
             this.successMessage.set(
@@ -989,6 +1008,7 @@ export class WalletPanelComponent implements OnInit {
   }
 
   private pushToast(message: string, kind: 'success' | 'error' | 'info'): void {
+    this.statusDismissed.set(false);
     if (kind === 'error') {
       this.errorMessage.set(message);
     } else {
@@ -1058,15 +1078,17 @@ export class WalletPanelComponent implements OnInit {
   }
 
   private pushRecentLookup(address: string, balance: string, displayHint?: string): void {
-    const own = normalizeAddressForApi(this.displayWalletAddress());
-    if (own && own === address) {
+    const normalized = normalizeAddressForApi(address);
+    if (!normalized) {
       return;
     }
 
     const display = toDisplayWalletAddress(displayHint || address, this.accountDisplayName());
     const next: RecentWalletLookup[] = [
-      { address, display, balance, at: Date.now() },
-      ...this.recentLookups().filter((entry) => entry.address !== address),
+      { address: normalized, display, balance, at: Date.now() },
+      ...this.recentLookups().filter(
+        (entry) => normalizeAddressForApi(entry.address) !== normalized
+      ),
     ].slice(0, RECENT_LOOKUPS_MAX);
 
     this.recentLookups.set(next);

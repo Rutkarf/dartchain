@@ -110,9 +110,20 @@ describe('PeerPanelComponent', () => {
     expect(element.querySelector('.peer-panel__connect-btn')).toBeTruthy();
     expect(element.textContent).toContain('1/1');
     expect(element.querySelector('.peer-panel.ds-surface')).toBeTruthy();
+
+    const search = element.querySelector('.peer-panel__search');
+    const connect = element.querySelector('.peer-panel__connect');
+    expect(search).toBeTruthy();
+    expect(connect).toBeTruthy();
+    expect(
+      !!(search && connect && Boolean(search.compareDocumentPosition(connect) & Node.DOCUMENT_POSITION_FOLLOWING))
+    ).toBe(true);
+
+    const peerInput = element.querySelector('.peer-panel__connect-input') as HTMLInputElement;
+    expect(peerInput.type).toBe('text');
   });
 
-  it('connects or reconnects peer via Connecter button', () => {
+  it('connects or reconnects peer via Connecter button', async () => {
     api.reconnectPeer.mockReturnValue(
       of({
         ok: true,
@@ -121,16 +132,17 @@ describe('PeerPanelComponent', () => {
       })
     );
 
-    const form = (fixture.nativeElement as HTMLElement).querySelector(
-      '.peer-panel__connect'
-    ) as HTMLFormElement;
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    const button = (fixture.nativeElement as HTMLElement).querySelector(
+      '.peer-panel__connect-btn'
+    ) as HTMLButtonElement;
+    button.click();
     fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(api.reconnectPeer).toHaveBeenCalledWith('ws://localhost:8080/ws/peers');
   });
 
-  it('adds a new peer url via Connecter', () => {
+  it('adds a new peer url via Connecter', async () => {
     api.addPeer.mockReturnValue(
       of({
         ok: true,
@@ -141,11 +153,12 @@ describe('PeerPanelComponent', () => {
     fixture.componentInstance['peerInput'].set('wss://peer.example/ws');
     fixture.detectChanges();
 
-    const form = (fixture.nativeElement as HTMLElement).querySelector(
-      '.peer-panel__connect'
-    ) as HTMLFormElement;
-    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    const button = (fixture.nativeElement as HTMLElement).querySelector(
+      '.peer-panel__connect-btn'
+    ) as HTMLButtonElement;
+    button.click();
     fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(api.addPeer).toHaveBeenCalledWith('wss://peer.example/ws');
   });

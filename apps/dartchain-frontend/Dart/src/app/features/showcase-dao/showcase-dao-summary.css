@@ -81,7 +81,7 @@
   height: 5px;
   border-radius: 50%;
   background: #3dd68c;
-  box-shadow: 0 0 4px rgba(61, 214, 140, 0.75);
+  box-shadow: none;
   flex: 0 0 auto;
 }
 

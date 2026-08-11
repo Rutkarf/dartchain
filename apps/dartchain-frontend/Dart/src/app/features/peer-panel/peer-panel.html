@@ -38,32 +38,6 @@
     </div>
   </header>
 
-  <form class="peer-panel__connect" (ngSubmit)="onConnectSubmit($event)">
-    <input
-      #peerInputRef
-      id="peer-input"
-      name="peer"
-      type="url"
-      class="peer-panel__connect-input"
-      [placeholder]="locale.t('peers.connectPlaceholder')"
-      [ngModel]="peerInput()"
-      (ngModelChange)="onPeerInput($event)"
-      [disabled]="submitting()"
-      autocomplete="off"
-      autocapitalize="off"
-      spellcheck="false"
-      [attr.aria-label]="locale.t('peers.connectPeer')"
-    />
-    <button
-      type="submit"
-      class="peer-panel__connect-btn"
-      [disabled]="submitting() || !normalizedPeerInput()"
-      [attr.aria-busy]="submitting()"
-    >
-      {{ connectButtonLabel() }}
-    </button>
-  </form>
-
   <label class="peer-panel__search">
     <span class="peer-panel__search-icon" aria-hidden="true">⌕</span>
     <input
@@ -71,6 +45,7 @@
       type="search"
       [placeholder]="locale.t('peers.search')"
       [ngModel]="searchQuery()"
+      [ngModelOptions]="{ standalone: true }"
       (ngModelChange)="onSearchInput($event)"
       autocomplete="off"
       spellcheck="false"
@@ -87,6 +62,35 @@
       FAV
     </button>
   </label>
+
+  <div class="peer-panel__connect">
+    <input
+      #peerInputRef
+      id="peer-input"
+      type="text"
+      inputmode="url"
+      class="peer-panel__connect-input"
+      [placeholder]="locale.t('peers.connectPlaceholder')"
+      [ngModel]="peerInput()"
+      [ngModelOptions]="{ standalone: true }"
+      (ngModelChange)="onPeerInput($event)"
+      (keydown.enter)="onConnectSubmit($event)"
+      [disabled]="submitting()"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      [attr.aria-label]="locale.t('peers.connectPeer')"
+    />
+    <button
+      type="button"
+      class="peer-panel__connect-btn"
+      [disabled]="submitting()"
+      [attr.aria-busy]="submitting()"
+      (click)="onConnectSubmit($event)"
+    >
+      {{ connectButtonLabel() }}
+    </button>
+  </div>
 
   <ul class="peer-panel__list" role="list" [attr.aria-label]="locale.t('peers.title')">
     @if (loading() && peerCount() === 0) {
