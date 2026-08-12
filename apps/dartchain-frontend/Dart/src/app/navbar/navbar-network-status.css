@@ -84,7 +84,7 @@
 
 .network-trust-chip__label {
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--nv-brand-chip-font, 0.4375rem);
+  font-size: var(--nv-brand-chip-font, 0.1875rem);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -93,7 +93,7 @@
 
 .network-trust-chip__detail {
   font-family: var(--ds-font-mono, var(--font-body));
-  font-size: var(--nv-brand-chip-font, 0.4375rem);
+  font-size: var(--nv-brand-chip-font, 0.1875rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
@@ -185,7 +185,7 @@
   }
 
   .network-trust-chip__label {
-    font-size: 0.4375rem;
+    font-size: 0.1875rem;
   }
 
   .network-trust-chip__detail {
@@ -199,9 +199,9 @@
 
   .network-trust-chip__led {
     width: 4px;
-    height: 4px;
+    height: 0px;
     min-width: 4px;
-    min-height: 4px;
+    min-height: 0px;
   }
 }
 

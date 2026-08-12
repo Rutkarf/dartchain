@@ -28,10 +28,10 @@
 
 .app-bottom-stack .showcase-header-tabs {
   flex: 1 1 0% !important;
-  width: 100% !important;
+  width: auto !important;
   min-width: 0 !important;
-  max-width: calc(100% - var(--showcase-toggle-w, 28px)) !important;
-  overflow: visible !important;
+  max-width: none !important;
+  overflow: hidden !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tabs,
@@ -39,16 +39,15 @@
   display: flex !important;
   flex-flow: row nowrap !important;
   align-items: stretch !important;
-  gap: 1px !important;
+  justify-content: stretch !important;
+  gap: 0px !important;
   width: 100% !important;
   min-width: 0 !important;
   height: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
-  overflow-x: auto !important;
-  overflow-y: visible !important;
+  overflow: hidden !important;
   scrollbar-width: none !important;
-  -webkit-overflow-scrolling: touch;
   container-type: inline-size;
   container-name: dock-tabs;
 }
@@ -65,16 +64,24 @@
   flex: 1 1 0 !important;
   min-width: 0 !important;
   max-width: none !important;
-  padding: 0 calc(2px * var(--bottom-stack-scale, 1.106)) !important;
-  font-size: inherit !important;
-  letter-spacing: 0.012em !important;
+  padding: 0 0px !important;
+  font-size: clamp(5px, 1.9vw, 7px) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
   overflow: hidden !important;
 }
 
+/* Mempool is the longest label: give it a larger share of the shared tab row. */
 .app-bottom-stack .showcase-header-tabs .showcase-tab--mempool {
-  flex: 1.2 1 0 !important;
+  flex: 1.75 1 0 !important;
   min-width: 0 !important;
-  padding-inline: calc(3px * var(--bottom-stack-scale, 1.106)) !important;
+  padding-inline: 3px !important;
+  letter-spacing: 0.02em !important;
+  overflow: hidden !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab--mempool .showcase-tab__label {
+  letter-spacing: 0.02em !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface.ds-surface--showcase-tab {
@@ -90,14 +97,24 @@
   text-overflow: clip !important;
   white-space: nowrap !important;
   text-align: center !important;
-  font-size: calc(clamp(6px, calc(100cqw / 48), 9px) * var(--bottom-stack-scale, 1.106)) !important;
-  line-height: 1.05 !important;
-  letter-spacing: 0.02em !important;
+  font-family: 'Open Sans', var(--font-body, system-ui, sans-serif) !important;
+  font-size: clamp(5px, 1.9vw, 7px) !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.04em !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab.is-active,
+.app-bottom-stack .showcase-header-tabs .showcase-tab.is-active .showcase-tab__label {
+  font-weight: 800 !important;
 }
 
 .app-bottom-stack .showcase-header-actions {
-  flex: 0 0 auto !important;
+  flex: 0 0 var(--panel-action-menu-w, 26px) !important;
   flex-shrink: 0 !important;
+  width: var(--panel-action-menu-w, 26px) !important;
+  min-width: var(--panel-action-menu-w, 26px) !important;
+  max-width: var(--panel-action-menu-w, 26px) !important;
 }
 
 /* Docks : carbone plus opaque (showcase-body dans le bottom stack) */

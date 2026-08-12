@@ -3,13 +3,13 @@
  * Les feuilles composant conservent leurs règles locales — import additive Phase K.
  */
 :root {
-  --dock-view-gap: 1px;
-  --dock-view-pad: 2px;
-  --dock-view-font: 6px;
-  --dock-view-font-sm: 5px;
-  --dock-view-title-font: 7px;
-  --dock-view-title-row-h: 13px;
-  --dock-view-row-h: clamp(10px, 4.8cqh, 13px);
+  --dock-view-gap: 0px;
+  --dock-view-pad: 0px;
+  --dock-view-font: 4px;
+  --dock-view-font-sm: 4px;
+  --dock-view-title-font: 5px;
+  --dock-view-title-row-h: 10px;
+  --dock-view-row-h: clamp(7px, 4.8cqh, 10px);
   --dock-view-col-gap: 0;
   --dock-view-row-cols: minmax(0, 1fr);
   --dock-view-border: 1px solid rgba(var(--accent-primary-rgb), 0.08);

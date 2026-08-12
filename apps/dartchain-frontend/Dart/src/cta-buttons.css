@@ -31,27 +31,27 @@
 }
 
 .cta--sm {
-  min-height: var(--cta-height-sm, 24px);
+  min-height: var(--cta-height-sm, 22px);
   height: auto;
-  padding: var(--cta-padding-sm, 0 8px);
+  padding: var(--cta-padding-sm, 0 6px);
   border-radius: var(--cta-radius-sm, 8px);
-  font-size: var(--cta-font-sm, 0.5rem);
+  font-size: var(--cta-font-sm, 0.375rem);
 }
 
 .cta--md {
-  min-height: var(--cta-height-md, 30px);
+  min-height: var(--cta-height-md, 28px);
   height: auto;
-  padding: var(--cta-padding-md, 0 12px);
+  padding: var(--cta-padding-md, 0 10px);
   border-radius: var(--cta-radius-md, 10px);
-  font-size: var(--cta-font-md, 0.625rem);
+  font-size: var(--cta-font-md, 0.5rem);
 }
 
 .cta--lg {
-  min-height: var(--cta-height-lg, 36px);
+  min-height: var(--cta-height-lg, 34px);
   height: auto;
-  padding: var(--cta-padding-lg, 0 16px);
+  padding: var(--cta-padding-lg, 0 14px);
   border-radius: var(--cta-radius-lg, 12px);
-  font-size: var(--cta-font-lg, 0.6875rem);
+  font-size: var(--cta-font-lg, 0.5625rem);
 }
 
 /* PRIMARY — SWAP / Créer wallet */
@@ -265,13 +265,13 @@
   min-width: var(--ds-icon-btn, var(--cta-height-sm, 24px));
   width: var(--ds-icon-btn, var(--cta-height-sm, 24px));
   max-width: var(--ds-icon-btn, var(--cta-height-sm, 24px));
-  min-height: var(--ds-icon-btn, var(--cta-height-sm, 24px));
+  min-height: var(--ds-icon-btn, var(--cta-height-sm, 22px));
   border-radius: var(--ds-radius-sm, 8px);
 }
 
 .cta.cta--icon-only svg {
   width: 14px;
-  height: 14px;
+  height: 12px;
   stroke: currentColor;
   stroke-width: 2;
   fill: none;

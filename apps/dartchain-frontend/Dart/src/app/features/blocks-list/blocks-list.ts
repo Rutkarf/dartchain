@@ -79,7 +79,8 @@ export class BlocksListComponent implements OnInit {
 
   readonly graphMaxNodes = computed(() => {
     const count = this.filteredBlockCount();
-    return Math.min(Math.max(count, 12), 40);
+    // 9 colonnes × 5 pastilles visibles sans scroll, puis scroll au-delà
+    return Math.min(Math.max(count, 12), 45);
   });
 
   readonly hasActiveFilters = computed(

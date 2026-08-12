@@ -20,8 +20,8 @@
 .dock-bottom-summary__fallback {
   flex: 1 1 auto;
   margin: 0;
-  padding: 0 8px;
-  font-size: clamp(0.4375rem, 2.35vw, 0.625rem);
+  padding: 0 6px;
+  font-size: clamp(0.3125rem, 2.35vw, 0.5rem);
   font-weight: 600;
   color: var(--text-muted, rgba(255, 255, 255, 0.58));
   white-space: nowrap;

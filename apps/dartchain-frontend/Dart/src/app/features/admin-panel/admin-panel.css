@@ -22,14 +22,14 @@
 
 .admin-panel__title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 0.975rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .admin-panel__subtitle {
   margin: 0.25rem 0 0;
-  font-size: 0.8rem;
+  font-size: 0.675rem;
   opacity: 0.75;
 }
 
@@ -64,18 +64,18 @@
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
   background: rgba(var(--accent-primary-rgb, 0, 180, 255), 0.2);
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   font-weight: 600;
 }
 
 .admin-panel__meta-item {
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   opacity: 0.8;
 }
 
 .admin-panel__section-title {
   margin: 0 0 0.5rem;
-  font-size: 0.85rem;
+  font-size: 0.725rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   opacity: 0.85;
@@ -100,14 +100,14 @@
 
 .admin-panel__stat-label {
   margin: 0;
-  font-size: 0.68rem;
+  font-size: 0.555rem;
   opacity: 0.7;
   text-transform: uppercase;
 }
 
 .admin-panel__stat-value {
   margin: 0.2rem 0 0;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 700;
 }
 
@@ -131,7 +131,7 @@
   gap: 0.15rem;
   padding: 0.55rem 0.65rem;
   border-radius: 0.45rem;
-  font-size: 0.8rem;
+  font-size: 0.675rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -149,7 +149,7 @@
   display: grid;
   grid-template-columns: minmax(5rem, 1fr) minmax(4rem, 0.8fr) 2fr;
   gap: 0.35rem;
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   padding: 0.35rem 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -162,7 +162,7 @@
 .admin-panel__toast {
   padding: 0.5rem 0.65rem;
   border-radius: 0.45rem;
-  font-size: 0.8rem;
+  font-size: 0.675rem;
 }
 
 .admin-panel__toast--error {
@@ -174,6 +174,6 @@
 .admin-panel__empty,
 .admin-panel__loading {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.695rem;
   opacity: 0.8;
 }

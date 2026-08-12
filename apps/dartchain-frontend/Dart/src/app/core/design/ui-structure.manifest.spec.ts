@@ -10,9 +10,9 @@ import {
 import { READING_ORDER, TARGET_VIEWPORT } from './ui-layout-zones.constants';
 
 describe('Phase 1 — UI structure manifest', () => {
-  it('documents target viewport 250×500', () => {
+  it('documents target viewport 250×550', () => {
     expect(TARGET_VIEWPORT.width).toBe(250);
-    expect(TARGET_VIEWPORT.height).toBe(500);
+    expect(TARGET_VIEWPORT.height).toBe(550);
   });
 
   it('tracks redesign phase progression', () => {

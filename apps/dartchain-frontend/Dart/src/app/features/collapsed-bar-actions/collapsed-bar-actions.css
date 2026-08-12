@@ -1,7 +1,7 @@
 :host {
   --cba-cyan-rgb: var(--accent-cyan-rgb, var(--ds-neon-cyan-rgb, 46, 196, 214));
   --cba-item-w: var(--panel-action-item-w, 14px);
-  --cba-h: var(--panel-action-menu-h, 14px);
+  --cba-h: var(--panel-action-menu-h, 12px);
   --cba-menu-w: var(--panel-action-menu-w, 34px);
   display: inline-flex;
   align-items: center;
@@ -49,7 +49,7 @@
   top: 0;
   left: 12%;
   right: 12%;
-  height: 1px;
+  height: 0px;
   border-radius: 999px;
   background: linear-gradient(
     90deg,
@@ -116,7 +116,7 @@
 
 .collapsed-bar-actions__refresh svg {
   width: 9px;
-  height: 9px;
+  height: 7px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2.15;
@@ -152,7 +152,7 @@
   flex: 0 0 auto;
   width: 1px;
   align-self: stretch;
-  margin: 1px 0;
+  margin: 0px 0;
   border-radius: 999px;
   background: linear-gradient(
     180deg,

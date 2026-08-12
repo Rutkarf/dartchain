@@ -11,13 +11,13 @@
 
 
 .dock-view {
-  --dock-gap: 1px;
-  --dock-pad: 2px;
-  --dock-font: 6px;
-  --dock-font-sm: 5px;
-  --dock-title-font: 7px;
-  --dock-title-row-h: 13px;
-  --dock-row-h: clamp(10px, 4.8cqh, 13px);
+  --dock-gap: 0px;
+  --dock-pad: 0px;
+  --dock-font: 4px;
+  --dock-font-sm: 4px;
+  --dock-title-font: 5px;
+  --dock-title-row-h: 11px;
+  --dock-row-h: clamp(8px, 4.8cqh, 11px);
   --dock-col-gap: 0;
   --dock-row-cols: minmax(0, 1fr);
 
@@ -41,7 +41,7 @@
 .dock-view__title-row {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   flex: 0 0 var(--dock-title-row-h);
   min-height: var(--dock-title-row-h);
   max-height: var(--dock-title-row-h);
@@ -77,7 +77,7 @@
   color: var(--text-primary);
   opacity: 0.88;
   line-height: 1;
-  padding: 0 2px 0 0;
+  padding: 0 0px 0 0;
 }
 
 .dock-view__live {
@@ -85,9 +85,9 @@
   min-width: 0;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 1px;
   margin: 0;
-  padding: 0 2px;
+  padding: 0 0px;
   font-size: var(--dock-font-sm);
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -101,7 +101,7 @@
 .dock-view__live-dot {
   flex-shrink: 0;
   width: 4px;
-  height: 4px;
+  height: 2px;
   border-radius: 50%;
   background: rgba(var(--text-soft-rgb, 139, 157, 173), 0.45);
 }
@@ -114,7 +114,7 @@
 .dock-view__meta {
   flex-shrink: 0;
   min-width: 0;
-  padding: 0 4px;
+  padding: 0 2px;
   font-size: var(--dock-font-sm);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -133,7 +133,7 @@
   height: calc(var(--dock-title-row-h) - 2px);
   min-height: calc(var(--dock-title-row-h) - 2px);
   margin-right: 1px;
-  padding: 0 4px;
+  padding: 0 2px;
   display: inline-grid;
   place-items: center;
   border-radius: 3px;
@@ -179,7 +179,7 @@
 
 .dock-view__refresh svg {
   width: 7px;
-  height: 7px;
+  height: 5px;
   stroke: currentColor;
   stroke-width: 2;
   fill: none;
@@ -203,10 +203,10 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0px;
   overflow-x: hidden;
   overflow-y: auto;
-  padding: 2px;
+  padding: 0px;
   scrollbar-width: thin;
 }
 
@@ -216,8 +216,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 4px;
+  gap: 1px;
+  padding: 2px;
   font-size: var(--dock-font);
   color: var(--text-soft);
   text-align: center;
@@ -234,7 +234,7 @@
 
 .dock-view__retry {
   border-radius: 3px;
-  padding: 1px 5px;
+  padding: 0px 3px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.28);
   background: rgba(var(--accent-primary-rgb), 0.1);
   color: var(--text-primary);
@@ -248,8 +248,8 @@
 
 .dock-view__flash {
   flex-shrink: 0;
-  margin: 2px 2px 0;
-  padding: 2px 4px;
+  margin: 0px 0px 0;
+  padding: 0px 2px;
   border-radius: 3px;
   font-size: var(--dock-font-sm);
   font-weight: 700;
@@ -271,7 +271,7 @@
 .dock-view__list {
   list-style: none;
   margin: 0;
-  padding: 1px;
+  padding: 0px;
   display: flex;
   flex-direction: column;
   gap: var(--dock-col-gap);
@@ -310,7 +310,7 @@
   grid-template-columns: var(--dock-row-cols);
   align-items: center;
   column-gap: 2px;
-  padding: 0 3px;
+  padding: 0 1px;
   min-height: var(--dock-row-h);
   height: var(--dock-row-h);
   line-height: 1;
@@ -368,7 +368,7 @@ button.dock-view__item-row:focus-visible {
 
 .dock-view__led {
   width: 4px;
-  height: 4px;
+  height: 2px;
   border-radius: 50%;
   justify-self: center;
   background: rgba(var(--text-soft-rgb, 139, 157, 173), 0.45);
@@ -391,7 +391,7 @@ button.dock-view__item-row:focus-visible {
 .dock-view__more {
   flex-shrink: 0;
   margin: 0;
-  padding: 2px;
+  padding: 0px;
   font-size: var(--dock-font-sm);
   color: var(--text-muted);
   text-align: center;
@@ -400,7 +400,7 @@ button.dock-view__item-row:focus-visible {
 .dock-view__form {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0px;
   min-height: 0;
 }
 
@@ -408,19 +408,19 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
 }
 
 .dock-view__form-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 2px;
+  gap: 0px;
 }
 
 .dock-view__field {
   display: grid;
-  gap: 1px;
+  gap: 0px;
   min-width: 0;
 }
 
@@ -460,13 +460,13 @@ button.dock-view__item-row:focus-visible {
 .dock-view__input {
   height: calc(var(--dock-row-h) + 4px);
   min-height: calc(var(--dock-row-h) + 4px);
-  padding: 0 4px;
+  padding: 0 2px;
 }
 
 .dock-view__textarea {
   min-height: calc(var(--dock-row-h) * 3);
   max-height: calc(var(--dock-row-h) * 5);
-  padding: 2px 4px;
+  padding: 0px 2px;
   resize: none;
 }
 
@@ -493,7 +493,7 @@ button.dock-view__item-row:focus-visible {
 
 .dock-view__feedback {
   margin: 0;
-  padding: 2px 4px;
+  padding: 0px 2px;
   border-radius: 3px;
   font-size: var(--dock-font-sm);
   font-weight: 700;
@@ -514,14 +514,14 @@ button.dock-view__item-row:focus-visible {
 
 .dock-view__footer {
   flex-shrink: 0;
-  padding: 2px;
+  padding: 0px;
 }
 
 .dock-view__cta {
   width: 100%;
   min-height: calc(var(--dock-row-h) + 4px);
   margin: 0;
-  padding: 0 6px;
+  padding: 0 4px;
   border-radius: 3px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.42);
   background: rgba(var(--accent-primary-rgb), 0.14);
@@ -556,7 +556,7 @@ button.dock-view__item-row:focus-visible {
 .dock-view__mini-btn {
   height: calc(var(--dock-row-h) - 2px);
   min-height: calc(var(--dock-row-h) - 2px);
-  padding: 0 4px;
+  padding: 0 2px;
   border-radius: 3px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.42);
   background: rgba(var(--accent-primary-rgb), 0.14);
@@ -579,8 +579,8 @@ button.dock-view__item-row:focus-visible {
 }
 
 .dock-view__mini-btn {
-  padding: 0 3px;
-  font-size: max(4px, var(--dock-font-sm));
+  padding: 0 1px;
+  font-size: max(2px, var(--dock-font-sm));
 }
 
 .dock-view__action:hover:not(:disabled),
@@ -600,9 +600,9 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 2px;
-  margin: 2px;
-  padding: 3px 4px;
+  gap: 0px;
+  margin: 0px;
+  padding: 1px 2px;
   border-radius: 3px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.1);
   background: rgba(var(--brand-black-rgb), 0.24);
@@ -619,7 +619,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .dock-view__balance-value {
-  font-size: clamp(10px, 4cqw, 14px);
+  font-size: clamp(8px, 4cqw, 12px);
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary);
@@ -636,8 +636,8 @@ button.dock-view__item-row:focus-visible {
 .dock-view__chip {
   display: inline-flex;
   max-width: 100%;
-  margin-top: 1px;
-  padding: 0 4px;
+  margin-top: 0px;
+  padding: 0 2px;
   border-radius: 999px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.14);
   background: rgba(var(--brand-black-rgb), 0.35);
@@ -652,7 +652,7 @@ button.dock-view__item-row:focus-visible {
 .dock-view__hero-actions {
   display: flex;
   flex-shrink: 0;
-  gap: 2px;
+  gap: 0px;
 }
 
 .dock-view__cards {
@@ -660,18 +660,18 @@ button.dock-view__item-row:focus-visible {
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2px;
-  margin: 0 2px;
+  gap: 0px;
+  margin: 0 0px;
   overflow: hidden;
 }
 
 .dock-view__card {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 1px;
+  gap: 0px;
   min-width: 0;
   min-height: 0;
-  padding: 2px 3px;
+  padding: 0px 1px;
   border-radius: 3px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.1);
   background: rgba(var(--brand-black-rgb), 0.24);
@@ -683,7 +683,7 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
   font-size: var(--dock-font-sm);
   font-weight: 800;
@@ -695,7 +695,7 @@ button.dock-view__item-row:focus-visible {
 .dock-view__card-actions {
   display: flex;
   flex-shrink: 0;
-  gap: 1px;
+  gap: 0px;
 }
 
 .dock-view__mono {
@@ -725,7 +725,7 @@ button.dock-view__item-row:focus-visible {
 .dock-view__skeleton-item {
   min-height: var(--dock-row-h);
   height: var(--dock-row-h);
-  padding: 0 3px;
+  padding: 0 1px;
   border-radius: 2px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.08);
   background: rgba(var(--brand-black-rgb), 0.2);
@@ -737,7 +737,7 @@ button.dock-view__item-row:focus-visible {
 .dock-view__skeleton-line {
   display: block;
   width: 72%;
-  height: 5px;
+  height: 3px;
   border-radius: 2px;
   background: rgba(var(--accent-primary-rgb), 0.1);
 }
@@ -767,21 +767,21 @@ button.dock-view__item-row:focus-visible {
 
 @media (min-width: 251px) and (max-width: 349px) {
   .dock-view {
-    --dock-font: 5px;
-    --dock-font-sm: 4px;
-    --dock-title-font: 7px;
-    --dock-title-row-h: 12px;
-    --dock-row-h: clamp(9px, 4.5cqh, 11px);
+    --dock-font: 3px;
+    --dock-font-sm: 3px;
+    --dock-title-font: 5px;
+    --dock-title-row-h: 10px;
+    --dock-row-h: clamp(7px, 4.5cqh, 9px);
   }
 }
 
 @media (min-width: 400px) {
   .dock-view {
-    --dock-font: 7px;
-    --dock-font-sm: 6px;
-    --dock-title-font: 8px;
-    --dock-title-row-h: 14px;
-    --dock-row-h: clamp(11px, 5cqh, 14px);
+    --dock-font: 5px;
+    --dock-font-sm: 5px;
+    --dock-title-font: 6px;
+    --dock-title-row-h: 12px;
+    --dock-row-h: clamp(9px, 5cqh, 12px);
   }
 }
 
@@ -802,13 +802,13 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
 }
 
 .wallet-view__title-actions {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   justify-self: end;
 }
 
@@ -823,9 +823,9 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr);
   align-items: center;
-  gap: 3px;
-  margin: 2px;
-  padding: 2px 4px;
+  gap: 1px;
+  margin: 0px;
+  padding: 0px 2px;
   border-radius: 3px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.1);
   background: rgba(var(--brand-black-rgb), 0.24);
@@ -857,7 +857,7 @@ button.dock-view__item-row:focus-visible {
 .dock-view__title-lead {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
 }
 
@@ -865,9 +865,9 @@ button.dock-view__item-row:focus-visible {
   justify-self: center;
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 1px;
   margin: 0;
-  padding: 0 2px;
+  padding: 0 0px;
   min-width: 0;
   font-size: var(--dock-font-sm);
   font-weight: 800;
@@ -878,7 +878,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-view__title-balance {
-  font-size: clamp(9px, 3.5cqw, 12px);
+  font-size: clamp(7px, 3.5cqw, 10px);
   font-weight: 800;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
@@ -900,9 +900,9 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 2px;
-  margin: 2px 2px 0;
-  padding: 2px 4px;
+  gap: 0px;
+  margin: 0px 0px 0;
+  padding: 0px 2px;
   border-radius: 3px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.1);
   background: rgba(var(--brand-black-rgb), 0.24);
@@ -912,17 +912,17 @@ button.dock-view__item-row:focus-visible {
 .wallet-view__identity-actions {
   display: flex;
   flex-shrink: 0;
-  gap: 2px;
+  gap: 0px;
 }
 
 .wallet-view__scroll {
-  gap: 2px;
+  gap: 0px;
 }
 
 .wallet-view__lookup {
   flex-shrink: 0;
   margin-top: auto;
-  padding: 2px;
+  padding: 0px;
 }
 
 @media (max-width: 299px) {
@@ -950,11 +950,11 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   flex-direction: column;
   position: relative;
-  gap: var(--space-2, 8px);
+  gap: var(--space-2, 6px);
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: var(--space-2, 8px);
+  padding: var(--space-2, 6px);
   border-radius: var(--ds-surface-radius, 16px);
   border: 1px solid var(--wallet-border);
   background-color: var(--wallet-bg);
@@ -975,12 +975,12 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__toast {
   position: absolute;
-  top: 8px;
+  top: 6px;
   right: 8px;
   z-index: 4;
-  padding: 4px 8px;
+  padding: 2px 6px;
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.05em;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.35);
@@ -1006,9 +1006,9 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex-shrink: 0;
-  min-height: 16px;
+  min-height: 14px;
   padding: 0;
 }
 
@@ -1017,10 +1017,10 @@ button.dock-view__item-row:focus-visible {
   align-items: center;
   justify-content: center;
   min-width: 0;
-  min-height: 16px;
-  padding: 0 4px;
+  min-height: 14px;
+  padding: 0 2px;
   text-align: center;
-  font-size: clamp(7px, 1.9vw, 9px);
+  font-size: clamp(5px, 1.9vw, 7px);
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1.15;
@@ -1054,10 +1054,10 @@ button.dock-view__item-row:focus-visible {
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  gap: 3px;
+  gap: 1px;
   flex-shrink: 0;
   min-width: 0;
-  padding: 4px 6px;
+  padding: 2px 4px;
   border-radius: 6px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.14);
   background: rgba(2, 12, 24, 0.42);
@@ -1067,7 +1067,7 @@ button.dock-view__item-row:focus-visible {
   margin: 0;
   text-align: left;
   width: 100%;
-  font-size: clamp(7px, 1.8vw, 9px);
+  font-size: clamp(5px, 1.8vw, 7px);
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -1080,13 +1080,13 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 
 .wallet-display__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(9px, 2.4vw, 11px);
+  font-size: clamp(7px, 2.4vw, 9px);
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -1098,8 +1098,8 @@ button.dock-view__item-row:focus-visible {
   z-index: 1;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.26);
   border-radius: 6px;
-  padding: 6px 8px;
-  font-size: 12px;
+  padding: 4px 6px;
+  font-size: 10px;
   color: #71ffe3;
   background: rgba(4, 18, 34, 0.55);
 }
@@ -1107,10 +1107,10 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__network {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   color: rgba(208, 236, 255, 0.72);
-  font-size: clamp(7px, 2.1vw, 9px);
+  font-size: clamp(5px, 2.1vw, 7px);
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
@@ -1118,7 +1118,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__icon-btn {
   flex: 0 0 auto;
   width: 16px;
-  height: 16px;
+  height: 14px;
   display: inline-grid;
   place-items: center;
   border-radius: 4px;
@@ -1130,7 +1130,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__icon-btn svg {
   width: 10px;
-  height: 10px;
+  height: 8px;
   stroke: currentColor;
   stroke-width: 1.8;
   fill: none;
@@ -1160,21 +1160,21 @@ button.dock-view__item-row:focus-visible {
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  gap: 2px;
+  gap: 0px;
   padding: 0;
   border: none;
   background: transparent;
 }
 
 .wallet-display__hero--empty {
-  gap: var(--space-2, 8px);
-  padding: var(--space-2, 8px) 0;
+  gap: var(--space-2, 6px);
+  padding: var(--space-2, 6px) 0;
   text-align: center;
 }
 
 .wallet-display__empty-title {
   margin: 0;
-  font-size: var(--ds-text-sm, 0.6875rem);
+  font-size: var(--ds-text-sm, 0.5625rem);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1184,7 +1184,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__empty-desc {
   margin: 0;
-  font-size: var(--ds-text-caption, 0.5625rem);
+  font-size: var(--ds-text-caption, 0.4375rem);
   font-weight: 500;
   color: var(--ds-text-muted, #5c6b7e);
   line-height: 1.35;
@@ -1195,17 +1195,17 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
-  min-height: 32px;
+  min-height: 30px;
   margin: 0;
-  padding: 0 12px;
+  padding: 0 10px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.55);
   border-radius: var(--ds-radius-btn, 12px);
   background: var(--cta-primary-bg, var(--wallet-cyan));
   color: var(--cta-primary-text, #050a12);
   font-family: var(--wallet-display-font);
-  font-size: clamp(9px, 2.1vw, 11px);
+  font-size: clamp(7px, 2.1vw, 9px);
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1;
@@ -1250,7 +1250,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__create-cta-spinner {
   flex: 0 0 auto;
   width: 10px;
-  height: 10px;
+  height: 8px;
   border: 1.5px solid rgba(255, 255, 255, 0.22);
   border-top-color: #fff;
   border-radius: 50%;
@@ -1265,7 +1265,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__status-line {
   position: absolute;
-  top: 4px;
+  top: 2px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 6;
@@ -1273,15 +1273,15 @@ button.dock-view__item-row:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   margin: 0;
   max-width: min(94%, 340px);
-  padding: 2px 4px 2px 8px;
+  padding: 0px 2px 0px 6px;
   border-radius: 999px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.18);
   background: rgba(2, 12, 24, 0.92);
   text-align: center;
-  font-size: clamp(6px, 1.7vw, 8px);
+  font-size: clamp(4px, 1.7vw, 6px);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -1303,14 +1303,14 @@ button.dock-view__item-row:focus-visible {
   align-items: center;
   justify-content: center;
   width: 12px;
-  height: 12px;
+  height: 10px;
   margin: 0;
   padding: 0;
   border: none;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   color: rgba(232, 248, 255, 0.78);
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -1347,7 +1347,7 @@ button.dock-view__item-row:focus-visible {
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  padding: 3px 5px;
+  padding: 1px 3px;
   border-radius: 8px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.2);
   background:
@@ -1360,7 +1360,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__holdings--split {
   display: grid;
   grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
-  gap: 6px;
+  gap: 4px;
   align-items: stretch;
   min-height: 0;
   flex: 1 1 auto;
@@ -1380,7 +1380,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__balance-col {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 3px;
   min-width: 0;
   min-height: 0;
   height: 100%;
@@ -1397,11 +1397,11 @@ button.dock-view__item-row:focus-visible {
   flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   min-height: 0;
   height: auto;
-  padding: 5px;
+  padding: 3px;
   border-radius: 8px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.16);
   background: rgba(var(--ds-surface-base-rgb, 14, 16, 22), 0.9);
@@ -1431,7 +1431,7 @@ button.dock-view__item-row:focus-visible {
   flex: 1 1 auto;
   min-width: 0;
   font-family: var(--wallet-display-font);
-  font-size: clamp(5px, 1.35vw, 7px);
+  font-size: clamp(3px, 1.35vw, 5px);
   font-weight: 800;
   letter-spacing: 0.06em;
   color: var(--ds-text-primary, rgba(232, 248, 255, 0.92));
@@ -1450,18 +1450,18 @@ button.dock-view__item-row:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 2px;
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 3px 6px;
+  padding: 1px 4px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.22);
   border-radius: 6px;
   background:
     linear-gradient(180deg, rgba(var(--wallet-cyan-rgb), 0.08), rgba(var(--ds-surface-base-deep-rgb, 6, 7, 10), 0.55));
   color: var(--ds-text-primary, #e8ecf0);
   font-family: var(--wallet-mono);
-  font-size: clamp(5px, 1.25vw, 7px);
+  font-size: clamp(3px, 1.25vw, 5px);
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.15;
@@ -1478,7 +1478,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__balance-cyber-address-led {
   flex-shrink: 0;
   width: 4px;
-  height: 4px;
+  height: 2px;
   border-radius: 50%;
   background: rgba(var(--wallet-cyan-rgb), 0.28);
 }
@@ -1498,7 +1498,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__balance-cyber-address-icon {
   flex-shrink: 0;
-  font-size: 8px;
+  font-size: 6px;
   opacity: 0.88;
   color: rgba(var(--wallet-cyan-rgb), 0.95);
 }
@@ -1528,10 +1528,10 @@ button.dock-view__item-row:focus-visible {
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  gap: 3px;
+  gap: 1px;
   min-width: 0;
-  min-height: 40px;
-  padding: 6px 6px 5px;
+  min-height: 38px;
+  padding: 4px 4px 3px;
   border-radius: 7px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(var(--surface-elevated-rgb, 13, 24, 40), 0.55);
@@ -1546,7 +1546,7 @@ button.dock-view__item-row:focus-visible {
   align-self: flex-start;
   text-align: left;
   font-family: var(--wallet-display-font);
-  font-size: clamp(7px, 1.6vw, 9px);
+  font-size: clamp(5px, 1.6vw, 7px);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1569,7 +1569,7 @@ button.dock-view__item-row:focus-visible {
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 1px 0 2px;
+  padding: 0px 0 0px;
   text-align: left;
   font-family: var(--wallet-mono);
   font-variant-numeric: tabular-nums;
@@ -1583,20 +1583,20 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__balance-whole {
-  font-size: clamp(11px, 2.6vw, 15px);
+  font-size: clamp(9px, 2.6vw, 13px);
   font-weight: 700;
   color: var(--ds-text-primary, #e8eef5);
   letter-spacing: -0.01em;
 }
 
 .wallet-display__balance-sep {
-  font-size: clamp(9px, 2.1vw, 12px);
+  font-size: clamp(7px, 2.1vw, 10px);
   font-weight: 600;
   color: var(--ds-text-secondary, #8b9bb0);
 }
 
 .wallet-display__balance-frac {
-  font-size: clamp(7px, 1.7vw, 9px);
+  font-size: clamp(5px, 1.7vw, 7px);
   font-weight: 550;
   color: var(--ds-text-secondary, #8b9bb0);
   letter-spacing: 0.01em;
@@ -1608,9 +1608,9 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
-  padding: 3px 6px;
+  padding: 1px 4px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background:
@@ -1628,19 +1628,19 @@ button.dock-view__item-row:focus-visible {
   z-index: 1;
   align-self: stretch;
   margin-top: auto;
-  padding: 1px 5px;
-  gap: 4px;
+  padding: 0px 3px;
+  gap: 2px;
   border-radius: 999px;
 }
 
 .wallet-display__balance-fiat-glass--embedded .wallet-display__balance-fiat-label {
-  font-size: clamp(4px, 1.1vw, 6px);
+  font-size: clamp(2px, 1.1vw, 4px);
   letter-spacing: 0.1em;
 }
 
 .wallet-display__balance-fiat-glass--embedded .wallet-display__balance-fiat-value {
   flex: 0 1 auto;
-  font-size: clamp(6px, 1.55vw, 8px);
+  font-size: clamp(4px, 1.55vw, 6px);
 }
 
 .wallet-display__balance-fiat-glass-sheen {
@@ -1660,7 +1660,7 @@ button.dock-view__item-row:focus-visible {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  font-size: clamp(5px, 1.3vw, 7px);
+  font-size: clamp(3px, 1.3vw, 5px);
   font-weight: 800;
   letter-spacing: 0.12em;
   color: rgba(210, 232, 248, 0.72);
@@ -1673,7 +1673,7 @@ button.dock-view__item-row:focus-visible {
   min-width: 0;
   text-align: center;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: clamp(8px, 2vw, 11px);
+  font-size: clamp(6px, 2vw, 9px);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: #f4fdff;
@@ -1687,8 +1687,8 @@ button.dock-view__item-row:focus-visible {
   position: relative;
   isolation: isolate;
   align-items: stretch;
-  gap: 2px;
-  padding: 4px 5px 3px;
+  gap: 0px;
+  padding: 2px 3px 1px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background:
@@ -1719,7 +1719,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__holding--glass .wallet-display__holding-label {
   text-align: center;
-  font-size: clamp(6px, 1.5vw, 8px);
+  font-size: clamp(4px, 1.5vw, 6px);
   letter-spacing: 0.16em;
   color: rgba(232, 248, 255, 0.92);
   text-shadow: none;
@@ -1744,7 +1744,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__holding-stack-line--lead {
-  font-size: clamp(6px, 1.5vw, 9px);
+  font-size: clamp(4px, 1.5vw, 7px);
   font-weight: 800;
   line-height: 0.85;
 }
@@ -1771,7 +1771,7 @@ button.dock-view__item-row:focus-visible {
   width: 100%;
   text-align: center;
   white-space: nowrap;
-  font-size: clamp(5.5px, 1.4vw, 8px);
+  font-size: clamp(3.5px, 1.4vw, 6px);
   font-weight: 700;
   letter-spacing: 0.025em;
   color: #f4fdff;
@@ -1784,9 +1784,9 @@ button.dock-view__item-row:focus-visible {
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
-  gap: 3px;
+  gap: 1px;
   min-width: 0;
-  padding: 0 4px;
+  padding: 0 2px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background:
@@ -1799,7 +1799,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__holding-stack-chf-label {
   flex: 0 0 auto;
-  font-size: clamp(4px, 1vw, 6px);
+  font-size: clamp(2px, 1vw, 4px);
   font-weight: 800;
   letter-spacing: 0.1em;
   color: rgba(210, 232, 248, 0.72);
@@ -1808,7 +1808,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__holding-stack-chf-value {
   flex: 0 1 auto;
   min-width: 0;
-  font-size: clamp(5.5px, 1.35vw, 7.5px);
+  font-size: clamp(3.5px, 1.35vw, 5.5px);
   font-weight: 800;
   color: #f4fdff;
   text-shadow: none;
@@ -1824,11 +1824,11 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   width: 100%;
   min-width: 0;
-  margin-top: 2px;
-  padding: 3px 6px;
+  margin-top: 0px;
+  padding: 1px 4px;
   border-radius: 999px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.2);
   background:
@@ -1843,7 +1843,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__balance-chf-label {
   flex: 0 0 auto;
   font-family: var(--wallet-display-font);
-  font-size: clamp(4.5px, 1.05vw, 6px);
+  font-size: clamp(2.5px, 1.05vw, 4px);
   font-weight: 800;
   letter-spacing: 0.12em;
   color: var(--ds-text-secondary, rgba(210, 232, 248, 0.72));
@@ -1852,7 +1852,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__balance-chf-value {
   flex: 0 1 auto;
   min-width: 0;
-  font-size: clamp(6px, 1.4vw, 8px);
+  font-size: clamp(4px, 1.4vw, 6px);
   font-weight: 700;
   color: var(--ds-text-primary, #e8ecf0);
   text-shadow: none;
@@ -1866,7 +1866,7 @@ button.dock-view__item-row:focus-visible {
   z-index: 1;
   align-self: center;
   margin: 0;
-  font-size: clamp(5px, 1.3vw, 7px);
+  font-size: clamp(3px, 1.3vw, 5px);
   font-weight: 600;
   color: rgba(210, 232, 248, 0.72);
   white-space: nowrap;
@@ -1880,7 +1880,7 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 4px;
+  gap: 2px;
   height: 100%;
   overflow: visible;
   padding-right: 1px;
@@ -1900,11 +1900,11 @@ button.dock-view__item-row:focus-visible {
   flex-direction: column;
   justify-content: flex-start;
   align-self: stretch;
-  gap: 3px;
+  gap: 1px;
   min-height: 0;
   height: auto;
   margin-top: 0;
-  padding: 5px;
+  padding: 3px;
   border-radius: 7px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.2);
   background:
@@ -1916,10 +1916,10 @@ button.dock-view__item-row:focus-visible {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
   min-width: 0;
-  min-height: 28px;
-  padding: 4px 5px;
+  min-height: 26px;
+  padding: 2px 3px;
   border-radius: 7px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.18);
   background:
@@ -1934,14 +1934,14 @@ button.dock-view__item-row:focus-visible {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
 }
 
 .wallet-display__recent-accent {
   flex-shrink: 0;
   width: 2px;
-  height: 8px;
+  height: 6px;
   border-radius: 1px;
   background: rgba(var(--wallet-cyan-rgb), 0.75);
 }
@@ -1949,7 +1949,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__recent-title {
   margin: 0;
   font-family: var(--wallet-display-font);
-  font-size: clamp(5px, 1.25vw, 7px);
+  font-size: clamp(3px, 1.25vw, 5px);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1962,7 +1962,7 @@ button.dock-view__item-row:focus-visible {
   flex: 1 1 auto;
   display: grid;
   place-items: center;
-  font-size: clamp(5px, 1.15vw, 6.5px);
+  font-size: clamp(3px, 1.15vw, 4.5px);
   color: var(--ds-text-muted, rgba(176, 205, 226, 0.55));
   text-align: center;
   line-height: 1.25;
@@ -1977,7 +1977,7 @@ button.dock-view__item-row:focus-visible {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 1px;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -1992,10 +1992,10 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: 1fr;
   align-items: stretch;
-  gap: 1px;
+  gap: 0px;
   min-height: 0;
   margin: 0;
-  padding: 2px 4px;
+  padding: 0px 2px;
   border-radius: 5px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.14);
   background: rgba(var(--ds-surface-base-deep-rgb, 6, 7, 10), 0.45);
@@ -2026,7 +2026,7 @@ button.dock-view__item-row:focus-visible {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--wallet-mono);
-  font-size: clamp(4.5px, 1.1vw, 6px);
+  font-size: clamp(2.5px, 1.1vw, 4px);
   line-height: 1.15;
   font-weight: 700;
   color: var(--ds-text-primary, rgba(210, 236, 248, 0.9));
@@ -2036,7 +2036,7 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -2047,7 +2047,7 @@ button.dock-view__item-row:focus-visible {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--wallet-mono);
-  font-size: clamp(4px, 1.05vw, 5.5px);
+  font-size: clamp(2px, 1.05vw, 3.5px);
   line-height: 1.1;
 }
 
@@ -2068,7 +2068,7 @@ button.dock-view__item-row:focus-visible {
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 3px 4px;
+  padding: 1px 2px;
   gap: 0;
   min-height: 0;
   margin: 0;
@@ -2086,10 +2086,10 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
   min-height: 0;
-  padding: 3px 2px;
+  padding: 1px 0px;
   line-height: 1;
   border-radius: 0;
   border: none;
@@ -2099,15 +2099,15 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__keys--under-balance .wallet-display__key-strip + .wallet-display__key-strip {
   border-top: 1px solid rgba(var(--wallet-cyan-rgb), 0.12);
-  padding-top: 4px;
-  margin-top: 1px;
+  padding-top: 2px;
+  margin-top: 0px;
 }
 
 .wallet-display__keys--under-balance .wallet-display__key-strip-label {
   flex: 0 0 auto;
   width: 100%;
   font-family: var(--wallet-display-font);
-  font-size: clamp(5px, 1.2vw, 6.5px);
+  font-size: clamp(3px, 1.2vw, 4.5px);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2122,7 +2122,7 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 3px;
+  gap: 1px;
   min-width: 0;
   width: 100%;
 }
@@ -2134,7 +2134,7 @@ button.dock-view__item-row:focus-visible {
   border: 0;
   background: transparent;
   font-family: var(--wallet-mono);
-  font-size: clamp(4px, 1.05vw, 5.5px);
+  font-size: clamp(2px, 1.05vw, 3.5px);
   font-weight: 600;
   line-height: 1.15;
   color: rgba(var(--wallet-cyan-rgb), 0.88);
@@ -2144,14 +2144,14 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__keys--under-balance .wallet-display__key-strip-actions {
-  gap: 2px;
+  gap: 0px;
 }
 
 .wallet-display__keys--under-balance .wallet-display__key-icon-btn {
   width: 14px;
-  height: 14px;
+  height: 12px;
   min-width: 14px;
-  min-height: 14px;
+  min-height: 12px;
   margin: 0;
   padding: 0;
   border-color: rgba(var(--wallet-cyan-rgb), 0.28);
@@ -2160,7 +2160,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__keys--under-balance .wallet-display__key-icon-btn svg {
   width: 8px;
-  height: 8px;
+  height: 6px;
 }
 
 .wallet-display__keys--under-balance .wallet-display__key-icon-btn--copy.is-copied {
@@ -2173,7 +2173,7 @@ button.dock-view__item-row:focus-visible {
   align-self: stretch;
   width: 100%;
   padding: 0;
-  gap: 1px;
+  gap: 0px;
   min-height: 0;
   margin: 0;
   border: none;
@@ -2187,10 +2187,10 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 1px;
+  gap: 0px;
   min-width: 0;
   min-height: 0;
-  padding: 0 2px;
+  padding: 0 0px;
   line-height: 1;
   border-color: rgba(var(--wallet-cyan-rgb), 0.22);
   background: rgba(1, 8, 18, 0.72);
@@ -2199,7 +2199,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__keys--faucet-col .wallet-display__key-strip-label {
   flex: 0 0 auto;
   width: 100%;
-  font-size: clamp(4px, 1.05vw, 5.5px);
+  font-size: clamp(2px, 1.05vw, 3.5px);
   line-height: 1.1;
 }
 
@@ -2207,7 +2207,7 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
   width: 100%;
 }
@@ -2219,7 +2219,7 @@ button.dock-view__item-row:focus-visible {
   border: 0;
   background: transparent;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: clamp(3.5px, 0.95vw, 5px);
+  font-size: clamp(1.5px, 0.95vw, 3px);
   font-weight: 600;
   line-height: 1.15;
   color: rgba(188, 240, 255, 0.82);
@@ -2229,19 +2229,19 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__keys--faucet-col .wallet-display__key-strip-actions {
-  gap: 1px;
+  gap: 0px;
 }
 
 .wallet-display__keys--faucet-col .wallet-display__key-icon-btn {
   width: 13px;
-  height: 13px;
+  height: 11px;
   min-width: 13px;
-  min-height: 13px;
+  min-height: 11px;
 }
 
 .wallet-display__keys--faucet-col .wallet-display__key-icon-btn svg {
   width: 7px;
-  height: 7px;
+  height: 5px;
 }
 
 .wallet-display__keys--faucet-col .wallet-display__key-icon-btn--copy.is-copied {
@@ -2257,7 +2257,7 @@ button.dock-view__item-row:focus-visible {
   justify-content: center;
   gap: 0;
   min-width: 0;
-  padding: 3px 2px;
+  padding: 1px 0px;
   border-radius: 7px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.22);
   background: rgba(1, 10, 22, 0.72);
@@ -2290,7 +2290,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__holding-label {
   position: relative;
   z-index: 1;
-  font-size: clamp(6px, 1.6vw, 8px);
+  font-size: clamp(4px, 1.6vw, 6px);
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -2302,7 +2302,7 @@ button.dock-view__item-row:focus-visible {
   z-index: 1;
   max-width: 100%;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: clamp(8px, 2.2vw, 12px);
+  font-size: clamp(6px, 2.2vw, 10px);
   font-weight: 800;
   letter-spacing: 0.03em;
   line-height: 1.1;
@@ -2317,7 +2317,7 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   align-items: baseline;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
   min-width: 0;
 }
@@ -2325,7 +2325,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__holding-fiat {
   flex: 0 1 auto;
   min-width: 0;
-  font-size: clamp(6px, 1.6vw, 9px);
+  font-size: clamp(4px, 1.6vw, 7px);
   font-weight: 600;
   color: rgba(187, 209, 225, 0.84);
   white-space: nowrap;
@@ -2372,7 +2372,7 @@ button.dock-view__item-row:focus-visible {
   z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 4px;
+  gap: 2px;
   align-items: stretch;
   min-width: 0;
 }
@@ -2384,18 +2384,18 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__keys--dual {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 4px;
+  gap: 2px;
   min-height: 0;
-  padding: 3px 4px;
+  padding: 1px 2px;
 }
 
 .wallet-display__key-strip {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
-  padding: 2px 3px;
+  padding: 0px 1px;
   border-radius: 5px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.14);
   background: rgba(1, 10, 20, 0.55);
@@ -2406,7 +2406,7 @@ button.dock-view__item-row:focus-visible {
   width: 100%;
   min-width: 0;
   margin: 0;
-  font-size: clamp(5px, 1.4vw, 7px);
+  font-size: clamp(3px, 1.4vw, 5px);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2421,7 +2421,7 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 3px;
+  gap: 1px;
   min-width: 0;
   width: 100%;
 }
@@ -2433,7 +2433,7 @@ button.dock-view__item-row:focus-visible {
   border: 0;
   background: transparent;
   font-family: var(--wallet-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
-  font-size: clamp(4.5px, 1.15vw, 6px);
+  font-size: clamp(2.5px, 1.15vw, 4px);
   font-weight: 600;
   line-height: 1.15;
   color: rgba(var(--wallet-cyan-rgb), 0.88);
@@ -2446,13 +2446,13 @@ button.dock-view__item-row:focus-visible {
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
 }
 
 .wallet-display__key-icon-btn {
   flex: 0 0 auto;
   width: 16px;
-  height: 16px;
+  height: 14px;
   display: inline-grid;
   place-items: center;
   padding: 0;
@@ -2469,7 +2469,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__key-icon-btn svg {
   width: 9px;
-  height: 9px;
+  height: 7px;
   stroke: currentColor;
   stroke-width: 1.6;
   fill: none;
@@ -2495,20 +2495,20 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__keys--compact {
   min-height: 0;
-  padding: 3px 4px;
-  gap: 4px;
+  padding: 1px 2px;
+  gap: 2px;
 }
 
 .wallet-display__key-row--stacked {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
   min-width: 0;
 }
 
 .wallet-display__key-title {
   margin: 0;
-  font-size: clamp(6px, 1.6vw, 8px);
+  font-size: clamp(4px, 1.6vw, 6px);
   font-weight: 700;
   letter-spacing: 0.03em;
   color: rgba(187, 217, 236, 0.82);
@@ -2518,20 +2518,20 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__key-line {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 1px;
   min-width: 0;
 }
 
 .wallet-display__key-btn {
   flex: 0 0 auto;
-  min-height: 16px;
-  padding: 0 4px;
+  min-height: 14px;
+  padding: 0 2px;
   border-radius: 4px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.28);
   background: rgba(var(--wallet-cyan-rgb), 0.08);
   color: rgba(188, 240, 255, 0.95);
   font-family: inherit;
-  font-size: clamp(5px, 1.4vw, 7px);
+  font-size: clamp(3px, 1.4vw, 5px);
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -2545,15 +2545,15 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__keys--compact .wallet-display__key-row {
-  gap: 1px;
+  gap: 0px;
 }
 
 .wallet-display__keys--compact .wallet-display__key-line .wallet-display__key-value {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
-  padding: 2px 4px;
-  font-size: clamp(5px, 1.4vw, 7px);
+  padding: 0px 2px;
+  font-size: clamp(3px, 1.4vw, 5px);
   line-height: 1.15;
   max-height: none;
   white-space: nowrap;
@@ -2568,7 +2568,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__label {
   margin: 0;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -2587,7 +2587,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__balance-value {
-  font-size: clamp(9px, 2.4vw, 14px);
+  font-size: clamp(7px, 2.4vw, 12px);
   font-weight: 700;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   letter-spacing: 0.02em;
@@ -2595,7 +2595,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__balance span {
-  font-size: clamp(14px, 3.8vw, 22px);
+  font-size: clamp(12px, 3.8vw, 20px);
   font-weight: 800;
   letter-spacing: 0.06em;
 }
@@ -2603,7 +2603,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__usd,
 .wallet-display__fiat {
   margin: 0;
-  font-size: 12px;
+  font-size: 10px;
   color: rgba(187, 209, 225, 0.84);
   text-align: center;
 }
@@ -2614,8 +2614,8 @@ button.dock-view__item-row:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 4px 6px;
+  gap: 0px;
+  padding: 2px 4px;
   border-radius: 6px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.14);
   background: rgba(2, 12, 24, 0.42);
@@ -2626,7 +2626,7 @@ button.dock-view__item-row:focus-visible {
   width: 100%;
   text-align: center;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: clamp(7px, 1.9vw, 10px);
+  font-size: clamp(5px, 1.9vw, 8px);
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.15;
@@ -2639,7 +2639,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__body {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   flex: 1 1 0%;
   min-height: 0;
   overflow: hidden;
@@ -2677,7 +2677,7 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) 24px 24px;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
   min-height: 0;
 }
@@ -2685,7 +2685,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__explorer-label {
   flex-shrink: 0;
   font-family: var(--wallet-display-font);
-  font-size: 8px;
+  font-size: 6px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ds-text-secondary, rgba(187, 217, 236, 0.75));
@@ -2696,19 +2696,18 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__explorer-input {
   width: 100%;
   min-width: 0;
-  min-height: 24px;
-  height: 24px;
+  min-height: 22px;
+  height: 22px;
   border-radius: 6px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.24);
-  background:
-    linear-gradient(180deg, rgba(var(--wallet-cyan-rgb), 0.06), rgba(var(--ds-surface-base-deep-rgb, 6, 7, 10), 0.72));
+  background: #000;
   color: var(--ds-text-primary, #e4f7ff);
-  padding: 0 7px;
+  padding: 0 5px;
   font-family: var(--wallet-mono);
-  font-size: 10px;
+  font-size: 8px;
   line-height: 1;
   box-sizing: border-box;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: none;
   outline: none;
   transition:
     border-color 160ms ease,
@@ -2728,9 +2727,9 @@ button.dock-view__item-row:focus-visible {
   width: 24px;
   min-width: 24px;
   max-width: 24px;
-  height: 24px;
-  min-height: 24px;
-  max-height: 24px;
+  height: 22px;
+  min-height: 22px;
+  max-height: 22px;
   margin: 0;
   padding: 0;
   border-radius: 4px;
@@ -2739,7 +2738,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__explorer-row .wallet-display__icon-btn--explorer svg {
   width: 14px;
-  height: 14px;
+  height: 12px;
   display: block;
 }
 
@@ -2754,7 +2753,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__icon-btn-ellipsis {
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 700;
   line-height: 1;
   color: currentColor;
@@ -2771,7 +2770,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__section-title {
   margin: 0;
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2781,30 +2780,30 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__explorer,
 .wallet-display__keys {
   display: grid;
-  gap: 2px;
+  gap: 0px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.14);
   border-radius: 8px;
-  padding: 4px;
+  padding: 2px;
   background: rgba(2, 12, 24, 0.55);
 }
 
 .wallet-display.is-wallet-active .wallet-display__keys {
   border-top: 1px solid rgba(var(--wallet-cyan-rgb), 0.12);
-  padding-top: 8px;
+  padding-top: 6px;
 }
 
 .wallet-display__explorer-form {
   display: grid;
-  gap: 4px;
+  gap: 2px;
 }
 
 .wallet-display__explorer-field {
   display: grid;
-  gap: 2px;
+  gap: 0px;
 }
 
 .wallet-display__explorer-field span {
-  font-size: 8px;
+  font-size: 6px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: rgba(187, 217, 236, 0.75);
@@ -2812,32 +2811,32 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__explorer-field input {
   width: 100%;
-  min-height: 26px;
+  min-height: 24px;
   border-radius: 6px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.24);
   background: rgba(2, 18, 34, 0.88);
   color: #e4f7ff;
-  padding: 4px 6px;
-  font-size: 10px;
+  padding: 2px 4px;
+  font-size: 8px;
   box-sizing: border-box;
 }
 
 .wallet-display__explorer-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 2px;
 }
 
 .wallet-display__mini-btn {
   flex: 1 1 auto;
-  min-height: 24px;
-  padding: 0 6px;
+  min-height: 22px;
+  padding: 0 4px;
   border-radius: 6px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.32);
   background: rgba(var(--wallet-cyan-rgb), 0.08);
   color: rgba(188, 240, 255, 0.95);
   font-family: inherit;
-  font-size: 8px;
+  font-size: 6px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2856,9 +2855,9 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__explorer-result {
   display: grid;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
-  padding-top: 2px;
+  padding-top: 0px;
   border-top: 1px solid rgba(var(--wallet-cyan-rgb), 0.12);
 }
 
@@ -2866,7 +2865,7 @@ button.dock-view__item-row:focus-visible {
   margin: 0;
   min-width: 0;
   font-family: var(--wallet-mono);
-  font-size: clamp(5px, 1.2vw, 7px);
+  font-size: clamp(3px, 1.2vw, 5px);
   font-weight: 700;
   color: rgba(228, 244, 255, 0.95);
   white-space: nowrap;
@@ -2878,7 +2877,7 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -2886,7 +2885,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__explorer-result-fiat {
   margin: 0;
   font-family: var(--wallet-mono);
-  font-size: clamp(5px, 1.15vw, 6.5px);
+  font-size: clamp(3px, 1.15vw, 4.5px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2905,15 +2904,15 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__key-row {
   display: grid;
-  gap: 3px;
+  gap: 1px;
 }
 
 .wallet-display__key-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
-  font-size: 8px;
+  gap: 2px;
+  font-size: 6px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: rgba(187, 217, 236, 0.78);
@@ -2922,26 +2921,26 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__key-actions {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: 1px;
 }
 
 .wallet-display__key-actions .wallet-display__mini-btn {
   flex: 0 1 auto;
-  min-height: 20px;
-  font-size: 7px;
-  padding: 0 4px;
+  min-height: 18px;
+  font-size: 5px;
+  padding: 0 2px;
 }
 
 .wallet-display__key-value {
   display: block;
   margin: 0;
-  padding: 4px 5px;
+  padding: 2px 3px;
   border-radius: 5px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.16);
   background: rgba(1, 10, 20, 0.72);
   color: rgba(210, 236, 248, 0.9);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 8px;
+  font-size: 6px;
   line-height: 1.35;
   word-break: break-all;
   white-space: pre-wrap;
@@ -2955,14 +2954,14 @@ button.dock-view__item-row:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 4px;
+  gap: 2px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.22);
   border-radius: 999px;
-  padding: 3px 8px;
+  padding: 1px 6px;
   background: rgba(3, 19, 34, 0.88);
   color: rgba(210, 235, 248, 0.86);
   font-family: inherit;
-  font-size: clamp(7px, 1.8vw, 10px);
+  font-size: clamp(5px, 1.8vw, 8px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2971,7 +2970,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__address-icon {
   margin-left: 2px;
-  font-size: 11px;
+  font-size: 9px;
   opacity: 0.8;
 }
 
@@ -2983,7 +2982,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__address-chip,
 .wallet-display__address-led {
   width: 8px;
-  height: 8px;
+  height: 6px;
   border-radius: 999px;
   flex-shrink: 0;
   background: rgba(var(--wallet-cyan-rgb), 0.28);
@@ -3000,21 +2999,21 @@ button.dock-view__item-row:focus-visible {
   z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .wallet-display__metric {
   min-width: 0;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.16);
   border-radius: 8px;
-  padding: 8px 6px;
+  padding: 6px 4px;
   background: rgba(3, 14, 27, 0.62);
   text-align: center;
 }
 
 .wallet-display__metric-label {
   margin: 0;
-  font-size: var(--ds-text-label, 0.5rem);
+  font-size: var(--ds-text-label, 0.375rem);
   letter-spacing: 0.08em;
   font-weight: 600;
   text-transform: uppercase;
@@ -3022,8 +3021,8 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__metric-value {
-  margin: 3px 0 0;
-  font-size: var(--ds-text-lg, 0.875rem);
+  margin: 1px 0 0;
+  font-size: var(--ds-text-lg, 0.75rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--ds-text-primary, #e8eef5);
@@ -3037,19 +3036,29 @@ button.dock-view__item-row:focus-visible {
   z-index: 1;
   flex: 0 0 auto;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 6px);
+}
+
+.wallet-display__actions-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-2, 8px);
+  gap: var(--space-2, 6px);
+}
+
+.wallet-display__actions > .wallet-display__create-cta {
+  width: 100%;
 }
 
 .wallet-display__action-btn {
-  min-height: 32px;
+  min-height: 30px;
   border-radius: var(--ds-radius-btn, 12px);
   border: 1px solid var(--border-default-ds, rgba(255, 255, 255, 0.1));
   background: var(--cta-secondary-bg, rgba(13, 24, 40, 0.92));
   color: var(--ds-text-primary, #e8eef5);
   font-family: var(--wallet-display-font);
-  font-size: clamp(8px, 2.2vw, 11px);
+  font-size: clamp(6px, 2.2vw, 9px);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3058,7 +3067,7 @@ button.dock-view__item-row:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   transition:
     border-color 160ms ease,
     background 160ms ease,
@@ -3097,7 +3106,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__action-btn svg {
   width: 16px;
-  height: 16px;
+  height: 14px;
   stroke: currentColor;
   stroke-width: 1.8;
   fill: none;
@@ -3122,8 +3131,8 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__flash {
   border-radius: 6px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.2);
-  padding: 4px 6px;
-  font-size: 9px;
+  padding: 2px 4px;
+  font-size: 7px;
 }
 
 .wallet-display__flash--error {
@@ -3143,10 +3152,10 @@ button.dock-view__item-row:focus-visible {
   border-radius: 10px;
   background:
     linear-gradient(165deg, rgb(4, 14, 26), rgb(2, 8, 16));
-  padding: 8px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   overflow: hidden;
   outline: none;
   box-shadow:
@@ -3162,7 +3171,7 @@ button.dock-view__item-row:focus-visible {
   content: '';
   position: absolute;
   inset: 0 0 auto;
-  height: 1px;
+  height: 0px;
   background: linear-gradient(
     90deg,
     transparent,
@@ -3192,14 +3201,14 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__panel-head h3 {
   margin: 0;
-  font-size: 11px;
+  font-size: 9px;
   letter-spacing: 0.08em;
   color: #d2f8ff;
 }
 
 .wallet-display__panel-close {
   width: 16px;
-  height: 16px;
+  height: 14px;
   border-radius: 999px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.45);
   background: rgba(var(--wallet-cyan-rgb), 0.12);
@@ -3209,13 +3218,13 @@ button.dock-view__item-row:focus-visible {
   padding: 0;
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: 9px;
   box-shadow: none;
 }
 
 .wallet-display__panel-close--float {
   position: absolute;
-  top: 3px;
+  top: 1px;
   right: 3px;
   z-index: 4;
 }
@@ -3225,8 +3234,8 @@ button.dock-view__item-row:focus-visible {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 18px 8px 6px;
+  gap: 3px;
+  padding: 16px 6px 4px;
   min-height: 0;
   max-height: 100%;
 }
@@ -3237,7 +3246,7 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: 68px minmax(0, 1fr);
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
   margin: 0;
   flex: 0 0 auto;
@@ -3247,7 +3256,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__send-row > span,
 .wallet-display__receive-label {
   font-family: var(--wallet-display-font);
-  font-size: 6.5px;
+  font-size: 4.5px;
   letter-spacing: 0.07em;
   color: rgba(186, 220, 236, 0.8);
   text-transform: uppercase;
@@ -3267,11 +3276,11 @@ button.dock-view__item-row:focus-visible {
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.32);
   background: linear-gradient(180deg, rgba(4, 18, 32, 0.96), rgba(2, 12, 24, 0.98));
   color: #e4f7ff;
-  padding: 0 7px;
+  padding: 0 5px;
   font-family: var(--wallet-mono);
-  font-size: 8px;
-  min-height: 20px;
-  height: 20px;
+  font-size: 6px;
+  min-height: 18px;
+  height: 18px;
   box-sizing: border-box;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
@@ -3288,7 +3297,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__receive {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 3px;
   min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
@@ -3299,7 +3308,7 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 15px;
   align-items: stretch;
-  gap: 3px;
+  gap: 1px;
   width: 100%;
   min-width: 0;
   border: none;
@@ -3316,8 +3325,8 @@ button.dock-view__item-row:focus-visible {
   align-items: center;
   gap: 0;
   min-width: 0;
-  min-height: 20px;
-  height: 20px;
+  min-height: 18px;
+  height: 18px;
   border-radius: 6px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.32);
   background: linear-gradient(180deg, rgba(4, 18, 32, 0.96), rgba(2, 12, 24, 0.98));
@@ -3343,13 +3352,13 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__amount-unit {
   display: grid;
   place-items: center;
-  padding: 0 5px;
+  padding: 0 3px;
   height: 100%;
   border-left: 1px solid rgba(var(--wallet-cyan-rgb), 0.22);
   background: rgba(var(--wallet-cyan-rgb), 0.08);
   color: rgba(180, 235, 255, 0.9);
   font-family: var(--wallet-display-font);
-  font-size: 6px;
+  font-size: 4px;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -3359,7 +3368,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__amount-steppers {
   display: grid;
   grid-template-rows: 1fr 1fr;
-  gap: 2px;
+  gap: 0px;
   min-width: 15px;
 }
 
@@ -3387,7 +3396,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__amount-step svg {
   width: 7px;
-  height: 7px;
+  height: 5px;
   stroke: currentColor;
   stroke-width: 1.9;
   fill: none;
@@ -3396,11 +3405,11 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__field-error {
-  margin: -2px 0 0 74px;
-  font-size: 5.5px;
+  margin: 0px 0 0 72px;
+  font-size: 3.5px;
   color: #ff8ba1;
   line-height: 1.05;
-  max-height: 10px;
+  max-height: 8px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -3408,14 +3417,14 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__panel-submit {
   width: 100%;
-  min-height: 22px;
+  min-height: 20px;
   margin-top: auto;
   border-radius: 7px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.55);
   background: linear-gradient(180deg, rgba(var(--wallet-cyan-rgb), 0.28), rgba(var(--wallet-cyan-rgb), 0.1));
   color: #c8fbff;
   font-family: var(--wallet-display-font);
-  font-size: 7.5px;
+  font-size: 5.5px;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -3441,7 +3450,7 @@ button.dock-view__item-row:focus-visible {
   z-index: 8;
   display: grid;
   place-items: center;
-  padding: 6px;
+  padding: 4px;
   background: rgba(1, 5, 10, 0.8);
   backdrop-filter: blur(3px);
 }
@@ -3449,8 +3458,8 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__send-confirm-card {
   width: min(100%, 248px);
   display: grid;
-  gap: 5px;
-  padding: 8px;
+  gap: 3px;
+  padding: 6px;
   border-radius: 8px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.38);
   background: linear-gradient(165deg, rgba(6, 18, 32, 0.98), rgba(3, 8, 16, 0.98));
@@ -3462,7 +3471,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__send-confirm-title {
   margin: 0;
   font-family: var(--wallet-display-font);
-  font-size: 8px;
+  font-size: 6px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #d2fbff;
@@ -3470,7 +3479,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__send-confirm-hint {
   margin: 0;
-  font-size: 6.5px;
+  font-size: 4.5px;
   color: rgba(190, 220, 235, 0.78);
   line-height: 1.3;
 }
@@ -3478,20 +3487,20 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__send-confirm-summary {
   margin: 0;
   display: grid;
-  gap: 3px;
+  gap: 1px;
 }
 
 .wallet-display__send-confirm-summary > div {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 6px;
+  gap: 4px;
   align-items: baseline;
   min-width: 0;
 }
 
 .wallet-display__send-confirm-summary dt {
   margin: 0;
-  font-size: 5.5px;
+  font-size: 3.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: rgba(176, 205, 226, 0.7);
@@ -3501,7 +3510,7 @@ button.dock-view__item-row:focus-visible {
   margin: 0;
   min-width: 0;
   font-family: var(--wallet-mono);
-  font-size: 6.5px;
+  font-size: 4.5px;
   font-weight: 700;
   color: rgba(220, 245, 255, 0.95);
   text-align: right;
@@ -3513,17 +3522,17 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__send-confirm-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
-  margin-top: 2px;
+  gap: 2px;
+  margin-top: 0px;
 }
 
 .wallet-display__send-confirm-btn {
-  min-height: 18px;
+  min-height: 16px;
   margin: 0;
-  padding: 0 5px;
+  padding: 0 3px;
   border-radius: 6px;
   font-family: var(--wallet-display-font);
-  font-size: 6.5px;
+  font-size: 4.5px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3554,13 +3563,13 @@ button.dock-view__item-row:focus-visible {
   display: grid;
   place-items: center;
   overflow: hidden;
-  padding: 2px 0;
+  padding: 0px 0;
 }
 
 .wallet-display__qr {
   width: min(42vw, 96px);
   max-width: 96px;
-  max-height: min(42%, 96px);
+  max-height: min(42%, 94px);
   aspect-ratio: 1 / 1;
   height: auto;
   margin: 0 auto;
@@ -3586,95 +3595,95 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__qr-placeholder {
   color: rgba(201, 243, 255, 0.8);
   font-weight: 700;
-  font-size: 9px;
+  font-size: 7px;
 }
 
 @media (max-width: 349px) {
   .wallet-display {
-    padding: 5px;
-    gap: 4px;
+    padding: 3px;
+    gap: 2px;
   }
 
   .wallet-display__title {
-    font-size: 8px;
-  }
-
-  .wallet-display__network {
-    font-size: 7px;
-  }
-
-  .wallet-display__balance {
-    font-size: 22px;
-  }
-
-  .wallet-display__usd {
-    font-size: 8px;
-  }
-
-  .wallet-display__address {
-    font-size: 8px;
-    padding: 2px 6px;
-  }
-
-  .wallet-display__metric {
-    padding: 4px 3px;
-  }
-
-  .wallet-display__metric-label {
     font-size: 6px;
   }
 
+  .wallet-display__network {
+    font-size: 5px;
+  }
+
+  .wallet-display__balance {
+    font-size: 20px;
+  }
+
+  .wallet-display__usd {
+    font-size: 6px;
+  }
+
+  .wallet-display__address {
+    font-size: 6px;
+    padding: 0px 4px;
+  }
+
+  .wallet-display__metric {
+    padding: 2px 1px;
+  }
+
+  .wallet-display__metric-label {
+    font-size: 4px;
+  }
+
   .wallet-display__metric-value {
-    font-size: 9px;
+    font-size: 7px;
   }
 
   .wallet-display__action-btn {
-    min-height: 24px;
-    font-size: 11px;
-    gap: 4px;
+    min-height: 22px;
+    font-size: 9px;
+    gap: 2px;
   }
 
   .wallet-display__action-btn svg {
     width: 10px;
-    height: 10px;
+    height: 8px;
   }
 
   .wallet-display__toast {
-    top: 6px;
+    top: 4px;
     right: 6px;
-    font-size: 8px;
-    padding: 3px 6px;
+    font-size: 6px;
+    padding: 1px 4px;
   }
 
   .wallet-display__panel {
-    gap: 4px;
-    padding: 5px;
+    gap: 2px;
+    padding: 3px;
   }
 
   .wallet-display__panel-head h3 {
-    font-size: 8px;
+    font-size: 6px;
   }
 
   .wallet-display__send-form label span,
   .wallet-display__receive-label {
-    font-size: 7px;
+    font-size: 5px;
   }
 
   .wallet-display__send-form input,
   .wallet-display__receive-address {
-    min-height: 20px;
-    padding: 3px 5px;
-    font-size: 8px;
+    min-height: 18px;
+    padding: 1px 3px;
+    font-size: 6px;
   }
 
   .wallet-display__panel-submit {
-    min-height: 20px;
-    font-size: 8px;
+    min-height: 18px;
+    font-size: 6px;
   }
 
   .wallet-display__qr {
     width: 120px;
-    height: 120px;
+    height: 118px;
   }
 }
 
@@ -3690,8 +3699,8 @@ button.dock-view__item-row:focus-visible {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 3px 4px 4px;
+  gap: 1px;
+  padding: 1px 2px 2px;
   overflow: hidden;
   border: none;
   border-radius: 0;
@@ -3705,23 +3714,23 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__toolbar {
-  min-height: 14px;
-  gap: 3px;
+  min-height: 12px;
+  gap: 1px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__center {
-  min-height: 14px;
-  font-size: clamp(6px, 1.7vw, 8px);
+  min-height: 12px;
+  font-size: clamp(4px, 1.7vw, 6px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__icon-btn {
   width: 14px;
-  height: 14px;
+  height: 12px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__icon-btn svg {
   width: 8px;
-  height: 8px;
+  height: 6px;
   stroke: currentColor;
   stroke-width: 1.8;
   fill: none;
@@ -3739,7 +3748,7 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__body {
   flex: 1 1 0%;
   min-height: 0;
-  gap: 4px;
+  gap: 2px;
   overflow: hidden;
   padding-bottom: 0;
 }
@@ -3757,12 +3766,12 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-block {
-  padding: 3px 4px;
-  gap: 1px;
+  padding: 1px 2px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-line {
-  font-size: clamp(6px, 1.6vw, 8px);
+  font-size: clamp(4px, 1.6vw, 6px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys {
@@ -3771,24 +3780,24 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__hero {
   padding: 0;
-  gap: 1px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__create-cta {
-  min-height: 18px;
-  padding: 0 6px;
-  font-size: clamp(6px, 1.6vw, 8px);
+  min-height: 16px;
+  padding: 0 4px;
+  font-size: clamp(4px, 1.6vw, 6px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__status-line {
-  top: 3px;
-  font-size: clamp(5px, 1.35vw, 6.5px);
-  padding: 1px 7px;
+  top: 1px;
+  font-size: clamp(3px, 1.35vw, 4.5px);
+  padding: 0px 5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__holdings--split {
   padding: 0;
-  gap: 5px;
+  gap: 3px;
   grid-template-columns: minmax(0, 0.68fr) minmax(0, 1.32fr);
   align-items: stretch;
   flex: 1 1 auto;
@@ -3797,11 +3806,11 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-col {
-  gap: 5px;
+  gap: 3px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__faucet-col {
-  gap: 3px;
+  gap: 1px;
   overflow: visible;
   min-width: 0;
   max-width: 100%;
@@ -3809,9 +3818,9 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent {
   flex: 1 1 auto;
-  min-height: 36px;
-  padding: 2px 3px;
-  gap: 2px;
+  min-height: 34px;
+  padding: 0px 1px;
+  gap: 0px;
   border-color: rgba(var(--wallet-cyan-rgb), 0.14);
   overflow: hidden;
 }
@@ -3819,30 +3828,30 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-list {
   overflow-x: hidden;
   overflow-y: auto;
-  gap: 2px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-btn {
   min-height: 0;
-  padding: 2px 3px;
-  gap: 1px;
+  padding: 0px 1px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-addr {
-  font-size: 4.5px;
+  font-size: 2.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-bal,
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-fiat {
-  font-size: 4px;
+  font-size: 2px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber {
-  padding: 2px 3px;
+  padding: 0px 1px;
   flex: 1 1 auto;
   height: auto;
   min-height: 0;
-  gap: 2px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber-head {
@@ -3851,21 +3860,21 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber-account {
-  font-size: 5px;
+  font-size: 3px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber-address {
   max-width: none;
-  padding: 1px 3px;
-  font-size: 4.5px;
+  padding: 0px 1px;
+  font-size: 2.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber-address-icon {
-  font-size: 6px;
+  font-size: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-brand {
-  font-size: clamp(6px, 1.4vw, 8px);
+  font-size: clamp(4px, 1.4vw, 6px);
   letter-spacing: 0.08em;
   line-height: 1.15;
   padding: 0;
@@ -3873,9 +3882,9 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-glass {
   flex: 1 1 auto;
-  min-height: 28px;
-  padding: 4px 4px 3px;
-  gap: 2px;
+  min-height: 26px;
+  padding: 2px 2px 1px;
+  gap: 0px;
   overflow: visible;
 }
 
@@ -3885,19 +3894,19 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-whole {
-  font-size: clamp(9px, 2.1vw, 12px);
+  font-size: clamp(7px, 2.1vw, 10px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-sep {
-  font-size: clamp(7px, 1.7vw, 9px);
+  font-size: clamp(5px, 1.7vw, 7px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-frac {
-  font-size: clamp(5px, 1.2vw, 6.5px);
+  font-size: clamp(3px, 1.2vw, 4.5px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__holding-stack-line--lead {
-  font-size: clamp(5.5px, 1.35vw, 7px);
+  font-size: clamp(3.5px, 1.35vw, 5px);
   line-height: 0.82;
 }
 
@@ -3910,13 +3919,13 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__holding-stack-line {
-  font-size: clamp(5px, 1.3vw, 6.5px);
+  font-size: clamp(3px, 1.3vw, 4.5px);
   line-height: 0.82;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer--under-faucet {
-  padding: 3px 4px;
-  gap: 2px;
+  padding: 1px 2px;
+  gap: 0px;
   flex: 0 0 auto;
   height: auto;
   min-height: 0;
@@ -3925,27 +3934,27 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer,
 :host-context(.app-bottom-stack__panel) .wallet-display__keys {
-  padding: 2px 3px;
+  padding: 0px 1px;
   gap: 0;
   border-radius: 6px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-input {
-  min-height: 18px;
-  height: 18px;
-  padding: 0 4px;
-  font-size: 7px;
+  min-height: 16px;
+  height: 16px;
+  padding: 0 2px;
+  font-size: 5px;
   border-radius: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-label {
-  font-size: 5px;
+  font-size: 3px;
   line-height: 1;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-row {
   grid-template-columns: auto minmax(0, 1fr) 18px 18px;
-  gap: 2px;
+  gap: 0px;
   min-height: 0;
 }
 
@@ -3953,9 +3962,9 @@ button.dock-view__item-row:focus-visible {
   width: 18px;
   min-width: 18px;
   max-width: 18px;
-  height: 18px;
-  min-height: 18px;
-  max-height: 18px;
+  height: 16px;
+  min-height: 16px;
+  max-height: 16px;
   margin: 0;
   padding: 0;
   flex: 0 0 18px;
@@ -3963,15 +3972,15 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-row .wallet-display__icon-btn--explorer svg {
   width: 12px;
-  height: 12px;
+  height: 10px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-head {
-  gap: 3px;
+  gap: 1px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-accent {
-  height: 7px;
+  height: 5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber-rail,
@@ -3981,56 +3990,56 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber-address-led {
   width: 3px;
-  height: 3px;
+  height: 1px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-title {
-  font-size: 5px;
+  font-size: 3px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-empty {
-  font-size: 4.5px;
+  font-size: 2.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-btn {
   min-height: 0;
-  padding: 2px 3px;
+  padding: 0px 1px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-addr,
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-bal,
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-fiat {
-  font-size: 4.5px;
+  font-size: 2.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-chf {
-  padding: 0 2px;
-  gap: 2px;
+  padding: 0 0px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-chf-label {
-  font-size: 4px;
+  font-size: 2px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-chf-value {
-  font-size: clamp(5px, 1.25vw, 6.5px);
+  font-size: clamp(3px, 1.25vw, 4.5px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__holding-fiat {
-  font-size: clamp(5px, 1.4vw, 7px);
+  font-size: clamp(3px, 1.4vw, 5px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__holding-meta {
-  gap: 4px;
-}
-
-:host-context(.app-bottom-stack__panel) .wallet-display__columns {
   gap: 2px;
 }
 
+:host-context(.app-bottom-stack__panel) .wallet-display__columns {
+  gap: 0px;
+}
+
 :host-context(.app-bottom-stack__panel) .wallet-display__identity {
-  padding: 2px 3px;
-  gap: 1px;
+  padding: 0px 1px;
+  gap: 0px;
   flex-shrink: 0;
 }
 
@@ -4044,7 +4053,7 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-value {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: clamp(7px, 1.8vw, 10px);
+  font-size: clamp(5px, 1.8vw, 8px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4053,12 +4062,12 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance > span:last-child {
   flex: 0 0 auto;
-  font-size: clamp(10px, 2.5vw, 13px);
+  font-size: clamp(8px, 2.5vw, 11px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__account {
   margin: 0;
-  font-size: 6px;
+  font-size: 4px;
   line-height: 1.1;
   text-align: left;
   width: 100%;
@@ -4066,50 +4075,50 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__address {
   margin: 0;
-  padding: 1px 5px;
-  font-size: clamp(6px, 1.6vw, 8px);
+  padding: 0px 3px;
+  font-size: clamp(4px, 1.6vw, 6px);
   flex-shrink: 0;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__address-led {
   width: 6px;
-  height: 6px;
+  height: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__address-icon {
-  font-size: 8px;
+  font-size: 6px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__metrics {
   grid-template-columns: minmax(0, 1fr);
-  gap: 3px;
+  gap: 1px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__metric {
-  padding: 3px 4px;
+  padding: 1px 2px;
   border-radius: 6px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__metric-label {
-  font-size: 6px;
+  font-size: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__usd,
 :host-context(.app-bottom-stack__panel) .wallet-display__fiat {
   margin: 0;
-  font-size: clamp(7px, 1.8vw, 9px);
+  font-size: clamp(5px, 1.8vw, 7px);
   line-height: 1.2;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__section-title {
-  font-size: 6px;
+  font-size: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__mini-btn {
-  min-height: 14px;
-  height: 14px;
-  font-size: 5px;
-  padding: 0 3px;
+  min-height: 12px;
+  height: 12px;
+  font-size: 3px;
+  padding: 0 1px;
   line-height: 1;
 }
 
@@ -4119,17 +4128,17 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__icon-btn {
   width: 12px;
-  height: 12px;
+  height: 10px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance {
-  padding: 2px 3px;
+  padding: 0px 1px;
   gap: 0;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip {
-  padding: 2px 1px;
-  gap: 1px;
+  padding: 0px 0px;
+  gap: 0px;
   border: none;
   background: transparent;
   box-shadow: none;
@@ -4137,143 +4146,147 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip + .wallet-display__key-strip {
   border-top: 1px solid rgba(var(--wallet-cyan-rgb), 0.12);
-  padding-top: 3px;
-  margin-top: 1px;
+  padding-top: 1px;
+  margin-top: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip-label {
-  font-size: 4.5px;
+  font-size: 2.5px;
   letter-spacing: 0.05em;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip-body {
-  gap: 2px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip-value {
-  font-size: 3.5px;
+  font-size: 1.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-icon-btn {
   width: 11px;
-  height: 11px;
+  height: 9px;
   min-width: 11px;
-  min-height: 11px;
+  min-height: 9px;
   margin: 0;
   padding: 0;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--faucet-col {
   padding: 0;
-  gap: 1px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--faucet-col .wallet-display__key-strip {
-  padding: 0 1px;
-  gap: 1px;
+  padding: 0 0px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--faucet-col .wallet-display__key-strip-label {
-  font-size: 4px;
+  font-size: 2px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--faucet-col .wallet-display__key-strip-value {
-  font-size: 3.5px;
+  font-size: 1.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--faucet-col .wallet-display__key-icon-btn {
   width: 11px;
-  height: 11px;
+  height: 9px;
   min-width: 11px;
-  min-height: 11px;
+  min-height: 9px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--dual {
-  padding: 2px;
-  gap: 2px;
+  padding: 0px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-strip {
-  padding: 1px 2px;
-  gap: 2px;
+  padding: 0px 0px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-strip-label {
-  font-size: 4.5px;
+  font-size: 2.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-icon-btn {
   width: 12px;
-  height: 12px;
+  height: 10px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-icon-btn svg {
   width: 7px;
-  height: 7px;
+  height: 5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--compact {
-  padding: 2px;
-  gap: 2px;
+  padding: 0px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-title {
-  font-size: 5px;
+  font-size: 3px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-btn {
-  min-height: 12px;
-  padding: 0 2px;
-  font-size: 4.5px;
+  min-height: 10px;
+  padding: 0 0px;
+  font-size: 2.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-line .wallet-display__key-value {
-  font-size: 4.5px;
-  padding: 1px 2px;
+  font-size: 2.5px;
+  padding: 0px 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-result {
-  gap: 1px;
-  padding-top: 1px;
+  gap: 0px;
+  padding-top: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-result-addr {
-  font-size: 5px;
+  font-size: 3px;
   line-height: 1.1;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-result-balance,
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-result-fiat {
   margin: 0;
-  font-size: 4.5px;
+  font-size: 2.5px;
   line-height: 1.1;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__metric-value {
-  margin-top: 1px;
-  font-size: clamp(8px, 2vw, 10px);
+  margin-top: 0px;
+  font-size: clamp(6px, 2vw, 8px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__actions {
   flex: 0 0 auto;
-  margin-top: 2px;
-  gap: 4px;
-  padding-top: 2px;
+  margin-top: 0px;
+  gap: 2px;
+  padding-top: 0px;
+}
+
+:host-context(.app-bottom-stack__panel) .wallet-display__actions-row {
+  gap: 2px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__action-btn {
-  min-height: 28px;
-  padding: 0 4px;
+  min-height: 26px;
+  padding: 0 2px;
   border-radius: var(--radius-md, 10px);
-  font-size: clamp(7px, 2vw, 9px);
-  gap: 3px;
+  font-size: clamp(5px, 2vw, 7px);
+  gap: 1px;
   letter-spacing: 0.04em;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__action-btn svg {
   width: 10px;
-  height: 10px;
+  height: 8px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__panel,
@@ -4285,8 +4298,8 @@ button.dock-view__item-row:focus-visible {
   min-height: 0;
   max-height: 100%;
   overflow: hidden;
-  padding: 3px 6px 4px;
-  gap: 3px;
+  padding: 1px 4px 2px;
+  gap: 1px;
   border-radius: 0;
   border: none;
   background: linear-gradient(165deg, rgb(3, 12, 22), rgb(2, 7, 14));
@@ -4298,23 +4311,23 @@ button.dock-view__item-row:focus-visible {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 14px 6px 4px;
+  gap: 1px;
+  padding: 12px 4px 2px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__panel-close--float {
-  top: 2px;
+  top: 0px;
   right: 2px;
   width: 14px;
-  height: 14px;
-  font-size: 10px;
+  height: 12px;
+  font-size: 8px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__send-form,
 :host-context(.app-bottom-stack__panel) .wallet-display__receive {
   flex: 1 1 auto;
   min-height: 0;
-  gap: 3px;
+  gap: 1px;
   overflow: hidden;
 }
 
@@ -4322,12 +4335,12 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__send-row,
 :host-context(.app-bottom-stack__panel) .wallet-display__receive-row {
   grid-template-columns: 58px minmax(0, 1fr);
-  gap: 4px;
+  gap: 2px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__field-label,
 :host-context(.app-bottom-stack__panel) .wallet-display__receive-label {
-  font-size: 5.5px;
+  font-size: 3.5px;
   letter-spacing: 0.05em;
 }
 
@@ -4336,21 +4349,21 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__amount-input-wrap,
 :host-context(.app-bottom-stack__panel) .wallet-display__amount-input-wrap input,
 :host-context(.app-bottom-stack__panel) .wallet-display__receive-address {
-  min-height: 16px;
-  height: 16px;
-  padding: 0 5px;
-  font-size: 6.5px;
+  min-height: 14px;
+  height: 14px;
+  padding: 0 3px;
+  font-size: 4.5px;
   border-radius: 5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__amount-field {
   grid-template-columns: minmax(0, 1fr) 12px;
-  gap: 2px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__amount-steppers {
   min-width: 12px;
-  gap: 1px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__amount-step {
@@ -4359,39 +4372,39 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__amount-step svg {
   width: 6px;
-  height: 6px;
+  height: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__amount-unit {
-  font-size: 5px;
-  padding: 0 3px;
+  font-size: 3px;
+  padding: 0 1px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__field-error {
   margin-left: 62px;
-  font-size: 5px;
-  max-height: 8px;
+  font-size: 3px;
+  max-height: 6px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__panel-submit {
-  min-height: 17px;
-  font-size: 6.5px;
+  min-height: 15px;
+  font-size: 4.5px;
   margin-top: auto;
   border-radius: 6px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__send-confirm {
-  padding: 4px;
+  padding: 2px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__send-confirm-card {
-  padding: 6px;
-  gap: 3px;
+  padding: 4px;
+  gap: 1px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__send-confirm-btn {
-  min-height: 15px;
-  font-size: 5.5px;
+  min-height: 13px;
+  font-size: 3.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__qr-wrap {
@@ -4403,7 +4416,7 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__qr {
   width: min(32%, 72px);
   max-width: 72px;
-  max-height: 72px;
+  max-height: 70px;
   aspect-ratio: 1 / 1;
   height: auto;
   margin-inline: auto;

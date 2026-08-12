@@ -189,11 +189,9 @@ export class ShowcaseNewsComponent {
       .connectLiveUpdates()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((message) => {
-        if (
-          message.type === 'blocks' ||
-          message.type === 'pending-transactions' ||
-          message.type === 'snapshot'
-        ) {
+        // Pas de reload sur chaque snapshot (~5s) : ça faisait sonner le ticker en boucle.
+        // On ne recharge que sur de vrais événements chaîne / mempool.
+        if (message.type === 'blocks' || message.type === 'pending-transactions') {
           this.loadFeed(false);
         }
       });

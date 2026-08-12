@@ -17,8 +17,8 @@
   width: 100%;
   height: 100%;
   min-height: 0;
-  gap: 2px;
-  padding: 2px;
+  gap: 0px;
+  padding: 0px;
   box-sizing: border-box;
   overflow: hidden;
   container-type: inline-size;
@@ -37,10 +37,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 4px;
-  min-height: 15px;
-  max-height: 16px;
-  padding: 0 1px;
+  gap: 2px;
+  min-height: 13px;
+  max-height: 14px;
+  padding: 0 0px;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -49,7 +49,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   overflow: hidden;
 }
@@ -58,7 +58,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   flex: 0 0 auto;
 }
@@ -67,14 +67,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   flex: 0 0 auto;
 }
 
 .chain-dock__sync-label {
   margin: 0;
-  font-size: 5.5px;
+  font-size: 3.5px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: lowercase;
@@ -84,14 +84,14 @@
 
 .chain-dock__badge {
   flex-shrink: 0;
-  padding: 0 4px;
+  padding: 0 2px;
   border-radius: 999px;
-  font-size: 5.5px;
+  font-size: 3.5px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   line-height: 1.25;
-  min-height: 13px;
+  min-height: 11px;
   display: inline-flex;
   align-items: center;
 }
@@ -116,9 +116,9 @@
 
 .chain-dock__block-pill {
   flex-shrink: 0;
-  min-height: 13px;
-  height: 13px;
-  padding: 0 5px;
+  min-height: 11px;
+  height: 11px;
+  padding: 0 3px;
   border-radius: 999px;
   border: 1px solid rgba(0, 229, 255, 0.42);
   background: linear-gradient(
@@ -128,7 +128,7 @@
   );
   color: rgba(188, 240, 255, 0.98);
   font-family: inherit;
-  font-size: 5.5px;
+  font-size: 3.5px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -151,7 +151,7 @@
 
 .chain-dock__view-toggle {
   display: inline-flex;
-  gap: 1px;
+  gap: 0px;
   border-radius: 4px;
   overflow: hidden;
   border: 1px solid rgba(0, 229, 255, 0.22);
@@ -159,14 +159,14 @@
 }
 
 .chain-dock__view-btn {
-  min-height: 13px;
-  height: 13px;
-  padding: 0 4px;
+  min-height: 11px;
+  height: 11px;
+  padding: 0 2px;
   border: 0;
   background: rgba(0, 12, 22, 0.8);
   color: rgba(167, 209, 228, 0.85);
   font-family: inherit;
-  font-size: 5.5px;
+  font-size: 3.5px;
   font-weight: 800;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -183,13 +183,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 2px;
+  gap: 0px;
   margin: 0;
   padding: 0;
   border: none;
   background: transparent;
   color: rgba(17, 217, 255, 0.92);
-  font-size: 5px;
+  font-size: 3px;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -199,7 +199,7 @@
 
 .chain-dock__export svg {
   width: 9px;
-  height: 9px;
+  height: 7px;
   flex: 0 0 auto;
 }
 
@@ -209,15 +209,15 @@
 
 .chain-dock__toast {
   position: absolute;
-  top: 4px;
+  top: 2px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
   max-width: calc(100% - 12px);
   margin: 0;
-  padding: 2px 6px;
+  padding: 0px 4px;
   border-radius: 6px;
-  font-size: clamp(6px, 1.8cqw, 8px);
+  font-size: clamp(4px, 1.8cqw, 6px);
   text-align: center;
   color: #b8ffd8;
   border: 1px solid rgba(0, 255, 136, 0.35);
@@ -242,11 +242,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 2px;
   margin: 0;
-  padding: 3px 5px;
+  padding: 1px 3px;
   border-radius: 6px;
-  font-size: clamp(6px, 1.8cqw, 8px);
+  font-size: clamp(4px, 1.8cqw, 6px);
   font-weight: 600;
 }
 
@@ -289,9 +289,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr) minmax(42px, 0.55fr) minmax(42px, 0.55fr);
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   min-height: 0;
-  padding: 2px;
+  padding: 0px;
   border-radius: 6px;
   border: 1px solid rgba(0, 229, 255, 0.14);
   background: rgba(0, 12, 22, 0.55);
@@ -301,14 +301,14 @@
 .chain-dock__input {
   width: 100%;
   min-width: 0;
-  height: 14px;
-  padding: 0 4px;
+  height: 12px;
+  padding: 0 2px;
   border-radius: 4px;
   border: 1px solid rgba(0, 229, 255, 0.18);
   background: rgba(0, 8, 16, 0.85);
   color: rgba(216, 244, 255, 0.95);
   font-family: inherit;
-  font-size: 6px;
+  font-size: 4px;
   font-weight: 600;
   outline: none;
   box-sizing: border-box;
@@ -329,7 +329,7 @@
 .chain-dock__input--index::-webkit-inner-spin-button,
 .chain-dock__input--index::-webkit-outer-spin-button {
   opacity: 1;
-  height: 10px;
+  height: 8px;
   margin-left: 1px;
   background: rgba(0, 229, 255, 0.12);
   border-left: 1px solid rgba(0, 229, 255, 0.28);
@@ -364,13 +364,17 @@
   background: rgba(0, 12, 22, 0.45);
 }
 
+.chain-dock__body:has(app-chain-graph) {
+  background: #000;
+}
+
 .chain-dock__list {
   list-style: none;
   margin: 0;
-  padding: 2px;
+  padding: 0px;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
   flex: 1 1 0;
   min-height: 0;
   overflow-x: hidden;
@@ -397,11 +401,11 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 3px;
+  gap: 1px;
   width: 100%;
-  min-height: 11px;
-  height: 11px;
-  padding: 0 3px;
+  min-height: 9px;
+  height: 9px;
+  padding: 0 1px;
   border: 0;
   background: transparent;
   color: inherit;
@@ -416,7 +420,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 5.5px;
+  font-size: 3.5px;
   font-weight: 600;
   color: rgba(167, 209, 228, 0.88);
 }
@@ -450,9 +454,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  padding: 4px;
-  font-size: clamp(7px, 2.1cqw, 10px);
+  gap: 1px;
+  padding: 2px;
+  font-size: clamp(5px, 2.1cqw, 8px);
   color: rgba(167, 209, 228, 0.75);
   text-align: center;
 }
@@ -462,13 +466,13 @@
 }
 
 .chain-dock__list--skeleton {
-  padding: 2px;
-  gap: 2px;
+  padding: 0px;
+  gap: 0px;
   overflow: hidden;
 }
 
 .chain-dock__skeleton {
-  height: clamp(13px, 3.8cqw, 17px);
+  height: clamp(11px, 3.8cqw, 15px);
   border-radius: 4px;
   border: 1px solid rgba(0, 229, 255, 0.08);
   background: rgba(0, 229, 255, 0.06);
@@ -494,11 +498,11 @@
 
 @media (max-width: 320px) {
   .chain-dock__head-right {
-    gap: 2px;
+    gap: 0px;
   }
 
   .chain-dock__sync-label {
-    font-size: 5px;
+    font-size: 3px;
   }
 }
 

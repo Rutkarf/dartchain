@@ -4,9 +4,9 @@
   flex: 0 0 auto;
   margin: 0;
   padding: 0;
-  height: var(--navbar-metrics-h, var(--navbar-mini-btn-size, 16px));
+  height: var(--navbar-metrics-h, var(--navbar-mini-btn-size, 12px));
   min-height: 0;
-  max-height: var(--navbar-metrics-h, var(--navbar-mini-btn-size, 16px));
+  max-height: var(--navbar-metrics-h, var(--navbar-mini-btn-size, 12px));
   vertical-align: middle;
 }
 
@@ -14,7 +14,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0;
-  height: var(--navbar-metrics-h, var(--navbar-mini-btn-size, 16px));
+  height: var(--navbar-metrics-h, var(--navbar-mini-btn-size, 12px));
   margin: 0;
   padding: 0;
   font-size: 0;
@@ -27,7 +27,7 @@
   gap: 0;
   margin: 0;
   padding: 0;
-  height: var(--navbar-metrics-h, var(--navbar-mini-btn-size, 16px));
+  height: var(--navbar-metrics-h, var(--navbar-mini-btn-size, 12px));
   font-size: 0;
   line-height: 0;
 }
@@ -37,10 +37,10 @@
   align-items: center;
   min-width: 0;
   width: auto;
-  margin: 0 4px 0 0;
+  margin: 0 0px 0 0;
   padding: 0;
   font-family: var(--font-display);
-  font-size: clamp(0.62rem, 1.5vw, 0.75rem);
+  font-size: clamp(0.37rem, 1.5vw, 0.5rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
@@ -53,14 +53,14 @@
 :host-context(.navbar-aux__peers) .navbar-peer-metrics {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
 }
 
 .navbar-peer-refresh {
   width: 18px;
-  height: 18px;
+  height: 14px;
   min-width: 18px;
-  min-height: 18px;
+  min-height: 14px;
   margin: 0;
   padding: 0;
   flex-shrink: 0;
@@ -82,7 +82,7 @@
 
 .navbar-peer-refresh svg {
   width: 14px;
-  height: 14px;
+  height: 10px;
   stroke: currentColor;
   stroke-width: 2;
   fill: none;
@@ -110,7 +110,7 @@
 
 @media (max-width: 500px) {
   .navbar-peer-count {
-    font-size: var(--nv-font-micro, var(--navbar-status-font-size, 0.625rem));
+    font-size: var(--nv-font-micro, var(--navbar-status-font-size, 0.375rem));
   }
 }
 
@@ -121,7 +121,7 @@
   }
 
   :host-context(.navbar-metrics__peers) .navbar-peer-count {
-    font-size: 0.5rem;
+    font-size: 0.25rem;
     margin: 0;
     color: var(--text-bright);
   }
@@ -132,7 +132,7 @@
 }
 
 :host-context(html.vp-compact) .navbar-peer-count {
-  font-size: 0.5rem;
+  font-size: 0.25rem;
 }
 
 @media (max-width: 250px) {
@@ -151,7 +151,7 @@
   }
 
   .navbar-peer-count {
-    font-size: 0.4375rem;
+    font-size: 0.1875rem;
   }
 
   .navbar-peer-refresh {
@@ -163,6 +163,6 @@
 
   .navbar-peer-refresh svg {
     width: 6px;
-    height: 6px;
+    height: 2px;
   }
 }

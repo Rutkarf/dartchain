@@ -11,11 +11,11 @@
 .faucet-panel {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 2px;
+  gap: 0px;
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: 3px 4px 4px;
+  padding: 1px 2px 2px;
   border-radius: var(--ds-surface-radius, 10px);
   background-color: var(--ds-surface-tint);
   background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
@@ -29,14 +29,14 @@
 
 .faucet-panel__toast {
   position: absolute;
-  top: 4px;
+  top: 2px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
   max-width: calc(100% - 8px);
-  padding: 2px 6px;
+  padding: 0px 4px;
   border-radius: 6px;
-  font-size: 6px;
+  font-size: 4px;
   line-height: 1.2;
   text-align: center;
   border: 1px solid rgba(0, 255, 136, 0.45);
@@ -62,7 +62,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
 }
 
@@ -78,11 +78,11 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 2px;
   margin: 0;
-  padding: 0 2px 1px;
+  padding: 0 0px 0px;
   min-width: 0;
-  font-size: 5.5px;
+  font-size: 3.5px;
   line-height: 1.2;
   color: rgba(167, 209, 228, 0.88);
   letter-spacing: 0.03em;
@@ -126,14 +126,14 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: baseline;
-  gap: 4px;
-  padding: 0 1px;
+  gap: 2px;
+  padding: 0 0px;
   min-width: 0;
 }
 
 .faucet-panel__title-wrap h2 {
   margin: 0;
-  font-size: 9px;
+  font-size: 7px;
   letter-spacing: 0.08em;
   color: #dbf4ff;
   line-height: 1.05;
@@ -143,7 +143,7 @@
 .faucet-panel__title-sub {
   margin: 0;
   min-width: 0;
-  font-size: 5px;
+  font-size: 3px;
   color: rgba(182, 216, 233, 0.8);
   line-height: 1.15;
   overflow: hidden;
@@ -156,12 +156,12 @@
 .faucet-panel__refresh {
   flex: 0 0 auto;
   width: 16px;
-  height: 16px;
+  height: 14px;
   border-radius: 4px;
   border: 1px solid rgba(0, 229, 255, 0.32);
   background: rgba(0, 229, 255, 0.08);
   color: rgba(188, 240, 255, 0.95);
-  font-size: 10px;
+  font-size: 8px;
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -170,10 +170,10 @@
 .faucet-panel__top {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(34px, 0.38fr) 48px;
-  gap: 2px;
+  gap: 0px;
   align-items: stretch;
   min-height: 0;
-  margin-bottom: 1px;
+  margin-bottom: 0px;
 }
 
 .faucet-panel__top .faucet-panel__tile--amount {
@@ -181,9 +181,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 28px;
-  max-height: 36px;
-  padding: 1px 2px;
+  min-height: 26px;
+  max-height: 34px;
+  padding: 0px 0px;
 }
 
 .faucet-panel__value-wrap {
@@ -211,7 +211,7 @@
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
-  gap: 3px;
+  gap: 1px;
   width: max-content;
   max-width: none;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -221,7 +221,7 @@
   letter-spacing: 0;
   line-height: 1;
   font-weight: 700;
-  font-size: 7px;
+  font-size: 5px;
   transition:
     color 180ms ease,
     text-shadow 180ms ease;
@@ -234,7 +234,7 @@
 
 .faucet-panel__cap-hint {
   margin: 0;
-  font-size: 4.5px;
+  font-size: 2.5px;
   line-height: 1;
   color: rgba(255, 213, 106, 0.85);
   text-align: center;
@@ -268,7 +268,7 @@
 
 .faucet-panel__label {
   margin: 0;
-  font-size: 6px;
+  font-size: 4px;
   letter-spacing: 0.09em;
   color: rgba(175, 220, 238, 0.78);
   white-space: nowrap;
@@ -278,7 +278,7 @@
   border: 1px solid rgba(0, 229, 255, 0.24);
   border-radius: 8px;
   background: rgba(3, 14, 24, 0.78);
-  padding: 2px 3px;
+  padding: 0px 1px;
   min-height: 0;
   min-width: 0;
 }
@@ -288,15 +288,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
-  padding: 2px;
-  max-height: 36px;
+  gap: 0px;
+  padding: 0px;
+  max-height: 34px;
 }
 
 .faucet-panel__cooldown-ring {
   --cooldown-progress: 0;
   width: 28px;
-  height: 28px;
+  height: 26px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -323,7 +323,7 @@
 .faucet-panel__cooldown-value {
   position: relative;
   z-index: 1;
-  font-size: 6px;
+  font-size: 4px;
   color: #bff6ff;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -333,7 +333,7 @@
 
 .faucet-panel__sub {
   margin: 0;
-  font-size: 5px;
+  font-size: 3px;
   color: rgba(185, 212, 226, 0.74);
   line-height: 1.05;
   white-space: nowrap;
@@ -344,7 +344,7 @@
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
   min-height: 0;
 }
@@ -356,7 +356,7 @@
 .faucet-panel__claim {
   flex: 1 1 auto;
   width: 100%;
-  min-height: 26px;
+  min-height: 24px;
   height: 100%;
   margin: 0;
   flex-shrink: 0;
@@ -364,7 +364,7 @@
   border: 1px solid rgba(0, 229, 255, 0.62);
   background: linear-gradient(180deg, rgba(0, 229, 255, 0.14), rgba(0, 145, 220, 0.08));
   color: #99f4ff;
-  font-size: 8px;
+  font-size: 6px;
   letter-spacing: 0.04em;
   font-weight: 700;
   cursor: pointer;
@@ -375,7 +375,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 0 1px;
+  padding: 0 0px;
   text-transform: uppercase;
   transition: opacity 160ms ease, color 160ms ease, border-color 160ms ease;
 }
@@ -405,14 +405,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
-  min-height: 12px;
+  padding: 0 2px;
+  min-height: 10px;
   border-radius: 5px;
   border: 1px solid rgba(0, 255, 136, 0.45);
   background: rgba(4, 24, 16, 0.88);
   color: #85ffd3;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: clamp(4.5px, 1.5cqw, 6px);
+  font-size: clamp(2.5px, 1.5cqw, 4px);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -427,10 +427,10 @@
 .faucet-panel__tx-line {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
-  min-height: 14px;
-  padding: 0 1px;
+  min-height: 12px;
+  padding: 0 0px;
 }
 
 .faucet-panel__tx-line .faucet-panel__tx {
@@ -451,9 +451,9 @@
 
 .faucet-panel__feedback {
   margin: 0;
-  padding: 1px 3px;
+  padding: 0px 1px;
   border-radius: 5px;
-  font-size: 5.5px;
+  font-size: 3.5px;
   line-height: 1.2;
   max-height: 2.4em;
   overflow: hidden;
@@ -474,9 +474,9 @@
 
 .faucet-panel__banner {
   margin: 0;
-  padding: 2px 4px;
+  padding: 0px 2px;
   border-radius: 5px;
-  font-size: 5.5px;
+  font-size: 3.5px;
   line-height: 1.2;
   text-align: center;
 }
@@ -504,7 +504,7 @@
   border: none;
   background: transparent;
   color: #ffd0d0;
-  font-size: 5.5px;
+  font-size: 3.5px;
   cursor: pointer;
   text-decoration: underline;
   padding: 0;
@@ -512,7 +512,7 @@
 
 .faucet-panel__sub--eligible {
   color: rgba(150, 220, 255, 0.82);
-  font-size: 5px;
+  font-size: 3px;
   line-height: 1.15;
   text-align: center;
   white-space: normal;
@@ -520,16 +520,16 @@
 
 .faucet-panel__balance {
   display: block;
-  margin-top: 2px;
-  font-size: 6px;
+  margin-top: 0px;
+  font-size: 4px;
   color: rgba(190, 245, 255, 0.92);
 }
 
 .faucet-panel__tx-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 2px;
+  gap: 2px;
+  margin-top: 0px;
 }
 
 .faucet-panel__tx--explorer {
@@ -538,11 +538,11 @@
 
 .faucet-panel__tx {
   display: block;
-  margin-top: 1px;
+  margin-top: 0px;
   padding: 0;
   border: none;
   background: transparent;
-  font-size: 5px;
+  font-size: 3px;
   color: rgba(186, 223, 239, 0.88);
   font-family: ui-monospace, monospace;
   text-align: left;
@@ -556,10 +556,10 @@
   border: 1px solid rgba(0, 229, 255, 0.2);
   border-radius: 8px;
   background: rgba(2, 10, 18, 0.72);
-  padding: 2px 4px;
+  padding: 0px 2px;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
   overflow: hidden;
 }
 
@@ -567,14 +567,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 2px;
+  gap: 0px;
   margin: 0;
   margin-left: auto;
   padding: 0;
   border: none;
   background: transparent;
   color: rgba(17, 217, 255, 0.92);
-  font-size: 5px;
+  font-size: 3px;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -586,7 +586,7 @@
 
 .faucet-panel__history-export svg {
   width: 9px;
-  height: 9px;
+  height: 7px;
   flex: 0 0 auto;
 }
 
@@ -612,11 +612,11 @@
 .faucet-panel__row {
   display: grid;
   grid-template-columns: 34px 44px 40px minmax(0, 1fr) 40px 28px;
-  gap: 2px;
+  gap: 0px;
   align-items: center;
   min-width: 0;
-  min-height: 11px;
-  font-size: 5.5px;
+  min-height: 9px;
+  font-size: 3.5px;
   line-height: 1.05;
   color: rgba(187, 212, 228, 0.8);
 }
@@ -625,12 +625,12 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  font-size: 5px;
+  font-size: 3px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: rgba(167, 209, 228, 0.62);
   border-bottom: 1px solid rgba(0, 229, 255, 0.12);
-  padding-bottom: 1px;
+  padding-bottom: 0px;
   margin-bottom: 0;
   background: rgba(2, 10, 18, 0.96);
 }
@@ -665,7 +665,7 @@
 .faucet-panel__row-explorer-spacer {
   display: block;
   width: 14px;
-  height: 1px;
+  height: 0px;
   justify-self: end;
 }
 
@@ -673,7 +673,7 @@
   border: none;
   background: transparent;
   color: rgba(17, 217, 255, 0.9);
-  font-size: 7px;
+  font-size: 5px;
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -681,19 +681,19 @@
 }
 
 .faucet-panel__empty {
-  font-size: 6px;
+  font-size: 4px;
   color: rgba(167, 209, 228, 0.75);
   text-align: center;
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .faucet-panel__load-more {
   align-self: center;
-  margin-top: 2px;
+  margin-top: 0px;
   border: none;
   background: transparent;
   color: rgba(17, 217, 255, 0.88);
-  font-size: 5.5px;
+  font-size: 3.5px;
   cursor: pointer;
   padding: 0;
 }
@@ -703,11 +703,11 @@
   flex-shrink: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
-  gap: 3px;
+  gap: 1px;
   align-items: center;
   border-top: 1px solid rgba(0, 229, 255, 0.28);
-  padding: 2px 2px 3px;
-  min-height: 20px;
+  padding: 0px 0px 1px;
+  min-height: 18px;
   line-height: 1.1;
   background: rgba(2, 10, 18, 0.92);
   position: relative;
@@ -718,13 +718,13 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
   line-height: 1.15;
 }
 
 .faucet-panel__meta-item span {
   display: block;
-  font-size: 5px;
+  font-size: 3px;
   line-height: 1.2;
   color: rgba(167, 209, 228, 0.85);
   letter-spacing: 0.07em;
@@ -733,7 +733,7 @@
 
 .faucet-panel__meta-item strong {
   display: block;
-  font-size: 8px;
+  font-size: 6px;
   line-height: 1.2;
   color: #d8f4ff;
   font-weight: 700;
@@ -748,7 +748,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  font-size: 8px;
+  font-size: 6px;
   line-height: 1.2;
   color: #d8f4ff;
   font-weight: 700;
@@ -770,7 +770,7 @@
 
 .faucet-panel__meta-detail {
   display: block;
-  font-size: 4.5px;
+  font-size: 2.5px;
   line-height: 1.1;
   color: rgba(167, 209, 228, 0.72);
   white-space: nowrap;
@@ -780,7 +780,7 @@
 
 .faucet-panel__dot {
   width: 6px;
-  height: 6px;
+  height: 4px;
   border-radius: 50%;
   flex-shrink: 0;
   background: #ffd56a;
@@ -824,8 +824,8 @@
   border: none;
   border-radius: 0;
   box-shadow: none;
-  padding: 2px 3px 3px;
-  gap: 1px;
+  padding: 0px 1px 1px;
+  gap: 0px;
   grid-template-rows: auto minmax(0, 1fr);
 }
 
@@ -835,31 +835,31 @@
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__top {
   grid-template-columns: minmax(0, 1.85fr) minmax(28px, 0.32fr) 40px;
-  gap: 2px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__top .faucet-panel__tile--amount {
-  min-height: 24px;
-  max-height: 28px;
-  padding: 1px;
+  min-height: 22px;
+  max-height: 26px;
+  padding: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__value {
-  font-size: 6px;
+  font-size: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__tile--cooldown {
-  max-height: 28px;
-  padding: 1px;
+  max-height: 26px;
+  padding: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__cooldown-ring {
   width: 22px;
-  height: 22px;
+  height: 20px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__cooldown-value {
-  font-size: 5px;
+  font-size: 3px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__label {
@@ -867,27 +867,27 @@
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__claim {
-  min-height: 24px;
+  min-height: 22px;
   height: 100%;
-  font-size: 6px;
+  font-size: 4px;
   letter-spacing: 0.02em;
   padding: 0;
   margin: 0;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__claim-success-info {
-  font-size: 4.5px;
-  padding: 0 3px;
-  min-height: 10px;
+  font-size: 2.5px;
+  padding: 0 1px;
+  min-height: 8px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__tx-line {
-  min-height: 11px;
+  min-height: 9px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__tx-line .faucet-panel__tx,
 :host-context(.app-bottom-stack__panel) .faucet-panel__tx-line .faucet-panel__tx--explorer {
-  font-size: 5px;
+  font-size: 3px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__body {
@@ -897,43 +897,43 @@
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__history {
   min-height: 0;
-  padding: 1px 3px 2px;
+  padding: 0px 1px 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__row {
-  min-height: 10px;
-  font-size: 5px;
+  min-height: 8px;
+  font-size: 3px;
   grid-template-columns: 30px 38px 34px minmax(0, 1fr) 34px 26px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__row--head {
-  font-size: 4.5px;
+  font-size: 2.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__history-export {
-  font-size: 4.5px;
-  gap: 1px;
+  font-size: 2.5px;
+  gap: 0px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__history-export svg {
   width: 8px;
-  height: 8px;
+  height: 6px;
 }
 
 :host-context(.app-bottom-stack__panel) .faucet-panel__meta-inline {
-  font-size: 5px;
-  gap: 3px;
-  padding: 0 1px;
+  font-size: 3px;
+  gap: 1px;
+  padding: 0 0px;
 }
 
 @media (max-width: 349px) {
   .faucet-panel {
-    padding: 2px 3px 3px;
-    gap: 1px;
+    padding: 0px 1px 1px;
+    gap: 0px;
   }
 
   .faucet-panel__row {
-    font-size: 5.5px;
-    gap: 2px;
+    font-size: 3.5px;
+    gap: 0px;
   }
 }

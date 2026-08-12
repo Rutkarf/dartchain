@@ -1,11 +1,11 @@
 /* Showcase D.A.O — viewport fixe 300×600 px, lignes ultra-compactes (max 2 / DAO) */
 :host {
-  --dao-gap: 1px;
-  --dao-pad: 2px;
-  --dao-line-h: 10px;
-  --dao-card-h: 21px;
-  --dao-font: 7px;
-  --dao-font-sm: 6.5px;
+  --dao-gap: 0px;
+  --dao-pad: 0px;
+  --dao-line-h: 8px;
+  --dao-card-h: 19px;
+  --dao-font: 5px;
+  --dao-font-sm: 5.5px;
   --dao-neon-cyan: #5ce1ff;
   --dao-neon-cyan-rgb: 92, 225, 255;
   --dao-neon-green: #3dd68c;
@@ -117,7 +117,7 @@
   min-height: 0;
   gap: var(--dao-gap);
   margin: 0;
-  padding: 2px;
+  padding: 0px;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
@@ -155,7 +155,7 @@
   display: grid;
   grid-template-rows: var(--dao-line-h) var(--dao-line-h);
   gap: 0;
-  padding: 0 3px;
+  padding: 0 1px;
   box-sizing: border-box;
   border-radius: 2px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -206,18 +206,18 @@
 
 .showcase-dao__line--head {
   grid-template-columns: auto minmax(0, 1fr) auto auto;
-  gap: 3px;
+  gap: 1px;
 }
 
 .showcase-dao__line--foot {
   grid-template-columns: auto minmax(0, 1fr) 28px;
-  gap: 4px;
+  gap: 2px;
   padding-left: 13px;
 }
 
 .showcase-dao__logo {
   width: 10px;
-  height: 10px;
+  height: 8px;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid rgba(var(--dao-neon-cyan-rgb), 0.24);
@@ -226,7 +226,7 @@
 .showcase-dao__logo--placeholder {
   display: inline-grid;
   place-items: center;
-  font-size: 5px;
+  font-size: 3px;
   font-weight: 800;
   color: #fff;
   background: linear-gradient(
@@ -239,7 +239,7 @@
 .showcase-dao__title {
   display: flex;
   align-items: baseline;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
   overflow: hidden;
 }
@@ -272,9 +272,9 @@
 }
 
 .showcase-dao__status {
-  padding: 0 3px;
+  padding: 0 1px;
   border-radius: 2px;
-  font-size: 5.5px;
+  font-size: 3.5px;
   font-weight: 900;
   letter-spacing: 0.03em;
   line-height: 1.2;
@@ -297,7 +297,7 @@
 }
 
 .showcase-dao__enter {
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 700;
   line-height: 1;
   color: rgba(var(--dao-neon-cyan-rgb), 0.7);
@@ -324,7 +324,7 @@
 }
 
 .showcase-dao__xp {
-  height: 2px;
+  height: 0px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   overflow: hidden;
@@ -354,16 +354,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  padding: 2px;
   font-size: var(--dao-font-sm);
   color: rgba(255, 255, 255, 0.55);
   text-align: center;
 }
 
 .showcase-dao-hub .showcase-news__retry {
-  margin-top: 3px;
+  margin-top: 1px;
   border-radius: 2px;
-  padding: 2px 6px;
+  padding: 0px 4px;
   border: 1px solid rgba(var(--dao-neon-cyan-rgb), 0.24);
   background: rgba(var(--brand-baltic-blue-rgb), 0.12);
   color: rgba(255, 255, 255, 0.86);

@@ -13,17 +13,17 @@
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr) auto var(--panel-action-menu-w, 34px);
   align-items: center;
-  gap: clamp(3px, 1vw, 6px);
+  gap: clamp(1px, 1vw, 4px);
   position: relative;
   width: 100%;
   min-width: 0;
   height: 100%;
-  padding: 0 0 0 clamp(4px, 1vw, 6px);
+  padding: 0 0 0 clamp(2px, 1vw, 4px);
   box-sizing: border-box;
 }
 
 .chart-summary-bar__actions {
-  --cba-h: var(--panel-action-menu-h, 14px);
+  --cba-h: var(--panel-action-menu-h, 12px);
   --cba-item-w: var(--panel-action-item-w, 14px);
   grid-column: 5;
   position: relative;
@@ -33,9 +33,9 @@
   width: var(--panel-action-menu-w, 34px);
   min-width: var(--panel-action-menu-w, 34px);
   max-width: var(--panel-action-menu-w, 34px);
-  height: var(--panel-action-menu-h, 14px);
-  min-height: var(--panel-action-menu-h, 14px);
-  max-height: var(--panel-action-menu-h, 14px);
+  height: var(--panel-action-menu-h, 12px);
+  min-height: var(--panel-action-menu-h, 12px);
+  max-height: var(--panel-action-menu-h, 12px);
   margin: 0;
   pointer-events: auto;
 }
@@ -43,14 +43,14 @@
 .chart-summary-bar__identity {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex: 0 0 auto;
   min-width: 0;
 }
 
 .chart-summary-bar__symbol {
   font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.5rem, 2.4vw, 0.625rem);
+  font-size: clamp(0.375rem, 2.4vw, 0.5rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   color: #f4fbff;
@@ -59,13 +59,13 @@
 
 .chart-summary-bar__range {
   flex: 0 0 auto;
-  padding: 0 4px;
+  padding: 0 2px;
   border-radius: 999px;
   border: 1px solid rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.2);
   background: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.08);
   color: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.9);
   font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.4375rem, 2vw, 0.5rem);
+  font-size: clamp(0.3125rem, 2vw, 0.375rem);
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
@@ -74,7 +74,7 @@
 .chart-summary-bar__quote {
   display: inline-flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 2px;
   flex: 0 0 auto;
   min-width: 0;
   white-space: nowrap;
@@ -82,7 +82,7 @@
 
 .chart-summary-bar__price {
   font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.5625rem, 2.6vw, 0.6875rem);
+  font-size: clamp(0.4375rem, 2.6vw, 0.5625rem);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: #f4fbff;
@@ -96,7 +96,7 @@
 
 .chart-summary-bar__delta {
   font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.4375rem, 2.1vw, 0.5625rem);
+  font-size: clamp(0.3125rem, 2.1vw, 0.4375rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -114,8 +114,8 @@
   display: flex;
   align-items: stretch;
   min-width: 0;
-  height: clamp(14px, 4.2vw, 18px);
-  min-height: clamp(14px, 4.2vw, 18px);
+  height: clamp(12px, 4.2vw, 16px);
+  min-height: clamp(12px, 4.2vw, 16px);
   border-radius: 3px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.22);
@@ -197,7 +197,7 @@
 .chart-summary-bar__metrics {
   display: inline-flex;
   align-items: center;
-  gap: clamp(4px, 1vw, 6px);
+  gap: clamp(2px, 1vw, 4px);
   flex: 0 0 auto;
   min-width: 0;
   white-space: nowrap;
@@ -205,7 +205,7 @@
 
 .chart-summary-bar__metric {
   font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.4rem, 1.9vw, 0.5rem);
+  font-size: clamp(0.275rem, 1.9vw, 0.375rem);
   font-weight: 600;
   color: rgba(255, 255, 255, 0.52);
   line-height: 1;
@@ -218,7 +218,7 @@
 @media (max-width: 420px) {
   .chart-summary-bar {
     grid-template-columns: auto auto minmax(0, 1fr) auto;
-    gap: 4px;
+    gap: 2px;
   }
 
   .chart-summary-bar__metrics {
@@ -227,8 +227,8 @@
 
   .chart-summary-bar__actions {
     grid-column: 5;
-    height: var(--panel-action-menu-h, 14px);
-    max-height: var(--panel-action-menu-h, 14px);
+    height: var(--panel-action-menu-h, 12px);
+    max-height: var(--panel-action-menu-h, 12px);
   }
 }
 

@@ -2,13 +2,13 @@
 :host {
   display: contents;
 
-  --drawer-label: 6px;
+  --drawer-label: 5px;
   --drawer-value: 7px;
   --drawer-title: 8px;
   --drawer-eyebrow: 6px;
   --drawer-control: 11px;
-  --drawer-head-h: 13px;
-  --drawer-foot-h: 12px;
+  --drawer-head-h: 11px;
+  --drawer-foot-h: 10px;
   --drawer-row-min: 8px;
   --drawer-field-label-w: 44px;
 
@@ -24,7 +24,7 @@
   inset: 0;
   z-index: 25;
   display: flex;
-  padding: 1px;
+  padding: 0px;
   background: rgba(0, 0, 0, 0.62);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
@@ -56,7 +56,7 @@
   flex-direction: column;
   justify-content: center;
   min-height: 0;
-  padding: 2px 3px 1px;
+  padding: 0px 1px 0px;
   border-bottom: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.1);
   background: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.04);
   overflow: hidden;
@@ -66,7 +66,7 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 3px;
+  gap: 1px;
   min-width: 0;
   height: var(--drawer-head-h);
   min-height: var(--drawer-head-h);
@@ -86,9 +86,9 @@
   align-items: center;
   justify-content: center;
   width: 16px;
-  height: 9px;
+  height: 7px;
   border-radius: 2px;
-  font-size: 5.5px;
+  font-size: 3.5px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
@@ -120,7 +120,7 @@
 .news-insight-panel__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   margin: 0;
   min-width: 0;
   font-size: var(--drawer-eyebrow);
@@ -140,12 +140,12 @@
 
 .news-insight-panel__featured {
   flex: 0 0 auto;
-  padding: 0 2px;
+  padding: 0 0px;
   border-radius: 999px;
   border: 1px solid rgba(255, 200, 80, 0.3);
   background: rgba(255, 200, 80, 0.1);
   color: rgba(255, 220, 140, 0.92);
-  font-size: 5.5px;
+  font-size: 3.5px;
   letter-spacing: 0;
 }
 
@@ -153,20 +153,20 @@
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
 }
 
 .news-insight-panel__nav {
   display: inline-flex;
   align-items: center;
-  gap: 1px;
+  gap: 0px;
 }
 
 .news-insight-panel__nav-pos {
-  padding: 0 2px;
+  padding: 0 0px;
   font-family: var(--ds-font-mono, ui-monospace, Menlo, monospace);
-  font-size: 5.5px;
+  font-size: 3.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: rgba(255, 255, 255, 0.42);
@@ -186,7 +186,7 @@
   border-radius: 2px;
   background: rgba(var(--brand-black-rgb, 0, 0, 0), 0.28);
   color: rgba(255, 255, 255, 0.78);
-  font-size: 8px;
+  font-size: 6px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -199,7 +199,7 @@
 
 .news-insight-panel__icon-btn--close svg {
   width: 7px;
-  height: 7px;
+  height: 5px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -209,7 +209,7 @@
 .news-insight-panel__title {
   min-width: 0;
   margin: 0;
-  padding: 0 1px;
+  padding: 0 0px;
   font-size: var(--drawer-title);
   font-weight: 800;
   line-height: 1;
@@ -225,8 +225,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  padding: 1px 2px;
+  gap: 0px;
+  padding: 0px 0px;
 }
 
 .news-insight-panel__fields {
@@ -246,11 +246,11 @@
   display: grid;
   grid-template-columns: var(--drawer-field-label-w) minmax(0, 1fr);
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   flex: 1 1 0;
   min-height: var(--drawer-row-min);
-  max-height: 10px;
-  padding: 0 1px;
+  max-height: 8px;
+  padding: 0 0px;
   border-left: 2px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.12);
   background: rgba(var(--brand-black-rgb, 0, 0, 0), 0.14);
   overflow: hidden;
@@ -262,7 +262,7 @@
 
 .news-insight-panel__field--mono .news-insight-panel__field-value {
   font-family: var(--ds-font-mono, ui-monospace, Menlo, monospace);
-  font-size: 6.5px;
+  font-size: 4.5px;
 }
 
 .news-insight-panel__field-label {
@@ -295,11 +295,11 @@
 .news-insight-panel__foot {
   display: flex;
   align-items: stretch;
-  gap: 2px;
+  gap: 0px;
   flex-shrink: 0;
   min-height: var(--drawer-foot-h);
   max-height: var(--drawer-foot-h);
-  padding: 1px 2px 2px;
+  padding: 0px 0px 0px;
   border-top: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.08);
   overflow: hidden;
 }
@@ -309,7 +309,7 @@
   min-width: 0;
   height: 100%;
   margin: 0;
-  padding: 0 4px;
+  padding: 0 2px;
   border: none;
   border-radius: 2px;
   background: transparent;

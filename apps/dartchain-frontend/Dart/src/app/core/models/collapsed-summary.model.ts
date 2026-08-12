@@ -34,7 +34,7 @@ export const SHOWCASE_COLLAPSED_SUMMARY_TABS: Readonly<
   },
   dao: {
     id: 'dao',
-    title: 'LAUNCH',
+    title: 'LABZ',
     summarySelector: 'app-showcase-launch-summary',
     metrics: ['phase', 'projects', 'progress'],
   },

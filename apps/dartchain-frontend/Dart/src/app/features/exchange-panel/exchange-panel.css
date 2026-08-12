@@ -11,9 +11,9 @@
   --ex-text-subtle: var(--ds-text-muted, #5c6b7e);
   --ex-shell-radius: var(--radius-lg, 16px);
   --ex-radius-sm: var(--radius-sm, 8px);
-  --ex-control-h: 20px;
-  --ex-font-xs: max(0.5625rem, var(--ds-text-xs, 0.5625rem));
-  --ex-font-sm: 0.625rem;
+  --ex-control-h: 17px;
+  --ex-font-xs: max(0.5rem, var(--ds-text-xs, 0.5rem));
+  --ex-font-sm: 0.5625rem;
   --ex-mono: var(--ds-font-mono, ui-monospace, Menlo, monospace);
   --ex-font-ui: var(--ds-font-ui, system-ui, sans-serif);
 
@@ -30,14 +30,17 @@
 
 :host(.app-hub-swap-stack) {
   grid-column: 1;
-  grid-row: 1;
+  grid-row: 2;
   z-index: 2;
   width: calc(100% + 2 * (var(--band-inline-pad) - var(--swap-inline-pad)));
   max-width: none;
+  margin: 0;
   margin-inline: calc(var(--swap-inline-pad) - var(--band-inline-pad));
-  min-height: var(--mvp-swap-h, 28px);
-  height: auto;
-  align-self: start;
+  padding: 0;
+  min-height: calc(var(--ex-control-h) - 2px);
+  height: calc(var(--ex-control-h) - 2px);
+  max-height: calc(var(--ex-control-h) - 2px);
+  align-self: stretch;
 }
 
 :host(.exchange-panel--collapsed) {
@@ -63,14 +66,16 @@
   row-gap: 0;
   width: 100%;
   min-width: 0;
-  min-height: var(--mvp-swap-h, 28px);
+  height: calc(var(--ex-control-h) - 2px);
+  min-height: calc(var(--ex-control-h) - 2px);
+  max-height: calc(var(--ex-control-h) - 2px);
   margin: 0;
-  padding: 1px 6px;
+  padding: 0 4px;
   box-sizing: border-box;
-  border-radius: var(--ex-shell-radius);
+  border-radius: 0;
   background: var(--glass-fill-fintech, rgba(10, 18, 32, 0.75));
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: var(--shadow-card, 0 2px 12px rgba(0, 0, 0, 0.22));
+  border: none;
+  box-shadow: none;
   backdrop-filter: var(--glass-blur-fintech, blur(16px) saturate(120%));
   -webkit-backdrop-filter: var(--glass-blur-fintech, blur(16px) saturate(120%));
 }
@@ -93,10 +98,10 @@
 .exchange-panel__pair-route {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
   max-width: 100%;
-  padding: 0 3px;
+  padding: 0 1px;
   height: var(--ex-control-h);
   border-radius: var(--ex-radius-sm);
   background: rgba(var(--ex-cyan-rgb), 0.04);
@@ -105,7 +110,7 @@
 .exchange-panel__pair-from {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   flex: 0 0 auto;
   min-width: 0;
 }
@@ -114,7 +119,7 @@
   display: block;
   flex: 0 0 auto;
   width: clamp(12px, 3vw, 15px);
-  height: clamp(12px, 3vw, 15px);
+  height: clamp(10px, 3vw, 13px);
   overflow: visible;
 }
 
@@ -123,7 +128,7 @@
   place-items: center;
   flex: 0 0 auto;
   width: clamp(11px, 2.6vw, 13px);
-  height: clamp(11px, 2.6vw, 13px);
+  height: clamp(9px, 2.6vw, 11px);
   border-radius: 50%;
   background: rgba(var(--ex-cyan-rgb), 0.14);
   color: var(--ex-cyan);
@@ -167,12 +172,12 @@
 .exchange-panel__token-trigger {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
   max-width: 100%;
   height: calc(var(--ex-control-h) - 2px);
   margin: 0;
-  padding: 0 2px;
+  padding: 0 0px;
   border: none;
   border-radius: var(--ex-radius-sm);
   background: transparent;
@@ -187,7 +192,7 @@
 
 .exchange-panel__token-trigger .exchange-panel__pair-icon {
   width: clamp(10px, 2.4vw, 12px);
-  height: clamp(10px, 2.4vw, 12px);
+  height: clamp(8px, 2.4vw, 10px);
 }
 
 .exchange-panel__token-trigger:hover,
@@ -230,7 +235,7 @@
   min-width: max(100%, 128px);
   max-width: min(220px, 72vw);
   margin: 0;
-  padding: 3px;
+  padding: 1px;
   list-style: none;
   border-radius: var(--ex-radius-sm);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -242,9 +247,9 @@
 .exchange-panel__token-menu-item {
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
-  padding: 4px 6px;
+  padding: 2px 4px;
   border-radius: calc(var(--ex-radius-sm) - 1px);
   cursor: pointer;
   transition: background 160ms ease;
@@ -256,7 +261,7 @@
 }
 
 .exchange-panel__token-menu-item--grid {
-  margin-top: 2px;
+  margin-top: 0px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--ex-text-muted);
 }
@@ -285,7 +290,7 @@
 .exchange-panel__amount-zone {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
   height: var(--ex-control-h);
 }
@@ -294,11 +299,11 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 2px;
+  gap: 0px;
   width: 100%;
   min-width: 0;
   height: 100%;
-  padding: 0 4px;
+  padding: 0 2px;
   border-radius: var(--ex-radius-sm);
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(0, 0, 0, 0.28);
@@ -381,7 +386,7 @@
 .exchange-panel__max-btn {
   flex: 0 0 auto;
   margin: 0;
-  padding: 1px 5px;
+  padding: 0px 3px;
   height: calc(var(--ex-control-h) - 2px);
   border: 1px solid rgba(var(--ex-green-rgb), 0.22);
   border-radius: 999px;
@@ -415,7 +420,7 @@
   flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
-  padding: 2px 4px;
+  padding: 0px 2px;
   border-radius: 999px;
   background: rgba(var(--ex-green-rgb), 0.1);
   border: 1px solid rgba(var(--ex-green-rgb), 0.18);
@@ -452,7 +457,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 1px;
   flex: 0 0 auto;
   min-width: 0;
   max-width: 100%;
@@ -460,7 +465,7 @@
   min-height: calc(var(--ex-control-h) - 2px);
   max-height: calc(var(--ex-control-h) - 2px);
   margin: 0;
-  padding: 0 clamp(6px, 1.75vw, 10px);
+  padding: 0 clamp(4px, 1.75vw, 8px);
   border: 1px solid rgba(var(--ex-cyan-rgb), 0.55);
   border-radius: var(--ds-radius-btn, 12px);
   background: var(--cta-primary-bg, var(--ex-cyan));
@@ -560,7 +565,7 @@
 .exchange-panel__cta-spinner {
   flex: 0 0 auto;
   width: 10px;
-  height: 10px;
+  height: 8px;
   border: 1.5px solid rgba(255, 255, 255, 0.22);
   border-top-color: #fff;
   border-radius: 50%;
@@ -585,7 +590,7 @@
   left: 5px;
   z-index: 20;
   min-width: min(100%, 180px);
-  padding: 4px;
+  padding: 2px;
   border-radius: var(--ex-radius-sm);
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(6, 12, 22, 0.98);
@@ -596,14 +601,14 @@
 .exchange-panel__targets {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 3px;
+  gap: 1px;
 }
 
 .exchange-panel__chip {
   box-sizing: border-box;
   min-width: 0;
   min-height: calc(var(--ex-control-h) - 2px);
-  padding: 2px 4px;
+  padding: 0px 2px;
   margin: 0;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: var(--ex-radius-sm);
@@ -616,7 +621,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 0px;
   cursor: pointer;
   transition:
     background 160ms ease,
@@ -668,9 +673,9 @@
 .exchange-panel__sr-only {
   position: absolute;
   width: 1px;
-  height: 1px;
+  height: 0px;
   padding: 0;
-  margin: -1px;
+  margin: 0px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
@@ -681,10 +686,10 @@
   position: absolute;
   left: 5px;
   right: 5px;
-  bottom: 4px;
+  bottom: 2px;
   z-index: 8;
   margin: 0;
-  padding: 3px 6px;
+  padding: 1px 4px;
   font-size: calc(var(--ex-font-sm) - 1px);
   line-height: 1.15;
   border-radius: var(--ex-radius-sm);
@@ -694,7 +699,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 2px;
   border: 1px solid rgba(var(--ex-green-rgb), 0.28);
   background: rgba(6, 12, 22, 0.96);
   color: var(--ex-green);
@@ -705,7 +710,7 @@
   border: none;
   background: transparent;
   color: inherit;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 800;
   cursor: pointer;
   padding: 0;
@@ -764,11 +769,11 @@
 
   .exchange-panel__estimate {
     font-size: calc(var(--ex-font-sm) - 2px);
-    padding: 1px 3px;
+    padding: 0px 1px;
   }
 
   .exchange-panel__cta {
-    padding: 0 6px;
+    padding: 0 4px;
   }
 }
 
@@ -793,7 +798,7 @@
 
   .exchange-panel__cta {
     min-width: clamp(38px, 10vw, 52px);
-    padding: 0 7px;
+    padding: 0 5px;
   }
 
   .exchange-panel__cta-label {

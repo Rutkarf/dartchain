@@ -7,7 +7,7 @@
 .searchbar {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0px;
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -18,9 +18,9 @@
   flex: 1 1 auto;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0px;
   min-width: 0;
-  padding: 3px 6px;
+  padding: 0px 2px;
   border-radius: 8px;
   border: 1px solid rgba(var(--ui-accent-rgb), 0.28);
   background: rgba(4, 13, 24, 0.82);
@@ -28,7 +28,7 @@
 
 .searchbar__icon {
   flex: 0 0 auto;
-  font-size: 11px;
+  font-size: 7px;
   line-height: 1;
   opacity: 0.72;
 }
@@ -40,7 +40,7 @@
   outline: none;
   background: transparent;
   color: rgba(205, 231, 245, 0.9);
-  font-size: 10px;
+  font-size: 6px;
   line-height: 1.2;
 }
 
@@ -51,13 +51,13 @@
 .searchbar__pending {
   flex: 0 0 auto;
   width: 24px;
-  height: 24px;
+  height: 20px;
   border-radius: 8px;
   border: 1px solid rgba(var(--ui-accent-rgb), 0.28);
   background: rgba(4, 13, 24, 0.82);
   color: rgba(205, 231, 245, 0.84);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 7px;
   line-height: 1;
   padding: 0;
 }

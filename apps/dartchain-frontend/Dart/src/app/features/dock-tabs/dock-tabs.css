@@ -4,7 +4,7 @@
   min-width: 0;
   --dock-tab-cyan: var(--ds-neon-cyan, #00f5ff);
   --dock-tab-cyan-rgb: var(--ds-neon-cyan-rgb, 0, 245, 255);
-  --dock-hub-tab-h: var(--dock-hub-tab-h, var(--showcase-hub-tab-h, 18px));
+  --dock-hub-tab-h: var(--dock-hub-tab-h, var(--showcase-hub-tab-h, 15px));
   --dock-hub-tab-w: var(--dock-hub-tab-w, clamp(2rem, 10vw, 2.75rem));
 }
 
@@ -26,7 +26,7 @@
 :host-context(.dock-header-tabs) .dock-tabs {
   justify-content: flex-end;
   align-items: flex-end;
-  gap: 3px;
+  gap: 1px;
   width: fit-content;
   max-width: 100%;
   height: 100%;
@@ -59,7 +59,7 @@
   flex-direction: row;
   align-items: flex-end;
   justify-content: flex-end;
-  gap: 3px;
+  gap: 1px;
   width: fit-content;
   max-width: 100%;
   height: var(--dock-hub-tab-h);
@@ -85,16 +85,16 @@
   min-height: 100%;
   height: 100%;
   margin: 0;
-  padding: 0 3px;
+  padding: 0 1px;
   box-sizing: border-box;
   border: none;
   border-radius: var(--ds-radius-pill, 6px);
   color: var(--ds-text-muted, rgba(255, 255, 255, 0.62));
   font-family: inherit;
-  font-size: clamp(5px, calc(1.25vw + 1px), 6.5px);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1;
+  font-size: clamp(5px, 1.9vw, 7px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: visible;
@@ -123,9 +123,14 @@
 
 .dock-tab.is-active {
   color: var(--dock-tab-cyan);
+  font-weight: 800;
   box-shadow:
     inset 0 1px 0 rgba(var(--ds-surface-metal-highlight-rgb, 148, 168, 196), 0.08),
     0 0 10px rgba(var(--dock-tab-cyan-rgb), 0.12);
+}
+
+.dock-tab.is-active .dock-tab-label {
+  font-weight: 800;
 }
 
 .dock-tab:focus {
@@ -147,6 +152,9 @@
   overflow: visible;
   min-width: min-content;
   color: inherit;
+  font-family: 'Open Sans', var(--font-body, system-ui, sans-serif);
+  font-size: inherit;
+  font-weight: 600;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -156,21 +164,27 @@
 }
 
 @media (max-width: 500px) {
+  .dock-tab,
   .dock-tab-label {
-    font-size: clamp(5px, calc(1.25vw + 1px), 6.5px);
+    font-size: clamp(5px, 1.9vw, 7px);
   }
 }
 
 @media (max-width: 349px) {
   .dock-tabs {
-    gap: 2px;
+    gap: 0px;
   }
 
   .dock-tab {
-    font-size: 7px;
-    letter-spacing: 0.08em;
-    padding: 0 2px;
+    font-size: 5px;
+    letter-spacing: 0.04em;
+    padding: 0 0px;
     border-radius: 6px;
+  }
+
+  .dock-tab.is-active,
+  .dock-tab.is-active .dock-tab-label {
+    font-weight: 800;
   }
 }
 

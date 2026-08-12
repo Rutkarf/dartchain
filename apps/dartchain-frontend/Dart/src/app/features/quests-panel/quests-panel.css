@@ -15,7 +15,7 @@
   --quest-green-rgb: 0, 255, 136;
   --quest-green: #00ff88;
   --quest-muted: rgba(177, 205, 224, 0.62);
-  --quest-row-height: 14px;
+  --quest-row-height: 12px;
   --ds-surface-carbon-opacity: 0.46;
   --ds-surface-sheen-opacity: 0.3;
 
@@ -23,11 +23,11 @@
   isolation: isolate;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
-  gap: 2px;
+  gap: 0px;
   width: 100%;
   height: 100%;
   min-height: 0;
-  padding: 2px;
+  padding: 0px;
   box-sizing: border-box;
   overflow: hidden;
   border-radius: var(--ds-surface-radius, 10px);
@@ -50,17 +50,17 @@
 
 .quests-panel__toast {
   position: absolute;
-  top: 3px;
+  top: 1px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 6;
   max-width: calc(100% - 8px);
-  padding: 2px 6px;
+  padding: 0px 4px;
   border-radius: 6px;
   border: 1px solid rgba(var(--quest-green-rgb), 0.45);
   background: rgba(2, 18, 14, 0.94);
   color: var(--quest-green);
-  font-size: 8px;
+  font-size: 6px;
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
@@ -84,17 +84,17 @@
 
 .quests-panel__error {
   position: absolute;
-  top: 2px;
+  top: 0px;
   left: 2px;
   right: 2px;
   z-index: 5;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
-  padding: 2px 4px;
+  gap: 2px;
+  padding: 0px 2px;
   border-radius: 6px;
-  font-size: 8px;
+  font-size: 6px;
   color: #ffd8e0;
   border: 1px solid rgba(255, 92, 122, 0.45);
   background: rgba(36, 8, 16, 0.94);
@@ -104,7 +104,7 @@
   border: none;
   background: transparent;
   color: inherit;
-  font-size: 12px;
+  font-size: 10px;
   cursor: pointer;
   padding: 0;
 }
@@ -112,7 +112,7 @@
 .quests-panel__head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 3px;
+  gap: 1px;
   align-items: center;
   min-width: 0;
   min-height: 0;
@@ -122,11 +122,11 @@
 .quests-panel__guardian {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
-  min-height: 14px;
-  max-height: 16px;
-  padding: 1px 4px;
+  min-height: 12px;
+  max-height: 14px;
+  padding: 0px 2px;
   border-radius: 5px;
   border: 1px solid rgba(var(--quest-cyan-rgb), 0.28);
   background:
@@ -152,7 +152,7 @@
   position: relative;
   flex-shrink: 0;
   width: 14px;
-  height: 14px;
+  height: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -173,7 +173,7 @@
   position: relative;
   z-index: 1;
   color: #baf3ff;
-  font-size: 9px;
+  font-size: 7px;
   line-height: 1;
   text-shadow: none;
 }
@@ -187,7 +187,7 @@
 }
 
 .quests-panel__guardian-rank {
-  font-size: 5px;
+  font-size: 3px;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -198,14 +198,14 @@
 .quests-panel__guardian-line {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
 }
 
 .quests-panel__guardian-name {
   flex-shrink: 0;
   max-width: 38%;
-  font-size: 7px;
+  font-size: 5px;
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -219,7 +219,7 @@
 .quests-panel__guardian-track {
   flex: 1 1 auto;
   min-width: 24px;
-  height: 3px;
+  height: 1px;
   border-radius: 999px;
   background: rgba(var(--quest-cyan-rgb), 0.12);
   overflow: hidden;
@@ -235,7 +235,7 @@
 
 .quests-panel__guardian-pct {
   flex-shrink: 0;
-  font-size: 6px;
+  font-size: 4px;
   font-weight: 800;
   color: #baf3ff;
   font-variant-numeric: tabular-nums;
@@ -244,12 +244,12 @@
 .quests-panel__refresh {
   flex-shrink: 0;
   width: 18px;
-  height: 18px;
+  height: 16px;
   border-radius: 5px;
   border: 1px solid rgba(var(--quest-cyan-rgb), 0.28);
   background: rgba(var(--quest-cyan-rgb), 0.08);
   color: #baf3ff;
-  font-size: 10px;
+  font-size: 8px;
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -266,8 +266,8 @@
   align-items: center;
   justify-content: center;
   min-width: 44px;
-  max-height: 16px;
-  padding: 1px 4px;
+  max-height: 14px;
+  padding: 0px 2px;
   border-radius: 5px;
   border: 1px solid rgba(var(--quest-cyan-rgb), 0.22);
   background: rgba(2, 10, 20, 0.55);
@@ -282,7 +282,7 @@
 }
 
 .quests-panel__countdown-label {
-  font-size: 5px;
+  font-size: 3px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -290,7 +290,7 @@
 }
 
 .quests-panel__countdown-value {
-  font-size: 7px;
+  font-size: 5px;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
   color: #baf3ff;
@@ -304,17 +304,17 @@
 .quests-panel__progress-strip {
   display: flex;
   align-items: center;
-  gap: 4px;
-  min-height: 9px;
-  max-height: 11px;
+  gap: 2px;
+  min-height: 7px;
+  max-height: 9px;
   flex-shrink: 0;
-  padding: 0 1px;
+  padding: 0 0px;
 }
 
 .quests-panel__progress-inline {
   display: inline-flex;
   align-items: baseline;
-  gap: 2px;
+  gap: 0px;
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -324,14 +324,14 @@
 }
 
 .quests-panel__progress-count {
-  font-size: 8px;
+  font-size: 6px;
   font-weight: 900;
   color: #eef9ff;
   font-variant-numeric: tabular-nums;
 }
 
 .quests-panel__progress-label {
-  font-size: 6px;
+  font-size: 4px;
   font-weight: 700;
   color: var(--quest-muted);
   text-transform: lowercase;
@@ -339,7 +339,7 @@
 
 .quests-panel__progress-track {
   flex: 1 1 auto;
-  height: 3px;
+  height: 1px;
   border-radius: 999px;
   background: rgba(var(--quest-cyan-rgb), 0.1);
   overflow: hidden;
@@ -356,13 +356,13 @@
 
 .quests-panel__claim-chip {
   flex-shrink: 0;
-  height: 14px;
-  padding: 0 5px;
+  height: 12px;
+  padding: 0 3px;
   border-radius: 4px;
   border: 1px solid rgba(var(--quest-green-rgb), 0.55);
   background: rgba(var(--quest-green-rgb), 0.12);
   color: var(--quest-green);
-  font-size: 6px;
+  font-size: 4px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -376,7 +376,7 @@
   padding: 0;
   display: grid;
   grid-auto-rows: minmax(0, 1fr);
-  gap: 2px;
+  gap: 0px;
   min-height: 0;
   height: 100%;
   align-content: stretch;
@@ -391,8 +391,8 @@
   display: grid;
   grid-template-columns: 10px minmax(0, 1fr) minmax(40px, auto);
   align-items: center;
-  gap: 4px;
-  padding: 0 4px;
+  gap: 2px;
+  padding: 0 2px;
   border-radius: 4px;
   border: 1px solid rgba(var(--quest-cyan-rgb), 0.1);
   background: rgba(1, 8, 16, 0.62);
@@ -418,13 +418,13 @@
 
 .quests-panel__check {
   width: 10px;
-  height: 10px;
+  height: 8px;
   border-radius: 3px;
   border: 1px solid rgba(177, 205, 224, 0.28);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 7px;
+  font-size: 5px;
   color: transparent;
   flex-shrink: 0;
 }
@@ -441,14 +441,14 @@
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(36px, 1.05fr);
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   overflow: hidden;
 }
 
 .quests-panel__row-title {
   margin: 0;
   min-width: 0;
-  font-size: 6.5px;
+  font-size: 4.5px;
   font-weight: 700;
   color: #eef9ff;
   line-height: 1.1;
@@ -461,7 +461,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 3px;
+  gap: 1px;
   min-width: 0;
   overflow: hidden;
 }
@@ -469,7 +469,7 @@
 .quests-panel__row-progress-track {
   display: block;
   min-width: 0;
-  height: 3px;
+  height: 1px;
   border-radius: 999px;
   background: rgba(177, 205, 224, 0.16);
   overflow: hidden;
@@ -493,7 +493,7 @@
 
 .quests-panel__row-progress-label {
   flex-shrink: 0;
-  font-size: 5px;
+  font-size: 3px;
   font-weight: 700;
   color: rgba(214, 240, 255, 0.72);
   font-variant-numeric: tabular-nums;
@@ -508,7 +508,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 3px;
+  gap: 1px;
   flex-shrink: 0;
   min-width: 0;
   overflow: hidden;
@@ -518,7 +518,7 @@
 .quests-panel__row-reward {
   position: relative;
   z-index: 1;
-  font-size: 6px;
+  font-size: 4px;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: rgba(var(--quest-cyan-rgb), 0.95);
@@ -527,17 +527,17 @@
   line-height: 1;
   text-shadow: none;
   background: rgba(1, 8, 16, 0.85);
-  padding: 1px 2px;
+  padding: 0px 0px;
   border-radius: 2px;
 }
 
 .quests-panel__btn {
   min-width: 14px;
-  min-height: 12px;
-  height: 12px;
-  padding: 0 3px;
+  min-height: 10px;
+  height: 10px;
+  padding: 0 1px;
   border-radius: 3px;
-  font-size: 7px;
+  font-size: 5px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -557,7 +557,7 @@
 
 .quests-panel__btn--go.is-login {
   min-width: 36px;
-  font-size: 6px;
+  font-size: 4px;
 }
 
 .quests-panel__btn--wallet {
@@ -568,11 +568,11 @@
 
 .quests-panel__status {
   min-width: 12px;
-  min-height: 12px;
+  min-height: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 7px;
+  font-size: 5px;
   font-weight: 800;
 }
 
@@ -585,11 +585,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
-  min-height: 14px;
-  max-height: 16px;
-  height: 15px;
-  padding: 0 5px;
+  gap: 2px;
+  min-height: 12px;
+  max-height: 14px;
+  height: 13px;
+  padding: 0 3px;
   border-radius: 5px;
   border: 1px solid rgba(var(--quest-purple-rgb), 0.28);
   background:
@@ -605,20 +605,20 @@
 .quests-panel__weekly-main {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   overflow: hidden;
 }
 
 .quests-panel__weekly-icon {
   flex-shrink: 0;
-  font-size: 7px;
+  font-size: 5px;
   color: rgba(var(--quest-purple-rgb), 0.88);
 }
 
 .quests-panel__weekly-title {
   flex-shrink: 0;
-  font-size: 6.5px;
+  font-size: 4.5px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -628,7 +628,7 @@
 
 .quests-panel__weekly-reward {
   min-width: 0;
-  font-size: 5.5px;
+  font-size: 3.5px;
   font-weight: 700;
   color: rgba(214, 240, 255, 0.78);
   white-space: nowrap;
@@ -639,15 +639,15 @@
 
 .quests-panel__weekly-btn {
   flex-shrink: 0;
-  height: 12px;
-  min-height: 12px;
-  padding: 0 6px;
+  height: 10px;
+  min-height: 10px;
+  padding: 0 4px;
   border-radius: 4px;
   border: 1px solid rgba(var(--quest-purple-rgb), 0.35);
   background: rgba(2, 10, 20, 0.92);
   color: rgba(214, 240, 255, 0.55);
   font-family: inherit;
-  font-size: 6px;
+  font-size: 4px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -769,5 +769,5 @@
   border: none;
   border-radius: 0;
   box-shadow: none;
-  padding: 2px;
+  padding: 0px;
 }

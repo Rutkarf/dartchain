@@ -52,9 +52,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
-  padding: 5px 10px;
+  padding: 3px 8px;
   border-bottom: 1px solid var(--border-subtle);
   background: var(--gradient-surface-header);
 }
@@ -65,7 +65,7 @@
 
 .launch-drawer__eyebrow {
   margin: 0;
-  font-size: 0.58rem;
+  font-size: 0.455rem;
   line-height: 1;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -83,24 +83,24 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
-  padding: 5px 10px 6px;
+  padding: 3px 8px 4px;
 }
 
 .launch-drawer__error {
-  margin: 0 0 4px;
-  padding: 4px 6px;
+  margin: 0 0 2px;
+  padding: 2px 4px;
   border-radius: 5px;
   background: var(--surface-error-bg);
   border: 1px solid var(--surface-error-border);
   color: var(--color-negative-soft);
-  font-size: 0.55rem;
+  font-size: 0.425rem;
   line-height: 1.2;
 }
 
 .launch-drawer__form {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 3px 5px;
+  gap: 1px 3px;
   align-items: end;
 }
 
@@ -113,9 +113,9 @@
 }
 
 .launch-drawer__section-title {
-  margin: 1px 0 0;
+  margin: 0px 0 0;
   padding: 0;
-  font-size: 0.4rem;
+  font-size: 0.275rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -128,10 +128,10 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   grid-template-rows: auto auto auto;
-  gap: 2px 4px;
+  gap: 0px 2px;
   align-items: start;
   align-self: stretch;
-  padding: 3px;
+  padding: 1px;
   border-radius: 6px;
   border: 1px solid var(--border-subtle);
   background: rgba(var(--shadow-ink-rgb), 0.2);
@@ -140,18 +140,18 @@
 .launch-drawer__logo-upload {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0px;
   min-width: 0;
 }
 
 .launch-drawer__logo-upload > .launch-drawer__label {
-  font-size: 0.36rem;
+  font-size: 0.235rem;
 }
 
 .launch-drawer__logo-preview {
   grid-row: 1 / span 2;
   width: 26px;
-  height: 26px;
+  height: 24px;
   border-radius: 6px;
   object-fit: cover;
   border: 1px solid var(--border-subtle);
@@ -161,7 +161,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.575rem;
   font-weight: 800;
   color: var(--drawer-muted);
   background: rgba(var(--shadow-ink-rgb), 0.35);
@@ -173,17 +173,17 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
-  min-height: 18px;
-  padding: 2px 8px;
+  min-height: 16px;
+  padding: 0px 6px;
   overflow: hidden;
   cursor: pointer;
 }
 
 .launch-drawer__browse-icon {
   width: 10px;
-  height: 10px;
+  height: 8px;
   flex-shrink: 0;
   background: currentColor;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='17 8 12 3 7 8'/%3E%3Cline x1='12' y1='3' x2='12' y2='15'/%3E%3C/svg%3E")
@@ -194,14 +194,14 @@
 }
 
 .launch-drawer__browse-text {
-  font-size: 0.48rem;
+  font-size: 0.355rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
 }
 
 .launch-drawer__browse-hint {
-  font-size: 0.34rem;
+  font-size: 0.215rem;
   line-height: 1.15;
   color: var(--drawer-muted);
   font-weight: 600;
@@ -223,13 +223,13 @@
   grid-row: 1 / span 2;
   align-self: start;
   width: 18px;
-  height: 18px;
+  height: 16px;
   padding: 0;
   border: 0;
   border-radius: 4px;
   background: rgba(var(--color-negative-rgb), 0.15);
   color: var(--color-negative-soft);
-  font-size: 0.75rem;
+  font-size: 0.625rem;
   line-height: 1;
   cursor: pointer;
 }
@@ -237,12 +237,12 @@
 .launch-drawer__field {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0px;
   min-width: 0;
 }
 
 .launch-drawer__label {
-  font-size: 0.38rem;
+  font-size: 0.255rem;
   font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -253,29 +253,29 @@
 .launch-drawer__field input:not(.launch-drawer__input-number),
 .launch-drawer__field select:not(.launch-drawer__glass-select) {
   width: 100%;
-  min-height: 18px;
-  height: 18px;
-  padding: 0 5px;
+  min-height: 16px;
+  height: 16px;
+  padding: 0 3px;
   border-radius: 4px;
   border: 1px solid var(--border-subtle);
   background-color: rgba(var(--shadow-ink-rgb), 0.32);
   color: var(--drawer-text);
-  font-size: 0.54rem;
+  font-size: 0.415rem;
   line-height: 1;
   font-family: inherit;
 }
 
 .launch-drawer__field input::placeholder {
   color: var(--text-faint);
-  font-size: 0.48rem;
+  font-size: 0.355rem;
 }
 
 /* Charte exchange-panel : token-select__trigger + exchange-panel__amount-input */
 .launch-drawer__glass-select {
   width: 100%;
-  min-height: 18px;
-  height: 18px;
-  padding: 0 16px 0 5px;
+  min-height: 16px;
+  height: 16px;
+  padding: 0 14px 0 3px;
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
@@ -288,7 +288,7 @@
   background-position: right 4px center;
   background-size: 8px 8px;
   color: var(--text-primary);
-  font-size: 0.54rem;
+  font-size: 0.415rem;
   font-weight: 800;
   line-height: 1;
   font-family: inherit;
@@ -306,7 +306,7 @@
 }
 
 .launch-drawer__glass-select option {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 800;
   color: var(--text-primary);
   background: var(--glass-dropdown-fill, rgb(18, 20, 30));
@@ -316,8 +316,8 @@
   position: relative;
   display: flex;
   width: 100%;
-  min-height: 18px;
-  height: 18px;
+  min-height: 16px;
+  height: 16px;
   border-radius: 5px;
   border: 1px solid var(--ui-border);
   background: var(--glass-field-bg);
@@ -345,12 +345,12 @@
   height: 100%;
   min-height: 0;
   margin: 0;
-  padding: 0 14px 0 5px;
+  padding: 0 12px 0 3px;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: var(--text-primary);
-  font-size: 0.54rem;
+  font-size: 0.415rem;
   font-weight: 700;
   line-height: 1;
   font-family: inherit;
@@ -359,7 +359,7 @@
 .launch-drawer__number-wrap .launch-drawer__input-number::placeholder {
   color: var(--text-soft);
   opacity: 0.6;
-  font-size: 0.48rem;
+  font-size: 0.355rem;
 }
 
 .launch-drawer__input-number {
@@ -427,7 +427,7 @@
 }
 
 .launch-drawer__field-hint {
-  font-size: 0.48rem;
+  font-size: 0.355rem;
   color: var(--drawer-muted);
 }
 
@@ -438,9 +438,9 @@
 .launch-drawer__actions {
   display: grid;
   grid-template-columns: 1fr 1.25fr;
-  gap: 6px;
-  margin-top: 2px;
-  padding-top: 4px;
+  gap: 4px;
+  margin-top: 0px;
+  padding-top: 2px;
   border-top: 1px solid var(--border-subtle);
 }
 

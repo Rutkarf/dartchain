@@ -36,22 +36,22 @@
   min-width: 0;
   min-height: 0;
   height: 100%;
-  padding: 3px;
+  padding: 1px;
   box-sizing: border-box;
   overflow: hidden;
   border-radius: clamp(4px, 1.2vw, 6px);
 }
 
 .showcase-tab-panel--launch {
-  padding: 2px;
+  padding: 0px;
 }
 
 .showcase-tab-panel--r4v3 {
-  padding: 0 2px 0;
+  padding: 0 0px 0;
 }
 
 .showcase-tab-panel--market {
-  padding: 2px;
+  padding: 0px;
 }
 
 .showcase-tab-panel.ds-surface.ds-surface--card {
@@ -68,7 +68,7 @@
 
 .showcase-window__defer {
   margin: 0;
-  padding: 8px;
+  padding: 6px;
   color: var(--text-soft);
-  font-size: 12px;
+  font-size: 10px;
 }

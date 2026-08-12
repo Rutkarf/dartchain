@@ -8,7 +8,7 @@
   flex-flow: row nowrap;
   align-items: stretch;
   justify-content: stretch;
-  gap: 2px;
+  gap: 0px;
   width: 100%;
   height: 100%;
   min-width: 0;
@@ -31,17 +31,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 0px;
   min-height: 100%;
   min-width: 0;
   max-width: none;
   margin: 0;
-  padding: 0 2px;
+  padding: 0 0px;
   border: none;
   border-radius: var(--ds-radius-sm, 8px);
   color: var(--ds-text-muted, #5c6b7e);
   font-family: inherit;
-  font-size: clamp(7px, 1.9vw, 9px);
+  font-size: clamp(5px, 1.9vw, 7px);
   font-weight: 600;
   letter-spacing: 0.04em;
   line-height: 1.1;
@@ -67,10 +67,15 @@
 .showcase-tab.is-active {
   flex: 1 1 0;
   min-width: 0;
-  padding: 0 2px;
+  padding: 0 0px;
   color: var(--ds-neon-cyan, var(--accent-cyan, #2ec4d6));
+  font-weight: 800;
   background-color: var(--ds-tab-a-bg-active, rgba(46, 196, 214, 0.08));
   box-shadow: inset 0 -2px 0 var(--ds-tab-a-border-active, var(--accent-cyan, #2ec4d6));
+}
+
+.showcase-tab.is-active .showcase-tab__label {
+  font-weight: 800;
 }
 
 .showcase-tab:focus-visible {
@@ -85,6 +90,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: 'Open Sans', var(--font-body, system-ui, sans-serif);
+  font-weight: 600;
 }
 
 .showcase-tab__badge {
@@ -93,12 +100,12 @@
   justify-content: center;
   flex: 0 0 auto;
   min-width: 14px;
-  height: 14px;
-  padding: 0 4px;
+  height: 12px;
+  padding: 0 2px;
   border-radius: var(--ds-badge-radius, 999px);
   background: rgba(var(--ds-neon-cyan-rgb, 46, 196, 214), 0.14);
   color: var(--ds-neon-cyan, var(--accent-cyan, #2ec4d6));
-  font-size: var(--ds-badge-font, 8px);
+  font-size: var(--ds-badge-font, 6px);
   font-weight: 700;
   line-height: 1;
 }
@@ -114,13 +121,13 @@
   box-sizing: border-box;
   min-width: 0;
   height: auto;
-  padding: 0 2px;
+  padding: 0 0px;
   border: 1px solid rgba(var(--ds-neon-cyan-rgb, 46, 196, 214), 0.28);
   border-radius: var(--ds-badge-radius, 999px);
   background: rgba(var(--ds-neon-cyan-rgb, 46, 196, 214), 0.12);
   color: var(--ds-neon-cyan, var(--accent-cyan, #2ec4d6));
   font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: 7px;
+  font-size: 5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -189,17 +196,23 @@
 
 @media (max-width: 349px) {
   .showcase-tabs {
-    gap: 1px;
+    gap: 0px;
   }
 
   .showcase-tab {
-    font-size: 7px;
+    font-size: 5px;
+    font-weight: 600;
     letter-spacing: 0.03em;
-    padding: 0 1px;
+    padding: 0 0px;
     border-radius: 6px;
   }
 
   .showcase-tab.is-active {
-    padding: 0 1px;
+    padding: 0 0px;
+    font-weight: 800;
+  }
+
+  .showcase-tab.is-active .showcase-tab__label {
+    font-weight: 800;
   }
 }

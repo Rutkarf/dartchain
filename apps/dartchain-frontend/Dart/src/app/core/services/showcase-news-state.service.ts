@@ -21,6 +21,8 @@ export class ShowcaseNewsStateService {
 
   private readonly readIds = signal<Set<string>>(this.loadReadIds());
   private readonly knownIds = signal<Set<string>>(new Set());
+  /** IDs déjà entendus / vus en session — ne rétrécit jamais (évite bip permanent sur refresh). */
+  private readonly heardIds = signal<Set<string>>(new Set());
   private readonly refreshRequested = new Subject<void>();
   private readonly categoryChanged = new Subject<string>();
   private lastChainSyncAt = 0;
@@ -220,18 +222,20 @@ export class ShowcaseNewsStateService {
   syncFeedItems(items: NewsItem[], append: boolean): void {
     const incomingIds = items.map((item) => item.id);
     const known = this.knownIds();
-    const wasKnown = known.size > 0;
-    const hasNew = incomingIds.some((id) => !known.has(id));
+    const heard = this.heardIds();
+    const wasHeard = heard.size > 0;
+    const hasBrandNew = incomingIds.some((id) => !heard.has(id));
 
-    const merged = append
+    const mergedKnown = append
       ? new Set([...known, ...incomingIds])
       : new Set(incomingIds);
 
-    this.knownIds.set(merged);
-    this.unreadCount.set([...merged].filter((id) => !this.readIds().has(id)).length);
-    this.newItemsToast.set(hasNew && !append);
+    this.knownIds.set(mergedKnown);
+    this.heardIds.set(new Set([...heard, ...incomingIds]));
+    this.unreadCount.set([...mergedKnown].filter((id) => !this.readIds().has(id)).length);
+    this.newItemsToast.set(hasBrandNew && !append);
 
-    if (wasKnown && hasNew) {
+    if (wasHeard && hasBrandNew) {
       this.newsFeedback.notifyNewItems();
       this.triggerRefreshPulse();
     }

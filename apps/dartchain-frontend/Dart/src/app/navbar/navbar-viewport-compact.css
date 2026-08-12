@@ -5,23 +5,23 @@
 
 @media (min-width: 250px) and (max-width: 349px) {
   :host {
-    --nv-margin-top: max(2px, env(safe-area-inset-top, 0px));
+    --nv-margin-top: max(1px, env(safe-area-inset-top, 0px));
     /* Pas de gouttière wrap : l’alignement horizontal est sur .app-navbar-zone */
     --nv-wrap-pad-x: 0px;
-    --nv-wrap-pad-left: 0px;
+    --nv-wrap-pad-left: 1px;
     --nv-wrap-pad-right: 0px;
-    --nv-pad-x: 6px;
-    --nv-pad-top: 2px;
-    --nv-pad-y: 2px;
+    --nv-pad-x: 3px;
+    --nv-pad-top: 0px;
+    --nv-pad-y: 0px;
     --nv-inner-gap: 0px;
     --nv-ticker-row-h: 0.6875rem;
     --nv-action-row-h: 0.6875rem;
-    --nv-action-btn: 22px;
+    --nv-action-btn: 20px;
     --nv-shell-radius: 10px;
-    --nv-logo: 24px;
-    --nv-logo-h: 22px;
-    --nv-brand-chip-h: calc(var(--nv-logo-h) - 1px);
-    --nv-logo-shift-y: -6px;
+    --nv-logo: 22px;
+    --nv-logo-h: 18px;
+    --nv-brand-chip-h: calc(var(--nv-logo-h) - 0px);
+    --nv-logo-shift-y: 1px;
     --nv-logo-scale: 1.28;
   }
 
@@ -34,7 +34,7 @@
   .navbar-top {
     column-gap: 4px;
     min-height: var(--nv-shell-min-h);
-    max-height: var(--ds-zone-navbar, 36px);
+    max-height: var(--ds-zone-navbar, 32px);
     padding: var(--nv-pad-top) var(--nv-pad-x) var(--nv-pad-y);
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: 'stack auth';
@@ -45,7 +45,7 @@
   }
 
   .navbar-auth-strip {
-    gap: 4px;
+    gap: 0px;
   }
 
   .navbar-auth-sep {
@@ -54,10 +54,10 @@
 
   .navbar-auth-btn {
     width: var(--nv-logo-h, 22px);
-    height: var(--nv-logo-h, 22px);
+    height: var(--nv-logo-h, 18px);
     min-width: var(--nv-logo-h, 22px);
-    min-height: var(--nv-logo-h, 22px);
-    max-height: var(--nv-logo-h, 22px);
+    min-height: var(--nv-logo-h, 18px);
+    max-height: var(--nv-logo-h, 18px);
   }
 
   .navbar-brand-row .navbar-brand-row__node {
@@ -65,7 +65,7 @@
   }
 
   .navbar-brand-row {
-    gap: 3px;
+    gap: 0px;
     height: var(--nv-logo-h);
     min-height: 0;
     max-height: var(--nv-logo-h);
@@ -90,14 +90,14 @@
 
   .navbar-auth-btn svg {
     width: 14px;
-    height: 14px;
+    height: 10px;
   }
 
   .navbar-auth-user__name {
     max-width: min(30vw, 5.5rem);
-    height: var(--nv-logo-h, 22px);
+    height: var(--nv-logo-h, 18px);
     padding: 0 0.22rem 0 0.26rem;
-    font-size: 0.5625rem;
+    font-size: 0.3125rem;
     letter-spacing: 0.01em;
   }
 }
@@ -105,14 +105,14 @@
 html.vp-compact app-navbar .navbar-wrap {
   width: 100%;
   box-sizing: border-box;
-  padding: var(--ds-navbar-top-inset, max(2px, env(safe-area-inset-top, 0px))) 0 0;
+  padding: var(--ds-navbar-top-inset, max(0px, env(safe-area-inset-top, 0px))) 0 0;
 }
 
 html.vp-compact app-navbar .navbar-top {
   column-gap: 4px;
-  padding: var(--nv-pad-top, 2px) var(--nv-pad-x, 6px) var(--nv-pad-y, 2px);
+  padding: var(--nv-pad-top, 0px) var(--nv-pad-x, 2px) var(--nv-pad-y, 0px);
   min-height: var(--nv-shell-min-h);
-  max-height: var(--ds-zone-navbar, 36px);
+  max-height: var(--ds-zone-navbar, 32px);
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas: 'stack auth';
   align-items: start;
@@ -122,9 +122,9 @@ html.vp-compact app-navbar .navbar-top {
 }
 
 html.vp-compact app-navbar .navbar-brand-row {
-  gap: 3px;
-  height: var(--nv-logo-h, 22px);
-  max-height: var(--nv-logo-h, 22px);
+  gap: 0px;
+  height: var(--nv-logo-h, 18px);
+  max-height: var(--nv-logo-h, 18px);
 }
 
 html.vp-compact app-navbar .navbar-brand-head {

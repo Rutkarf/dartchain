@@ -29,24 +29,24 @@
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
-  min-height: clamp(12px, 3.2vw, 16px);
-  padding: 0 8px;
+  min-height: clamp(10px, 3.2vw, 14px);
+  padding: 0 6px;
   border-bottom: 1px solid rgba(0, 229, 255, 0.12);
   background: rgba(2, 6, 12, 0.92);
 }
 
 .showcase-panel__accent {
   width: 2px;
-  height: 10px;
+  height: 8px;
   border-radius: 1px;
   background: #00e5ff;
   box-shadow: none;
 }
 
 .showcase-panel__title {
-  font-size: clamp(8px, 2.2vw, 10px);
+  font-size: clamp(6px, 2.2vw, 8px);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;

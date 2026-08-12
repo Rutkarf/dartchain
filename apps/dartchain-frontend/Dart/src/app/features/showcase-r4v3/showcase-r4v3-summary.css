@@ -14,11 +14,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(6px, 1.5vw, 10px);
+  gap: clamp(4px, 1.5vw, 8px);
   width: 100%;
   min-width: 0;
   height: 100%;
-  padding: 0 var(--panel-action-edge-inset, 2px) 0 6px;
+  padding: 0 var(--panel-action-edge-inset, 0px) 0 4px;
   box-sizing: border-box;
 }
 
@@ -30,10 +30,10 @@
 .r4v3-summary-bar__status-cluster {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 3px;
   flex: 1 1 auto;
   min-width: 0;
-  padding: 2px 6px 2px 4px;
+  padding: 0px 4px 0px 2px;
   border-radius: 999px;
   border: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.22);
   background: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.08);
@@ -46,7 +46,7 @@
   flex: 0 1 auto;
   min-width: 0;
   font-family: var(--font-display, inherit);
-  font-size: clamp(0.5rem, 2.2vw, 0.625rem);
+  font-size: clamp(0.375rem, 2.2vw, 0.5rem);
   font-weight: 800;
   letter-spacing: 0.05em;
   line-height: 1;
@@ -71,7 +71,7 @@
 .r4v3-summary-bar__led {
   flex: 0 0 auto;
   width: 6px;
-  height: 6px;
+  height: 4px;
   border-radius: 50%;
   box-shadow: none;
 }
@@ -139,7 +139,7 @@
 
 .r4v3-summary-bar__wp-btn-label {
   font-family: var(--font-display, inherit);
-  font-size: clamp(0.4375rem, 1.9vw, 0.5625rem);
+  font-size: clamp(0.3125rem, 1.9vw, 0.4375rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;

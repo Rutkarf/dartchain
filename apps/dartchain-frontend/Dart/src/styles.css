@@ -9,7 +9,7 @@
 @import './styles/dock-view-tokens.css';
 @import './styles/ds-pass3-polish.css';
 
-/* —— Viewport one-page @ 250×500 (pas de scroll global) —— */
+/* —— Viewport one-page @ 250×550 —— */
 html,
 body,
 app-root {
@@ -53,9 +53,9 @@ app-root {
   justify-content: flex-end !important;
   align-items: flex-end !important;
   width: 100% !important;
-  height: var(--dock-hub-tab-h, 20px) !important;
-  min-height: var(--dock-hub-tab-h, 20px) !important;
-  max-height: var(--dock-hub-tab-h, 20px) !important;
+  height: var(--dock-hub-tab-h, 18px) !important;
+  min-height: var(--dock-hub-tab-h, 18px) !important;
+  max-height: var(--dock-hub-tab-h, 18px) !important;
   overflow: visible !important;
   visibility: visible !important;
   z-index: 10 !important;
@@ -69,9 +69,9 @@ app-root {
   justify-content: flex-end !important;
   width: fit-content !important;
   max-width: 100% !important;
-  height: var(--dock-hub-tab-h, 20px) !important;
-  min-height: var(--dock-hub-tab-h, 20px) !important;
-  max-height: var(--dock-hub-tab-h, 20px) !important;
+  height: var(--dock-hub-tab-h, 18px) !important;
+  min-height: var(--dock-hub-tab-h, 18px) !important;
+  max-height: var(--dock-hub-tab-h, 18px) !important;
   gap: 0 !important;
   overflow: visible !important;
   visibility: visible !important;
@@ -164,7 +164,7 @@ app-dock-panel .dock-panel-layer > app-wallet-panel {
 }
 
 app-dock-panel .peer-shell {
-  padding: 5px;
+  padding: 3px;
 }
 
 app-dock-panel .composer-card,
@@ -200,9 +200,7 @@ optgroup {
   h6,
   .brand-title,
   .bandeau-accueil__content span,
-  .dock-tab-label,
   .showcase-tab,
-  .showcase-tab__label,
   .showcase-window__title,
   .faucet-inline__claim-text,
   .faucet-inline__value,

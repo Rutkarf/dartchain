@@ -14,12 +14,12 @@
   position: relative;
   -webkit-tap-highlight-color: transparent;
 
-  --shell-gap: 4px;
-  --section-gap: 4px;
+  --shell-gap: 0px;
+  --section-gap: 0px;
   --panel-radius: var(--radius-lg, 16px);
   /* Gouttière horizontale entre panneaux juxtaposés */
-  --panel-column-gap: 6px;
-  /* Bande marché : pile verticale Exchange → Graph */
+  --panel-column-gap: 4px;
+  /* Bande marché : pile verticale Graph → Swap */
   --hub-market-swap-col: 1fr;
   --hub-market-rate-col: 1fr;
 
@@ -28,30 +28,33 @@
   --navbar-inline-overflow: 2px;
   --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
   /* Swap : 1px plus étroit chaque côté que la navbar (= navbar-pad + 1) */
-  --swap-inline-pad: calc(var(--navbar-inline-pad) + 1px);
+  --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
 
-  /* Pas de floor peek — hiérarchie contenu d’abord @ 250×500 */
+  /* Pas de floor peek — hiérarchie contenu d’abord @ 250×550 (floor three.js inchangé) */
   --floor-peek-height: 0px;
   --app-bottom-footer-space: 0;
   --dock-panel-gap: 0;
 
-  --section-stack-gap: 4px;
-  /* Respiration verticale uniforme entre bandes (grille 4px) */
-  --band-air-gap: var(--ds-band-gap, 4px);
+  --section-stack-gap: 0px;
+  /* Bandes collées par défaut ; gouttières explicites 1px entre sections majeures */
+  --band-air-gap: var(--ds-band-gap, 0px);
   --showcase-dock-offset: 0px;
-  --stack-gap-showcase-dock: var(--band-air-gap);
-  --band-external-gap: var(--band-air-gap);
-  --stack-gap-navbar-market: var(--band-air-gap);
-  --stack-gap-market-showcase: var(--band-air-gap);
-  /* Espace clair navbar ↔ swap (évite collage / chevauchement) */
-  --navbar-hub-gap: 10px;
-  --navbar-stack-estimate: calc(var(--ds-zone-navbar, 36px) + var(--ds-navbar-top-inset, 0px));
+  /* navbar → graph · graph → swap · swap → showcase · showcase → dock */
+  --navbar-hub-gap: 1px;
+  --hub-market-internal-gap: 1px;
+  --hub-swap-showcase-gap: 1px;
+  --hub-market-showcase-gap: 1px;
+  --stack-gap-showcase-dock: 1px;
+  --stack-gap-navbar-market: var(--navbar-hub-gap);
+  --stack-gap-market-showcase: var(--hub-swap-showcase-gap);
+  --band-external-gap: 0px;
+  --navbar-stack-estimate: calc(var(--ds-zone-navbar, 32px) + var(--ds-navbar-top-inset, 0px));
   --hub-wallet-gap: 0px;
-  --shell-inline-gap: 6px;
+  --shell-inline-gap: 4px;
 
   /* Menu actions panneau — tertiary, discret */
   --panel-action-item-w: 11px;
-  --panel-action-menu-h: 11px;
+  --panel-action-menu-h: 7px;
   --panel-action-menu-w: 26px;
   --panel-action-edge-inset: 0px;
 
@@ -60,16 +63,15 @@
   --market-after-ticker-gap: var(--stack-gap-navbar-market);
 
   /* —— Hiérarchie spatiale MVP 250 ——
-     graph 196 · dock 176 · activity 128 · swap strip 28 · navbar 36 */
-  --mvp-swap-h: var(--ds-zone-exchange, 28px);
-  --mvp-chart-h: var(--ds-zone-chart, 196px);
-  --mvp-showcase-body-h: var(--ds-zone-showcase-body, 128px);
-  --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 176px);
+     graph · dock · activity · swap · navbar (−2px vs budg. navbar) */
+  --mvp-swap-h: var(--ds-zone-exchange, 14px);
+  --mvp-chart-h: var(--ds-zone-chart, 192px);
+  --mvp-showcase-body-h: var(--ds-zone-showcase-body, 124px);
+  --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 154px);
 
   --market-exchange-strip-h: var(--mvp-swap-h);
   --market-exchange-height-estimate: var(--mvp-swap-h);
-  /* Un seul gap Swap↔Graph (pas ×2) */
-  --hub-market-internal-gap: var(--band-air-gap);
+  /* Graph↔Swap déjà défini ci-dessus (--hub-market-internal-gap: 1px) */
   --market-chart-height-expanded: var(--mvp-chart-h);
   --market-chart-height: var(--market-chart-height-expanded);
   --market-band-height: calc(
@@ -77,14 +79,14 @@
   );
   --market-height: var(--market-band-height);
   /* Tokens swap (miroir exchange-panel) pour l’écart sous MONTANT */
-  --swap-row-h: 14px;
-  --swap-mid-h: 11px;
+  --swap-row-h: 11px;
+  --swap-mid-h: 8px;
   --swap-pad-block: 0px;
-  --swap-flex-gap-block: 1px;
-  --swap-header-h: 7px;
-  --swap-block-inner-h: calc(2px + 7px + var(--swap-row-h));
+  --swap-flex-gap-block: 0px;
+  --swap-header-h: 4px;
+  --swap-block-inner-h: calc(1px + 6px + var(--swap-row-h));
   --swap-mid-net: calc(var(--swap-mid-h) - 2px);
-  --swap-footer-h: calc(1px + var(--swap-row-h));
+  --swap-footer-h: calc(0px + var(--swap-row-h));
   --swap-market-card-pad-block: 0px;
   --market-swap-content-h: calc(
     var(--swap-pad-block) + var(--swap-flex-gap-block) + var(--swap-header-h) +
@@ -95,23 +97,23 @@
     0px,
     calc(var(--market-height) - var(--swap-market-card-pad-block) - var(--market-swap-content-h))
   );
-  --hub-market-showcase-gap: var(--band-air-gap);
+  /* --hub-market-showcase-gap déjà 1px (showcase → dock) */
   --showcase-tab-fusion-overlap: 0px;
-  --showcase-smart-bar-h: 28px;
-  --chart-smart-bar-h: 28px;
-  --swap-smart-bar-h: 36px;
+  --showcase-smart-bar-h: 24px;
+  --chart-smart-bar-h: 24px;
+  --swap-smart-bar-h: 32px;
   --chart-stack-header-h: 0px;
   --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
   --market-chart-collapsed-h: var(--chart-smart-bar-h);
   --market-exchange-collapsed-h: var(--swap-smart-bar-h);
-  --showcase-panel-handle-h: 12px;
+  --showcase-panel-handle-h: 8px;
   --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
   /* Découplage dock ↔ showcase : wallet a son propre budget */
-  --bottom-stack-scale: 1;
+  --bottom-stack-scale: 0.9;
   --bottom-stack-panel-scale: 1;
   --dock-stack-share-dock: 0.5;
   --dock-stack-share-hub: 0.5;
-  --showcase-hub-tab-h: var(--ds-zone-showcase-header, 20px);
+  --showcase-hub-tab-h: var(--ds-zone-showcase-header, 16px);
   --showcase-hub-chevron-row-h: 0px;
   --showcase-hub-header-h: var(--showcase-hub-tab-h);
   --hub-showcase-block-height-collapsed: calc(
@@ -124,12 +126,12 @@
     var(--showcase-hub-header-h) + var(--showcase-band-height) -
       var(--showcase-tab-fusion-overlap)
   );
-  --showcase-hub-tab-w: 24px;
-  --dock-hub-tab-h: var(--ds-zone-bottom-dock, 20px);
+  --showcase-hub-tab-w: 23px;
+  --dock-hub-tab-h: var(--ds-zone-bottom-dock, 16px);
   --dock-hub-tab-w: 2.5rem;
   --dock-panel-height: var(--mvp-bottom-panel-h);
-  --dock-panel-handle-h: 12px;
-  --dock-smart-bar-h: 28px;
+  --dock-panel-handle-h: 8px;
+  --dock-smart-bar-h: 24px;
   --dock-toggle-w: 24px;
   --dock-collapsed-band-h: var(--dock-panel-handle-h);
   --app-dock-stack-height: calc(
@@ -164,11 +166,11 @@
   /* Activity dépliée — surface de lecture (meta + liste) */
   --showcase-band-height: var(--mvp-showcase-body-h);
   --faucet-band-height: auto;
-  --faucet-row-h: 20px;
-  --hub-faucet-pad-block: 1px;
+  --faucet-row-h: 16px;
+  --hub-faucet-pad-block: 0px;
   --showcase-tabs-width: var(--tab-rail-width, 20px);
   --dock-rail-width: var(--tab-rail-width, var(--showcase-tabs-width));
-  --showcase-tab-gap: 1px;
+  --showcase-tab-gap: 0px;
 
   --workspace-gap: 0;
   --showcase-tab-slot: calc((var(--showcase-band-height) - var(--showcase-tab-gap) * 2) / 3);
@@ -178,8 +180,8 @@
   --paired-panel-block-height: var(--mvp-bottom-panel-h);
   --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
   --wallet-display-height: calc(var(--bottom-stack-panel-height) + var(--showcase-hub-tab-h));
-  --bottom-dock-height: var(--ds-zone-bottom-dock, 20px);
-  --dock-stack-header-h: var(--ds-zone-bottom-dock, 20px);
+  --bottom-dock-height: var(--ds-zone-bottom-dock, 16px);
+  --dock-stack-header-h: var(--ds-zone-bottom-dock, 16px);
   --bottom-stack-height-expanded: calc(
     var(--showcase-hub-header-h) + var(--bottom-stack-panel-height)
   );
@@ -211,7 +213,7 @@
   left: 0;
   z-index: 10000;
   transform: translateY(-120%);
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 0 0 8px 0;
   background: var(--text-primary);
   color: var(--brand-black);
@@ -322,7 +324,7 @@ app-three-floor {
   margin-bottom: 0;
   padding-inline: var(--navbar-inline-pad);
   padding-block: 0;
-  padding-bottom: var(--navbar-hub-gap, 10px);
+  padding-bottom: var(--navbar-hub-gap, 1px);
   box-sizing: border-box;
   line-height: 1;
   background: transparent;
@@ -537,21 +539,21 @@ app-three-floor {
 .app-bottom-stack__placeholder {
   display: grid;
   place-content: center;
-  gap: 6px;
+  gap: 4px;
   text-align: center;
   color: rgba(214, 240, 255, 0.82);
 }
 
 .app-bottom-stack__placeholder h3 {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .app-bottom-stack__placeholder p {
   margin: 0;
-  font-size: 11px;
+  font-size: 9px;
   color: rgba(177, 205, 224, 0.72);
 }
 
@@ -569,7 +571,7 @@ app-three-floor {
   max-width: 100%;
 }
 
-/* —— Hub : Exchange → Graph → Showcase (toujours vertical) —— */
+/* —— Hub : Graph → Swap → Showcase (toujours vertical) —— */
 .app-hub {
   flex: 0 0 auto;
   grid-column: 1;
@@ -578,15 +580,16 @@ app-three-floor {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows:
-    auto
     var(--market-chart-height)
+    auto
     var(--hub-showcase-block-height);
   column-gap: 0;
-  /* Graph ↔ Showcase : air standard ; Swap ↔ Graph via marge + ce row-gap */
-  row-gap: var(--band-air-gap);
+  /* 1px graph↔swap + 1px swap↔showcase */
+  row-gap: var(--hub-market-internal-gap, 1px);
   margin: 0;
   margin-block-start: 0;
-  margin-block-end: var(--hub-market-showcase-gap);
+  /* 1px showcase → dock tabs */
+  margin-block-end: var(--stack-gap-showcase-dock, var(--hub-market-showcase-gap, 1px));
   padding-inline: var(--band-inline-pad);
   width: 100%;
   min-width: 0;
@@ -600,8 +603,8 @@ app-three-floor {
 
 .app-hub.is-showcase-collapsed {
   grid-template-rows:
-    auto
     var(--market-chart-height)
+    auto
     var(--hub-showcase-block-height-collapsed);
   /* Replié : le surplus activity revient au chart (même budget global). */
   --market-chart-height: calc(
@@ -639,8 +642,8 @@ app-three-floor {
 
 .app-hub.is-showcase-collapsed.is-chart-collapsed:not(.is-showcase-disabled) {
   grid-template-rows:
-    auto
     var(--market-chart-height)
+    auto
     var(--hub-showcase-block-height-collapsed);
 }
 
@@ -702,8 +705,8 @@ app-three-floor {
 .app-market-stack--rate.is-chart-collapsed .rate-panel-chart__engine--hidden {
   position: absolute;
   width: 1px;
-  height: 1px;
-  margin: -1px;
+  height: 0px;
+  margin: 0px;
   padding: 0;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
@@ -713,8 +716,8 @@ app-three-floor {
 }
 
 .app-hub.is-showcase-disabled {
-  grid-template-rows: auto var(--market-chart-height);
-  row-gap: var(--band-air-gap);
+  grid-template-rows: var(--market-chart-height) auto;
+  row-gap: 0;
   margin-block-end: 0;
 }
 
@@ -749,7 +752,7 @@ app-three-floor {
 
 .app-market-stack--rate {
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 1;
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -851,8 +854,8 @@ app-three-floor {
   min-height: var(--showcase-hub-tab-h);
   max-height: var(--showcase-hub-tab-h);
   margin: 0;
-  padding: 0 0 0 2px;
-  gap: 2px;
+  padding: 0 0 0 0px;
+  gap: 0px;
   overflow: visible;
   box-sizing: border-box;
   position: relative;
@@ -874,7 +877,7 @@ app-three-floor {
 }
 
 .app-bottom-stack .showcase-header {
-  padding: 0 0 0 2px;
+  padding: 0 0 0 0px;
 }
 
 .app-hub-showcase-block .showcase-block__shell .showcase-view--news,
@@ -913,13 +916,13 @@ app-three-floor {
   max-width: 58px;
   height: calc(100% - 2px);
   margin: 0;
-  padding: 0 2px;
+  padding: 0 0px;
   border: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.14);
   border-radius: 4px;
   background: rgba(var(--ds-surface-base-deep-rgb), 0.35);
   color: var(--ds-text-primary, var(--text-primary));
   font-family: inherit;
-  font-size: clamp(6px, 1.8vw, 8px);
+  font-size: clamp(4px, 1.8vw, 6px);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -1151,7 +1154,7 @@ app-three-floor {
   min-width: 0;
   max-width: 100%;
   margin-inline: auto;
-  --faucet-row-h: clamp(18px, 4.5vw, 22px);
+  --faucet-row-h: clamp(16px, 4.5vw, 20px);
 }
 
 .app-hub-faucet-slot app-faucet {
@@ -1211,7 +1214,7 @@ app-three-floor {
   max-height: var(--dock-hub-tab-h);
   margin: 0;
   padding: 0;
-  gap: 4px;
+  gap: 2px;
   overflow: visible;
   box-sizing: border-box;
   position: relative;
@@ -1751,12 +1754,12 @@ app-block-detail-drawer {
   transform: translateX(-50%);
   z-index: 120;
   max-width: min(92vw, 360px);
-  padding: 6px 10px;
+  padding: 4px 8px;
   border-radius: 8px;
   border: 1px solid rgba(0, 255, 136, 0.45);
   background: rgba(2, 18, 14, 0.94);
   color: #b8ffd8;
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
   line-height: 1.25;
   text-align: center;
@@ -1779,11 +1782,11 @@ app-block-detail-drawer {
 /* Écrans compacts en hauteur uniquement (n’affecte pas 390×844, 450×800) */
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
-    --swap-row-h: 14px;
-    --swap-mid-h: 11px;
+    --swap-row-h: 11px;
+    --swap-mid-h: 8px;
     --showcase-tab-fusion-overlap: 0px;
     /* Ne pas élargir les gaps — budgets MVP 6px */
-    --band-air-gap: 4px;
+    --band-air-gap: 0px;
   }
 
   .app-hub-swap-stack {
@@ -1794,20 +1797,20 @@ app-block-detail-drawer {
 
 @media (min-width: 400px) {
   :host {
-    --swap-row-h: 17px;
-    --swap-mid-h: 14px;
+    --swap-row-h: 14px;
+    --swap-mid-h: 11px;
   }
 }
 
 /* Hauteurs fluides désactivées sous 350px — budgets MVP (lock final) priment */
 @media (max-height: 640px) and (min-width: 350px) {
   :host {
-    --section-stack-gap: clamp(4px, 1vw, 6px);
-    --showcase-band-height: max(var(--mvp-showcase-body-h), min(calc(140px * var(--showcase-tab-scale)), 24vh));
-    --market-height: clamp(168px, 28vh, 208px);
-    --showcase-hub-tab-h: calc(clamp(13px, 3.6vw, 16px) * var(--bottom-stack-scale));
+    --section-stack-gap: clamp(2px, 1vw, 4px);
+    --showcase-band-height: max(var(--mvp-showcase-body-h), min(calc(139px * var(--showcase-tab-scale)), 24vh));
+    --market-height: clamp(166px, 28vh, 206px);
+    --showcase-hub-tab-h: calc(clamp(12px, 3.6vw, 15px) * var(--bottom-stack-scale));
     --faucet-band-height: auto;
-    --floor-peek-height: clamp(24px, 4.5vh, 36px);
+    --floor-peek-height: clamp(22px, 4.5vh, 34px);
   }
 }
 
@@ -1816,11 +1819,11 @@ app-block-detail-drawer {
   :host {
     --wallet-display-extra: 0px;
     --navbar-stack-estimate: calc(var(--ds-zone-navbar, 56px) + var(--ds-navbar-top-inset, 0px));
-    --market-height: clamp(136px, 21.5vh, 154px);
-    --showcase-band-height-base: clamp(128px, 18vh, 160px);
+    --market-height: clamp(134px, 21.5vh, 152px);
+    --showcase-band-height-base: clamp(127px, 18vh, 159px);
     --showcase-tab-fusion-overlap: 0px;
-    --band-air-gap: 8px;
-    --shell-vertical-gaps: 6px;
+    --band-air-gap: 6px;
+    --shell-vertical-gaps: 4px;
     --hub-showcase-block-height-base: calc(
       var(--showcase-hub-header-h) + var(--showcase-band-height-base) - var(--showcase-tab-fusion-overlap)
     );
@@ -1848,8 +1851,8 @@ app-block-detail-drawer {
 /* Dock legacy clamps — hors MVP ≤349 (budgets verrouillés plus bas). */
 @media (min-width: 350px) and (max-width: 449px) {
   :host {
-    --dock-panel-height: clamp(120px, 22vh, 176px);
-    --dock-hub-tab-h: clamp(14px, 3.8vw, 18px);
+    --dock-panel-height: clamp(118px, 22vh, calc(175px * 0.9));
+    --dock-hub-tab-h: clamp(12px, 3.8vw, 16px);
     --app-dock-stack-height: calc(
       var(--dock-hub-tab-h) + var(--dock-panel-height) - var(--showcase-tab-fusion-overlap)
     );
@@ -1868,8 +1871,8 @@ app-block-detail-drawer {
 
 @media (max-height: 520px) and (min-width: 350px) {
   :host {
-    --showcase-band-height: max(var(--mvp-showcase-body-h), min(calc(140px * var(--showcase-tab-scale)), 22vh));
-    --section-stack-gap: 3px;
+    --showcase-band-height: max(var(--mvp-showcase-body-h), min(calc(139px * var(--showcase-tab-scale)), 22vh));
+    --section-stack-gap: 0px;
   }
 }
 
@@ -1904,26 +1907,26 @@ app-block-detail-drawer {
   .app-dock-stack { border-radius: clamp(4px, 1.4vw, 7px); }
 }
 
-/* === Viewport MVP 250×500 — hiérarchie spatiale verrouillée === */
+/* === Viewport MVP 250×550 — hiérarchie spatiale verrouillée (−1px/zone, hors floor) === */
 @media (max-width: 250px), (min-width: 250px) and (max-width: 250px) {
   :host {
     padding-top: 0;
-    --band-air-gap: 4px;
-    --section-stack-gap: 4px;
-    --mvp-swap-h: 28px;
-    --mvp-chart-h: 196px;
-    --mvp-showcase-body-h: 128px;
-    --mvp-bottom-panel-h: 176px;
+    --band-air-gap: 0px;
+    --section-stack-gap: 0px;
+    --mvp-swap-h: 14px;
+    --mvp-chart-h: 192px;
+    --mvp-showcase-body-h: 124px;
+    --mvp-bottom-panel-h: calc(175px * 0.9 - 1px);
     --market-exchange-strip-h: var(--mvp-swap-h);
     --market-exchange-height-estimate: var(--mvp-swap-h);
     --market-chart-height-expanded: var(--mvp-chart-h);
     --market-chart-height: var(--mvp-chart-h);
     --showcase-band-height: var(--mvp-showcase-body-h);
-    --showcase-hub-tab-h: 20px;
-    --showcase-hub-header-h: 20px;
+    --showcase-hub-tab-h: 16px;
+    --showcase-hub-header-h: 16px;
     --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
     --floor-peek-height: 0px;
-    --showcase-tab-gap: 2px;
+    --showcase-tab-gap: 0px;
     --showcase-tab-rail-height: var(--showcase-band-height);
     --hub-showcase-block-height: calc(
       var(--showcase-hub-header-h) + var(--showcase-band-height)
@@ -1946,7 +1949,7 @@ app-block-detail-drawer {
   }
 
   .app-navbar-zone {
-    padding-bottom: var(--navbar-hub-gap, 10px);
+    padding-bottom: var(--navbar-hub-gap, 1px);
   }
 
   .app-navbar-zone app-bandeau-accueil {
@@ -2002,16 +2005,16 @@ app-block-detail-drawer {
 /* === Viewport compact 251–349 (même hiérarchie, cible 250) === */
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
-    --band-air-gap: 4px;
-    --mvp-swap-h: 28px;
-    --mvp-chart-h: 196px;
-    --mvp-showcase-body-h: 128px;
-    --mvp-bottom-panel-h: 176px;
+    --band-air-gap: 0px;
+    --mvp-swap-h: 14px;
+    --mvp-chart-h: 192px;
+    --mvp-showcase-body-h: 124px;
+    --mvp-bottom-panel-h: calc(175px * 0.9 - 1px);
     --market-chart-height: var(--mvp-chart-h);
     --showcase-band-height: var(--mvp-showcase-body-h);
     --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
     --floor-peek-height: 0px;
-    --showcase-tab-gap: 2px;
+    --showcase-tab-gap: 0px;
     --showcase-tab-rail-height: var(--showcase-band-height);
   }
 }
@@ -2043,9 +2046,9 @@ app-block-detail-drawer {
 /* === Viewport 350×560px === */
 @media (min-width: 301px) and (max-width: 350px) {
   :host {
-    --showcase-band-height: var(--nv-showcase-height, max(var(--mvp-showcase-body-h), min(calc(140px * var(--showcase-tab-scale)), 24vh)));
+    --showcase-band-height: var(--nv-showcase-height, max(var(--mvp-showcase-body-h), min(calc(139px * var(--showcase-tab-scale)), 24vh)));
     --faucet-band-height: auto;
-    --showcase-tab-gap: 1px;
+    --showcase-tab-gap: 0px;
     --showcase-tab-slot: calc((var(--showcase-band-height) - var(--showcase-tab-gap) * 2) / 3);
     --showcase-tab-rail-height: var(--showcase-band-height);
   }
@@ -2089,9 +2092,9 @@ app-block-detail-drawer {
 /* === Viewport 399×640px === */
 @media (min-width: 351px) and (max-width: 399px) {
   :host {
-    --showcase-band-height: var(--nv-showcase-height, max(var(--mvp-showcase-body-h), min(calc(136px * var(--showcase-tab-scale)), 22vh)));
+    --showcase-band-height: var(--nv-showcase-height, max(var(--mvp-showcase-body-h), min(calc(135px * var(--showcase-tab-scale)), 22vh)));
     --faucet-band-height: auto;
-    --showcase-tab-gap: 1px;
+    --showcase-tab-gap: 0px;
     --showcase-tab-slot: calc((var(--showcase-band-height) - var(--showcase-tab-gap) * 2) / 3);
     --showcase-tab-rail-height: var(--showcase-band-height);
   }
@@ -2142,9 +2145,9 @@ app-block-detail-drawer {
 /* === Viewport 449×700px === */
 @media (min-width: 400px) and (max-width: 449px) {
   :host {
-    --showcase-band-height: var(--nv-showcase-height, max(var(--mvp-showcase-body-h), min(calc(132px * var(--showcase-tab-scale)), 20vh)));
+    --showcase-band-height: var(--nv-showcase-height, max(var(--mvp-showcase-body-h), min(calc(131px * var(--showcase-tab-scale)), 20vh)));
     --faucet-band-height: auto;
-    --showcase-tab-gap: 1px;
+    --showcase-tab-gap: 0px;
     --showcase-tab-slot: calc((var(--showcase-band-height) - var(--showcase-tab-gap) * 2) / 3);
     --showcase-tab-rail-height: var(--showcase-band-height);
   }
@@ -2197,26 +2200,29 @@ app-block-detail-drawer {
   :host {
     --shell-inline-gap: 0px;
     --nv-pad-inline: 0px;
-    --panel-column-gap: 2px;
-    --section-stack-gap: 4px;
-    --band-air-gap: 4px;
-    --band-inline-pad: 4px;
+    --panel-column-gap: 0px;
+    --section-stack-gap: 0px;
+    --band-air-gap: 0px;
+    --band-inline-pad: 2px;
     --navbar-inline-overflow: 2px;
     --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
-    --swap-inline-pad: calc(var(--navbar-inline-pad) + 1px);
-    --navbar-hub-gap: 10px;
+    --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
+    --navbar-hub-gap: 1px;
+    --hub-market-internal-gap: 1px;
+    --hub-swap-showcase-gap: 1px;
+    --hub-market-showcase-gap: 1px;
+    --stack-gap-showcase-dock: 1px;
     --showcase-dock-offset: 0px;
-    --stack-gap-showcase-dock: var(--band-air-gap);
-    --band-external-gap: var(--band-air-gap);
-    --mvp-swap-h: 28px;
-    --mvp-chart-h: 196px;
-    --mvp-showcase-body-h: 128px;
-    --mvp-bottom-panel-h: 176px;
+    --band-external-gap: 0px;
+    --mvp-swap-h: 14px;
+    --mvp-chart-h: 192px;
+    --mvp-showcase-body-h: 124px;
+    --mvp-bottom-panel-h: calc(175px * 0.9 - 1px);
     --market-exchange-height: var(--mvp-swap-h);
     --market-exchange-height-estimate: var(--mvp-swap-h);
     --market-chart-height-expanded: var(--mvp-chart-h);
     --chart-stack-header-h: 0px;
-    --chart-smart-bar-h: 28px;
+    --chart-smart-bar-h: 24px;
     --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
     --market-chart-collapsed-h: calc(
       var(--chart-stack-header-h) + var(--chart-smart-bar-h)
@@ -2229,9 +2235,9 @@ app-block-detail-drawer {
     --hub-wallet-gap: 0px;
     --wallet-display-extra: 0px;
     --floor-peek-height: 0px;
-    --shell-vertical-gaps: 6px;
-    --showcase-hub-tab-h: 20px;
-    --showcase-hub-header-h: 20px;
+    --shell-vertical-gaps: 4px;
+    --showcase-hub-tab-h: 16px;
+    --showcase-hub-header-h: 16px;
     --showcase-band-height: var(--mvp-showcase-body-h);
     --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
     --hub-showcase-block-height: calc(
@@ -2242,9 +2248,9 @@ app-block-detail-drawer {
     );
     --bottom-stack-active-height: var(--bottom-stack-height-expanded);
     --wallet-display-height: calc(var(--bottom-stack-panel-height) + var(--showcase-hub-tab-h));
-    --bottom-dock-height: 20px;
-    --dock-hub-tab-h: 20px;
-    --navbar-stack-estimate: calc(var(--ds-zone-navbar, 36px) + var(--ds-navbar-top-inset, 0px));
+    --bottom-dock-height: 16px;
+    --dock-hub-tab-h: 16px;
+    --navbar-stack-estimate: calc(var(--ds-zone-navbar, 32px) + var(--ds-navbar-top-inset, 0px));
     --bandeau-slot-h: auto !important;
     --market-after-ticker-gap: var(--stack-gap-navbar-market);
     --nv-gap-stack: var(--stack-gap-navbar-market);
@@ -2268,7 +2274,7 @@ app-block-detail-drawer {
   .app-navbar-zone {
     margin-bottom: 0;
     padding-inline: var(--navbar-inline-pad);
-    padding-bottom: var(--navbar-hub-gap, 10px);
+    padding-bottom: var(--navbar-hub-gap, 1px);
     box-sizing: border-box;
   }
 
@@ -2325,7 +2331,7 @@ app-block-detail-drawer {
   }
 
   .app-bottom-stack .showcase-tabs.app-bottom-stack__tabs {
-    gap: 2px;
+    gap: 0px;
   }
 
   .app-hub-swap-stack,
@@ -2339,7 +2345,7 @@ app-block-detail-drawer {
   }
 }
 
-/* === LOCK FINAL — hiérarchie spatiale MVP 250×500 (cascade last) === */
+/* === LOCK FINAL — hiérarchie spatiale MVP 250×550 (cascade last, −1px/zone) === */
 @media (max-width: 349px) {
   :host {
     height: auto;
@@ -2347,29 +2353,32 @@ app-block-detail-drawer {
     max-height: none;
     overflow-x: hidden;
     overflow-y: auto;
-    --band-air-gap: 4px;
-    --section-stack-gap: 4px;
-    --band-inline-pad: 4px;
+    --band-air-gap: 0px;
+    --section-stack-gap: 0px;
+    --band-inline-pad: 2px;
     --navbar-inline-overflow: 2px;
     --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
-    --swap-inline-pad: calc(var(--navbar-inline-pad) + 1px);
-    --navbar-hub-gap: 10px;
-    --mvp-swap-h: 28px;
-    --mvp-chart-h: 196px;
-    --mvp-showcase-body-h: 128px;
-    --mvp-bottom-panel-h: 176px;
+    --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
+    --navbar-hub-gap: 1px;
+    --hub-market-internal-gap: 1px;
+    --hub-swap-showcase-gap: 1px;
+    --hub-market-showcase-gap: 1px;
+    --stack-gap-showcase-dock: 1px;
+    --mvp-swap-h: 14px;
+    --mvp-chart-h: 192px;
+    --mvp-showcase-body-h: 124px;
+    --mvp-bottom-panel-h: calc(175px * 0.9 - 1px);
     --market-exchange-strip-h: var(--mvp-swap-h);
     --market-exchange-height: var(--mvp-swap-h);
     --market-exchange-height-estimate: var(--mvp-swap-h);
-    --hub-market-internal-gap: var(--band-air-gap);
     --market-chart-height-expanded: var(--mvp-chart-h);
     --market-chart-height: var(--mvp-chart-h);
     --market-band-height: calc(
       var(--mvp-swap-h) + var(--mvp-chart-h) + var(--hub-market-internal-gap)
     );
     --market-height: var(--market-band-height);
-    --showcase-hub-tab-h: 20px;
-    --showcase-hub-header-h: 20px;
+    --showcase-hub-tab-h: 16px;
+    --showcase-hub-header-h: 16px;
     --showcase-band-height: var(--mvp-showcase-body-h);
     --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
     --paired-panel-block-height: var(--mvp-bottom-panel-h);
@@ -2380,16 +2389,16 @@ app-block-detail-drawer {
       var(--showcase-hub-header-h) + var(--bottom-stack-panel-height)
     );
     --bottom-stack-active-height: var(--bottom-stack-height-expanded);
-    --bottom-dock-height: 20px;
-    --dock-hub-tab-h: 20px;
+    --bottom-dock-height: 16px;
+    --dock-hub-tab-h: 16px;
     --dock-panel-height: var(--mvp-bottom-panel-h);
     --floor-peek-height: 0px;
-    --navbar-stack-estimate: calc(var(--ds-zone-navbar, 36px) + var(--ds-navbar-top-inset, 0px));
+    --navbar-stack-estimate: calc(var(--ds-zone-navbar, 32px) + var(--ds-navbar-top-inset, 0px));
   }
 
   .app-navbar-zone {
     padding-inline: var(--navbar-inline-pad);
-    padding-bottom: var(--navbar-hub-gap, 10px);
+    padding-bottom: var(--navbar-hub-gap, 1px);
     margin-bottom: 0;
   }
 

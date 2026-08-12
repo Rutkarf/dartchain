@@ -122,7 +122,7 @@
 .navbar-node-panel__pct {
   flex-shrink: 0;
   font-family: var(--ds-font-mono, var(--font-body));
-  font-size: var(--nv-brand-chip-font, 0.4375rem);
+  font-size: var(--nv-brand-chip-font, 0.1875rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
@@ -141,7 +141,7 @@
 .navbar-node-panel__range {
   flex-shrink: 0;
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--nv-brand-chip-font, 0.4375rem);
+  font-size: var(--nv-brand-chip-font, 0.1875rem);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -173,13 +173,13 @@
 
   .navbar-node-panel__led {
     width: 4px;
-    height: 4px;
+    height: 0px;
     min-width: 4px;
-    min-height: 4px;
+    min-height: 0px;
   }
 
   .navbar-node-panel__range {
-    font-size: 0.375rem;
+    font-size: 0.125rem;
   }
 }
 

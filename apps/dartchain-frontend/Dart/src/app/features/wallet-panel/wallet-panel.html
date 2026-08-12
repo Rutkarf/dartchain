@@ -4,25 +4,6 @@
   [class.is-action-panel-open]="showSendPanel() || showReceivePanel()"
   aria-label="Wallet"
 >
-  @if (!hasWallet()) {
-    <div class="wallet-display__hero wallet-display__hero--empty ds-empty">
-      <button
-        type="button"
-        class="wallet-display__create-cta"
-        [class.wallet-display__create-cta--loading]="creatingWallet()"
-        (click)="createWallet()"
-        [disabled]="creatingWallet()"
-      >
-        @if (creatingWallet()) {
-          <span class="wallet-display__create-cta-spinner" aria-hidden="true"></span>
-        }
-        <span class="wallet-display__create-cta-label">
-          {{ creatingWallet() ? 'Création…' : 'Créer wallet' }}
-        </span>
-      </button>
-    </div>
-  }
-
   @if (shouldShowStatusLine()) {
     <div
       class="wallet-display__status-line"
@@ -335,41 +316,60 @@
   </div>
 
   <footer class="wallet-display__actions">
-    <button
-      type="button"
-      class="wallet-display__action-btn"
-      (click)="sendAction()"
-      [disabled]="!hasWallet() || sending()"
-      [class.is-active]="showSendPanel()"
-    >
-      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-        <path d="M2 8h10M8 3l4 5-4 5" />
-      </svg>
-      {{ locale.t('wallet.send') }}
-    </button>
-    <button
-      type="button"
-      class="wallet-display__action-btn wallet-display__action-btn--swap"
-      (click)="swapAction()"
-    >
-      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-        <path d="M3 5h9M9 2l3 3-3 3" />
-        <path d="M13 11H4M7 8l-3 3 3 3" />
-      </svg>
-      {{ locale.t('wallet.swap') }}
-    </button>
-    <button
-      type="button"
-      class="wallet-display__action-btn"
-      (click)="receiveAction()"
-      [disabled]="!hasWallet()"
-      [class.is-active]="showReceivePanel()"
-    >
-      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-        <path d="M2 8h10M8 13l4-5-4-5" />
-      </svg>
-      {{ locale.t('wallet.receive') }}
-    </button>
+    @if (!hasWallet()) {
+      <button
+        type="button"
+        class="wallet-display__create-cta"
+        [class.wallet-display__create-cta--loading]="creatingWallet()"
+        (click)="createWallet()"
+        [disabled]="creatingWallet()"
+      >
+        @if (creatingWallet()) {
+          <span class="wallet-display__create-cta-spinner" aria-hidden="true"></span>
+        }
+        <span class="wallet-display__create-cta-label">
+          {{ creatingWallet() ? 'Création…' : 'Créer wallet' }}
+        </span>
+      </button>
+    }
+
+    <div class="wallet-display__actions-row">
+      <button
+        type="button"
+        class="wallet-display__action-btn"
+        (click)="sendAction()"
+        [disabled]="!hasWallet() || sending()"
+        [class.is-active]="showSendPanel()"
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M2 8h10M8 3l4 5-4 5" />
+        </svg>
+        {{ locale.t('wallet.send') }}
+      </button>
+      <button
+        type="button"
+        class="wallet-display__action-btn wallet-display__action-btn--swap"
+        (click)="swapAction()"
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M3 5h9M9 2l3 3-3 3" />
+          <path d="M13 11H4M7 8l-3 3 3 3" />
+        </svg>
+        {{ locale.t('wallet.swap') }}
+      </button>
+      <button
+        type="button"
+        class="wallet-display__action-btn"
+        (click)="receiveAction()"
+        [disabled]="!hasWallet()"
+        [class.is-active]="showReceivePanel()"
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M2 8h10M8 13l4-5-4-5" />
+        </svg>
+        {{ locale.t('wallet.receive') }}
+      </button>
+    </div>
   </footer>
 
   @if (showSendPanel()) {

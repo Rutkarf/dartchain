@@ -17,7 +17,7 @@
   min-width: 0;
   height: 100%;
   max-height: 100%;
-  padding: 0 4px 0 6px;
+  padding: 0 2px 0 4px;
   box-sizing: border-box;
   overflow: hidden;
   line-height: 1;
@@ -43,11 +43,11 @@
   align-items: center;
   flex: 0 1 auto;
   min-width: 0;
-  height: 12px;
-  padding: 0 4px;
+  height: 10px;
+  padding: 0 2px;
   border-radius: 999px;
   font-family: var(--font-display);
-  font-size: clamp(0.4rem, 2vw, 0.5rem);
+  font-size: clamp(0.275rem, 2vw, 0.375rem);
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -60,7 +60,7 @@
 
 .launch-summary-status--cluster {
   gap: 0;
-  padding: 0 6px;
+  padding: 0 4px;
 }
 
 .launch-summary-status--ready {
@@ -130,7 +130,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
   max-width: 100%;
   height: 100%;
@@ -148,7 +148,7 @@
   align-items: center;
   flex: 0 0 auto;
   height: 100%;
-  font-size: clamp(0.4375rem, 2.35vw, 0.625rem);
+  font-size: clamp(0.3125rem, 2.35vw, 0.5rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -163,7 +163,7 @@
   flex: 0 1 auto;
   min-width: 0;
   height: 100%;
-  font-size: clamp(0.4375rem, 2.35vw, 0.625rem);
+  font-size: clamp(0.3125rem, 2.35vw, 0.5rem);
   font-weight: 600;
   color: var(--text-soft);
   white-space: nowrap;
@@ -180,7 +180,7 @@
   width: 100%;
   min-width: 0;
   height: 100%;
-  font-size: clamp(0.4375rem, 2.35vw, 0.625rem);
+  font-size: clamp(0.3125rem, 2.35vw, 0.5rem);
   font-weight: 600;
   color: var(--text-muted, rgba(255, 255, 255, 0.58));
   white-space: nowrap;
@@ -206,7 +206,7 @@
   display: inline-flex;
   align-items: center;
   height: 100%;
-  font-size: clamp(0.4rem, 2vw, 0.5rem);
+  font-size: clamp(0.275rem, 2vw, 0.375rem);
   line-height: 1;
   color: var(--text-muted, rgba(255, 255, 255, 0.5));
 }
@@ -219,7 +219,7 @@
   align-self: center;
   flex: 0 0 auto;
   height: 100%;
-  gap: 3px;
+  gap: 1px;
   padding-left: 4px;
   border-left: 1px solid rgba(var(--tab-accent-rgb), 0.1);
 }
@@ -229,7 +229,7 @@
   align-items: center;
   justify-content: center;
   width: 14px;
-  height: 14px;
+  height: 12px;
   margin: 0;
   padding: 0;
   border: none;
@@ -242,7 +242,7 @@
 
 .launch-summary-actions__refresh svg {
   width: 9px;
-  height: 9px;
+  height: 7px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;

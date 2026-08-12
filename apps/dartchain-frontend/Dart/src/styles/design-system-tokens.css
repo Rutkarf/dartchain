@@ -63,7 +63,7 @@
   --space-10: 40px;
   --space-12: 48px;
 
-  --shadow-soft: 0 4px 18px rgba(0, 0, 0, 0.28);
+  --shadow-soft: 0 3px 17px rgba(0, 0, 0, 0.28);
   --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.22);
   --shadow-focus:
     0 0 0 2px rgba(var(--bg-primary-rgb), 0.92),
@@ -73,13 +73,13 @@
   --font-display: 'Orbit', 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
 
-  --type-h1: 1.125rem;      /* 18px — rare @ 250 */
-  --type-h2: 0.8125rem;    /* 13px */
-  --type-h3: 0.6875rem;    /* 11px */
-  --type-body: 0.6875rem;  /* 11px */
-  --type-caption: 0.5625rem; /* 9px */
-  --type-label: 0.5rem;    /* 8px */
-  --type-metric: 0.9375rem; /* 15px — KPI values */
+  --type-h1: 1.0625rem;      /* 18px — rare @ 250 */
+  --type-h2: 0.75rem;    /* 13px */
+  --type-h3: 0.625rem;    /* 11px */
+  --type-body: 0.625rem;  /* 11px */
+  --type-caption: 0.5rem; /* 9px */
+  --type-label: 0.4375rem;    /* 8px */
+  --type-metric: 0.875rem; /* 15px — KPI values */
 
   /* Glass subtil (cards premium, pas vitres néon) */
   --glass-fill-fintech: rgba(var(--surface-rgb), 0.75);
@@ -239,7 +239,7 @@
   --ds-radius-input: var(--radius-md);
   --ds-radius-btn: 12px;
 
-  /* Espacement (grille 4px, viewport 250×500) */
+  /* Espacement (grille 3px, viewport 250×550) */
   --ds-space-1: var(--space-1);
   --ds-space-2: var(--space-2);
   --ds-space-3: var(--space-3);
@@ -257,7 +257,7 @@
   --ds-text-xs: var(--type-caption);
   --ds-text-sm: var(--type-body);
   --ds-text-md: var(--type-h2);
-  --ds-text-lg: 0.875rem;   /* 14px */
+  --ds-text-lg: 0.8125rem;   /* 14px */
   --ds-text-xl: var(--type-metric);
   --ds-text-label: var(--type-label);
   --ds-text-caption: var(--type-caption);
@@ -295,11 +295,11 @@
   );
 
   /* Tabs : niveau A (vue) vs B (filtre) — underline discret, pas halo */
-  --ds-tab-a-height: 26px;
+  --ds-tab-a-height: 23px;
   --ds-tab-a-bg-active: rgba(var(--accent-cyan-rgb), 0.08);
   --ds-tab-a-border-active: var(--accent-cyan);
   --ds-tab-a-underline: 2px solid var(--accent-cyan);
-  --ds-tab-b-height: 22px;
+  --ds-tab-b-height: 19px;
   --ds-tab-b-bg: transparent;
   --ds-tab-b-border: var(--ds-border-default);
 
@@ -309,15 +309,15 @@
   --ds-input-border: var(--ds-border-default);
   --ds-input-border-focus: rgba(var(--accent-cyan-rgb), 0.55);
   --ds-input-radius: var(--ds-radius-input);
-  --ds-input-padding-y: 6px;
-  --ds-input-padding-x: 10px;
+  --ds-input-padding-y: 5px;
+  --ds-input-padding-x: 9px;
   --ds-input-font: var(--ds-text-sm);
   --ds-input-placeholder: var(--ds-text-muted);
 
   /* Badges / status */
   --ds-badge-radius: var(--radius-pill);
   --ds-badge-font: var(--type-label);
-  --ds-badge-padding: 2px 6px;
+  --ds-badge-padding: 0px 4px;
   --ds-status-live: var(--success);
   --ds-status-live-rgb: var(--success-rgb);
   --ds-status-secondary-fg: var(--ds-text-secondary);
@@ -332,32 +332,32 @@
   --ds-skeleton-base: rgba(255, 255, 255, 0.04);
   --ds-skeleton-shine: rgba(255, 255, 255, 0.08);
 
-  /* —— Layout budgets @ 250×500 (zero-scroll, hiérarchie spatiale) —— */
+  /* —— Layout budgets @ 250×550 (hiérarchie spatiale ; floor three.js inchangé) —— */
   --ds-viewport-w: 250px;
-  --ds-viewport-h: 500px;
-  --ds-zone-navbar: 36px;
-  --ds-zone-exchange: 28px;
-  --ds-zone-chart: 196px;
-  --ds-zone-showcase-header: 20px;
-  --ds-zone-showcase-body: 128px;
-  --ds-zone-bottom-panel: 176px;
-  --ds-zone-bottom-dock: 20px;
+  --ds-viewport-h: 548px;
+  --ds-zone-navbar: 32px;
+  --ds-zone-exchange: 16px;
+  --ds-zone-chart: 194px;
+  --ds-zone-showcase-header: 17px;
+  --ds-zone-showcase-body: 126px;
+  --ds-zone-bottom-panel: calc(176px * 0.9 - 2px);
+  --ds-zone-bottom-dock: 18px;
   --ds-zone-floor-peek: 0px;
-  --ds-band-gap: 4px;
-  --ds-band-inline-pad: 4px;
+  --ds-band-gap: 0px;
+  --ds-band-inline-pad: 2px;
   --ds-navbar-inline-overflow: 2px;
-  --ds-navbar-top-inset: max(2px, env(safe-area-inset-top, 0px));
+  --ds-navbar-top-inset: max(0px, env(safe-area-inset-top, 0px));
   --ds-navbar-shell-radius: var(--radius-md);
-  --ds-navbar-pad-top: 2px;
-  --ds-navbar-pad-bottom: 2px;
-  --ds-navbar-inner-gap: 2px;
+  --ds-navbar-pad-top: 0px;
+  --ds-navbar-pad-bottom: 0px;
+  --ds-navbar-inner-gap: 0px;
   --ds-exchange-shell-radius: var(--radius-lg);
-  --ds-exchange-pad: 8px;
-  --ds-exchange-gap: 6px;
+  --ds-exchange-pad: 6px;
+  --ds-exchange-gap: 4px;
   --ds-exchange-margin: 0px;
-  --ds-exchange-row-gap: 4px;
+  --ds-exchange-row-gap: 2px;
   --ds-exchange-shell-width: 100%;
-  --ds-exchange-font-min: 0.5625rem;
+  --ds-exchange-font-min: 0.4375rem;
   --ds-zone-market: var(--ds-zone-chart);
 
   /* Hub column ratio 35/65 — conservé */
@@ -472,12 +472,12 @@
   --cta-radius-sm: var(--radius-sm);
   --cta-radius-md: var(--radius-md);
   --cta-radius-lg: 12px;
-  --cta-height-sm: 24px;
-  --cta-height-md: 30px;
-  --cta-height-lg: 36px;
-  --cta-font-sm: 0.5rem;
-  --cta-font-md: 0.625rem;
-  --cta-font-lg: 0.6875rem;
+  --cta-height-sm: 22px;
+  --cta-height-md: 28px;
+  --cta-height-lg: 34px;
+  --cta-font-sm: 0.375rem;
+  --cta-font-md: 0.5rem;
+  --cta-font-lg: 0.5625rem;
   --cta-disabled-opacity: 0.48;
   --cta-focus-ring: var(--shadow-focus);
 

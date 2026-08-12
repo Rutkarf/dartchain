@@ -67,7 +67,7 @@ export class ShowcasePanelComponent {
       tours: 'TOUS',
       r4v3: 'R4V3',
       rv23: 'CHAT',
-      dao: 'LAUNCH',
+      dao: 'LABZ',
       daonews: 'D.A.O',
       market: 'MARCHÉ',
     } satisfies Record<ShowcaseTab, string>;

@@ -30,6 +30,9 @@ describe('ChainGraphComponent', () => {
 
     expect(component.layoutNodes()).toHaveLength(2);
     expect(component.linkSegments()).toHaveLength(1);
+    // Première colonne : onde descendante
+    expect(component.layoutNodes()[0].x).toBe(component.layoutNodes()[1].x);
+    expect(component.layoutNodes()[0].y).toBeLessThan(component.layoutNodes()[1].y);
   });
 
   it('emits selectBlock when a node bubble is clicked', () => {

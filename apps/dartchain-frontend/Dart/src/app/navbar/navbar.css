@@ -17,10 +17,10 @@
   --nv-shell-border: var(--ds-surface-border-bottom);
   --nv-shell-bg: transparent;
   --nv-margin-top: var(--ds-navbar-top-inset, max(clamp(6px, 1.6vh, 12px), env(safe-area-inset-top, 0px)));
-  --nv-wrap-pad-x: var(--ds-shell-inline, 12px);
-  --nv-wrap-pad-left: 0px;
+  --nv-wrap-pad-x: var(--ds-shell-inline, 9px);
+  --nv-wrap-pad-left: 1px;
   --nv-wrap-pad-right: var(--nv-wrap-pad-x);
-  --nv-pad-x: var(--ds-space-3, 12px);
+  --nv-pad-x: var(--ds-space-3, 9px);
   /* Calques navbar (base → overlays) */
   --nv-layer-surface: 1;
   --nv-layer-brand: 2;
@@ -29,25 +29,25 @@
   --nv-layer-dropdown: calc(var(--nv-layer-ticker-drawer) + 40);
   --nv-layer-ticker-drawer: 60;
   --nv-layer-ticker-drawer-overlay: 200;
-  --nv-pad-top: var(--ds-navbar-pad-top, clamp(3px, 0.8vh, 5px));
-  --nv-pad-y: var(--ds-navbar-pad-bottom, clamp(2px, 0.6vh, 4px));
+  --nv-pad-top: var(--ds-navbar-pad-top, clamp(0px, 0.8vh, 2px));
+  --nv-pad-y: var(--ds-navbar-pad-bottom, clamp(0px, 0.6vh, 1px));
   --nv-inner-gap: 0px;
   --nv-ticker-row-h: 0.8125rem;
   --nv-action-row-h: var(--nv-ticker-row-h);
-  --nv-action-btn: 26px;
+  --nv-action-btn: 24px;
   --nv-shell-min-h: calc(
     var(--nv-logo-h) + var(--nv-ticker-row-h) + var(--nv-pad-top) + var(--nv-pad-y)
   );
-  --nv-logo: 34px;
-  --nv-logo-h: 26px;
+  --nv-logo: 32px;
+  --nv-logo-h: 22px;
   --nv-logo-scale: 1.36;
-  --nv-logo-shift-y: -8px;
-  --nv-brand-chip-h: calc(var(--nv-logo-h) - 1px);
+  --nv-logo-shift-y: 1px;
+  --nv-brand-chip-h: calc(var(--nv-logo-h) - 0px);
   --nv-brand-chip-pad-y: 0;
   --nv-brand-chip-pad-right: 0.26rem;
-  --nv-brand-chip-pad-left: 0.22rem;
+  --nv-brand-chip-pad-left: 0.05rem;
   --nv-brand-chip-gap: 0.2rem;
-  --nv-brand-chip-font: 0.4375rem;
+  --nv-brand-chip-font: 0.1875rem;
   --nv-brand-chip-line: var(--nv-brand-chip-font);
   --nv-brand-led-size: 5px;
   --nv-brand-sync-y: 0px;
@@ -83,7 +83,7 @@
   position: absolute;
   inset: 0 auto auto 0;
   width: 100%;
-  height: 1px;
+  height: 0px;
   border-radius: var(--nv-shell-radius) var(--nv-shell-radius) 0 0;
   pointer-events: none;
   z-index: calc(var(--nv-layer-surface) + 2);
@@ -140,7 +140,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 5px;
+  gap: 1px;
   flex: 0 0 auto;
   flex-shrink: 0;
   padding: 0;
@@ -170,14 +170,14 @@
 }
 
 .navbar-auth-strip--session {
-  gap: 4px;
+  gap: 0px;
   margin-inline-start: auto;
 }
 
 .navbar-auth-user {
   display: inline-flex;
   align-items: center;
-  gap: var(--ds-space-1, 4px);
+  gap: var(--ds-space-1, 0px);
   max-width: min(36vw, 140px);
 }
 
@@ -195,7 +195,7 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.05),
     inset 2px 0 0 rgba(var(--nv-cyan-rgb), 0.55);
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--ds-text-sm, 0.6875rem);
+  font-size: var(--ds-text-sm, 0.4375rem);
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--ds-text-primary, #e8ecf0);
@@ -207,14 +207,14 @@
 
 .navbar-locale-btn {
   min-width: var(--ds-icon-btn, 32px);
-  height: var(--ds-icon-btn, 32px);
-  padding: 0 8px;
+  height: var(--ds-icon-btn, 28px);
+  padding: 0 4px;
   border-radius: var(--ds-radius-sm, 6px);
   border: 1px solid var(--ds-border-default, rgba(255, 255, 255, 0.1));
   background: rgba(0, 0, 0, 0.25);
   color: var(--ds-text-primary, #e8ecf0);
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--ds-text-sm, 0.6875rem);
+  font-size: var(--ds-text-sm, 0.4375rem);
   font-weight: 700;
   letter-spacing: 0.06em;
   cursor: pointer;
@@ -235,9 +235,9 @@
 
 .navbar-auth-btn {
   width: min(var(--nv-action-btn, 26px), var(--nv-logo-h, 24px));
-  height: min(var(--nv-action-btn, 26px), var(--nv-logo-h, 24px));
+  height: min(var(--nv-action-btn, 22px), var(--nv-logo-h, 20px));
   min-width: min(var(--nv-action-btn, 26px), var(--nv-logo-h, 24px));
-  min-height: min(var(--nv-action-btn, 26px), var(--nv-logo-h, 24px));
+  min-height: min(var(--nv-action-btn, 22px), var(--nv-logo-h, 20px));
   padding: 0;
   display: inline-grid;
   place-items: center;
@@ -257,7 +257,7 @@
 
 .navbar-auth-btn svg {
   width: 15px;
-  height: 15px;
+  height: 11px;
 }
 
 .navbar-auth-btn svg :is(path, circle, polyline, line) {
@@ -564,7 +564,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  gap: clamp(4px, 1.2vw, 7px);
+  gap: clamp(0px, 1.2vw, 3px);
   flex: 0 0 auto;
   width: fit-content;
   max-width: 100%;
@@ -593,7 +593,7 @@
 
   .navbar-brand-row {
     margin-inline-start: 0;
-    gap: 3px;
+    gap: 0px;
   }
 
   .navbar-top {
@@ -808,15 +808,15 @@
 @media (min-width: 1100px) {
   :host {
     --nv-margin-top: max(clamp(8px, 1.2vh, 16px), env(safe-area-inset-top, 0px));
-    --nv-wrap-pad-x: 16px;
-    --nv-pad-x: 14px;
-    --nv-pad-top: clamp(7px, 1.2vh, 10px);
-    --nv-pad-y: 6px;
+    --nv-wrap-pad-x: 13px;
+    --nv-pad-x: 11px;
+    --nv-pad-top: clamp(4px, 1.2vh, 7px);
+    --nv-pad-y: 3px;
     --nv-shell-radius: clamp(10px, 1vw, 14px);
-    --nv-logo: 37px;
-    --nv-logo-h: 28px;
+    --nv-logo: 35px;
+    --nv-logo-h: 24px;
     --nv-logo-scale: 1.3;
-    --nv-shell-min-h: 60px;
+    --nv-shell-min-h: 56px;
   }
 
   .navbar-wrap {
@@ -835,7 +835,7 @@
     align-items: center;
     align-self: center;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 4px;
     min-width: 0;
   }
 

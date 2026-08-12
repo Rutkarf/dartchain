@@ -140,7 +140,7 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
   {
     id: 'hub',
     readingOrder: 1,
-    label: 'Hub marché (exchange + graphique)',
+    label: 'Hub marché (graphique + exchange)',
     components: [
       {
         selector: 'app-exchange-panel',
@@ -210,7 +210,7 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
     readingOrder: 2,
     label: 'Showcase (tabs + seam collapse + panel)',
     notes: [
-      'Tabs niveau A : TOUS R4V3 CHAT LAUNCH D.A.O MARCHÉ (showcase-tabs)',
+      'Tabs niveau A : TOUS R4V3 CHAT LABZ D.A.O MARCHÉ (showcase-tabs)',
       'Tabs niveau B : filtres catégories news (showcase-news) — logique distincte, rendu à différencier Phase 8–9',
       'Chevron discret haut-droite (showcase-toggle / app-panel-collapse-control) : collapse/expand — ne pas supprimer',
     ],
@@ -223,7 +223,7 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
           { id: 'tab-tours', label: 'TOUS', kind: 'tab' },
           { id: 'tab-r4v3', label: 'R4V3', kind: 'tab' },
           { id: 'tab-rv23', label: 'CHAT', kind: 'tab' },
-          { id: 'tab-dao', label: 'LAUNCH', kind: 'tab' },
+          { id: 'tab-dao', label: 'LABZ', kind: 'tab' },
           { id: 'tab-daonews', label: 'D.A.O', kind: 'tab' },
           { id: 'tab-market', label: 'MARCHÉ', kind: 'tab' },
         ],

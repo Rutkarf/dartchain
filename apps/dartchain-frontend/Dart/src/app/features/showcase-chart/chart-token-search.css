@@ -19,9 +19,9 @@
 .chart-token-search__form {
   display: flex;
   align-items: center;
-  gap: 4px;
-  min-height: 18px;
-  padding: 0 6px;
+  gap: 2px;
+  min-height: 16px;
+  padding: 0 4px;
   border: 1px solid rgba(var(--chart-hub-cyan-rgb, 0, 255, 255), 0.16);
   border-radius: var(--ds-radius-pill, 999px);
   background: rgba(255, 255, 255, 0.04);
@@ -30,7 +30,7 @@
 .chart-token-search__icon {
   display: inline-flex;
   width: 11px;
-  height: 11px;
+  height: 9px;
   color: rgba(255, 255, 255, 0.45);
   flex-shrink: 0;
 }
@@ -46,7 +46,7 @@
   border: 0;
   background: transparent;
   color: #f4fbff;
-  font-size: var(--chart-hub-fs, 8px);
+  font-size: var(--chart-hub-fs, 6px);
   line-height: 1.2;
   outline: none;
 }
@@ -57,7 +57,7 @@
 
 .chart-token-search__spinner {
   width: 10px;
-  height: 10px;
+  height: 8px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-top-color: rgba(var(--chart-hub-cyan-rgb, 0, 255, 255), 0.85);
   border-radius: 50%;
@@ -79,12 +79,12 @@
   z-index: 50;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0px;
   width: max(100%, 9rem);
   min-width: 9rem;
-  max-height: min(168px, 40vh);
+  max-height: min(166px, 40vh);
   overflow: auto;
-  padding: 3px;
+  padding: 1px;
   border: 1px solid rgba(var(--chart-hub-cyan-rgb, 0, 255, 255), 0.18);
   border-radius: 8px;
   background: rgba(4, 10, 18, 0.98);
@@ -94,7 +94,7 @@
 .chart-token-search__section,
 .chart-token-search__empty {
   margin: 0;
-  padding: 4px 6px;
+  padding: 2px 4px;
   font-size: calc(var(--chart-hub-fs, 8px) - 1px);
   color: rgba(255, 255, 255, 0.45);
 }
@@ -102,9 +102,9 @@
 .chart-token-search__item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
-  padding: 4px 6px;
+  padding: 2px 4px;
   border: 0;
   border-radius: 6px;
   background: transparent;
@@ -121,7 +121,7 @@
 
 .chart-token-search__logo {
   width: 16px;
-  height: 16px;
+  height: 14px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
@@ -131,7 +131,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 8px;
+  font-size: 6px;
   font-weight: 800;
   color: #041018;
   background: rgba(var(--chart-hub-cyan-rgb, 0, 255, 255), 0.75);
@@ -151,7 +151,7 @@
 }
 
 .chart-token-search__name {
-  font-size: var(--chart-hub-fs, 8px);
+  font-size: var(--chart-hub-fs, 6px);
   font-weight: 700;
   color: #f4fbff;
 }
@@ -162,9 +162,9 @@
 }
 
 .chart-token-search--compact .chart-token-search__form {
-  min-height: 14px;
-  padding: 0 5px;
-  gap: 3px;
+  min-height: 12px;
+  padding: 0 3px;
+  gap: 1px;
 }
 
 .chart-token-search--compact .chart-token-search__input {
@@ -180,7 +180,7 @@
 .chart-token-search--icon-only .chart-token-search__form {
   width: clamp(16px, 4.5cqw, 20px);
   min-width: clamp(16px, 4.5cqw, 20px);
-  padding: 0 clamp(3px, 1cqw, 5px);
+  padding: 0 clamp(1px, 1cqw, 3px);
   gap: 0;
   overflow: hidden;
   transition:
@@ -194,8 +194,8 @@
 .chart-token-search--icon-only:focus-within .chart-token-search__form {
   width: min(38cqw, 4.75rem);
   min-width: min(38cqw, 4.75rem);
-  gap: 3px;
-  padding: 0 5px;
+  gap: 1px;
+  padding: 0 3px;
 }
 
 .chart-token-search--icon-only .chart-token-search__input {

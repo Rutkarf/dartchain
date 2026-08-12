@@ -28,13 +28,13 @@
   z-index: 400;
   width: max-content;
   max-width: min(240px, 72vw);
-  padding: 6px 8px;
+  padding: 2px 4px;
   border-radius: 6px;
   border: 1px solid rgba(var(--nv-cyan-rgb, 0, 245, 255), 0.22);
   background: rgba(8, 10, 16, 0.96);
   color: var(--ds-text-primary, #e8ecf0);
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: 0.62rem;
+  font-size: 0.37rem;
   font-weight: 500;
   line-height: 1.35;
   letter-spacing: 0.01em;

@@ -8,7 +8,15 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { Block } from '../../core/models/block.model';
-import { buildChainGraphNodes } from './chain-explorer.util';
+import {
+  buildChainGraphNodes,
+  chainGraphDimensions,
+  chainGraphLinkSegment,
+  chainGraphMinWidthPercent,
+  chainGraphPointForIndex,
+  CHAIN_GRAPH_HIT_RADIUS,
+  CHAIN_GRAPH_NODE_RADIUS,
+} from './chain-explorer.util';
 
 export interface ChainGraphNodeLayout {
   block: Block;
@@ -28,26 +36,35 @@ export interface ChainGraphNodeLayout {
 export class ChainGraphComponent {
   readonly blocks = input<Block[]>([]);
   readonly tipIndex = input<number | null>(null);
-  readonly maxNodes = input(20);
+  readonly maxNodes = input(45);
 
   readonly selectBlock = output<Block>();
 
-  readonly graphWidth = computed(() => {
-    const count = this.layoutNodes().length;
-    return Math.max(240, count * 72 + 24);
-  });
+  readonly hitRadius = CHAIN_GRAPH_HIT_RADIUS;
+  readonly nodeRadius = CHAIN_GRAPH_NODE_RADIUS;
 
   readonly layoutNodes = computed<ChainGraphNodeLayout[]>(() => {
     const nodes = buildChainGraphNodes(this.blocks(), this.maxNodes());
     const tip = this.tipIndex();
 
-    return nodes.map((block, index) => ({
-      block,
-      x: 24 + index * 72,
-      y: 42,
-      isTip: tip != null ? block.index === tip : index === nodes.length - 1,
-    }));
+    return nodes.map((block, index) => {
+      const point = chainGraphPointForIndex(index);
+      return {
+        block,
+        x: point.x,
+        y: point.y,
+        isTip: tip != null ? block.index === tip : index === nodes.length - 1,
+      };
+    });
   });
+
+  readonly graphSize = computed(() => chainGraphDimensions(this.layoutNodes().length));
+
+  readonly graphWidth = computed(() => this.graphSize().width);
+
+  readonly graphHeight = computed(() => this.graphSize().height);
+
+  readonly minWidthPercent = computed(() => chainGraphMinWidthPercent(this.layoutNodes().length));
 
   readonly linkSegments = computed(() => {
     const nodes = this.layoutNodes();
@@ -56,12 +73,7 @@ export class ChainGraphComponent {
     for (let index = 1; index < nodes.length; index += 1) {
       const previous = nodes[index - 1];
       const current = nodes[index];
-      segments.push({
-        x1: previous.x + 18,
-        y1: previous.y,
-        x2: current.x - 18,
-        y2: current.y,
-      });
+      segments.push(chainGraphLinkSegment(previous, current));
     }
 
     return segments;

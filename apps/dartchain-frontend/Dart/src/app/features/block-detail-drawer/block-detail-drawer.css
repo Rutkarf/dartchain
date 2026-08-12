@@ -1,6 +1,6 @@
 :host {
   display: block;
-  --navbar-offset: 76px;
+  --navbar-offset: 75px;
   --drawer-radius: 14px;
   --drawer-accent: rgba(var(--ui-accent-rgb), 0.45);
   --drawer-border: var(--border-faint);
@@ -53,8 +53,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 6px;
-  padding: 8px;
+  gap: 4px;
+  padding: 6px;
   border-bottom: 1px solid var(--border-faint);
   background: var(--gradient-surface-header);
 }
@@ -62,12 +62,12 @@
 .drawer-head-copy {
   min-width: 0;
   display: grid;
-  gap: 1px;
+  gap: 0px;
 }
 
 .drawer-eyebrow {
   margin: 0;
-  font-size: 0.48rem;
+  font-size: 0.355rem;
   line-height: 1;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -76,7 +76,7 @@
 
 .drawer-head h3 {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: 0.735rem;
   font-weight: 800;
   line-height: 1.02;
   color: var(--drawer-text);
@@ -84,21 +84,21 @@
 
 .drawer-subtitle {
   margin: 0;
-  font-size: 0.60rem;
+  font-size: 0.475rem;
   line-height: 1.15;
   color: var(--drawer-muted);
 }
 
 .drawer-close {
   width: 28px;
-  height: 28px;
+  height: 26px;
   border-radius: 10px;
   border: 1px solid rgba(var(--ui-accent-rgb), 0.10);
   background:
     linear-gradient(135deg, rgba(var(--ui-accent-rgb), 0.08), rgba(var(--ui-accent-2-rgb), 0.04)),
     rgba(var(--text-primary-rgb), 0.06);
   color: var(--drawer-text);
-  font-size: 0.78rem;
+  font-size: 0.655rem;
   font-weight: 800;
   cursor: pointer;
   appearance: none;
@@ -128,7 +128,7 @@
 
 .drawer-body {
   overflow: auto;
-  padding: 8px;
+  padding: 6px;
   min-width: 0;
   scrollbar-width: thin;
   scrollbar-color: var(--ds-scrollbar-thumb) var(--ds-scrollbar-track);
@@ -137,7 +137,7 @@
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 5px;
+  gap: 3px;
   min-width: 0;
 }
 
@@ -146,8 +146,8 @@
   width: 100%;
   min-width: 0;
   display: grid;
-  gap: 2px;
-  padding: 6px 7px;
+  gap: 0px;
+  padding: 4px 5px;
   border-radius: 10px;
   background:
     linear-gradient(135deg, rgba(var(--ui-accent-rgb), 0.025), rgba(var(--ui-accent-rgb), 0.012)),
@@ -156,7 +156,7 @@
 }
 
 .detail-label {
-  font-size: 0.48rem;
+  font-size: 0.355rem;
   color: var(--drawer-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -164,7 +164,7 @@
 }
 
 .detail-value {
-  font-size: 0.74rem;
+  font-size: 0.615rem;
   font-weight: 700;
   color: var(--drawer-text);
   line-height: 1.12;
@@ -177,7 +177,7 @@
   min-width: 0;
   max-width: 100%;
   font-family: var(--font-body);
-  font-size: 0.58rem;
+  font-size: 0.455rem;
   line-height: 1.18;
   color: var(--text-primary);
   white-space: normal;
@@ -190,14 +190,14 @@
   align-items: center;
   width: fit-content;
   max-width: 100%;
-  min-height: 17px;
-  padding: 0 6px;
+  min-height: 15px;
+  padding: 0 4px;
   border-radius: 999px;
   background: rgba(var(--ui-accent-rgb), 0.08);
   border: 1px solid rgba(var(--ui-accent-rgb), 0.10);
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 0.54rem;
+  font-size: 0.415rem;
   line-height: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -208,7 +208,7 @@
   margin: 0;
   min-width: 0;
   max-width: 100%;
-  font-size: 0.74rem;
+  font-size: 0.615rem;
   line-height: 1.18;
   color: var(--drawer-text);
   white-space: normal;
@@ -238,12 +238,12 @@
 
 @media (max-width: 390px) {
   :host {
-    --navbar-offset: 72px;
+    --navbar-offset: 71px;
     --drawer-radius: 12px;
   }
 
   .drawer-backdrop {
-    padding: 10px 20px 30px 20px;
+    padding: 8px 18px 28px 18px;
   }
 
   .drawer {
@@ -254,33 +254,33 @@
 
   .drawer-head,
   .drawer-body {
-    padding: 7px;
+    padding: 5px;
   }
 
   .detail-item,
   .detail-item-full {
-    padding: 5px 6px;
+    padding: 3px 4px;
     border-radius: 9px;
   }
 
   .drawer-head h3 {
-    font-size: 0.82rem;
+    font-size: 0.695rem;
   }
 
   .drawer-subtitle,
   .detail-value,
   .detail-content {
-    font-size: 0.70rem;
+    font-size: 0.575rem;
   }
 
   .detail-code {
-    font-size: 0.56rem;
+    font-size: 0.435rem;
   }
 }
 
 @media (max-width: 360px) {
   .drawer-backdrop {
-    padding: 10px 18px 28px 18px;
+    padding: 8px 16px 26px 16px;
   }
 
   .drawer {
@@ -289,12 +289,12 @@
 
   .drawer-close {
     width: 26px;
-    height: 26px;
+    height: 24px;
   }
 
   .detail-item,
   .detail-item-full {
-    padding: 5px;
+    padding: 3px;
   }
 }
 

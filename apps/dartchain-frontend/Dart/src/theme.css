@@ -173,7 +173,7 @@
 
   --tab-rail-scale: 1.5;
   --tab-rail-width: calc(20px * var(--tab-rail-scale));
-  --tab-rail-gap: 1px;
+  --tab-rail-gap: 0px;
   --tab-rail-radius: calc(4px * var(--tab-rail-scale));
   --tab-rail-label-size: clamp(7px, 3vw, 10px);
   --tab-rail-slot-min: calc(29.25px * var(--tab-rail-scale));
@@ -183,15 +183,15 @@
   --cta-radius-sm: 6px;
   --cta-radius-md: 8px;
   --cta-radius-lg: 10px;
-  --cta-height-sm: 22px;
-  --cta-height-md: 28px;
-  --cta-height-lg: 38px;
-  --cta-padding-sm: 0 8px;
-  --cta-padding-md: 0 12px;
-  --cta-padding-lg: 0 16px;
-  --cta-font-sm: 0.5rem;
-  --cta-font-md: 0.62rem;
-  --cta-font-lg: 0.72rem;
+  --cta-height-sm: 20px;
+  --cta-height-md: 26px;
+  --cta-height-lg: 37px;
+  --cta-padding-sm: 0 7px;
+  --cta-padding-md: 0 11px;
+  --cta-padding-lg: 0 15px;
+  --cta-font-sm: 0.375rem;
+  --cta-font-md: 0.495rem;
+  --cta-font-lg: 0.595rem;
   --cta-focus-ring:
     0 0 0 2px rgba(var(--bg-base-rgb), 0.95),
     0 0 0 3px rgba(var(--brand-baltic-blue-rgb), 0.5),
@@ -332,12 +332,12 @@
   /* Navbar : hauteur ×2 (contenu inclus) */
   --navbar-scale: 2;
   --navbar-logo-visual-scale: 0.63;
-  --navbar-content-lift: 0px;
+  --navbar-content-lift: 1px;
   --bandeau-slot-h: auto;
   --faucet-band-height: auto;
   --navbar-utility-h: auto;
   --navbar-stack-h: auto;
-  --market-after-ticker-gap: calc(clamp(5px, 1.2vw, 8px) * 3);
+  --market-after-ticker-gap: calc(clamp(4px, 1.2vw, 7px) * 3);
   --market-logo-clearance: 0px;
 
   --navbar-top-bleed: 0px;
@@ -351,7 +351,7 @@
   --navbar-logo-canvas-scale: 1;
   --navbar-logo-inset-top: 0px;
   /* Canvas collé en haut du slot logo (pas de bande vide au-dessus du gem) */
-  --navbar-logo-canvas-shift-y: -24px;
+  --navbar-logo-canvas-shift-y: 1px;
   --navbar-logo-column-pull: 0px;
   --navbar-logo-top-pull: 0px;
   --navbar-logo-dead-space: 0px;
@@ -372,9 +372,9 @@
   --navbar-auth-btn-size: var(--navbar-chrome-h);
   --navbar-auth-strip-w: calc(var(--navbar-auth-btn-size) * 2);
   --navbar-icon-btn-size: calc(24px * var(--navbar-scale));
-  --navbar-status-font-size: calc(0.38rem * var(--navbar-scale));
+  --navbar-status-font-size: calc(0.3175rem * var(--navbar-scale));
   --navbar-brand-title-size: calc(0.46rem * var(--navbar-scale));
-  --navbar-crypto-font-size: calc(0.42rem * var(--navbar-scale));
+  --navbar-crypto-font-size: calc(0.3575rem * var(--navbar-scale));
   --navbar-crypto-select-w: 2.75rem;
 
   --bg-base: #000000;

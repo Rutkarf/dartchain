@@ -13,12 +13,12 @@
   flex-direction: row;
   align-items: center;
   flex: 1 1 auto;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
   min-width: 0;
   height: 100%;
   max-height: 100%;
-  padding: 1px 4px 2px 6px;
+  padding: 0px 2px 0px 4px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -28,7 +28,7 @@
   flex-direction: row;
   align-items: center;
   flex: 1 1 auto;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   overflow: hidden;
 }
@@ -36,7 +36,7 @@
 .showcase-chat-main--preview .showcase-chat__live-led {
   flex: 0 0 6px;
   width: 6px;
-  height: 6px;
+  height: 4px;
   border-radius: 50%;
 }
 
@@ -58,15 +58,15 @@
 .unread-badge {
   flex: 0 0 auto;
   min-width: 12px;
-  height: 12px;
-  padding: 0 3px;
+  height: 10px;
+  padding: 0 1px;
   border-radius: 999px;
   background: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.2);
   color: var(--accent-cyan, #2ec4d6);
   font-family: var(--font-display);
-  font-size: clamp(0.4rem, 2vw, 0.5rem);
+  font-size: clamp(0.275rem, 2vw, 0.375rem);
   font-weight: 700;
-  line-height: 12px;
+  line-height: 10px;
   text-align: center;
   white-space: nowrap;
   box-shadow: none;
@@ -75,7 +75,7 @@
 .showcase-chat-preview__author {
   flex: 0 0 auto;
   font-family: 'DejaVu Sans Mono', 'Liberation Mono', 'Share Tech Mono', monospace;
-  font-size: clamp(0.4375rem, 2.35vw, 0.625rem);
+  font-size: clamp(0.3125rem, 2.35vw, 0.5rem);
   font-weight: 800;
   line-height: 1.1;
   color: #b8bcc4;
@@ -93,7 +93,7 @@
   flex: 1 1 auto;
   min-width: 0;
   display: block;
-  font-size: clamp(0.4375rem, 2.35vw, 0.625rem);
+  font-size: clamp(0.3125rem, 2.35vw, 0.5rem);
   font-weight: 600;
   line-height: 1.1;
   color: var(--text-primary);
@@ -112,7 +112,7 @@
   flex-direction: row;
   align-items: center;
   flex: 0 0 auto;
-  gap: 4px;
+  gap: 2px;
   padding-left: 4px;
   white-space: nowrap;
 }
@@ -133,7 +133,7 @@
   justify-content: center;
   flex: 0 0 auto;
   width: 14px;
-  height: 14px;
+  height: 12px;
   margin: 0;
   padding: 0;
   border: none;
@@ -159,7 +159,7 @@
 
 .showcase-chat-meta__refresh svg {
   width: 10px;
-  height: 10px;
+  height: 8px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;

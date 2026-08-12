@@ -2,9 +2,9 @@
   <div class="chain-graph__scroll">
     <svg
       class="chain-graph__svg"
-      [attr.viewBox]="'0 0 ' + graphWidth() + ' 88'"
-      [attr.width]="graphWidth()"
-      height="88"
+      [attr.viewBox]="'0 0 ' + graphWidth() + ' ' + graphHeight()"
+      [style.min-width.%]="minWidthPercent()"
+      width="100%"
       preserveAspectRatio="xMinYMid meet"
       aria-hidden="false"
     >
@@ -25,6 +25,7 @@
           role="button"
           tabindex="0"
           [attr.aria-label]="'Ouvrir le bloc #' + node.block.index"
+          [attr.title]="shortHash(node.block.hash) + ' · #' + node.block.index"
           (click)="openBlock(node.block)"
           (keydown.enter)="openBlock(node.block)"
           (keydown.space)="$event.preventDefault(); openBlock(node.block)"
@@ -33,19 +34,16 @@
             class="chain-graph__node-hit"
             [attr.cx]="node.x"
             [attr.cy]="node.y"
-            r="20"
+            [attr.r]="hitRadius"
           />
           <circle
             class="chain-graph__node-circle"
             [attr.cx]="node.x"
             [attr.cy]="node.y"
-            r="16"
+            [attr.r]="nodeRadius"
           />
-          <text class="chain-graph__node-index" [attr.x]="node.x" [attr.y]="node.y + 3">
+          <text class="chain-graph__node-index" [attr.x]="node.x" [attr.y]="node.y">
             {{ node.block.index }}
-          </text>
-          <text class="chain-graph__node-hash" [attr.x]="node.x" [attr.y]="node.y + 28">
-            {{ shortHash(node.block.hash) }}
           </text>
         </g>
       }

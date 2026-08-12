@@ -16,7 +16,7 @@
 :where(app-root) :where(*::-webkit-scrollbar-track) {
   background: var(--ds-scrollbar-track);
   border-radius: var(--ds-radius-pill, 999px);
-  margin: 1px 0;
+  margin: 0px 0;
 }
 
 :where(app-root) :where(*::-webkit-scrollbar-thumb) {

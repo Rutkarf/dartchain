@@ -25,9 +25,9 @@
 .navbar-node-panel__led {
   display: block;
   width: var(--nv-brand-led-size, 5px);
-  height: var(--nv-brand-led-size, 5px);
+  height: var(--nv-brand-led-size, 1px);
   min-width: var(--nv-brand-led-size, 5px);
-  min-height: var(--nv-brand-led-size, 5px);
+  min-height: var(--nv-brand-led-size, 1px);
   margin: 0;
   padding: 0;
   border-radius: 50%;
