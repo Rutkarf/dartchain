@@ -36,15 +36,15 @@
   --dock-panel-gap: 0;
 
   --section-stack-gap: 0px;
-  /* Bandes collées par défaut ; gouttières explicites 1px entre sections majeures */
+  /* Bandes : gouttières verticales entre sections majeures */
   --band-air-gap: var(--ds-band-gap, 0px);
   --showcase-dock-offset: 0px;
-  /* navbar → graph · graph → swap · swap → showcase · showcase → dock */
-  --navbar-hub-gap: 1px;
-  --hub-market-internal-gap: 1px;
-  --hub-swap-showcase-gap: 1px;
-  --hub-market-showcase-gap: 1px;
-  --stack-gap-showcase-dock: 1px;
+  /* navbar → graph (+5) · graph → swap (+3) · swap → showcase (+3) · showcase → dock (+3) */
+  --navbar-hub-gap: 6px;
+  --hub-market-internal-gap: 4px;
+  --hub-swap-showcase-gap: 4px;
+  --hub-market-showcase-gap: 4px;
+  --stack-gap-showcase-dock: 4px;
   --stack-gap-navbar-market: var(--navbar-hub-gap);
   --stack-gap-market-showcase: var(--hub-swap-showcase-gap);
   --band-external-gap: 0px;
@@ -71,7 +71,7 @@
 
   --market-exchange-strip-h: var(--mvp-swap-h);
   --market-exchange-height-estimate: var(--mvp-swap-h);
-  /* Graph↔Swap déjà défini ci-dessus (--hub-market-internal-gap: 1px) */
+  /* Graph↔Swap déjà défini ci-dessus (--hub-market-internal-gap: 4px) */
   --market-chart-height-expanded: var(--mvp-chart-h);
   --market-chart-height: var(--market-chart-height-expanded);
   --market-band-height: calc(
@@ -97,7 +97,7 @@
     0px,
     calc(var(--market-height) - var(--swap-market-card-pad-block) - var(--market-swap-content-h))
   );
-  /* --hub-market-showcase-gap déjà 1px (showcase → dock) */
+  /* --hub-market-showcase-gap / stack-gap-showcase-dock : 4px (showcase → dock) */
   --showcase-tab-fusion-overlap: 0px;
   --showcase-smart-bar-h: 24px;
   --chart-smart-bar-h: 24px;
@@ -324,7 +324,7 @@ app-three-floor {
   margin-bottom: 0;
   padding-inline: var(--navbar-inline-pad);
   padding-block: 0;
-  padding-bottom: var(--navbar-hub-gap, 1px);
+  padding-bottom: var(--navbar-hub-gap, 6px);
   box-sizing: border-box;
   line-height: 1;
   background: transparent;
@@ -584,12 +584,12 @@ app-three-floor {
     auto
     var(--hub-showcase-block-height);
   column-gap: 0;
-  /* 1px graph↔swap + 1px swap↔showcase */
-  row-gap: var(--hub-market-internal-gap, 1px);
+  /* Gouttières via margins enfants (row-gap unreliable avec host Angular + overrides vp-compact) */
+  row-gap: 0;
   margin: 0;
   margin-block-start: 0;
-  /* 1px showcase → dock tabs */
-  margin-block-end: var(--stack-gap-showcase-dock, var(--hub-market-showcase-gap, 1px));
+  /* 4px showcase → dock tabs */
+  margin-block-end: var(--stack-gap-showcase-dock, var(--hub-market-showcase-gap, 4px));
   padding-inline: var(--band-inline-pad);
   width: 100%;
   min-width: 0;
@@ -762,7 +762,8 @@ app-three-floor {
   min-height: var(--market-chart-height);
   height: var(--market-chart-height);
   max-height: var(--market-chart-height);
-  margin-bottom: 0;
+  /* graph → swap */
+  margin-bottom: var(--hub-market-internal-gap, 4px);
   gap: 0;
   overflow: hidden;
   pointer-events: auto;
@@ -772,6 +773,13 @@ app-three-floor {
     min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
     height 280ms cubic-bezier(0.22, 1, 0.36, 1),
     max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* swap → showcase tabs */
+.app-hub > app-exchange-panel.app-hub-swap-stack,
+.app-hub > .app-hub-swap-stack {
+  margin-block-start: 0 !important;
+  margin-block-end: var(--hub-swap-showcase-gap, 4px) !important;
 }
 
 .app-market-card--rate.is-summary-expandable,
@@ -1949,7 +1957,7 @@ app-block-detail-drawer {
   }
 
   .app-navbar-zone {
-    padding-bottom: var(--navbar-hub-gap, 1px);
+    padding-bottom: var(--navbar-hub-gap, 6px);
   }
 
   .app-navbar-zone app-bandeau-accueil {
@@ -2207,11 +2215,11 @@ app-block-detail-drawer {
     --navbar-inline-overflow: 2px;
     --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
     --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
-    --navbar-hub-gap: 1px;
-    --hub-market-internal-gap: 1px;
-    --hub-swap-showcase-gap: 1px;
-    --hub-market-showcase-gap: 1px;
-    --stack-gap-showcase-dock: 1px;
+    --navbar-hub-gap: 6px;
+    --hub-market-internal-gap: 4px;
+    --hub-swap-showcase-gap: 4px;
+    --hub-market-showcase-gap: 4px;
+    --stack-gap-showcase-dock: 4px;
     --showcase-dock-offset: 0px;
     --band-external-gap: 0px;
     --mvp-swap-h: 14px;
@@ -2274,7 +2282,7 @@ app-block-detail-drawer {
   .app-navbar-zone {
     margin-bottom: 0;
     padding-inline: var(--navbar-inline-pad);
-    padding-bottom: var(--navbar-hub-gap, 1px);
+    padding-bottom: var(--navbar-hub-gap, 6px);
     box-sizing: border-box;
   }
 
@@ -2334,9 +2342,19 @@ app-block-detail-drawer {
     gap: 0px;
   }
 
-  .app-hub-swap-stack,
   .app-market-card--rate {
     margin-block: 0;
+    padding-block: 0;
+  }
+
+  .app-market-stack--rate {
+    margin-bottom: var(--hub-market-internal-gap, 4px) !important;
+  }
+
+  .app-hub > app-exchange-panel.app-hub-swap-stack,
+  .app-hub > .app-hub-swap-stack {
+    margin-block-start: 0 !important;
+    margin-block-end: var(--hub-swap-showcase-gap, 4px) !important;
     padding-block: 0;
   }
 
@@ -2359,11 +2377,11 @@ app-block-detail-drawer {
     --navbar-inline-overflow: 2px;
     --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
     --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
-    --navbar-hub-gap: 1px;
-    --hub-market-internal-gap: 1px;
-    --hub-swap-showcase-gap: 1px;
-    --hub-market-showcase-gap: 1px;
-    --stack-gap-showcase-dock: 1px;
+    --navbar-hub-gap: 6px;
+    --hub-market-internal-gap: 4px;
+    --hub-swap-showcase-gap: 4px;
+    --hub-market-showcase-gap: 4px;
+    --stack-gap-showcase-dock: 4px;
     --mvp-swap-h: 14px;
     --mvp-chart-h: 192px;
     --mvp-showcase-body-h: 124px;
@@ -2398,7 +2416,7 @@ app-block-detail-drawer {
 
   .app-navbar-zone {
     padding-inline: var(--navbar-inline-pad);
-    padding-bottom: var(--navbar-hub-gap, 1px);
+    padding-bottom: var(--navbar-hub-gap, 6px);
     margin-bottom: 0;
   }
 
@@ -2409,6 +2427,16 @@ app-block-detail-drawer {
 
   .app-hub-swap-stack {
     min-height: var(--mvp-swap-h);
+  }
+
+  .app-market-stack--rate {
+    margin-bottom: var(--hub-market-internal-gap, 4px) !important;
+  }
+
+  .app-hub > app-exchange-panel.app-hub-swap-stack,
+  .app-hub > .app-hub-swap-stack {
+    margin-block-start: 0 !important;
+    margin-block-end: var(--hub-swap-showcase-gap, 4px) !important;
   }
 
   .app-market-stack--rate:not(.is-chart-collapsed) {

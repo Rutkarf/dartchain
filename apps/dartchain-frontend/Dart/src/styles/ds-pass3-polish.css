@@ -192,7 +192,13 @@ html.vp-compact .app-shell {
   padding-inline: 0;
 }
 
-html.vp-compact .app-hub,
+/* Ne pas écraser le row-gap / les gouttières hub (graph↔swap↔showcase). */
+html.vp-compact .app-hub {
+  gap: unset;
+  row-gap: 0;
+  column-gap: 0;
+}
+
 html.vp-compact .app-bottom-stack {
   gap: var(--ds-section-gap, 2px);
 }

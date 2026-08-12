@@ -36,6 +36,8 @@
   max-width: none;
   margin: 0;
   margin-inline: calc(var(--swap-inline-pad) - var(--band-inline-pad));
+  /* swap → showcase : ne pas écraser avec margin: 0 */
+  margin-block-end: var(--hub-swap-showcase-gap, 4px);
   padding: 0;
   min-height: calc(var(--ex-control-h) - 2px);
   height: calc(var(--ex-control-h) - 2px);
