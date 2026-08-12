@@ -242,7 +242,7 @@
   border: 1px solid rgba(255, 96, 96, 0.35);
   background: rgba(255, 96, 96, 0.08);
   color: #ffb4b4;
-  font-size: 0.555rem;
+  font-size: 0.6175rem;
   line-height: 1.35;
 }
 
@@ -268,7 +268,7 @@
 
 .auth-drawer__label {
   font-family: var(--font-body);
-  font-size: 0.555rem;
+  font-size: 0.6175rem;
   font-weight: 600;
   letter-spacing: 0.01em;
   text-transform: none;
@@ -316,7 +316,7 @@
   background: var(--glass-field-bg);
   color: var(--auth-drawer-text);
   font-family: var(--font-body);
-  font-size: 0.635rem;
+  font-size: 0.6975rem;
   transition: background 160ms ease;
 }
 
@@ -334,7 +334,7 @@
 }
 
 .auth-drawer__field-error {
-  font-size: 0.475rem;
+  font-size: 0.5375rem;
   color: #ffb4b4;
   letter-spacing: 0.01em;
   overflow-wrap: anywhere;
@@ -405,7 +405,7 @@
   min-width: 0;
   color: rgba(var(--brand-info-grey-rgb), 0.78);
   font-family: var(--font-body);
-  font-size: 0.495rem;
+  font-size: 0.5575rem;
   font-weight: 500;
   letter-spacing: 0.02em;
   text-transform: none;
@@ -587,7 +587,7 @@
   }
 
   .auth-drawer__tab-label {
-    font-size: 0.395rem;
+    font-size: 0.4575rem;
     letter-spacing: 0.06em;
   }
 
@@ -604,13 +604,13 @@
   }
 
   .auth-drawer__label {
-    font-size: 0.515rem;
+    font-size: 0.5775rem;
   }
 
   .auth-drawer__input {
     height: 30px;
     padding: 0 8px;
-    font-size: 0.595rem;
+    font-size: 0.6575rem;
   }
 
   .auth-drawer__input-shell--password .auth-drawer__input {
@@ -635,7 +635,7 @@
   }
 
   .auth-drawer__oauth-divider {
-    font-size: 0.455rem;
+    font-size: 0.5175rem;
     gap: 4px;
   }
 
@@ -653,7 +653,7 @@
 
   .auth-drawer__error {
     padding: 4px 6px;
-    font-size: 0.495rem;
+    font-size: 0.5575rem;
   }
 }
 

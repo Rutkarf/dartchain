@@ -1,9 +1,9 @@
 :host {
   --pending-gap: 0px;
   --pending-pad: 0px;
-  --pending-font: clamp(5px, 2.1cqw, 8px);
-  --pending-font-sm: clamp(5px, 1.8cqw, 7px);
-  --pending-title-font: clamp(6px, 2.4cqw, 9px);
+  --pending-font: clamp(6px, 2.1cqw, 9px);
+  --pending-font-sm: clamp(6px, 1.8cqw, 8px);
+  --pending-title-font: clamp(7px, 2.4cqw, 10px);
   --pending-title-row-h: clamp(12px, 4cqw, 16px);
   --pending-row-h: clamp(12px, 4.2cqw, 16px);
   --pending-time-w: clamp(24px, 11%, 32px);
@@ -526,9 +526,9 @@
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
     --pending-pad: 0px;
-    --pending-font: 3px;
-    --pending-font-sm: 3px;
-    --pending-title-font: 5px;
+    --pending-font: 4px;
+    --pending-font-sm: 4px;
+    --pending-title-font: 6px;
     --pending-title-row-h: 10px;
     --pending-row-h: clamp(7px, 4.5cqh, 9px);
   }
@@ -536,9 +536,9 @@
 
 @media (min-width: 400px) {
   :host {
-    --pending-font: 5px;
-    --pending-font-sm: 5px;
-    --pending-title-font: 6px;
+    --pending-font: 6px;
+    --pending-font-sm: 6px;
+    --pending-title-font: 7px;
     --pending-title-row-h: 12px;
     --pending-row-h: clamp(9px, 5cqh, 12px);
   }
@@ -564,7 +564,7 @@
 .pending-view__copy-feedback {
   margin: 0;
   padding: 0px 2px;
-  font-size: 3.5px;
+  font-size: 4.5px;
   color: rgba(184, 255, 216, 0.95);
   text-align: center;
 }
@@ -586,7 +586,7 @@
 .pending-view__center--inline {
   justify-self: start;
   min-width: 0;
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -596,7 +596,7 @@
   min-width: 0;
   width: 100%;
   height: clamp(14px, 4.5cqw, 18px);
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   padding: 0 2px;
 }
 
@@ -607,7 +607,7 @@
   border: 1px solid rgba(var(--accent-primary-rgb), 0.28);
   background: rgba(var(--accent-primary-rgb), 0.08);
   color: var(--text-primary);
-  font-size: clamp(7px, 2.5cqw, 9px);
+  font-size: clamp(8px, 2.5cqw, 10px);
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -621,7 +621,7 @@
   border: 1px solid rgba(var(--accent-primary-rgb), 0.32);
   background: rgba(var(--accent-primary-rgb), 0.1);
   color: var(--text-primary);
-  font-size: clamp(3px, 1.6cqw, 5px);
+  font-size: clamp(4px, 1.6cqw, 6px);
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
@@ -670,7 +670,7 @@
   gap: 2px;
   margin: 0;
   padding: 1px 2px 2px;
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   font-weight: 600;
   color: var(--chart-trend-down);
   line-height: 1.2;
@@ -703,7 +703,7 @@
   justify-content: center;
   margin: 0;
   padding: 2px;
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   font-weight: 600;
   color: rgba(167, 209, 228, 0.75);
   text-align: center;
@@ -730,7 +730,7 @@
 }
 
 .pending-view__item-row--compact > .pending-view__time {
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: rgba(167, 209, 228, 0.72);
@@ -739,7 +739,7 @@
 .pending-view__item-row--compact > .pending-view__hash,
 .pending-view__item-row--compact > .pending-view__copy {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 2.5px;
+  font-size: 3.5px;
   font-weight: 600;
   letter-spacing: 0.01em;
   color: rgba(186, 220, 240, 0.78);
@@ -749,7 +749,7 @@
 
 .pending-view__item-row--compact > .pending-view__route {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 2.5px;
+  font-size: 3.5px;
   font-weight: 600;
   letter-spacing: 0.01em;
   color: rgba(186, 220, 240, 0.78);
@@ -757,7 +757,7 @@
 }
 
 .pending-view__item-row--compact > .pending-view__amount {
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 800;
   text-align: right;
   justify-self: stretch;
@@ -769,7 +769,7 @@
   justify-self: stretch;
   height: 8px;
   min-height: 8px;
-  font-size: 3px;
+  font-size: 4px;
   padding: 0 0px;
   letter-spacing: 0.02em;
 }
@@ -806,7 +806,7 @@
 }
 
 .pending-view__item-row--head {
-  font-size: 2.5px;
+  font-size: 3.5px;
   font-family: inherit;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -837,7 +837,7 @@
   flex: 0 0 auto;
   margin: 0;
   padding: 0px 2px 2px;
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   font-weight: 700;
   color: var(--text-muted);
   text-align: center;
@@ -856,10 +856,10 @@
   flex: 1 1 auto;
   min-height: 0;
   padding: 0px;
-  font-size: 3.5px;
+  font-size: 4.5px;
 }
 
 :host(.pending-view--compact) .pending-view__status .pending-view__retry {
   min-height: 9px;
-  font-size: 3px;
+  font-size: 4px;
 }

@@ -38,13 +38,17 @@
   --section-stack-gap: 0px;
   /* Bandes : gouttières verticales entre sections majeures */
   --band-air-gap: var(--ds-band-gap, 0px);
-  --showcase-dock-offset: 0px;
-  /* navbar → graph (+5) · graph → swap (+3) · swap → showcase (+3) · showcase → dock (+3) */
+  --showcase-dock-offset: 1px;
+  /* navbar → graph · graph → swap · swap → showcase · showcase → dock */
   --navbar-hub-gap: 6px;
-  --hub-market-internal-gap: 4px;
-  --hub-swap-showcase-gap: 4px;
+  --hub-market-internal-gap: 6px;
+  --hub-swap-showcase-gap: 6px;
   --hub-market-showcase-gap: 4px;
   --stack-gap-showcase-dock: 4px;
+  /* Gouttières en état replié (smart bars) */
+  --hub-market-internal-gap-collapsed: 4px;
+  --hub-swap-showcase-gap-collapsed: 5px;
+  --stack-gap-showcase-dock-collapsed: 5px;
   --stack-gap-navbar-market: var(--navbar-hub-gap);
   --stack-gap-market-showcase: var(--hub-swap-showcase-gap);
   --band-external-gap: 0px;
@@ -71,7 +75,7 @@
 
   --market-exchange-strip-h: var(--mvp-swap-h);
   --market-exchange-height-estimate: var(--mvp-swap-h);
-  /* Graph↔Swap déjà défini ci-dessus (--hub-market-internal-gap: 4px) */
+  /* Graph↔Swap déjà défini ci-dessus (--hub-market-internal-gap: 6px) */
   --market-chart-height-expanded: var(--mvp-chart-h);
   --market-chart-height: var(--market-chart-height-expanded);
   --market-band-height: calc(
@@ -546,14 +550,14 @@ app-three-floor {
 
 .app-bottom-stack__placeholder h3 {
   margin: 0;
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .app-bottom-stack__placeholder p {
   margin: 0;
-  font-size: 9px;
+  font-size: 10px;
   color: rgba(177, 205, 224, 0.72);
 }
 
@@ -579,12 +583,16 @@ app-three-floor {
   z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  /* Pistes 2 & 4 = gouttières graph→swap / swap→showcase (pas de margin avalé par row fixe) */
+  --hub-gap-graph-swap: var(--hub-market-internal-gap, 6px);
+  --hub-gap-swap-showcase: var(--hub-swap-showcase-gap, 6px);
   grid-template-rows:
     var(--market-chart-height)
+    var(--hub-gap-graph-swap)
     auto
+    var(--hub-gap-swap-showcase)
     var(--hub-showcase-block-height);
   column-gap: 0;
-  /* Gouttières via margins enfants (row-gap unreliable avec host Angular + overrides vp-compact) */
   row-gap: 0;
   margin: 0;
   margin-block-start: 0;
@@ -604,7 +612,9 @@ app-three-floor {
 .app-hub.is-showcase-collapsed {
   grid-template-rows:
     var(--market-chart-height)
+    var(--hub-gap-graph-swap)
     auto
+    var(--hub-gap-swap-showcase)
     var(--hub-showcase-block-height-collapsed);
   /* Replié : le surplus activity revient au chart (même budget global). */
   --market-chart-height: calc(
@@ -643,8 +653,22 @@ app-three-floor {
 .app-hub.is-showcase-collapsed.is-chart-collapsed:not(.is-showcase-disabled) {
   grid-template-rows:
     var(--market-chart-height)
+    var(--hub-gap-graph-swap)
     auto
+    var(--hub-gap-swap-showcase)
     var(--hub-showcase-block-height-collapsed);
+}
+
+.app-hub.is-chart-collapsed,
+.app-hub.is-exchange-collapsed,
+.app-hub:has(.app-market-stack--rate.is-chart-collapsed) {
+  --hub-gap-graph-swap: var(--hub-market-internal-gap-collapsed, 4px);
+}
+
+.app-hub.is-exchange-collapsed,
+.app-hub.is-showcase-collapsed,
+.app-hub:has(app-exchange-panel.exchange-panel--collapsed) {
+  --hub-gap-swap-showcase: var(--hub-swap-showcase-gap-collapsed, 5px);
 }
 
 .app-hub:has(.app-market-stack--rate.is-chart-collapsed) {
@@ -716,7 +740,10 @@ app-three-floor {
 }
 
 .app-hub.is-showcase-disabled {
-  grid-template-rows: var(--market-chart-height) auto;
+  grid-template-rows:
+    var(--market-chart-height)
+    var(--hub-gap-graph-swap)
+    auto;
   row-gap: 0;
   margin-block-end: 0;
 }
@@ -762,8 +789,8 @@ app-three-floor {
   min-height: var(--market-chart-height);
   height: var(--market-chart-height);
   max-height: var(--market-chart-height);
-  /* graph → swap */
-  margin-bottom: var(--hub-market-internal-gap, 4px);
+  /* Gap graph→swap via margin-top du swap (row 1 est en hauteur fixe : margin-bottom est avalé) */
+  margin-bottom: 0;
   gap: 0;
   overflow: hidden;
   pointer-events: auto;
@@ -775,11 +802,17 @@ app-three-floor {
     max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* swap → showcase tabs */
+/* Swap en piste 3 ; gouttières = pistes 2/4 (pas de margins) */
 .app-hub > app-exchange-panel.app-hub-swap-stack,
 .app-hub > .app-hub-swap-stack {
+  grid-row: 3;
   margin-block-start: 0 !important;
-  margin-block-end: var(--hub-swap-showcase-gap, 4px) !important;
+  margin-block-end: 0 !important;
+}
+
+/* Replié : showcase → dock tabs = 5px */
+.app-hub.is-showcase-collapsed {
+  margin-block-end: var(--stack-gap-showcase-dock-collapsed, 5px) !important;
 }
 
 .app-market-card--rate.is-summary-expandable,
@@ -811,7 +844,7 @@ app-three-floor {
 /* —— Bloc showcase : onglets + panneau —— */
 .app-hub-showcase-block {
   grid-column: 1;
-  grid-row: 3;
+  grid-row: 5;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -930,7 +963,7 @@ app-three-floor {
   background: rgba(var(--ds-surface-base-deep-rgb), 0.35);
   color: var(--ds-text-primary, var(--text-primary));
   font-family: inherit;
-  font-size: clamp(4px, 1.8vw, 6px);
+  font-size: clamp(5px, 1.8vw, 7px);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -1073,9 +1106,7 @@ app-three-floor {
   margin-top: 0;
 }
 
-.app-hub.is-showcase-collapsed {
-  margin-block-end: var(--band-air-gap);
-}
+/* (showcase → dock replié : --stack-gap-showcase-dock-collapsed, défini plus haut) */
 
 .app-hub-showcase-block .app-showcase-band.is-collapsed:has(.collapsed-summary-bar) {
   overflow: visible;
@@ -1767,7 +1798,7 @@ app-block-detail-drawer {
   border: 1px solid rgba(0, 255, 136, 0.45);
   background: rgba(2, 18, 14, 0.94);
   color: #b8ffd8;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   line-height: 1.25;
   text-align: center;
@@ -2216,11 +2247,14 @@ app-block-detail-drawer {
     --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
     --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
     --navbar-hub-gap: 6px;
-    --hub-market-internal-gap: 4px;
-    --hub-swap-showcase-gap: 4px;
+    --hub-market-internal-gap: 6px;
+    --hub-swap-showcase-gap: 6px;
     --hub-market-showcase-gap: 4px;
     --stack-gap-showcase-dock: 4px;
-    --showcase-dock-offset: 0px;
+    --hub-market-internal-gap-collapsed: 4px;
+    --hub-swap-showcase-gap-collapsed: 5px;
+    --stack-gap-showcase-dock-collapsed: 5px;
+    --showcase-dock-offset: 1px;
     --band-external-gap: 0px;
     --mvp-swap-h: 14px;
     --mvp-chart-h: 192px;
@@ -2348,13 +2382,14 @@ app-block-detail-drawer {
   }
 
   .app-market-stack--rate {
-    margin-bottom: var(--hub-market-internal-gap, 4px) !important;
+    margin-bottom: 0 !important;
   }
 
   .app-hub > app-exchange-panel.app-hub-swap-stack,
   .app-hub > .app-hub-swap-stack {
+    grid-row: 3;
     margin-block-start: 0 !important;
-    margin-block-end: var(--hub-swap-showcase-gap, 4px) !important;
+    margin-block-end: 0 !important;
     padding-block: 0;
   }
 
@@ -2378,10 +2413,13 @@ app-block-detail-drawer {
     --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
     --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
     --navbar-hub-gap: 6px;
-    --hub-market-internal-gap: 4px;
-    --hub-swap-showcase-gap: 4px;
+    --hub-market-internal-gap: 6px;
+    --hub-swap-showcase-gap: 6px;
     --hub-market-showcase-gap: 4px;
     --stack-gap-showcase-dock: 4px;
+    --hub-market-internal-gap-collapsed: 4px;
+    --hub-swap-showcase-gap-collapsed: 5px;
+    --stack-gap-showcase-dock-collapsed: 5px;
     --mvp-swap-h: 14px;
     --mvp-chart-h: 192px;
     --mvp-showcase-body-h: 124px;
@@ -2430,13 +2468,18 @@ app-block-detail-drawer {
   }
 
   .app-market-stack--rate {
-    margin-bottom: var(--hub-market-internal-gap, 4px) !important;
+    margin-bottom: 0 !important;
   }
 
   .app-hub > app-exchange-panel.app-hub-swap-stack,
   .app-hub > .app-hub-swap-stack {
+    grid-row: 3;
     margin-block-start: 0 !important;
-    margin-block-end: var(--hub-swap-showcase-gap, 4px) !important;
+    margin-block-end: 0 !important;
+  }
+
+  .app-hub.is-showcase-collapsed {
+    margin-block-end: var(--stack-gap-showcase-dock-collapsed, 5px) !important;
   }
 
   .app-market-stack--rate:not(.is-chart-collapsed) {

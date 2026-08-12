@@ -28,7 +28,7 @@
 
 .searchbar__icon {
   flex: 0 0 auto;
-  font-size: 7px;
+  font-size: 8px;
   line-height: 1;
   opacity: 0.72;
 }
@@ -40,7 +40,7 @@
   outline: none;
   background: transparent;
   color: rgba(205, 231, 245, 0.9);
-  font-size: 6px;
+  font-size: 7px;
   line-height: 1.2;
 }
 
@@ -57,7 +57,7 @@
   background: rgba(4, 13, 24, 0.82);
   color: rgba(205, 231, 245, 0.84);
   cursor: pointer;
-  font-size: 7px;
+  font-size: 8px;
   line-height: 1;
   padding: 0;
 }

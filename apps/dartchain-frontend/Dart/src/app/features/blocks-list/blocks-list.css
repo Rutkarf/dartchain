@@ -74,7 +74,7 @@
 
 .chain-dock__sync-label {
   margin: 0;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: lowercase;
@@ -86,7 +86,7 @@
   flex-shrink: 0;
   padding: 0 2px;
   border-radius: 999px;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -128,7 +128,7 @@
   );
   color: rgba(188, 240, 255, 0.98);
   font-family: inherit;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -166,7 +166,7 @@
   background: rgba(0, 12, 22, 0.8);
   color: rgba(167, 209, 228, 0.85);
   font-family: inherit;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 800;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -189,7 +189,7 @@
   border: none;
   background: transparent;
   color: rgba(17, 217, 255, 0.92);
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -217,7 +217,7 @@
   margin: 0;
   padding: 0px 4px;
   border-radius: 6px;
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   text-align: center;
   color: #b8ffd8;
   border: 1px solid rgba(0, 255, 136, 0.35);
@@ -246,7 +246,7 @@
   margin: 0;
   padding: 1px 3px;
   border-radius: 6px;
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   font-weight: 600;
 }
 
@@ -308,7 +308,7 @@
   background: rgba(0, 8, 16, 0.85);
   color: rgba(216, 244, 255, 0.95);
   font-family: inherit;
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 600;
   outline: none;
   box-sizing: border-box;
@@ -420,7 +420,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 600;
   color: rgba(167, 209, 228, 0.88);
 }
@@ -456,7 +456,7 @@
   justify-content: center;
   gap: 1px;
   padding: 2px;
-  font-size: clamp(5px, 2.1cqw, 8px);
+  font-size: clamp(6px, 2.1cqw, 9px);
   color: rgba(167, 209, 228, 0.75);
   text-align: center;
 }
@@ -502,7 +502,7 @@
   }
 
   .chain-dock__sync-label {
-    font-size: 3px;
+    font-size: 4px;
   }
 }
 

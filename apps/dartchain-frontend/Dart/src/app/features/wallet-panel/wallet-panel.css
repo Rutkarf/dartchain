@@ -13,9 +13,9 @@
 .dock-view {
   --dock-gap: 0px;
   --dock-pad: 0px;
-  --dock-font: 4px;
-  --dock-font-sm: 4px;
-  --dock-title-font: 5px;
+  --dock-font: 5px;
+  --dock-font-sm: 5px;
+  --dock-title-font: 6px;
   --dock-title-row-h: 11px;
   --dock-row-h: clamp(8px, 4.8cqh, 11px);
   --dock-col-gap: 0;
@@ -580,7 +580,7 @@ button.dock-view__item-row:focus-visible {
 
 .dock-view__mini-btn {
   padding: 0 1px;
-  font-size: max(2px, var(--dock-font-sm));
+  font-size: max(3px, var(--dock-font-sm));
 }
 
 .dock-view__action:hover:not(:disabled),
@@ -619,7 +619,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .dock-view__balance-value {
-  font-size: clamp(8px, 4cqw, 12px);
+  font-size: clamp(9px, 4cqw, 13px);
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary);
@@ -767,9 +767,9 @@ button.dock-view__item-row:focus-visible {
 
 @media (min-width: 251px) and (max-width: 349px) {
   .dock-view {
-    --dock-font: 3px;
-    --dock-font-sm: 3px;
-    --dock-title-font: 5px;
+    --dock-font: 4px;
+    --dock-font-sm: 4px;
+    --dock-title-font: 6px;
     --dock-title-row-h: 10px;
     --dock-row-h: clamp(7px, 4.5cqh, 9px);
   }
@@ -777,9 +777,9 @@ button.dock-view__item-row:focus-visible {
 
 @media (min-width: 400px) {
   .dock-view {
-    --dock-font: 5px;
-    --dock-font-sm: 5px;
-    --dock-title-font: 6px;
+    --dock-font: 6px;
+    --dock-font-sm: 6px;
+    --dock-title-font: 7px;
     --dock-title-row-h: 12px;
     --dock-row-h: clamp(9px, 5cqh, 12px);
   }
@@ -878,7 +878,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-view__title-balance {
-  font-size: clamp(7px, 3.5cqw, 10px);
+  font-size: clamp(8px, 3.5cqw, 11px);
   font-weight: 800;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
@@ -980,7 +980,7 @@ button.dock-view__item-row:focus-visible {
   z-index: 4;
   padding: 2px 6px;
   border-radius: 6px;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.05em;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.35);
@@ -1020,7 +1020,7 @@ button.dock-view__item-row:focus-visible {
   min-height: 14px;
   padding: 0 2px;
   text-align: center;
-  font-size: clamp(5px, 1.9vw, 7px);
+  font-size: clamp(6px, 1.9vw, 8px);
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1.15;
@@ -1067,7 +1067,7 @@ button.dock-view__item-row:focus-visible {
   margin: 0;
   text-align: left;
   width: 100%;
-  font-size: clamp(5px, 1.8vw, 7px);
+  font-size: clamp(6px, 1.8vw, 8px);
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -1086,7 +1086,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(7px, 2.4vw, 9px);
+  font-size: clamp(8px, 2.4vw, 10px);
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -1099,7 +1099,7 @@ button.dock-view__item-row:focus-visible {
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.26);
   border-radius: 6px;
   padding: 4px 6px;
-  font-size: 10px;
+  font-size: 11px;
   color: #71ffe3;
   background: rgba(4, 18, 34, 0.55);
 }
@@ -1110,7 +1110,7 @@ button.dock-view__item-row:focus-visible {
   gap: 2px;
   min-width: 0;
   color: rgba(208, 236, 255, 0.72);
-  font-size: clamp(5px, 2.1vw, 7px);
+  font-size: clamp(6px, 2.1vw, 8px);
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
@@ -1174,7 +1174,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__empty-title {
   margin: 0;
-  font-size: var(--ds-text-sm, 0.5625rem);
+  font-size: var(--ds-text-sm, 0.625rem);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1184,7 +1184,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__empty-desc {
   margin: 0;
-  font-size: var(--ds-text-caption, 0.4375rem);
+  font-size: var(--ds-text-caption, 0.5rem);
   font-weight: 500;
   color: var(--ds-text-muted, #5c6b7e);
   line-height: 1.35;
@@ -1205,7 +1205,7 @@ button.dock-view__item-row:focus-visible {
   background: var(--cta-primary-bg, var(--wallet-cyan));
   color: var(--cta-primary-text, #050a12);
   font-family: var(--wallet-display-font);
-  font-size: clamp(7px, 2.1vw, 9px);
+  font-size: clamp(8px, 2.1vw, 10px);
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1;
@@ -1281,7 +1281,7 @@ button.dock-view__item-row:focus-visible {
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.18);
   background: rgba(2, 12, 24, 0.92);
   text-align: center;
-  font-size: clamp(4px, 1.7vw, 6px);
+  font-size: clamp(5px, 1.7vw, 7px);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -1310,7 +1310,7 @@ button.dock-view__item-row:focus-visible {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   color: rgba(232, 248, 255, 0.78);
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -1431,7 +1431,7 @@ button.dock-view__item-row:focus-visible {
   flex: 1 1 auto;
   min-width: 0;
   font-family: var(--wallet-display-font);
-  font-size: clamp(3px, 1.35vw, 5px);
+  font-size: clamp(4px, 1.35vw, 6px);
   font-weight: 800;
   letter-spacing: 0.06em;
   color: var(--ds-text-primary, rgba(232, 248, 255, 0.92));
@@ -1461,7 +1461,7 @@ button.dock-view__item-row:focus-visible {
     linear-gradient(180deg, rgba(var(--wallet-cyan-rgb), 0.08), rgba(var(--ds-surface-base-deep-rgb, 6, 7, 10), 0.55));
   color: var(--ds-text-primary, #e8ecf0);
   font-family: var(--wallet-mono);
-  font-size: clamp(3px, 1.25vw, 5px);
+  font-size: clamp(4px, 1.25vw, 6px);
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.15;
@@ -1498,7 +1498,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__balance-cyber-address-icon {
   flex-shrink: 0;
-  font-size: 6px;
+  font-size: 7px;
   opacity: 0.88;
   color: rgba(var(--wallet-cyan-rgb), 0.95);
 }
@@ -1546,7 +1546,7 @@ button.dock-view__item-row:focus-visible {
   align-self: flex-start;
   text-align: left;
   font-family: var(--wallet-display-font);
-  font-size: clamp(5px, 1.6vw, 7px);
+  font-size: clamp(6px, 1.6vw, 8px);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1583,20 +1583,20 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__balance-whole {
-  font-size: clamp(9px, 2.6vw, 13px);
+  font-size: clamp(10px, 2.6vw, 14px);
   font-weight: 700;
   color: var(--ds-text-primary, #e8eef5);
   letter-spacing: -0.01em;
 }
 
 .wallet-display__balance-sep {
-  font-size: clamp(7px, 2.1vw, 10px);
+  font-size: clamp(8px, 2.1vw, 11px);
   font-weight: 600;
   color: var(--ds-text-secondary, #8b9bb0);
 }
 
 .wallet-display__balance-frac {
-  font-size: clamp(5px, 1.7vw, 7px);
+  font-size: clamp(6px, 1.7vw, 8px);
   font-weight: 550;
   color: var(--ds-text-secondary, #8b9bb0);
   letter-spacing: 0.01em;
@@ -1634,13 +1634,13 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__balance-fiat-glass--embedded .wallet-display__balance-fiat-label {
-  font-size: clamp(2px, 1.1vw, 4px);
+  font-size: clamp(3px, 1.1vw, 5px);
   letter-spacing: 0.1em;
 }
 
 .wallet-display__balance-fiat-glass--embedded .wallet-display__balance-fiat-value {
   flex: 0 1 auto;
-  font-size: clamp(4px, 1.55vw, 6px);
+  font-size: clamp(5px, 1.55vw, 7px);
 }
 
 .wallet-display__balance-fiat-glass-sheen {
@@ -1660,7 +1660,7 @@ button.dock-view__item-row:focus-visible {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  font-size: clamp(3px, 1.3vw, 5px);
+  font-size: clamp(4px, 1.3vw, 6px);
   font-weight: 800;
   letter-spacing: 0.12em;
   color: rgba(210, 232, 248, 0.72);
@@ -1673,7 +1673,7 @@ button.dock-view__item-row:focus-visible {
   min-width: 0;
   text-align: center;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: clamp(6px, 2vw, 9px);
+  font-size: clamp(7px, 2vw, 10px);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: #f4fdff;
@@ -1719,7 +1719,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__holding--glass .wallet-display__holding-label {
   text-align: center;
-  font-size: clamp(4px, 1.5vw, 6px);
+  font-size: clamp(5px, 1.5vw, 7px);
   letter-spacing: 0.16em;
   color: rgba(232, 248, 255, 0.92);
   text-shadow: none;
@@ -1744,7 +1744,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__holding-stack-line--lead {
-  font-size: clamp(4px, 1.5vw, 7px);
+  font-size: clamp(5px, 1.5vw, 8px);
   font-weight: 800;
   line-height: 0.85;
 }
@@ -1771,7 +1771,7 @@ button.dock-view__item-row:focus-visible {
   width: 100%;
   text-align: center;
   white-space: nowrap;
-  font-size: clamp(3.5px, 1.4vw, 6px);
+  font-size: clamp(4.5px, 1.4vw, 7px);
   font-weight: 700;
   letter-spacing: 0.025em;
   color: #f4fdff;
@@ -1799,7 +1799,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__holding-stack-chf-label {
   flex: 0 0 auto;
-  font-size: clamp(2px, 1vw, 4px);
+  font-size: clamp(3px, 1vw, 5px);
   font-weight: 800;
   letter-spacing: 0.1em;
   color: rgba(210, 232, 248, 0.72);
@@ -1808,7 +1808,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__holding-stack-chf-value {
   flex: 0 1 auto;
   min-width: 0;
-  font-size: clamp(3.5px, 1.35vw, 5.5px);
+  font-size: clamp(4.5px, 1.35vw, 6.5px);
   font-weight: 800;
   color: #f4fdff;
   text-shadow: none;
@@ -1843,7 +1843,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__balance-chf-label {
   flex: 0 0 auto;
   font-family: var(--wallet-display-font);
-  font-size: clamp(2.5px, 1.05vw, 4px);
+  font-size: clamp(3.5px, 1.05vw, 5px);
   font-weight: 800;
   letter-spacing: 0.12em;
   color: var(--ds-text-secondary, rgba(210, 232, 248, 0.72));
@@ -1852,7 +1852,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__balance-chf-value {
   flex: 0 1 auto;
   min-width: 0;
-  font-size: clamp(4px, 1.4vw, 6px);
+  font-size: clamp(5px, 1.4vw, 7px);
   font-weight: 700;
   color: var(--ds-text-primary, #e8ecf0);
   text-shadow: none;
@@ -1866,7 +1866,7 @@ button.dock-view__item-row:focus-visible {
   z-index: 1;
   align-self: center;
   margin: 0;
-  font-size: clamp(3px, 1.3vw, 5px);
+  font-size: clamp(4px, 1.3vw, 6px);
   font-weight: 600;
   color: rgba(210, 232, 248, 0.72);
   white-space: nowrap;
@@ -1949,7 +1949,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__recent-title {
   margin: 0;
   font-family: var(--wallet-display-font);
-  font-size: clamp(3px, 1.25vw, 5px);
+  font-size: clamp(4px, 1.25vw, 6px);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1962,7 +1962,7 @@ button.dock-view__item-row:focus-visible {
   flex: 1 1 auto;
   display: grid;
   place-items: center;
-  font-size: clamp(3px, 1.15vw, 4.5px);
+  font-size: clamp(4px, 1.15vw, 5.5px);
   color: var(--ds-text-muted, rgba(176, 205, 226, 0.55));
   text-align: center;
   line-height: 1.25;
@@ -2026,7 +2026,7 @@ button.dock-view__item-row:focus-visible {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--wallet-mono);
-  font-size: clamp(2.5px, 1.1vw, 4px);
+  font-size: clamp(3.5px, 1.1vw, 5px);
   line-height: 1.15;
   font-weight: 700;
   color: var(--ds-text-primary, rgba(210, 236, 248, 0.9));
@@ -2047,7 +2047,7 @@ button.dock-view__item-row:focus-visible {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--wallet-mono);
-  font-size: clamp(2px, 1.05vw, 3.5px);
+  font-size: clamp(3px, 1.05vw, 4.5px);
   line-height: 1.1;
 }
 
@@ -2107,7 +2107,7 @@ button.dock-view__item-row:focus-visible {
   flex: 0 0 auto;
   width: 100%;
   font-family: var(--wallet-display-font);
-  font-size: clamp(3px, 1.2vw, 4.5px);
+  font-size: clamp(4px, 1.2vw, 5.5px);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2134,7 +2134,7 @@ button.dock-view__item-row:focus-visible {
   border: 0;
   background: transparent;
   font-family: var(--wallet-mono);
-  font-size: clamp(2px, 1.05vw, 3.5px);
+  font-size: clamp(3px, 1.05vw, 4.5px);
   font-weight: 600;
   line-height: 1.15;
   color: rgba(var(--wallet-cyan-rgb), 0.88);
@@ -2199,7 +2199,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__keys--faucet-col .wallet-display__key-strip-label {
   flex: 0 0 auto;
   width: 100%;
-  font-size: clamp(2px, 1.05vw, 3.5px);
+  font-size: clamp(3px, 1.05vw, 4.5px);
   line-height: 1.1;
 }
 
@@ -2219,7 +2219,7 @@ button.dock-view__item-row:focus-visible {
   border: 0;
   background: transparent;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: clamp(1.5px, 0.95vw, 3px);
+  font-size: clamp(2.5px, 0.95vw, 4px);
   font-weight: 600;
   line-height: 1.15;
   color: rgba(188, 240, 255, 0.82);
@@ -2290,7 +2290,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__holding-label {
   position: relative;
   z-index: 1;
-  font-size: clamp(4px, 1.6vw, 6px);
+  font-size: clamp(5px, 1.6vw, 7px);
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -2302,7 +2302,7 @@ button.dock-view__item-row:focus-visible {
   z-index: 1;
   max-width: 100%;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: clamp(6px, 2.2vw, 10px);
+  font-size: clamp(7px, 2.2vw, 11px);
   font-weight: 800;
   letter-spacing: 0.03em;
   line-height: 1.1;
@@ -2325,7 +2325,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__holding-fiat {
   flex: 0 1 auto;
   min-width: 0;
-  font-size: clamp(4px, 1.6vw, 7px);
+  font-size: clamp(5px, 1.6vw, 8px);
   font-weight: 600;
   color: rgba(187, 209, 225, 0.84);
   white-space: nowrap;
@@ -2406,7 +2406,7 @@ button.dock-view__item-row:focus-visible {
   width: 100%;
   min-width: 0;
   margin: 0;
-  font-size: clamp(3px, 1.4vw, 5px);
+  font-size: clamp(4px, 1.4vw, 6px);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2433,7 +2433,7 @@ button.dock-view__item-row:focus-visible {
   border: 0;
   background: transparent;
   font-family: var(--wallet-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
-  font-size: clamp(2.5px, 1.15vw, 4px);
+  font-size: clamp(3.5px, 1.15vw, 5px);
   font-weight: 600;
   line-height: 1.15;
   color: rgba(var(--wallet-cyan-rgb), 0.88);
@@ -2508,7 +2508,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__key-title {
   margin: 0;
-  font-size: clamp(4px, 1.6vw, 6px);
+  font-size: clamp(5px, 1.6vw, 7px);
   font-weight: 700;
   letter-spacing: 0.03em;
   color: rgba(187, 217, 236, 0.82);
@@ -2531,7 +2531,7 @@ button.dock-view__item-row:focus-visible {
   background: rgba(var(--wallet-cyan-rgb), 0.08);
   color: rgba(188, 240, 255, 0.95);
   font-family: inherit;
-  font-size: clamp(3px, 1.4vw, 5px);
+  font-size: clamp(4px, 1.4vw, 6px);
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -2553,7 +2553,7 @@ button.dock-view__item-row:focus-visible {
   min-width: 0;
   margin: 0;
   padding: 0px 2px;
-  font-size: clamp(3px, 1.4vw, 5px);
+  font-size: clamp(4px, 1.4vw, 6px);
   line-height: 1.15;
   max-height: none;
   white-space: nowrap;
@@ -2568,7 +2568,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__label {
   margin: 0;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -2587,7 +2587,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__balance-value {
-  font-size: clamp(7px, 2.4vw, 12px);
+  font-size: clamp(8px, 2.4vw, 13px);
   font-weight: 700;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   letter-spacing: 0.02em;
@@ -2595,7 +2595,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__balance span {
-  font-size: clamp(12px, 3.8vw, 20px);
+  font-size: clamp(13px, 3.8vw, 21px);
   font-weight: 800;
   letter-spacing: 0.06em;
 }
@@ -2603,7 +2603,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__usd,
 .wallet-display__fiat {
   margin: 0;
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(187, 209, 225, 0.84);
   text-align: center;
 }
@@ -2626,7 +2626,7 @@ button.dock-view__item-row:focus-visible {
   width: 100%;
   text-align: center;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: clamp(5px, 1.9vw, 8px);
+  font-size: clamp(6px, 1.9vw, 9px);
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.15;
@@ -2685,7 +2685,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__explorer-label {
   flex-shrink: 0;
   font-family: var(--wallet-display-font);
-  font-size: 6px;
+  font-size: 7px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ds-text-secondary, rgba(187, 217, 236, 0.75));
@@ -2704,7 +2704,7 @@ button.dock-view__item-row:focus-visible {
   color: var(--ds-text-primary, #e4f7ff);
   padding: 0 5px;
   font-family: var(--wallet-mono);
-  font-size: 8px;
+  font-size: 9px;
   line-height: 1;
   box-sizing: border-box;
   box-shadow: none;
@@ -2753,7 +2753,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__icon-btn-ellipsis {
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 700;
   line-height: 1;
   color: currentColor;
@@ -2770,7 +2770,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__section-title {
   margin: 0;
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2803,7 +2803,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__explorer-field span {
-  font-size: 6px;
+  font-size: 7px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: rgba(187, 217, 236, 0.75);
@@ -2817,7 +2817,7 @@ button.dock-view__item-row:focus-visible {
   background: rgba(2, 18, 34, 0.88);
   color: #e4f7ff;
   padding: 2px 4px;
-  font-size: 8px;
+  font-size: 9px;
   box-sizing: border-box;
 }
 
@@ -2836,7 +2836,7 @@ button.dock-view__item-row:focus-visible {
   background: rgba(var(--wallet-cyan-rgb), 0.08);
   color: rgba(188, 240, 255, 0.95);
   font-family: inherit;
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2865,7 +2865,7 @@ button.dock-view__item-row:focus-visible {
   margin: 0;
   min-width: 0;
   font-family: var(--wallet-mono);
-  font-size: clamp(3px, 1.2vw, 5px);
+  font-size: clamp(4px, 1.2vw, 6px);
   font-weight: 700;
   color: rgba(228, 244, 255, 0.95);
   white-space: nowrap;
@@ -2885,7 +2885,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__explorer-result-fiat {
   margin: 0;
   font-family: var(--wallet-mono);
-  font-size: clamp(3px, 1.15vw, 4.5px);
+  font-size: clamp(4px, 1.15vw, 5.5px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2912,7 +2912,7 @@ button.dock-view__item-row:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 2px;
-  font-size: 6px;
+  font-size: 7px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: rgba(187, 217, 236, 0.78);
@@ -2927,7 +2927,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__key-actions .wallet-display__mini-btn {
   flex: 0 1 auto;
   min-height: 18px;
-  font-size: 5px;
+  font-size: 6px;
   padding: 0 2px;
 }
 
@@ -2940,7 +2940,7 @@ button.dock-view__item-row:focus-visible {
   background: rgba(1, 10, 20, 0.72);
   color: rgba(210, 236, 248, 0.9);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 6px;
+  font-size: 7px;
   line-height: 1.35;
   word-break: break-all;
   white-space: pre-wrap;
@@ -2961,7 +2961,7 @@ button.dock-view__item-row:focus-visible {
   background: rgba(3, 19, 34, 0.88);
   color: rgba(210, 235, 248, 0.86);
   font-family: inherit;
-  font-size: clamp(5px, 1.8vw, 8px);
+  font-size: clamp(6px, 1.8vw, 9px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2970,7 +2970,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__address-icon {
   margin-left: 2px;
-  font-size: 9px;
+  font-size: 10px;
   opacity: 0.8;
 }
 
@@ -3013,7 +3013,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__metric-label {
   margin: 0;
-  font-size: var(--ds-text-label, 0.375rem);
+  font-size: var(--ds-text-label, 0.4375rem);
   letter-spacing: 0.08em;
   font-weight: 600;
   text-transform: uppercase;
@@ -3022,7 +3022,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__metric-value {
   margin: 1px 0 0;
-  font-size: var(--ds-text-lg, 0.75rem);
+  font-size: var(--ds-text-lg, 0.8125rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--ds-text-primary, #e8eef5);
@@ -3058,7 +3058,7 @@ button.dock-view__item-row:focus-visible {
   background: var(--cta-secondary-bg, rgba(13, 24, 40, 0.92));
   color: var(--ds-text-primary, #e8eef5);
   font-family: var(--wallet-display-font);
-  font-size: clamp(6px, 2.2vw, 9px);
+  font-size: clamp(7px, 2.2vw, 10px);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3132,7 +3132,7 @@ button.dock-view__item-row:focus-visible {
   border-radius: 6px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.2);
   padding: 2px 4px;
-  font-size: 7px;
+  font-size: 8px;
 }
 
 .wallet-display__flash--error {
@@ -3201,7 +3201,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__panel-head h3 {
   margin: 0;
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.08em;
   color: #d2f8ff;
 }
@@ -3218,7 +3218,7 @@ button.dock-view__item-row:focus-visible {
   padding: 0;
   display: grid;
   place-items: center;
-  font-size: 9px;
+  font-size: 10px;
   box-shadow: none;
 }
 
@@ -3256,7 +3256,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__send-row > span,
 .wallet-display__receive-label {
   font-family: var(--wallet-display-font);
-  font-size: 4.5px;
+  font-size: 5.5px;
   letter-spacing: 0.07em;
   color: rgba(186, 220, 236, 0.8);
   text-transform: uppercase;
@@ -3278,7 +3278,7 @@ button.dock-view__item-row:focus-visible {
   color: #e4f7ff;
   padding: 0 5px;
   font-family: var(--wallet-mono);
-  font-size: 6px;
+  font-size: 7px;
   min-height: 18px;
   height: 18px;
   box-sizing: border-box;
@@ -3358,7 +3358,7 @@ button.dock-view__item-row:focus-visible {
   background: rgba(var(--wallet-cyan-rgb), 0.08);
   color: rgba(180, 235, 255, 0.9);
   font-family: var(--wallet-display-font);
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -3406,7 +3406,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__field-error {
   margin: 0px 0 0 72px;
-  font-size: 3.5px;
+  font-size: 4.5px;
   color: #ff8ba1;
   line-height: 1.05;
   max-height: 8px;
@@ -3424,7 +3424,7 @@ button.dock-view__item-row:focus-visible {
   background: linear-gradient(180deg, rgba(var(--wallet-cyan-rgb), 0.28), rgba(var(--wallet-cyan-rgb), 0.1));
   color: #c8fbff;
   font-family: var(--wallet-display-font);
-  font-size: 5.5px;
+  font-size: 6.5px;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -3471,7 +3471,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__send-confirm-title {
   margin: 0;
   font-family: var(--wallet-display-font);
-  font-size: 6px;
+  font-size: 7px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #d2fbff;
@@ -3479,7 +3479,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__send-confirm-hint {
   margin: 0;
-  font-size: 4.5px;
+  font-size: 5.5px;
   color: rgba(190, 220, 235, 0.78);
   line-height: 1.3;
 }
@@ -3500,7 +3500,7 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__send-confirm-summary dt {
   margin: 0;
-  font-size: 3.5px;
+  font-size: 4.5px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: rgba(176, 205, 226, 0.7);
@@ -3510,7 +3510,7 @@ button.dock-view__item-row:focus-visible {
   margin: 0;
   min-width: 0;
   font-family: var(--wallet-mono);
-  font-size: 4.5px;
+  font-size: 5.5px;
   font-weight: 700;
   color: rgba(220, 245, 255, 0.95);
   text-align: right;
@@ -3532,7 +3532,7 @@ button.dock-view__item-row:focus-visible {
   padding: 0 3px;
   border-radius: 6px;
   font-family: var(--wallet-display-font);
-  font-size: 4.5px;
+  font-size: 5.5px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3595,7 +3595,7 @@ button.dock-view__item-row:focus-visible {
 .wallet-display__qr-placeholder {
   color: rgba(201, 243, 255, 0.8);
   font-weight: 700;
-  font-size: 7px;
+  font-size: 8px;
 }
 
 @media (max-width: 349px) {
@@ -3605,23 +3605,23 @@ button.dock-view__item-row:focus-visible {
   }
 
   .wallet-display__title {
-    font-size: 6px;
+    font-size: 7px;
   }
 
   .wallet-display__network {
-    font-size: 5px;
+    font-size: 6px;
   }
 
   .wallet-display__balance {
-    font-size: 20px;
+    font-size: 21px;
   }
 
   .wallet-display__usd {
-    font-size: 6px;
+    font-size: 7px;
   }
 
   .wallet-display__address {
-    font-size: 6px;
+    font-size: 7px;
     padding: 0px 4px;
   }
 
@@ -3630,16 +3630,16 @@ button.dock-view__item-row:focus-visible {
   }
 
   .wallet-display__metric-label {
-    font-size: 4px;
+    font-size: 5px;
   }
 
   .wallet-display__metric-value {
-    font-size: 7px;
+    font-size: 8px;
   }
 
   .wallet-display__action-btn {
     min-height: 22px;
-    font-size: 9px;
+    font-size: 10px;
     gap: 2px;
   }
 
@@ -3651,7 +3651,7 @@ button.dock-view__item-row:focus-visible {
   .wallet-display__toast {
     top: 4px;
     right: 6px;
-    font-size: 6px;
+    font-size: 7px;
     padding: 1px 4px;
   }
 
@@ -3661,24 +3661,24 @@ button.dock-view__item-row:focus-visible {
   }
 
   .wallet-display__panel-head h3 {
-    font-size: 6px;
+    font-size: 7px;
   }
 
   .wallet-display__send-form label span,
   .wallet-display__receive-label {
-    font-size: 5px;
+    font-size: 6px;
   }
 
   .wallet-display__send-form input,
   .wallet-display__receive-address {
     min-height: 18px;
     padding: 1px 3px;
-    font-size: 6px;
+    font-size: 7px;
   }
 
   .wallet-display__panel-submit {
     min-height: 18px;
-    font-size: 6px;
+    font-size: 7px;
   }
 
   .wallet-display__qr {
@@ -3720,7 +3720,7 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__center {
   min-height: 12px;
-  font-size: clamp(4px, 1.7vw, 6px);
+  font-size: clamp(5px, 1.7vw, 7px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__icon-btn {
@@ -3771,7 +3771,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-line {
-  font-size: clamp(4px, 1.6vw, 6px);
+  font-size: clamp(5px, 1.6vw, 7px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys {
@@ -3786,12 +3786,12 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__create-cta {
   min-height: 16px;
   padding: 0 4px;
-  font-size: clamp(4px, 1.6vw, 6px);
+  font-size: clamp(5px, 1.6vw, 7px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__status-line {
   top: 1px;
-  font-size: clamp(3px, 1.35vw, 4.5px);
+  font-size: clamp(4px, 1.35vw, 5.5px);
   padding: 0px 5px;
 }
 
@@ -3838,12 +3838,12 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-addr {
-  font-size: 2.5px;
+  font-size: 3.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-bal,
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-fiat {
-  font-size: 2px;
+  font-size: 3px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber {
@@ -3860,21 +3860,21 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber-account {
-  font-size: 3px;
+  font-size: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber-address {
   max-width: none;
   padding: 0px 1px;
-  font-size: 2.5px;
+  font-size: 3.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-cyber-address-icon {
-  font-size: 4px;
+  font-size: 5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-brand {
-  font-size: clamp(4px, 1.4vw, 6px);
+  font-size: clamp(5px, 1.4vw, 7px);
   letter-spacing: 0.08em;
   line-height: 1.15;
   padding: 0;
@@ -3894,19 +3894,19 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-whole {
-  font-size: clamp(7px, 2.1vw, 10px);
+  font-size: clamp(8px, 2.1vw, 11px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-sep {
-  font-size: clamp(5px, 1.7vw, 7px);
+  font-size: clamp(6px, 1.7vw, 8px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-frac {
-  font-size: clamp(3px, 1.2vw, 4.5px);
+  font-size: clamp(4px, 1.2vw, 5.5px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__holding-stack-line--lead {
-  font-size: clamp(3.5px, 1.35vw, 5px);
+  font-size: clamp(4.5px, 1.35vw, 6px);
   line-height: 0.82;
 }
 
@@ -3919,7 +3919,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__holding-stack-line {
-  font-size: clamp(3px, 1.3vw, 4.5px);
+  font-size: clamp(4px, 1.3vw, 5.5px);
   line-height: 0.82;
 }
 
@@ -3943,12 +3943,12 @@ button.dock-view__item-row:focus-visible {
   min-height: 16px;
   height: 16px;
   padding: 0 2px;
-  font-size: 5px;
+  font-size: 6px;
   border-radius: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-label {
-  font-size: 3px;
+  font-size: 4px;
   line-height: 1;
 }
 
@@ -3994,11 +3994,11 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-title {
-  font-size: 3px;
+  font-size: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-empty {
-  font-size: 2.5px;
+  font-size: 3.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-btn {
@@ -4009,7 +4009,7 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-addr,
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-bal,
 :host-context(.app-bottom-stack__panel) .wallet-display__recent-fiat {
-  font-size: 2.5px;
+  font-size: 3.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-chf {
@@ -4018,15 +4018,15 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-chf-label {
-  font-size: 2px;
+  font-size: 3px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-chf-value {
-  font-size: clamp(3px, 1.25vw, 4.5px);
+  font-size: clamp(4px, 1.25vw, 5.5px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__holding-fiat {
-  font-size: clamp(3px, 1.4vw, 5px);
+  font-size: clamp(4px, 1.4vw, 6px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__holding-meta {
@@ -4053,7 +4053,7 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-value {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: clamp(5px, 1.8vw, 8px);
+  font-size: clamp(6px, 1.8vw, 9px);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4062,12 +4062,12 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance > span:last-child {
   flex: 0 0 auto;
-  font-size: clamp(8px, 2.5vw, 11px);
+  font-size: clamp(9px, 2.5vw, 12px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__account {
   margin: 0;
-  font-size: 4px;
+  font-size: 5px;
   line-height: 1.1;
   text-align: left;
   width: 100%;
@@ -4076,7 +4076,7 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__address {
   margin: 0;
   padding: 0px 3px;
-  font-size: clamp(4px, 1.6vw, 6px);
+  font-size: clamp(5px, 1.6vw, 7px);
   flex-shrink: 0;
 }
 
@@ -4086,7 +4086,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__address-icon {
-  font-size: 6px;
+  font-size: 7px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__metrics {
@@ -4100,24 +4100,24 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__metric-label {
-  font-size: 4px;
+  font-size: 5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__usd,
 :host-context(.app-bottom-stack__panel) .wallet-display__fiat {
   margin: 0;
-  font-size: clamp(5px, 1.8vw, 7px);
+  font-size: clamp(6px, 1.8vw, 8px);
   line-height: 1.2;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__section-title {
-  font-size: 4px;
+  font-size: 5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__mini-btn {
   min-height: 12px;
   height: 12px;
-  font-size: 3px;
+  font-size: 4px;
   padding: 0 1px;
   line-height: 1;
 }
@@ -4151,7 +4151,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip-label {
-  font-size: 2.5px;
+  font-size: 3.5px;
   letter-spacing: 0.05em;
 }
 
@@ -4160,7 +4160,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip-value {
-  font-size: 1.5px;
+  font-size: 2.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-icon-btn {
@@ -4183,11 +4183,11 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--faucet-col .wallet-display__key-strip-label {
-  font-size: 2px;
+  font-size: 3px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--faucet-col .wallet-display__key-strip-value {
-  font-size: 1.5px;
+  font-size: 2.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--faucet-col .wallet-display__key-icon-btn {
@@ -4208,7 +4208,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-strip-label {
-  font-size: 2.5px;
+  font-size: 3.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-icon-btn {
@@ -4227,17 +4227,17 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-title {
-  font-size: 3px;
+  font-size: 4px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-btn {
   min-height: 10px;
   padding: 0 0px;
-  font-size: 2.5px;
+  font-size: 3.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__key-line .wallet-display__key-value {
-  font-size: 2.5px;
+  font-size: 3.5px;
   padding: 0px 0px;
 }
 
@@ -4247,20 +4247,20 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-result-addr {
-  font-size: 3px;
+  font-size: 4px;
   line-height: 1.1;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-result-balance,
 :host-context(.app-bottom-stack__panel) .wallet-display__explorer-result-fiat {
   margin: 0;
-  font-size: 2.5px;
+  font-size: 3.5px;
   line-height: 1.1;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__metric-value {
   margin-top: 0px;
-  font-size: clamp(6px, 2vw, 8px);
+  font-size: clamp(7px, 2vw, 9px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__actions {
@@ -4279,7 +4279,7 @@ button.dock-view__item-row:focus-visible {
   min-height: 26px;
   padding: 0 2px;
   border-radius: var(--radius-md, 10px);
-  font-size: clamp(5px, 2vw, 7px);
+  font-size: clamp(6px, 2vw, 8px);
   gap: 1px;
   letter-spacing: 0.04em;
 }
@@ -4320,7 +4320,7 @@ button.dock-view__item-row:focus-visible {
   right: 2px;
   width: 14px;
   height: 12px;
-  font-size: 8px;
+  font-size: 9px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__send-form,
@@ -4340,7 +4340,7 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__field-label,
 :host-context(.app-bottom-stack__panel) .wallet-display__receive-label {
-  font-size: 3.5px;
+  font-size: 4.5px;
   letter-spacing: 0.05em;
 }
 
@@ -4352,7 +4352,7 @@ button.dock-view__item-row:focus-visible {
   min-height: 14px;
   height: 14px;
   padding: 0 3px;
-  font-size: 4.5px;
+  font-size: 5.5px;
   border-radius: 5px;
 }
 
@@ -4376,19 +4376,19 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__amount-unit {
-  font-size: 3px;
+  font-size: 4px;
   padding: 0 1px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__field-error {
   margin-left: 62px;
-  font-size: 3px;
+  font-size: 4px;
   max-height: 6px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__panel-submit {
   min-height: 15px;
-  font-size: 4.5px;
+  font-size: 5.5px;
   margin-top: auto;
   border-radius: 6px;
 }
@@ -4404,7 +4404,7 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__send-confirm-btn {
   min-height: 13px;
-  font-size: 3.5px;
+  font-size: 4.5px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__qr-wrap {

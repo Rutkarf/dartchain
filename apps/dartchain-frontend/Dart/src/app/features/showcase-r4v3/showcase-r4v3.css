@@ -1,11 +1,11 @@
 :host {
   --r4v3-gap: 0px;
   --r4v3-pad: 0px;
-  --r4v3-font: 5.5px;
-  --r4v3-font-sm: 5.5px;
-  --r4v3-pin-font: clamp(5px, 2.4vw, 7px);
-  --r4v3-pin-font-sm: clamp(5px, 2vw, 7px);
-  --r4v3-pin-title-font: clamp(7px, 3vw, 10px);
+  --r4v3-font: 6.5px;
+  --r4v3-font-sm: 6.5px;
+  --r4v3-pin-font: clamp(6px, 2.4vw, 8px);
+  --r4v3-pin-font-sm: clamp(6px, 2vw, 8px);
+  --r4v3-pin-title-font: clamp(8px, 3vw, 11px);
   --r4v3-pin-control-h: clamp(16px, 4.8vw, 20px);
   --r4v3-live-font: var(--r4v3-font);
   --r4v3-title-row-h: 11px;
@@ -97,7 +97,7 @@
   margin: 0;
   padding: 0 clamp(1px, 0.8vw, 3px);
   border-radius: 0;
-  font-size: clamp(6px, 2.4vw, 9px);
+  font-size: clamp(7px, 2.4vw, 10px);
   line-height: 1;
   border: none;
   border-bottom: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.14);
@@ -199,7 +199,7 @@
   background:
     linear-gradient(180deg, rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.18), rgba(4, 12, 20, 0.55));
   color: #e8feff;
-  font-size: clamp(6px, 2.4vw, 9px);
+  font-size: clamp(7px, 2.4vw, 10px);
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
@@ -1454,8 +1454,8 @@
 
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
-    --r4v3-font: 4.5px;
-    --r4v3-font-sm: 4.5px;
+    --r4v3-font: 5.5px;
+    --r4v3-font-sm: 5.5px;
     --r4v3-title-row-h: 12px;
     --r4v3-row-h: clamp(8.5px, 4.5cqh, 10.5px);
   }
@@ -1463,8 +1463,8 @@
 
 @media (min-width: 400px) {
   :host {
-    --r4v3-font: 6.5px;
-    --r4v3-font-sm: 6.5px;
+    --r4v3-font: 7.5px;
+    --r4v3-font-sm: 7.5px;
     --r4v3-title-row-h: 14px;
     --r4v3-row-h: clamp(10.5px, 5cqh, 13.5px);
   }
@@ -1797,7 +1797,7 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  font-size: clamp(26px, min(68cqw, 68cqh), 54px);
+  font-size: clamp(27px, min(68cqw, 68cqh), 55px);
   line-height: 1;
   opacity: 0.12;
   pointer-events: none;
@@ -1823,7 +1823,7 @@
 .showcase-r4v3__pillar-label {
   flex: 0 0 auto;
   width: 100%;
-  font-size: clamp(5px, 3.6cqh, 8px);
+  font-size: clamp(6px, 3.6cqh, 9px);
   font-weight: 800;
   line-height: 1.15;
   color: #f4fbff;
@@ -1837,7 +1837,7 @@
   flex: 0 1 auto;
   width: 100%;
   min-height: 0;
-  font-size: clamp(4px, 2.8cqh, 6.5px);
+  font-size: clamp(5px, 2.8cqh, 7.5px);
   line-height: 1.28;
   color: rgba(255, 255, 255, 0.86);
   overflow-wrap: anywhere;
@@ -2076,7 +2076,7 @@
   border: none;
   background: transparent;
   color: rgba(255, 255, 255, 0.38);
-  font-size: 0.375rem;
+  font-size: 0.4375rem;
   line-height: 1;
   cursor: pointer;
 }

@@ -110,7 +110,7 @@
 
 .ticker-drawer__eyebrow {
   font-family: var(--ds-font-ui, system-ui, sans-serif);
-  font-size: 0.1875rem;
+  font-size: 0.25rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -124,7 +124,7 @@
 .ticker-drawer__title {
   margin: 0;
   font-family: var(--ds-font-display, var(--font-display));
-  font-size: 0.4375rem;
+  font-size: 0.5rem;
   font-weight: 800;
   letter-spacing: 0.03em;
   line-height: 1.15;
@@ -172,7 +172,7 @@
 }
 
 .ticker-drawer__icon-btn--close {
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 600;
 }
 
@@ -227,7 +227,7 @@
 
 .ticker-drawer__metric-label {
   font-family: var(--ds-font-ui, system-ui, sans-serif);
-  font-size: 0.1563rem;
+  font-size: 0.2188rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -240,7 +240,7 @@
 
 .ticker-drawer__metric-value {
   font-family: var(--ds-font-mono, ui-monospace, Menlo, monospace);
-  font-size: 0.2813rem;
+  font-size: 0.3438rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1.15;
@@ -252,7 +252,7 @@
 
 .ticker-drawer__metrics--solo .ticker-drawer__metric-value,
 .status-drawer--ticker-compact .ticker-drawer__metric-value {
-  font-size: 0.3125rem;
+  font-size: 0.375rem;
 }
 
 .ticker-drawer__hero {
@@ -267,7 +267,7 @@
 
 .ticker-drawer__hero-value {
   font-family: var(--ds-font-mono, ui-monospace, Menlo, monospace);
-  font-size: 0.3125rem;
+  font-size: 0.375rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
@@ -279,7 +279,7 @@
   margin: 0;
   padding: 0 0px;
   font-family: var(--ds-font-ui, system-ui, sans-serif);
-  font-size: 0.25rem;
+  font-size: 0.3125rem;
   font-weight: 500;
   line-height: 1.4;
   color: rgba(205, 231, 245, 0.58);
@@ -319,16 +319,16 @@
   }
 
   .ticker-drawer__title {
-    font-size: 0.375rem;
+    font-size: 0.4375rem;
   }
 
   .ticker-drawer__metric-value,
   .ticker-drawer__hero-value {
-    font-size: 0.25rem;
+    font-size: 0.3125rem;
   }
 
   .ticker-drawer__summary {
-    font-size: 0.2187rem;
+    font-size: 0.2812rem;
     -webkit-line-clamp: 2;
   }
 }

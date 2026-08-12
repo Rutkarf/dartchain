@@ -46,7 +46,7 @@
   flex: 0 1 auto;
   min-width: 0;
   font-family: var(--font-display, inherit);
-  font-size: clamp(0.375rem, 2.2vw, 0.5rem);
+  font-size: clamp(0.4375rem, 2.2vw, 0.5625rem);
   font-weight: 800;
   letter-spacing: 0.05em;
   line-height: 1;
@@ -139,7 +139,7 @@
 
 .r4v3-summary-bar__wp-btn-label {
   font-family: var(--font-display, inherit);
-  font-size: clamp(0.3125rem, 1.9vw, 0.4375rem);
+  font-size: clamp(0.375rem, 1.9vw, 0.5rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;

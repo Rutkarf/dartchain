@@ -60,7 +60,7 @@
   border: 1px solid rgba(var(--quest-green-rgb), 0.45);
   background: rgba(2, 18, 14, 0.94);
   color: var(--quest-green);
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
@@ -94,7 +94,7 @@
   gap: 2px;
   padding: 0px 2px;
   border-radius: 6px;
-  font-size: 6px;
+  font-size: 7px;
   color: #ffd8e0;
   border: 1px solid rgba(255, 92, 122, 0.45);
   background: rgba(36, 8, 16, 0.94);
@@ -104,7 +104,7 @@
   border: none;
   background: transparent;
   color: inherit;
-  font-size: 10px;
+  font-size: 11px;
   cursor: pointer;
   padding: 0;
 }
@@ -173,7 +173,7 @@
   position: relative;
   z-index: 1;
   color: #baf3ff;
-  font-size: 7px;
+  font-size: 8px;
   line-height: 1;
   text-shadow: none;
 }
@@ -187,7 +187,7 @@
 }
 
 .quests-panel__guardian-rank {
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -205,7 +205,7 @@
 .quests-panel__guardian-name {
   flex-shrink: 0;
   max-width: 38%;
-  font-size: 5px;
+  font-size: 6px;
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -235,7 +235,7 @@
 
 .quests-panel__guardian-pct {
   flex-shrink: 0;
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 800;
   color: #baf3ff;
   font-variant-numeric: tabular-nums;
@@ -249,7 +249,7 @@
   border: 1px solid rgba(var(--quest-cyan-rgb), 0.28);
   background: rgba(var(--quest-cyan-rgb), 0.08);
   color: #baf3ff;
-  font-size: 8px;
+  font-size: 9px;
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -282,7 +282,7 @@
 }
 
 .quests-panel__countdown-label {
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -290,7 +290,7 @@
 }
 
 .quests-panel__countdown-value {
-  font-size: 5px;
+  font-size: 6px;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
   color: #baf3ff;
@@ -324,14 +324,14 @@
 }
 
 .quests-panel__progress-count {
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 900;
   color: #eef9ff;
   font-variant-numeric: tabular-nums;
 }
 
 .quests-panel__progress-label {
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 700;
   color: var(--quest-muted);
   text-transform: lowercase;
@@ -362,7 +362,7 @@
   border: 1px solid rgba(var(--quest-green-rgb), 0.55);
   background: rgba(var(--quest-green-rgb), 0.12);
   color: var(--quest-green);
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -424,7 +424,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 5px;
+  font-size: 6px;
   color: transparent;
   flex-shrink: 0;
 }
@@ -448,7 +448,7 @@
 .quests-panel__row-title {
   margin: 0;
   min-width: 0;
-  font-size: 4.5px;
+  font-size: 5.5px;
   font-weight: 700;
   color: #eef9ff;
   line-height: 1.1;
@@ -493,7 +493,7 @@
 
 .quests-panel__row-progress-label {
   flex-shrink: 0;
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 700;
   color: rgba(214, 240, 255, 0.72);
   font-variant-numeric: tabular-nums;
@@ -518,7 +518,7 @@
 .quests-panel__row-reward {
   position: relative;
   z-index: 1;
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: rgba(var(--quest-cyan-rgb), 0.95);
@@ -537,7 +537,7 @@
   height: 10px;
   padding: 0 1px;
   border-radius: 3px;
-  font-size: 5px;
+  font-size: 6px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -557,7 +557,7 @@
 
 .quests-panel__btn--go.is-login {
   min-width: 36px;
-  font-size: 4px;
+  font-size: 5px;
 }
 
 .quests-panel__btn--wallet {
@@ -572,7 +572,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 5px;
+  font-size: 6px;
   font-weight: 800;
 }
 
@@ -612,13 +612,13 @@
 
 .quests-panel__weekly-icon {
   flex-shrink: 0;
-  font-size: 5px;
+  font-size: 6px;
   color: rgba(var(--quest-purple-rgb), 0.88);
 }
 
 .quests-panel__weekly-title {
   flex-shrink: 0;
-  font-size: 4.5px;
+  font-size: 5.5px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -628,7 +628,7 @@
 
 .quests-panel__weekly-reward {
   min-width: 0;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 700;
   color: rgba(214, 240, 255, 0.78);
   white-space: nowrap;
@@ -647,7 +647,7 @@
   background: rgba(2, 10, 20, 0.92);
   color: rgba(214, 240, 255, 0.55);
   font-family: inherit;
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;

@@ -2,9 +2,9 @@
 
 :host-context(.navbar-wrap),
 .navbar-wrap {
-  --navbar-chrome-font: var(--ds-text-sm, 0.4375rem);
-  --navbar-status-font-size: var(--ds-text-xs, 0.375rem);
-  --navbar-crypto-font-size: clamp(0.5325rem, 3.2vw, 0.7325rem);
+  --navbar-chrome-font: var(--ds-text-sm, 0.5rem);
+  --navbar-status-font-size: var(--ds-text-xs, 0.4375rem);
+  --navbar-crypto-font-size: clamp(0.595rem, 3.2vw, 0.795rem);
   --navbar-chrome-h: var(--ds-icon-btn, 28px);
   --nv-control-h: var(--ds-icon-btn, 28px);
 }

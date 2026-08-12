@@ -5,9 +5,9 @@
 :root {
   --dock-view-gap: 0px;
   --dock-view-pad: 0px;
-  --dock-view-font: 4px;
-  --dock-view-font-sm: 4px;
-  --dock-view-title-font: 5px;
+  --dock-view-font: 5px;
+  --dock-view-font-sm: 5px;
+  --dock-view-title-font: 6px;
   --dock-view-title-row-h: 10px;
   --dock-view-row-h: clamp(7px, 4.8cqh, 10px);
   --dock-view-col-gap: 0;

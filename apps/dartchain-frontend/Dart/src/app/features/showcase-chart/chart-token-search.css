@@ -46,7 +46,7 @@
   border: 0;
   background: transparent;
   color: #f4fbff;
-  font-size: var(--chart-hub-fs, 6px);
+  font-size: var(--chart-hub-fs, 7px);
   line-height: 1.2;
   outline: none;
 }
@@ -131,7 +131,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 800;
   color: #041018;
   background: rgba(var(--chart-hub-cyan-rgb, 0, 255, 255), 0.75);
@@ -151,7 +151,7 @@
 }
 
 .chart-token-search__name {
-  font-size: var(--chart-hub-fs, 6px);
+  font-size: var(--chart-hub-fs, 7px);
   font-weight: 700;
   color: #f4fbff;
 }

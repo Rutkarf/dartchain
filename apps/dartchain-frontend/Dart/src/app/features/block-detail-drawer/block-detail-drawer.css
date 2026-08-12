@@ -1,6 +1,6 @@
 :host {
   display: block;
-  --navbar-offset: 75px;
+  --navbar-offset: 76px;
   --drawer-radius: 14px;
   --drawer-accent: rgba(var(--ui-accent-rgb), 0.45);
   --drawer-border: var(--border-faint);
@@ -67,7 +67,7 @@
 
 .drawer-eyebrow {
   margin: 0;
-  font-size: 0.355rem;
+  font-size: 0.4175rem;
   line-height: 1;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -76,7 +76,7 @@
 
 .drawer-head h3 {
   margin: 0;
-  font-size: 0.735rem;
+  font-size: 0.7975rem;
   font-weight: 800;
   line-height: 1.02;
   color: var(--drawer-text);
@@ -84,7 +84,7 @@
 
 .drawer-subtitle {
   margin: 0;
-  font-size: 0.475rem;
+  font-size: 0.5375rem;
   line-height: 1.15;
   color: var(--drawer-muted);
 }
@@ -98,7 +98,7 @@
     linear-gradient(135deg, rgba(var(--ui-accent-rgb), 0.08), rgba(var(--ui-accent-2-rgb), 0.04)),
     rgba(var(--text-primary-rgb), 0.06);
   color: var(--drawer-text);
-  font-size: 0.655rem;
+  font-size: 0.7175rem;
   font-weight: 800;
   cursor: pointer;
   appearance: none;
@@ -156,7 +156,7 @@
 }
 
 .detail-label {
-  font-size: 0.355rem;
+  font-size: 0.4175rem;
   color: var(--drawer-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -164,7 +164,7 @@
 }
 
 .detail-value {
-  font-size: 0.615rem;
+  font-size: 0.6775rem;
   font-weight: 700;
   color: var(--drawer-text);
   line-height: 1.12;
@@ -177,7 +177,7 @@
   min-width: 0;
   max-width: 100%;
   font-family: var(--font-body);
-  font-size: 0.455rem;
+  font-size: 0.5175rem;
   line-height: 1.18;
   color: var(--text-primary);
   white-space: normal;
@@ -197,7 +197,7 @@
   border: 1px solid rgba(var(--ui-accent-rgb), 0.10);
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 0.415rem;
+  font-size: 0.4775rem;
   line-height: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -208,7 +208,7 @@
   margin: 0;
   min-width: 0;
   max-width: 100%;
-  font-size: 0.615rem;
+  font-size: 0.6775rem;
   line-height: 1.18;
   color: var(--drawer-text);
   white-space: normal;
@@ -238,7 +238,7 @@
 
 @media (max-width: 390px) {
   :host {
-    --navbar-offset: 71px;
+    --navbar-offset: 72px;
     --drawer-radius: 12px;
   }
 
@@ -264,17 +264,17 @@
   }
 
   .drawer-head h3 {
-    font-size: 0.695rem;
+    font-size: 0.7575rem;
   }
 
   .drawer-subtitle,
   .detail-value,
   .detail-content {
-    font-size: 0.575rem;
+    font-size: 0.6375rem;
   }
 
   .detail-code {
-    font-size: 0.435rem;
+    font-size: 0.4975rem;
   }
 }
 

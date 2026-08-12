@@ -46,7 +46,7 @@
 }
 
 .showcase-panel__title {
-  font-size: clamp(6px, 2.2vw, 8px);
+  font-size: clamp(7px, 2.2vw, 9px);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;

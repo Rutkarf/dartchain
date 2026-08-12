@@ -2,9 +2,9 @@
 :host {
   --news-gap: 0;
   --news-pad: 0;
-  --news-font: 5.5px;
-  --news-font-sm: 6px;
-  --news-live-font: 5px;
+  --news-font: 6.5px;
+  --news-font-sm: 7px;
+  --news-live-font: 6px;
   --news-meta-bar-h: 11px;
   --news-meta-inner-h: 9px;
   --news-row-h: 12px;
@@ -393,7 +393,7 @@
   justify-content: center;
   width: 100%;
   height: 9px;
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 700;
   line-height: 1;
   border-radius: var(--ds-badge-radius, 999px);
@@ -432,7 +432,7 @@
 }
 
 .showcase-news__load-sentinel-label {
-  font-size: 5px;
+  font-size: 6px;
   color: rgba(255, 255, 255, 0.28);
 }
 

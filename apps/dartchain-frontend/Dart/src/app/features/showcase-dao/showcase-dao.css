@@ -4,8 +4,8 @@
   --dao-pad: 0px;
   --dao-line-h: 8px;
   --dao-card-h: 19px;
-  --dao-font: 5px;
-  --dao-font-sm: 5.5px;
+  --dao-font: 6px;
+  --dao-font-sm: 6.5px;
   --dao-neon-cyan: #5ce1ff;
   --dao-neon-cyan-rgb: 92, 225, 255;
   --dao-neon-green: #3dd68c;
@@ -226,7 +226,7 @@
 .showcase-dao__logo--placeholder {
   display: inline-grid;
   place-items: center;
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 800;
   color: #fff;
   background: linear-gradient(
@@ -274,7 +274,7 @@
 .showcase-dao__status {
   padding: 0 1px;
   border-radius: 2px;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 900;
   letter-spacing: 0.03em;
   line-height: 1.2;
@@ -297,7 +297,7 @@
 }
 
 .showcase-dao__enter {
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 700;
   line-height: 1;
   color: rgba(var(--dao-neon-cyan-rgb), 0.7);

@@ -47,7 +47,7 @@
   --nv-brand-chip-pad-right: 0.26rem;
   --nv-brand-chip-pad-left: 0.05rem;
   --nv-brand-chip-gap: 0.2rem;
-  --nv-brand-chip-font: 0.1875rem;
+  --nv-brand-chip-font: 0.25rem;
   --nv-brand-chip-line: var(--nv-brand-chip-font);
   --nv-brand-led-size: 5px;
   --nv-brand-sync-y: 0px;
@@ -195,7 +195,7 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.05),
     inset 2px 0 0 rgba(var(--nv-cyan-rgb), 0.55);
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--ds-text-sm, 0.4375rem);
+  font-size: var(--ds-text-sm, 0.5rem);
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--ds-text-primary, #e8ecf0);
@@ -214,7 +214,7 @@
   background: rgba(0, 0, 0, 0.25);
   color: var(--ds-text-primary, #e8ecf0);
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--ds-text-sm, 0.4375rem);
+  font-size: var(--ds-text-sm, 0.5rem);
   font-weight: 700;
   letter-spacing: 0.06em;
   cursor: pointer;

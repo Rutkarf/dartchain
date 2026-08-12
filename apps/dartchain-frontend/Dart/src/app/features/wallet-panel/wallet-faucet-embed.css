@@ -109,7 +109,7 @@
   white-space: nowrap;
   line-height: 1;
   font-weight: 700;
-  font-size: 5px;
+  font-size: 6px;
   letter-spacing: -0.02em;
   text-shadow: none;
 }
@@ -186,7 +186,7 @@
 .wallet-faucet__cooldown-value {
   position: relative;
   z-index: 1;
-  font-size: 1.5px;
+  font-size: 2.5px;
   color: rgba(220, 240, 250, 0.92);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -393,7 +393,7 @@
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-faucet__cooldown-value {
-  font-size: 1px;
+  font-size: 2px;
   margin: 0;
   padding: 0;
 }

@@ -120,7 +120,7 @@
   margin: 0;
   padding: 0 0px;
   font-family: var(--ds-font-mono, monospace);
-  font-size: 0.25rem;
+  font-size: 0.3125rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -225,7 +225,7 @@
 .status-drawer--network .status-drawer__cell--latency .status-drawer__value {
   display: block;
   min-height: 0.5625rem;
-  font-size: 0.25rem;
+  font-size: 0.3125rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: #e8ecf0;
@@ -252,7 +252,7 @@
 
 .status-drawer--network .status-drawer__cell--api .status-drawer__value,
 .status-drawer--network .status-drawer__cell--stream .status-drawer__value {
-  font-size: 0.25rem;
+  font-size: 0.3125rem;
   white-space: nowrap;
 }
 
@@ -291,7 +291,7 @@
   width: auto;
   max-width: none;
   min-width: 0;
-  font-size: 0.3125rem;
+  font-size: 0.375rem;
   font-weight: 800;
   white-space: nowrap;
   overflow: visible;
@@ -381,7 +381,7 @@
 }
 
 .status-drawer__close {
-  font-size: 6px;
+  font-size: 7px;
 }
 
 .status-drawer__refresh:hover:not(:disabled),
@@ -430,7 +430,7 @@
   display: block;
   margin: 0;
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: 0.1563rem;
+  font-size: 0.2188rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -445,7 +445,7 @@
   display: block;
   margin: 0;
   font-family: var(--ds-font-mono, monospace);
-  font-size: 0.3125rem;
+  font-size: 0.375rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
@@ -583,7 +583,7 @@
   margin: 0;
   padding: 0 0px 0px;
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: 0.25rem;
+  font-size: 0.3125rem;
   line-height: 1.35;
   color: rgba(205, 231, 245, 0.58);
 }
@@ -603,7 +603,7 @@
   background: rgba(var(--nv-cyan-rgb, 0, 245, 255), 0.06);
   color: rgba(var(--nv-cyan-rgb, 0, 245, 255), 0.92);
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: 0.1875rem;
+  font-size: 0.25rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -623,7 +623,7 @@
   background: var(--surface-error-bg, rgba(255, 107, 138, 0.12));
   border: 1px solid var(--surface-error-border, rgba(255, 107, 138, 0.28));
   color: var(--color-negative-soft, #ffb8c9);
-  font-size: 0.25rem;
+  font-size: 0.3125rem;
   line-height: 1.2;
 }
 

@@ -12,8 +12,8 @@
   --ex-shell-radius: var(--radius-lg, 16px);
   --ex-radius-sm: var(--radius-sm, 8px);
   --ex-control-h: 17px;
-  --ex-font-xs: max(0.5rem, var(--ds-text-xs, 0.5rem));
-  --ex-font-sm: 0.5625rem;
+  --ex-font-xs: max(0.5625rem, var(--ds-text-xs, 0.5625rem));
+  --ex-font-sm: 0.625rem;
   --ex-mono: var(--ds-font-mono, ui-monospace, Menlo, monospace);
   --ex-font-ui: var(--ds-font-ui, system-ui, sans-serif);
 
@@ -30,14 +30,15 @@
 
 :host(.app-hub-swap-stack) {
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 3;
   z-index: 2;
   width: calc(100% + 2 * (var(--band-inline-pad) - var(--swap-inline-pad)));
   max-width: none;
   margin: 0;
   margin-inline: calc(var(--swap-inline-pad) - var(--band-inline-pad));
-  /* swap → showcase : ne pas écraser avec margin: 0 */
-  margin-block-end: var(--hub-swap-showcase-gap, 4px);
+  /* Gouttières hub = pistes grille 2/4 */
+  margin-block-start: 0;
+  margin-block-end: 0;
   padding: 0;
   min-height: calc(var(--ex-control-h) - 2px);
   height: calc(var(--ex-control-h) - 2px);
@@ -49,6 +50,11 @@
   height: 100%;
   min-height: 0;
   max-height: 100%;
+}
+
+:host(.app-hub-swap-stack.exchange-panel--collapsed) {
+  margin-block-start: 0;
+  margin-block-end: 0;
 }
 
 :host(.is-quest-focus) .exchange-panel__rail {
@@ -712,7 +718,7 @@
   border: none;
   background: transparent;
   color: inherit;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
   cursor: pointer;
   padding: 0;

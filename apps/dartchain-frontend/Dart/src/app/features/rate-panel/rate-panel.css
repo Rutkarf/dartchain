@@ -1,9 +1,9 @@
 :host {
   --rate-gap: 0px;
   --rate-pad: 0px 0px;
-  --rate-font: 4px;
-  --rate-font-sm: 4px;
-  --rate-title-font: 5px;
+  --rate-font: 5px;
+  --rate-font-sm: 5px;
+  --rate-title-font: 6px;
   --rate-meta-h: 2px;
   --rate-head-h: 11px;
   --rate-search-h: var(--rate-head-h);
@@ -29,9 +29,9 @@
   :host {
     --rate-gap: 0;
     --rate-pad: 0 0px;
-    --rate-font: 3px;
-    --rate-font-sm: 3px;
-    --rate-title-font: 4px;
+    --rate-font: 4px;
+    --rate-font-sm: 4px;
+    --rate-title-font: 5px;
     --rate-head-h: 8px;
     --rate-card-row-h: clamp(2px, 2.8cqh, 4px);
   }
@@ -254,7 +254,7 @@
   min-width: 0;
   padding: 1px 2px;
   border-radius: 3px;
-  font-size: clamp(3px, 2.6cqmin, 5px);
+  font-size: clamp(4px, 2.6cqmin, 6px);
   line-height: 1.1;
   cursor: pointer;
 }
@@ -695,8 +695,8 @@
 
 @media (max-width: 280px) {
   :host {
-    --rate-font: 4px;
-    --rate-font-sm: 4px;
+    --rate-font: 5px;
+    --rate-font-sm: 5px;
   }
 }
 
@@ -717,19 +717,19 @@
 
 @media (max-width: 399px) {
   :host {
-    --rate-font: 4px;
-    --rate-font-sm: 4px;
+    --rate-font: 5px;
+    --rate-font-sm: 5px;
   }
 }
 
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
-    --rate-title-font: 5px;
+    --rate-title-font: 6px;
     --rate-head-h: 10px;
     --rate-search-h: var(--rate-head-h);
     --rate-meta-h: 2px;
-    --rate-font: 3px;
-    --rate-font-sm: 3px;
+    --rate-font: 4px;
+    --rate-font-sm: 4px;
     --rate-card-row-h: clamp(3px, 3cqh, 4px);
     --rate-pad: 0px 0px;
   }
@@ -745,9 +745,9 @@
 
 @media (min-width: 400px) {
   :host {
-    --rate-font: 5px;
-    --rate-font-sm: 5px;
-    --rate-title-font: 6px;
+    --rate-font: 6px;
+    --rate-font-sm: 6px;
+    --rate-title-font: 7px;
     --rate-head-h: 12px;
     --rate-search-h: var(--rate-head-h);
     --rate-meta-h: 2px;

@@ -72,7 +72,7 @@
 .chain-graph__node-index {
   pointer-events: none;
   fill: rgba(210, 245, 255, 0.95);
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 800;
   text-anchor: middle;
   dominant-baseline: central;

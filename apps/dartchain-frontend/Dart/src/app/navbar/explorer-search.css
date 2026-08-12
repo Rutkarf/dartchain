@@ -78,7 +78,7 @@
   border: 1px solid rgba(var(--electric-cyan-rgb, 0, 229, 255), 0.22);
   background: rgba(0, 0, 0, 0.42);
   color: var(--text-primary);
-  font-size: clamp(0.37rem, 1.5vw, 0.47rem);
+  font-size: clamp(0.4325rem, 1.5vw, 0.5325rem);
   font-weight: 500;
   line-height: 1;
   font-family: inherit;
@@ -185,7 +185,7 @@
   border-radius: 3px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.18);
   background: rgba(var(--accent-primary-rgb), 0.08);
-  font-size: calc(0.05rem * var(--navbar-scale, 2));
+  font-size: calc(0.1125rem * var(--navbar-scale, 2));
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -195,7 +195,7 @@
 
 .explorer-search__label-text {
   min-width: 0;
-  font-size: var(--navbar-crypto-font-size, 0.59rem);
+  font-size: var(--navbar-crypto-font-size, 0.6525rem);
   font-weight: 800;
   color: var(--text-primary);
   white-space: nowrap;
@@ -204,7 +204,7 @@
 }
 
 .explorer-search__subtitle {
-  font-size: calc(0.11rem * var(--navbar-scale, 2));
+  font-size: calc(0.1725rem * var(--navbar-scale, 2));
   font-weight: 600;
   color: var(--text-faint);
   line-height: 1.2;
@@ -214,7 +214,7 @@
 .explorer-search__empty {
   margin: 0;
   padding: 2px 3px;
-  font-size: var(--navbar-status-font-size, 0.51rem);
+  font-size: var(--navbar-status-font-size, 0.5725rem);
   font-weight: 600;
   color: var(--text-faint);
   list-style: none;
@@ -265,13 +265,13 @@
 /* === Responsive 250–500px (explorer-search) === */
 @media (max-width: 500px) {
   .explorer-search__input {
-    font-size: var(--nv-font-micro, var(--navbar-status-font-size, 0.375rem));
+    font-size: var(--nv-font-micro, var(--navbar-status-font-size, 0.4375rem));
   }
 }
 
 @media (max-width: 399px) {
   .explorer-search__input::placeholder {
-    font-size: clamp(0.1875rem, 2.2vw, 0.3125rem);
+    font-size: clamp(0.25rem, 2.2vw, 0.375rem);
   }
 }
 
@@ -304,14 +304,14 @@
     max-height: var(--navbar-chrome-h, var(--navbar-control-h, 12px));
     padding-block: 0;
     padding-inline: 4px;
-    font-size: var(--navbar-status-font-size, 0.25rem);
+    font-size: var(--navbar-status-font-size, 0.3125rem);
     line-height: 1;
   }
 
   .explorer-search__input::placeholder {
     color: var(--text-soft);
     opacity: 0.85;
-    font-size: 0.1875rem;
+    font-size: 0.25rem;
   }
 }
 
@@ -325,7 +325,7 @@
 
   .explorer-search__input {
     padding-inline: 5px;
-    font-size: var(--navbar-status-font-size, 0.25rem);
+    font-size: var(--navbar-status-font-size, 0.3125rem);
   }
 
   .explorer-search__input::placeholder {

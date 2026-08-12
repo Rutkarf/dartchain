@@ -2,7 +2,7 @@
   --token-select-cyan: var(--ds-neon-cyan, #00f5ff);
   --token-select-cyan-rgb: var(--ds-neon-cyan-rgb, 0, 245, 255);
   --token-select-radius-sm: 3px;
-  --token-select-font-sm: clamp(0.25rem, 1.9vw, 0.375rem);
+  --token-select-font-sm: clamp(0.3125rem, 1.9vw, 0.4375rem);
   --token-select-text-muted: rgba(255, 255, 255, 0.52);
   --token-select-text-subtle: rgba(255, 255, 255, 0.38);
   --token-select-chevron-border-x: 4px;
@@ -102,7 +102,7 @@
 :host-context(.navbar-brand-row) .token-select__value,
 :host-context(.navbar-controls-band) .token-select__value {
   font-family: var(--ds-font-display, var(--font-display));
-  font-size: clamp(0.47rem, 3.2vw, 0.63rem);
+  font-size: clamp(0.5325rem, 3.2vw, 0.6925rem);
   line-height: 1;
   display: flex;
   align-items: center;
@@ -140,7 +140,7 @@
 
 @media (min-width: 251px) and (max-width: 349px) {
   :host-context(.navbar-brand) .token-select__value {
-    font-size: 0.37rem;
+    font-size: 0.4325rem;
     letter-spacing: 0.04em;
   }
 
@@ -156,7 +156,7 @@
 }
 
 :host-context(html.vp-compact) .token-select__value {
-  font-size: 0.37rem;
+  font-size: 0.4325rem;
   letter-spacing: 0.04em;
 }
 
@@ -197,7 +197,7 @@
   min-width: 0;
   margin-left: 0;
   padding-left: 0;
-  font-size: var(--navbar-crypto-font-size, 0.59rem);
+  font-size: var(--navbar-crypto-font-size, 0.6525rem);
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0.02em;
@@ -371,6 +371,6 @@
 
   :host-context(.navbar-controls-band) .token-select__value {
     line-height: 1;
-    font-size: 0.25rem;
+    font-size: 0.3125rem;
   }
 }

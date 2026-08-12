@@ -41,17 +41,17 @@
 
   --chat-gap: 0px;
   --chat-pad: 0px;
-  --chat-font: 4.5px;
-  --chat-font-sm: 4.5px;
+  --chat-font: 5.5px;
+  --chat-font-sm: 5.5px;
   --chat-msg-size: 13px;
   --chat-msg-size-sm: 11px;
-  --chat-title-font: 5px;
+  --chat-title-font: 6px;
   --chat-title-row-h: 11px;
   --chat-ribbon-h: 9px;
-  --chat-ribbon-font: 3px;
+  --chat-ribbon-font: 4px;
   --chat-line-min-h: clamp(18px, 9.6cqh, 24px);
   --chat-composer-h: 7px;
-  --chat-send-font: max(2px, calc(var(--chat-font) + 0px));
+  --chat-send-font: max(3px, calc(var(--chat-font) + 0px));
   --chat-input-caret-inset: clamp(8px, 4vw, 12px);
   --chat-identity-w: clamp(34px, 16vw, 46px);
   --chat-role-w: 10px;
@@ -697,7 +697,7 @@
 
 .showcase-chat__ribbon-btn.cta--sm {
   color: var(--text-bright);
-  font-size: clamp(1.5px, 1.4vw, 3.5px) !important;
+  font-size: clamp(2.5px, 1.4vw, 4.5px) !important;
 }
 
 .showcase-chat__menu-select {
@@ -746,7 +746,7 @@
 }
 
 .showcase-chat__menu-select option {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--parrot-fg);
   background: var(--parrot-bg-panel);
@@ -769,7 +769,7 @@
   min-width: 0;
   max-width: 100%;
   padding: 0 7px 0 0px;
-  font-size: max(2px, clamp(2px, 1.65vw, 3.5px));
+  font-size: max(3px, clamp(3px, 1.65vw, 4.5px));
   text-overflow: clip;
   overflow: visible;
   background-image: none;
@@ -844,7 +844,7 @@
   background: rgba(var(--brand-black-rgb), 0.45);
   color: var(--text-soft);
   font-family: inherit;
-  font-size: clamp(2px, 1.5vw, 4px);
+  font-size: clamp(3px, 1.5vw, 5px);
   font-weight: 700;
   letter-spacing: 0.02em;
   cursor: pointer;
@@ -887,7 +887,7 @@
 }
 
 .showcase-chat__trigger-a {
-  font-size: max(3px, clamp(2.5px, 1.8vw, 4px));
+  font-size: max(4px, clamp(3.5px, 1.8vw, 5px));
   font-weight: 900;
   line-height: 1;
   color: var(--text-bright);
@@ -902,7 +902,7 @@
 }
 
 .showcase-chat__trigger-caret {
-  font-size: max(4px, clamp(3px, 1.6vw, 5px));
+  font-size: max(5px, clamp(4px, 1.6vw, 6px));
   opacity: 0.85;
   line-height: 1;
   flex-shrink: 0;
@@ -936,7 +936,7 @@
 
 .showcase-chat__palette-title {
   margin: 0 0 2px;
-  font-size: clamp(2px, 1.5vw, 4px);
+  font-size: clamp(3px, 1.5vw, 5px);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -984,7 +984,7 @@
   margin-top: 2px;
   padding-top: 2px;
   border-top: 1px solid rgba(var(--electric-cyan-rgb), 0.15);
-  font-size: clamp(2px, 1.5vw, 4px);
+  font-size: clamp(3px, 1.5vw, 5px);
   font-weight: 700;
   color: var(--text-soft);
   cursor: pointer;
@@ -1059,7 +1059,7 @@
     inset 0 1px 0 rgba(255, 180, 180, 0.08),
     0 0 12px rgba(255, 85, 85, 0.12);
   color: #ffd4d4;
-  font-size: 0.655rem;
+  font-size: 0.7175rem;
   line-height: 1.35;
 }
 
@@ -1068,7 +1068,7 @@
   border: 0;
   background: transparent;
   color: inherit;
-  font-size: 0.975rem;
+  font-size: 1.0375rem;
   line-height: 1;
   cursor: pointer;
   padding: 0 0px;
@@ -1434,7 +1434,7 @@
   align-items: flex-start;
   justify-content: flex-start;
   padding: 0px 0px 0 0px;
-  font-size: max(1.5px, calc(var(--chat-font-sm) - 1px));
+  font-size: max(2.5px, calc(var(--chat-font-sm) - 1px));
 }
 
 .showcase-chat__identity-btn--anon {
@@ -1479,7 +1479,7 @@
 }
 
 .showcase-chat__identity-anon-label {
-  font-size: max(1.5px, calc(var(--chat-font-sm) - 1px));
+  font-size: max(2.5px, calc(var(--chat-font-sm) - 1px));
   font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -1692,12 +1692,12 @@
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
     --chat-pad: 0px;
-    --chat-font: 3px;
-    --chat-font-sm: 3px;
-    --chat-title-font: 5px;
+    --chat-font: 4px;
+    --chat-font-sm: 4px;
+    --chat-title-font: 6px;
     --chat-title-row-h: 10px;
     --chat-ribbon-h: 8px;
-    --chat-ribbon-font: 2.5px;
+    --chat-ribbon-font: 3.5px;
     --chat-composer-h: 7px;
     --chat-msg-size: 10px;
     --chat-msg-size-sm: 8px;
@@ -1707,12 +1707,12 @@
 
 @media (min-width: 400px) {
   :host {
-    --chat-font: 5px;
-    --chat-font-sm: 5px;
-    --chat-title-font: 6px;
+    --chat-font: 6px;
+    --chat-font-sm: 6px;
+    --chat-title-font: 7px;
     --chat-title-row-h: 12px;
     --chat-ribbon-h: 10px;
-    --chat-ribbon-font: 3.5px;
+    --chat-ribbon-font: 4.5px;
     --chat-composer-h: 8px;
     --chat-msg-size: 14px;
     --chat-msg-size-sm: 12px;
@@ -1723,7 +1723,7 @@
 @media (max-width: 250px) {
   :host {
     --chat-ribbon-h: 7px;
-    --chat-ribbon-font: 2px;
+    --chat-ribbon-font: 3px;
     --chat-tool-w: calc(var(--chat-ribbon-h) - 3px);
   }
 }

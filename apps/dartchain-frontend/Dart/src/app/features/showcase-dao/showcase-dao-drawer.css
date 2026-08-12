@@ -2,13 +2,13 @@
 :host {
   display: contents;
 
-  --drawer-label: 5px;
+  --drawer-label: 6px;
   --drawer-value: 7px;
   --drawer-title: 8px;
   --drawer-head-h: 11px;
   --drawer-control: 11px;
   --drawer-row-h: 8px;
-  --drawer-field-label-w: 44px;
+  --drawer-field-label-w: 45px;
   --drawer-form-h: 19px;
 
   --dao-drawer-cyan: 92, 225, 255;
@@ -86,7 +86,7 @@
 .dao-drawer__logo--placeholder {
   display: inline-grid;
   place-items: center;
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 900;
   color: #fff;
   background: linear-gradient(
@@ -116,7 +116,7 @@
 .dao-drawer__status {
   padding: 0 1px;
   border-radius: 999px;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -141,7 +141,7 @@
 }
 
 .dao-drawer__chain {
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -211,7 +211,7 @@
 }
 
 .dao-drawer__recap-pwr {
-  font-size: 3.5px;
+  font-size: 4.5px;
   color: rgba(var(--dao-drawer-cyan), 0.85);
 }
 
@@ -352,7 +352,7 @@
 }
 
 .dao-drawer__question-meta {
-  font-size: 3.5px;
+  font-size: 4.5px;
   color: rgba(255, 255, 255, 0.42);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -394,7 +394,7 @@
   border: 1px solid rgba(var(--dao-drawer-cyan), 0.14);
   background: rgba(0, 0, 0, 0.28);
   color: rgba(255, 255, 255, 0.78);
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -411,7 +411,7 @@
   margin: 0;
   padding: 0 1px;
   height: 6px;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -506,7 +506,7 @@
   border-radius: 2px;
   background: rgba(var(--dao-drawer-cyan), 0.12);
   color: rgba(255, 255, 255, 0.92);
-  font-size: 5px;
+  font-size: 6px;
   font-weight: 900;
   line-height: 1;
   cursor: pointer;

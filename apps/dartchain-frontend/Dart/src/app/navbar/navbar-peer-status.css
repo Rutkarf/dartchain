@@ -40,7 +40,7 @@
   margin: 0 0px 0 0;
   padding: 0;
   font-family: var(--font-display);
-  font-size: clamp(0.37rem, 1.5vw, 0.5rem);
+  font-size: clamp(0.4325rem, 1.5vw, 0.5625rem);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
@@ -110,7 +110,7 @@
 
 @media (max-width: 500px) {
   .navbar-peer-count {
-    font-size: var(--nv-font-micro, var(--navbar-status-font-size, 0.375rem));
+    font-size: var(--nv-font-micro, var(--navbar-status-font-size, 0.4375rem));
   }
 }
 
@@ -121,7 +121,7 @@
   }
 
   :host-context(.navbar-metrics__peers) .navbar-peer-count {
-    font-size: 0.25rem;
+    font-size: 0.3125rem;
     margin: 0;
     color: var(--text-bright);
   }
@@ -132,7 +132,7 @@
 }
 
 :host-context(html.vp-compact) .navbar-peer-count {
-  font-size: 0.25rem;
+  font-size: 0.3125rem;
 }
 
 @media (max-width: 250px) {
@@ -151,7 +151,7 @@
   }
 
   .navbar-peer-count {
-    font-size: 0.1875rem;
+    font-size: 0.25rem;
   }
 
   .navbar-peer-refresh {

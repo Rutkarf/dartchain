@@ -73,13 +73,13 @@
   --font-display: 'Orbit', 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
 
-  --type-h1: 1.0625rem;      /* 18px — rare @ 250 */
-  --type-h2: 0.75rem;    /* 13px */
-  --type-h3: 0.625rem;    /* 11px */
-  --type-body: 0.625rem;  /* 11px */
-  --type-caption: 0.5rem; /* 9px */
-  --type-label: 0.4375rem;    /* 8px */
-  --type-metric: 0.875rem; /* 15px — KPI values */
+  --type-h1: 1.125rem;      /* 18px — rare @ 250 */
+  --type-h2: 0.8125rem;    /* 13px */
+  --type-h3: 0.6875rem;    /* 11px */
+  --type-body: 0.6875rem;  /* 11px */
+  --type-caption: 0.5625rem; /* 9px */
+  --type-label: 0.5rem;    /* 8px */
+  --type-metric: 0.9375rem; /* 15px — KPI values */
 
   /* Glass subtil (cards premium, pas vitres néon) */
   --glass-fill-fintech: rgba(var(--surface-rgb), 0.75);
@@ -257,7 +257,7 @@
   --ds-text-xs: var(--type-caption);
   --ds-text-sm: var(--type-body);
   --ds-text-md: var(--type-h2);
-  --ds-text-lg: 0.8125rem;   /* 14px */
+  --ds-text-lg: 0.875rem;   /* 14px */
   --ds-text-xl: var(--type-metric);
   --ds-text-label: var(--type-label);
   --ds-text-caption: var(--type-caption);
@@ -357,7 +357,7 @@
   --ds-exchange-margin: 0px;
   --ds-exchange-row-gap: 2px;
   --ds-exchange-shell-width: 100%;
-  --ds-exchange-font-min: 0.4375rem;
+  --ds-exchange-font-min: 0.5rem;
   --ds-zone-market: var(--ds-zone-chart);
 
   /* Hub column ratio 35/65 — conservé */
@@ -475,9 +475,9 @@
   --cta-height-sm: 22px;
   --cta-height-md: 28px;
   --cta-height-lg: 34px;
-  --cta-font-sm: 0.375rem;
-  --cta-font-md: 0.5rem;
-  --cta-font-lg: 0.5625rem;
+  --cta-font-sm: 0.4375rem;
+  --cta-font-md: 0.5625rem;
+  --cta-font-lg: 0.625rem;
   --cta-disabled-opacity: 0.48;
   --cta-focus-ring: var(--shadow-focus);
 

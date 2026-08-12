@@ -16,9 +16,9 @@
 .dock-view {
   --dock-gap: 0px;
   --dock-pad: 0px;
-  --dock-font: 4px;
-  --dock-font-sm: 4px;
-  --dock-title-font: 5px;
+  --dock-font: 5px;
+  --dock-font-sm: 5px;
+  --dock-title-font: 6px;
   --dock-title-row-h: 11px;
   --dock-row-h: clamp(8px, 4.8cqh, 11px);
   --dock-col-gap: 0;
@@ -583,7 +583,7 @@ button.dock-view__item-row:focus-visible {
 
 .dock-view__mini-btn {
   padding: 0 1px;
-  font-size: max(2px, var(--dock-font-sm));
+  font-size: max(3px, var(--dock-font-sm));
 }
 
 .dock-view__action:hover:not(:disabled),
@@ -622,7 +622,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .dock-view__balance-value {
-  font-size: clamp(8px, 4cqw, 12px);
+  font-size: clamp(9px, 4cqw, 13px);
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary);
@@ -770,9 +770,9 @@ button.dock-view__item-row:focus-visible {
 
 @media (min-width: 251px) and (max-width: 349px) {
   .dock-view {
-    --dock-font: 3px;
-    --dock-font-sm: 3px;
-    --dock-title-font: 5px;
+    --dock-font: 4px;
+    --dock-font-sm: 4px;
+    --dock-title-font: 6px;
     --dock-title-row-h: 10px;
     --dock-row-h: clamp(7px, 4.5cqh, 9px);
   }
@@ -780,9 +780,9 @@ button.dock-view__item-row:focus-visible {
 
 @media (min-width: 400px) {
   .dock-view {
-    --dock-font: 5px;
-    --dock-font-sm: 5px;
-    --dock-title-font: 6px;
+    --dock-font: 6px;
+    --dock-font-sm: 6px;
+    --dock-title-font: 7px;
     --dock-title-row-h: 12px;
     --dock-row-h: clamp(9px, 5cqh, 12px);
   }
@@ -946,7 +946,7 @@ button.dock-view__item-row:focus-visible {
 .block-view__grid--compact .dock-view__textarea {
   min-height: 10px;
   padding: 0px 1px;
-  font-size: 3.5px;
+  font-size: 4.5px;
 }
 
 .block-view__grid--compact .dock-view__textarea {
@@ -965,7 +965,7 @@ button.dock-view__item-row:focus-visible {
 .block-view__quick-actions--compact .dock-view__mini-btn {
   min-height: 9px;
   padding: 0 2px;
-  font-size: 3px;
+  font-size: 4px;
 }
 
 .block-view__compact-bar {
@@ -981,14 +981,14 @@ button.dock-view__item-row:focus-visible {
   border: none;
   background: transparent;
   padding: 0;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 700;
   color: rgba(var(--accent-primary-rgb), 0.9);
   cursor: pointer;
 }
 
 .block-view__compact-count {
-  font-size: 3px;
+  font-size: 4px;
   color: var(--text-muted);
 }
 
@@ -1057,7 +1057,7 @@ button.dock-view__item-row:focus-visible {
   padding: 0px 3px;
   resize: none;
   overflow: hidden;
-  font-size: clamp(5px, 2.1cqw, 8px);
+  font-size: clamp(6px, 2.1cqw, 9px);
   line-height: 1.2;
   border-radius: 5px;
   border: 1px solid rgba(var(--accent-primary-rgb), 0.22);
@@ -1113,7 +1113,7 @@ button.dock-view__item-row:focus-visible {
 .block-view__compact-input--amount {
   height: clamp(12px, 4cqw, 16px);
   min-height: clamp(12px, 4cqw, 16px);
-  font-size: clamp(6px, 2.3cqw, 9px);
+  font-size: clamp(7px, 2.3cqw, 10px);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: #d8f8ff;
@@ -1170,14 +1170,14 @@ button.dock-view__item-row:focus-visible {
 }
 
 .block-view__compact-tip-label {
-  font-size: clamp(5px, 2.1cqw, 8px);
+  font-size: clamp(6px, 2.1cqw, 9px);
   font-weight: 800;
   letter-spacing: 0.06em;
   color: rgba(var(--accent-primary-rgb), 0.98);
 }
 
 .block-view__compact-tip-action {
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1235,7 +1235,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .block-view__compact-label {
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1249,7 +1249,7 @@ button.dock-view__item-row:focus-visible {
   height: clamp(12px, 4cqw, 16px);
   min-height: clamp(12px, 4cqw, 16px);
   padding: 0 3px;
-  font-size: clamp(5px, 2.1cqw, 8px);
+  font-size: clamp(6px, 2.1cqw, 9px);
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -1259,7 +1259,7 @@ button.dock-view__item-row:focus-visible {
   border: none;
   background: transparent;
   padding: 0;
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   font-weight: 700;
   color: rgba(var(--accent-primary-rgb), 0.95);
   cursor: pointer;
@@ -1267,7 +1267,7 @@ button.dock-view__item-row:focus-visible {
 }
 
 .block-view__compact-count {
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   color: var(--text-muted);
   white-space: nowrap;
 }
@@ -1276,7 +1276,7 @@ button.dock-view__item-row:focus-visible {
   margin: 0;
   padding: 0px 2px;
   border-radius: 4px;
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
   font-weight: 700;
   line-height: 1.25;
   overflow: hidden;
@@ -1304,15 +1304,15 @@ button.dock-view__item-row:focus-visible {
 
 .block-view__compact-submit {
   min-height: clamp(16px, 5cqw, 20px);
-  font-size: clamp(5px, 2.1cqw, 8px);
+  font-size: clamp(6px, 2.1cqw, 9px);
   pointer-events: auto;
 }
 
 :host(.block-view--compact) .dock-view {
   --dock-pad: 0;
   --dock-gap: 0;
-  --dock-font: clamp(5px, 2.1cqw, 8px);
-  --dock-font-sm: clamp(5px, 1.8cqw, 7px);
+  --dock-font: clamp(6px, 2.1cqw, 9px);
+  --dock-font-sm: clamp(6px, 1.8cqw, 8px);
   height: auto;
   min-height: 0;
   overflow: hidden;
@@ -1322,7 +1322,7 @@ button.dock-view__item-row:focus-visible {
 :host(.block-view--compact) .dock-view__mini-btn {
   min-height: clamp(12px, 4cqw, 16px);
   padding: 0 3px;
-  font-size: clamp(4px, 1.8cqw, 6px);
+  font-size: clamp(5px, 1.8cqw, 7px);
 }
 
 :host(.block-view--compact) .dock-view__content {
@@ -1342,14 +1342,14 @@ button.dock-view__item-row:focus-visible {
 
 :host(.block-view--compact) .dock-view__cta {
   min-height: 11px;
-  font-size: 4px;
+  font-size: 5px;
   padding: 0 2px;
 }
 
 :host(.block-view--compact) .dock-view__feedback {
   margin: 0;
   padding: 0px 0px;
-  font-size: 3px;
+  font-size: 4px;
   max-height: 1.4em;
   overflow: hidden;
 }

@@ -1,8 +1,8 @@
 :host {
   --launch-gap: 0px;
   --launch-pad: 0px;
-  --launch-font: 5.5px;
-  --launch-font-sm: 5.5px;
+  --launch-font: 6.5px;
+  --launch-font-sm: 6.5px;
   --launch-title-row-h: 11px;
   --launch-meta-control-h: calc(var(--launch-title-row-h) - 1px);
   --launch-row-h: clamp(8.5px, 4.2cqh, 10.5px);
@@ -606,8 +606,8 @@
 
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
-    --launch-font: 4.5px;
-    --launch-font-sm: 4.5px;
+    --launch-font: 5.5px;
+    --launch-font-sm: 5.5px;
     --launch-title-row-h: 12px;
     --launch-row-h: clamp(8.5px, 4.5cqh, 10.5px);
   }
@@ -615,8 +615,8 @@
 
 @media (min-width: 400px) {
   :host {
-    --launch-font: 6.5px;
-    --launch-font-sm: 6.5px;
+    --launch-font: 7.5px;
+    --launch-font-sm: 7.5px;
     --launch-title-row-h: 14px;
     --launch-row-h: clamp(10.5px, 5cqh, 13.5px);
   }

@@ -2,7 +2,7 @@
 :host {
   display: contents;
 
-  --drawer-label: 5px;
+  --drawer-label: 6px;
   --drawer-value: 7px;
   --drawer-title: 8px;
   --drawer-eyebrow: 6px;
@@ -10,7 +10,7 @@
   --drawer-head-h: 11px;
   --drawer-foot-h: 10px;
   --drawer-row-min: 8px;
-  --drawer-field-label-w: 44px;
+  --drawer-field-label-w: 45px;
 
   --drawer-cat-reseau: 0, 245, 255;
   --drawer-cat-peers: 168, 132, 255;
@@ -88,7 +88,7 @@
   width: 16px;
   height: 7px;
   border-radius: 2px;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
@@ -145,7 +145,7 @@
   border: 1px solid rgba(255, 200, 80, 0.3);
   background: rgba(255, 200, 80, 0.1);
   color: rgba(255, 220, 140, 0.92);
-  font-size: 3.5px;
+  font-size: 4.5px;
   letter-spacing: 0;
 }
 
@@ -166,7 +166,7 @@
 .news-insight-panel__nav-pos {
   padding: 0 0px;
   font-family: var(--ds-font-mono, ui-monospace, Menlo, monospace);
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: rgba(255, 255, 255, 0.42);
@@ -186,7 +186,7 @@
   border-radius: 2px;
   background: rgba(var(--brand-black-rgb, 0, 0, 0), 0.28);
   color: rgba(255, 255, 255, 0.78);
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -262,7 +262,7 @@
 
 .news-insight-panel__field--mono .news-insight-panel__field-value {
   font-family: var(--ds-font-mono, ui-monospace, Menlo, monospace);
-  font-size: 4.5px;
+  font-size: 5.5px;
 }
 
 .news-insight-panel__field-label {

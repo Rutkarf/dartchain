@@ -59,7 +59,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
   color: #f3fbff;
   background: color-mix(in srgb, var(--token-accent) 28%, rgba(2, 8, 16, 0.94));
@@ -79,7 +79,7 @@
 }
 
 .market-token-drawer__symbol {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.04em;
   color: #edf8ff;
@@ -87,7 +87,7 @@
 }
 
 .market-token-drawer__name {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 600;
   color: rgba(177, 205, 224, 0.78);
   white-space: nowrap;
@@ -101,19 +101,19 @@
   align-items: center;
   gap: 4px;
   margin: 0px 0 0;
-  font-size: 7px;
+  font-size: 8px;
   color: rgba(177, 205, 224, 0.72);
 }
 
 .market-token-drawer__price {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 800;
   color: #f3fbff;
   font-variant-numeric: tabular-nums;
 }
 
 .market-token-drawer__change {
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -132,7 +132,7 @@
   border-radius: 999px;
   border: 1px solid rgba(0, 217, 255, 0.18);
   background: rgba(0, 217, 255, 0.06);
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -146,7 +146,7 @@
   border-radius: 6px;
   background: rgba(2, 10, 18, 0.92);
   color: #baf3ff;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
   cursor: pointer;
 }
@@ -166,7 +166,7 @@
   background: rgba(0, 217, 255, 0.12);
   color: #d8f8ff;
   font-family: inherit;
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -198,7 +198,7 @@
   border: 1px solid rgba(0, 217, 255, 0.22);
   background: rgba(2, 10, 18, 0.92);
   color: #baf3ff;
-  font-size: 9px;
+  font-size: 10px;
   cursor: pointer;
 }
 
@@ -224,7 +224,7 @@
 }
 
 .market-token-drawer__metric-label {
-  font-size: 5px;
+  font-size: 6px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -232,7 +232,7 @@
 }
 
 .market-token-drawer__metric strong {
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 700;
   color: #edf8ff;
   white-space: nowrap;
@@ -275,7 +275,7 @@
   border-radius: 5px;
   border: 1px solid rgba(0, 217, 255, 0.1);
   background: rgba(0, 12, 22, 0.45);
-  font-size: 7px;
+  font-size: 8px;
   line-height: 1.35;
   color: rgba(190, 220, 238, 0.82);
   display: -webkit-box;
@@ -319,7 +319,7 @@
   background: transparent;
   color: rgba(190, 220, 238, 0.75);
   font-family: inherit;
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -350,7 +350,7 @@
   background: rgba(2, 10, 18, 0.88);
   color: #baf3ff;
   font-family: inherit;
-  font-size: 5px;
+  font-size: 6px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -370,7 +370,7 @@
 }
 
 .market-token-drawer__amount span {
-  font-size: 5px;
+  font-size: 6px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -385,14 +385,14 @@
   background: rgba(2, 10, 18, 0.92);
   color: #edf8ff;
   font-family: inherit;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
   outline: none;
 }
 
 .market-token-drawer__balance {
   margin: 0;
-  font-size: 6px;
+  font-size: 7px;
   color: rgba(177, 205, 224, 0.72);
 }
 
@@ -408,7 +408,7 @@
 .market-token-drawer__trade-loading,
 .market-token-drawer__trade-error {
   margin: 0;
-  font-size: 7px;
+  font-size: 8px;
 }
 
 .market-token-drawer__trade-error {
@@ -423,7 +423,7 @@
 
 .market-token-drawer__activity h4 {
   margin: 0;
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -435,7 +435,7 @@
   border-radius: 4px;
   border: 1px solid rgba(0, 217, 255, 0.1);
   background: rgba(0, 12, 22, 0.45);
-  font-size: 6px;
+  font-size: 7px;
   color: rgba(190, 220, 238, 0.85);
   white-space: nowrap;
   overflow: hidden;

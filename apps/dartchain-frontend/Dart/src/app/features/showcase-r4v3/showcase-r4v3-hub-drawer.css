@@ -6,7 +6,7 @@
   display: block;
   pointer-events: none;
 
-  --drawer-label: 5px;
+  --drawer-label: 6px;
   --drawer-value: 7px;
   --drawer-title: 8px;
   --drawer-eyebrow: 6px;
@@ -161,7 +161,7 @@
   min-height: 14px;
   padding: 0 3px;
   border-radius: 3px;
-  font-size: 5px;
+  font-size: 6px;
   background: rgba(0, 0, 0, 0.45);
 }
 
@@ -196,7 +196,7 @@
   width: 16px;
   height: 7px;
   border-radius: 2px;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
@@ -235,7 +235,7 @@
 .r4v3-hub-drawer__nav-pos {
   padding: 0 0px;
   font-family: var(--ds-font-mono, ui-monospace, Menlo, monospace);
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: rgba(255, 255, 255, 0.42);
@@ -255,7 +255,7 @@
   border-radius: 2px;
   background: rgba(var(--brand-black-rgb, 0, 0, 0), 0.28);
   color: rgba(255, 255, 255, 0.78);
-  font-size: 6px;
+  font-size: 7px;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
@@ -406,7 +406,7 @@
   border: 1px solid rgba(255, 200, 80, 0.3);
   background: rgba(255, 200, 80, 0.1);
   color: rgba(255, 220, 140, 0.92);
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: 0;
@@ -522,7 +522,7 @@
   border: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.14);
   background: rgba(0, 0, 0, 0.38);
   color: rgba(255, 255, 255, 0.68);
-  font-size: 3px;
+  font-size: 4px;
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0;
@@ -578,7 +578,7 @@
   align-items: center;
   justify-content: center;
   min-height: 18px;
-  font-size: 5px;
+  font-size: 6px;
   color: rgba(255, 255, 255, 0.48);
 }
 
@@ -611,7 +611,7 @@
 }
 
 .r4v3-hub-drawer__wiki-icon {
-  font-size: 5px;
+  font-size: 6px;
   opacity: 0.8;
   line-height: 1;
   text-align: center;
@@ -625,7 +625,7 @@
 
 .r4v3-hub-drawer__wiki-copy strong {
   display: block;
-  font-size: 5px;
+  font-size: 6px;
   font-weight: 700;
   line-height: 1.1;
   color: rgba(255, 255, 255, 0.92);
@@ -636,7 +636,7 @@
 
 .r4v3-hub-drawer__wiki-chevron {
   color: rgba(255, 255, 255, 0.4);
-  font-size: 6px;
+  font-size: 7px;
   line-height: 1;
   text-align: center;
 }
@@ -658,7 +658,7 @@
   border: 1px solid rgba(167, 139, 250, 0.35);
   background: rgba(167, 139, 250, 0.12);
   color: #c4b5fd;
-  font-size: 3.5px;
+  font-size: 4.5px;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -763,7 +763,7 @@
   border-radius: 50%;
   background: rgba(var(--chart-trend-up-rgb, 61, 214, 140), 0.2);
   color: var(--chart-trend-up, #3dd68c);
-  font-size: 4px;
+  font-size: 5px;
   font-weight: 800;
 }
 
