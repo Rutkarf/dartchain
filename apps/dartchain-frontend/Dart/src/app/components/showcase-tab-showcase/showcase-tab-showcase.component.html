@@ -1,0 +1,41 @@
+@if (product.showcaseEnabled) {
+  <div
+    class="app-hub-showcase-block"
+    [class.is-showcase-collapsed]="showcaseCollapsed"
+  >
+    <div class="showcase-block__shell ds-surface ds-surface--card">
+      <header class="showcase-header showcase-header--tabs" aria-label="Showcase">
+        <div class="showcase-header-tabs">
+          <app-showcase-tabs
+            [activeTab]="activeTab"
+            (tabChange)="tabChange.emit($event)"
+          />
+        </div>
+        <div class="showcase-header-actions">
+          <app-collapsed-bar-actions
+            [collapsed]="showcaseCollapsed"
+            [collapseAriaLabel]="collapseAriaLabel"
+            refreshAriaLabel="Actualiser le showcase"
+            [refreshBusy]="refreshBusy"
+            (refresh)="refresh.emit($event)"
+            (collapseToggle)="collapseToggle.emit()"
+          />
+        </div>
+      </header>
+
+      <div
+        class="app-showcase-band"
+        [class.is-collapsed]="showcaseCollapsed"
+        [class.is-summary-expandable]="showcaseCollapsed"
+        [attr.data-active-tab]="activeTab"
+        (click)="onBandClick()"
+      >
+        <app-showcase-panel
+          [activeTab]="activeTab"
+          [collapsed]="showcaseCollapsed"
+          (selectBlock)="selectBlock.emit($event)"
+        />
+      </div>
+    </div>
+  </div>
+}

@@ -5,6 +5,8 @@
 @import './styles/showcase-tabs-global.css';
 @import './styles/showcase-meta-shared.css';
 @import './styles/dock-shell.css';
+@import './styles/panel-headers.css';
+@import './styles/shell-stack.css';
 @import './cta-buttons.css';
 @import './styles/dock-view-tokens.css';
 @import './styles/ds-pass3-polish.css';
@@ -373,6 +375,19 @@ body {
   max-height: 100%;
   overflow: hidden;
   background: var(--bg-base);
+}
+
+/* Compact ≤349 (cible 250×580) — après tous les resets html/body */
+@media (max-width: 349px) {
+  html,
+  body,
+  app-root {
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
 }
 
 .exchange-panel__swap--inactive:not(:disabled) {

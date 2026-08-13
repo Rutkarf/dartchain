@@ -1,0 +1,8 @@
+<header class="app-navbar-zone">
+  <app-navbar-shell
+    (exploreBlock)="exploreBlock.emit($event)"
+    (explorePending)="explorePending.emit()"
+  >
+    <ng-content />
+  </app-navbar-shell>
+</header>

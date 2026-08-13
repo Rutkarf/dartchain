@@ -25,7 +25,7 @@ import { NavbarHintDirective } from './navbar-hint.directive';
 import { NavbarTickerDrawerComponent } from '../features/navbar-ticker-drawer/navbar-ticker-drawer';
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'app-navbar-shell',
   standalone: true,
   imports: [
     CommonModule,
@@ -42,7 +42,7 @@ import { NavbarTickerDrawerComponent } from '../features/navbar-ticker-drawer/na
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css', './navbar-chrome.css', './navbar-viewport-compact.css', './navbar-hint.css'],
 })
-export class NavbarComponent implements AfterViewInit {
+export class NavbarShellComponent implements AfterViewInit {
   readonly auth = inject(AuthService);
   readonly locale = inject(LocaleService);
   private readonly shell = inject(ShellFeedbackService);

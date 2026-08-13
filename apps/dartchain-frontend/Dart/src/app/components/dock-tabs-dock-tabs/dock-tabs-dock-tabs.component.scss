@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 var(--bottom-stack-active-height, auto);
+  height: var(--bottom-stack-active-height, auto);
+  min-height: var(--bottom-stack-active-height, auto);
+  max-height: var(--bottom-stack-active-height, auto);
+}
+
+:host(.is-dock-collapsed) {
+  flex-basis: var(--bottom-stack-height-collapsed);
+  height: var(--bottom-stack-height-collapsed);
+  min-height: var(--bottom-stack-height-collapsed);
+  max-height: var(--bottom-stack-height-collapsed);
+}
+
+/* Header : onglets + menu actions sur la même ligne, actions à droite */
+:host .showcase-header,
+:host .app-bottom-stack__header {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: var(--showcase-hub-tab-h, 16px);
+  max-height: var(--showcase-hub-tab-h, 16px);
+  overflow: visible;
+}
+
+:host .showcase-header-tabs {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: auto;
+  overflow: hidden;
+}
+
+:host .showcase-header-actions {
+  flex: 0 0 var(--panel-action-menu-w, 26px);
+  margin-left: auto;
+  pointer-events: auto;
+  z-index: 8;
+}

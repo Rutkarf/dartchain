@@ -9,7 +9,8 @@ import { CommonModule } from '@angular/common';
 
 import { AppComponent } from './app';
 import { AuthDrawerComponent } from './features/auth-drawer/auth-drawer';
-import { NavbarComponent } from './navbar/navbar';
+import { NavbarShellComponent } from './navbar/navbar';
+import { NavbarComponent } from './components/navbar/navbar.component';
 import { BrandCryptoSelectComponent } from './navbar/brand-crypto-select';
 import { ExplorerSearchComponent } from './navbar/explorer-search';
 import { NavbarNetworkStatusComponent } from './navbar/navbar-network-status';
@@ -41,7 +42,7 @@ describe('AppComponent', () => {
       imports: [AppComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()],
     })
-      .overrideComponent(NavbarComponent, {
+      .overrideComponent(NavbarShellComponent, {
         set: {
           imports: [
             CommonModule,
@@ -169,7 +170,11 @@ describe('AppComponent', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.app-shell')).toBeTruthy();
-    expect(compiled.querySelector('.app-hub')).toBeTruthy();
+    expect(compiled.querySelector('.app-main-layout')).toBeTruthy();
+    expect(compiled.querySelector('app-swap')).toBeTruthy();
+    expect(compiled.querySelector('app-showcase-tab-showcase')).toBeTruthy();
+    expect(compiled.querySelector('app-dock-tabs-dock-tabs')).toBeTruthy();
+    expect(compiled.querySelector('app-graph')).toBeTruthy();
     expect(compiled.querySelector('.app-hub-showcase-block')).toBeTruthy();
     expect(compiled.querySelector('app-showcase-tabs')).toBeTruthy();
     expect(compiled.querySelector('app-showcase-panel')).toBeTruthy();

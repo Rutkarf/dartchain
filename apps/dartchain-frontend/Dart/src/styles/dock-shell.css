@@ -109,12 +109,22 @@
   font-weight: 800 !important;
 }
 
+.app-bottom-stack .showcase-header.app-bottom-stack__header {
+  display: flex !important;
+  flex-flow: row nowrap !important;
+  align-items: center !important;
+  overflow: visible !important;
+}
+
 .app-bottom-stack .showcase-header-actions {
   flex: 0 0 var(--panel-action-menu-w, 26px) !important;
   flex-shrink: 0 !important;
   width: var(--panel-action-menu-w, 26px) !important;
   min-width: var(--panel-action-menu-w, 26px) !important;
   max-width: var(--panel-action-menu-w, 26px) !important;
+  margin-left: auto !important;
+  pointer-events: auto !important;
+  z-index: 8 !important;
 }
 
 /* Docks : carbone plus opaque (showcase-body dans le bottom stack) */

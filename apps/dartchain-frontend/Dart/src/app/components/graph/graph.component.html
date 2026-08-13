@@ -1,0 +1,18 @@
+<section
+  class="app-market-stack app-market-stack--rate"
+  [class.is-chart-collapsed]="chartCollapsed"
+  aria-label="Graphique"
+>
+  <div
+    class="app-market-card app-market-card--rate"
+    [class.is-summary-expandable]="chartCollapsed"
+    (click)="onCardClick()"
+  >
+    <app-rate-panel
+      hubGraphOnly
+      [chartCollapsed]="chartCollapsed"
+      [collapseAriaLabel]="collapseAriaLabel"
+      (collapseToggle)="collapseToggle.emit()"
+    />
+  </div>
+</section>

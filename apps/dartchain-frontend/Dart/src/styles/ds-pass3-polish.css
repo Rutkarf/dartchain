@@ -163,12 +163,33 @@ html.vp-compact body {
 }
 
 html.vp-compact .app-shell,
-html.vp-compact .app-main {
+html.vp-compact .app-main,
+html.vp-compact .app-main-layout {
   overflow-x: hidden !important;
   overflow-y: visible !important;
-  max-height: none;
-  height: auto;
-  min-height: 100%;
+  max-height: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
+  align-self: flex-start !important;
+}
+
+html.vp-compact .app-main-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-content: flex-start !important;
+}
+
+html.vp-compact .app-main-layout > app-graph,
+html.vp-compact .app-main-layout > .app-graph-section {
+  margin-top: var(--hub-market-internal-gap, 6px) !important;
+  margin-bottom: 0 !important;
+  flex-grow: 0 !important;
+}
+
+html.vp-compact .app-main-layout .app-bottom-stack {
+  margin-bottom: 0 !important;
 }
 
 html.vp-compact .app-showcase-band,

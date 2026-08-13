@@ -7,7 +7,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
-import { NavbarComponent } from './navbar';
+import { NavbarShellComponent } from './navbar';
 import { NavbarNetworkStatusComponent } from './navbar-network-status';
 import { NavbarPeerStatusComponent } from './navbar-peer-status';
 import { BrandCryptoSelectComponent } from './brand-crypto-select';
@@ -32,16 +32,16 @@ class MockR4v3ThreeComponent {
 }
 
 describe('Navbar', () => {
-  let component: NavbarComponent;
-  let fixture: ComponentFixture<NavbarComponent>;
+  let component: NavbarShellComponent;
+  let fixture: ComponentFixture<NavbarShellComponent>;
   let httpMock: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NavbarComponent],
+      imports: [NavbarShellComponent],
       providers: [provideHttpClient(), provideHttpClientTesting()],
     })
-      .overrideComponent(NavbarComponent, {
+      .overrideComponent(NavbarShellComponent, {
         set: {
           imports: [
             CommonModule,
@@ -56,7 +56,7 @@ describe('Navbar', () => {
       })
       .compileComponents();
 
-    fixture = TestBed.createComponent(NavbarComponent);
+    fixture = TestBed.createComponent(NavbarShellComponent);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
   });

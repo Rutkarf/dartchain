@@ -2,244 +2,57 @@
   <a class="app-skip-link" href="#app-main-content">{{ locale.t('skip.main') }}</a>
   <app-particle-background class="app-background"></app-particle-background>
 
-  <header class="app-navbar-zone">
-    <app-navbar
-      (exploreBlock)="openBlockDrawer($event)"
-      (explorePending)="openPendingPanel()"
-    >
-      <app-bandeau-accueil></app-bandeau-accueil>
-    </app-navbar>
-  </header>
+  <app-navbar
+    (exploreBlock)="openBlockDrawer($event)"
+    (explorePending)="openPendingPanel()"
+  >
+    <app-bandeau-accueil></app-bandeau-accueil>
+  </app-navbar>
 
-  <section
+  <main
     id="app-main-content"
-    class="app-hub"
+    class="app-main-layout"
     [class.is-showcase-disabled]="!product.showcaseEnabled"
     [class.is-showcase-collapsed]="product.showcaseEnabled && showcaseCollapsed()"
     [class.is-chart-collapsed]="chartCollapsed()"
+    [class.is-exchange-collapsed]="exchangeCollapsed()"
+    [class.is-dock-collapsed]="dockCollapsed()"
     aria-label="Marché"
     tabindex="-1"
   >
-    <div
-      class="app-market-stack app-market-stack--rate"
-      [class.is-chart-collapsed]="chartCollapsed()"
-    >
-      <div
-        class="app-market-card app-market-card--rate"
-        [class.is-summary-expandable]="chartCollapsed()"
-        (click)="chartCollapsed() && toggleChartCollapsed()"
-      >
-        <app-rate-panel
-          hubGraphOnly
-          [chartCollapsed]="chartCollapsed()"
-          [collapseAriaLabel]="chartCollapseLabel()"
-          (collapseToggle)="toggleChartCollapsed()"
-        ></app-rate-panel>
-      </div>
-    </div>
+    <app-swap></app-swap>
 
-    <app-exchange-panel class="app-hub-swap-stack"></app-exchange-panel>
+    <app-showcase-tab-showcase
+      [activeTab]="activeShowcaseTab()"
+      [showcaseCollapsed]="showcaseCollapsed()"
+      [collapseAriaLabel]="showcaseCollapseLabel()"
+      [refreshBusy]="showcaseRefreshBusy()"
+      (tabChange)="onShowcaseTabChange($event)"
+      (collapseToggle)="toggleShowcaseCollapsed()"
+      (refresh)="refreshShowcasePanel($event)"
+      (summaryExpand)="toggleShowcaseCollapsed()"
+      (selectBlock)="openBlockFromShowcaseIndex($event)"
+    />
 
-    @if (product.showcaseEnabled) {
-    <div
-      class="app-hub-showcase-block"
-      [class.is-showcase-collapsed]="showcaseCollapsed()"
-    >
-      <div class="showcase-block__shell ds-surface ds-surface--card">
-        <header class="showcase-header showcase-header--tabs" aria-label="Showcase">
-          <div class="showcase-header-tabs">
-            <app-showcase-tabs
-              [activeTab]="activeShowcaseTab()"
-              (tabChange)="onShowcaseTabChange($event)"
-            />
-          </div>
-          <div class="showcase-header-actions">
-            <app-collapsed-bar-actions
-              [collapsed]="showcaseCollapsed()"
-              [collapseAriaLabel]="showcaseCollapseLabel()"
-              refreshAriaLabel="Actualiser le showcase"
-              [refreshBusy]="showcaseRefreshBusy()"
-              (refresh)="refreshShowcasePanel($event)"
-              (collapseToggle)="toggleShowcaseCollapsed()"
-            />
-          </div>
-        </header>
+    <app-dock-tabs-dock-tabs
+      [activeTab]="activeBottomTab()"
+      [dockCollapsed]="dockCollapsed()"
+      [collapseAriaLabel]="dockCollapseLabel()"
+      [refreshBusy]="dockRefreshBusy()"
+      (tabChange)="onBottomTabChange($event)"
+      (collapseToggle)="toggleDockCollapsed()"
+      (refresh)="refreshDockPanel($event)"
+      (summaryExpand)="toggleDockCollapsed()"
+      (selectBlock)="openBlockDrawer($event)"
+    />
 
-        <div
-          class="app-showcase-band"
-          [class.is-collapsed]="showcaseCollapsed()"
-          [class.is-summary-expandable]="showcaseCollapsed()"
-          [attr.data-active-tab]="activeShowcaseTab()"
-          (click)="showcaseCollapsed() && toggleShowcaseCollapsed()"
-        >
-          <app-showcase-panel
-            [activeTab]="activeShowcaseTab()"
-            [collapsed]="showcaseCollapsed()"
-            (selectBlock)="openBlockFromShowcaseIndex($event)"
-          />
-        </div>
-      </div>
-    </div>
-    }
-  </section>
-
-  <section
-    class="app-bottom-stack"
-    [class.is-dock-collapsed]="dockCollapsed()"
-    aria-label="Dock navigation"
-  >
-    <div
-      class="showcase-block__shell bottom-stack__shell ds-surface ds-surface--card"
-    >
-      <header class="showcase-header showcase-header--tabs app-bottom-stack__header" aria-label="Navigation principale">
-        <div class="showcase-header-tabs">
-          <nav class="showcase-tabs app-bottom-stack__tabs" role="tablist">
-            <button
-              type="button"
-              class="showcase-tab ds-surface ds-surface--showcase-tab"
-              role="tab"
-              [attr.aria-selected]="activeBottomTab() === 'wallet'"
-              [class.is-active]="activeBottomTab() === 'wallet'"
-              (click)="onBottomTabChange('wallet')"
-            >
-              <span class="showcase-tab__label">{{ locale.t('dock.wallet') }}</span>
-            </button>
-            @if (product.faucetEnabled) {
-            <button
-              type="button"
-              class="showcase-tab ds-surface ds-surface--showcase-tab"
-              role="tab"
-              [attr.aria-selected]="activeBottomTab() === 'faucet'"
-              [class.is-active]="activeBottomTab() === 'faucet'"
-              (click)="onBottomTabChange('faucet')"
-            >
-              <span class="showcase-tab__label">{{ locale.t('dock.faucet') }}</span>
-            </button>
-            }
-            <button
-              type="button"
-              class="showcase-tab showcase-tab--mempool ds-surface ds-surface--showcase-tab"
-              role="tab"
-              [attr.aria-selected]="activeBottomTab() === 'transactions'"
-              [class.is-active]="activeBottomTab() === 'transactions'"
-              (click)="onBottomTabChange('transactions')"
-            >
-              <span class="showcase-tab__label">{{ locale.t('dock.transactions') }}</span>
-            </button>
-            <button
-              type="button"
-              class="showcase-tab ds-surface ds-surface--showcase-tab"
-              role="tab"
-              [attr.aria-selected]="activeBottomTab() === 'chain'"
-              [class.is-active]="activeBottomTab() === 'chain'"
-              (click)="onBottomTabChange('chain')"
-            >
-              <span class="showcase-tab__label">{{ locale.t('chain.title') }}</span>
-            </button>
-            <button
-              type="button"
-              class="showcase-tab ds-surface ds-surface--showcase-tab"
-              role="tab"
-              [attr.aria-selected]="activeBottomTab() === 'quests'"
-              [class.is-active]="activeBottomTab() === 'quests'"
-              (click)="onBottomTabChange('quests')"
-            >
-              <span class="showcase-tab__label">{{ locale.t('dock.quests') }}</span>
-            </button>
-            <button
-              type="button"
-              class="showcase-tab ds-surface ds-surface--showcase-tab"
-              role="tab"
-              [attr.aria-selected]="activeBottomTab() === 'peers'"
-              [class.is-active]="activeBottomTab() === 'peers'"
-              (click)="onBottomTabChange('peers')"
-            >
-              <span class="showcase-tab__label">{{ locale.t('dock.peers') }}</span>
-            </button>
-            @if (auth.isAdmin()) {
-            <button
-              type="button"
-              class="showcase-tab ds-surface ds-surface--showcase-tab"
-              role="tab"
-              [attr.aria-selected]="activeBottomTab() === 'admin'"
-              [class.is-active]="activeBottomTab() === 'admin'"
-              (click)="onBottomTabChange('admin')"
-            >
-              <span class="showcase-tab__label">{{ locale.t('dock.admin') }}</span>
-            </button>
-            }
-          </nav>
-        </div>
-        <div class="showcase-header-actions">
-          <app-collapsed-bar-actions
-            [collapsed]="dockCollapsed()"
-            [collapseAriaLabel]="dockCollapseLabel()"
-            refreshAriaLabel="Actualiser le dock"
-            [refreshBusy]="dockRefreshBusy()"
-            (refresh)="refreshDockPanel($event)"
-            (collapseToggle)="toggleDockCollapsed()"
-          />
-        </div>
-      </header>
-
-      <div
-        class="app-bottom-stack__content app-bottom-stack__band"
-        [class.is-collapsed]="dockCollapsed()"
-        [class.is-smart-collapsed]="dockCollapsed()"
-        [class.is-summary-expandable]="dockCollapsed()"
-        [attr.data-active-tab]="activeBottomTab()"
-        (click)="dockCollapsed() && toggleDockCollapsed()"
-      >
-      @if (dockCollapsed()) {
-        <div class="app-bottom-stack__summary">
-          <app-dock-bottom-summary [activeTab]="activeBottomTab()" />
-        </div>
-      } @else {
-      @switch (activeBottomTab()) {
-        @case ('wallet') {
-          <div class="app-bottom-stack__panel">
-            <app-wallet-panel></app-wallet-panel>
-          </div>
-        }
-        @case ('faucet') {
-          @if (product.faucetEnabled) {
-          <div class="app-bottom-stack__panel app-bottom-stack__panel--faucet">
-            <app-faucet></app-faucet>
-          </div>
-          }
-        }
-        @case ('transactions') {
-          <div class="app-bottom-stack__panel app-bottom-stack__panel--transactions">
-            <app-transactions-dock></app-transactions-dock>
-          </div>
-        }
-        @case ('chain') {
-          <div class="app-bottom-stack__panel app-bottom-stack__panel--chain">
-            <app-blocks-list (selectBlock)="openBlockDrawer($event)"></app-blocks-list>
-          </div>
-        }
-        @case ('quests') {
-          <div class="app-bottom-stack__panel app-bottom-stack__panel--quests">
-            <app-quests-panel></app-quests-panel>
-          </div>
-        }
-        @case ('peers') {
-          <div class="app-bottom-stack__panel app-bottom-stack__panel--peers">
-            <app-peer-panel></app-peer-panel>
-          </div>
-        }
-        @case ('admin') {
-          @if (auth.isAdmin()) {
-          <div class="app-bottom-stack__panel app-bottom-stack__panel--admin">
-            <app-admin-panel></app-admin-panel>
-          </div>
-          }
-        }
-      }
-      }
-    </div>
-    </div>
-  </section>
+    <app-graph
+      [chartCollapsed]="chartCollapsed()"
+      [collapseAriaLabel]="chartCollapseLabel()"
+      (collapseToggle)="toggleChartCollapsed()"
+      (summaryExpand)="toggleChartCollapsed()"
+    />
+  </main>
 
   <app-three-floor></app-three-floor>
 

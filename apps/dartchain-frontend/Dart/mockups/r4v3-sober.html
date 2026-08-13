@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>R4V3 — Maquette sobre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─────────────────────────────────────────────────────────
+       Charte « adulte / sobre » — exploration visuelle
+       Accent unique : Baltic Blue marque DartChain
+       Pas de néon, pas de glow, surfaces plates, air entre zones
+       Viewport canonique produit : 250 × 550
+       ───────────────────────────────────────────────────────── */
+    :root {
+      --ink: #12161c;
+      --ink-soft: #3a4450;
+      --ink-mute: #7a8794;
+      --paper: #f3f1ec;
+      --paper-2: #e9e6df;
+      --surface: #fbfaf7;
+      --line: rgba(18, 22, 28, 0.08);
+      --line-strong: rgba(18, 22, 28, 0.14);
+      --accent: #235789;
+      --accent-soft: rgba(35, 87, 137, 0.1);
+      --up: #2f6b4f;
+      --down: #8a4a52;
+      --live: #2f6b4f;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --font: "Manrope", "Segoe UI", sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+      --phone-w: 250px;
+      --phone-h: 550px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, #dfe6ee 0%, transparent 55%),
+        linear-gradient(165deg, #c8d0da 0%, #b4bec9 42%, #9eabb8 100%);
+      display: grid;
+      place-items: center;
+      padding: 32px 16px 48px;
+      gap: 28px;
+    }
+
+    .deck {
+      width: min(920px, 100%);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 36px;
+      align-items: start;
+    }
+
+    @media (max-width: 780px) {
+      .deck { grid-template-columns: 1fr; justify-items: center; }
+      .brief { max-width: 420px; }
+    }
+
+    .brief h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    .brief p {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      margin-bottom: 18px;
+    }
+    .brief ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .brief li {
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--ink-soft);
+      padding-left: 14px;
+      position: relative;
+    }
+    .brief li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .swatches {
+      display: flex;
+      gap: 8px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+    .swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--line-strong);
+    }
+    .swatch-label {
+      margin-top: 10px;
+      font-size: 0.72rem;
+      color: var(--ink-mute);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* —— Device —— */
+    .device {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      background: var(--paper);
+      border-radius: 22px;
+      border: 1px solid rgba(18, 22, 28, 0.18);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.35) inset,
+        0 24px 48px rgba(18, 22, 28, 0.22);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .device::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, transparent 18%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.55;
+      z-index: 2;
+    }
+
+    .screen {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 10px 10px 8px;
+      gap: 8px;
+    }
+
+    /* Navbar */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      min-height: 28px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      background: var(--accent);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .mark svg { width: 10px; height: 10px; fill: #fbfaf7; }
+    .brand-name {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .live {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--live);
+      background: rgba(47, 107, 79, 0.1);
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
+    .live i {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--live);
+      display: block;
+    }
+    .user {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .user button {
+      border: none;
+      background: transparent;
+      color: var(--ink-mute);
+      cursor: pointer;
+      padding: 2px;
+      display: grid;
+      place-items: center;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      font-size: 8px;
+      font-weight: 500;
+      color: var(--ink-mute);
+      letter-spacing: 0.02em;
+      padding: 0 1px;
+    }
+    .meta b { color: var(--ink-soft); font-weight: 600; }
+
+    /* Chart */
+    .chart {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 8px 8px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 0 0 auto;
+    }
+    .chart-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .token-search {
+      flex: 1;
+      min-width: 0;
+      height: 22px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: var(--paper);
+      padding: 0 8px;
+      font: 500 9px/1 var(--font);
+      color: var(--ink-mute);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .chip-row { display: flex; gap: 4px; }
+    .chip {
+      height: 22px;
+      padding: 0 7px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: transparent;
+      font: 600 8px/1 var(--font);
+      color: var(--ink-soft);
+      letter-spacing: 0.04em;
+    }
+    .chip.is-on {
+      background: var(--accent-soft);
+      border-color: transparent;
+      color: var(--accent);
+    }
+
+    .plot {
+      position: relative;
+      height: 92px;
+      border-radius: 6px;
+      background:
+        linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 100% 23px,
+        linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 25% 100%;
+      overflow: hidden;
+    }
+    .plot svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .axis {
+      position: absolute;
+      font-size: 7px;
+      color: var(--ink-mute);
+      font-weight: 500;
+    }
+    .axis.y-top { top: 4px; left: 6px; }
+    .axis.y-bot { bottom: 14px; left: 6px; }
+    .axis-x {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 2px;
+      font-size: 7px;
+      color: var(--ink-mute);
+      font-weight: 500;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+    .kpi {
+      padding: 5px 6px;
+      border-radius: var(--radius-sm);
+      background: var(--paper);
+      border: 1px solid transparent;
+    }
+    .kpi span {
+      display: block;
+      font-size: 7px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-bottom: 2px;
+    }
+    .kpi strong {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .kpi strong.up { color: var(--up); }
+    .kpi strong.accent { color: var(--accent); }
+
+    /* Swap strip */
+    .swap {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto;
+      gap: 4px;
+      align-items: center;
+      padding: 6px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .pair {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .pair label {
+      font-size: 7px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .pair .val {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .swap-arrow {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      color: var(--ink-mute);
+      background: var(--paper);
+    }
+    .btn-convert {
+      height: 26px;
+      padding: 0 10px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--accent);
+      color: #fbfaf7;
+      font: 600 9px/1 var(--font);
+      letter-spacing: 0.03em;
+      cursor: pointer;
+    }
+
+    /* Activity */
+    .activity {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 6px;
+    }
+    .tabs {
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex: 0 0 auto;
+      height: 20px;
+      padding: 0 7px;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      font: 600 8px/1 var(--font);
+      letter-spacing: 0.04em;
+      color: var(--ink-mute);
+      cursor: pointer;
+    }
+    .tab.is-on {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .find {
+      height: 22px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: var(--paper);
+      padding: 0 8px;
+      font-size: 9px;
+      color: var(--ink-mute);
+      display: flex;
+      align-items: center;
+    }
+    .feed {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 38px 1fr auto;
+      gap: 6px;
+      align-items: baseline;
+      padding: 5px 2px;
+      border-bottom: 1px solid var(--line);
+    }
+    .row:last-child { border-bottom: none; }
+    .tag {
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      font-family: var(--mono);
+    }
+    .msg {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .when {
+      font-size: 7px;
+      color: var(--ink-mute);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Wallet */
+    .wallet {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 7px 7px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 0 0 auto;
+    }
+    .w-tabs {
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .w-tabs::-webkit-scrollbar { display: none; }
+    .w-tab {
+      height: 18px;
+      padding: 0 6px;
+      border: none;
+      background: transparent;
+      font: 600 7.5px/1 var(--font);
+      letter-spacing: 0.05em;
+      color: var(--ink-mute);
+      border-bottom: 1.5px solid transparent;
+      cursor: pointer;
+    }
+    .w-tab.is-on {
+      color: var(--ink);
+      border-bottom-color: var(--accent);
+    }
+    .balance {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .balance .amt {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+    .balance .amt small {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--ink-mute);
+      margin-left: 3px;
+    }
+    .balance .fiat {
+      font-size: 9px;
+      color: var(--ink-mute);
+      font-weight: 500;
+    }
+    .keys {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    .key {
+      padding: 5px 6px;
+      border-radius: var(--radius-sm);
+      background: var(--paper);
+      min-width: 0;
+    }
+    .key span {
+      display: block;
+      font-size: 6.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-bottom: 2px;
+    }
+    .key code {
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--ink-soft);
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .addr {
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--ink-soft);
+      background: var(--paper);
+      border-radius: var(--radius-sm);
+      padding: 5px 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: 4px;
+    }
+    .actions button {
+      height: 28px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line-strong);
+      background: var(--paper);
+      font: 700 8px/1 var(--font);
+      letter-spacing: 0.05em;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .actions button.primary {
+      background: var(--accent);
+      border-color: transparent;
+      color: #fbfaf7;
+    }
+
+    .caption {
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(18, 22, 28, 0.55);
+      margin-top: -8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <aside class="brief">
+      <h1>R4V3 — maquette sobre</h1>
+      <p>
+        Même structure fonctionnelle que le prototype (navbar → graphique → swap → activité → wallet),
+        avec une charte adulte : papier chaleureux, un seul accent Baltic Blue, surfaces plates, typographie Manrope.
+      </p>
+      <ul>
+        <li>Suppression des néons, glows et cadres empilés</li>
+        <li>Palette papier / encre + accent marque unique</li>
+        <li>Métriques en ligne sobre, flux d’activité lisible (plus de console hacking)</li>
+        <li>CTA wallet hiérarchisés : Swap en primaire, Envoyer / Recevoir en secondaire</li>
+        <li>Viewport conservé : 250 × 550</li>
+      </ul>
+      <div class="swatches" aria-hidden="true">
+        <div class="swatch" style="background:#f3f1ec"></div>
+        <div class="swatch" style="background:#fbfaf7"></div>
+        <div class="swatch" style="background:#235789"></div>
+        <div class="swatch" style="background:#12161c"></div>
+        <div class="swatch" style="background:#2f6b4f"></div>
+        <div class="swatch" style="background:#8a4a52"></div>
+      </div>
+      <div class="swatch-label">Papier · Surface · Baltic · Encre · Up · Down</div>
+    </aside>
+
+    <div>
+      <div class="device" role="img" aria-label="Maquette mobile R4V3 sobre">
+        <div class="screen">
+          <header class="nav">
+            <div class="brand">
+              <div class="mark" aria-hidden="true">
+                <svg viewBox="0 0 12 12"><path d="M6 1.2 10.5 4v4L6 10.8 1.5 8V4L6 1.2Z"/></svg>
+              </div>
+              <span class="brand-name">R4V3</span>
+              <span class="live"><i></i>Live</span>
+            </div>
+            <div class="user">
+              @rutkarf
+              <button type="button" aria-label="Déconnexion" title="Déconnexion">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              </button>
+            </div>
+          </header>
+
+          <div class="meta">
+            <span>Peers <b>0</b></span>
+            <span>Bloc <b>#1</b></span>
+            <span>Net <b>DartChain</b></span>
+            <span style="color:var(--ink-mute)">0,00 % 24h</span>
+          </div>
+
+          <section class="chart" aria-label="Graphique marché">
+            <div class="chart-top">
+              <div class="token-search">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                Rechercher un token
+              </div>
+              <div class="chip-row">
+                <button class="chip is-on" type="button">24H</button>
+                <button class="chip" type="button">AUTO</button>
+              </div>
+            </div>
+            <div class="plot">
+              <span class="axis y-top">Fort</span>
+              <span class="axis y-bot">Faible</span>
+              <svg viewBox="0 0 220 92" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#235789" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#235789" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0 58 C18 52, 28 40, 42 44 C58 49, 68 28, 84 34 C102 42, 112 62, 128 48 C144 34, 156 22, 172 30 C188 38, 198 55, 220 42 L220 92 L0 92 Z" fill="url(#fill)"/>
+                <path d="M0 58 C18 52, 28 40, 42 44 C58 49, 68 28, 84 34 C102 42, 112 62, 128 48 C144 34, 156 22, 172 30 C188 38, 198 55, 220 42" fill="none" stroke="#235789" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="axis-x">
+              <span>12:00</span><span>18:27</span><span>00:55</span><span>07:22</span><span>13:50</span>
+            </div>
+            <div class="kpis">
+              <div class="kpi"><span>Santé</span><strong class="up">71/100</strong></div>
+              <div class="kpi"><span>Liquidité</span><strong class="accent">44 %</strong></div>
+              <div class="kpi"><span>Swaps</span><strong>0</strong></div>
+            </div>
+          </section>
+
+          <section class="swap" aria-label="Conversion rapide">
+            <div class="pair">
+              <label>De</label>
+              <div class="val">1 R4V3</div>
+            </div>
+            <div class="swap-arrow" aria-hidden="true">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 10l5 5 5-5"/></svg>
+            </div>
+            <div class="pair">
+              <label>Vers</label>
+              <div class="val">1,00 PXD</div>
+            </div>
+            <button class="btn-convert" type="button">Convertir</button>
+          </section>
+
+          <section class="activity" aria-label="Activité">
+            <div class="tabs" role="tablist">
+              <button class="tab is-on" type="button">Tous</button>
+              <button class="tab" type="button">R4V3</button>
+              <button class="tab" type="button">Chat</button>
+              <button class="tab" type="button">Labz</button>
+              <button class="tab" type="button">DAO</button>
+              <button class="tab" type="button">Marché</button>
+            </div>
+            <div class="find">Rechercher…</div>
+            <div class="feed">
+              <div class="row"><span class="tag">MET</span><span class="msg">Bloc #1 confirmé</span><span class="when">12:10</span></div>
+              <div class="row"><span class="tag">INFO</span><span class="msg">Bienvenue sur Dart Explorer</span><span class="when">12:10</span></div>
+              <div class="row"><span class="tag">P2P</span><span class="msg">Aucun pair connecté</span><span class="when">12:10</span></div>
+              <div class="row"><span class="tag">MET</span><span class="msg">TX pending · réseau local</span><span class="when">12:11</span></div>
+              <div class="row"><span class="tag">INFO</span><span class="msg">Swap exécuté sur le testnet</span><span class="when">12:11</span></div>
+            </div>
+          </section>
+
+          <section class="wallet" aria-label="Portefeuille">
+            <div class="w-tabs">
+              <button class="w-tab is-on" type="button">Wallet</button>
+              <button class="w-tab" type="button">Faucet</button>
+              <button class="w-tab" type="button">Mempool</button>
+              <button class="w-tab" type="button">Chain</button>
+              <button class="w-tab" type="button">Quêtes</button>
+            </div>
+            <div class="balance">
+              <div class="amt">1,000000<small>R4V3</small></div>
+              <div class="fiat">≈ CHF 1,00</div>
+            </div>
+            <div class="keys">
+              <div class="key"><span>Clé publique</span><code>04a8…f2c1</code></div>
+              <div class="key"><span>Clé privée</span><code>••••••••••</code></div>
+            </div>
+            <div class="addr">rutkarfR4V380ad68a46be…</div>
+            <div class="actions">
+              <button type="button">Envoyer</button>
+              <button class="primary" type="button">Swap</button>
+              <button type="button">Recevoir</button>
+            </div>
+          </section>
+        </div>
+      </div>
+      <p class="caption">Maquette exploratoire · non branchée au shell Angular</p>
+    </div>
+  </div>
+</body>
+</html>

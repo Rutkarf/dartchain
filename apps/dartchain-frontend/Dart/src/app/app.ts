@@ -11,25 +11,18 @@ import {
 import { BlockchainApiService } from './core/services/blockchain-api.service';
 
 import { ParticleBackgroundComponent } from './particle-background/particle-background';
-import { NavbarComponent } from './navbar/navbar';
 import { BandeauAccueilComponent } from './features/bandeau-accueil/bandeau-accueil';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { SwapComponent } from './components/swap/swap.component';
+import { ShowcaseTabShowcaseComponent } from './components/showcase-tab-showcase/showcase-tab-showcase.component';
+import { DockTabsDockTabsComponent } from './components/dock-tabs-dock-tabs/dock-tabs-dock-tabs.component';
+import { GraphComponent } from './components/graph/graph.component';
 
-import { ExchangePanelComponent } from './features/exchange-panel/exchange-panel';
-import { RatePanelComponent } from './features/rate-panel/rate-panel';
-import {
-  ShowcaseTab,
+import { ShowcaseTab,
   isNewsShowcaseTab,
   newsCategoryForTab,
   normalizeShowcaseTab,
 } from './core/models/showcase-tab.model';
-import { ShowcaseTabsComponent } from './features/showcase-tabs/showcase-tabs';
-import { ShowcasePanelComponent } from './features/showcase-panel/showcase-panel';
-import { WalletPanelComponent } from './features/wallet-panel/wallet-panel';
-import { FaucetComponent } from './features/faucet/faucet';
-import { PeerPanelComponent } from './features/peer-panel/peer-panel';
-import { QuestsPanelComponent } from './features/quests-panel/quests-panel';
-import { TransactionsDockComponent } from './features/transactions-dock/transactions-dock';
-import { BlocksListComponent } from './features/blocks-list/blocks-list';
 import {
   BottomDockTab,
   DockNavigationService,
@@ -51,11 +44,8 @@ import { FocusTrapDirective } from './core/directives/focus-trap.directive';
 import { AuthService } from './core/services/auth.service';
 import { ShowcaseNewsStateService } from './core/services/showcase-news-state.service';
 import { ShowcaseHubUiService } from './core/services/showcase-hub-ui.service';
-import { AdminPanelComponent } from './features/admin-panel/admin-panel';
-import { DockBottomSummaryComponent } from './features/dock-summary/dock-bottom-summary';
 import { AuthDrawerComponent } from './features/auth-drawer/auth-drawer';
 import { FaucetRuntimeService } from './core/services/faucet-runtime.service';
-import { CollapsedBarActionsComponent } from './features/collapsed-bar-actions/collapsed-bar-actions';
 import { ChartSummaryStateService } from './core/services/chart-summary-state.service';
 import { ShowcaseR4v3StateService } from './core/services/showcase-r4v3-state.service';
 import { ShowcaseChatStateService } from './core/services/showcase-chat-state.service';
@@ -81,26 +71,17 @@ import { PeersDataService } from './core/services/peers-data.service';
     ParticleBackgroundComponent,
     NavbarComponent,
     BandeauAccueilComponent,
-    ExchangePanelComponent,
-    RatePanelComponent,
-    ShowcaseTabsComponent,
-    ShowcasePanelComponent,
-    WalletPanelComponent,
-    FaucetComponent,
-    PeerPanelComponent,
-    QuestsPanelComponent,
-    TransactionsDockComponent,
-    BlocksListComponent,
+    SwapComponent,
+    ShowcaseTabShowcaseComponent,
+    DockTabsDockTabsComponent,
+    GraphComponent,
     ErrorBannerComponent,
     R4v3SceneComponent,
     BlockDetailDrawerComponent,
     LaunchFormDrawerComponent,
     ThreeFloor,
     FocusTrapDirective,
-    AdminPanelComponent,
-    DockBottomSummaryComponent,
     AuthDrawerComponent,
-    CollapsedBarActionsComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

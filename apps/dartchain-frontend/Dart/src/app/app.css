@@ -238,15 +238,19 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
   padding-inline: var(--shell-inline-gap);
   padding-top: 0;
   padding-bottom: 0;
   margin-top: 0;
 }
 
+.app-shell > .app-main-layout,
 .app-shell > .app-hub,
 .app-shell > .app-dock-stack,
 .app-shell > .app-bottom-stack,
+.app-shell > app-navbar,
 .app-shell > .app-navbar-zone {
   width: 100%;
   max-width: 100%;
@@ -315,6 +319,7 @@ app-three-floor {
 }
 
 /* Navbar : un seul item de grille (évite logo + utilitaire en enfants séparés de .app-shell) */
+.app-shell > app-navbar,
 .app-navbar-zone {
   flex: 0 0 auto;
   display: block;
@@ -575,12 +580,135 @@ app-three-floor {
   max-width: 100%;
 }
 
-/* —— Hub : Graph → Swap → Showcase (toujours vertical) —— */
+/* —— Layout principal : swap → showcase → dock → graph (grid, graph collé sous dock) —— */
+.app-shell {
+  justify-content: flex-start;
+}
+
+.app-main-layout,
 .app-hub {
   flex: 0 0 auto;
   grid-column: 1;
   position: relative;
   z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto;
+  align-content: start;
+  justify-items: stretch;
+  gap: 0;
+  row-gap: 0;
+  column-gap: 0;
+  margin: 0;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  padding-inline: var(--band-inline-pad);
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: fit-content;
+  max-height: none;
+  box-sizing: border-box;
+  align-self: flex-start;
+  overflow: visible;
+}
+
+.app-main-layout.is-showcase-disabled {
+  margin-block-end: 0;
+}
+
+.app-main-layout > app-swap,
+.app-main-layout > .app-swap-section {
+  grid-row: 1;
+  min-height: 0;
+  margin: 0;
+}
+
+/* swap → showcase */
+.app-main-layout > app-showcase-tab-showcase,
+.app-main-layout > .app-showcase-tab-showcase-section {
+  grid-row: 2;
+  min-height: 0;
+  margin: 0;
+  margin-top: var(--hub-swap-showcase-gap, 6px);
+  overflow: hidden;
+}
+
+.app-main-layout > app-showcase-tab-showcase:not(.is-showcase-collapsed):not(.is-showcase-disabled),
+.app-main-layout > .app-showcase-tab-showcase-section:not(.is-showcase-collapsed):not(.is-showcase-disabled) {
+  max-height: var(--hub-showcase-block-height);
+}
+
+.app-main-layout > app-showcase-tab-showcase.is-showcase-collapsed,
+.app-main-layout > .app-showcase-tab-showcase-section.is-showcase-collapsed {
+  max-height: var(--hub-showcase-block-height-collapsed);
+  margin-top: var(--hub-swap-showcase-gap-collapsed, 5px);
+  overflow: visible;
+}
+
+.app-main-layout > app-showcase-tab-showcase.is-showcase-disabled,
+.app-main-layout > .app-showcase-tab-showcase-section.is-showcase-disabled {
+  margin-top: 0;
+}
+
+/* showcase → dock */
+.app-main-layout > app-dock-tabs-dock-tabs,
+.app-main-layout > .app-dock-tabs-section {
+  grid-row: 3;
+  min-height: 0;
+  height: var(--bottom-stack-active-height);
+  max-height: var(--bottom-stack-active-height);
+  margin: 0;
+  margin-top: var(--stack-gap-showcase-dock, 4px);
+}
+
+.app-main-layout > app-dock-tabs-dock-tabs.is-dock-collapsed,
+.app-main-layout > .app-dock-tabs-section.is-dock-collapsed {
+  height: var(--bottom-stack-height-collapsed);
+  max-height: var(--bottom-stack-height-collapsed);
+  margin-top: var(--stack-gap-showcase-dock-collapsed, 5px);
+}
+
+/* Pas de marge fantôme sous le dock */
+.app-main-layout .app-bottom-stack,
+.app-main-layout > app-dock-tabs-dock-tabs .app-bottom-stack,
+.app-main-layout > .app-dock-tabs-section .app-bottom-stack {
+  margin-bottom: 0 !important;
+}
+
+/* dock → graph : row 4, collé sous le dock */
+.app-main-layout > app-graph,
+.app-main-layout > .app-graph-section {
+  grid-row: 4;
+  height: var(--market-chart-height);
+  min-height: var(--market-chart-height);
+  max-height: var(--market-chart-height);
+  margin: 0 !important;
+  margin-top: var(--hub-market-internal-gap, 6px) !important;
+  margin-bottom: 0 !important;
+  overflow: hidden;
+  position: relative !important;
+  inset: auto !important;
+}
+
+.app-main-layout.is-chart-collapsed > app-graph,
+.app-main-layout.is-chart-collapsed > .app-graph-section,
+.app-main-layout > app-graph.is-chart-collapsed,
+.app-main-layout > .app-graph-section.is-chart-collapsed {
+  height: var(--market-chart-collapsed-h);
+  min-height: var(--market-chart-collapsed-h);
+  max-height: var(--market-chart-collapsed-h);
+  margin-top: var(--hub-market-internal-gap-collapsed, 4px) !important;
+  overflow: visible;
+}
+
+.app-main-layout:has(> app-dock-tabs-dock-tabs.is-dock-collapsed) > app-graph:not(.is-chart-collapsed),
+.app-main-layout:has(> .app-dock-tabs-section.is-dock-collapsed) > .app-graph-section:not(.is-chart-collapsed) {
+  margin-top: var(--stack-gap-showcase-dock-collapsed, 5px) !important;
+}
+
+/* —— Hub legacy (grid) — conservé pour media queries —— */
+.app-hub {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   /* Pistes 2 & 4 = gouttières graph→swap / swap→showcase (pas de margin avalé par row fixe) */
@@ -594,21 +722,10 @@ app-three-floor {
     var(--hub-showcase-block-height);
   column-gap: 0;
   row-gap: 0;
-  margin: 0;
-  margin-block-start: 0;
-  /* 4px showcase → dock tabs */
-  margin-block-end: var(--stack-gap-showcase-dock, var(--hub-market-showcase-gap, 4px));
-  padding-inline: var(--band-inline-pad);
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-  height: auto;
-  box-sizing: border-box;
-  align-self: stretch;
-  overflow: visible;
   transition: grid-template-rows 0.28s ease;
 }
 
+.app-main-layout.is-showcase-collapsed,
 .app-hub.is-showcase-collapsed {
   grid-template-rows:
     var(--market-chart-height)
@@ -627,6 +744,7 @@ app-three-floor {
   --market-height: var(--market-band-height);
 }
 
+.app-main-layout.is-chart-collapsed,
 .app-hub.is-chart-collapsed {
   --market-chart-height: var(--market-chart-collapsed-h);
   --market-band-height: calc(
@@ -635,6 +753,7 @@ app-three-floor {
   --market-height: var(--market-band-height);
 }
 
+.app-main-layout.is-exchange-collapsed,
 .app-hub.is-exchange-collapsed {
   --market-exchange-height-estimate: var(--market-exchange-collapsed-h);
   --market-band-height: calc(
@@ -643,6 +762,7 @@ app-three-floor {
   --market-height: var(--market-band-height);
 }
 
+.app-main-layout.is-exchange-collapsed.is-chart-collapsed,
 .app-hub.is-exchange-collapsed.is-chart-collapsed {
   --market-band-height: calc(
     var(--market-exchange-collapsed-h) + var(--market-chart-collapsed-h) + var(--hub-market-internal-gap)
@@ -650,6 +770,7 @@ app-three-floor {
   --market-height: var(--market-band-height);
 }
 
+.app-main-layout.is-showcase-collapsed.is-chart-collapsed:not(.is-showcase-disabled),
 .app-hub.is-showcase-collapsed.is-chart-collapsed:not(.is-showcase-disabled) {
   grid-template-rows:
     var(--market-chart-height)
@@ -659,12 +780,18 @@ app-three-floor {
     var(--hub-showcase-block-height-collapsed);
 }
 
+.app-main-layout.is-chart-collapsed,
+.app-main-layout.is-exchange-collapsed,
+.app-main-layout:has(.app-market-stack--rate.is-chart-collapsed),
 .app-hub.is-chart-collapsed,
 .app-hub.is-exchange-collapsed,
 .app-hub:has(.app-market-stack--rate.is-chart-collapsed) {
   --hub-gap-graph-swap: var(--hub-market-internal-gap-collapsed, 4px);
 }
 
+.app-main-layout.is-exchange-collapsed,
+.app-main-layout.is-showcase-collapsed,
+.app-main-layout:has(app-exchange-panel.exchange-panel--collapsed),
 .app-hub.is-exchange-collapsed,
 .app-hub.is-showcase-collapsed,
 .app-hub:has(app-exchange-panel.exchange-panel--collapsed) {
@@ -803,6 +930,8 @@ app-three-floor {
 }
 
 /* Swap en piste 3 ; gouttières = pistes 2/4 (pas de margins) */
+.app-main-layout app-exchange-panel.app-hub-swap-stack,
+.app-main-layout > app-swap app-exchange-panel.app-hub-swap-stack,
 .app-hub > app-exchange-panel.app-hub-swap-stack,
 .app-hub > .app-hub-swap-stack {
   grid-row: 3;
@@ -811,6 +940,7 @@ app-three-floor {
 }
 
 /* Replié : showcase → dock tabs = 5px */
+.app-main-layout.is-showcase-collapsed,
 .app-hub.is-showcase-collapsed {
   margin-block-end: var(--stack-gap-showcase-dock-collapsed, 5px) !important;
 }
@@ -886,7 +1016,7 @@ app-three-floor {
 .app-bottom-stack .showcase-header {
   flex: 0 0 var(--showcase-hub-tab-h);
   display: flex;
-  flex-direction: row;
+  flex-flow: row nowrap;
   align-items: center;
   align-self: stretch;
   width: 100%;
@@ -895,12 +1025,12 @@ app-three-floor {
   min-height: var(--showcase-hub-tab-h);
   max-height: var(--showcase-hub-tab-h);
   margin: 0;
-  padding: 0 0 0 0px;
-  gap: 0px;
+  padding: 0;
+  gap: 0;
   overflow: visible;
   box-sizing: border-box;
   position: relative;
-  z-index: 2;
+  z-index: 6;
   border: none;
   border-bottom: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.1);
   border-radius: 0;
@@ -981,17 +1111,8 @@ app-three-floor {
   outline-offset: 1px;
 }
 
-.showcase-header-tabs {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
+/* Header tabs/actions : styles globaux dans styles/panel-headers.css
+   (composants showcase/dock hors encapsulation app.css). */
 .showcase-header-tabs .showcase-tabs {
   width: 100%;
   min-width: 0;
@@ -1002,50 +1123,6 @@ app-three-floor {
   flex: 1 1 0;
   min-width: 0;
   max-width: none;
-}
-
-.showcase-header:has(.showcase-header-actions) .showcase-header-tabs {
-  flex: 1 1 auto;
-  width: auto;
-  min-width: 0;
-  padding-right: 0;
-  overflow: hidden;
-}
-
-.showcase-header-actions {
-  position: relative;
-  z-index: 6;
-  flex: 0 0 var(--panel-action-menu-w);
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  align-self: center;
-  width: var(--panel-action-menu-w);
-  min-width: var(--panel-action-menu-w);
-  max-width: var(--panel-action-menu-w);
-  margin: 0;
-  height: var(--panel-action-menu-h);
-  min-height: var(--panel-action-menu-h);
-  max-height: var(--panel-action-menu-h);
-  padding: 0;
-  pointer-events: auto;
-}
-
-.showcase-header-actions app-collapsed-bar-actions {
-  --cba-h: var(--panel-action-menu-h);
-  --cba-item-w: var(--panel-action-item-w);
-  width: var(--panel-action-menu-w);
-  height: var(--panel-action-menu-h);
-  min-height: var(--panel-action-menu-h);
-  max-height: var(--panel-action-menu-h);
-  margin: 0;
-  align-self: center;
-  pointer-events: auto;
-}
-
-.showcase-header-actions app-panel-collapse-control {
-  height: 100%;
-  min-height: 100%;
 }
 
 /* Ancien chevron flottant remplacé par app-panel-collapse-control (classe .showcase-toggle conservée). */
@@ -1950,6 +2027,10 @@ app-block-detail-drawer {
 @media (max-width: 250px), (min-width: 250px) and (max-width: 250px) {
   :host {
     padding-top: 0;
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden;
+    overflow-y: auto !important;
     --band-air-gap: 0px;
     --section-stack-gap: 0px;
     --mvp-swap-h: 14px;
@@ -1979,6 +2060,16 @@ app-block-detail-drawer {
   .app-shell {
     padding-top: 0;
     margin-top: 0;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .app-main-layout {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   .app-navbar-zone,
@@ -2385,7 +2476,9 @@ app-block-detail-drawer {
     margin-bottom: 0 !important;
   }
 
-  .app-hub > app-exchange-panel.app-hub-swap-stack,
+  .app-main-layout app-exchange-panel.app-hub-swap-stack,
+.app-main-layout > app-swap app-exchange-panel.app-hub-swap-stack,
+.app-hub > app-exchange-panel.app-hub-swap-stack,
   .app-hub > .app-hub-swap-stack {
     grid-row: 3;
     margin-block-start: 0 !important;
@@ -2401,11 +2494,11 @@ app-block-detail-drawer {
 /* === LOCK FINAL — hiérarchie spatiale MVP 250×550 (cascade last, −1px/zone) === */
 @media (max-width: 349px) {
   :host {
-    height: auto;
+    height: auto !important;
     min-height: 100svh;
-    max-height: none;
+    max-height: none !important;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: auto !important;
     --band-air-gap: 0px;
     --section-stack-gap: 0px;
     --band-inline-pad: 2px;
@@ -2452,6 +2545,61 @@ app-block-detail-drawer {
     --navbar-stack-estimate: calc(var(--ds-zone-navbar, 32px) + var(--ds-navbar-top-inset, 0px));
   }
 
+  /* 250×580 : pile visible swap → showcase → dock → graph (pas de clip viewport) */
+  .app-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 100%;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .app-shell > app-navbar,
+  .app-shell > .app-navbar-zone {
+    flex: 0 0 auto;
+  }
+
+  .app-main-layout {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-self: flex-start !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0;
+    overflow: visible !important;
+  }
+
+  .app-main-layout > app-swap,
+  .app-main-layout > .app-swap-section,
+  .app-main-layout > app-showcase-tab-showcase,
+  .app-main-layout > .app-showcase-tab-showcase-section,
+  .app-main-layout > app-dock-tabs-dock-tabs,
+  .app-main-layout > .app-dock-tabs-section,
+  .app-main-layout > app-graph,
+  .app-main-layout > .app-graph-section {
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .app-main-layout > app-graph,
+  .app-main-layout > .app-graph-section {
+    order: 4 !important;
+    margin-top: var(--hub-market-internal-gap, 6px) !important;
+    margin-bottom: 0 !important;
+  }
+
+  .app-main-layout .app-bottom-stack {
+    margin-bottom: 0 !important;
+  }
+
   .app-navbar-zone {
     padding-inline: var(--navbar-inline-pad);
     padding-bottom: var(--navbar-hub-gap, 6px);
@@ -2471,7 +2619,9 @@ app-block-detail-drawer {
     margin-bottom: 0 !important;
   }
 
-  .app-hub > app-exchange-panel.app-hub-swap-stack,
+  .app-main-layout app-exchange-panel.app-hub-swap-stack,
+.app-main-layout > app-swap app-exchange-panel.app-hub-swap-stack,
+.app-hub > app-exchange-panel.app-hub-swap-stack,
   .app-hub > .app-hub-swap-stack {
     grid-row: 3;
     margin-block-start: 0 !important;

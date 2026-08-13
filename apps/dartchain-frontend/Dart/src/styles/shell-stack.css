@@ -1,0 +1,74 @@
+/**
+ * Pile shell — ordre strict, sans espace libre entre dock et graph.
+ * Global (hors encapsulation Angular) pour gagner sur tous les viewports.
+ */
+.app-shell[data-testid='app-shell'],
+.app-shell {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  align-content: flex-start !important;
+}
+
+.app-main-layout {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto auto auto auto !important;
+  align-content: start !important;
+  justify-items: stretch !important;
+  row-gap: 0 !important;
+  column-gap: 0 !important;
+  flex: 0 0 auto !important;
+  flex-grow: 0 !important;
+  width: 100% !important;
+  height: fit-content !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  align-self: flex-start !important;
+}
+
+.app-main-layout > app-swap,
+.app-main-layout > .app-swap-section {
+  grid-row: 1 !important;
+  margin: 0 !important;
+}
+
+.app-main-layout > app-showcase-tab-showcase,
+.app-main-layout > .app-showcase-tab-showcase-section {
+  grid-row: 2 !important;
+  margin: 0 !important;
+  margin-top: var(--hub-swap-showcase-gap, 6px) !important;
+}
+
+.app-main-layout > app-dock-tabs-dock-tabs,
+.app-main-layout > .app-dock-tabs-section {
+  grid-row: 3 !important;
+  margin: 0 !important;
+  margin-top: var(--stack-gap-showcase-dock, 4px) !important;
+}
+
+.app-main-layout > app-graph,
+.app-main-layout > .app-graph-section,
+app-graph.app-graph-section {
+  grid-row: 4 !important;
+  margin: 0 !important;
+  margin-top: var(--hub-market-internal-gap, 6px) !important;
+  margin-bottom: 0 !important;
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  inset: auto !important;
+  align-self: stretch !important;
+  justify-self: stretch !important;
+  flex: none !important;
+  float: none !important;
+}
+
+.app-main-layout .app-bottom-stack,
+app-dock-tabs-dock-tabs .app-bottom-stack {
+  margin-bottom: 0 !important;
+}

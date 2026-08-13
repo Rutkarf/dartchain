@@ -1,0 +1,91 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  overflow: hidden;
+}
+
+:host(:not(.is-showcase-collapsed):not(.is-showcase-disabled)) {
+  height: var(--hub-showcase-block-height, 140px);
+  min-height: var(--hub-showcase-block-height, 140px);
+  max-height: var(--hub-showcase-block-height, 140px);
+}
+
+:host(.is-showcase-disabled) {
+  display: none;
+}
+
+:host(.is-showcase-collapsed) {
+  height: var(--hub-showcase-block-height-collapsed, 40px);
+  min-height: var(--hub-showcase-block-height-collapsed, 40px);
+  max-height: var(--hub-showcase-block-height-collapsed, 40px);
+  overflow: visible;
+}
+
+.app-hub-showcase-block {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.showcase-block__shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Header : onglets + menu actions sur la même ligne, actions à droite */
+.showcase-header {
+  flex: 0 0 var(--showcase-hub-tab-h, 16px);
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: var(--showcase-hub-tab-h, 16px);
+  max-height: var(--showcase-hub-tab-h, 16px);
+  overflow: visible;
+  position: relative;
+  z-index: 6;
+}
+
+.showcase-header-tabs {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: auto;
+  overflow: hidden;
+}
+
+.showcase-header-actions {
+  flex: 0 0 var(--panel-action-menu-w, 26px);
+  margin-left: auto;
+  pointer-events: auto;
+  z-index: 8;
+}
+
+.app-showcase-band {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:host(.is-showcase-collapsed) .app-showcase-band.is-collapsed {
+  flex: 0 0 var(--showcase-smart-bar-h, 24px);
+  height: var(--showcase-smart-bar-h, 24px);
+  max-height: var(--showcase-smart-bar-h, 24px);
+  overflow: visible;
+}

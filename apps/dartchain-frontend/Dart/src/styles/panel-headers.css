@@ -1,0 +1,81 @@
+/**
+ * Headers showcase / dock — onglets + menu actions sur une seule ligne.
+ * Styles globaux (les panneaux sont hors de l’encapsulation app.css).
+ */
+
+.showcase-header,
+.app-hub-showcase-block .showcase-header,
+.app-bottom-stack .showcase-header {
+  display: flex !important;
+  flex-flow: row nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: var(--showcase-hub-tab-h, var(--ds-zone-showcase-header, 16px));
+  min-height: var(--showcase-hub-tab-h, var(--ds-zone-showcase-header, 16px));
+  max-height: var(--showcase-hub-tab-h, var(--ds-zone-showcase-header, 16px));
+  gap: 0;
+  box-sizing: border-box;
+  overflow: visible;
+  position: relative;
+  z-index: 6;
+}
+
+.showcase-header-tabs {
+  flex: 1 1 0% !important;
+  display: flex !important;
+  align-items: center;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 100%;
+  overflow: hidden;
+}
+
+.showcase-header-tabs app-showcase-tabs,
+.showcase-header-tabs .showcase-tabs,
+.showcase-header-tabs .app-bottom-stack__tabs {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 100%;
+}
+
+.showcase-header-actions {
+  position: relative;
+  z-index: 8;
+  flex: 0 0 var(--panel-action-menu-w, 26px) !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-end;
+  align-self: center;
+  width: var(--panel-action-menu-w, 26px) !important;
+  min-width: var(--panel-action-menu-w, 26px) !important;
+  max-width: var(--panel-action-menu-w, 26px) !important;
+  height: var(--panel-action-menu-h, 7px);
+  min-height: var(--panel-action-menu-h, 7px);
+  max-height: var(--panel-action-menu-h, 7px);
+  margin: 0 0 0 auto;
+  padding: 0;
+  pointer-events: auto !important;
+}
+
+.showcase-header-actions app-collapsed-bar-actions {
+  --cba-h: var(--panel-action-menu-h, 7px);
+  --cba-item-w: var(--panel-action-item-w, 11px);
+  --cba-menu-w: var(--panel-action-menu-w, 26px);
+  display: inline-flex;
+  width: var(--panel-action-menu-w, 26px);
+  min-width: var(--panel-action-menu-w, 26px);
+  max-width: var(--panel-action-menu-w, 26px);
+  height: var(--panel-action-menu-h, 7px);
+  min-height: var(--panel-action-menu-h, 7px);
+  max-height: var(--panel-action-menu-h, 7px);
+  margin: 0;
+  pointer-events: auto !important;
+}

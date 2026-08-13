@@ -1,0 +1,158 @@
+<section
+  class="app-bottom-stack"
+  [class.is-dock-collapsed]="dockCollapsed"
+  aria-label="Dock navigation"
+>
+  <div class="showcase-block__shell bottom-stack__shell ds-surface ds-surface--card">
+    <header
+      class="showcase-header showcase-header--tabs app-bottom-stack__header"
+      aria-label="Navigation principale"
+    >
+      <div class="showcase-header-tabs">
+        <nav class="showcase-tabs app-bottom-stack__tabs" role="tablist">
+          <button
+            type="button"
+            class="showcase-tab ds-surface ds-surface--showcase-tab"
+            role="tab"
+            [attr.aria-selected]="activeTab === 'wallet'"
+            [class.is-active]="activeTab === 'wallet'"
+            (click)="tabChange.emit('wallet')"
+          >
+            <span class="showcase-tab__label">{{ locale.t('dock.wallet') }}</span>
+          </button>
+          @if (product.faucetEnabled) {
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeTab === 'faucet'"
+              [class.is-active]="activeTab === 'faucet'"
+              (click)="tabChange.emit('faucet')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('dock.faucet') }}</span>
+            </button>
+          }
+          <button
+            type="button"
+            class="showcase-tab showcase-tab--mempool ds-surface ds-surface--showcase-tab"
+            role="tab"
+            [attr.aria-selected]="activeTab === 'transactions'"
+            [class.is-active]="activeTab === 'transactions'"
+            (click)="tabChange.emit('transactions')"
+          >
+            <span class="showcase-tab__label">{{ locale.t('dock.transactions') }}</span>
+          </button>
+          <button
+            type="button"
+            class="showcase-tab ds-surface ds-surface--showcase-tab"
+            role="tab"
+            [attr.aria-selected]="activeTab === 'chain'"
+            [class.is-active]="activeTab === 'chain'"
+            (click)="tabChange.emit('chain')"
+          >
+            <span class="showcase-tab__label">{{ locale.t('chain.title') }}</span>
+          </button>
+          <button
+            type="button"
+            class="showcase-tab ds-surface ds-surface--showcase-tab"
+            role="tab"
+            [attr.aria-selected]="activeTab === 'quests'"
+            [class.is-active]="activeTab === 'quests'"
+            (click)="tabChange.emit('quests')"
+          >
+            <span class="showcase-tab__label">{{ locale.t('dock.quests') }}</span>
+          </button>
+          <button
+            type="button"
+            class="showcase-tab ds-surface ds-surface--showcase-tab"
+            role="tab"
+            [attr.aria-selected]="activeTab === 'peers'"
+            [class.is-active]="activeTab === 'peers'"
+            (click)="tabChange.emit('peers')"
+          >
+            <span class="showcase-tab__label">{{ locale.t('dock.peers') }}</span>
+          </button>
+          @if (auth.isAdmin()) {
+            <button
+              type="button"
+              class="showcase-tab ds-surface ds-surface--showcase-tab"
+              role="tab"
+              [attr.aria-selected]="activeTab === 'admin'"
+              [class.is-active]="activeTab === 'admin'"
+              (click)="tabChange.emit('admin')"
+            >
+              <span class="showcase-tab__label">{{ locale.t('dock.admin') }}</span>
+            </button>
+          }
+        </nav>
+      </div>
+      <div class="showcase-header-actions">
+        <app-collapsed-bar-actions
+          [collapsed]="dockCollapsed"
+          [collapseAriaLabel]="collapseAriaLabel"
+          refreshAriaLabel="Actualiser le dock"
+          [refreshBusy]="refreshBusy"
+          (refresh)="refresh.emit($event)"
+          (collapseToggle)="collapseToggle.emit()"
+        />
+      </div>
+    </header>
+
+    <div
+      class="app-bottom-stack__content app-bottom-stack__band"
+      [class.is-collapsed]="dockCollapsed"
+      [class.is-smart-collapsed]="dockCollapsed"
+      [class.is-summary-expandable]="dockCollapsed"
+      [attr.data-active-tab]="activeTab"
+      (click)="onContentClick()"
+    >
+      @if (dockCollapsed) {
+        <div class="app-bottom-stack__summary">
+          <app-dock-bottom-summary [activeTab]="activeTab" />
+        </div>
+      } @else {
+        @switch (activeTab) {
+          @case ('wallet') {
+            <div class="app-bottom-stack__panel">
+              <app-wallet-panel />
+            </div>
+          }
+          @case ('faucet') {
+            @if (product.faucetEnabled) {
+              <div class="app-bottom-stack__panel app-bottom-stack__panel--faucet">
+                <app-faucet />
+              </div>
+            }
+          }
+          @case ('transactions') {
+            <div class="app-bottom-stack__panel app-bottom-stack__panel--transactions">
+              <app-transactions-dock />
+            </div>
+          }
+          @case ('chain') {
+            <div class="app-bottom-stack__panel app-bottom-stack__panel--chain">
+              <app-blocks-list (selectBlock)="selectBlock.emit($event)" />
+            </div>
+          }
+          @case ('quests') {
+            <div class="app-bottom-stack__panel app-bottom-stack__panel--quests">
+              <app-quests-panel />
+            </div>
+          }
+          @case ('peers') {
+            <div class="app-bottom-stack__panel app-bottom-stack__panel--peers">
+              <app-peer-panel />
+            </div>
+          }
+          @case ('admin') {
+            @if (auth.isAdmin()) {
+              <div class="app-bottom-stack__panel app-bottom-stack__panel--admin">
+                <app-admin-panel />
+              </div>
+            }
+          }
+        }
+      }
+    </div>
+  </div>
+</section>
