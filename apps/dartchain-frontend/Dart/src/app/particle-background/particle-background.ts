@@ -103,6 +103,8 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private readonly worldPos = new THREE.Vector3();
   private readonly projected = new THREE.Vector3();
   private lastFrameMs = 0;
+  /** Accu sim particules : ~30 Hz idle (rendu reste 60 Hz). */
+  private conquestSimAccMs = 0;
   private pointerActive = false;
   private focusedId: string | null = null;
   private hoverPreviewId: string | null = null;
@@ -155,17 +157,13 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.renderer.setClearColor(0x000000, 0);
       this.renderer.autoClear = true;
 
-      console.log('[BACKGROUND] Active Angular component:', this.constructor.name);
-      console.log(
-        '[BACKGROUND] Renderer alpha:',
-        this.renderer.getContextAttributes()?.alpha
-      );
-      console.log('[BACKGROUND] Scene fog:', this.scene.fog);
-      console.log('[BACKGROUND] Scene background:', this.scene.background);
-      console.log(
-        '[BACKGROUND] Canvas computed background:',
-        getComputedStyle(created.canvas).backgroundColor
-      );
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('PERF_DEBUG') === '1') {
+        console.log('[BACKGROUND] Active Angular component:', this.constructor.name);
+        console.log(
+          '[BACKGROUND] Renderer alpha:',
+          this.renderer.getContextAttributes()?.alpha
+        );
+      }
 
       applyCanvasLayerStyles(created.canvas, 'background');
       created.canvas.style.pointerEvents = 'auto';
@@ -968,7 +966,17 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         }
       }
       if (this.conquest) {
-        this.conquest.tick(delta, this.camera);
+        // Navigation stick : sim pleine ; idle : ~30 Hz (même look, moins CPU)
+        if (this.conquestState.worldNavigating()) {
+          this.conquest.tick(delta, this.camera);
+          this.conquestSimAccMs = 0;
+        } else {
+          this.conquestSimAccMs += delta;
+          if (this.conquestSimAccMs >= 33.3) {
+            this.conquest.tick(this.conquestSimAccMs, this.camera);
+            this.conquestSimAccMs = 0;
+          }
+        }
       }
       if (this.focusedId && this.conquestState.selected()) {
         this.syncPanelAnchor();

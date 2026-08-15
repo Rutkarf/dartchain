@@ -19,11 +19,28 @@ export interface RunnerCollider {
   maxY: number;
 }
 
+interface BuildingSpec {
+  bucket: number;
+  sideX: number;
+  progress: number;
+  w: number;
+  h: number;
+  d: number;
+  hasAccent: boolean;
+}
+
+interface LampSpec {
+  sideX: number;
+  progress: number;
+}
+
 interface ActiveSegment {
   index: number;
   startProgress: number;
   group: THREE.Group;
   colliders: RunnerCollider[];
+  buildings: BuildingSpec[];
+  lamps: LampSpec[];
 }
 
 /**
@@ -71,7 +88,7 @@ export class RunnerWorldService {
     new THREE.MeshLambertMaterial({ color: 0x52e6ed })
   );
   private readonly bulbMat = this.sharedMat(
-    new THREE.MeshStandardMaterial({
+    new THREE.MeshLambertMaterial({
       color: 0xffe6a8,
       emissive: 0xffc878,
       emissiveIntensity: 0.9,
@@ -79,13 +96,29 @@ export class RunnerWorldService {
   );
   private readonly wallMats = new Map<number, THREE.MeshLambertMaterial>();
   private readonly rainbowTextures = new Map<number, THREE.CanvasTexture>();
+  /** Boîte unitaire partagée — scale par mesh (moins de géométries GPU). */
+  private readonly unitBoxGeo = this.sharedGeo(new THREE.BoxGeometry(1, 1, 1));
+  private readonly railBoxGeo = this.sharedGeo(
+    new THREE.BoxGeometry(0.12, 0.35, RUNNER_CONFIG.segmentLength * 0.92)
+  );
   private readonly poleGeo = this.sharedGeo(new THREE.CylinderGeometry(0.04, 0.05, 1.6, 6));
-  private readonly bulbGeo = this.sharedGeo(new THREE.SphereGeometry(0.12, 8, 8));
+  private readonly bulbGeo = this.sharedGeo(new THREE.SphereGeometry(0.12, 6, 6));
   private readonly accentGeo = this.sharedGeo(
-    new THREE.CylinderGeometry(0.06, 0.06, 1.2, 6)
+    new THREE.CylinderGeometry(0.06, 0.06, 1.2, 5)
   );
 
   private horizonGroup: THREE.Group | null = null;
+  /** Couche InstancedMesh partagée (bâtiments / lampes) — 1 draw call / bucket. */
+  private instanceLayer: THREE.Group | null = null;
+  private readonly bodyInstances: THREE.InstancedMesh[] = [];
+  private readonly roofInstances: THREE.InstancedMesh[] = [];
+  private accentInstances: THREE.InstancedMesh | null = null;
+  private lampPoleInstances: THREE.InstancedMesh | null = null;
+  private lampBulbInstances: THREE.InstancedMesh | null = null;
+  private readonly instanceDummy = new THREE.Object3D();
+  private static readonly MAX_PER_BUCKET = 32;
+  private static readonly MAX_ACCENT = 48;
+  private static readonly MAX_LAMP = 48;
 
   /** Monte le monde runner (remplace l’ancienne ville fixe). */
   start(scene: THREE.Scene): void {
@@ -97,11 +130,13 @@ export class RunnerWorldService {
     scene.add(this.root);
 
     this.createHorizonWallAndLadder();
+    this.createInstanceLayer();
 
     for (let i = -RUNNER_CONFIG.segmentsBehind; i <= RUNNER_CONFIG.segmentsAhead; i++) {
       this.spawnSegment(i);
     }
     this.rebuildColliderCache();
+    this.syncBuildingInstances();
     this.lastSegmentIdx = 0;
   }
 
@@ -132,7 +167,10 @@ export class RunnerWorldService {
         changed = true;
       }
     }
-    if (changed) this.rebuildColliderCache();
+    if (changed) {
+      this.rebuildColliderCache();
+      this.syncBuildingInstances();
+    }
   }
 
   getWallColliders(): readonly RunnerCollider[] {
@@ -171,6 +209,7 @@ export class RunnerWorldService {
       const g = this.pool.pop()!;
       disposeObject3D(g);
     }
+    this.disposeInstanceLayer();
     if (this.horizonGroup) {
       this.root?.remove(this.horizonGroup);
       disposeObject3D(this.horizonGroup);
@@ -185,6 +224,166 @@ export class RunnerWorldService {
     this.scene = null;
     this.lastSegmentIdx = Number.NaN;
     // Matériaux / géométries partagés : conservés (service root singleton)
+  }
+
+  private createInstanceLayer(): void {
+    if (!this.root) return;
+    const layer = new THREE.Group();
+    layer.name = 'runner-building-instances';
+    this.bodyInstances.length = 0;
+    this.roofInstances.length = 0;
+
+    for (let b = 0; b < 12; b++) {
+      const body = new THREE.InstancedMesh(
+        this.unitBoxGeo,
+        this.rainbowWallMat(b),
+        RunnerWorldService.MAX_PER_BUCKET
+      );
+      body.name = `runner-body-${b}`;
+      body.count = 0;
+      body.frustumCulled = true;
+      body.castShadow = false;
+      body.receiveShadow = false;
+      layer.add(body);
+      this.bodyInstances.push(body);
+
+      const roof = new THREE.InstancedMesh(
+        this.unitBoxGeo,
+        this.rainbowRoofMat(b),
+        RunnerWorldService.MAX_PER_BUCKET
+      );
+      roof.name = `runner-roof-${b}`;
+      roof.count = 0;
+      roof.frustumCulled = true;
+      roof.castShadow = false;
+      roof.receiveShadow = false;
+      layer.add(roof);
+      this.roofInstances.push(roof);
+    }
+
+    this.accentInstances = new THREE.InstancedMesh(
+      this.accentGeo,
+      this.accentMat,
+      RunnerWorldService.MAX_ACCENT
+    );
+    this.accentInstances.name = 'runner-accents';
+    this.accentInstances.count = 0;
+    this.accentInstances.frustumCulled = true;
+    layer.add(this.accentInstances);
+
+    this.lampPoleInstances = new THREE.InstancedMesh(
+      this.poleGeo,
+      this.railMat,
+      RunnerWorldService.MAX_LAMP
+    );
+    this.lampPoleInstances.name = 'runner-lamp-poles';
+    this.lampPoleInstances.count = 0;
+    this.lampPoleInstances.frustumCulled = true;
+    layer.add(this.lampPoleInstances);
+
+    this.lampBulbInstances = new THREE.InstancedMesh(
+      this.bulbGeo,
+      this.bulbMat,
+      RunnerWorldService.MAX_LAMP
+    );
+    this.lampBulbInstances.name = 'runner-lamp-bulbs';
+    this.lampBulbInstances.count = 0;
+    this.lampBulbInstances.frustumCulled = true;
+    layer.add(this.lampBulbInstances);
+
+    this.root.add(layer);
+    this.instanceLayer = layer;
+  }
+
+  private disposeInstanceLayer(): void {
+    if (!this.instanceLayer) return;
+    this.root?.remove(this.instanceLayer);
+    // Géos/mats partagés : ne pas dispose — juste retirer du graphe
+    this.instanceLayer.clear();
+    this.instanceLayer = null;
+    this.bodyInstances.length = 0;
+    this.roofInstances.length = 0;
+    this.accentInstances = null;
+    this.lampPoleInstances = null;
+    this.lampBulbInstances = null;
+  }
+
+  /** Reconstruit les matrices InstancedMesh depuis les specs des segments actifs. */
+  private syncBuildingInstances(): void {
+    if (!this.instanceLayer) return;
+    const bodyCounts = new Array(12).fill(0) as number[];
+    const roofCounts = new Array(12).fill(0) as number[];
+    let accentCount = 0;
+    let lampCount = 0;
+    const dummy = this.instanceDummy;
+
+    for (const seg of this.active.values()) {
+      for (const b of seg.buildings) {
+        const bucket = ((b.bucket % 12) + 12) % 12;
+        const bi = bodyCounts[bucket];
+        if (bi < RunnerWorldService.MAX_PER_BUCKET) {
+          dummy.position.set(b.sideX, 0.02 + b.h * 0.5, -b.progress);
+          dummy.quaternion.identity();
+          dummy.scale.set(b.w, b.h, b.d);
+          dummy.updateMatrix();
+          this.bodyInstances[bucket].setMatrixAt(bi, dummy.matrix);
+          bodyCounts[bucket] = bi + 1;
+        }
+        const ri = roofCounts[bucket];
+        if (ri < RunnerWorldService.MAX_PER_BUCKET) {
+          dummy.position.set(b.sideX, 0.02 + b.h + 0.09, -b.progress);
+          dummy.quaternion.identity();
+          dummy.scale.set(b.w * 1.02, 0.18, b.d * 1.02);
+          dummy.updateMatrix();
+          this.roofInstances[bucket].setMatrixAt(ri, dummy.matrix);
+          roofCounts[bucket] = ri + 1;
+        }
+        if (b.hasAccent && this.accentInstances && accentCount < RunnerWorldService.MAX_ACCENT) {
+          dummy.position.set(b.sideX, 0.02 + b.h + 0.85, -b.progress);
+          dummy.quaternion.identity();
+          dummy.scale.set(1, 1, 1);
+          dummy.updateMatrix();
+          this.accentInstances.setMatrixAt(accentCount, dummy.matrix);
+          accentCount++;
+        }
+      }
+      for (const lamp of seg.lamps) {
+        if (
+          !this.lampPoleInstances ||
+          !this.lampBulbInstances ||
+          lampCount >= RunnerWorldService.MAX_LAMP
+        ) {
+          break;
+        }
+        dummy.position.set(lamp.sideX, 0.02 + 0.8, -lamp.progress);
+        dummy.quaternion.identity();
+        dummy.scale.set(1, 1, 1);
+        dummy.updateMatrix();
+        this.lampPoleInstances.setMatrixAt(lampCount, dummy.matrix);
+
+        dummy.position.set(lamp.sideX, 0.02 + 1.65, -lamp.progress);
+        dummy.updateMatrix();
+        this.lampBulbInstances.setMatrixAt(lampCount, dummy.matrix);
+        lampCount++;
+      }
+    }
+
+    for (let i = 0; i < 12; i++) {
+      this.bodyInstances[i].count = bodyCounts[i];
+      this.bodyInstances[i].instanceMatrix.needsUpdate = true;
+      this.roofInstances[i].count = roofCounts[i];
+      this.roofInstances[i].instanceMatrix.needsUpdate = true;
+    }
+    if (this.accentInstances) {
+      this.accentInstances.count = accentCount;
+      this.accentInstances.instanceMatrix.needsUpdate = true;
+    }
+    if (this.lampPoleInstances && this.lampBulbInstances) {
+      this.lampPoleInstances.count = lampCount;
+      this.lampPoleInstances.instanceMatrix.needsUpdate = true;
+      this.lampBulbInstances.count = lampCount;
+      this.lampBulbInstances.instanceMatrix.needsUpdate = true;
+    }
   }
 
   private sharedMat<T extends THREE.Material>(mat: T): T {
@@ -292,7 +491,7 @@ export class RunnerWorldService {
   }
 
   /**
-   * Mur + échelle à Z = ladderZ (floor plat) + marqueur stop zone.
+   * Mur + échelle à Z = ladderZ — Lambert + géométries fusionnées (même look, moins de draw calls).
    */
   private createHorizonWallAndLadder(): void {
     if (!this.root) return;
@@ -302,59 +501,79 @@ export class RunnerWorldService {
     group.name = 'horizon-wall-ladder';
     group.position.set(0, 0, ladderZ);
 
-    const wallMat = new THREE.MeshStandardMaterial({
-      color: 0x1a2840,
-      roughness: 0.3,
-      metalness: 0.9,
-      emissive: 0x001133,
-      emissiveIntensity: 0.35,
-      side: THREE.DoubleSide,
-    });
-    const wall = new THREE.Mesh(new THREE.PlaneGeometry(22, 16), wallMat);
+    const wallMat = this.sharedMat(
+      new THREE.MeshLambertMaterial({
+        color: 0x1a2840,
+        emissive: 0x001133,
+        emissiveIntensity: 0.35,
+        side: THREE.DoubleSide,
+      })
+    );
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(22, 16, 1, 1), wallMat);
     wall.position.set(0, 8, 0);
-    wall.receiveShadow = true;
+    wall.receiveShadow = false;
+    wall.castShadow = false;
     group.add(wall);
 
-    const skirting = new THREE.Mesh(
-      new THREE.BoxGeometry(22, 0.35, 0.4),
-      new THREE.MeshStandardMaterial({
+    const skirtingMat = this.sharedMat(
+      new THREE.MeshLambertMaterial({
         color: 0x00ffff,
         emissive: 0x0088ff,
         emissiveIntensity: 0.6,
-        metalness: 0.85,
-        roughness: 0.2,
       })
     );
+    const skirting = new THREE.Mesh(new THREE.BoxGeometry(22, 0.35, 0.4), skirtingMat);
     skirting.position.set(0, 0.2, 0.15);
     group.add(skirting);
 
-    const metal = new THREE.MeshStandardMaterial({
-      color: 0x00ffff,
-      metalness: 0.85,
-      roughness: 0.2,
-      emissive: 0x0088ff,
-      emissiveIntensity: 0.55,
-    });
-    const poleGeo = new THREE.CylinderGeometry(0.07, 0.07, 12, 8);
-    const left = new THREE.Mesh(poleGeo, metal);
-    left.position.set(-0.45, 6.2, 0.12);
-    const right = new THREE.Mesh(poleGeo, metal);
-    right.position.set(0.45, 6.2, 0.12);
-    group.add(left, right);
+    const metal = this.sharedMat(
+      new THREE.MeshLambertMaterial({
+        color: 0x00ffff,
+        emissive: 0x0088ff,
+        emissiveIntensity: 0.55,
+      })
+    );
 
-    const rungGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.95, 6);
-    for (let i = 0; i < 11; i++) {
-      const rung = new THREE.Mesh(rungGeo, metal);
-      rung.position.set(0, 1.2 + i * 1.05, 0.12);
-      rung.rotation.z = Math.PI / 2;
-      group.add(rung);
+    // Poteaux + barreaux → InstancedMesh (1 draw call, même rendu)
+    const rungCount = 11;
+    const ladderParts = new THREE.InstancedMesh(
+      new THREE.CylinderGeometry(0.05, 0.05, 0.95, 6),
+      metal,
+      rungCount + 2
+    );
+    ladderParts.name = 'ladder-instanced';
+    ladderParts.instanceMatrix.setUsage(THREE.StaticDrawUsage);
+    ladderParts.frustumCulled = true;
+    const dummy = new THREE.Object3D();
+
+    // Poteaux (cylindre vertical — scale Y pour hauteur 12 / geo 0.95)
+    const poleScaleY = 12 / 0.95;
+    const poleRadiusScale = 0.07 / 0.05;
+    dummy.position.set(-0.45, 6.2, 0.12);
+    dummy.rotation.set(0, 0, 0);
+    dummy.scale.set(poleRadiusScale, poleScaleY, poleRadiusScale);
+    dummy.updateMatrix();
+    ladderParts.setMatrixAt(0, dummy.matrix);
+
+    dummy.position.set(0.45, 6.2, 0.12);
+    dummy.updateMatrix();
+    ladderParts.setMatrixAt(1, dummy.matrix);
+
+    for (let i = 0; i < rungCount; i++) {
+      dummy.position.set(0, 1.2 + i * 1.05, 0.12);
+      dummy.rotation.set(0, 0, Math.PI / 2);
+      dummy.scale.set(1, 1, 1);
+      dummy.updateMatrix();
+      ladderParts.setMatrixAt(2 + i, dummy.matrix);
     }
+    ladderParts.instanceMatrix.needsUpdate = true;
+    group.add(ladderParts);
 
     this.root.add(group);
     this.horizonGroup = group;
 
     const stopMarker = new THREE.Mesh(
-      new THREE.RingGeometry(0.8, 1.0, 32),
+      new THREE.RingGeometry(0.8, 1.0, 16),
       new THREE.MeshBasicMaterial({
         color: 0x00ff00,
         transparent: true,
@@ -366,6 +585,7 @@ export class RunnerWorldService {
     stopMarker.name = 'ladder-stop-marker';
     stopMarker.rotation.x = -Math.PI / 2;
     stopMarker.position.set(0, 0.05, RUNNER_CONFIG.ladderStopZ);
+    stopMarker.frustumCulled = true;
     this.root.add(stopMarker);
   }
 
@@ -377,11 +597,13 @@ export class RunnerWorldService {
     group.name = `runner-seg-${index}`;
 
     const colliders: RunnerCollider[] = [];
+    const buildings: BuildingSpec[] = [];
+    const lamps: LampSpec[] = [];
     this.buildRoad(group, start, colliders);
-    this.buildSideBuildings(group, start, index, colliders);
+    this.buildSideBuildings(group, start, index, colliders, buildings, lamps);
 
     this.root.add(group);
-    this.active.set(index, { index, startProgress: start, group, colliders });
+    this.active.set(index, { index, startProgress: start, group, colliders, buildings, lamps });
   }
 
   private recycleSegment(seg: ActiveSegment, keepPool = true): void {
@@ -413,7 +635,7 @@ export class RunnerWorldService {
   ): void {
     const len = RUNNER_CONFIG.segmentLength;
     const halfW = (RUNNER_CONFIG.laneWidth * 3) / 2 + 0.15;
-    const steps = 10;
+    const steps = 8;
     const positions: number[] = [];
     const normals: number[] = [];
     const indices: number[] = [];
@@ -461,20 +683,20 @@ export class RunnerWorldService {
   ): void {
     pathFrameAt(start + len * 0.5, sideX, this.tmpFrame);
     const mid = this.tmpFrame;
-    const rail = new THREE.Mesh(
-      new THREE.BoxGeometry(0.12, 0.35, len * 0.92),
-      this.railMat
-    );
+    const rail = new THREE.Mesh(this.railBoxGeo, this.railMat);
     rail.position.copy(mid.position).addScaledVector(mid.up, 0.18);
     rail.quaternion.copy(mid.quaternion);
+    rail.frustumCulled = true;
     group.add(rail);
   }
 
   private buildSideBuildings(
-    group: THREE.Group,
+    _group: THREE.Group,
     start: number,
     index: number,
-    colliders: RunnerCollider[]
+    colliders: RunnerCollider[],
+    buildings: BuildingSpec[],
+    lamps: LampSpec[]
   ): void {
     const localRng = createSeededRng(RUNNER_CONFIG.seed + index * 9973);
     const pattern = index % 5;
@@ -495,35 +717,35 @@ export class RunnerWorldService {
     }
 
     if (placeLeft) {
-      this.placeBuilding(group, midP, -side, color, index, colliders, localRng);
+      this.placeBuilding(midP, -side, color, index, colliders, buildings, localRng);
     }
     if (placeRight) {
-      this.placeBuilding(group, midP, side, color, index + 1, colliders, localRng);
+      this.placeBuilding(midP, side, color, index + 1, colliders, buildings, localRng);
     }
 
     if (localRng() > 0.55) {
       this.placeLamp(
-        group,
         start + lenFrac(localRng) * RUNNER_CONFIG.segmentLength,
-        -side * 0.72
+        -side * 0.72,
+        lamps
       );
     }
     if (localRng() > 0.55) {
       this.placeLamp(
-        group,
         start + lenFrac(localRng) * RUNNER_CONFIG.segmentLength,
-        side * 0.72
+        side * 0.72,
+        lamps
       );
     }
   }
 
   private placeBuilding(
-    group: THREE.Group,
     progress: number,
     sideX: number,
     _color: number,
     variant: number,
     colliders: RunnerCollider[],
+    buildings: BuildingSpec[],
     rng: () => number
   ): void {
     const w = 2.8 + rng() * 2.4;
@@ -532,30 +754,16 @@ export class RunnerWorldService {
 
     // Chaque bâtiment : variante arc-en-ciel (hue shift déterministe)
     const rainbowBucket = Math.abs(variant * 3 + Math.floor(rng() * 12)) % 12;
-    const wallMat = this.rainbowWallMat(rainbowBucket);
-    const roofMat = this.rainbowRoofMat(rainbowBucket);
 
-    const building = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
-    body.position.y = h / 2;
-    building.add(body);
-
-    const roof = new THREE.Mesh(
-      new THREE.BoxGeometry(w * 1.02, 0.18, d * 1.02),
-      roofMat
-    );
-    roof.position.y = h + 0.09;
-    building.add(roof);
-
-    if (variant % 3 === 0) {
-      const accent = new THREE.Mesh(this.accentGeo, this.accentMat);
-      accent.position.y = h + 0.85;
-      building.add(accent);
-    }
-
-    building.position.set(sideX, 0.02, -progress);
-    building.quaternion.identity();
-    group.add(building);
+    buildings.push({
+      bucket: rainbowBucket,
+      sideX,
+      progress,
+      w,
+      h,
+      d,
+      hasAccent: variant % 3 === 0,
+    });
 
     // Collider AABB précalculé (pas de setFromObject chaque frame)
     const halfW = w * 0.5;
@@ -570,15 +778,8 @@ export class RunnerWorldService {
     });
   }
 
-  private placeLamp(group: THREE.Group, progress: number, sideX: number): void {
-    const lamp = new THREE.Group();
-    const pole = new THREE.Mesh(this.poleGeo, this.railMat);
-    pole.position.y = 0.8;
-    const bulb = new THREE.Mesh(this.bulbGeo, this.bulbMat);
-    bulb.position.y = 1.65;
-    lamp.add(pole, bulb);
-    lamp.position.set(sideX, 0.02, -progress);
-    group.add(lamp);
+  private placeLamp(progress: number, sideX: number, lamps: LampSpec[]): void {
+    lamps.push({ sideX, progress });
   }
 
   private particleColors(): number[] {

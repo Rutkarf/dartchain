@@ -141,10 +141,15 @@ export class QuestsPanelComponent implements OnDestroy {
 
   constructor() {
     this.questsData.init();
-    this.destroyRef.onDestroy(() => this.questsData.destroy());
+    this.questsData.resumePolling();
+    this.destroyRef.onDestroy(() => {
+      this.questsData.pausePolling();
+      this.questsData.destroy();
+    });
   }
 
   ngOnDestroy(): void {
+    this.questsData.pausePolling();
     this.questsData.destroy();
   }
 

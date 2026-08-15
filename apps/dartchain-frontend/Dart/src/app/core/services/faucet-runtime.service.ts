@@ -604,15 +604,18 @@ export class FaucetRuntimeService {
     }
     if (this.visualTimerId !== null) {
       window.clearInterval(this.visualTimerId);
+      this.visualTimerId = null;
     }
 
+    let visualAccMs = 0;
     this.tickTimerId = window.setInterval(() => {
       this.syncCooldownFromTimestamp();
+      visualAccMs += FaucetRuntimeService.COOLDOWN_TICK_MS;
+      if (visualAccMs >= FaucetRuntimeService.VISUAL_TICK_MS) {
+        visualAccMs = 0;
+        this.incrementDisplayValue();
+      }
     }, FaucetRuntimeService.COOLDOWN_TICK_MS);
-
-    this.visualTimerId = window.setInterval(() => {
-      this.incrementDisplayValue();
-    }, FaucetRuntimeService.VISUAL_TICK_MS);
   }
 
   private resolveClaimAmount(): string {

@@ -63,13 +63,12 @@ export interface JoystickVector {
         border-radius: 50%;
         background: radial-gradient(
           circle at 35% 30%,
-          rgba(255, 255, 255, 0.22),
-          rgba(20, 28, 36, 0.45) 55%,
-          rgba(8, 12, 18, 0.55)
+          rgba(255, 255, 255, 0.28),
+          rgba(20, 28, 36, 0.72) 55%,
+          rgba(8, 12, 18, 0.82)
         );
         border: 1px solid rgba(0, 180, 220, 0.45);
         box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.12);
-        backdrop-filter: blur(6px);
       }
       .vj-knob {
         position: absolute;

@@ -600,40 +600,36 @@ export class CharacterNftService {
     const root = new THREE.Group();
     root.name = 'walk-rig';
 
-    const bodyMat = new THREE.MeshStandardMaterial({
+    const bodyMat = new THREE.MeshLambertMaterial({
       color: 0xffffff,
       emissive: 0xff2d9a,
       emissiveIntensity: 0.55,
-      roughness: 0.45,
-      metalness: 0.15,
     });
-    const headMat = new THREE.MeshStandardMaterial({
+    const headMat = new THREE.MeshLambertMaterial({
       color: 0xffffff,
       emissive: 0xff66b3,
       emissiveIntensity: 0.5,
-      roughness: 0.4,
-      metalness: 0.12,
     });
 
     const torsoBaseY = 1.5;
     const torso = new THREE.Group();
     torso.position.y = torsoBaseY;
     const torsoMesh = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.4, 1.0, 8, 16),
-      bodyMat.clone()
+      new THREE.CapsuleGeometry(0.4, 1.0, 4, 8),
+      bodyMat
     );
     torso.add(torsoMesh);
 
     const headBaseY = 0.95;
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), headMat);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 10, 10), headMat);
     head.position.y = headBaseY;
     torso.add(head);
 
-    const armGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.7, 12);
+    const armGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.7, 8);
     const leftArm = new THREE.Group();
     leftArm.position.set(-0.55, 0.45, 0);
     leftArm.rotation.z = THREE.MathUtils.degToRad(4);
-    const leftArmMesh = new THREE.Mesh(armGeo, bodyMat.clone());
+    const leftArmMesh = new THREE.Mesh(armGeo, bodyMat);
     leftArmMesh.position.y = -0.35;
     leftArm.add(leftArmMesh);
     torso.add(leftArm);
@@ -641,22 +637,22 @@ export class CharacterNftService {
     const rightArm = new THREE.Group();
     rightArm.position.set(0.55, 0.45, 0);
     rightArm.rotation.z = THREE.MathUtils.degToRad(-4);
-    const rightArmMesh = new THREE.Mesh(armGeo, bodyMat.clone());
+    const rightArmMesh = new THREE.Mesh(armGeo, bodyMat);
     rightArmMesh.position.y = -0.35;
     rightArm.add(rightArmMesh);
     torso.add(rightArm);
 
-    const legGeo = new THREE.CylinderGeometry(0.14, 0.12, 0.85, 12);
+    const legGeo = new THREE.CylinderGeometry(0.14, 0.12, 0.85, 8);
     const leftLeg = new THREE.Group();
     leftLeg.position.set(-0.25, -0.55, 0);
-    const leftLegMesh = new THREE.Mesh(legGeo, bodyMat.clone());
+    const leftLegMesh = new THREE.Mesh(legGeo, bodyMat);
     leftLegMesh.position.y = -0.4;
     leftLeg.add(leftLegMesh);
     torso.add(leftLeg);
 
     const rightLeg = new THREE.Group();
     rightLeg.position.set(0.25, -0.55, 0);
-    const rightLegMesh = new THREE.Mesh(legGeo, bodyMat.clone());
+    const rightLegMesh = new THREE.Mesh(legGeo, bodyMat);
     rightLegMesh.position.y = -0.4;
     rightLeg.add(rightLegMesh);
     torso.add(rightLeg);
@@ -778,48 +774,44 @@ export class CharacterNftService {
     throw lastError ?? new Error('CharacterAnon.fbx introuvable');
   }
 
+  private fbxBodyMat: THREE.MeshLambertMaterial | null = null;
+
   private prepareFbxMaterials(root: THREE.Object3D): void {
+    // Un seul Lambert partagé = même blanc/fuchsia, shader bien plus léger que Standard
+    if (!this.fbxBodyMat) {
+      this.fbxBodyMat = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        emissive: 0xff2d9a,
+        emissiveIntensity: 0.55,
+        side: THREE.FrontSide,
+        transparent: false,
+        opacity: 1,
+        depthWrite: true,
+        depthTest: true,
+      });
+      this.fbxBodyMat.userData['shared'] = true;
+    }
+
     root.visible = true;
     root.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         child.visible = true;
         child.castShadow = false;
         child.receiveShadow = false;
-        child.frustumCulled = false;
-        const mats = Array.isArray(child.material) ? child.material : [child.material];
-        for (const mat of mats) {
-          if (!mat) continue;
-          mat.side = THREE.FrontSide;
-          mat.transparent = false;
-          mat.opacity = 1;
-          mat.depthWrite = true;
-          mat.depthTest = true;
-
-          // Blanc + fuchsia (évite le mesh FBX quasi noir)
-          if ('map' in mat) {
-            const textured = mat as THREE.MeshStandardMaterial;
-            textured.map = null;
-            textured.normalMap = null;
-            textured.roughnessMap = null;
-            textured.metalnessMap = null;
-            textured.emissiveMap = null;
-            textured.aoMap = null;
+        child.frustumCulled = true;
+        const old = child.material;
+        child.material = this.fbxBodyMat!;
+        // Dispose anciens mats FBX (lourds / textures) — pas le shared
+        const oldMats = Array.isArray(old) ? old : old ? [old] : [];
+        for (const m of oldMats) {
+          if (!m || m === this.fbxBodyMat || m.userData?.['shared']) continue;
+          if ('map' in m) {
+            const textured = m as THREE.MeshStandardMaterial;
+            textured.map?.dispose();
+            textured.normalMap?.dispose();
+            textured.emissiveMap?.dispose();
           }
-          if ('color' in mat) {
-            (mat as THREE.MeshStandardMaterial).color?.set(0xffffff);
-          }
-          if ('emissive' in mat) {
-            const std = mat as THREE.MeshStandardMaterial;
-            std.emissive?.set(0xff2d9a);
-            std.emissiveIntensity = 0.55;
-          }
-          if ('metalness' in mat) {
-            (mat as THREE.MeshStandardMaterial).metalness = 0.12;
-          }
-          if ('roughness' in mat) {
-            (mat as THREE.MeshStandardMaterial).roughness = 0.48;
-          }
-          mat.needsUpdate = true;
+          m.dispose();
         }
       }
     });
@@ -856,10 +848,17 @@ export class CharacterNftService {
   private disposeObject(object: THREE.Object3D): void {
     object.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        child.geometry?.dispose();
-        const mat = child.material;
-        if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
-        else mat?.dispose();
+        const geo = child.geometry;
+        if (geo && !geo.userData?.['shared']) geo.dispose();
+        const mats = Array.isArray(child.material)
+          ? child.material
+          : child.material
+            ? [child.material]
+            : [];
+        for (const m of mats) {
+          if (!m || m.userData?.['shared'] || m === this.fbxBodyMat) continue;
+          m.dispose();
+        }
       }
     });
   }

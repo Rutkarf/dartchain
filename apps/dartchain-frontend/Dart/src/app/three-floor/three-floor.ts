@@ -72,7 +72,6 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private animationId?: number;
 
   private neonFloor?: THREE.Mesh;
-  private neonGrid?: THREE.GridHelper;
   private floorTexture?: THREE.CanvasTexture;
   private pathLine?: THREE.Line;
   private animating = false;
@@ -139,7 +138,8 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       fill.castShadow = false;
       this.scene.add(fill);
 
-      const accent = new THREE.PointLight(0x52e6ed, 0.35, 60);
+      // Directional (moins cher qu’un PointLight) — même teinte / direction, intensité calée
+      const accent = new THREE.DirectionalLight(0x52e6ed, 0.28);
       accent.position.set(-8, 6, -10);
       accent.castShadow = false;
       this.scene.add(accent);
@@ -167,17 +167,15 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
 
       if (PERF_DEBUG) console.log('[PERF] Three.js renderer created');
 
-      console.log('[BACKGROUND] Active Angular component:', this.constructor.name);
-      console.log(
-        '[BACKGROUND] Renderer alpha:',
-        this.renderer.getContextAttributes()?.alpha
-      );
-      console.log('[BACKGROUND] Scene fog:', this.scene.fog);
-      console.log('[BACKGROUND] Scene background:', this.scene.background);
-      console.log(
-        '[BACKGROUND] Canvas computed background:',
-        getComputedStyle(canvas).backgroundColor
-      );
+      if (PERF_DEBUG) {
+        console.log('[BACKGROUND] Active Angular component:', this.constructor.name);
+        console.log(
+          '[BACKGROUND] Renderer alpha:',
+          this.renderer.getContextAttributes()?.alpha
+        );
+        console.log('[BACKGROUND] Scene fog:', this.scene.fog);
+        console.log('[BACKGROUND] Scene background:', this.scene.background);
+      }
 
       this.createProfessionalFloor();
       this.createPathLine();
@@ -214,8 +212,8 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * Floor : surface + texture grille dense (maillage serré) sans moiré GridHelper×100.
-   * La densité vient de la texture répétée (contraste doux), pas de milliers de Lines.
+   * Floor : surface + texture grille dense (maillage + accent soft GridHelper bakés).
+   * Un seul mesh — pas de Lines GridHelper (même look, moins de draw calls).
    */
   private createProfessionalFloor(): void {
     if (!this.scene) return;
@@ -247,27 +245,12 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     this.neonFloor = floor;
     this.scene.add(floor);
 
-    // Grille d’accent douce (pas 100 divisions → anti-moiré)
-    const gridHelper = new THREE.GridHelper(100, 50, 0x45b8c8, 0x30495f);
-    gridHelper.position.y = 0.012;
-    gridHelper.name = 'neon-grid';
-    const mats = Array.isArray(gridHelper.material)
-      ? gridHelper.material
-      : [gridHelper.material];
-    for (const m of mats) {
-      m.transparent = true;
-      m.opacity = 0.28;
-      m.depthWrite = false;
-    }
-    this.neonGrid = gridHelper;
-    this.scene.add(gridHelper);
-
     if (PERF_DEBUG) {
-      console.log('[PERF] Floor dense texture+soft grid ready');
+      console.log('[PERF] Floor dense texture (grid baked) ready');
     }
   }
 
-  /** Texture procédurale dense, contraste modéré (évite scintillement). */
+  /** Texture procédurale dense + accent soft (ex-GridHelper 50 div @ opacity 0.28). */
   private createDenseGridTexture(): THREE.CanvasTexture {
     const size = 64;
     const canvas = document.createElement('canvas');
@@ -291,13 +274,24 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       ctx.lineTo(size, p);
       ctx.stroke();
     }
-    // Lignes majeures plus douces
+    // Lignes majeures + soft accent (équivalent GridHelper 0x45b8c8 / 0x30495f @ 0.28)
     ctx.strokeStyle = 'rgba(52, 230, 237, 0.22)';
     ctx.beginPath();
     ctx.moveTo(0.5, 0);
     ctx.lineTo(0.5, size);
     ctx.moveTo(0, 0.5);
     ctx.lineTo(size, 0.5);
+    ctx.stroke();
+    // Bordure soft cyan / slate (1 ligne / tuile ≈ GridHelper 50 div sur 100u @ repeat 48)
+    ctx.strokeStyle = 'rgba(69, 184, 200, 0.28)';
+    ctx.lineWidth = 1.25;
+    ctx.strokeRect(0.5, 0.5, size - 1, size - 1);
+    ctx.strokeStyle = 'rgba(48, 73, 95, 0.28)';
+    ctx.beginPath();
+    ctx.moveTo(size * 0.5 + 0.5, 0);
+    ctx.lineTo(size * 0.5 + 0.5, size);
+    ctx.moveTo(0, size * 0.5 + 0.5);
+    ctx.lineTo(size, size * 0.5 + 0.5);
     ctx.stroke();
     return new THREE.CanvasTexture(canvas);
   }
@@ -337,14 +331,6 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       this.neonFloor.geometry.dispose();
       (this.neonFloor.material as THREE.Material).dispose();
       this.neonFloor = undefined;
-    }
-    if (this.neonGrid) {
-      this.scene?.remove(this.neonGrid);
-      this.neonGrid.geometry.dispose();
-      const mats = this.neonGrid.material;
-      if (Array.isArray(mats)) mats.forEach((m) => m.dispose());
-      else mats?.dispose();
-      this.neonGrid = undefined;
     }
     this.floorTexture?.dispose();
     this.floorTexture = undefined;

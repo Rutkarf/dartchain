@@ -18,6 +18,7 @@ export class QuestsDataService {
 
   private refreshTimerId: number | null = null;
   private pollTimerId: number | null = null;
+  private pollingPaused = false;
   private refreshInflight: Promise<void> | null = null;
   private lastFetchMs = 0;
   private started = false;
@@ -36,6 +37,7 @@ export class QuestsDataService {
     window.addEventListener('market-swap-complete', this.onExternalRefresh);
 
     this.pollTimerId = window.setInterval(() => {
+      if (this.pollingPaused) return;
       if (typeof document !== 'undefined' && document.hidden) return;
       void this.refreshAll(false);
     }, QuestsDataService.AUTO_REFRESH_MS);
@@ -56,6 +58,14 @@ export class QuestsDataService {
       window.clearTimeout(this.refreshTimerId);
       this.refreshTimerId = null;
     }
+  }
+
+  pausePolling(): void {
+    this.pollingPaused = true;
+  }
+
+  resumePolling(): void {
+    this.pollingPaused = false;
   }
 
   scheduleRefresh(force = false): void {

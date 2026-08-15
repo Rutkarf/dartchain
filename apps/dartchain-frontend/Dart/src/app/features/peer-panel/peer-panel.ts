@@ -157,10 +157,15 @@ export class PeerPanelComponent implements OnDestroy {
   constructor() {
     this.favorites.set(this.loadFavorites());
     this.peersData.init();
-    this.destroyRef.onDestroy(() => this.peersData.destroy());
+    this.peersData.resumePolling();
+    this.destroyRef.onDestroy(() => {
+      this.peersData.pausePolling();
+      this.peersData.destroy();
+    });
   }
 
   ngOnDestroy(): void {
+    this.peersData.pausePolling();
     this.peersData.destroy();
   }
 
