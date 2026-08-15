@@ -8,7 +8,7 @@ import { RatePanelComponent } from '../../features/rate-panel/rate-panel';
  *
  * Hauteurs :
  * - Déplié : `--market-chart-height`
- * - Replié : `--bottom-stack-height-collapsed` (comme le dock)
+ * - Replié : `--market-chart-collapsed-h` / `--chart-smart-bar-h` (smart-bar seule)
  * Gouttière : `--stack-section-gap` (identique swap/showcase/dock)
  */
 @Component({

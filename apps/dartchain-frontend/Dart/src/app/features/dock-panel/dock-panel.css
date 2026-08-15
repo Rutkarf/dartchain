@@ -6,8 +6,8 @@
   min-height: 0;
   overflow: hidden;
 
-  --dock-panel-handle-h: clamp(10px, 3.2vw, 14px);
-  --dock-smart-bar-h: clamp(26px, 7vw, 32px);
+  /* Hérite --dock-smart-bar-h du shell (pas de clamp local qui gonfle la barre) */
+  --dock-panel-handle-h: 8px;
   --dock-panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --dock-panel-duration: 280ms;
 }
@@ -64,24 +64,26 @@
 .dock-panel.is-collapsed.is-wallet,
 .dock-panel.is-collapsed.is-chain,
 .dock-panel.is-collapsed.is-peers {
-  --dock-panel-handle-h: var(--dock-smart-bar-h, clamp(26px, 7vw, 32px));
+  --dock-panel-handle-h: var(--dock-smart-bar-h, 22px);
   overflow: visible;
 }
 
 .dock-panel__handle.dock-summary-bar {
-  flex: 0 0 var(--dock-smart-bar-h, clamp(28px, 7vw, 34px));
-  min-height: var(--dock-smart-bar-h, clamp(26px, 7vw, 32px));
-  height: var(--dock-smart-bar-h, clamp(26px, 7vw, 32px));
-  max-height: none;
+  flex: 0 0 var(--dock-smart-bar-h, 22px);
+  min-height: var(--dock-smart-bar-h, 22px);
+  height: var(--dock-smart-bar-h, 22px);
+  max-height: var(--dock-smart-bar-h, 22px);
   flex-direction: row;
   align-items: center;
   gap: 0;
-  padding: 0 0 3px;
+  /* Horizontal only — aucun padding/margin vertical sous la barre */
+  padding: 0 2px;
+  margin-bottom: 0;
   width: 100%;
   overflow: hidden;
   box-sizing: border-box;
   position: relative;
-  border-bottom: 1px solid var(--ds-surface-border-bottom);
+  border-bottom: none;
   animation: panel-smart-bar-slide-down var(--dock-panel-duration) var(--dock-panel-ease) both;
 }
 
@@ -129,12 +131,23 @@
 
 .dock-panel.is-collapsed .dock-panel__body {
   grid-template-rows: 0fr;
-  flex: 0 0 auto;
+  flex: 0 0 0;
+  min-height: 0;
+  max-height: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   pointer-events: none;
+  border: none;
 }
 
 .dock-panel.is-collapsed .dock-panel__body > .dock-tabs-panel {
-  transform: translateY(-10px);
+  transform: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  max-height: 0;
 }
 
 .dock-panel.is-expanded .dock-tabs-panel {

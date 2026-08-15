@@ -15,10 +15,23 @@
   z-index: 6;
 }
 
+/* Replié : aucun padding/margin vertical sur le conteneur global */
 :host(.is-chart-collapsed) {
-  height: var(--bottom-stack-height-collapsed, 40px);
-  min-height: var(--bottom-stack-height-collapsed, 40px);
-  max-height: var(--bottom-stack-height-collapsed, 40px);
+  height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 22px));
+  min-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 22px));
+  max-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 22px));
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+:host(.is-chart-collapsed) .app-market-stack--rate,
+:host(.is-chart-collapsed) .app-market-card--rate {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .app-market-stack--rate {

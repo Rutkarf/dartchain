@@ -1,22 +1,44 @@
+/* Niveau 3 — ciel neuronal Star Conquest (derrière floor z=1 et UI z≥2) */
 :host {
   position: fixed !important;
   inset: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
   width: 100vw !important;
+  width: 100dvw !important;
+  max-width: none !important;
   height: 100vh !important;
+  height: 100dvh !important;
   max-height: none !important;
   z-index: 0 !important;
   pointer-events: none !important;
   display: block !important;
   overflow: visible !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 :host canvas {
   position: fixed !important;
   inset: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
   width: 100vw !important;
+  width: 100dvw !important;
+  max-width: none !important;
   height: 100vh !important;
-  pointer-events: none !important;
+  height: 100dvh !important;
+  max-height: none !important;
+  pointer-events: auto !important;
+  touch-action: none !important;
   z-index: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
 }
 
 .particle-canvas {
@@ -24,21 +46,22 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  max-width: none;
 }
 
-/* Overlay CSS — léger pour ne pas masquer les particules WebGL */
+/* Voile diffus — nébuleuse numérique derrière l’UI */
 .space-overlay {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
   background:
-    radial-gradient(circle at 22% 18%, rgba(255, 45, 154, 0.03), transparent 32%),
-    radial-gradient(circle at 78% 28%, rgba(0, 245, 255, 0.025), transparent 30%);
-  filter: blur(16px);
+    radial-gradient(ellipse at 18% 22%, rgba(167, 139, 250, 0.04), transparent 42%),
+    radial-gradient(ellipse at 78% 38%, rgba(62, 207, 220, 0.03), transparent 40%),
+    radial-gradient(ellipse at 50% 70%, rgba(232, 90, 155, 0.018), transparent 48%);
+  filter: blur(22px);
   pointer-events: none;
   opacity: 0.85;
-}
-
-/* === Responsive 250–500px (particle-background) === */
-@media (max-width: 500px) {
-  :host canvas { max-width: 100%; }
+  z-index: 1;
 }

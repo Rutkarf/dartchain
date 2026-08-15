@@ -1,0 +1,285 @@
+:host {
+  display: contents;
+  pointer-events: none;
+}
+
+/* Panel scanner = overlay fonctionnel critique (au-dessus UI) */
+.sc-scanner__panel {
+  position: fixed;
+  z-index: 140;
+  left: 50%;
+  bottom: max(12px, calc(var(--floor-peek-height, 64px) * 0.15 + 8px));
+  transform: translateX(-50%);
+  pointer-events: auto;
+  width: min(168px, calc(100vw - 14px));
+  max-height: min(180px, 36vh);
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(8, 12, 18, 0.88);
+  backdrop-filter: blur(14px) saturate(115%);
+  -webkit-backdrop-filter: blur(14px) saturate(115%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.sc-scanner__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sc-scanner__title {
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(170, 190, 210, 0.9);
+}
+
+.sc-scanner__close {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(200, 210, 220, 0.9);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sc-scanner__empty {
+  margin: 0;
+  padding: 10px 8px;
+  font-size: 9px;
+  color: rgba(160, 175, 190, 0.85);
+  text-align: center;
+}
+
+.sc-scanner__list {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overscroll-behavior: contain;
+}
+
+.sc-scanner__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin: 0;
+  padding: 5px 6px;
+  border: 1px solid rgba(var(--sc-family-rgb, 62, 207, 220), 0.2);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(230, 238, 245, 0.92);
+  text-align: left;
+  cursor: pointer;
+}
+
+.sc-scanner__item:hover,
+.sc-scanner__item:focus-visible {
+  background: rgba(var(--sc-family-rgb, 62, 207, 220), 0.1);
+  outline: none;
+}
+
+.sc-scanner__dot {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgb(var(--sc-family-rgb, 62, 207, 220));
+  box-shadow: 0 0 6px rgba(var(--sc-family-rgb, 62, 207, 220), 0.5);
+}
+
+.sc-scanner__meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sc-scanner__item-title {
+  font-size: 9px;
+  font-weight: 650;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sc-scanner__item-sub {
+  font-size: 7px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: rgba(140, 158, 176, 0.85);
+}
+
+.sc-scanner__reward {
+  flex: 0 0 auto;
+  font-size: 8px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgb(var(--sc-family-rgb, 62, 207, 220));
+}
+
+/* Labels M4T3R — niveau 3 (derrière floor z=1 et UI z≥2) */
+.sc-reward-label {
+  appearance: none;
+  -webkit-appearance: none;
+  position: fixed;
+  z-index: 0;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 5px 7px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: rgba(var(--sc-family-rgb, 62, 207, 220), 0.78);
+  font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 3.75px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    transform 140ms ease,
+    color 140ms ease,
+    opacity 140ms ease,
+    filter 140ms ease;
+}
+
+.sc-reward-label.is-far {
+  filter: blur(0.15px);
+  color: rgba(var(--sc-family-rgb, 62, 207, 220), 0.55);
+}
+
+.sc-reward-label.is-near {
+  color: rgba(var(--sc-family-rgb, 62, 207, 220), 0.9);
+}
+
+.sc-reward-label__dot {
+  flex: 0 0 auto;
+  width: 4px;
+  height: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(var(--sc-family-rgb, 62, 207, 220));
+  box-shadow:
+    0 0 4px rgba(var(--sc-family-rgb, 62, 207, 220), 0.7),
+    0 0 9px rgba(var(--sc-family-rgb, 62, 207, 220), 0.28);
+  animation: sc-neural-pulse 3.8s ease-in-out infinite;
+  animation-delay: var(--sc-pulse-delay, 0s);
+}
+
+.sc-reward-label__value {
+  opacity: 0.78;
+  text-shadow:
+    0 0 6px rgba(var(--sc-family-rgb, 62, 207, 220), 0.35),
+    0 0 1px rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+}
+
+.sc-reward-label.is-dim {
+  opacity: 0.18 !important;
+  pointer-events: none;
+  filter: saturate(0.55);
+}
+
+.sc-reward-label.is-dim .sc-reward-label__dot {
+  animation: none;
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+.sc-reward-label.is-active,
+.sc-reward-label:hover,
+.sc-reward-label:focus-visible {
+  z-index: 0;
+  transform: translate(-50%, -50%) scale(1.28);
+  opacity: 1 !important;
+  color: rgb(var(--sc-family-rgb, 62, 207, 220));
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none;
+  filter: none;
+}
+
+.sc-reward-label.is-active .sc-reward-label__value,
+.sc-reward-label:hover .sc-reward-label__value,
+.sc-reward-label:focus-visible .sc-reward-label__value {
+  opacity: 1;
+  text-shadow:
+    0 0 8px rgba(var(--sc-family-rgb, 62, 207, 220), 0.55),
+    0 0 1px rgba(0, 0, 0, 0.85);
+}
+
+.sc-reward-label.is-active .sc-reward-label__dot,
+.sc-reward-label:hover .sc-reward-label__dot,
+.sc-reward-label:focus-visible .sc-reward-label__dot {
+  animation-duration: 1.7s;
+  box-shadow:
+    0 0 6px rgba(var(--sc-family-rgb, 62, 207, 220), 0.9),
+    0 0 14px rgba(var(--sc-family-rgb, 62, 207, 220), 0.4);
+}
+
+@keyframes sc-neural-pulse {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+@media (max-width: 349px) {
+  .sc-scanner__panel {
+    width: min(152px, calc(100vw - 10px));
+    max-height: min(190px, 38vh);
+    bottom: 8px;
+  }
+
+  .sc-scanner__list {
+    max-height: 150px;
+  }
+
+  .sc-reward-label {
+    font-size: 3.5px;
+    padding: 6px 8px;
+  }
+
+  .sc-reward-label__dot {
+    width: 3.5px;
+    height: 3.5px;
+  }
+}

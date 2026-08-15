@@ -1,0 +1,181 @@
+:host {
+  display: contents;
+  pointer-events: none;
+}
+
+/* Glassmorphisme sobre — accent famille via --sc-family-* */
+.star-quest-panel {
+  --sc-family-rgb: 62, 207, 220;
+  --sc-family-hex: #3ecfdc;
+
+  position: fixed;
+  z-index: 140;
+  pointer-events: auto;
+  box-sizing: border-box;
+  width: min(156px, calc(100vw - 10px));
+  max-width: calc(100vw - 10px);
+  padding: 7px 8px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(var(--sc-family-rgb), 0.28);
+  background: rgba(8, 12, 18, 0.48);
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.3),
+    0 0 18px rgba(var(--sc-family-rgb), 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(14px) saturate(115%);
+  -webkit-backdrop-filter: blur(14px) saturate(115%);
+  color: rgba(232, 238, 245, 0.92);
+  animation: star-quest-panel-in 140ms ease-out;
+}
+
+.star-quest-panel--compact {
+  width: min(132px, calc(100vw - 10px));
+  padding: 5px 6px 6px;
+  font-size: 0.92em;
+}
+
+.star-quest-panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.star-quest-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.star-quest-panel__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 5px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(180, 196, 210, 0.9);
+  line-height: 1.4;
+}
+
+.star-quest-panel__badge--family {
+  border-color: rgba(var(--sc-family-rgb), 0.35);
+  background: rgba(var(--sc-family-rgb), 0.12);
+  color: rgba(var(--sc-family-rgb), 0.95);
+}
+
+.star-quest-panel__badge--status {
+  color: rgba(150, 165, 180, 0.85);
+}
+
+.star-quest-panel__close {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(180, 196, 210, 0.85);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.star-quest-panel__close:hover,
+.star-quest-panel__close:focus-visible {
+  color: rgba(232, 238, 245, 0.95);
+  background: rgba(var(--sc-family-rgb), 0.1);
+  border-color: rgba(var(--sc-family-rgb), 0.28);
+  outline: none;
+}
+
+.star-quest-panel__title {
+  margin: 0 0 4px;
+  font-family: var(--ds-font-ui, var(--font-display, 'Orbit', system-ui, sans-serif));
+  font-size: clamp(9px, 3vw, 11px);
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  color: rgba(236, 242, 248, 0.94);
+}
+
+.star-quest-panel__desc {
+  margin: 0 0 7px;
+  font-size: clamp(7px, 2.4vw, 8.5px);
+  line-height: 1.4;
+  color: rgba(150, 168, 186, 0.88);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+.star-quest-panel__reward {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 0;
+  padding-top: 6px;
+  border-top: 1px solid rgba(var(--sc-family-rgb), 0.18);
+}
+
+.star-quest-panel__reward-label {
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(130, 148, 166, 0.8);
+}
+
+.star-quest-panel__reward-value {
+  font-size: clamp(8px, 2.6vw, 9px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--sc-family-hex);
+}
+
+@keyframes star-quest-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 349px) {
+  .star-quest-panel {
+    width: min(138px, calc(100vw - 8px));
+    padding: 5px 6px 6px;
+    border-radius: 8px;
+  }
+
+  .star-quest-panel__title {
+    font-size: 9px;
+  }
+
+  .star-quest-panel__desc {
+    font-size: 7px;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    margin-bottom: 5px;
+  }
+
+  .star-quest-panel__close {
+    width: 16px;
+    height: 16px;
+  }
+}

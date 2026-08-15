@@ -1,0 +1,49 @@
+@if (state.panel(); as panel) {
+  <aside
+    class="star-quest-panel"
+    [class.star-quest-panel--compact]="state.panelCompact()"
+    role="dialog"
+    aria-modal="false"
+    aria-label="Star Conquest quest"
+    [attr.data-family]="panel.quest.family"
+    [style.left.px]="panel.x"
+    [style.top.px]="panel.y"
+    [style.--sc-family-rgb]="familyRgb(panel.quest.family)"
+    [style.--sc-family-hex]="familyHex(panel.quest.family)"
+    (pointerdown)="$event.stopPropagation()"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="star-quest-panel__head">
+      <div class="star-quest-panel__meta">
+        <span class="star-quest-panel__badge star-quest-panel__badge--family">
+          {{ familyLabel(panel.quest.family) }}
+        </span>
+        <span
+          class="star-quest-panel__badge star-quest-panel__badge--status"
+          [attr.data-status]="panel.quest.status"
+        >
+          {{ panel.quest.status }}
+        </span>
+      </div>
+      <button
+        type="button"
+        class="star-quest-panel__close"
+        aria-label="Fermer la quest"
+        (click)="dismiss(); $event.stopPropagation()"
+        (pointerdown)="$event.stopPropagation()"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+
+    <h2 class="star-quest-panel__title">{{ panel.quest.title }}</h2>
+    <p class="star-quest-panel__desc">{{ panel.quest.description }}</p>
+
+    <footer class="star-quest-panel__reward">
+      <span class="star-quest-panel__reward-label">Gain probable</span>
+      <strong class="star-quest-panel__reward-value"
+        >{{ panel.quest.rewardM4T3R }} M4T3R</strong
+      >
+    </footer>
+  </aside>
+}

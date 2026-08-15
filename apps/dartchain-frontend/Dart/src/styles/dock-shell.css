@@ -24,6 +24,14 @@
   height: var(--bottom-stack-height-collapsed);
   min-height: var(--bottom-stack-height-collapsed);
   max-height: var(--bottom-stack-height-collapsed);
+  margin-bottom: 0 !important;
+  padding-bottom: 0;
+}
+
+.app-bottom-stack.is-dock-collapsed .showcase-block__shell,
+.app-bottom-stack.is-dock-collapsed .bottom-stack__shell {
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .app-bottom-stack .showcase-block__shell.bottom-stack__shell.ds-surface.ds-surface--card {
@@ -86,6 +94,9 @@
 .app-bottom-stack.is-dock-collapsed .app-bottom-stack__band {
   height: var(--dock-smart-bar-h, 24px);
   max-height: var(--dock-smart-bar-h, 24px);
+  min-height: var(--dock-smart-bar-h, 24px);
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .app-bottom-stack .showcase-header-tabs {

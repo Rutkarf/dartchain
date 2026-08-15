@@ -1,0 +1,74 @@
+@if (state.scannerOpen()) {
+  <div
+    class="sc-scanner__panel"
+    role="dialog"
+    aria-label="Quests hors champ ou masquées"
+    [style.left]="scannerStyle().left"
+    [style.top]="scannerStyle().top"
+    [style.bottom]="scannerStyle().bottom"
+    [style.transform]="scannerStyle().transform"
+    (pointerdown)="$event.stopPropagation()"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="sc-scanner__head">
+      <span class="sc-scanner__title">Signal · hors vue</span>
+      <button
+        type="button"
+        class="sc-scanner__close"
+        aria-label="Fermer le scanner"
+        (click)="closeList()"
+      >
+        ×
+      </button>
+    </header>
+    @if (state.hiddenCount() === 0) {
+      <p class="sc-scanner__empty">Toutes les Quests sont visibles.</p>
+    } @else {
+      <ul class="sc-scanner__list">
+        @for (quest of state.hiddenQuests(); track quest.id) {
+          <li>
+            <button
+              type="button"
+              class="sc-scanner__item"
+              [style.--sc-family-rgb]="familyRgb(quest.family)"
+              (click)="pick(quest)"
+            >
+              <span class="sc-scanner__dot" aria-hidden="true"></span>
+              <span class="sc-scanner__meta">
+                <span class="sc-scanner__item-title">{{ quest.title }}</span>
+                <span class="sc-scanner__item-sub"
+                  >{{ familyLabel(quest.family) }} · {{ quest.status }}</span
+                >
+              </span>
+              <span class="sc-scanner__reward">{{ rewardText(quest) }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+}
+
+@for (label of state.rewardLabels(); track label.id) {
+  <button
+    type="button"
+    class="sc-reward-label"
+    [class.is-active]="label.active"
+    [class.is-dim]="label.dim"
+    [class.is-near]="(label.depth ?? 0) > 0.25"
+    [class.is-far]="(label.depth ?? 0) < -0.25"
+    [style.left.px]="label.x"
+    [style.top.px]="label.y"
+    [style.opacity]="label.dim ? null : (label.opacity ?? 0.7)"
+    [style.--sc-family-rgb]="familyRgb(label.family)"
+    [style.--sc-pulse-delay]="pulseDelay(label.id)"
+    [attr.aria-label]="'Quest ' + label.text + ' M4T3R'"
+    (click)="pickLabel(label.id); $event.stopPropagation()"
+    (pointerdown)="$event.stopPropagation()"
+    (pointerenter)="hoverLabel(label.id)"
+    (pointerleave)="clearHoverLabel(label.id)"
+  >
+    <span class="sc-reward-label__dot" aria-hidden="true"></span>
+    <span class="sc-reward-label__value">{{ label.text }}</span>
+  </button>
+}

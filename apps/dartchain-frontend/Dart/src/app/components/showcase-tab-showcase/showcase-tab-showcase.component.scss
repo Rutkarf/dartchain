@@ -19,11 +19,20 @@
   display: none;
 }
 
+/* Replié : aucun padding/margin bottom sur le conteneur global (tabs inchangés) */
 :host(.is-showcase-collapsed) {
-  height: var(--hub-showcase-block-height-collapsed, 40px);
-  min-height: var(--hub-showcase-block-height-collapsed, 40px);
-  max-height: var(--hub-showcase-block-height-collapsed, 40px);
+  height: var(--hub-showcase-block-height-collapsed, 36px);
+  min-height: var(--hub-showcase-block-height-collapsed, 36px);
+  max-height: var(--hub-showcase-block-height-collapsed, 36px);
   overflow: visible;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+:host(.is-showcase-collapsed) .app-hub-showcase-block,
+:host(.is-showcase-collapsed) .showcase-block__shell {
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .app-hub-showcase-block {
@@ -84,8 +93,10 @@
 }
 
 :host(.is-showcase-collapsed) .app-showcase-band.is-collapsed {
-  flex: 0 0 var(--showcase-smart-bar-h, 24px);
-  height: var(--showcase-smart-bar-h, 24px);
-  max-height: var(--showcase-smart-bar-h, 24px);
+  flex: 0 0 var(--showcase-smart-bar-h, 20px);
+  height: var(--showcase-smart-bar-h, 20px);
+  max-height: var(--showcase-smart-bar-h, 20px);
   overflow: visible;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }

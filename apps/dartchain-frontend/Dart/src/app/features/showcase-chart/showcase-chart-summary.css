@@ -18,6 +18,7 @@
   width: 100%;
   min-width: 0;
   height: 100%;
+  /* Pas de padding vertical — la hauteur vient de la smart-bar */
   padding: 0 0 0 clamp(2px, 1vw, 4px);
   box-sizing: border-box;
 }

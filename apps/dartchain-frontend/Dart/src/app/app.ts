@@ -11,6 +11,8 @@ import {
 import { BlockchainApiService } from './core/services/blockchain-api.service';
 
 import { ParticleBackgroundComponent } from './particle-background/particle-background';
+import { StarQuestPanelComponent } from './particle-background/star-conquest/star-quest-panel';
+import { StarQuestScannerComponent } from './particle-background/star-conquest/star-quest-scanner';
 import { BandeauAccueilComponent } from './features/bandeau-accueil/bandeau-accueil';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { SwapComponent } from './components/swap/swap.component';
@@ -69,6 +71,8 @@ import { PeersDataService } from './core/services/peers-data.service';
   imports: [
     CommonModule,
     ParticleBackgroundComponent,
+    StarQuestPanelComponent,
+    StarQuestScannerComponent,
     NavbarComponent,
     BandeauAccueilComponent,
     SwapComponent,

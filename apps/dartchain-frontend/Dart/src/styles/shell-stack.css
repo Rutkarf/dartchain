@@ -61,12 +61,17 @@ app-graph.app-graph-section {
   overflow: hidden;
 }
 
+/* Graph replié = smart-bar seule — aucun padding/margin vertical */
 .app-main-layout.is-chart-collapsed > app-graph,
 .app-main-layout > app-graph.is-chart-collapsed,
 app-graph.app-graph-section.is-chart-collapsed {
-  height: var(--bottom-stack-height-collapsed, 40px) !important;
-  min-height: var(--bottom-stack-height-collapsed, 40px) !important;
-  max-height: var(--bottom-stack-height-collapsed, 40px) !important;
+  height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 20px)) !important;
+  min-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 20px)) !important;
+  max-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 20px)) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .app-main-layout .app-bottom-stack {

@@ -1,6 +1,8 @@
 <div class="app-shell" data-testid="app-shell">
   <a class="app-skip-link" href="#app-main-content">{{ locale.t('skip.main') }}</a>
   <app-particle-background class="app-background"></app-particle-background>
+  <app-star-quest-panel />
+  <app-star-quest-scanner />
 
   <app-navbar
     (exploreBlock)="openBlockDrawer($event)"

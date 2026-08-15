@@ -3,7 +3,7 @@ import {
   Component,
   ElementRef,
   OnDestroy,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import * as THREE from 'three';
 import {
@@ -24,15 +24,19 @@ import { applyCanvasLayerStyles } from '../core/utils/three-webgl.util';
 
 const FLOOR_HEIGHT_FALLBACK = 140;
 
+/**
+ * Floor Three.js unique (z-index 1).
+ * Joystick = scène particules (bande libre au-dessus du floor).
+ */
 @Component({
   selector: 'app-three-floor',
   standalone: true,
   templateUrl: './three-floor.html',
-  styleUrl: './three-floor.css'
+  styleUrl: './three-floor.css',
 })
 export class ThreeFloor implements AfterViewInit, OnDestroy {
-
-  @ViewChild('floorCanvas', { static: true }) floorCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('floorCanvas', { static: true })
+  floorCanvas!: ElementRef<HTMLCanvasElement>;
 
   private scene?: THREE.Scene;
   private camera?: THREE.PerspectiveCamera;
@@ -129,8 +133,8 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     const gridMat = new THREE.MeshBasicMaterial({
       vertexColors: true,
       transparent: true,
-      opacity: 0.55,
-      wireframe: true
+      opacity: 0.62,
+      wireframe: true,
     });
 
     const grid = new THREE.Mesh(gridGeo, gridMat);
@@ -142,8 +146,8 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     const glowMat = new THREE.MeshBasicMaterial({
       color: THREE_FLOOR_GLOW,
       transparent: true,
-      opacity: 0.12,
-      side: THREE.BackSide
+      opacity: 0.16,
+      side: THREE.BackSide,
     });
     const glowPlane = new THREE.Mesh(
       new THREE.PlaneGeometry(size * 1.1, size * 1.1),
