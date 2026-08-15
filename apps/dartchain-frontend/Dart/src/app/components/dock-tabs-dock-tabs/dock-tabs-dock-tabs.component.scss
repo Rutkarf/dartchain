@@ -2,20 +2,21 @@
   display: block;
   width: 100%;
   min-width: 0;
-  flex: 0 0 var(--bottom-stack-active-height, auto);
-  height: var(--bottom-stack-active-height, auto);
-  min-height: var(--bottom-stack-active-height, auto);
-  max-height: var(--bottom-stack-active-height, auto);
+  /* Shrink-wrap le stack — plus de boîte host vide sous le panneau */
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  margin: 0 !important;
+  padding: 0;
 }
 
 :host(.is-dock-collapsed) {
-  flex-basis: var(--bottom-stack-height-collapsed);
-  height: var(--bottom-stack-height-collapsed);
-  min-height: var(--bottom-stack-height-collapsed);
-  max-height: var(--bottom-stack-height-collapsed);
+  height: auto;
+  min-height: 0;
+  max-height: none;
 }
 
-/* Header : onglets + menu actions sur la même ligne, actions à droite */
 :host .showcase-header,
 :host .app-bottom-stack__header {
   display: flex;

@@ -1,7 +1,6 @@
 /**
- * Palier shell compact — viewport MVP exclusif 250×500.
- * Bande continue 250–250 px (cible unique) ; plage élargie 250–349
- * conservée pour ne pas casser les media queries / classes existantes.
+ * Palier shell compact — viewport MVP exclusif 250×550, zero-scroll.
+ * Plage élargie 250–349 conservée pour media queries / classes existantes.
  */
 export const VIEWPORT_COMPACT_CLASS = 'vp-compact';
 
@@ -10,7 +9,7 @@ export const VIEWPORT_COMPACT_WIDTH_MIN = 250;
 export const VIEWPORT_COMPACT_WIDTH_MAX = 349;
 
 /** Hauteur de référence MVP (documentaire ; layout piloté par tokens). */
-export const VIEWPORT_MVP_HEIGHT = 500;
+export const VIEWPORT_MVP_HEIGHT = 550;
 export const VIEWPORT_MVP_WIDTH = 250;
 
 export function isCompactShellViewport(): boolean {

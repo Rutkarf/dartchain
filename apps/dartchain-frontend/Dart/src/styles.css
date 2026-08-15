@@ -377,16 +377,15 @@ body {
   background: var(--bg-base);
 }
 
-/* Compact ≤349 (cible 250×580) — après tous les resets html/body */
+/* Compact ≤349 (cible 250×550) — zero-scroll, hauteur verrouillée viewport */
 @media (max-width: 349px) {
   html,
   body,
   app-root {
-    height: auto !important;
-    min-height: 100% !important;
-    max-height: none !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
   }
 }
 

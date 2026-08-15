@@ -2,6 +2,15 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { RatePanelComponent } from '../../features/rate-panel/rate-panel';
 
+/**
+ * Graphique — 4ᵉ enfant de `.app-main-layout` (flex column).
+ * Ordre : swap → showcase → dock → graph → (padding-bottom floor).
+ *
+ * Hauteurs :
+ * - Déplié : `--market-chart-height`
+ * - Replié : `--bottom-stack-height-collapsed` (comme le dock)
+ * Gouttière : `--stack-section-gap` (identique swap/showcase/dock)
+ */
 @Component({
   selector: 'app-graph',
   standalone: true,

@@ -10,7 +10,8 @@
   height: auto !important;
   max-height: none !important;
   min-height: 0 !important;
-  z-index: 2 !important;
+  /* Toujours sous la pile UI (swap/showcase/dock/graph) */
+  z-index: 1 !important;
 }
 
 .floor-wrapper {
@@ -18,8 +19,8 @@
   left: 0;
   bottom: 0;
   width: 100vw;
-  height: 120px;      /* visible en bas de l’écran */
-  z-index: 2;
+  height: var(--floor-canvas-height, var(--ds-zone-floor-peek, 64px));
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -29,25 +30,26 @@
   display: block;
 }
 
-
-/* Mobile first */
-@media (max-width: 480px) {
+/* MVP 250×550 : peek stable, pas de canvas trop haut */
+@media (max-width: 349px) {
   .floor-wrapper {
-    height: 110px;
+    height: var(--floor-canvas-height, var(--ds-zone-floor-peek, 64px));
   }
-}
 
-/* Tablette+ */
-@media (min-width: 481px) {
-  .floor-wrapper {
-    height: 140px;
-  }
-}
-
-/* === Responsive 250–500px (three-floor) === */
-@media (max-width: 500px) {
   :host {
     height: auto;
     min-height: 0;
+  }
+}
+
+@media (min-width: 350px) and (max-width: 480px) {
+  .floor-wrapper {
+    height: var(--floor-canvas-height, 72px);
+  }
+}
+
+@media (min-width: 481px) {
+  .floor-wrapper {
+    height: var(--floor-canvas-height, 80px);
   }
 }

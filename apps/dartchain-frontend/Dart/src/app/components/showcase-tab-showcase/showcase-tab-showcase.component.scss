@@ -10,9 +10,9 @@
 }
 
 :host(:not(.is-showcase-collapsed):not(.is-showcase-disabled)) {
-  height: var(--hub-showcase-block-height, 140px);
-  min-height: var(--hub-showcase-block-height, 140px);
-  max-height: var(--hub-showcase-block-height, 140px);
+  height: var(--hub-showcase-block-height, 122px);
+  min-height: var(--hub-showcase-block-height, 122px);
+  max-height: var(--hub-showcase-block-height, 122px);
 }
 
 :host(.is-showcase-disabled) {

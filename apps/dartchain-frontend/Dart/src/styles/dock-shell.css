@@ -1,18 +1,40 @@
 /**
- * Dock — même surface carbone glass que showcase / exchange / navbar (ds-surface).
- * z-index 6 : reste au-dessus du three-floor (z-index 2).
+ * Dock — surface + hauteur réelle du stack (global : hors encapsulation App).
  */
-
 .app-bottom-stack {
   position: relative;
   z-index: 6 !important;
   isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  /* Hauteur ici (global) — pas sur le host Angular opaque */
+  height: var(--bottom-stack-active-height);
+  min-height: var(--bottom-stack-active-height);
+  max-height: var(--bottom-stack-active-height);
+  margin: 0 !important;
+  padding: 0;
+  gap: 0;
 }
 
-/* Shell = ds-surface ds-surface--card (identique au showcase-block__shell) */
+.app-bottom-stack.is-dock-collapsed {
+  --bottom-stack-active-height: var(--bottom-stack-height-collapsed);
+  height: var(--bottom-stack-height-collapsed);
+  min-height: var(--bottom-stack-height-collapsed);
+  max-height: var(--bottom-stack-height-collapsed);
+}
+
 .app-bottom-stack .showcase-block__shell.bottom-stack__shell.ds-surface.ds-surface--card {
   border: none;
   box-shadow: var(--ds-surface-shadow);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 .app-bottom-stack .showcase-header.app-bottom-stack__header,
@@ -24,6 +46,46 @@
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+}
+
+.app-bottom-stack .app-bottom-stack__content,
+.app-bottom-stack .app-bottom-stack__band {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: var(--bottom-stack-panel-height, 154px);
+  max-height: var(--bottom-stack-panel-height, 154px);
+  overflow: hidden;
+}
+
+/* Remplit la bande — sinon trou semi-transparent sous le wallet (= faux gap dock→graph) */
+.app-bottom-stack .app-bottom-stack__panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.app-bottom-stack .app-bottom-stack__panel > * {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__content,
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__band {
+  height: var(--dock-smart-bar-h, 24px);
+  max-height: var(--dock-smart-bar-h, 24px);
 }
 
 .app-bottom-stack .showcase-header-tabs {
@@ -71,7 +133,6 @@
   overflow: hidden !important;
 }
 
-/* Mempool is the longest label: give it a larger share of the shared tab row. */
 .app-bottom-stack .showcase-header-tabs .showcase-tab--mempool {
   flex: 1.75 1 0 !important;
   min-width: 0 !important;
@@ -113,6 +174,9 @@
   display: flex !important;
   flex-flow: row nowrap !important;
   align-items: center !important;
+  flex: 0 0 var(--showcase-hub-tab-h, 16px);
+  height: var(--showcase-hub-tab-h, 16px);
+  max-height: var(--showcase-hub-tab-h, 16px);
   overflow: visible !important;
 }
 
@@ -127,7 +191,6 @@
   z-index: 8 !important;
 }
 
-/* Docks : carbone plus opaque (showcase-body dans le bottom stack) */
 .app-bottom-stack .app-bottom-stack__panel .quests-panel.ds-surface,
 .app-bottom-stack .app-bottom-stack__panel .market-panel.ds-surface,
 .app-bottom-stack .app-bottom-stack__panel .peer-panel.ds-surface,

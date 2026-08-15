@@ -21,16 +21,20 @@ export class ChainConfigService {
 
   readonly config = this.configSignal.asReadonly();
 
-  async load(): Promise<ChainConfig> {
+  async load(): Promise<ChainConfig | null> {
     const cached = this.configSignal();
     if (cached) {
       return cached;
     }
 
-    const config = await firstValueFrom(
-      this.http.get<ChainConfig>(`${environment.apiUrl.replace(/\/+$/, '')}/v1/chain/config`)
-    );
-    this.configSignal.set(config);
-    return config;
+    try {
+      const config = await firstValueFrom(
+        this.http.get<ChainConfig>(`${environment.apiUrl.replace(/\/+$/, '')}/v1/chain/config`)
+      );
+      this.configSignal.set(config);
+      return config;
+    } catch {
+      return null;
+    }
   }
 }

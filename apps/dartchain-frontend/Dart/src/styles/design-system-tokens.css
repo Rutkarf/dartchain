@@ -332,18 +332,20 @@
   --ds-skeleton-base: rgba(255, 255, 255, 0.04);
   --ds-skeleton-shine: rgba(255, 255, 255, 0.08);
 
-  /* —— Layout budgets @ 250×550 (hiérarchie spatiale ; floor three.js inchangé) —— */
+  /* —— Layout budgets @ 250×550 zero-scroll (tout déplié ≤ 550) —— */
   --ds-viewport-w: 250px;
-  --ds-viewport-h: 548px;
+  --ds-viewport-h: 550px;
   --ds-zone-navbar: 32px;
   --ds-zone-exchange: 16px;
-  --ds-zone-chart: 194px;
-  --ds-zone-showcase-header: 17px;
-  --ds-zone-showcase-body: 126px;
-  --ds-zone-bottom-panel: calc(176px * 0.9 - 2px);
-  --ds-zone-bottom-dock: 18px;
-  --ds-zone-floor-peek: 0px;
-  --ds-band-gap: 0px;
+  --ds-zone-chart: 136px;
+  --ds-zone-showcase-header: 14px;
+  --ds-zone-showcase-body: 108px;
+  --ds-zone-bottom-panel: 118px;
+  --ds-zone-bottom-dock: 14px;
+  /* Peek canvas floor + marge Graph→floor gérée à part (--graph-floor-gap) */
+  --ds-zone-floor-peek: 64px;
+  --ds-graph-floor-gap: 6px;
+  --ds-band-gap: 2px;
   --ds-band-inline-pad: 2px;
   --ds-navbar-inline-overflow: 2px;
   --ds-navbar-top-inset: max(0px, env(safe-area-inset-top, 0px));

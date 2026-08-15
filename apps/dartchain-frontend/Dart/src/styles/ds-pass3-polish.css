@@ -147,31 +147,47 @@
   filter: none;
 }
 
-/* ── Viewport MVP 250×550 — gaps = band-air (2px) ── */
+/* ── Viewport MVP 250×550 — zero-scroll, gaps = band-air (2px) ── */
 html.vp-compact {
   --ds-shell-inline: 0px;
-  --ds-section-gap: var(--ds-band-gap, 0px);
-  --ds-panel-gap: var(--ds-band-gap, 0px);
+  --ds-section-gap: var(--ds-band-gap, 2px);
+  --ds-panel-gap: var(--ds-band-gap, 2px);
+  --stack-section-gap: 2px;
+  --stack-section-gap-collapsed: 2px;
+  --floor-canvas-height: var(--ds-zone-floor-peek, 64px);
+  --floor-peek-height: var(--floor-canvas-height);
+  --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
 }
 
 html.vp-compact,
-html.vp-compact body {
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  height: 100%;
-  max-height: none;
+html.vp-compact body,
+html.vp-compact app-root {
+  overflow: hidden !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
 }
 
-html.vp-compact .app-shell,
+html.vp-compact .app-shell {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding-inline: 0;
+  flex: 1 1 auto !important;
+  align-self: stretch !important;
+}
+
 html.vp-compact .app-main,
 html.vp-compact .app-main-layout {
-  overflow-x: hidden !important;
-  overflow-y: visible !important;
+  overflow: hidden !important;
   max-height: none !important;
-  height: auto !important;
   min-height: 0 !important;
   flex: 0 0 auto !important;
-  align-self: flex-start !important;
+  align-self: stretch !important;
+  height: auto !important;
 }
 
 html.vp-compact .app-main-layout {
@@ -179,13 +195,28 @@ html.vp-compact .app-main-layout {
   flex-direction: column !important;
   justify-content: flex-start !important;
   align-content: flex-start !important;
+  gap: var(--stack-section-gap, 2px) !important;
+  row-gap: var(--stack-section-gap, 2px) !important;
+  padding-bottom: calc(
+    var(--floor-peek-height, 64px) + var(--graph-floor-gap, 6px)
+  ) !important;
 }
 
 html.vp-compact .app-main-layout > app-graph,
 html.vp-compact .app-main-layout > .app-graph-section {
-  margin-top: var(--hub-market-internal-gap, 6px) !important;
-  margin-bottom: 0 !important;
-  flex-grow: 0 !important;
+  margin-top: 0;
+  margin-bottom: 0;
+  flex: 0 0 auto;
+  flex-grow: 0;
+  order: 4;
+}
+
+html.vp-compact .app-main-layout.is-chart-collapsed > app-graph,
+html.vp-compact .app-main-layout.is-chart-collapsed > .app-graph-section,
+html.vp-compact .app-main-layout > app-graph.is-chart-collapsed,
+html.vp-compact .app-main-layout > .app-graph-section.is-chart-collapsed {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 html.vp-compact .app-main-layout .app-bottom-stack {
@@ -199,18 +230,12 @@ html.vp-compact .dock-view__list {
   overflow: hidden !important;
 }
 
-/* Showcase déplié : listes scrollables pour rester lisibles dans le budget. */
+/* Zero-scroll : listes clampées dans le budget (pas de scrollbar interne) */
 html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-news__list,
 html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-chat__messages,
 html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-launch__list,
 html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-dao__list {
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
-
-/* Shell sans gouttière globale : alignement via --band-inline-pad / --navbar-inline-pad */
-html.vp-compact .app-shell {
-  padding-inline: 0;
+  overflow: hidden !important;
 }
 
 /* Ne pas écraser le row-gap / les gouttières hub (graph↔swap↔showcase). */
@@ -222,6 +247,18 @@ html.vp-compact .app-hub {
 
 html.vp-compact .app-bottom-stack {
   gap: var(--ds-section-gap, 2px);
+}
+
+/* Zero-scroll interne @ MVP — clamp, pas de scrollbar dans les panneaux */
+html.vp-compact .dock-view__scroll,
+html.vp-compact .dock-view__list,
+html.vp-compact .wallet-display,
+html.vp-compact .wallet-display__recent,
+html.vp-compact .pending-view,
+html.vp-compact .showcase-chart__plot-gutter,
+html.vp-compact .rate-panel,
+html.vp-compact .rate-panel--hub-graph {
+  overflow: hidden !important;
 }
 
 /* Tabs : pas de scroll horizontal non plus @ MVP (contenu clampé) */

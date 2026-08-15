@@ -861,30 +861,44 @@
   height: 100%;
   min-height: 0;
   flex: 1 1 auto;
-  overflow: visible;
+  overflow: hidden;
 }
 
 :host(.rate-panel--hub-collapsed) .rate-panel-graph-zone--hub {
   flex: 1 1 auto;
   height: 100%;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 :host(.rate-panel--hub-collapsed) .rate-panel-chart {
   flex: 1 1 auto;
   height: 100%;
   min-height: 0;
-  overflow: visible;
-  padding: 0;
-}
-
-:host(.rate-panel--hub-collapsed) .rate-panel-chart--collapsed {
+  overflow: hidden;
   padding: 0;
 }
 
 :host(.rate-panel--hub-collapsed) .rate-panel-chart--collapsed {
   position: relative;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+/* Le masque était dans app.css (encapsulation App) : il ne s’appliquait jamais ici. */
+:host(.rate-panel--hub-collapsed) .rate-panel-chart__engine--hidden,
+:host(.rate-panel--hub-collapsed) app-showcase-chart {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
 }

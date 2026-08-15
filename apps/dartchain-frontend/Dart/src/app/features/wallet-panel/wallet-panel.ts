@@ -347,7 +347,7 @@ export class WalletPanelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    void this.chainConfig.load();
+    void this.chainConfig.load().catch(() => undefined);
 
     const sessionWallet = this.walletSession.wallet();
     if (sessionWallet) {

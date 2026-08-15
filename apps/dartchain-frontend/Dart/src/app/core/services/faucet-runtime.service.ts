@@ -533,7 +533,6 @@ export class FaucetRuntimeService {
     this.blockchain
       .getStats()
       .pipe(
-        catchError(() => this.blockchain.getLegacyStats()),
         catchError(() => of(null)),
         takeUntilDestroyed(this.destroyRef)
       )
