@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# No-op deploy — Cloudflare publie dist/browser via "Build output directory".
-# À utiliser quand l'UI exige une Deploy command mais le token n'a pas Pages Edit.
+# Vérifie que le dist Angular est prêt avant wrangler deploy.
+# Workers Builds : préférer Deploy command = `npx wrangler deploy`
+# (ou `bash scripts/cloudflare-deploy.sh`). Ce script ne publie rien seul.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -11,5 +12,5 @@ if [[ ! -f "${DIST}/index.html" ]]; then
   exit 1
 fi
 
-echo "Deploy no-op OK — Cloudflare publiera: ${DIST}"
-echo "(Build output directory doit être: apps/dartchain-frontend/Dart/dist/browser)"
+echo "OK: dist prêt → ${DIST}"
+echo "Deploy command attendu: npx wrangler deploy"
