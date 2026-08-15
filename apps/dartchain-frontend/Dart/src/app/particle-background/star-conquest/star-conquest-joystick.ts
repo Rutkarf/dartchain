@@ -27,8 +27,8 @@ export const JOYSTICK_ARIA_LABEL = "Déplace l'univers de particules";
 
 const RING_R = 5.6;
 const KNOB_TRAVEL = 3.2;
-/** Hit stick — assez pour le contrôle, sans masquer les Quests sous le floor. */
-const HIT_RADIUS_PX = 72;
+/** Hit stick — un seul disque, aligné sur le bord visuel (pas d’anneaux élargis). */
+const HIT_RADIUS_PX = 38;
 const DRAG_THRESHOLD_PX = 7;
 /** Légèrement réduit vs ×9 précédent. */
 const SCALE_MIN = 0.58;
@@ -115,8 +115,9 @@ export class StarConquestJoystick {
     this.glassDisc.position.z = 0.02;
     this.glassDisc.raycast = () => {};
 
+    // Bordure fine (anneau mince ~ RingGeometry 0.45–0.55 relatif)
     this.glassRim = new THREE.Mesh(
-      new THREE.RingGeometry(RING_R * 0.86, RING_R * 0.98, 48),
+      new THREE.RingGeometry(RING_R * 0.94, RING_R * 1.02, 48),
       new THREE.MeshBasicMaterial({
         color: COL.chrome,
         transparent: true,
@@ -128,18 +129,19 @@ export class StarConquestJoystick {
     this.glassRim.position.z = 0.03;
     this.glassRim.raycast = () => {};
 
-    this.outerRing = this.makeCircleLine(RING_R * 1.08, 64, COL.silver, 0.98);
-    this.outerRing2 = this.makeCircleLine(RING_R * 1.18, 64, COL.amber, 0.55);
-    this.pulseRing = this.makeCircleLine(RING_R * 1.42, 48, COL.cyan, 0.45);
+    this.outerRing = this.makeCircleLine(RING_R * 1.02, 64, COL.silver, 0.7);
+    // Un seul anneau extérieur fin — pas de double / pulse hitbox
+    this.outerRing2 = this.makeCircleLine(RING_R * 1.02, 64, COL.amber, 0);
+    this.pulseRing = this.makeCircleLine(RING_R * 1.02, 48, COL.cyan, 0);
     this.dirMarks = this.makeDirMarks(RING_R * 0.72);
     this.cardinalDots = this.makeCardinalDots(RING_R * 0.7);
 
     this.orbitGroup.add(this.outerRing);
-    this.orbitGroup.add(this.outerRing2);
     this.orbitGroup.add(this.dirMarks);
     this.orbitGroup.add(this.cardinalDots);
+    // outerRing2 / pulseRing non ajoutés → pas de hitbox / bordure épaisse dupliquée
 
-    this.halo = this.makeSprite(COL.chrome, 22, 0.5);
+    this.halo = this.makeSprite(COL.chrome, 12, 0.28);
     this.stick = this.makeSprite(COL.silver, 4.6, 1);
     this.stickCore = this.makeSprite(COL.cyan, 2.2, 1);
     this.hintLabel = new THREE.Sprite(
@@ -172,17 +174,24 @@ export class StarConquestJoystick {
     );
     this.trail.raycast = () => {};
 
+    // UNIQUE hitbox — rayon = bordure visuelle du disque (pas d’extension)
     this.hitProxy = new THREE.Mesh(
-      new THREE.CircleGeometry(RING_R * 1.25, 28),
-      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+      new THREE.CircleGeometry(RING_R * 0.5, 16),
+      new THREE.MeshBasicMaterial({
+        color: 0x00ffff,
+        transparent: true,
+        opacity: 0,
+        visible: false,
+        depthWrite: false,
+      })
     );
     this.hitProxy.name = 'star-conquest-joy-hit';
+    this.hitProxy.position.set(0, 0, 0.05);
 
     this.group.add(this.halo);
     this.group.add(this.glassDisc);
     this.group.add(this.glassRim);
     this.group.add(this.orbitGroup);
-    this.group.add(this.pulseRing);
     this.group.add(this.trail);
     this.group.add(this.stick);
     this.group.add(this.stickCore);
@@ -391,8 +400,8 @@ export class StarConquestJoystick {
   getExclusionZone(camera: THREE.Camera, padPx = 8): JoystickExclusionZone {
     const vw = window.innerWidth || 1;
     const vh = window.innerHeight || 1;
-    // Rayon monde max visible (pulse ring 1.42 + marge halo ~1.55)
-    const localR = RING_R * 1.55;
+    // Un seul rayon = bordure visuelle (plus d’anneaux ×1.55)
+    const localR = RING_R * 1.02;
     const samples = [
       [0, 0],
       [localR, 0],
@@ -419,8 +428,7 @@ export class StarConquestJoystick {
       minY = Math.min(minY, sy);
       maxY = Math.max(maxY, sy);
     }
-    // Inclure au moins le hit-radius drag (zone tactile)
-    const hitR = this.hitRadiusPx() * 0.72;
+    const hitR = this.hitRadiusPx();
     minX = Math.min(minX, this.screenX - hitR);
     maxX = Math.max(maxX, this.screenX + hitR);
     minY = Math.min(minY, this.screenY - hitR);
@@ -513,21 +521,20 @@ export class StarConquestJoystick {
     rimMat.opacity = 0.55 + active * 0.4 + flash * 0.1;
 
     (this.halo.material as THREE.SpriteMaterial).opacity =
-      0.14 + active * 0.42 + stickMag * 0.12 + flash * 0.35 + pulseWave * 0.06;
-    this.halo.scale.setScalar(18 * breathe * (1 + active * 0.18 + flash * 0.2));
+      0.1 + active * 0.28 + stickMag * 0.08;
+    this.halo.scale.setScalar(11 * breathe * (1 + active * 0.12));
     (this.halo.material as THREE.SpriteMaterial).color.setHex(
       active > 0.4 ? COL.cyan : COL.ink
     );
 
-    (this.outerRing.material as THREE.LineBasicMaterial).opacity = 0.45 + active * 0.5;
+    (this.outerRing.material as THREE.LineBasicMaterial).opacity = 0.4 + active * 0.35;
     (this.outerRing.material as THREE.LineBasicMaterial).color.setHex(
       active > 0.35 ? COL.silver : COL.graphite
     );
-    (this.outerRing2.material as THREE.LineBasicMaterial).opacity =
-      0.18 + active * 0.45 + stickMag * 0.15 + flash * 0.25;
-    (this.pulseRing.material as THREE.LineBasicMaterial).opacity =
-      0.08 + pulseWave * 0.2 + active * 0.45 + flash * 0.35;
-    this.pulseRing.scale.setScalar(1 + pulseWave * 0.1 + active * 0.1);
+    // Anneaux dupliqués désactivés (pas de 2e / 3e hitbox visuelle)
+    (this.outerRing2.material as THREE.LineBasicMaterial).opacity = 0;
+    (this.pulseRing.material as THREE.LineBasicMaterial).opacity = 0;
+    this.pulseRing.scale.setScalar(1);
     (this.dirMarks.material as THREE.LineBasicMaterial).opacity =
       0.35 + active * 0.5 + stickMag * 0.1;
     (this.cardinalDots.material as THREE.PointsMaterial).opacity =
@@ -617,7 +624,13 @@ function createGlassDiscTexture(size: number): THREE.CanvasTexture {
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
-  if (!ctx) return new THREE.CanvasTexture(canvas);
+  if (!ctx) {
+    const empty = new THREE.CanvasTexture(canvas);
+    empty.generateMipmaps = false;
+    empty.minFilter = THREE.LinearFilter;
+    empty.magFilter = THREE.LinearFilter;
+    return empty;
+  }
   const cx = size / 2;
   const g = ctx.createRadialGradient(cx * 0.7, cx * 0.55, 0, cx, cx, cx);
   g.addColorStop(0, 'rgba(255,255,255,0.95)');
@@ -638,6 +651,9 @@ function createGlassDiscTexture(size: number): THREE.CanvasTexture {
   ctx.ellipse(cx, cx * 0.55, cx * 0.7, cx * 0.28, -0.35, 0, Math.PI * 2);
   ctx.fill();
   const tex = new THREE.CanvasTexture(canvas);
+  tex.generateMipmaps = false;
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
   tex.needsUpdate = true;
   return tex;
 }
@@ -647,7 +663,13 @@ function createOrbitLabelTexture(): THREE.CanvasTexture {
   canvas.width = 512;
   canvas.height = 96;
   const ctx = canvas.getContext('2d');
-  if (!ctx) return new THREE.CanvasTexture(canvas);
+  if (!ctx) {
+    const empty = new THREE.CanvasTexture(canvas);
+    empty.generateMipmaps = false;
+    empty.minFilter = THREE.LinearFilter;
+    empty.magFilter = THREE.LinearFilter;
+    return empty;
+  }
   ctx.clearRect(0, 0, 512, 96);
   ctx.font = '600 11px ui-monospace, SF Mono, Menlo, monospace';
   ctx.textAlign = 'center';
@@ -659,6 +681,9 @@ function createOrbitLabelTexture(): THREE.CanvasTexture {
   ctx.font = '600 8px ui-monospace, SF Mono, Menlo, monospace';
   ctx.fillText('de particules', 256, 64);
   const tex = new THREE.CanvasTexture(canvas);
+  tex.generateMipmaps = false;
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
   tex.needsUpdate = true;
   return tex;
 }

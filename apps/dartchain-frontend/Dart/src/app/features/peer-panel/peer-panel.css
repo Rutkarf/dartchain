@@ -16,7 +16,7 @@
   --peer-red: #ff5c7a;
   --peer-muted: rgba(177, 205, 224, 0.62);
   --peer-row-height: 11px;
-  --ds-surface-carbon-opacity: 0.46;
+  --ds-surface-carbon-opacity: 0;
   --ds-surface-sheen-opacity: 0.3;
 
   position: relative;

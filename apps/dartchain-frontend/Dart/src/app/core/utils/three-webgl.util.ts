@@ -5,7 +5,7 @@ export interface WebGlRendererResult {
   canvas: HTMLCanvasElement;
 }
 
-/** Crée un renderer WebGL avec repli si le GPU est limité. */
+/** Crée un renderer WebGL optimisé mobile basse config. */
 export function createWebGlRenderer(
   parameters: THREE.WebGLRendererParameters = {}
 ): WebGlRendererResult | null {
@@ -15,12 +15,17 @@ export function createWebGlRenderer(
 
   try {
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: false,
       alpha: true,
-      powerPreference: 'high-performance',
+      depth: true,
+      stencil: false,
+      powerPreference: 'low-power',
+      preserveDrawingBuffer: false,
       failIfMajorPerformanceCaveat: false,
       ...parameters,
     });
+    renderer.setPixelRatio(1);
+    renderer.shadowMap.enabled = false;
 
     return { renderer, canvas: renderer.domElement };
   } catch (error) {

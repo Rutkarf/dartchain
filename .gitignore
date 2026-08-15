@@ -21,6 +21,7 @@ out/
 # Logs
 *.log
 logs/
+.dev-logs/
 npm-debug.log*
 
 # Frontend (Angular)

@@ -208,7 +208,7 @@
 .app-bottom-stack .app-bottom-stack__panel .chain-dock.ds-surface,
 .app-bottom-stack .app-bottom-stack__panel .transactions-dock.ds-surface,
 .app-bottom-stack .app-bottom-stack__panel .faucet-panel.ds-surface {
-  --ds-surface-carbon-opacity: 0.46;
+  --ds-surface-carbon-opacity: 0;
   --ds-surface-sheen-opacity: 0.3;
   background-color: rgba(var(--ds-surface-base-deep-rgb, 6, 7, 10), 0.62);
   background-image: var(--ds-surface-metallic), var(--ds-surface-bg), var(--ds-surface-veil);

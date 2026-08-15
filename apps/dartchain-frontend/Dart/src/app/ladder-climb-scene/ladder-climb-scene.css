@@ -1,0 +1,97 @@
+:host {
+  display: block;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: min(42vh, 420px);
+  min-height: 280px;
+  z-index: 1;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.ladder-climb {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to top,
+    #000 0%,
+    #000 72%,
+    rgba(0, 0, 0, 0.55) 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to top,
+    #000 0%,
+    #000 72%,
+    rgba(0, 0, 0, 0.55) 90%,
+    transparent 100%
+  );
+}
+
+.ladder-climb__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ladder-climb__prompt,
+.ladder-climb__status {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.ladder-climb__prompt {
+  bottom: 18%;
+  color: #fff;
+  background: rgba(10, 16, 28, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.ladder-climb__status {
+  top: 12%;
+  color: #1a1a1a;
+  background: rgba(255, 220, 120, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font-weight: 600;
+}
+
+.ladder-climb__hint {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+  :host {
+    height: min(38vh, 320px);
+    min-height: 220px;
+  }
+
+  .ladder-climb__prompt,
+  .ladder-climb__status {
+    font-size: 0.75rem;
+    white-space: normal;
+    max-width: 90vw;
+  }
+}

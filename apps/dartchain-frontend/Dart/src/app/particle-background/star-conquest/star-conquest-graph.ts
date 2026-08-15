@@ -70,6 +70,9 @@ export interface StarQuestScreenPos {
   depth: number;
 }
 
+// [starConquest 2026-08] Désactivation des lignes neuronales visuelles.
+// Les particules et tous les effets associés (glow, trails, energy packets, etc.) sont conservés.
+// Objectif : préparer l’intégration du Character NFT et de la ville 3D.
 /**
  * Nœuds (noyau + halo) + liens + paquets d’énergie sur liens actifs.
  */
@@ -182,9 +185,10 @@ export class StarConquestGraph {
       this.layoutHomes[i3 + 2] = quest.position.z;
 
       const [r, g, b] = this.colorForQuest(quest);
-      this.baseColors[i3] = r;
-      this.baseColors[i3 + 1] = g;
-      this.baseColors[i3 + 2] = b;
+      // Contraste doux vs fond gris bleuté (cyan / violet / blanc)
+      this.baseColors[i3] = Math.min(1, r * 0.5 + 0.25);
+      this.baseColors[i3 + 1] = Math.min(1, g * 0.55 + 0.55);
+      this.baseColors[i3 + 2] = Math.min(1, b * 0.4 + 0.75);
 
       const h = hashFloat(quest.id);
       const h2 = hashFloat(quest.id + ':b');
@@ -216,12 +220,13 @@ export class StarConquestGraph {
       new THREE.BufferAttribute(this.baseColors.slice(), 3)
     );
 
-    // Halo Three.js doux — l’identité visuelle est le label • +N sans pill
+    // Halo Three.js — points doux, contraste vs fond gris 0x7f8c9b
     const coreMat = new THREE.PointsMaterial({
-      size: this.meanCoreSize * 0.55,
+      size: Math.max(0.14, Math.min(0.22, this.meanCoreSize * 0.9)),
       map: this.discTexture,
+      color: 0x52e6ed,
       transparent: true,
-      opacity: 0.28,
+      opacity: 0.85,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -234,10 +239,11 @@ export class StarConquestGraph {
     haloGeom.setAttribute('position', geometry.getAttribute('position'));
     haloGeom.setAttribute('color', geometry.getAttribute('color'));
     const haloMat = new THREE.PointsMaterial({
-      size: this.meanCoreSize * 2.4,
+      size: Math.max(0.28, Math.min(0.45, this.meanCoreSize * 2.0)),
       map: this.discTexture,
+      color: 0xb47cff,
       transparent: true,
-      opacity: 0.1,
+      opacity: 0.35,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -332,8 +338,9 @@ export class StarConquestGraph {
     );
     packetGeom.setAttribute('color', new THREE.BufferAttribute(this.packetColors, 3));
     const packetMat = new THREE.PointsMaterial({
-      size: 2.35,
+      size: 3.2,
       map: this.discTexture,
+      color: 0x00ffff,
       transparent: true,
       opacity: 0,
       vertexColors: true,
@@ -347,9 +354,13 @@ export class StarConquestGraph {
     this.energyPackets.visible = false;
     this.energyPackets.renderOrder = 2;
 
-    // Ordre groupe : liens quest → halos → cœurs → signaux (pas de décor far/mid)
+    // Ordre groupe : halos → cœurs → signaux (pas de décor far/mid)
+    // [starConquest] Lignes neuronales désactivées – effets conservés
+    // Géométrie + update des liens gardés pour energy packets / focus ; mesh non affiché.
     this.constellationGuides.visible = false;
-    this.group.add(this.connectionLines);
+    this.connectionLines.visible = false;
+    // this.group.add(this.connectionLines);
+    // this.group.add(this.constellationGuides);
     this.group.add(this.haloPoints);
     this.group.add(this.questPoints);
     this.group.add(this.energyPackets);
@@ -386,9 +397,9 @@ export class StarConquestGraph {
       this.layoutHomes[i3 + 2] = quest.position.z;
       pos.setXYZ(i, quest.position.x, quest.position.y, quest.position.z);
       const [r, g, b] = this.colorForQuest(this.quests[i]);
-      this.baseColors[i3] = r;
-      this.baseColors[i3 + 1] = g;
-      this.baseColors[i3 + 2] = b;
+      this.baseColors[i3] = Math.min(1, r * 0.5 + 0.25);
+      this.baseColors[i3 + 1] = Math.min(1, g * 0.55 + 0.55);
+      this.baseColors[i3 + 2] = Math.min(1, b * 0.4 + 0.75);
       sizeSum += sizeFromReward(quest.rewardM4T3R, RARITY_BOOST[quest.rarity]);
     });
     this.meanCoreSize = sizeSum / Math.max(quests.length, 1);

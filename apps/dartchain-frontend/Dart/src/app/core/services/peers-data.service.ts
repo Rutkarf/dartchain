@@ -49,6 +49,7 @@ export class PeersDataService {
     this.startLiveUpdates();
 
     this.pollTimerId = window.setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       void this.refreshAll(false);
     }, PEER_AUTO_REFRESH_MS);
 

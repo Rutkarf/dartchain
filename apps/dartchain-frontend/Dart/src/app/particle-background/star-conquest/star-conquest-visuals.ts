@@ -7,7 +7,7 @@ export function createSoftDiscTexture(size = 64): THREE.CanvasTexture {
   canvas.height = size;
   const ctx = canvas.getContext('2d');
   if (!ctx) {
-    return new THREE.CanvasTexture(canvas);
+    return configureCanvasTexture(new THREE.CanvasTexture(canvas));
   }
   const g = ctx.createRadialGradient(
     size / 2,
@@ -25,6 +25,13 @@ export function createSoftDiscTexture(size = 64): THREE.CanvasTexture {
   ctx.fillRect(0, 0, size, size);
   const tex = new THREE.CanvasTexture(canvas);
   tex.needsUpdate = true;
+  return configureCanvasTexture(tex);
+}
+
+function configureCanvasTexture(tex: THREE.CanvasTexture): THREE.CanvasTexture {
+  tex.generateMipmaps = false;
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
   return tex;
 }
 

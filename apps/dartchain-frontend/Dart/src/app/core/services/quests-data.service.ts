@@ -36,6 +36,7 @@ export class QuestsDataService {
     window.addEventListener('market-swap-complete', this.onExternalRefresh);
 
     this.pollTimerId = window.setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       void this.refreshAll(false);
     }, QuestsDataService.AUTO_REFRESH_MS);
 

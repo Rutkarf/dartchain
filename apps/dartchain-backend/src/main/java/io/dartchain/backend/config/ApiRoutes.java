@@ -62,6 +62,10 @@ public final class ApiRoutes {
     public static final String WALLETS_V1_PREFIX = API_V1_PREFIX + "/wallets";
     public static final String WALLETS_GENERATE_EVM_V1 = WALLETS_V1_PREFIX + "/generate-evm";
 
+    /** Character NFT (1 mesh .stl / user) — mint blockchain ultérieur. */
+    public static final String CHARACTERS_V1_PREFIX = API_V1_PREFIX + "/characters";
+    public static final String CHARACTERS_ME_V1 = CHARACTERS_V1_PREFIX + "/me";
+
     private ApiRoutes() {
     }
 }

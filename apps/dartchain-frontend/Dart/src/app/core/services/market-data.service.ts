@@ -82,6 +82,9 @@ export class MarketDataService {
       if (this.pollingPaused) {
         return;
       }
+      if (typeof document !== 'undefined' && document.hidden) {
+        return;
+      }
       void this.refreshAll(false);
     }, MARKET_AUTO_REFRESH_MS);
   }

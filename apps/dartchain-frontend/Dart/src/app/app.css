@@ -258,8 +258,44 @@
   padding-top: 0;
   padding-bottom: 0;
   margin-top: 0;
+  isolation: isolate;
+  background-color: var(--background-middle, #718291);
   /* Laisse passer les events vers Star Conquest (canvas z-index 0) hors panneaux */
   pointer-events: none;
+}
+
+/* Fond organique — derrière particules (0) et floor (1), sans motif diagonal */
+.app-game-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 82% 58% at 13% 4%,
+      var(--background-light-halo, rgba(193, 214, 221, 0.16)) 0%,
+      rgba(193, 214, 221, 0.06) 38%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 72% 52% at 90% 21%,
+      var(--background-blue-halo, rgba(100, 145, 165, 0.12)) 0%,
+      rgba(100, 145, 165, 0.04) 42%,
+      transparent 78%
+    ),
+    radial-gradient(
+      ellipse 90% 65% at 50% 105%,
+      var(--background-depth-halo, rgba(37, 55, 69, 0.16)) 0%,
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      var(--background-top, #7e909f) 0%,
+      var(--background-middle, #718291) 54%,
+      var(--background-bottom, #61717f) 100%
+    );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 .app-shell > app-navbar,
@@ -298,6 +334,7 @@
 }
 
 /* Calques plein écran */
+.app-game-background,
 .app-background,
 app-particle-background,
 app-three-floor,

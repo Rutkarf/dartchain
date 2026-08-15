@@ -42,7 +42,6 @@ import { LaunchDrawerService } from './core/services/launch-drawer.service';
 import { ThreeFloor } from './three-floor/three-floor';
 import { bindViewportCompactClass } from './core/viewport-compact';
 import { ProductConfigService } from './core/config/product-config.service';
-import { FocusTrapDirective } from './core/directives/focus-trap.directive';
 import { AuthService } from './core/services/auth.service';
 import { ShowcaseNewsStateService } from './core/services/showcase-news-state.service';
 import { ShowcaseHubUiService } from './core/services/showcase-hub-ui.service';
@@ -84,7 +83,6 @@ import { PeersDataService } from './core/services/peers-data.service';
     BlockDetailDrawerComponent,
     LaunchFormDrawerComponent,
     ThreeFloor,
-    FocusTrapDirective,
     AuthDrawerComponent,
   ],
   templateUrl: './app.html',

@@ -18,7 +18,7 @@
       <span class="admin-panel__meta-item">
         {{ locale.t('admin.collected') }}: {{ formatTimestamp(data.collectedAt) }}
       </span>
-      @if (data.metadata?.['observabilityModel']) {
+      @if (data.metadata['observabilityModel']) {
         <span class="admin-panel__meta-item">
           {{ data.metadata['observabilityModel'] }}
         </span>

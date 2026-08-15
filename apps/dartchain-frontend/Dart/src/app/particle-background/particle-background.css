@@ -18,6 +18,7 @@
   overflow: visible !important;
   margin: 0 !important;
   padding: 0 !important;
+  background: transparent !important;
 }
 
 :host canvas {
@@ -39,6 +40,8 @@
   margin: 0 !important;
   padding: 0 !important;
   display: block !important;
+  background: transparent !important;
+  opacity: 1 !important;
 }
 
 .particle-canvas {
@@ -47,21 +50,5 @@
   width: 100%;
   height: 100%;
   max-width: none;
-}
-
-/* Voile diffus — nébuleuse numérique derrière l’UI */
-.space-overlay {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  background:
-    radial-gradient(ellipse at 18% 22%, rgba(167, 139, 250, 0.04), transparent 42%),
-    radial-gradient(ellipse at 78% 38%, rgba(62, 207, 220, 0.03), transparent 40%),
-    radial-gradient(ellipse at 50% 70%, rgba(232, 90, 155, 0.018), transparent 48%);
-  filter: blur(22px);
-  pointer-events: none;
-  opacity: 0.85;
-  z-index: 1;
+  background: transparent;
 }

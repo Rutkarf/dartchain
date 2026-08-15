@@ -10,59 +10,50 @@
   height: auto !important;
   max-height: none !important;
   min-height: 0 !important;
-  /* Niveau 2 : devant neuronal (0), derrière Angular (≥2) */
+  /* Niveau 2 : devant fond CSS (0), derrière Angular (≥2) */
   z-index: 1 !important;
   isolation: isolate;
 }
 
-/* Un seul floor peek — pas d’extension qui dédouble le sol */
+/*
+ * Floor peek — bâtiments / perso pleinement opaques.
+ * Pas de mask-image ni d’opacity < 1 (cause de la couture floue au sommet).
+ */
 .floor-wrapper {
   position: fixed;
   left: 0;
   bottom: 0;
   width: 100vw;
-  height: var(--floor-canvas-height, var(--ds-zone-floor-peek, 64px));
+  height: var(--floor-canvas-height, var(--ds-zone-floor-peek, 96px));
   z-index: 1;
   pointer-events: none;
   overflow: visible;
-  -webkit-mask-image: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.94) 55%,
-    rgba(0, 0, 0, 0.4) 88%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  mask-image: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.94) 55%,
-    rgba(0, 0, 0, 0.4) 88%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  background: transparent;
 }
 
 .floor-canvas {
   width: 100%;
   height: 100%;
   display: block;
-  opacity: 0.95;
+  opacity: 1;
+  background: transparent;
   pointer-events: none !important;
 }
 
 @media (max-width: 349px) {
   .floor-wrapper {
-    height: var(--floor-canvas-height, var(--ds-zone-floor-peek, 64px));
+    height: var(--floor-canvas-height, var(--ds-zone-floor-peek, 88px));
   }
 }
 
 @media (min-width: 350px) and (max-width: 480px) {
   .floor-wrapper {
-    height: var(--floor-canvas-height, 72px);
+    height: var(--floor-canvas-height, 104px);
   }
 }
 
 @media (min-width: 481px) {
   .floor-wrapper {
-    height: var(--floor-canvas-height, 80px);
+    height: var(--floor-canvas-height, 120px);
   }
 }

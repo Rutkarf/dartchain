@@ -25,10 +25,9 @@
   pointer-events: none;
   z-index: 0;
   border-radius: inherit;
-  opacity: var(--ds-surface-carbon-opacity);
-  background-image: var(--ds-surface-carbon-weave), var(--ds-surface-micro-grain);
-  background-size: var(--ds-surface-carbon-size), 64px 64px;
-  mix-blend-mode: soft-light;
+  opacity: 0;
+  background-image: none;
+  mix-blend-mode: normal;
 }
 
 .ds-surface::after {

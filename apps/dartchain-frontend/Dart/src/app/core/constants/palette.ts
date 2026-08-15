@@ -194,12 +194,12 @@ function lightenHex(hex: string, amount: number): string {
   return toHex(r + (255 - r) * amount, g + (255 - g) * amount, b + (255 - b) * amount);
 }
 
-/** Fond CSS global (noir pur) */
-export const THEME_BG_BASE = '#000000';
+/** Fond CSS / scène — gris bleuté calme (aligné shell organique) */
+export const THEME_BG_BASE = '#718291';
 
-/** Scène particules — fond noir */
+/** Scène particules — même fond gris bleuté */
 export const THREE_SCENE_BG = hexToThree(THEME_BG_BASE);
-export const THREE_AMBIENT_DARK = hexToThree(THEME_BG_BASE);
+export const THREE_AMBIENT_DARK = hexToThree('#61717f');
 export const THREE_SCENE_CLEAR_LIGHT = hexToThree(THEME_BG_BASE);
 export const THREE_RIM_DEFAULT = hexToThree(THREE_LEGACY.floorLight);
 export const THREE_CORE_DEFAULT = hexToThree(THREE_LEGACY.floorGlow);

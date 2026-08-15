@@ -1,0 +1,9 @@
+<div class="joy-zone" data-testid="joystick-move">
+  <div class="joy-stick-slot">
+    <app-virtual-joystick
+      [ariaLabel]="'Déplacer le personnage'"
+      (vectorChange)="onVector($event)"
+    />
+  </div>
+  <span class="joy-label">Move</span>
+</div>

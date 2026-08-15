@@ -13,6 +13,19 @@
 
 /* —— Viewport one-page @ 250×550 —— */
 html,
+body {
+  background-color: var(--background-middle, #718291);
+  background-image: linear-gradient(
+    180deg,
+    var(--background-top, #7e909f) 0%,
+    var(--background-middle, #718291) 54%,
+    var(--background-bottom, #61717f) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+html,
 body,
 app-root {
   display: block;

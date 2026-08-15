@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   HostListener,
@@ -8,7 +9,6 @@ import {
   inject,
 } from '@angular/core';
 import * as THREE from 'three';
-import { THREE_SCENE_CLEAR_LIGHT } from '../core/constants/palette';
 import {
   StarConquestStateService,
   type StarQuestRewardLabel,
@@ -62,6 +62,7 @@ import { formatRewardShort } from './star-conquest/star-conquest-visuals';
 @Component({
   selector: 'app-particle-background',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './particle-background.html',
   styleUrl: './particle-background.css',
 })
@@ -131,7 +132,12 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   };
 
   ngAfterViewInit(): void {
-    const created = createWebGlRenderer({ alpha: false });
+    this.zone.runOutsideAngular(() => this.initWebGl());
+  }
+
+  private initWebGl(): void {
+    // alpha:true → le fond CSS organique transparait ; particules inchangées
+    const created = createWebGlRenderer({ alpha: true });
     if (!created) return;
 
     try {
@@ -140,17 +146,32 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       const { width, height } = viewportSize();
 
       this.scene = new THREE.Scene();
+      this.scene.background = null;
       this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 2000);
       this.camera.position.z = 160;
 
       this.renderer.setSize(width, height, false);
-      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      this.renderer.setClearColor(THREE_SCENE_CLEAR_LIGHT, 1);
+      this.renderer.setPixelRatio(1);
+      this.renderer.setClearColor(0x000000, 0);
+      this.renderer.autoClear = true;
+
+      console.log('[BACKGROUND] Active Angular component:', this.constructor.name);
+      console.log(
+        '[BACKGROUND] Renderer alpha:',
+        this.renderer.getContextAttributes()?.alpha
+      );
+      console.log('[BACKGROUND] Scene fog:', this.scene.fog);
+      console.log('[BACKGROUND] Scene background:', this.scene.background);
+      console.log(
+        '[BACKGROUND] Canvas computed background:',
+        getComputedStyle(created.canvas).backgroundColor
+      );
 
       applyCanvasLayerStyles(created.canvas, 'background');
       created.canvas.style.pointerEvents = 'auto';
       created.canvas.style.touchAction = 'none';
       created.canvas.style.cursor = 'default';
+      created.canvas.style.background = 'transparent';
       created.canvas.setAttribute('data-star-conquest', 'canvas');
       created.canvas.setAttribute('aria-label', 'Univers neuronal Star Conquest');
       created.canvas.removeAttribute('title');
@@ -992,7 +1013,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height, false);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(1);
     this.relayoutBackground();
   }
 }

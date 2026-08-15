@@ -1,0 +1,26 @@
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { CharacterControlService } from '../../core/services/character-control.service';
+import {
+  VirtualJoystickComponent,
+  type JoystickVector,
+} from '../joystick-shared/virtual-joystick.component';
+
+/**
+ * Zone bas-gauche 250×550 : déplacement CharacterAnon.
+ * Stick visuel réduit (~60px) centré dans la moitié basse de la zone.
+ */
+@Component({
+  selector: 'app-joystick-move',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [VirtualJoystickComponent],
+  templateUrl: './joystick-move.component.html',
+  styleUrl: './joystick-move.component.css',
+})
+export class JoystickMoveComponent {
+  private readonly control = inject(CharacterControlService);
+
+  onVector(vector: JoystickVector): void {
+    this.control.onMovementJoystickUpdate(vector);
+  }
+}

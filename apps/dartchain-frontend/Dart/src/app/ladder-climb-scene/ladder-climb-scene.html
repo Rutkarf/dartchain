@@ -1,0 +1,14 @@
+<div class="ladder-climb" data-testid="ladder-climb-scene">
+  <canvas #gameCanvas class="ladder-climb__canvas" aria-label="Ladder climb game"></canvas>
+
+  @if (promptText(); as prompt) {
+    <div class="ladder-climb__prompt" role="status">{{ prompt }}</div>
+  }
+  @if (statusText(); as status) {
+    <div class="ladder-climb__status" role="status">{{ status }}</div>
+  }
+
+  <div class="ladder-climb__hint" aria-hidden="true">
+    WASD / arrows · E climb · orange capsule
+  </div>
+</div>

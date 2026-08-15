@@ -1,16 +1,18 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
+  NgZone,
   OnDestroy,
   ViewChild,
+  inject,
 } from '@angular/core';
 import * as THREE from 'three';
-import {
-  THREE_AMBIENT_DARK,
-  THREE_FLOOR_GLOW,
-  THREE_FLOOR_LIGHT,
-} from '../core/constants/palette';
+import { THREE_FLOOR_LIGHT } from '../core/constants/palette';
+import { CameraControlService } from '../core/services/camera-control.service';
+import { CharacterControlService } from '../core/services/character-control.service';
+import { ThreeSceneService } from '../core/services/three-scene.service';
 import {
   bindContainerResize,
   type ContainerResizeBinding,
@@ -21,16 +23,37 @@ import {
   shouldAnimateWebGl,
 } from '../core/utils/three-animation.util';
 import { applyCanvasLayerStyles } from '../core/utils/three-webgl.util';
+import {
+  PerfProfiler,
+  isPerfDebugEnabled,
+  markRafLoopStart,
+  markRafLoopStop,
+  resetCollisionChecks,
+} from '../core/utils/perf-profiler.util';
+import { CharacterComponent } from './character/character.component';
+import { CitySceneComponent } from './city-scene/city-scene.component';
+import { JoystickMoveComponent } from './joystick-move/joystick-move.component';
+import { JoystickViewComponent } from './joystick-view/joystick-view.component';
 
 const FLOOR_HEIGHT_FALLBACK = 140;
+const PERF_DEBUG = isPerfDebugEnabled();
+
+/** Gris bleuté calme — aligné fond CSS organique (--background-middle). */
+const SCENE_BG = 0x718291;
 
 /**
- * Floor Three.js unique (z-index 1).
- * Joystick = scène particules (bande libre au-dessus du floor).
+ * Floor Three.js — boucle unique hors NgZone, pixelRatio 1 (même look CSS 100%).
  */
 @Component({
   selector: 'app-three-floor',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CharacterComponent,
+    CitySceneComponent,
+    JoystickMoveComponent,
+    JoystickViewComponent,
+  ],
   templateUrl: './three-floor.html',
   styleUrl: './three-floor.css',
 })
@@ -38,18 +61,54 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   @ViewChild('floorCanvas', { static: true })
   floorCanvas!: ElementRef<HTMLCanvasElement>;
 
+  private readonly threeScene = inject(ThreeSceneService);
+  private readonly characterControl = inject(CharacterControlService);
+  private readonly cameraControl = inject(CameraControlService);
+  private readonly zone = inject(NgZone);
+
   private scene?: THREE.Scene;
   private camera?: THREE.PerspectiveCamera;
   private renderer?: THREE.WebGLRenderer;
   private animationId?: number;
 
-  private gridMesh?: THREE.Mesh;
+  private neonFloor?: THREE.Mesh;
+  private neonGrid?: THREE.GridHelper;
+  private floorTexture?: THREE.CanvasTexture;
+  private pathLine?: THREE.Line;
   private animating = false;
   private visibilityBinding?: { unsubscribe: () => void };
   private resizeBinding?: ContainerResizeBinding;
+  private lastFrameMs = 0;
+  private unsubControl?: () => void;
+  private readonly profiler = new PerfProfiler();
 
   ngAfterViewInit(): void {
+    this.zone.runOutsideAngular(() => this.initScene());
+  }
+
+  ngOnDestroy(): void {
+    this.unsubControl?.();
+    this.characterControl.unbindKeys();
+    this.threeScene.unregister();
+    this.visibilityBinding?.unsubscribe();
+    this.resizeBinding?.unsubscribe();
+    this.pauseAnimation();
+    this.disposeFloor();
+    this.disposePathLine();
+    if (this.renderer) {
+      this.renderer.renderLists.dispose();
+      this.renderer.dispose();
+      this.renderer = undefined;
+    }
+    this.scene?.clear();
+    this.scene = undefined;
+    this.camera = undefined;
+  }
+
+  private initScene(): void {
     try {
+      if (PERF_DEBUG) console.log('[PERF] Game component created', 'ThreeFloor');
+
       const canvas = this.floorCanvas.nativeElement;
       const container = canvas.parentElement ?? canvas;
       const { width, height } = readContainerSize(container, {
@@ -58,32 +117,77 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       });
 
       this.scene = new THREE.Scene();
-      this.scene.background = null;
+      // Couleur unie assortie au fond CSS (pas d’alpha canvas = pas de seam CSS/WebGL)
+      this.scene.background = new THREE.Color(SCENE_BG);
+      // Fog lointain uniquement — near > bâtiments proches (évite toits lavés)
+      this.scene.fog = new THREE.Fog(SCENE_BG, 90, 240);
 
-      this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-      this.camera.position.set(0, 3.5, 5);
-      this.camera.lookAt(0, 0, 0);
+      this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 250);
+      this.camera.position.set(0, 2.2, 5);
+      this.camera.lookAt(0, 0.4, -4);
 
-      const ambient = new THREE.AmbientLight(THREE_AMBIENT_DARK, 0.8);
+      const ambient = new THREE.AmbientLight(0xb8c4d0, 0.7);
       this.scene.add(ambient);
 
-      const topLight = new THREE.DirectionalLight(THREE_FLOOR_LIGHT, 1.2);
-      topLight.position.set(0, 5, 5);
+      const topLight = new THREE.DirectionalLight(THREE_FLOOR_LIGHT, 0.75);
+      topLight.position.set(2, 10, 4);
+      topLight.castShadow = false;
       this.scene.add(topLight);
+
+      const fill = new THREE.DirectionalLight(0x9eb0c0, 0.4);
+      fill.position.set(-4, 4, -2);
+      fill.castShadow = false;
+      this.scene.add(fill);
+
+      const accent = new THREE.PointLight(0x52e6ed, 0.35, 60);
+      accent.position.set(-8, 6, -10);
+      accent.castShadow = false;
+      this.scene.add(accent);
 
       this.renderer = new THREE.WebGLRenderer({
         canvas,
-        alpha: true,
-        antialias: true,
-        powerPreference: 'high-performance',
+        alpha: false,
+        antialias: false,
+        depth: true,
+        stencil: false,
+        powerPreference: 'low-power',
+        preserveDrawingBuffer: false,
+        logarithmicDepthBuffer: false,
         failIfMajorPerformanceCaveat: false,
       });
-      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      // CSS reste 100% — résolution interne fixe 1× (pas de déformation layout)
+      this.renderer.setPixelRatio(1);
       this.renderer.setSize(width, height, false);
-      this.renderer.setClearColor(0x000000, 0);
+      this.renderer.setClearColor(SCENE_BG, 1);
+      this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+      this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      this.renderer.toneMappingExposure = 1.0;
+      this.renderer.shadowMap.enabled = false;
       applyCanvasLayerStyles(canvas, 'floor');
 
-      this.createNeonFloor();
+      if (PERF_DEBUG) console.log('[PERF] Three.js renderer created');
+
+      console.log('[BACKGROUND] Active Angular component:', this.constructor.name);
+      console.log(
+        '[BACKGROUND] Renderer alpha:',
+        this.renderer.getContextAttributes()?.alpha
+      );
+      console.log('[BACKGROUND] Scene fog:', this.scene.fog);
+      console.log('[BACKGROUND] Scene background:', this.scene.background);
+      console.log(
+        '[BACKGROUND] Canvas computed background:',
+        getComputedStyle(canvas).backgroundColor
+      );
+
+      this.createProfessionalFloor();
+      this.createPathLine();
+
+      this.threeScene.register(this.scene, this.camera, this.renderer);
+      this.cameraControl.resetOrbit();
+      this.unsubControl = this.threeScene.registerUpdate((dt) => {
+        this.characterControl.update(dt);
+      });
+
       this.renderFrame();
 
       this.resizeBinding = bindContainerResize(
@@ -96,66 +200,154 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
         () => this.pauseAnimation(),
         () => this.resumeAnimation()
       );
+      this.lastFrameMs = performance.now();
       this.resumeAnimation();
+
+      if (PERF_DEBUG) {
+        console.log('[PERF] Render loop started');
+        console.log('[PERF] Scene children:', this.scene.children.length);
+        console.log('[PERF] Renderer info:', this.renderer.info);
+      }
     } catch (error) {
       console.error('[three-floor] Initialisation impossible.', error);
     }
   }
 
-  ngOnDestroy(): void {
-    this.visibilityBinding?.unsubscribe();
-    this.resizeBinding?.unsubscribe();
-    this.pauseAnimation();
-    this.renderer?.dispose();
-  }
-
-  private createNeonFloor(): void {
+  /**
+   * Floor : surface + texture grille dense (maillage serré) sans moiré GridHelper×100.
+   * La densité vient de la texture répétée (contraste doux), pas de milliers de Lines.
+   */
+  private createProfessionalFloor(): void {
     if (!this.scene) return;
 
-    const size = 40;
-    const divisions = 40;
-    const gridGeo = new THREE.PlaneGeometry(size, size, divisions, divisions);
-    const pos = gridGeo.attributes['position'] as THREE.BufferAttribute;
-    const colors = new Float32Array(pos.count * 3);
-    const color = new THREE.Color();
+    this.floorTexture = this.createDenseGridTexture();
+    this.floorTexture.wrapS = THREE.RepeatWrapping;
+    this.floorTexture.wrapT = THREE.RepeatWrapping;
+    // Maillage serré via repeat élevé
+    this.floorTexture.repeat.set(48, 48);
+    this.floorTexture.anisotropy = 1;
+    this.floorTexture.generateMipmaps = false;
+    this.floorTexture.minFilter = THREE.LinearFilter;
+    this.floorTexture.magFilter = THREE.LinearFilter;
+    this.floorTexture.colorSpace = THREE.SRGBColorSpace;
 
-    for (let i = 0; i < pos.count; i++) {
-      const y = pos.getY(i);
-      const t = (y + size / 2) / size;
-      color.setHSL(0.88 - t * 0.38, 0.72, 0.42 + t * 0.08);
-      colors[i * 3] = color.r;
-      colors[i * 3 + 1] = color.g;
-      colors[i * 3 + 2] = color.b;
+    const floorMaterial = new THREE.MeshLambertMaterial({
+      color: 0x596b7d,
+      map: this.floorTexture,
+      side: THREE.FrontSide,
+      transparent: false,
+      opacity: 1,
+    });
+
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), floorMaterial);
+    floor.name = 'neon-floor';
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0;
+    floor.receiveShadow = false;
+    this.neonFloor = floor;
+    this.scene.add(floor);
+
+    // Grille d’accent douce (pas 100 divisions → anti-moiré)
+    const gridHelper = new THREE.GridHelper(100, 50, 0x45b8c8, 0x30495f);
+    gridHelper.position.y = 0.012;
+    gridHelper.name = 'neon-grid';
+    const mats = Array.isArray(gridHelper.material)
+      ? gridHelper.material
+      : [gridHelper.material];
+    for (const m of mats) {
+      m.transparent = true;
+      m.opacity = 0.28;
+      m.depthWrite = false;
     }
+    this.neonGrid = gridHelper;
+    this.scene.add(gridHelper);
 
-    gridGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    if (PERF_DEBUG) {
+      console.log('[PERF] Floor dense texture+soft grid ready');
+    }
+  }
 
-    const gridMat = new THREE.MeshBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.62,
-      wireframe: true,
-    });
+  /** Texture procédurale dense, contraste modéré (évite scintillement). */
+  private createDenseGridTexture(): THREE.CanvasTexture {
+    const size = 64;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#596b7d';
+    ctx.fillRect(0, 0, size, size);
+    // Maillage serré (8×8 cellules) — répété ×48 = densite visuelle élevée
+    ctx.strokeStyle = 'rgba(69, 184, 200, 0.35)';
+    ctx.lineWidth = 1;
+    const step = size / 8;
+    for (let i = 0; i <= 8; i++) {
+      const p = i * step + 0.5;
+      ctx.beginPath();
+      ctx.moveTo(p, 0);
+      ctx.lineTo(p, size);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, p);
+      ctx.lineTo(size, p);
+      ctx.stroke();
+    }
+    // Lignes majeures plus douces
+    ctx.strokeStyle = 'rgba(52, 230, 237, 0.22)';
+    ctx.beginPath();
+    ctx.moveTo(0.5, 0);
+    ctx.lineTo(0.5, size);
+    ctx.moveTo(0, 0.5);
+    ctx.lineTo(size, 0.5);
+    ctx.stroke();
+    return new THREE.CanvasTexture(canvas);
+  }
 
-    const grid = new THREE.Mesh(gridGeo, gridMat);
-    grid.rotation.x = -Math.PI / 2;
-    grid.position.y = -0.5;
-    this.gridMesh = grid;
-    this.scene.add(grid);
-
-    const glowMat = new THREE.MeshBasicMaterial({
-      color: THREE_FLOOR_GLOW,
-      transparent: true,
-      opacity: 0.16,
-      side: THREE.BackSide,
-    });
-    const glowPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(size * 1.1, size * 1.1),
-      glowMat
+  private createPathLine(): void {
+    if (!this.scene) return;
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0.08, 5),
+      new THREE.Vector3(0, 0.08, -40),
+    ]);
+    const pathLine = new THREE.Line(
+      geo,
+      new THREE.LineBasicMaterial({
+        color: 0x5a7aaa,
+        transparent: true,
+        opacity: 0.35,
+        depthWrite: false,
+      })
     );
-    glowPlane.rotation.x = -Math.PI / 2;
-    glowPlane.position.y = -0.52;
-    this.scene.add(glowPlane);
+    pathLine.name = 'path-line';
+    pathLine.raycast = () => {};
+    this.pathLine = pathLine;
+    this.scene.add(pathLine);
+  }
+
+  private disposePathLine(): void {
+    if (!this.pathLine) return;
+    this.scene?.remove(this.pathLine);
+    this.pathLine.geometry.dispose();
+    (this.pathLine.material as THREE.Material).dispose();
+    this.pathLine = undefined;
+  }
+
+  private disposeFloor(): void {
+    if (this.neonFloor) {
+      this.scene?.remove(this.neonFloor);
+      this.neonFloor.geometry.dispose();
+      (this.neonFloor.material as THREE.Material).dispose();
+      this.neonFloor = undefined;
+    }
+    if (this.neonGrid) {
+      this.scene?.remove(this.neonGrid);
+      this.neonGrid.geometry.dispose();
+      const mats = this.neonGrid.material;
+      if (Array.isArray(mats)) mats.forEach((m) => m.dispose());
+      else mats?.dispose();
+      this.neonGrid = undefined;
+    }
+    this.floorTexture?.dispose();
+    this.floorTexture = undefined;
   }
 
   private animate = (): void => {
@@ -165,19 +357,24 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
 
     this.animationId = requestAnimationFrame(this.animate);
 
-    if (shouldAnimateWebGl() && this.gridMesh) {
-      const t = performance.now() * 0.001;
-      this.gridMesh.position.z = (t * 2) % 2;
+    const now = performance.now();
+    const deltaSeconds = Math.min(0.05, (now - this.lastFrameMs) / 1000);
+    this.lastFrameMs = now;
+
+    if (shouldAnimateWebGl()) {
+      if (PERF_DEBUG) resetCollisionChecks();
+      this.threeScene.tick(deltaSeconds);
+      this.renderFrame();
     }
 
-    this.renderFrame();
+    if (PERF_DEBUG) {
+      this.profiler.sample(deltaSeconds * 1000);
+      this.profiler.maybeReport(this.renderer, this.scene.children.length, 'floor');
+    }
   };
 
   private renderFrame(): void {
-    if (!this.scene || !this.camera || !this.renderer) {
-      return;
-    }
-
+    if (!this.scene || !this.camera || !this.renderer) return;
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -188,20 +385,19 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       cancelAnimationFrame(this.animationId);
       this.animationId = undefined;
     }
+    markRafLoopStop();
   }
 
   private resumeAnimation(): void {
-    if (this.animating) {
-      return;
-    }
-
+    if (this.animating) return;
     this.animating = true;
+    this.lastFrameMs = performance.now();
+    markRafLoopStart();
     this.animate();
   }
 
   private applyRendererSize(width: number, height: number): void {
     if (!this.camera || !this.renderer) return;
-
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height, false);

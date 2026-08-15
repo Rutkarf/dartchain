@@ -1,0 +1,9 @@
+<div class="joy-zone" data-testid="joystick-view">
+  <div class="joy-stick-slot">
+    <app-virtual-joystick
+      [ariaLabel]="'Orienter la caméra'"
+      (vectorChange)="onVector($event)"
+    />
+  </div>
+  <span class="joy-label">View</span>
+</div>

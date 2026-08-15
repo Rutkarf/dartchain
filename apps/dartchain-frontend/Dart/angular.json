@@ -106,7 +106,8 @@
             },
             "development": {
               "buildTarget": "Dart:build:development",
-              "proxyConfig": "proxy.conf.json"
+              "proxyConfig": "proxy.conf.json",
+              "hmr": false
             }
           },
           "defaultConfiguration": "development"
