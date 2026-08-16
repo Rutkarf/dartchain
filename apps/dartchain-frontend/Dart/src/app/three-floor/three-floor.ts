@@ -9,7 +9,6 @@ import {
   inject,
 } from '@angular/core';
 import * as THREE from 'three';
-import { THREE_FLOOR_LIGHT } from '../core/constants/palette';
 import { CameraControlService } from '../core/services/camera-control.service';
 import { CharacterControlService } from '../core/services/character-control.service';
 import { ThreeSceneService } from '../core/services/three-scene.service';
@@ -38,8 +37,8 @@ import { JoystickViewComponent } from './joystick-view/joystick-view.component';
 const FLOOR_HEIGHT_FALLBACK = 140;
 const PERF_DEBUG = isPerfDebugEnabled();
 
-/** Gris bleuté calme — aligné fond CSS organique (--background-middle). */
-const SCENE_BG = 0x718291;
+/** Noir plein — aligné fond app. */
+const SCENE_BG = 0x000000;
 
 /**
  * Floor Three.js — boucle unique hors NgZone, pixelRatio 1 (même look CSS 100%).
@@ -125,21 +124,21 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       this.camera.position.set(0, 2.2, 5);
       this.camera.lookAt(0, 0.4, -4);
 
-      const ambient = new THREE.AmbientLight(0xb8c4d0, 0.7);
+      // Éclairage neutre — sol invert (clair) sur fond noir
+      const ambient = new THREE.AmbientLight(0xffffff, 0.55);
       this.scene.add(ambient);
 
-      const topLight = new THREE.DirectionalLight(THREE_FLOOR_LIGHT, 0.75);
+      const topLight = new THREE.DirectionalLight(0xffffff, 0.7);
       topLight.position.set(2, 10, 4);
       topLight.castShadow = false;
       this.scene.add(topLight);
 
-      const fill = new THREE.DirectionalLight(0x9eb0c0, 0.4);
+      const fill = new THREE.DirectionalLight(0xd0d0d0, 0.35);
       fill.position.set(-4, 4, -2);
       fill.castShadow = false;
       this.scene.add(fill);
 
-      // Directional (moins cher qu’un PointLight) — même teinte / direction, intensité calée
-      const accent = new THREE.DirectionalLight(0x52e6ed, 0.28);
+      const accent = new THREE.DirectionalLight(0xa0a0a0, 0.2);
       accent.position.set(-8, 6, -10);
       accent.castShadow = false;
       this.scene.add(accent);
@@ -229,8 +228,9 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     this.floorTexture.magFilter = THREE.LinearFilter;
     this.floorTexture.colorSpace = THREE.SRGBColorSpace;
 
+    // Sol « invert » LCD : base claire, grille sombre (noir↔blanc)
     const floorMaterial = new THREE.MeshLambertMaterial({
-      color: 0x596b7d,
+      color: 0xffffff,
       map: this.floorTexture,
       side: THREE.FrontSide,
       transparent: false,
@@ -250,17 +250,20 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     }
   }
 
-  /** Texture procédurale dense + accent soft (ex-GridHelper 50 div @ opacity 0.28). */
+  /**
+   * Texture grille invert rétro (LCD invert téléphone) :
+   * base claire (ex-noir→blanc), traits sombres (ex-blanc/cyan→noir).
+   */
   private createDenseGridTexture(): THREE.CanvasTexture {
     const size = 64;
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#596b7d';
+    ctx.fillStyle = '#f4f4f4';
     ctx.fillRect(0, 0, size, size);
-    // Maillage serré (8×8 cellules) — répété ×48 = densite visuelle élevée
-    ctx.strokeStyle = 'rgba(69, 184, 200, 0.35)';
+    // Maillage serré (8×8) — traits noirs
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.38)';
     ctx.lineWidth = 1;
     const step = size / 8;
     for (let i = 0; i <= 8; i++) {
@@ -274,19 +277,18 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       ctx.lineTo(size, p);
       ctx.stroke();
     }
-    // Lignes majeures + soft accent (équivalent GridHelper 0x45b8c8 / 0x30495f @ 0.28)
-    ctx.strokeStyle = 'rgba(52, 230, 237, 0.22)';
+    // Lignes majeures plus marquées
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
     ctx.beginPath();
     ctx.moveTo(0.5, 0);
     ctx.lineTo(0.5, size);
     ctx.moveTo(0, 0.5);
     ctx.lineTo(size, 0.5);
     ctx.stroke();
-    // Bordure soft cyan / slate (1 ligne / tuile ≈ GridHelper 50 div sur 100u @ repeat 48)
-    ctx.strokeStyle = 'rgba(69, 184, 200, 0.28)';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
     ctx.lineWidth = 1.25;
     ctx.strokeRect(0.5, 0.5, size - 1, size - 1);
-    ctx.strokeStyle = 'rgba(48, 73, 95, 0.28)';
+    ctx.strokeStyle = 'rgba(20, 20, 20, 0.5)';
     ctx.beginPath();
     ctx.moveTo(size * 0.5 + 0.5, 0);
     ctx.lineTo(size * 0.5 + 0.5, size);
@@ -305,9 +307,9 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     const pathLine = new THREE.Line(
       geo,
       new THREE.LineBasicMaterial({
-        color: 0x5a7aaa,
+        color: 0x111111,
         transparent: true,
-        opacity: 0.35,
+        opacity: 0.45,
         depthWrite: false,
       })
     );

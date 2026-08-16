@@ -377,21 +377,21 @@
   --navbar-crypto-font-size: calc(0.42rem * var(--navbar-scale));
   --navbar-crypto-select-w: 2.75rem;
 
-  --bg-base: #718291;
-  --bg-base-rgb: 113, 130, 145;
-  --bg-deep: #61717f;
-  --bg-deep-rgb: 97, 113, 127;
-  --bg-elevated: #7e909f;
-  --bg-elevated-rgb: 126, 144, 159;
-  --bg-body-top: #7e909f;
-  --bg-body-bottom: #61717f;
+  --bg-base: #000000;
+  --bg-base-rgb: 0, 0, 0;
+  --bg-deep: #000000;
+  --bg-deep-rgb: 0, 0, 0;
+  --bg-elevated: #0a0a0a;
+  --bg-elevated-rgb: 10, 10, 10;
+  --bg-body-top: #000000;
+  --bg-body-bottom: #000000;
 
-  --background-top: #7e909f;
-  --background-middle: #718291;
-  --background-bottom: #61717f;
-  --background-light-halo: rgba(193, 214, 221, 0.16);
-  --background-blue-halo: rgba(100, 145, 165, 0.12);
-  --background-depth-halo: rgba(37, 55, 69, 0.16);
+  --background-top: #000000;
+  --background-middle: #000000;
+  --background-bottom: #000000;
+  --background-light-halo: transparent;
+  --background-blue-halo: transparent;
+  --background-depth-halo: transparent;
   --surface-card-top: rgba(var(--palette-4-rgb), 0.45);
   --surface-card-bottom: rgba(var(--palette-2-rgb), 0.65);
   --surface-panel-rgb: 18, 31, 46;

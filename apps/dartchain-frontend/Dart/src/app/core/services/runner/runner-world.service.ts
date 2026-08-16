@@ -62,10 +62,10 @@ export class RunnerWorldService {
   /** Marge broadphase XZ (rayon perso + marge). */
   private readonly broadphasePad = 6;
 
-  /** Route douce — ne concurrence pas la grille floor. */
+  /** Route douce — invert LCD (clair) pour coller au floor. */
   private readonly roadMat = this.sharedMat(
     new THREE.MeshLambertMaterial({
-      color: 0x4a5c6e,
+      color: 0xd8d8d8,
       transparent: false,
       opacity: 1,
       side: THREE.DoubleSide,
@@ -73,7 +73,7 @@ export class RunnerWorldService {
   );
   private readonly railMat = this.sharedMat(
     new THREE.MeshLambertMaterial({
-      color: 0x5a7088,
+      color: 0x1a1a1a,
     })
   );
   private readonly roofMat = this.sharedMat(
