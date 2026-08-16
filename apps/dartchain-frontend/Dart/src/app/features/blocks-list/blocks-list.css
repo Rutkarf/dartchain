@@ -511,3 +511,142 @@
     animation: none;
   }
 }
+
+/* ── Dock polish V4 (Wallet charter) — LIST mode only; graph untouched ── */
+.chain-dock:not(:has(app-chain-graph)) {
+  --dock-cyan: #2ec4d6;
+  --dock-cyan-rgb: 46, 196, 214;
+  --dock-green: #3dd68c;
+  --dock-green-rgb: 61, 214, 140;
+  --dock-glass-bg: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(var(--dock-cyan-rgb), 0.06) 42%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
+  --dock-glass-border: rgba(var(--dock-cyan-rgb), 0.28);
+  --dock-glass-blur: blur(10px) saturate(135%);
+  --dock-glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+
+  gap: 2px;
+  padding: 3px;
+  border-radius: 0;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.2);
+  background-color: #070b10;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 28%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 7px,
+      rgba(255, 255, 255, 0.012) 7px 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 7px,
+      rgba(255, 255, 255, 0.01) 7px 8px
+    );
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__toolbar,
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__list {
+  border-radius: 0 !important;
+  border: 1px solid var(--dock-glass-border) !important;
+  background: var(--dock-glass-bg) !important;
+  backdrop-filter: var(--dock-glass-blur);
+  -webkit-backdrop-filter: var(--dock-glass-blur);
+  box-shadow: var(--dock-glass-shadow) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__input,
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__export,
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__alert-btn {
+  border-radius: 0 !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.28) !important;
+  background: rgba(0, 0, 0, 0.42) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+  color: rgba(244, 251, 255, 0.9) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__block-pill {
+  border-radius: 0 !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.4) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dock-cyan-rgb), 0.2) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  ) !important;
+  color: #f4fbff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 8px rgba(var(--dock-cyan-rgb), 0.18) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__view-toggle {
+  border-radius: 0 !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.28);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__view-btn {
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  color: rgba(168, 184, 200, 0.7) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__view-btn.is-active {
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dock-cyan-rgb), 0.88) 0%,
+    rgba(var(--dock-cyan-rgb), 0.55) 100%
+  ) !important;
+  color: #041018 !important;
+  font-weight: 800 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__item,
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__item-btn {
+  border-radius: 0 !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__item {
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.12) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(0, 0, 0, 0.28) 100%
+  ) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__item.is-head {
+  border-color: rgba(var(--dock-cyan-rgb), 0.4) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--dock-cyan-rgb), 0.18) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__item-btn:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dock-cyan-rgb), 0.12) 0%,
+    rgba(0, 0, 0, 0.3) 100%
+  ) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__badge--valid {
+  color: var(--dock-green) !important;
+  border-color: rgba(var(--dock-green-rgb), 0.4) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__toast,
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__alert {
+  border-radius: 0 !important;
+}

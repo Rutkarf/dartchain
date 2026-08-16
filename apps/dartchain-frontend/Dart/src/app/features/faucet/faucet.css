@@ -937,3 +937,166 @@
     gap: 0px;
   }
 }
+
+/* ── Dock polish V4 (Wallet charter — moderated glass) ── */
+.faucet-panel {
+  --dock-cyan: #2ec4d6;
+  --dock-cyan-rgb: 46, 196, 214;
+  --dock-green: #3dd68c;
+  --dock-green-rgb: 61, 214, 140;
+  --dock-glass-bg: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(var(--dock-cyan-rgb), 0.06) 42%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
+  --dock-glass-border: rgba(var(--dock-cyan-rgb), 0.28);
+  --dock-glass-blur: blur(10px) saturate(135%);
+  --dock-glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+
+  gap: 2px;
+  padding: 3px;
+  border-radius: 0;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.2);
+  background-color: #070b10;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 28%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 7px,
+      rgba(255, 255, 255, 0.012) 7px 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 7px,
+      rgba(255, 255, 255, 0.01) 7px 8px
+    );
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.faucet-panel__tile,
+.faucet-panel__history,
+.faucet-panel__claim-slot {
+  border-radius: 0 !important;
+  border: 1px solid var(--dock-glass-border) !important;
+  background: var(--dock-glass-bg) !important;
+  backdrop-filter: var(--dock-glass-blur);
+  -webkit-backdrop-filter: var(--dock-glass-blur);
+  box-shadow: var(--dock-glass-shadow) !important;
+}
+
+.faucet-panel__tile--amount {
+  clip-path: polygon(
+    0 3px,
+    3px 0,
+    calc(100% - 3px) 0,
+    100% 3px,
+    100% calc(100% - 3px),
+    calc(100% - 3px) 100%,
+    3px 100%,
+    0 calc(100% - 3px)
+  );
+}
+
+.faucet-panel__claim {
+  border-radius: 0 !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.55) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dock-cyan-rgb), 0.95) 0%,
+    rgba(var(--dock-cyan-rgb), 0.62) 55%,
+    rgba(18, 90, 104, 0.95) 100%
+  ) !important;
+  color: #041018 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 0 12px rgba(var(--dock-cyan-rgb), 0.28) !important;
+}
+
+.faucet-panel__claim:hover:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    rgba(90, 220, 235, 1) 0%,
+    rgba(var(--dock-cyan-rgb), 0.78) 55%,
+    rgba(24, 110, 124, 1) 100%
+  ) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 0 16px rgba(var(--dock-cyan-rgb), 0.38) !important;
+}
+
+.faucet-panel__claim.is-inactive,
+.faucet-panel__claim.is-cooling,
+.faucet-panel__claim:disabled {
+  opacity: 0.42 !important;
+  color: rgba(168, 184, 200, 0.7) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(0, 0, 0, 0.42) 100%
+  ) !important;
+  box-shadow: none !important;
+}
+
+.faucet-panel__claim.is-success {
+  border-color: rgba(var(--dock-green-rgb), 0.55) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dock-green-rgb), 0.35) 0%,
+    rgba(0, 80, 50, 0.55) 100%
+  ) !important;
+  color: #e8fff4 !important;
+}
+
+.faucet-panel__retry,
+.faucet-panel__history-export,
+.faucet-panel__tx,
+.faucet-panel__block-link,
+.faucet-panel__load-more {
+  border-radius: 0 !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.32) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(0, 0, 0, 0.35) 100%
+  ) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4) !important;
+  color: rgba(var(--dock-cyan-rgb), 0.92) !important;
+}
+
+.faucet-panel__row {
+  border-radius: 0 !important;
+  border-color: rgba(var(--dock-cyan-rgb), 0.14) !important;
+  background: rgba(0, 0, 0, 0.28) !important;
+}
+
+.faucet-panel__row--head {
+  background: rgba(var(--dock-cyan-rgb), 0.08) !important;
+}
+
+.faucet-panel__value-whole {
+  color: #f4fbff !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(var(--dock-cyan-rgb), 0.35);
+}
+
+.faucet-panel__value-sep {
+  color: rgba(var(--dock-cyan-rgb), 0.9) !important;
+}
+
+.faucet-panel__toast {
+  border-radius: 0 !important;
+}

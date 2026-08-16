@@ -25,7 +25,7 @@ describe('WalletPanel', () => {
   it('should render create wallet CTA without idle status toast', () => {
     const root = fixture.nativeElement as HTMLElement;
     expect(root.querySelector('.wallet-display__create-cta')).toBeTruthy();
-    expect(root.querySelector('.wallet-display__create-cta-label')?.textContent).toContain('Créer wallet');
+    expect(root.querySelector('.wallet-display__create-cta-label')?.textContent).toContain('Créer un wallet');
     expect(root.querySelector('.wallet-display__status-line')).toBeFalsy();
   });
 

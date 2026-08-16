@@ -179,6 +179,7 @@ export type LocaleKey =
   | 'wallet.explorer.result'
   | 'wallet.recent.title'
   | 'wallet.recent.empty'
+  | 'wallet.recent.hint'
   | 'wallet.keys.title'
   | 'wallet.keys.public'
   | 'wallet.keys.private'
@@ -422,6 +423,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.explorer.result': 'Solde exploré',
     'wallet.recent.title': 'Consultations récentes',
     'wallet.recent.empty': 'Aucune consultation récente',
+    'wallet.recent.hint': 'Colle une adresse pour consulter',
     'wallet.keys.title': 'Clés du wallet',
     'wallet.keys.public': 'Clef publique',
     'wallet.keys.private': 'Clef privée',
@@ -716,6 +718,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.explorer.result': 'Explored balance',
     'wallet.recent.title': 'Recent lookups',
     'wallet.recent.empty': 'No recent lookups',
+    'wallet.recent.hint': 'Paste an address to look up',
     'wallet.keys.title': 'Wallet keys',
     'wallet.keys.public': 'Public key',
     'wallet.keys.private': 'Private key',

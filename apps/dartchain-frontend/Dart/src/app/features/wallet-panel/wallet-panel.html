@@ -287,7 +287,10 @@
             <h3 class="wallet-display__recent-title">{{ locale.t('wallet.recent.title') }}</h3>
           </header>
           @if (recentLookupRows().length === 0) {
-            <p class="wallet-display__recent-empty">{{ locale.t('wallet.recent.empty') }}</p>
+            <div class="wallet-display__recent-empty">
+              <p class="wallet-display__recent-empty-title">{{ locale.t('wallet.recent.empty') }}</p>
+              <p class="wallet-display__recent-empty-hint">{{ locale.t('wallet.recent.hint') }}</p>
+            </div>
           } @else {
             <ul class="wallet-display__recent-list">
               @for (entry of recentLookupRows(); track entry.address) {
@@ -328,7 +331,7 @@
           <span class="wallet-display__create-cta-spinner" aria-hidden="true"></span>
         }
         <span class="wallet-display__create-cta-label">
-          {{ creatingWallet() ? 'Création…' : 'Créer wallet' }}
+          {{ creatingWallet() ? 'Création…' : locale.t('wallet.create') }}
         </span>
       </button>
     }

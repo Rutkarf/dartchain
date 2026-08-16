@@ -277,3 +277,125 @@
   height: 13px;
   font-size: 5px;
 }
+
+/* ── Dock polish V4 (Wallet charter — moderated glass) ── */
+.transactions-dock.transactions-dock--mempool {
+  --dock-cyan: #2ec4d6;
+  --dock-cyan-rgb: 46, 196, 214;
+  --dock-green: #3dd68c;
+  --dock-green-rgb: 61, 214, 140;
+  --dock-glass-bg: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(var(--dock-cyan-rgb), 0.06) 42%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
+  --dock-glass-border: rgba(var(--dock-cyan-rgb), 0.28);
+  --dock-glass-blur: blur(10px) saturate(135%);
+  --dock-glass-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.35);
+
+  gap: 2px;
+  padding: 3px;
+  border-radius: 0;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.2);
+  background-color: #070b10;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 28%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 7px,
+      rgba(255, 255, 255, 0.012) 7px 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 7px,
+      rgba(255, 255, 255, 0.01) 7px 8px
+    );
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.transactions-dock__head,
+.transactions-dock__mempool,
+.transactions-dock__footer {
+  border-radius: 0 !important;
+}
+
+.transactions-dock__head {
+  border: 1px solid var(--dock-glass-border) !important;
+  background: var(--dock-glass-bg) !important;
+  backdrop-filter: var(--dock-glass-blur);
+  -webkit-backdrop-filter: var(--dock-glass-blur);
+  box-shadow: var(--dock-glass-shadow) !important;
+  padding: 2px 3px !important;
+}
+
+.transactions-dock__block,
+.transactions-dock__filter,
+.transactions-dock__refresh {
+  border-radius: 0 !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.28) !important;
+  background: rgba(0, 0, 0, 0.42) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+  color: rgba(244, 251, 255, 0.92) !important;
+}
+
+.transactions-dock__block:hover:not(.transactions-dock__block--static),
+.transactions-dock__refresh:hover {
+  border-color: rgba(var(--dock-cyan-rgb), 0.5) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dock-cyan-rgb), 0.16) 0%,
+    rgba(0, 0, 0, 0.35) 100%
+  ) !important;
+}
+
+.transactions-dock__live-dot.is-active {
+  background: var(--dock-green) !important;
+  box-shadow: 0 0 4px rgba(var(--dock-green-rgb), 0.45) !important;
+}
+
+.transactions-dock__submit {
+  border-radius: 0 !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.55) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dock-cyan-rgb), 0.95) 0%,
+    rgba(var(--dock-cyan-rgb), 0.62) 55%,
+    rgba(18, 90, 104, 0.95) 100%
+  ) !important;
+  color: #041018 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 0 12px rgba(var(--dock-cyan-rgb), 0.28) !important;
+}
+
+.transactions-dock__submit:hover:not(:disabled) {
+  background: linear-gradient(
+    180deg,
+    rgba(90, 220, 235, 1) 0%,
+    rgba(var(--dock-cyan-rgb), 0.78) 55%,
+    rgba(24, 110, 124, 1) 100%
+  ) !important;
+}
+
+.transactions-dock__submit:disabled {
+  opacity: 0.38 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(168, 184, 200, 0.45) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(0, 0, 0, 0.42) 100%
+  ) !important;
+  box-shadow: none !important;
+}

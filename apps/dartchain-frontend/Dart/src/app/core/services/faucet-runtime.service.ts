@@ -311,10 +311,14 @@ export class FaucetRuntimeService {
 
     if (!this.isReady()) {
       if (!this.auth.isAuthenticated()) {
-        this.errorMessage.set(this.t('faucet.error.loginRequired'));
+        const message = this.t('faucet.error.loginRequired');
+        this.errorMessage.set(message);
+        this.showToast(message, 'error');
         this.auth.openDrawer('login');
       } else if (!this.walletAddress()) {
-        this.errorMessage.set(this.t('faucet.error.walletRequired'));
+        const message = this.t('faucet.error.walletRequired');
+        this.errorMessage.set(message);
+        this.showToast(message, 'error');
       }
       return;
     }

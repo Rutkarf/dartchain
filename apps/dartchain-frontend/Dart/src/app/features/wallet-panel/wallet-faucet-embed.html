@@ -1,4 +1,17 @@
 <div class="wallet-faucet" aria-label="Faucet">
+  @if (runtime.toastMessage()) {
+    <div
+      class="wallet-faucet__toast"
+      [class.is-success]="runtime.toastKind() === 'success'"
+      [class.is-error]="runtime.toastKind() === 'error'"
+      [class.is-info]="runtime.toastKind() === 'info'"
+      role="status"
+      aria-live="polite"
+    >
+      {{ runtime.toastMessage() }}
+    </div>
+  }
+
   <div class="wallet-faucet__top">
     <article class="wallet-faucet__tile wallet-faucet__tile--amount">
       <div #valueWrap class="wallet-faucet__value-wrap">
