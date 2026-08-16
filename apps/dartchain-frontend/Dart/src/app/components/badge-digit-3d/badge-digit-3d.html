@@ -1,0 +1,11 @@
+<canvas
+  #canvas
+  class="badge-digit-3d__canvas"
+  [class.is-hidden]="webglFailed"
+  width="40"
+  height="28"
+  aria-hidden="true"
+></canvas>
+@if (webglFailed) {
+  <span class="badge-digit-3d__fallback" aria-hidden="true">{{ text }}</span>
+}

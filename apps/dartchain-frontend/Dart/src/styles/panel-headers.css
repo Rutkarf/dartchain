@@ -31,7 +31,7 @@
   min-width: 0 !important;
   max-width: none !important;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .showcase-header-tabs app-showcase-tabs,

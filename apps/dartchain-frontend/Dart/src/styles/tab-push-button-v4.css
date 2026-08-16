@@ -1,0 +1,240 @@
+/**
+ * Tab push-button V4 — idle / hover / pressed / active
+ * Shared by showcase-tabs and dock-tabs (.ds-surface--showcase-tab).
+ */
+
+:root {
+  --tab-push-cyan: var(--ds-neon-cyan, var(--accent-cyan, #2ec4d6));
+  --tab-push-cyan-rgb: var(--ds-neon-cyan-rgb, var(--accent-cyan-rgb, 46, 196, 214));
+  --tab-push-radius: 0;
+  --tab-push-gap: 1px;
+  --tab-push-label-idle: rgba(168, 180, 196, 0.52);
+  --tab-push-label-hover: rgba(236, 242, 248, 0.94);
+  --tab-push-label-pressed: rgba(190, 200, 214, 0.72);
+  --tab-push-face-idle: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.025) 42%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
+  --tab-push-face-hover: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.11) 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    rgba(0, 0, 0, 0.22) 100%
+  );
+  --tab-push-face-pressed: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.22) 0%,
+    rgba(255, 255, 255, 0.02) 55%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  --tab-push-face-active: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.42) 0%,
+    rgba(8, 16, 22, 0.88) 48%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  --tab-push-shadow-idle:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.48),
+    0 1px 1px rgba(0, 0, 0, 0.42);
+  --tab-push-shadow-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 2px 3px rgba(0, 0, 0, 0.55);
+  --tab-push-shadow-pressed:
+    inset 0 2px 3px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    0 0 0 rgba(0, 0, 0, 0);
+  --tab-push-shadow-active:
+    inset 0 2px 4px rgba(0, 0, 0, 0.72),
+    inset 0 0 0 1px rgba(var(--tab-push-cyan-rgb), 0.42),
+    inset 0 -1px 0 rgba(var(--tab-push-cyan-rgb), 0.22);
+}
+
+.showcase-tabs,
+.dock-tabs {
+  gap: var(--tab-push-gap);
+  padding: 1px;
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, transparent 40%),
+    rgba(8, 12, 18, 0.92);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.showcase-tab.ds-surface.ds-surface--showcase-tab,
+.dock-tab.ds-surface.ds-surface--showcase-tab,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab,
+.news-insight-panel__action.ds-surface.ds-surface--showcase-tab,
+.news-insight-panel__icon-btn.ds-surface.ds-surface--showcase-tab,
+.r4v3-hub-drawer__action.ds-surface.ds-surface--showcase-tab,
+.r4v3-hub-drawer__submit.ds-surface.ds-surface--showcase-tab,
+.r4v3-hub-drawer__icon-btn.ds-surface.ds-surface--showcase-tab,
+.r4v3-hub-drawer__login-btn.ds-surface.ds-surface--showcase-tab,
+.showcase-chat__send.ds-surface.ds-surface--showcase-tab,
+.showcase-launch__action.ds-surface.ds-surface--showcase-tab,
+.showcase-launch__cta.ds-surface.ds-surface--showcase-tab,
+.launch-drawer__btn.ds-surface.ds-surface--showcase-tab,
+.launch-drawer__close.ds-surface.ds-surface--showcase-tab,
+.launch-drawer__browse.ds-surface.ds-surface--showcase-tab {
+  border: none !important;
+  border-radius: var(--tab-push-radius) !important;
+  overflow: visible !important;
+  color: var(--tab-push-label-idle) !important;
+  background-color: rgba(18, 24, 32, 0.92) !important;
+  background-image: var(--tab-push-face-idle) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--tab-push-shadow-idle) !important;
+  transform: translateY(0);
+  transition:
+    color 140ms ease,
+    background-image 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.showcase-tab.ds-surface.ds-surface--showcase-tab:hover:not(.is-active):not(:active),
+.dock-tab.ds-surface.ds-surface--showcase-tab:hover:not(.is-active):not(:active),
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab:hover:not(.is-active):not(:active),
+.news-insight-panel__action.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.news-insight-panel__icon-btn.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.r4v3-hub-drawer__action.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.r4v3-hub-drawer__submit.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.r4v3-hub-drawer__icon-btn.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.r4v3-hub-drawer__login-btn.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.showcase-chat__send.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.showcase-launch__action.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.showcase-launch__cta.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.launch-drawer__btn.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.launch-drawer__close.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.launch-drawer__browse.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active) {
+  color: var(--tab-push-label-hover) !important;
+  background-image: var(--tab-push-face-hover) !important;
+  box-shadow: var(--tab-push-shadow-hover) !important;
+  transform: translateY(-1px);
+}
+
+.showcase-tab.ds-surface.ds-surface--showcase-tab:active:not(.is-active),
+.dock-tab.ds-surface.ds-surface--showcase-tab:active:not(.is-active),
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab:active:not(.is-active),
+.news-insight-panel__action.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.news-insight-panel__icon-btn.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.r4v3-hub-drawer__action.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.r4v3-hub-drawer__submit.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.r4v3-hub-drawer__icon-btn.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.r4v3-hub-drawer__login-btn.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.showcase-chat__send.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.showcase-launch__action.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.showcase-launch__cta.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.launch-drawer__btn.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.launch-drawer__close.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.launch-drawer__browse.ds-surface.ds-surface--showcase-tab:active:not(:disabled) {
+  color: var(--tab-push-label-pressed) !important;
+  background-image: var(--tab-push-face-pressed) !important;
+  box-shadow: var(--tab-push-shadow-pressed) !important;
+  transform: translateY(1px);
+}
+
+.showcase-tab.ds-surface.ds-surface--showcase-tab.is-active,
+.dock-tab.ds-surface.ds-surface--showcase-tab.is-active,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab.is-active,
+.news-insight-panel__action--primary.ds-surface.ds-surface--showcase-tab,
+.r4v3-hub-drawer__action--primary.ds-surface.ds-surface--showcase-tab {
+  color: var(--tab-push-cyan) !important;
+  font-weight: 800 !important;
+  background-color: rgba(4, 10, 14, 0.96) !important;
+  background-image: var(--tab-push-face-active) !important;
+  box-shadow: var(--tab-push-shadow-active) !important;
+  transform: translateY(1px);
+}
+
+.news-insight-panel__icon-btn.ds-surface.ds-surface--showcase-tab:disabled,
+.r4v3-hub-drawer__icon-btn.ds-surface.ds-surface--showcase-tab:disabled,
+.r4v3-hub-drawer__submit.ds-surface.ds-surface--showcase-tab:disabled,
+.r4v3-hub-drawer__login-btn.ds-surface.ds-surface--showcase-tab:disabled,
+.showcase-chat__send.ds-surface.ds-surface--showcase-tab:disabled,
+.showcase-launch__action.ds-surface.ds-surface--showcase-tab:disabled,
+.launch-drawer__btn.ds-surface.ds-surface--showcase-tab:disabled,
+.launch-drawer__close.ds-surface.ds-surface--showcase-tab:disabled {
+  opacity: 0.35 !important;
+  transform: none !important;
+  box-shadow: var(--tab-push-shadow-pressed) !important;
+  cursor: not-allowed !important;
+}
+
+.news-insight-panel__action--primary.ds-surface.ds-surface--showcase-tab:hover:not(:active),
+.r4v3-hub-drawer__action--primary.ds-surface.ds-surface--showcase-tab:hover:not(:active) {
+  color: var(--tab-push-cyan) !important;
+}
+
+.showcase-tab.ds-surface.ds-surface--showcase-tab.is-active::after,
+.dock-tab.ds-surface.ds-surface--showcase-tab.is-active::after,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab.is-active::after {
+  content: '';
+  position: absolute;
+  left: 16%;
+  right: 16%;
+  bottom: 1px;
+  height: 1.5px;
+  border-radius: 999px;
+  background: var(--tab-push-cyan);
+  box-shadow: 0 0 4px rgba(var(--tab-push-cyan-rgb), 0.45);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.showcase-tab.ds-surface.ds-surface--showcase-tab .showcase-tab__label,
+.dock-tab.ds-surface.ds-surface--showcase-tab .dock-tab-label,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab .showcase-tab__label {
+  color: inherit !important;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.55);
+}
+
+.showcase-tab.ds-surface.ds-surface--showcase-tab.is-active .showcase-tab__label,
+.dock-tab.ds-surface.ds-surface--showcase-tab.is-active .dock-tab-label,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab.is-active .showcase-tab__label {
+  font-weight: 800 !important;
+  text-shadow:
+    0 0 6px rgba(var(--tab-push-cyan-rgb), 0.28),
+    0 1px 1px rgba(0, 0, 0, 0.65);
+}
+
+/* Fintech chip badge — hug the 3D digit tightly */
+.showcase-tab__unread-toast {
+  width: fit-content !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid rgba(var(--tab-push-cyan-rgb), 0.45) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(
+    160deg,
+    rgba(var(--tab-push-cyan-rgb), 0.38),
+    rgba(var(--tab-push-cyan-rgb), 0.14)
+  ) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 1px 2px rgba(0, 0, 0, 0.35) !important;
+  line-height: 0 !important;
+}
+
+.showcase-tab__badge {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-tab.ds-surface.ds-surface--showcase-tab,
+  .dock-tab.ds-surface.ds-surface--showcase-tab,
+  .app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab {
+    transition: none !important;
+    transform: none !important;
+  }
+}

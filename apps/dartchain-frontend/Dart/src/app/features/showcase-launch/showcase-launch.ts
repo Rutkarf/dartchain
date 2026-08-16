@@ -1,11 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   HostBinding,
   HostListener,
   Input,
-  ViewChild,
   computed,
   inject,
   signal,
@@ -38,9 +36,6 @@ import {
 export class ShowcaseLaunchComponent {
   @Input() isExpanded = true;
 
-  @ViewChild('searchInput')
-  private searchInput?: ElementRef<HTMLInputElement>;
-
   @HostBinding('class.is-launch')
   readonly isLaunchHost = true;
 
@@ -62,7 +57,6 @@ export class ShowcaseLaunchComponent {
   readonly successMessage = this.launchState.successMessage;
   readonly projects = this.launchState.projects;
   readonly searchQuery = signal('');
-  readonly searchExpanded = signal(false);
   readonly selectedProject = signal<LaunchProject | null>(null);
 
   readonly liveCount = computed(() => this.launchState.counts().live);
@@ -131,22 +125,8 @@ export class ShowcaseLaunchComponent {
     this.searchQuery.set(value);
   }
 
-  protected openSearch(): void {
-    this.searchExpanded.set(true);
-    queueMicrotask(() => this.searchInput?.nativeElement.focus());
-  }
-
-  protected closeSearch(event?: Event): void {
-    event?.preventDefault();
-    if (this.searchQuery().trim()) {
-      return;
-    }
-    this.searchExpanded.set(false);
-  }
-
   protected clearSearch(): void {
     this.searchQuery.set('');
-    this.searchExpanded.set(false);
   }
 
   protected statusLabel(status: LaunchStatus): string {
@@ -175,6 +155,42 @@ export class ShowcaseLaunchComponent {
 
   protected marketCapLabel(project: LaunchProject): string {
     return this.launchState.marketCapLabel(project);
+  }
+
+  protected progressPercent(project: LaunchProject): number | null {
+    const raised = this.parseAmount(project.raised);
+    const target = this.parseAmount(project.target);
+    if (raised === null || target === null || target <= 0) {
+      return null;
+    }
+    return Math.min(100, Math.round((raised / target) * 100));
+  }
+
+  private parseAmount(value: string | undefined): number | null {
+    if (!value) {
+      return null;
+    }
+    const cleaned = value.replace(/[^\d.kKmM]/g, '').trim();
+    if (!cleaned || cleaned === '—' || cleaned === '-') {
+      return null;
+    }
+    const match = cleaned.match(/^([\d.]+)\s*([kKmM])?$/);
+    if (!match) {
+      const n = Number(cleaned);
+      return Number.isFinite(n) ? n : null;
+    }
+    const base = Number(match[1]);
+    if (!Number.isFinite(base)) {
+      return null;
+    }
+    const suffix = match[2]?.toLowerCase();
+    if (suffix === 'k') {
+      return base * 1_000;
+    }
+    if (suffix === 'm') {
+      return base * 1_000_000;
+    }
+    return base;
   }
 
   protected hasWhitepaper(project: LaunchProject): boolean {

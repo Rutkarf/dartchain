@@ -104,7 +104,7 @@
   width: auto !important;
   min-width: 0 !important;
   max-width: none !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tabs,
@@ -113,13 +113,13 @@
   flex-flow: row nowrap !important;
   align-items: stretch !important;
   justify-content: stretch !important;
-  gap: 0px !important;
+  gap: var(--tab-push-gap, 1px) !important;
   width: 100% !important;
   min-width: 0 !important;
   height: 100% !important;
   margin: 0 !important;
-  padding: 0 !important;
-  overflow: hidden !important;
+  padding: 1px !important;
+  overflow: visible !important;
   scrollbar-width: none !important;
   container-type: inline-size;
   container-name: dock-tabs;
@@ -140,8 +140,8 @@
   padding: 0 0px !important;
   font-size: clamp(5px, 1.9vw, 7px) !important;
   font-weight: 600 !important;
-  letter-spacing: 0.04em !important;
-  overflow: hidden !important;
+  letter-spacing: 0.05em !important;
+  overflow: visible !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab--mempool {
@@ -157,7 +157,7 @@
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface.ds-surface--showcase-tab {
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab__label {

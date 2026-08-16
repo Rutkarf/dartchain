@@ -9,6 +9,7 @@
 @import './styles/shell-stack.css';
 @import './cta-buttons.css';
 @import './styles/dock-view-tokens.css';
+@import './styles/tab-push-button-v4.css';
 @import './styles/ds-pass3-polish.css';
 
 /* —— Viewport one-page @ 250×550 —— */
@@ -80,7 +81,8 @@ app-root {
   height: var(--dock-hub-tab-h, 18px) !important;
   min-height: var(--dock-hub-tab-h, 18px) !important;
   max-height: var(--dock-hub-tab-h, 18px) !important;
-  gap: 0 !important;
+  gap: var(--tab-push-gap, 1px) !important;
+  padding: 1px !important;
   overflow: visible !important;
   visibility: visible !important;
 }

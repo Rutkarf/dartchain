@@ -239,7 +239,10 @@
     }
 
     <div class="showcase-chat__content">
-      <ul class="showcase-chat__messages" aria-live="polite">
+      <ul #messagesList class="showcase-chat__messages" aria-live="polite">
+        @if (filteredMessages().length === 0) {
+          <li class="showcase-chat__empty" aria-hidden="true">Aucun message</li>
+        }
         @for (msg of filteredMessages(); track msg.id) {
           <li [ngClass]="lineNgClass(msg)">
             <div class="showcase-chat__line-inner" [ngStyle]="lineStyle(msg)">
@@ -326,7 +329,7 @@
         </div>
         <button
           type="submit"
-          class="showcase-chat__send"
+          class="showcase-chat__send ds-surface ds-surface--showcase-tab"
           [disabled]="!auth.isAuthenticated() || messageControl.invalid"
           [attr.title]="sendButtonLabel()"
           [attr.aria-label]="sendButtonLabel()"

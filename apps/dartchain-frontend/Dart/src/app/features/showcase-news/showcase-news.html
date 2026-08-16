@@ -59,11 +59,22 @@
 
         <label class="showcase-meta__search showcase-news__search-inline">
           <span class="sr-only">Rechercher dans les actualités</span>
+          <span class="showcase-news__search-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" focusable="false">
+              <circle cx="6.5" cy="6.5" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5" />
+              <path d="M9.8 9.8 13.2 13.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span
+            class="showcase-news__search-hint"
+            [class.is-hidden]="!!searchQuery().trim()"
+            aria-hidden="true"
+          >Rechercher</span>
           <input
             #searchInput
             type="search"
             class="showcase-meta__search-input"
-            placeholder="Rechercher…"
+            placeholder=""
             [value]="searchQuery()"
             (input)="onSearchInput($any($event.target).value)"
           />
@@ -74,7 +85,7 @@
     <div #contentPanel class="showcase-news__content">
       @if (loading()) {
         <ul class="showcase-news__list showcase-news__list--skeleton" aria-hidden="true">
-          @for (row of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]; track row) {
+          @for (row of [1, 2, 3, 4, 5, 6, 7]; track row) {
             <li class="showcase-news__skeleton-item">
               <span class="showcase-news__skeleton-tag"></span>
               <span class="showcase-news__skeleton-lines"><span></span></span>
@@ -121,6 +132,9 @@
                   <span class="showcase-news__tag-badge">{{ categoryAbbrev(item) }}</span>
                 </span>
                 <span class="showcase-news__item-title">{{ itemLineTitle(item) }}</span>
+                @if (itemRelativeTime(item); as relTime) {
+                  <span class="showcase-news__item-time">{{ relTime }}</span>
+                }
               </button>
             </li>
           }

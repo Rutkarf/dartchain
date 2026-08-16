@@ -6,30 +6,23 @@ import {
   ShowcaseTab,
 } from '../../core/models/showcase-tab.model';
 import { ShowcaseNewsStateService } from '../../core/services/showcase-news-state.service';
-import { ShowcaseR4v3StateService } from '../../core/services/showcase-r4v3-state.service';
+import { BadgeDigit3dComponent } from '../../components/badge-digit-3d/badge-digit-3d';
 
 @Component({
   selector: 'app-showcase-tabs',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, BadgeDigit3dComponent],
   templateUrl: './showcase-tabs.html',
   styleUrls: ['./showcase-tabs.css'],
 })
 export class ShowcaseTabsComponent {
   private readonly newsState = inject(ShowcaseNewsStateService);
-  private readonly r4v3State = inject(ShowcaseR4v3StateService);
 
   readonly tabs = SHOWCASE_TABS;
 
   @Input() activeTab: ShowcaseTab = 'tours';
 
   @Output() readonly tabChange = new EventEmitter<ShowcaseTab>();
-
-  constructor() {
-    if (this.r4v3State.items().length === 0 && !this.r4v3State.loading()) {
-      this.r4v3State.load(false);
-    }
-  }
 
   unreadNewsCount(): number {
     return this.newsState.unreadCount();
@@ -42,10 +35,6 @@ export class ShowcaseTabsComponent {
 
   newsToastLive(): boolean {
     return this.newsState.newItemsToast() || this.newsState.refreshPulse();
-  }
-
-  unreadR4v3Count(): number {
-    return this.r4v3State.unreadCount();
   }
 
   selectTab(tab: ShowcaseTab): void {
@@ -65,13 +54,6 @@ export class ShowcaseTabsComponent {
       const count = this.unreadNewsCount();
       if (count > 0) {
         return `${tab.label}, ${count} non lue${count > 1 ? 's' : ''}`;
-      }
-    }
-
-    if (tab.id === 'r4v3') {
-      const count = this.unreadR4v3Count();
-      if (count > 0) {
-        return `${tab.label}, ${count} non lue${count > 1 ? 's' : ''} R4V3`;
       }
     }
 

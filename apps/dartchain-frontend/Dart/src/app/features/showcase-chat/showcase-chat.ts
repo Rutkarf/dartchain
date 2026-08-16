@@ -75,7 +75,7 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
   protected readonly chatState = inject(ShowcaseChatStateService);
   readonly prefs = inject(ChatStylePreferencesService);
 
-  @ViewChild('messagesEnd') messagesEnd?: ElementRef<HTMLDivElement>;
+  @ViewChild('messagesList') messagesList?: ElementRef<HTMLUListElement>;
 
   readonly fontOptions = CHAT_FONT_OPTIONS;
   readonly fontColorGrid = CHAT_THEME_COLOR_GRID;
@@ -399,9 +399,10 @@ export class ShowcaseChatComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private scrollToBottom(): void {
-    const element = this.messagesEnd?.nativeElement;
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    const list = this.messagesList?.nativeElement;
+    if (!list) {
+      return;
     }
+    list.scrollTop = list.scrollHeight;
   }
 }

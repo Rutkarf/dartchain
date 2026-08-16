@@ -1,11 +1,12 @@
 import { booleanAttribute, Component, input, output } from '@angular/core';
 
 import { PanelCollapseControlComponent } from '../panel-collapse-control/panel-collapse-control';
+import { IconRelief3dComponent } from '../../components/icon-relief-3d/icon-relief-3d';
 
 @Component({
   selector: 'app-collapsed-bar-actions',
   standalone: true,
-  imports: [PanelCollapseControlComponent],
+  imports: [PanelCollapseControlComponent, IconRelief3dComponent],
   templateUrl: './collapsed-bar-actions.html',
   styleUrl: './collapsed-bar-actions.css',
 })

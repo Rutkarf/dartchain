@@ -1,0 +1,48 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 11px;
+  height: 9px;
+  min-width: 11px;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.icon-relief-3d__canvas {
+  display: block;
+  width: 11px;
+  height: 9px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.icon-relief-3d__canvas.is-hidden {
+  display: none;
+}
+
+.icon-relief-3d__fallback {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border: 1.4px solid #fff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
+}
+
+.icon-relief-3d__fallback[data-kind='chevron'] {
+  width: 6px;
+  height: 6px;
+  border: none;
+  border-radius: 0;
+  border-right: 1.6px solid #fff;
+  border-bottom: 1.6px solid #fff;
+  transform: rotate(225deg);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
+}

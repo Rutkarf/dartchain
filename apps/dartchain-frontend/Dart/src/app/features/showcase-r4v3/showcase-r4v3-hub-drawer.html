@@ -98,7 +98,7 @@
                   }
                   <button
                     type="button"
-                    class="r4v3-hub-drawer__icon-btn"
+                    class="r4v3-hub-drawer__icon-btn ds-surface ds-surface--showcase-tab"
                     [disabled]="!canPrev()"
                     aria-label="Élément précédent"
                     (click)="navigatePrev.emit()"
@@ -107,7 +107,7 @@
                   </button>
                   <button
                     type="button"
-                    class="r4v3-hub-drawer__icon-btn"
+                    class="r4v3-hub-drawer__icon-btn ds-surface ds-surface--showcase-tab"
                     [disabled]="!canNext()"
                     aria-label="Élément suivant"
                     (click)="navigateNext.emit()"
@@ -118,7 +118,7 @@
               }
               <button
                 type="button"
-                class="r4v3-hub-drawer__icon-btn r4v3-hub-drawer__icon-btn--close"
+                class="r4v3-hub-drawer__icon-btn r4v3-hub-drawer__icon-btn--close ds-surface ds-surface--showcase-tab"
                 aria-label="Fermer"
                 (click)="dismiss()"
               >
@@ -329,7 +329,11 @@
               } @else {
                 <div class="r4v3-hub-drawer__login-card">
                   <p>Connectez-vous pour proposer une question à la communauté.</p>
-                  <button type="button" class="r4v3-hub-drawer__login-btn" (click)="promptLoginForQuestion()">
+                  <button
+                    type="button"
+                    class="r4v3-hub-drawer__login-btn ds-surface ds-surface--showcase-tab"
+                    (click)="promptLoginForQuestion()"
+                  >
                     Se connecter
                   </button>
                 </div>

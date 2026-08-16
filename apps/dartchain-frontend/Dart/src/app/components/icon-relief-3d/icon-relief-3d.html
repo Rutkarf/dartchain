@@ -1,0 +1,11 @@
+<canvas
+  #canvas
+  class="icon-relief-3d__canvas"
+  [class.is-hidden]="webglFailed"
+  width="56"
+  height="48"
+  aria-hidden="true"
+></canvas>
+@if (webglFailed) {
+  <span class="icon-relief-3d__fallback" [attr.data-kind]="kind" aria-hidden="true"></span>
+}

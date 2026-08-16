@@ -39,7 +39,7 @@
   padding: 1px;
   box-sizing: border-box;
   overflow: hidden;
-  border-radius: clamp(4px, 1.2vw, 6px);
+  border-radius: 0;
 }
 
 .showcase-tab-panel--launch {

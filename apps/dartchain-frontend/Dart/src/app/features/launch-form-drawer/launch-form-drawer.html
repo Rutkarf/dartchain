@@ -18,7 +18,7 @@
         </div>
         <button
           type="button"
-          class="cta cta--tertiary cta--sm launch-drawer__close"
+          class="launch-drawer__close ds-surface ds-surface--showcase-tab"
           aria-label="Fermer le formulaire"
           [disabled]="submitting()"
           (click)="closeDrawer()"
@@ -44,7 +44,7 @@
             <div class="launch-drawer__logo-upload">
               <span class="launch-drawer__label">Logo du token</span>
               <label
-                class="launch-drawer__browse cta cta--tertiary cta--sm"
+                class="launch-drawer__browse ds-surface ds-surface--showcase-tab"
                 title="Choisir une image enregistrée sur votre ordinateur"
               >
                 <span class="launch-drawer__browse-icon" aria-hidden="true"></span>
@@ -187,7 +187,7 @@
           <div class="launch-drawer__actions launch-drawer__span-all">
             <button
               type="button"
-              class="cta cta--secondary cta--sm launch-drawer__btn launch-drawer__btn--ghost"
+              class="launch-drawer__btn launch-drawer__btn--ghost ds-surface ds-surface--showcase-tab"
               [disabled]="submitting()"
               (click)="closeDrawer()"
             >
@@ -195,7 +195,7 @@
             </button>
             <button
               type="submit"
-              class="cta cta--primary cta--sm launch-drawer__btn launch-drawer__btn--primary"
+              class="launch-drawer__btn launch-drawer__btn--primary ds-surface ds-surface--showcase-tab"
               [disabled]="form.invalid || submitting()"
             >
               {{ submitting() ? 'Création…' : 'Créer le projet' }}

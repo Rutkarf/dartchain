@@ -93,12 +93,14 @@ describe('ShowcaseLaunchComponent (Phase V)', () => {
     await fixture.whenStable();
   });
 
-  it('should create and render launch hub with live header', () => {
+  it('should create and render launch hub with search header', () => {
     expect(fixture.componentInstance).toBeTruthy();
     const root = fixture.nativeElement as HTMLElement;
     expect(root.textContent).toContain('Pixel DAO');
-    expect(root.querySelector('.showcase-launch__live-led')).toBeTruthy();
-    expect(root.querySelector('.showcase-meta__live-text')?.textContent?.trim()).toBe('1 LIVE');
+    expect(root.querySelector('.showcase-launch__live-led')).toBeFalsy();
+    expect(root.querySelector('.showcase-meta__live-text')).toBeFalsy();
+    expect(root.querySelector('.showcase-launch__search-inline')).toBeTruthy();
+    expect(root.querySelector('.showcase-launch__search-icon')).toBeTruthy();
     expect(root.querySelector('.showcase-meta__refresh')).toBeFalsy();
     expect(root.querySelector('.showcase-meta__filter-select')).toBeFalsy();
     expect(root.querySelector('.showcase-launch__whitepaper')).toBeTruthy();

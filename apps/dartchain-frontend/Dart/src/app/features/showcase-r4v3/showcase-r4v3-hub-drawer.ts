@@ -183,7 +183,7 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
       case 'official-wiki':
         return '◆';
       case 'community-form':
-        return '✦';
+        return '+';
     }
   });
 

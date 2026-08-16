@@ -20,12 +20,7 @@
           [class.showcase-tab__unread-toast--live]="newsToastLive()"
           aria-hidden="true"
         >
-          {{ unreadBadgeLabel() }}
-        </span>
-      }
-      @if (tab.id === 'r4v3' && unreadR4v3Count() > 0) {
-        <span class="showcase-tab__badge" [attr.aria-label]="unreadR4v3Count() + ' non lues R4V3'">
-          {{ unreadR4v3Count() > 9 ? '9+' : unreadR4v3Count() }}
+          <app-badge-digit-3d [text]="unreadBadgeLabel()" />
         </span>
       }
     </button>

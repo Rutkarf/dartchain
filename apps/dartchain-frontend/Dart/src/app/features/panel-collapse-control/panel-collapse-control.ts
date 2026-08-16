@@ -1,8 +1,11 @@
 import { booleanAttribute, Component, input, output } from '@angular/core';
 
+import { IconRelief3dComponent } from '../../components/icon-relief-3d/icon-relief-3d';
+
 @Component({
   selector: 'app-panel-collapse-control',
   standalone: true,
+  imports: [IconRelief3dComponent],
   host: {
     class: 'panel-collapse-control-host',
     '[class.is-collapsed]': 'collapsed()',

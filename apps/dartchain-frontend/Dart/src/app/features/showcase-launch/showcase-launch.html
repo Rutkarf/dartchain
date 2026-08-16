@@ -2,57 +2,34 @@
   @if (isExpanded) {
     <header class="showcase-news__head">
       <div class="showcase-meta showcase-news__meta-bar showcase-launch__meta-bar">
-        <div class="showcase-meta__status-zone showcase-news__status-zone">
-          <p
-            class="showcase-meta__live"
-            aria-live="polite"
-            [attr.title]="liveSummaryTooltip()"
-          >
-            <span
-              class="showcase-launch__live-led"
-              [class.showcase-launch__live-led--dim]="liveCount() === 0"
-              aria-hidden="true"
-            ></span>
-            <span class="showcase-meta__live-text">{{ liveCountLabel() }}</span>
-          </p>
-        </div>
-
-        <div class="showcase-meta-actions showcase-news__meta-actions">
-          <div
-            class="showcase-meta__search-wrap"
-            [class.is-expanded]="searchExpanded()"
-          >
-            @if (searchExpanded()) {
-              <label class="showcase-meta__search">
-                <span class="sr-only">Rechercher un projet</span>
-                <input
-                  #searchInput
-                  type="search"
-                  class="showcase-meta__search-input"
-                  placeholder="Rechercher…"
-                  [value]="searchQuery()"
-                  (input)="onSearchInput($any($event.target).value)"
-                  (blur)="closeSearch()"
-                  (keydown.escape)="closeSearch($event)"
-                />
-              </label>
-            } @else {
-              <button
-                type="button"
-                class="showcase-meta__search-toggle"
-                (click)="openSearch()"
-                aria-label="Rechercher un projet"
-                title="Rechercher"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="m20 20-3.5-3.5" />
-                </svg>
-              </button>
-            }
-          </div>
-
-        </div>
+        <label class="showcase-meta__search showcase-launch__search-inline">
+          <span class="sr-only">Rechercher un projet</span>
+          <span class="showcase-launch__search-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" focusable="false">
+              <circle cx="6.5" cy="6.5" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5" />
+              <path
+                d="M9.8 9.8 13.2 13.2"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <span
+            class="showcase-launch__search-hint"
+            [class.is-hidden]="!!searchQuery().trim()"
+            aria-hidden="true"
+          >Rechercher</span>
+          <input
+            #searchInput
+            type="search"
+            class="showcase-meta__search-input"
+            placeholder=""
+            [value]="searchQuery()"
+            (input)="onSearchInput($any($event.target).value)"
+          />
+        </label>
       </div>
     </header>
 
@@ -119,8 +96,20 @@
                   {{ statusLabel(project.status) }}
                 </span>
 
-                <span class="showcase-launch__raised" [title]="marketCapLabel(project)">
-                  {{ marketCapLabel(project) }}
+                <span class="showcase-launch__metrics">
+                  <span class="showcase-launch__raised" [title]="marketCapLabel(project)">
+                    {{ marketCapLabel(project) }}
+                  </span>
+                  <span
+                    class="showcase-launch__progress"
+                    [class.showcase-launch__progress--empty]="progressPercent(project) === null"
+                    aria-hidden="true"
+                  >
+                    <span
+                      class="showcase-launch__progress-fill"
+                      [style.width.%]="progressPercent(project) ?? 0"
+                    ></span>
+                  </span>
                 </span>
 
                 <button
@@ -148,18 +137,16 @@
                   {{ project.symbol }}
                 </button>
 
-                @if (canSwapProject(project)) {
-                  <button
-                    type="button"
-                    class="showcase-launch__action"
-                    (click)="swapProject(project, $event)"
-                    [attr.aria-label]="swapAriaLabel(project)"
-                  >
-                    Swap
-                  </button>
-                } @else {
-                  <span class="showcase-launch__action showcase-launch__action--muted" aria-hidden="true">—</span>
-                }
+                <button
+                  type="button"
+                  class="showcase-launch__action ds-surface ds-surface--showcase-tab"
+                  [class.showcase-launch__action--muted]="!canSwapProject(project)"
+                  [disabled]="!canSwapProject(project)"
+                  (click)="swapProject(project, $event)"
+                  [attr.aria-label]="swapAriaLabel(project)"
+                >
+                  Swap
+                </button>
               </div>
             </li>
           }
@@ -169,8 +156,11 @@
           <p class="showcase-launch__feedback" role="status">{{ successMessage() }}</p>
         }
 
-        <button type="button" class="showcase-launch__cta" (click)="openDrawer()">
-          <span class="showcase-launch__cta-glow" aria-hidden="true"></span>
+        <button
+          type="button"
+          class="showcase-launch__cta ds-surface ds-surface--showcase-tab"
+          (click)="openDrawer()"
+        >
           <span class="showcase-launch__cta-label">LANCER UN PROJET</span>
         </button>
       }

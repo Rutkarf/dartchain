@@ -82,14 +82,47 @@ export function drawerSourceLabel(source: NewsSource): string {
   }
 }
 
+export function compactDrawerRelativeTime(raw: string): string {
+  const stripped = raw.replace(/^il y a\s+/i, '').trim();
+  if (!stripped) {
+    return '—';
+  }
+  if (/^(à l['’]instant|now|instant)$/i.test(stripped)) {
+    return '0s';
+  }
+
+  const match = stripped.match(
+    /^(\d+)\s*(s|sec|secs?|secondes?|m|min|mins?|minutes?|h|hrs?|heures?|j|d|jours?|days?)?\.?$/i
+  );
+  if (match) {
+    const n = match[1];
+    const unit = (match[2] ?? 's').toLowerCase();
+    if (unit.startsWith('s') || unit.startsWith('sec')) {
+      return `${n}s`;
+    }
+    if (unit === 'm' || unit.startsWith('min')) {
+      return `${n}min`;
+    }
+    if (unit.startsWith('h')) {
+      return `${n}h`;
+    }
+    if (unit.startsWith('j') || unit.startsWith('d') || unit.startsWith('jour') || unit.startsWith('day')) {
+      return `${n}j`;
+    }
+  }
+
+  return stripped.replace(/(\d)\s+(\w)/g, '$1$2');
+}
+
 export function formatDrawerFreshPublished(item: NewsItem): {
   value: string;
   displayValue: string;
 } {
-  const fresh = item.relativeTime?.trim() || '—';
+  const freshRaw = item.relativeTime?.trim() || '';
+  const fresh = freshRaw ? compactDrawerRelativeTime(freshRaw) : '—';
   const published = formatDrawerPublishedAt(item.publishedAt);
   return {
-    value: `Publier: ${fresh} · ${published}`,
+    value: `Publié: ${fresh} · ${published}`,
     displayValue: `${fresh} · ${published}`,
   };
 }
@@ -103,7 +136,7 @@ export function buildNewsDrawerFields(item: NewsItem): NewsDrawerField[] {
     {
       id: 'fresh-published',
       section: 'meta',
-      label: 'PUBLIER',
+      label: 'Publié',
       value: freshPublished.value,
       displayValue: freshPublished.displayValue,
     },

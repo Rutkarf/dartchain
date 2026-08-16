@@ -7,9 +7,9 @@
   [attr.aria-expanded]="!collapsed()"
   (click)="onActivate($event)"
 >
-  <span
-    class="panel-collapse-control__chevron"
-    [class.is-collapsed]="collapsed()"
-    aria-hidden="true"
-  ></span>
+  <app-icon-relief-3d
+    class="panel-collapse-control__icon"
+    kind="chevron"
+    [flipped]="collapsed()"
+  />
 </button>

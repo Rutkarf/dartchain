@@ -263,6 +263,40 @@ export class ShowcaseNewsComponent {
     return formatNewsDisplayTitle(item);
   }
 
+  protected itemRelativeTime(item: NewsItem): string {
+    const raw = item.relativeTime?.trim() ?? '';
+    if (!raw) {
+      return '';
+    }
+
+    const stripped = raw.replace(/^il y a\s+/i, '').trim();
+    if (/^(à l['’]instant|now|instant)$/i.test(stripped)) {
+      return '0s';
+    }
+
+    const match = stripped.match(
+      /^(\d+)\s*(s|sec|secs?|secondes?|m|min|mins?|minutes?|h|hrs?|heures?|j|d|jours?|days?)?\.?$/i
+    );
+    if (match) {
+      const n = match[1];
+      const unit = (match[2] ?? 's').toLowerCase();
+      if (unit.startsWith('s') || unit.startsWith('sec')) {
+        return `${n}s`;
+      }
+      if (unit === 'm' || unit.startsWith('min')) {
+        return `${n}min`;
+      }
+      if (unit.startsWith('h')) {
+        return `${n}h`;
+      }
+      if (unit.startsWith('j') || unit.startsWith('d') || unit.startsWith('jour') || unit.startsWith('day')) {
+        return `${n}j`;
+      }
+    }
+
+    return stripped.replace(/(\d)\s+(\w)/g, '$1$2');
+  }
+
   protected itemLineTooltip(item: NewsItem): string {
     const time = item.relativeTime?.trim();
     const full = newsDisplayTitleTooltip(item);

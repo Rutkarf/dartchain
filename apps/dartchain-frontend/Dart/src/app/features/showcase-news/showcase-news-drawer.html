@@ -41,7 +41,7 @@
               }
               <button
                 type="button"
-                class="news-insight-panel__icon-btn"
+                class="news-insight-panel__icon-btn ds-surface ds-surface--showcase-tab"
                 [disabled]="!canPrev()"
                 aria-label="Article précédent"
                 (click)="navigatePrev.emit()"
@@ -50,7 +50,7 @@
               </button>
               <button
                 type="button"
-                class="news-insight-panel__icon-btn"
+                class="news-insight-panel__icon-btn ds-surface ds-surface--showcase-tab"
                 [disabled]="!canNext()"
                 aria-label="Article suivant"
                 (click)="navigateNext.emit()"
@@ -60,7 +60,7 @@
             </div>
             <button
               type="button"
-              class="news-insight-panel__icon-btn news-insight-panel__icon-btn--close"
+              class="news-insight-panel__icon-btn news-insight-panel__icon-btn--close ds-surface ds-surface--showcase-tab"
               aria-label="Fermer l'article"
               (click)="dismiss()"
             >
@@ -81,19 +81,36 @@
           </div>
         } @else {
           <div class="news-insight-panel__fields" aria-label="Informations">
-            @for (field of metaFields(); track field.id) {
-              <div class="news-insight-panel__field" [class.news-insight-panel__field--mono]="field.mono">
+            @for (field of metaFields(); track field.id; let odd = $odd) {
+              <div
+                class="news-insight-panel__field"
+                [attr.data-field]="field.id"
+                [class.news-insight-panel__field--mono]="field.mono"
+                [class.news-insight-panel__field--alt]="odd"
+              >
                 <span class="news-insight-panel__field-label">{{ field.label }}</span>
-                <span class="news-insight-panel__field-value" [attr.title]="field.value">{{
-                  field.displayValue
-                }}</span>
+                @if (field.id === 'action') {
+                  <span class="news-insight-panel__status-chip" [attr.title]="field.value">
+                    <span class="news-insight-panel__status-dot" aria-hidden="true"></span>
+                    {{ field.displayValue }}
+                  </span>
+                } @else {
+                  <span class="news-insight-panel__field-value" [attr.title]="field.value">{{
+                    field.displayValue
+                  }}</span>
+                }
               </div>
             }
           </div>
 
           <div class="news-insight-panel__fields news-insight-panel__fields--content" aria-label="Contenu">
-            @for (field of contentFields(); track field.id) {
-              <div class="news-insight-panel__field" [class.news-insight-panel__field--mono]="field.mono">
+            @for (field of contentFields(); track field.id; let odd = $odd) {
+              <div
+                class="news-insight-panel__field"
+                [attr.data-field]="field.id"
+                [class.news-insight-panel__field--mono]="field.mono"
+                [class.news-insight-panel__field--alt]="odd"
+              >
                 <span class="news-insight-panel__field-label">{{ field.label }}</span>
                 <span class="news-insight-panel__field-value" [attr.title]="field.value">{{
                   field.displayValue

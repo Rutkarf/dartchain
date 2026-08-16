@@ -1,0 +1,42 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 8px;
+  min-width: 0;
+  max-width: 10px;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.badge-digit-3d__canvas {
+  display: block;
+  width: 10px;
+  height: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.badge-digit-3d__canvas.is-hidden {
+  display: none;
+}
+
+.badge-digit-3d__fallback {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-data, ui-monospace, Menlo, monospace);
+  font-size: 6px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: #ffffff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+}
