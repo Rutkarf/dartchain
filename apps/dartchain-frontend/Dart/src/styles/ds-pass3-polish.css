@@ -233,13 +233,11 @@ html.vp-compact .dock-view__list {
 /* Listes showcase : scroll discret (même barre que TOUS) */
 html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-news__list,
 html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-chat__messages,
-html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-launch__list {
+html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-launch__list,
+html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-dao__list,
+html.vp-compact .app-showcase-band:not(.is-collapsed) .market-panel__list {
   overflow-x: hidden !important;
   overflow-y: auto !important;
-}
-
-html.vp-compact .app-showcase-band:not(.is-collapsed) .showcase-dao__list {
-  overflow: hidden !important;
 }
 
 /* Ne pas écraser le row-gap / les gouttières hub (graph↔swap↔showcase). */

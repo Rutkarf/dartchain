@@ -57,10 +57,12 @@
                     <span class="showcase-dao__sep" aria-hidden="true">·</span>
                     <span class="showcase-dao__symbol">{{ card.symbol }}</span>
                   </span>
-                  <span class="showcase-dao__status" [ngClass]="statusClass(card)">
-                    {{ statusShortLabel(card) }}
+                  <span class="showcase-dao__chip">
+                    <span class="showcase-dao__status" [ngClass]="statusClass(card)">
+                      {{ statusShortLabel(card) }}
+                    </span>
+                    <span class="showcase-dao__enter" aria-hidden="true">›</span>
                   </span>
-                  <span class="showcase-dao__enter" aria-hidden="true">›</span>
                 </span>
 
                 <span class="showcase-dao__line showcase-dao__line--foot">
@@ -68,9 +70,10 @@
                     {{ card.proposalsCount }}P · {{ card.votesCount }}V · {{ card.membersActive }}M
                   </span>
                   <span class="showcase-dao__summary">{{ card.summary }}</span>
-                  <span class="showcase-dao__xp" aria-hidden="true">
-                    <span class="showcase-dao__xp-fill" [style.width.%]="xpPercent(card)"></span>
-                  </span>
+                </span>
+
+                <span class="showcase-dao__xp" aria-hidden="true">
+                  <span class="showcase-dao__xp-fill" [style.width.%]="xpPercent(card)"></span>
                 </span>
               </button>
             </li>

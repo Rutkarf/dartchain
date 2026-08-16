@@ -80,7 +80,8 @@
 .showcase-launch__cta.ds-surface.ds-surface--showcase-tab,
 .launch-drawer__btn.ds-surface.ds-surface--showcase-tab,
 .launch-drawer__close.ds-surface.ds-surface--showcase-tab,
-.launch-drawer__browse.ds-surface.ds-surface--showcase-tab {
+.launch-drawer__browse.ds-surface.ds-surface--showcase-tab,
+.market-panel__sort.ds-surface.ds-surface--showcase-tab {
   border: none !important;
   border-radius: var(--tab-push-radius) !important;
   overflow: visible !important;
@@ -112,7 +113,8 @@
 .showcase-launch__cta.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
 .launch-drawer__btn.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
 .launch-drawer__close.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
-.launch-drawer__browse.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active) {
+.launch-drawer__browse.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active),
+.market-panel__sort.ds-surface.ds-surface--showcase-tab:hover:not(:disabled):not(:active) {
   color: var(--tab-push-label-hover) !important;
   background-image: var(--tab-push-face-hover) !important;
   box-shadow: var(--tab-push-shadow-hover) !important;
@@ -133,7 +135,8 @@
 .showcase-launch__cta.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
 .launch-drawer__btn.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
 .launch-drawer__close.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
-.launch-drawer__browse.ds-surface.ds-surface--showcase-tab:active:not(:disabled) {
+.launch-drawer__browse.ds-surface.ds-surface--showcase-tab:active:not(:disabled),
+.market-panel__sort.ds-surface.ds-surface--showcase-tab:active:not(:disabled) {
   color: var(--tab-push-label-pressed) !important;
   background-image: var(--tab-push-face-pressed) !important;
   box-shadow: var(--tab-push-shadow-pressed) !important;

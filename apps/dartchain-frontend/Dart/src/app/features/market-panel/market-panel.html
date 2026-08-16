@@ -1,18 +1,44 @@
 <section class="market-panel ds-surface ds-surface--showcase-body" aria-label="Marché" tabindex="0">
   <header class="market-panel__toolbar">
-    <label class="market-panel__search">
-      <span class="market-panel__search-icon" aria-hidden="true">⌕</span>
-      <input
-        type="search"
-        class="market-panel__search-input"
-        [attr.placeholder]="searchPlaceholder()"
-        [ngModel]="searchQuery()"
-        (ngModelChange)="onSearchInput($event)"
-        autocomplete="off"
-        spellcheck="false"
-        aria-label="Rechercher des tokens"
-      />
-    </label>
+    <div class="market-panel__meta-bar">
+      <span class="market-panel__live" title="Flux marché">
+        <span class="market-panel__live-led" aria-hidden="true"></span>
+        <span class="market-panel__live-text">LIVE</span>
+      </span>
+
+      <label class="market-panel__search">
+        <span class="sr-only">Rechercher un token</span>
+        <span class="market-panel__search-icon" aria-hidden="true">
+          <svg viewBox="0 0 16 16" focusable="false">
+            <circle cx="6.5" cy="6.5" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5" />
+            <path
+              d="M9.8 9.8 13.2 13.2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <span
+          class="market-panel__search-hint"
+          [class.is-hidden]="!!searchQuery().trim()"
+          aria-hidden="true"
+        >Rechercher un token…</span>
+        <input
+          type="search"
+          class="market-panel__search-input"
+          placeholder=""
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchInput($event)"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Rechercher un token"
+        />
+      </label>
+
+      <span class="market-panel__count" [attr.title]="resultCountLabel()">{{ filteredRows().length }}</span>
+    </div>
 
     @if (statusBanner(); as banner) {
       <div
@@ -54,12 +80,20 @@
       <div class="market-panel__table" role="table" aria-label="Tokens disponibles">
         <div class="market-panel__cols" role="row">
           <span role="columnheader">Token</span>
-          <span role="columnheader">Prix</span>
-          <span role="columnheader">24h</span>
+          <span
+            role="columnheader"
+            class="market-panel__col"
+            [class.is-sorted]="sortMode() === 'price'"
+          >Prix</span>
+          <span
+            role="columnheader"
+            class="market-panel__col"
+            [class.is-sorted]="sortMode() === 'change'"
+          >24h</span>
           <span role="columnheader">Vol</span>
           <span role="columnheader">Liq</span>
           <span role="columnheader">Cap</span>
-          <span role="columnheader" aria-label="Momentum"></span>
+          <span role="columnheader" class="sr-only">Ouvrir</span>
         </div>
         <div class="market-panel__list" role="rowgroup">
           @for (row of sortedRows(); track row.config.exchangeToken; let i = $index) {
@@ -100,18 +134,24 @@
               <span class="market-panel__row-stat" role="cell" [title]="'Liquidité ' + row.metrics.liquidityLabel">
                 {{ compactMetric(row.metrics.liquidityLabel) }}
               </span>
-              <span class="market-panel__row-stat" role="cell" [title]="'Market cap ' + row.metrics.marketCapLabel">
-                {{ compactMetric(row.metrics.marketCapLabel) }}
-              </span>
               <span
-                class="market-panel__row-momentum"
+                class="market-panel__row-cap"
                 role="cell"
-                [class.is-hot]="row.metrics.momentum === 'hot'"
-                [class.is-warm]="row.metrics.momentum === 'warm'"
-                [attr.title]="row.metrics.momentum"
+                [title]="'Market cap ' + row.metrics.marketCapLabel"
               >
-                {{ momentumShort(row) }}
+                <span class="market-panel__row-cap-label">{{ compactMetric(row.metrics.marketCapLabel) }}</span>
+                <span
+                  class="market-panel__row-progress"
+                  [class.is-empty]="row.metrics.progressPercent === null"
+                  aria-hidden="true"
+                >
+                  <span
+                    class="market-panel__row-progress-fill"
+                    [style.width.%]="row.metrics.progressPercent ?? 0"
+                  ></span>
+                </span>
               </span>
+              <span class="market-panel__row-enter" role="cell" aria-hidden="true">›</span>
             </article>
           }
         </div>

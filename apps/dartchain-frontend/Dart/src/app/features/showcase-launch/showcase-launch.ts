@@ -132,11 +132,11 @@ export class ShowcaseLaunchComponent {
   protected statusLabel(status: LaunchStatus): string {
     switch (status) {
       case 'LIVE':
-        return 'Live';
+        return 'LIVE';
       case 'ENDED':
-        return 'Ended';
+        return 'ENDED';
       default:
-        return 'Soon';
+        return 'SOON';
     }
   }
 

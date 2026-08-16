@@ -147,7 +147,9 @@ export class MarketPanelComponent implements OnDestroy {
     () => this.sortOptions.find((option) => option.id === this.sortMode())?.label ?? '★'
   );
 
-  protected readonly searchPlaceholder = computed(() => {
+  protected readonly searchPlaceholder = computed(() => 'Rechercher un token…');
+
+  protected readonly resultCountLabel = computed(() => {
     const count = this.filteredRows().length;
     return `${count} résultat${count > 1 ? 's' : ''}`;
   });

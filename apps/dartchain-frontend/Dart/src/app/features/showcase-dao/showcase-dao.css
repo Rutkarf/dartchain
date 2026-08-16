@@ -1,35 +1,22 @@
-/* Showcase D.A.O — viewport fixe 300×600 px, lignes ultra-compactes (max 2 / DAO) */
+/* Showcase D.A.O — lisible, 7 rangées, sans chevauchement */
 :host {
   --dao-gap: 0px;
   --dao-pad: 0px;
-  --dao-line-h: 8px;
-  --dao-card-h: 19px;
-  --dao-font: 6px;
-  --dao-font-sm: 6.5px;
-  --dao-neon-cyan: #5ce1ff;
-  --dao-neon-cyan-rgb: 92, 225, 255;
+  --dao-visible-rows: 7;
+  --dao-row-min: 18px;
+  --dao-row-h: max(var(--dao-row-min), calc(100cqh / var(--dao-visible-rows)));
+  --dao-cyan-rgb: var(--ds-neon-cyan-rgb, var(--accent-cyan-rgb, 46, 196, 214));
+  --dao-neon-cyan: var(--ds-neon-cyan, var(--accent-cyan, #2ec4d6));
+  --dao-neon-cyan-rgb: var(--dao-cyan-rgb);
   --dao-neon-green: #3dd68c;
   --dao-neon-green-rgb: 61, 214, 140;
-  --dao-neon-purple-rgb: var(--brand-ultra-purple-rgb, 168, 85, 247);
-  --dao-glass-fill: linear-gradient(
-    165deg,
-    rgba(8, 10, 14, 0.88) 0%,
-    rgba(255, 255, 255, 0.02) 34%,
-    rgba(var(--brand-baltic-blue-rgb), 0.1) 68%,
-    rgba(var(--dao-neon-purple-rgb), 0.14) 100%
-  );
-  --dao-glass-border: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.16),
-    rgba(var(--brand-baltic-blue-rgb), 0.34),
-    rgba(var(--dao-neon-purple-rgb), 0.3)
-  );
-  --dao-glass-blur: blur(10px) saturate(150%);
-  --dao-glass-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-    0 4px 18px rgba(0, 0, 0, 0.45),
-    0 0 14px rgba(var(--brand-baltic-blue-rgb), 0.08);
+  --dao-font: 5.5px;
+  --dao-font-sm: 5px;
+  --dao-logo: 9px;
+  --dao-chip-h: 8px;
+  --dao-xp-h: 2px;
+  --dao-row-pad-y: 1px;
+  --dao-row-pad-x: 3px;
 
   display: flex;
   flex-direction: column;
@@ -54,41 +41,32 @@
   padding: var(--dao-pad);
   box-sizing: border-box;
   overflow: hidden;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  background: var(--dao-glass-fill) padding-box, var(--dao-glass-border) border-box;
-  backdrop-filter: var(--dao-glass-blur);
-  -webkit-backdrop-filter: var(--dao-glass-blur);
-  box-shadow: var(--dao-glass-shadow);
-}
-
-.showcase-dao-hub::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.18;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.14) 2px,
-    rgba(0, 0, 0, 0.14) 4px
-  );
-}
-
-.showcase-dao-hub::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 0;
+  border-radius: 0;
+  border: 1px solid rgba(var(--dao-cyan-rgb), 0.18);
   background:
-    radial-gradient(ellipse 50% 38% at 0% 0%, rgba(255, 255, 255, 0.06), transparent 58%),
-    radial-gradient(ellipse 40% 30% at 100% 100%, rgba(var(--dao-neon-purple-rgb), 0.08), transparent 55%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 24%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 7px,
+      rgba(255, 255, 255, 0.012) 7px 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 7px,
+      rgba(255, 255, 255, 0.01) 7px 8px
+    ),
+    #070b10;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.showcase-dao-hub::before,
+.showcase-dao-hub::after {
+  content: none;
+  display: none;
 }
 
 .showcase-dao-hub > * {
@@ -102,12 +80,14 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-top: 0;
+  margin: 0;
   padding: 0;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(0, 0, 0, 0.72);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.85);
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  container-type: size;
+  container-name: showcase-dao-feed;
 }
 
 .showcase-dao__list.showcase-news__list {
@@ -115,131 +95,182 @@
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
-  gap: var(--dao-gap);
+  height: 100%;
+  gap: 0;
   margin: 0;
-  padding: 0px;
-  overflow-y: auto;
+  padding: 0;
   overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
-  scrollbar-color: rgba(var(--dao-neon-cyan-rgb), 0.35) transparent;
+  scrollbar-color: rgba(var(--dao-cyan-rgb), 0.22) transparent;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .showcase-dao__list.showcase-news__list::-webkit-scrollbar {
-  width: 2px;
+  width: 3px;
+}
+
+.showcase-dao__list.showcase-news__list::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 1px 0;
+  border-radius: 0;
 }
 
 .showcase-dao__list.showcase-news__list::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgba(var(--dao-neon-cyan-rgb), 0.35);
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dao-cyan-rgb), 0.18),
+    rgba(var(--dao-cyan-rgb), 0.32)
+  );
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.showcase-dao__list.showcase-news__list::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--dao-cyan-rgb), 0.42);
+}
+
+.showcase-dao__list.showcase-news__list::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .showcase-dao__item.showcase-news__item {
-  flex: 0 0 auto;
-  min-height: var(--dao-card-h);
+  flex: 0 0 var(--dao-row-h);
+  height: var(--dao-row-h);
+  min-height: var(--dao-row-h);
+  max-height: var(--dao-row-h);
   display: flex;
   border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   background: transparent;
   padding: 0;
+  box-sizing: border-box;
+}
+
+.showcase-dao__item.showcase-news__item::before,
+.showcase-dao__item.showcase-news__item::after {
+  content: none !important;
+  display: none !important;
+}
+
+.showcase-dao__item.showcase-news__item:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015);
 }
 
 .showcase-dao__item.showcase-news__item:hover {
-  background: transparent;
+  background: rgba(var(--dao-cyan-rgb), 0.045);
 }
 
+/* Carte : pile verticale compacte, XP dans le flux (jamais absolute) */
 .showcase-dao__card {
   position: relative;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   width: 100%;
-  height: var(--dao-card-h);
-  min-height: var(--dao-card-h);
-  display: grid;
-  grid-template-rows: var(--dao-line-h) var(--dao-line-h);
-  gap: 0;
-  padding: 0 1px;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  padding: var(--dao-row-pad-y) var(--dao-row-pad-x);
   box-sizing: border-box;
-  border-radius: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(8, 10, 14, 0.5);
+  border-radius: 0;
+  border: 1px solid transparent;
+  background: transparent;
   color: inherit;
   text-align: left;
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 120ms ease, background 120ms ease;
+  transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
 }
 
 .showcase-dao__card--active {
-  border-color: rgba(var(--dao-neon-green-rgb), 0.26);
-  background: rgba(var(--dao-neon-green-rgb), 0.04);
+  border-color: rgba(var(--dao-neon-green-rgb), 0.3);
+  background: linear-gradient(
+    90deg,
+    rgba(var(--dao-neon-green-rgb), 0.08) 0%,
+    rgba(var(--dao-neon-green-rgb), 0.02) 55%,
+    transparent 100%
+  );
+  box-shadow: inset 2px 0 0 rgba(var(--dao-neon-green-rgb), 0.88);
 }
 
 .showcase-dao__card--active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: rgba(var(--dao-neon-green-rgb), 0.85);
-  box-shadow: none;
+  content: none;
+  display: none;
 }
 
 .showcase-dao__card:hover,
 .showcase-dao__card:focus-visible {
-  border-color: rgba(var(--dao-neon-cyan-rgb), 0.28);
-  background: rgba(var(--brand-baltic-blue-rgb), 0.1);
+  border-color: rgba(var(--dao-cyan-rgb), 0.28);
+  background: rgba(var(--dao-cyan-rgb), 0.05);
+  box-shadow: inset 2px 0 0 rgba(var(--dao-cyan-rgb), 0.45);
+}
+
+.showcase-dao__card--active:hover,
+.showcase-dao__card--active:focus-visible {
+  border-color: rgba(var(--dao-neon-green-rgb), 0.42);
+  box-shadow: inset 2px 0 0 rgba(var(--dao-neon-green-rgb), 0.95);
 }
 
 .showcase-dao__card:focus-visible {
-  outline: 1px solid rgba(var(--dao-neon-cyan-rgb), 0.4);
+  outline: 1px solid rgba(var(--dao-cyan-rgb), 0.4);
   outline-offset: 0;
 }
 
 .showcase-dao__line {
   display: grid;
   align-items: center;
+  flex: 0 0 auto;
+  width: 100%;
   min-width: 0;
-  height: var(--dao-line-h);
-  min-height: var(--dao-line-h);
-  max-height: var(--dao-line-h);
+  height: auto;
   overflow: hidden;
 }
 
 .showcase-dao__line--head {
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  gap: 1px;
+  grid-template-columns: var(--dao-logo) minmax(0, 1fr) auto;
+  column-gap: 3px;
 }
 
 .showcase-dao__line--foot {
-  grid-template-columns: auto minmax(0, 1fr) 28px;
-  gap: 2px;
-  padding-left: 13px;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 3px;
+  padding-left: calc(var(--dao-logo) + 3px);
 }
 
 .showcase-dao__logo {
-  width: 10px;
-  height: 8px;
-  border-radius: 50%;
+  width: var(--dao-logo);
+  height: var(--dao-logo);
+  flex-shrink: 0;
+  border-radius: 0;
   object-fit: cover;
-  border: 1px solid rgba(var(--dao-neon-cyan-rgb), 0.24);
+  border: 1px solid rgba(var(--dao-cyan-rgb), 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .showcase-dao__logo--placeholder {
   display: inline-grid;
   place-items: center;
-  font-size: 4px;
+  font-size: 4.5px;
   font-weight: 800;
-  color: #fff;
+  letter-spacing: 0.02em;
+  color: rgba(244, 251, 255, 0.94);
   background: linear-gradient(
-    135deg,
-    rgba(var(--brand-baltic-blue-rgb), 0.45),
-    rgba(var(--dao-neon-purple-rgb), 0.28)
+    180deg,
+    rgba(var(--dao-cyan-rgb), 0.24) 0%,
+    rgba(0, 0, 0, 0.45) 100%
   );
 }
 
 .showcase-dao__title {
   display: flex;
   align-items: baseline;
-  gap: 0px;
+  gap: 2px;
   min-width: 0;
   overflow: hidden;
 }
@@ -247,7 +278,7 @@
 .showcase-dao__name {
   font-size: var(--dao-font);
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(244, 251, 255, 0.96);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -263,52 +294,91 @@
 
 .showcase-dao__symbol {
   flex: 0 0 auto;
+  font-family: var(--ds-font-mono, ui-monospace, Menlo, monospace);
   font-size: var(--dao-font-sm);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(var(--dao-neon-cyan-rgb), 0.72);
+  color: rgba(var(--dao-cyan-rgb), 0.9);
   line-height: 1;
 }
 
+.showcase-dao__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  height: var(--dao-chip-h);
+  min-height: var(--dao-chip-h);
+  max-height: var(--dao-chip-h);
+  padding: 0 3px;
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(0, 0, 0, 0.32) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.showcase-dao__card--active .showcase-dao__chip {
+  border-color: rgba(var(--dao-neon-green-rgb), 0.48);
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dao-neon-green-rgb), 0.2) 0%,
+    rgba(var(--dao-neon-green-rgb), 0.07) 100%
+  );
+}
+
 .showcase-dao__status {
-  padding: 0 1px;
-  border-radius: 2px;
-  font-size: 4.5px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 5px;
   font-weight: 900;
-  letter-spacing: 0.03em;
-  line-height: 1.2;
+  letter-spacing: 0.06em;
+  line-height: 1;
   white-space: nowrap;
 }
 
 .showcase-dao__status--active {
   color: #9dffd0;
-  background: rgba(var(--dao-neon-green-rgb), 0.12);
 }
 
 .showcase-dao__status--creating {
-  color: var(--dao-neon-cyan);
-  background: rgba(var(--dao-neon-cyan-rgb), 0.1);
+  color: rgba(200, 212, 224, 0.78);
 }
 
 .showcase-dao__status--closed {
-  color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.42);
 }
 
 .showcase-dao__enter {
-  font-size: 8px;
+  margin: 0;
+  font-size: 6px;
   font-weight: 700;
   line-height: 1;
-  color: rgba(var(--dao-neon-cyan-rgb), 0.7);
+  color: rgba(var(--dao-cyan-rgb), 0.6);
+}
+
+.showcase-dao__card--active .showcase-dao__enter {
+  color: #9dffd0;
 }
 
 .showcase-dao__stats {
   flex: 0 0 auto;
+  font-family: var(--ds-font-mono, ui-monospace, Menlo, monospace);
   font-size: var(--dao-font-sm);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(210, 222, 234, 0.84);
   white-space: nowrap;
   line-height: 1;
 }
@@ -316,29 +386,39 @@
 .showcase-dao__summary {
   font-size: var(--dao-font-sm);
   line-height: 1;
-  color: rgba(255, 255, 255, 0.38);
+  color: rgba(180, 194, 210, 0.68);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
 }
 
+/* XP dans le flux — sous le texte, jamais superposée */
 .showcase-dao__xp {
-  height: 0px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  position: static;
+  display: block;
+  flex: 0 0 var(--dao-xp-h);
+  width: auto;
+  margin: 0 0 0 calc(var(--dao-logo) + 3px);
+  height: var(--dao-xp-h);
+  min-height: var(--dao-xp-h);
+  max-height: var(--dao-xp-h);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 .showcase-dao__xp-fill {
   display: block;
   height: 100%;
   min-width: 2px;
-  border-radius: inherit;
+  max-width: 100%;
+  border-radius: 0;
   background: linear-gradient(
     90deg,
-    rgba(var(--dao-neon-purple-rgb), 0.5),
-    rgba(var(--dao-neon-cyan-rgb), 0.9)
+    rgba(var(--dao-cyan-rgb), 0.45),
+    rgba(var(--dao-cyan-rgb), 0.92)
   );
 }
 
@@ -354,25 +434,33 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  padding: 4px;
   font-size: var(--dao-font-sm);
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(210, 222, 234, 0.7);
   text-align: center;
 }
 
 .showcase-dao-hub .showcase-news__retry {
-  margin-top: 1px;
-  border-radius: 2px;
-  padding: 0px 4px;
-  border: 1px solid rgba(var(--dao-neon-cyan-rgb), 0.24);
-  background: rgba(var(--brand-baltic-blue-rgb), 0.12);
-  color: rgba(255, 255, 255, 0.86);
+  margin-top: 2px;
+  border-radius: 0;
+  padding: 1px 5px;
+  border: 1px solid rgba(var(--dao-cyan-rgb), 0.28);
+  background: rgba(var(--dao-cyan-rgb), 0.1);
+  color: rgba(244, 251, 255, 0.92);
   font-size: var(--dao-font-sm);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 .showcase-dao__skeleton-item {
-  flex: 0 0 auto;
-  min-height: var(--dao-card-h);
+  flex: 0 0 var(--dao-row-h);
+  height: var(--dao-row-h);
+  min-height: var(--dao-row-h);
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.28);
 }
 
 .showcase-dao-hub .showcase-news__list--skeleton {
