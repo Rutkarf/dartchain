@@ -159,6 +159,7 @@ export type LocaleKey =
   | 'wallet.network'
   | 'wallet.refresh'
   | 'wallet.create'
+  | 'wallet.creating'
   | 'wallet.noWallet'
   | 'wallet.totalBalance'
   | 'wallet.fiatApprox'
@@ -186,6 +187,11 @@ export type LocaleKey =
   | 'wallet.keys.show'
   | 'wallet.keys.hide'
   | 'wallet.keys.copy'
+  | 'wallet.keys.showPrivate'
+  | 'wallet.keys.privateWarning'
+  | 'wallet.keys.confirmReveal'
+  | 'wallet.keys.confirmReveal.ok'
+  | 'wallet.keys.confirmReveal.cancel'
   | 'wallet.send.title'
   | 'wallet.send.recipient'
   | 'wallet.send.amount'
@@ -403,6 +409,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.network': 'Réseau',
     'wallet.refresh': 'Actualiser le wallet',
     'wallet.create': 'Créer un wallet',
+    'wallet.creating': 'Création…',
     'wallet.noWallet': 'Aucun wallet actif.',
     'wallet.totalBalance': 'Solde total',
     'wallet.fiatApprox': '{chf} CHF',
@@ -430,6 +437,12 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.keys.show': 'Afficher Clef',
     'wallet.keys.hide': 'Masquer',
     'wallet.keys.copy': 'Copier clef',
+    'wallet.keys.showPrivate': 'Afficher la clé privée',
+    'wallet.keys.privateWarning':
+      'Clé privée sensible : ne la partagez jamais et sauvegardez-la hors ligne.',
+    'wallet.keys.confirmReveal': 'J’ai compris que cette clé donne accès aux fonds.',
+    'wallet.keys.confirmReveal.ok': 'Afficher',
+    'wallet.keys.confirmReveal.cancel': 'Annuler',
     'wallet.send.title': 'Envoyer',
     'wallet.send.recipient': 'Destinataire',
     'wallet.send.amount': 'Montant',
@@ -698,6 +711,7 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.network': 'Network',
     'wallet.refresh': 'Refresh wallet',
     'wallet.create': 'Create wallet',
+    'wallet.creating': 'Creating…',
     'wallet.noWallet': 'No active wallet.',
     'wallet.totalBalance': 'Total balance',
     'wallet.fiatApprox': '{chf} CHF',
@@ -725,6 +739,12 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'wallet.keys.show': 'Show key',
     'wallet.keys.hide': 'Hide',
     'wallet.keys.copy': 'Copy key',
+    'wallet.keys.showPrivate': 'Show private key',
+    'wallet.keys.privateWarning':
+      'Sensitive private key: never share it, and store it offline.',
+    'wallet.keys.confirmReveal': 'I understand this key grants access to the funds.',
+    'wallet.keys.confirmReveal.ok': 'Show',
+    'wallet.keys.confirmReveal.cancel': 'Cancel',
     'wallet.send.title': 'Send',
     'wallet.send.recipient': 'Recipient',
     'wallet.send.amount': 'Amount',

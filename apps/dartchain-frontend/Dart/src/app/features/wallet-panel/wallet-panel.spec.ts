@@ -22,10 +22,12 @@ describe('WalletPanel', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render create wallet CTA without idle status toast', () => {
+  it('should render create wallet CTA under the balance, not in the footer', () => {
     const root = fixture.nativeElement as HTMLElement;
-    expect(root.querySelector('.wallet-display__create-cta')).toBeTruthy();
+    const cta = root.querySelector('.wallet-display__create-slot .wallet-display__create-cta');
+    expect(cta).toBeTruthy();
     expect(root.querySelector('.wallet-display__create-cta-label')?.textContent).toContain('Créer un wallet');
+    expect(root.querySelector('.wallet-display__actions .wallet-display__create-cta')).toBeFalsy();
     expect(root.querySelector('.wallet-display__status-line')).toBeFalsy();
   });
 
@@ -63,7 +65,7 @@ describe('WalletPanel', () => {
 
   it('should render recent lookups panel under explorer', () => {
     const root = fixture.nativeElement as HTMLElement;
-    expect(root.querySelector('.wallet-display__recent')).toBeTruthy();
+    expect(root.querySelector('.wallet-display__faucet-col .wallet-display__recent')).toBeTruthy();
     expect(root.querySelector('.wallet-display__recent-title')).toBeTruthy();
     expect(root.querySelector('.wallet-display__recent-empty')).toBeTruthy();
   });

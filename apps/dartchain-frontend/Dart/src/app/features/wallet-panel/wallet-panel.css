@@ -1190,6 +1190,15 @@ button.dock-view__item-row:focus-visible {
   line-height: 1.35;
 }
 
+.wallet-display__create-slot {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
 .wallet-display__create-cta {
   position: relative;
   display: flex;
@@ -1197,19 +1206,23 @@ button.dock-view__item-row:focus-visible {
   justify-content: center;
   gap: 4px;
   width: 100%;
-  min-height: 30px;
+  max-width: 100%;
+  align-self: stretch;
+  flex: 0 0 auto;
+  min-height: 22px;
   margin: 0;
-  padding: 0 10px;
+  padding: 2px 6px;
   border: 1px solid rgba(var(--wallet-cyan-rgb), 0.55);
   border-radius: var(--ds-radius-btn, 12px);
   background: var(--cta-primary-bg, var(--wallet-cyan));
   color: var(--cta-primary-text, #050a12);
   font-family: var(--wallet-display-font);
-  font-size: clamp(8px, 2.1vw, 10px);
+  font-size: clamp(6px, 2cqw, 9px);
   font-weight: 700;
-  letter-spacing: 0.06em;
-  line-height: 1;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
   white-space: nowrap;
+  text-align: center;
   cursor: pointer;
   box-shadow: var(--cta-primary-shadow, inset 0 1px 0 rgba(255, 255, 255, 0.18));
   transition:
@@ -1223,6 +1236,7 @@ button.dock-view__item-row:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+  white-space: nowrap;
 }
 
 .wallet-display__create-cta:hover:not(:disabled) {
@@ -2083,13 +2097,13 @@ button.dock-view__item-row:focus-visible {
 }
 
 .wallet-display__keys--under-balance .wallet-display__key-strip {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 2px;
   min-width: 0;
   min-height: 0;
-  padding: 1px 0px;
+  padding: 0;
   line-height: 1;
   border-radius: 0;
   border: none;
@@ -2105,7 +2119,8 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__keys--under-balance .wallet-display__key-strip-label {
   flex: 0 0 auto;
-  width: 100%;
+  width: auto;
+  max-width: 42%;
   font-family: var(--wallet-display-font);
   font-size: clamp(4px, 1.2vw, 5.5px);
   font-weight: 700;
@@ -3049,6 +3064,8 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__actions > .wallet-display__create-cta {
   width: 100%;
+  max-width: 100%;
+  align-self: stretch;
 }
 
 .wallet-display__action-btn {
@@ -3784,9 +3801,12 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__create-cta {
-  min-height: 16px;
-  padding: 0 4px;
-  font-size: clamp(5px, 1.6vw, 7px);
+  width: 100%;
+  max-width: 100%;
+  align-self: stretch;
+  min-height: 22px;
+  padding: 2px 4px;
+  font-size: clamp(5px, 1.8vw, 7px);
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__status-line {
@@ -4137,8 +4157,11 @@ button.dock-view__item-row:focus-visible {
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
   padding: 0px 0px;
-  gap: 0px;
+  gap: 1px;
   border: none;
   background: transparent;
   box-shadow: none;
@@ -4153,14 +4176,18 @@ button.dock-view__item-row:focus-visible {
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip-label {
   font-size: 3.5px;
   letter-spacing: 0.05em;
+  width: auto;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip-body {
-  gap: 0px;
+  gap: 2px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-strip-value {
   font-size: 2.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__keys--under-balance .wallet-display__key-icon-btn {
@@ -4727,6 +4754,9 @@ button.dock-view__item-row:focus-visible {
   position: relative;
   z-index: 2;
   flex: 0 0 auto;
+  width: 100% !important;
+  max-width: 100% !important;
+  align-self: stretch;
   border-radius: 0 !important;
   min-height: 22px !important;
   height: auto !important;
@@ -4739,7 +4769,7 @@ button.dock-view__item-row:focus-visible {
   ) !important;
   color: #041018 !important;
   font-weight: 800 !important;
-  letter-spacing: 0.08em !important;
+  letter-spacing: 0.04em !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
     inset 0 -1px 0 rgba(0, 0, 0, 0.35),

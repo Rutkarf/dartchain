@@ -392,12 +392,15 @@ export class WalletPanelComponent implements OnInit {
   protected createWallet(): void {
     this.clearMessages();
     this.creatingWallet.set(true);
+    this.privateKeyVisible.set(false);
 
     void this.api
       .createWalletClientSide()
       .then((wallet) => {
         this.walletSession.setWallet(wallet);
         this.wallet.set(wallet);
+        this.publicKeyVisible.set(true);
+        this.privateKeyVisible.set(false);
         this.balanceForm.patchValue(
           { address: this.ownDisplayAddress(wallet.address) },
           { emitEvent: false }
@@ -500,7 +503,14 @@ export class WalletPanelComponent implements OnInit {
   }
 
   protected togglePrivateKeyVisibility(): void {
-    this.privateKeyVisible.update((value) => !value);
+    if (this.privateKeyVisible()) {
+      this.privateKeyVisible.set(false);
+      return;
+    }
+
+    if (window.confirm(this.locale.t('wallet.keys.confirmReveal'))) {
+      this.privateKeyVisible.set(true);
+    }
   }
 
   protected togglePublicKeyVisibility(): void {
