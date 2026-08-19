@@ -44,7 +44,7 @@ describe('M4T3R trail sampling', () => {
     const world = getPlayerHeadWorldPosition(player);
     expect(world.y).toBeCloseTo(3.9, 3);
     expect(world.x).toBeCloseTo(3, 3);
-    expect(M4T3R_PICKUP_FX.headOffsetMeters).toBeCloseTo(0.45);
+    expect(M4T3R_PICKUP_FX.headOffsetMeters).toBeCloseTo(0.32);
     expect(M4T3R_PICKUP_FX.text).toBe('+1');
   });
 

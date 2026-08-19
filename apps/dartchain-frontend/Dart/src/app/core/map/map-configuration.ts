@@ -75,12 +75,33 @@ export const SCENE_COPY = {
 export const M4T3R_PICKUP_FX = {
   text: '+1',
   durationMs: 900,
-  riseMeters: 1.55,
-  headOffsetMeters: 0.45,
-  poolSize: 12,
-  maxBurst: 6,
-  batchWindowMs: 40,
+  riseMeters: 1.35,
+  headOffsetMeters: 0.32,
+  stackLaneSpacingMeters: 1.0,
+  poolSize: 48,
+  maxBurst: 14,
+  spriteStartScale: 0.7,
+  spritePopBoost: 0.0875,
+  spriteGrowScale: 0.1375,
   glowOpacity: 0.2,
+} as const;
+
+/** Pièce 3D type Mario — pop élastique + flip + montée verticale. */
+export const M4T3R_COIN_PICKUP_FX = {
+  durationMs: 820,
+  poolSize: 48,
+  maxBurst: 14,
+  popHeight: 0.62,
+  riseMeters: 2.15,
+  spinSpeed: 18,
+  flipSpeed: 22,
+  staggerSeconds: 0.04,
+  startScale: 1,
+  peakScale: 1.52,
+  sparkleScale: 2.1,
+  burstScale: 2.6,
+  emissiveBase: 0.58,
+  emissivePulse: 0.42,
 } as const;
 
 /**
@@ -161,8 +182,12 @@ export const TRAIL_CONFIG = {
   maxCellsPerUpdate: 5000,
   fadeDurationMs: 350,
   respawnDelayMs: 30_000,
+  /** Masquage définitif des clusters collectés (pas de réapparition visuelle). */
+  permanentHide: true,
   maxStepMeters: 3.6,
   maxSpeedMetersPerSecond: 32,
+  /** Limite anti-spam par pièce visuelle (1,25 m), pas par cluster 14 cm. */
+  maxVisualPickupsPerSecond: 32,
 } as const;
 
 /** Glow résiduel au sol après une collecte M4T3R (2–3 s). */
@@ -222,8 +247,8 @@ export const ORBIT_CONFIG = {
   maxPolarAngle: 1.32,
   zoomSpeed: 0.8,
   rotateSpeed: 0.55,
-  /** Centre du perso (~4.2 m) pour cadrer le corps entier dans le peek. */
-  targetHeight: 2.1,
+  /** Centre du perso (~2.8 m) pour cadrer le corps entier dans le peek. */
+  targetHeight: 1.4,
 } as const;
 
 export type QuestParticleMode = 'quest-field' | 'metaverse-starry-sky';

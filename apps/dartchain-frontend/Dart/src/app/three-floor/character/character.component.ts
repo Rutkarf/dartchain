@@ -59,8 +59,8 @@ export class CharacterComponent implements AfterViewInit, OnDestroy {
     if (!scene) return;
     this.bootstrapped = true;
     const userId = this.auth.user()?.id ?? 'guest';
-    void this.characterApi.fetchMine(userId);
-    await this.characterNft.loadCharacterForUser(userId, scene);
+    const nft = await this.characterApi.fetchMine(userId);
+    await this.characterNft.loadCharacterForUser(userId, scene, nft?.stlPath);
     this.characterControl.resetRunner();
   }
 }

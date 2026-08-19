@@ -25,6 +25,7 @@ import {
   worldToCluster,
   clusterId as trailClusterId,
 } from './m4t3r-trail.util';
+import { groupClustersByRenderCell } from './m4t3r-pickup-fx.util';
 
 export interface TrailCollectResult {
   type: 'M4T3R_TRAIL_PICKUP_REQUEST';
@@ -59,6 +60,17 @@ export interface M4T3RDebugStats {
 const R4V3_TOKEN_COLORS = [0x40e0ff, 0xff3ecf, 0x7a5cff, 0xffe600, 0x235789];
 const CELLS_PER_CLUSTER =
   (M4T3R_DENSITY_CONFIG.visualClusterSize / M4T3R_DENSITY_CONFIG.logicalCellSize) ** 2;
+
+/** Timestamp « jamais » — cluster collecté ne réapparaît pas visuellement. */
+const PERMANENT_HIDE_UNTIL = Number.MAX_SAFE_INTEGER;
+
+function hideUntilForCollect(now: number): number {
+  return TRAIL_CONFIG.permanentHide ? PERMANENT_HIDE_UNTIL : now + TRAIL_CONFIG.respawnDelayMs;
+}
+
+function isPermanentlyHidden(until: number): boolean {
+  return until >= PERMANENT_HIDE_UNTIL - 1;
+}
 
 const ORIGINAL_TOKEN_THICKNESS = R4V3_GROUND_FIELD.tokenThickness;
 const SCALED_TOKEN_THICKNESS = ORIGINAL_TOKEN_THICKNESS * M4T3R_RENDER_CONFIG.heightMultiplier;
@@ -406,6 +418,7 @@ export class TokenCellService {
     const now = Date.now();
     let respawning = 0;
     for (const until of this.hiddenUntil.values()) {
+      if (isPermanentlyHidden(until)) continue;
       if (until > now) respawning++;
     }
     return {
@@ -437,7 +450,8 @@ export class TokenCellService {
     playerId: string,
     previous: THREE.Vector3,
     current: THREE.Vector3,
-    deltaSeconds = 0
+    deltaSeconds = 0,
+    commit = true
   ): TrailCollectResult | null {
     const step = Math.hypot(current.x - previous.x, current.z - previous.z);
     if (step < 0.02 || step > TRAIL_CONFIG.maxStepMeters) {
@@ -461,32 +475,45 @@ export class TokenCellService {
       return !isGroundCellExcluded(x, z) && (this.hiddenUntil.get(id) ?? 0) <= now;
     });
     if (clusterIds.length === 0) return null;
-    const remaining = Math.max(0, 250 - this.rateWindowCount);
-    const accepted = clusterIds.slice(0, remaining);
-    if (accepted.length === 0) return null;
-    this.rateWindowCount += accepted.length;
-    const respawnAt = now + TRAIL_CONFIG.respawnDelayMs;
-    for (const id of accepted) {
-      this.hiddenUntil.set(id, respawnAt);
-      this.pending.push({ cellId: id, playerId, timestamp: now });
-    }
-    this.lastLogicalCount = Math.min(
-      TRAIL_CONFIG.maxCellsPerUpdate,
-      Math.round(accepted.length * CELLS_PER_CLUSTER)
-    );
-    this.lastCollectedCellCount = accepted.length;
 
-    this.forceGridDirty();
+    const visualCells = groupClustersByRenderCell(clusterIds);
+    const remaining = Math.max(0, TRAIL_CONFIG.maxVisualPickupsPerSecond - this.rateWindowCount);
+    const allowedCells = visualCells.slice(0, remaining);
+    if (allowedCells.length === 0) return null;
+    const accepted = allowedCells.flatMap((cell) => cell.clusterIds);
 
-    return {
+    const trail: TrailCollectResult = {
       type: 'M4T3R_TRAIL_PICKUP_REQUEST',
       clusterIds: accepted,
       candidateCellIds: accepted,
-      logicalEstimate: this.lastLogicalCount,
+      logicalEstimate: Math.min(
+        TRAIL_CONFIG.maxCellsPerUpdate,
+        Math.round(accepted.length * CELLS_PER_CLUSTER)
+      ),
       previousPosition: { x: previous.x, y: previous.y, z: previous.z },
       currentPosition: { x: current.x, y: current.y, z: current.z },
       timestamp: now,
     };
+
+    if (commit) {
+      this.commitTrailCollect(playerId, trail);
+    }
+
+    return trail;
+  }
+
+  /** Applique le masquage local après confirmation visuelle (FX ramassage). */
+  commitTrailCollect(playerId: string, trail: TrailCollectResult): void {
+    const now = trail.timestamp;
+    this.rateWindowCount += groupClustersByRenderCell(trail.clusterIds).length;
+    const respawnAt = hideUntilForCollect(now);
+    for (const id of trail.clusterIds) {
+      this.hiddenUntil.set(id, respawnAt);
+      this.pending.push({ cellId: id, playerId, timestamp: now });
+    }
+    this.lastLogicalCount = trail.logicalEstimate;
+    this.lastCollectedCellCount = trail.clusterIds.length;
+    this.forceGridDirty();
   }
 
   requestCollect(playerId: string, playerPosition: THREE.Vector3): TokenCollectionRequest | null {
@@ -496,7 +523,7 @@ export class TokenCellService {
     return this.pending[this.pending.length - 1] ?? null;
   }
 
-  markCollected(cellId: string, respawnAt = Date.now() + TRAIL_CONFIG.respawnDelayMs): void {
+  markCollected(cellId: string, respawnAt = hideUntilForCollect(Date.now())): void {
     this.hiddenUntil.set(cellId, respawnAt);
     this.forceGridDirty();
   }
@@ -509,8 +536,10 @@ export class TokenCellService {
   }
 
   applyServerHide(clusterIds: string[], respawnAt: number): void {
+    void respawnAt;
+    const until = hideUntilForCollect(Date.now());
     for (const id of clusterIds) {
-      this.hiddenUntil.set(id, respawnAt);
+      this.hiddenUntil.set(id, until);
     }
     this.forceGridDirty();
   }
@@ -523,15 +552,14 @@ export class TokenCellService {
     const now = Date.now();
     const incoming = new Set(cells.map((cell) => cell.cellId));
     for (const [id, until] of this.hiddenUntil) {
+      if (isPermanentlyHidden(until)) continue;
       if (until <= now) this.hiddenUntil.delete(id);
       else if (!incoming.has(id) && until - now > TRAIL_CONFIG.respawnDelayMs) {
         this.hiddenUntil.delete(id);
       }
     }
     for (const cell of cells) {
-      if (cell.respawnAt > now) {
-        this.hiddenUntil.set(cell.cellId, cell.respawnAt);
-      }
+      this.hiddenUntil.set(cell.cellId, hideUntilForCollect(now));
     }
     this.forceGridDirty();
   }
@@ -563,6 +591,7 @@ export class TokenCellService {
     const now = Date.now();
     let expired = false;
     for (const [id, until] of this.hiddenUntil) {
+      if (isPermanentlyHidden(until)) continue;
       if (until <= now) {
         this.hiddenUntil.delete(id);
         expired = true;
@@ -586,7 +615,7 @@ export class TokenCellService {
         const cz = worldToCluster(worldZ + dz);
         const key = trailClusterId(cx, cz);
         const until = this.hiddenUntil.get(key);
-        if (until !== undefined && until > now) return true;
+        if (until !== undefined && (isPermanentlyHidden(until) || until > now)) return true;
       }
     }
     return false;

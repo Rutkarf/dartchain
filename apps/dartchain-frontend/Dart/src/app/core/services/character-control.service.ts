@@ -7,8 +7,11 @@ import { MapLoadingService } from '../map/map-loading.service';
 import { METRO_SPAWN_ANCHOR, MOVE_JOYSTICK_CONFIG } from '../map/map-configuration';
 import { TokenCellService } from '../map/token-cell.service';
 import { M4t3rPickupFxService } from '../map/m4t3r-pickup-fx.service';
+import { M4t3rCoinPickupFxService } from '../map/m4t3r-coin-pickup-fx.service';
+import { M4t3rPickupFxOrchestratorService } from '../map/m4t3r-pickup-fx-orchestrator.service';
 import { M4t3rTrailApiService } from '../map/m4t3r-trail-api.service';
 import { CharacterNftService } from './character-nft.service';
+import { CHARACTER_ASSETS } from './character-assets.config';
 import { CameraControlService } from './camera-control.service';
 import { RunnerWorldService } from './runner/runner-world.service';
 import { RunnerStateService } from './runner/runner-state.service';
@@ -28,6 +31,8 @@ export class CharacterControlService {
   private readonly mapLoading = inject(MapLoadingService);
   private readonly tokenCells = inject(TokenCellService);
   private readonly pickupFx = inject(M4t3rPickupFxService);
+  private readonly coinPickupFx = inject(M4t3rCoinPickupFxService);
+  private readonly pickupFxOrchestrator = inject(M4t3rPickupFxOrchestratorService);
   private readonly trailApi = inject(M4t3rTrailApiService);
   private readonly mapConfig = inject(MapConfigService);
   private readonly geo = inject(GeoCoordinateService);
@@ -35,8 +40,8 @@ export class CharacterControlService {
   private readonly footprints = inject(FootprintTrailManager);
   private readonly collectTrailVisual = inject(M4t3rCollectTrailVisualService);
 
-  /** Lift léger pour éviter les pieds "dans le sol" (modèle vs terrain). */
-  private readonly footClearanceMeters = 0.035;
+  /** Lift léger pour éviter les pieds dans le sol (modèle vs terrain). */
+  private readonly footClearanceMeters = CHARACTER_ASSETS.footClearanceMeters;
 
   private moveX = 0;
   private moveY = 0;
@@ -282,6 +287,7 @@ export class CharacterControlService {
       this.footprints.update(state.mesh.position, this.velocity, deltaSeconds, groundY);
       this.updateMarseilleTrail(state.mesh, state.userId || 'local', deltaSeconds);
       this.pickupFx.update(deltaSeconds);
+      this.coinPickupFx.update(deltaSeconds);
     }
 
     this.character.updateAnimation(
@@ -334,10 +340,19 @@ export class CharacterControlService {
       this.trailPrevReady = true;
       return;
     }
-    const trail = this.tokenCells.collectTrail(playerId, this.trailPrev, mesh.position, deltaSeconds);
+    const trail = this.tokenCells.collectTrail(
+      playerId,
+      this.trailPrev,
+      mesh.position,
+      deltaSeconds,
+      false
+    );
     this.trailPrev.copy(mesh.position);
     if (trail) {
-      this.pickupFx.spawn(mesh, trail.clusterIds.length);
+      this.pickupFxOrchestrator.spawnForCollect(trail.clusterIds, mesh, (x, z) =>
+        this.getGroundYAt(x, z)
+      );
+      this.tokenCells.commitTrailCollect(playerId, trail);
       this.collectTrailVisual.addCollectSegment(
         trail.previousPosition,
         { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z },

@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, type Observable } from 'rxjs';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+import {
+  CHARACTER_ASSETS,
+  isCharacterFbxPath,
+  isCharacterStlPath,
+} from './character-assets.config';
 
 /**
  * État runtime du personnage NFT (1 modèle / user).
@@ -35,17 +41,24 @@ interface SkeletonWalkBones {
   rightArm: THREE.Object3D;
   leftLeg: THREE.Object3D;
   rightLeg: THREE.Object3D;
+  leftShin: THREE.Object3D | null;
+  rightShin: THREE.Object3D | null;
   leftForeArm: THREE.Object3D | null;
   rightForeArm: THREE.Object3D | null;
   hips: THREE.Object3D | null;
   spine: THREE.Object3D | null;
   armSwingAxis: 'x' | 'y' | 'z';
-  /** Pose « bras en avant du corps » + dandinement. */
+  leftArmSwingSign: number;
+  rightArmSwingSign: number;
+  leftArmSwingMin: number;
+  rightArmSwingMin: number;
   hang: {
     leftArm: THREE.Euler;
     rightArm: THREE.Euler;
     leftLeg: THREE.Euler;
     rightLeg: THREE.Euler;
+    leftShin: THREE.Euler | null;
+    rightShin: THREE.Euler | null;
     leftForeArm: THREE.Euler | null;
     rightForeArm: THREE.Euler | null;
     hips: THREE.Euler | null;
@@ -53,28 +66,27 @@ interface SkeletonWalkBones {
   };
 }
 
-const CHARACTER_FBX_PATHS = [
-  'assets/characters/CharacterAnon.fbx',
-  '/assets/characters/CharacterAnon.fbx',
-] as const;
+const CHARACTER_FBX_PATHS = CHARACTER_ASSETS.fbx;
+const CHARACTER_STL_PATHS = CHARACTER_ASSETS.stl;
 
-const TARGET_HEIGHT = 4.2; // +50 % vs 2.8
+const TARGET_HEIGHT = CHARACTER_ASSETS.targetHeight;
 export const FLOOR_Y = 0;
 export const CHARACTER_MOVE_SPEED = 1.6;
-export const CHARACTER_RADIUS = 0.65;
+export const CHARACTER_RADIUS = 0.43;
 
 const WALK_SPEED = 6.4;
-const ARM_SWING = 0.32;
-const LEG_SWING = Math.PI / 5;
+const STRIDE_METERS = 0.58;
+const ARM_SWING = 0.38;
+const LEG_SWING = 0.42;
+const KNEE_BEND = 0.62;
 /** Abaisse les bras depuis la T-pose Mixamo (perpendiculaires → le long du corps). */
 const ARM_HANG_Z = Math.PI * 0.5;
-/** Avance les bras devant le torse (~40°). */
-const ARM_FORWARD = 0.72;
-const FOREARM_HANG_X = Math.PI * 0.38;
-const WADDLE_ROLL = 0.24;
-const WADDLE_YAW = 0.18;
-const WADDLE_BOUNCE = 0.07;
-const IDLE_LERP = 6;
+/** Légère inclinaison avant max après calibration (axe X Mixamo). */
+const ARM_FORWARD_X = 0.28;
+const FOREARM_HANG_X = Math.PI * 0.08;
+const WADDLE_ROLL = 0.08;
+const WADDLE_YAW = 0.06;
+const IDLE_LERP = 8;
 
 const WALK_NAME_RE = /walk|run|locomotion|move|marche/i;
 const IDLE_NAME_RE = /idle|stand|wait|breath|tpose|a-pose|rest/i;
@@ -83,8 +95,10 @@ const LEFT_ARM_RE = /LeftArm|leftarm|upperarm_l|UpperArm\.L|Arm_L/i;
 const RIGHT_ARM_RE = /RightArm|rightarm|upperarm_r|UpperArm\.R|Arm_R/i;
 const LEFT_FOREARM_RE = /LeftForeArm|leftforearm|lowerarm_l|ForeArm\.L/i;
 const RIGHT_FOREARM_RE = /RightForeArm|rightforearm|lowerarm_r|ForeArm\.R/i;
-const LEFT_LEG_RE = /LeftUpLeg|leftupleg|LeftThigh|thigh_l|UpperLeg\.L|LeftLeg(?!acy)/i;
-const RIGHT_LEG_RE = /RightUpLeg|rightupleg|RightThigh|thigh_r|UpperLeg\.R|RightLeg(?!acy)/i;
+const LEFT_THIGH_RE = /LeftUpLeg|leftupleg|LeftThigh|thigh_l|UpperLeg\.L/i;
+const RIGHT_THIGH_RE = /RightUpLeg|rightupleg|RightThigh|thigh_r|UpperLeg\.R/i;
+const LEFT_SHIN_RE = /LeftLeg(?!acy)|lowerleg_l|LowerLeg\.L|LeftShin|leftshin/i;
+const RIGHT_SHIN_RE = /RightLeg(?!acy)|lowerleg_r|LowerLeg\.R|RightShin|rightshin/i;
 const HIPS_RE = /Hips|pelvis|Hip/i;
 const SPINE_RE = /Spine(?!1|2|3)|spine(?!1|2|3)/i;
 
@@ -99,8 +113,18 @@ function emptyState(userId = ''): CharacterState {
   };
 }
 
+function isShinBone(name: string): boolean {
+  if (/UpLeg|Upper|Thigh|Foot|Toe/i.test(name)) return false;
+  return LEFT_SHIN_RE.test(name) || RIGHT_SHIN_RE.test(name);
+}
+
 function cloneEuler(e: THREE.Euler): THREE.Euler {
   return new THREE.Euler(e.x, e.y, e.z, e.order);
+}
+
+function stepCadence(speedMps: number, speedNorm: number): number {
+  const base = THREE.MathUtils.clamp(speedMps / STRIDE_METERS, 1.5, 4.4);
+  return base * THREE.MathUtils.lerp(0.9, 1.08, speedNorm) * Math.PI * 2;
 }
 
 /**
@@ -133,7 +157,11 @@ export class CharacterNftService {
     return this.stateSubject.value.mesh;
   }
 
-  async loadCharacterForUser(userId: string, scene: THREE.Scene): Promise<void> {
+  async loadCharacterForUser(
+    userId: string,
+    scene: THREE.Scene,
+    customAssetPath?: string | null
+  ): Promise<void> {
     const current = this.stateSubject.value;
     if (current.isLoaded && current.userId === userId && current.mesh) {
       return;
@@ -148,25 +176,27 @@ export class CharacterNftService {
     this.walkRig = null;
     this.skeletonWalk = null;
 
-    // TOUJOURS CharacterAnon.fbx si possible
+    // CharacterAnon.fbx → CharacterAnon.stl (jamais le walk-rig procédural)
     try {
-      const fbx = await this.loadFbxModel();
+      const loaded = await this.loadCharacterAnonVisual(customAssetPath);
       if (token !== this.loadToken) {
-        this.disposeObject(fbx);
+        this.disposeObject(loaded.root);
         return;
       }
-      clips = fbx.animations ?? [];
-      this.prepareFbxMaterials(fbx);
-      visual = fbx;
+      clips = loaded.clips;
+      if (loaded.kind === 'fbx') {
+        this.prepareFbxMaterials(loaded.root);
+      } else {
+        this.prepareStlMaterial(loaded.root);
+      }
+      visual = loaded.root;
       console.info(
-        `[CharacterNftService] CharacterAnon.fbx chargé (${clips.length} clip(s))`,
-        clips.map((c) => c.name || '(unnamed)')
+        `[CharacterNftService] CharacterAnon chargé (${loaded.kind}, ${clips.length} clip(s))`,
+        loaded.source
       );
     } catch (err) {
-      console.warn('[CharacterNftService] FBX indisponible — walk-rig.', err);
-      this.walkRig = this.createWalkRig();
-      visual = this.walkRig.root;
-      clips = [];
+      console.error('[CharacterNftService] Échec chargement CharacterAnon — modèle local requis.', err);
+      throw err;
     }
 
     if (token !== this.loadToken) {
@@ -183,18 +213,16 @@ export class CharacterNftService {
     root.rotation.y = emptyState().rotation;
     scene.add(root);
 
-    // Marche procédurale sur os Mixamo (garanti bras/jambes) + clips si utiles
-    this.skeletonWalk = this.bindSkeletonWalk(visual);
+    // Marche procédurale os prioritaire (pas à pas + bras sync) ; clips en secours.
     this.setupMixer(visual, clips);
-
-    // Si os trouvés : priorité procédurale (clips souvent Take 001 figé / non fiable)
+    this.skeletonWalk = this.bindSkeletonWalk(visual);
     if (this.skeletonWalk) {
       this.stopClipAnimation();
-      console.info('[CharacterNftService] Marche procédurale os (bras/jambes) active');
-    } else if (this.useClipAnimation) {
-      console.info('[CharacterNftService] Marche via AnimationMixer (clips)');
-    } else if (this.walkRig) {
-      console.info('[CharacterNftService] Marche via walk-rig procédural');
+      console.info('[CharacterNftService] Marche procédurale os (pas à pas) active');
+    } else if (this.hasUsableWalkClip(clips)) {
+      console.info('[CharacterNftService] Marche via AnimationMixer (clips Mixamo)');
+    } else {
+      this.stopClipAnimation();
     }
 
     if (typeof localStorage !== 'undefined' && localStorage.getItem('GAME_DEBUG') === '1') {
@@ -274,9 +302,9 @@ export class CharacterNftService {
     const norm = THREE.MathUtils.clamp(speed / Math.max(maxSpeed, 0.01), 0, 1);
     const climbNorm = climbing ? 0.85 : norm;
 
-    // 1) Os Mixamo du CharacterAnon.fbx — bras / jambes visibles
+    // 1) Os Mixamo — pas à pas synchronisé à la vitesse
     if (this.skeletonWalk) {
-      this.updateSkeletonWalk(deltaSeconds, moving || climbing, climbNorm);
+      this.updateSkeletonWalk(deltaSeconds, moving || climbing, climbNorm, speed);
       return;
     }
 
@@ -298,11 +326,12 @@ export class CharacterNftService {
       return;
     }
 
-    // 4) Bob simple
+    // 4) STL — pieds collés au sol, pas de bob vertical
     if (!this.visual) return;
-    if (moving) this.walkTime += deltaSeconds * WALK_SPEED * (0.65 + norm * 0.5);
-    const bob = Math.sin(this.walkTime) * 0.04 * blend;
-    this.visual.position.y = this.plantY + bob;
+    this.visual.position.y = this.plantY;
+    if (moving) {
+      this.walkTime += deltaSeconds * stepCadence(speed, norm);
+    }
   }
 
   dispose(scene?: THREE.Scene): void {
@@ -340,6 +369,8 @@ export class CharacterNftService {
       rightArm: null as THREE.Object3D | null,
       leftLeg: null as THREE.Object3D | null,
       rightLeg: null as THREE.Object3D | null,
+      leftShin: null as THREE.Object3D | null,
+      rightShin: null as THREE.Object3D | null,
       leftForeArm: null as THREE.Object3D | null,
       rightForeArm: null as THREE.Object3D | null,
       hips: null as THREE.Object3D | null,
@@ -364,15 +395,17 @@ export class CharacterNftService {
       if (!found.rightForeArm && RIGHT_FOREARM_RE.test(n) && !/Roll|Twist/i.test(n)) {
         found.rightForeArm = obj;
       }
-      if (!found.leftLeg && LEFT_LEG_RE.test(n) && !/Foot|Toe|Roll|Twist|Calf|Lower/i.test(n)) {
+      if (!found.leftLeg && LEFT_THIGH_RE.test(n)) {
         found.leftLeg = obj;
       }
-      if (
-        !found.rightLeg &&
-        RIGHT_LEG_RE.test(n) &&
-        !/Foot|Toe|Roll|Twist|Calf|Lower/i.test(n)
-      ) {
+      if (!found.rightLeg && RIGHT_THIGH_RE.test(n)) {
         found.rightLeg = obj;
+      }
+      if (!found.leftShin && isShinBone(n) && /left/i.test(n)) {
+        found.leftShin = obj;
+      }
+      if (!found.rightShin && isShinBone(n) && /right/i.test(n)) {
+        found.rightShin = obj;
       }
       if (!found.hips && HIPS_RE.test(n) && !/Spine/i.test(n)) {
         found.hips = obj;
@@ -414,34 +447,36 @@ export class CharacterNftService {
     const armR = found.rightArm;
     const legL = found.leftLeg;
     const legR = found.rightLeg;
+    const shinL = found.leftShin;
+    const shinR = found.rightShin;
     const foreL = found.leftForeArm;
     const foreR = found.rightForeArm;
     const hipsBone = found.hips;
     const spineBone = found.spine;
 
-    // Bind = souvent T-pose : bras baissés, puis avancés devant le torse.
-    const hangSign = this.detectArmHangSign(armL, armR, hipsBone);
-    armL.rotation.z += hangSign.left * ARM_HANG_Z;
-    armR.rotation.z += hangSign.right * ARM_HANG_Z;
-    const armSwingAxis = this.poseArmsForward(armL, armR, hipsBone, root);
+    // Pose bras : sur les côtés ou devant — jamais derrière le torse.
+    const leftPose = this.calibrateArmRestPose(armL, root, hipsBone ?? root, true);
+    const rightPose = this.calibrateArmRestPose(armR, root, hipsBone ?? root, false);
     if (foreL) foreL.rotation.x += FOREARM_HANG_X;
     if (foreR) foreR.rotation.x += FOREARM_HANG_X;
 
-    const hangL = cloneEuler(armL.rotation);
-    const hangR = cloneEuler(armR.rotation);
+    const hangL = leftPose.hang;
+    const hangR = rightPose.hang;
     const hangForeL = foreL ? cloneEuler(foreL.rotation) : null;
     const hangForeR = foreR ? cloneEuler(foreR.rotation) : null;
 
-    console.info('[CharacterNftService] Os marche liés (bras en avant, dandinement)', {
+    console.info('[CharacterNftService] Os marche liés (cuisses + genoux + bras)', {
       leftArm: armL.name,
       rightArm: armR.name,
       leftForeArm: foreL?.name ?? null,
       rightForeArm: foreR?.name ?? null,
       leftLeg: legL.name,
       rightLeg: legR.name,
+      leftShin: shinL?.name ?? null,
+      rightShin: shinR?.name ?? null,
       hips: hipsBone?.name ?? null,
       spine: spineBone?.name ?? null,
-      armSwingAxis,
+      armSwingAxis: 'x',
     });
 
     return {
@@ -449,16 +484,24 @@ export class CharacterNftService {
       rightArm: armR,
       leftLeg: legL,
       rightLeg: legR,
+      leftShin: shinL,
+      rightShin: shinR,
       leftForeArm: foreL,
       rightForeArm: foreR,
       hips: hipsBone,
       spine: spineBone,
-      armSwingAxis,
+      armSwingAxis: 'x',
+      leftArmSwingSign: leftPose.swingSign,
+      rightArmSwingSign: rightPose.swingSign,
+      leftArmSwingMin: leftPose.swingMin,
+      rightArmSwingMin: rightPose.swingMin,
       hang: {
         leftArm: hangL,
         rightArm: hangR,
         leftLeg: cloneEuler(legL.rotation),
         rightLeg: cloneEuler(legR.rotation),
+        leftShin: shinL ? cloneEuler(shinL.rotation) : null,
+        rightShin: shinR ? cloneEuler(shinR.rotation) : null,
         leftForeArm: hangForeL,
         rightForeArm: hangForeR,
         hips: hipsBone ? cloneEuler(hipsBone.rotation) : null,
@@ -467,30 +510,53 @@ export class CharacterNftService {
     };
   }
 
-  private updateSkeletonWalk(dt: number, isWalking: boolean, speedNorm = 1): void {
+  private updateSkeletonWalk(
+    dt: number,
+    isWalking: boolean,
+    speedNorm = 1,
+    speedMps = 0
+  ): void {
     const sk = this.skeletonWalk;
     if (!sk) return;
 
-    const axis = sk.armSwingAxis;
-    const armSwing = ARM_SWING * THREE.MathUtils.lerp(0.65, 1, speedNorm);
-    const legSwing = LEG_SWING * THREE.MathUtils.lerp(0.55, 1, speedNorm);
-    const elbow = 0.42 * speedNorm;
-    const waddle = THREE.MathUtils.lerp(0.55, 1, speedNorm);
+    const armSwing = ARM_SWING * THREE.MathUtils.lerp(0.7, 1, speedNorm);
+    const legSwing = LEG_SWING * THREE.MathUtils.lerp(0.65, 1, speedNorm);
+    const knee = KNEE_BEND * THREE.MathUtils.lerp(0.55, 1, speedNorm);
+    const elbow = 0.32 * speedNorm;
+    const waddle = THREE.MathUtils.lerp(0.45, 1, speedNorm);
+
+    if (this.visual) {
+      this.visual.position.y = this.plantY;
+    }
 
     if (isWalking) {
-      this.walkTime += dt * WALK_SPEED * THREE.MathUtils.lerp(0.75, 1.2, speedNorm);
+      this.walkTime += dt * stepCadence(Math.max(speedMps, 0.4), speedNorm);
       const phase = Math.sin(this.walkTime);
       const opposite = -phase;
-      const bounce = Math.abs(Math.sin(this.walkTime * 2));
+      const leftStrike = Math.pow(Math.max(0, phase), 1.35);
+      const rightStrike = Math.pow(Math.max(0, -phase), 1.35);
+      const contact = leftStrike + rightStrike;
 
-      sk.leftArm.rotation.copy(sk.hang.leftArm);
-      sk.rightArm.rotation.copy(sk.hang.rightArm);
-      sk.leftArm.rotation[axis] += phase * armSwing;
-      sk.rightArm.rotation[axis] += opposite * armSwing;
+      this.applyArmSwing(
+        sk.leftArm,
+        sk.hang.leftArm,
+        opposite,
+        armSwing,
+        sk.leftArmSwingSign,
+        sk.leftArmSwingMin
+      );
+      this.applyArmSwing(
+        sk.rightArm,
+        sk.hang.rightArm,
+        phase,
+        armSwing,
+        sk.rightArmSwingSign,
+        sk.rightArmSwingMin
+      );
 
       if (sk.leftForeArm && sk.hang.leftForeArm) {
         sk.leftForeArm.rotation.set(
-          sk.hang.leftForeArm.x + Math.max(0, -phase) * elbow,
+          sk.hang.leftForeArm.x + leftStrike * elbow,
           sk.hang.leftForeArm.y,
           sk.hang.leftForeArm.z,
           sk.hang.leftForeArm.order
@@ -498,21 +564,28 @@ export class CharacterNftService {
       }
       if (sk.rightForeArm && sk.hang.rightForeArm) {
         sk.rightForeArm.rotation.set(
-          sk.hang.rightForeArm.x + Math.max(0, phase) * elbow,
+          sk.hang.rightForeArm.x + rightStrike * elbow,
           sk.hang.rightForeArm.y,
           sk.hang.rightForeArm.z,
           sk.hang.rightForeArm.order
         );
       }
 
-      sk.leftLeg.rotation.x = sk.hang.leftLeg.x + opposite * legSwing;
-      sk.rightLeg.rotation.x = sk.hang.rightLeg.x + phase * legSwing;
-      sk.leftLeg.rotation.z = sk.hang.leftLeg.z + Math.max(0, phase) * 0.1 * waddle;
-      sk.rightLeg.rotation.z = sk.hang.rightLeg.z - Math.max(0, opposite) * 0.1 * waddle;
+      sk.leftLeg.rotation.x = sk.hang.leftLeg.x + phase * legSwing;
+      sk.rightLeg.rotation.x = sk.hang.rightLeg.x + opposite * legSwing;
+      sk.leftLeg.rotation.z = sk.hang.leftLeg.z + leftStrike * 0.05 * waddle;
+      sk.rightLeg.rotation.z = sk.hang.rightLeg.z + rightStrike * 0.05 * waddle;
+
+      if (sk.leftShin && sk.hang.leftShin) {
+        sk.leftShin.rotation.x = sk.hang.leftShin.x + leftStrike * knee;
+      }
+      if (sk.rightShin && sk.hang.rightShin) {
+        sk.rightShin.rotation.x = sk.hang.rightShin.x + rightStrike * knee;
+      }
 
       if (sk.hips && sk.hang.hips) {
         sk.hips.rotation.set(
-          sk.hang.hips.x + bounce * 0.08 * waddle,
+          sk.hang.hips.x + contact * 0.025 * waddle,
           sk.hang.hips.y + phase * WADDLE_YAW * waddle,
           sk.hang.hips.z + phase * WADDLE_ROLL * waddle,
           sk.hang.hips.order
@@ -520,19 +593,16 @@ export class CharacterNftService {
       }
       if (sk.spine && sk.hang.spine) {
         sk.spine.rotation.set(
-          sk.hang.spine.x - bounce * 0.04 * waddle,
-          sk.hang.spine.y - phase * WADDLE_YAW * 0.75 * waddle,
-          sk.hang.spine.z - phase * WADDLE_ROLL * 0.55 * waddle,
+          sk.hang.spine.x - contact * 0.015 * waddle,
+          sk.hang.spine.y - phase * WADDLE_YAW * 0.5 * waddle,
+          sk.hang.spine.z - phase * WADDLE_ROLL * 0.4 * waddle,
           sk.hang.spine.order
         );
       }
-      if (this.visual) {
-        this.visual.position.y = this.plantY + bounce * WADDLE_BOUNCE * waddle;
-      }
     } else {
       const k = Math.min(1, IDLE_LERP * dt);
-      this.walkTime += dt * 1.4;
-      const idleSway = Math.sin(this.walkTime) * 0.035;
+      this.walkTime += dt * 1.2;
+      const idleSway = Math.sin(this.walkTime) * 0.02;
       this.lerpEuler(sk.leftArm.rotation, sk.hang.leftArm, k);
       this.lerpEuler(sk.rightArm.rotation, sk.hang.rightArm, k);
       if (sk.leftForeArm && sk.hang.leftForeArm) {
@@ -545,6 +615,12 @@ export class CharacterNftService {
       sk.rightLeg.rotation.x += (sk.hang.rightLeg.x - sk.rightLeg.rotation.x) * k;
       sk.leftLeg.rotation.z += (sk.hang.leftLeg.z - sk.leftLeg.rotation.z) * k;
       sk.rightLeg.rotation.z += (sk.hang.rightLeg.z - sk.rightLeg.rotation.z) * k;
+      if (sk.leftShin && sk.hang.leftShin) {
+        this.lerpEuler(sk.leftShin.rotation, sk.hang.leftShin, k);
+      }
+      if (sk.rightShin && sk.hang.rightShin) {
+        this.lerpEuler(sk.rightShin.rotation, sk.hang.rightShin, k);
+      }
       if (sk.hips && sk.hang.hips) {
         sk.hips.rotation.x += (sk.hang.hips.x - sk.hips.rotation.x) * k;
         sk.hips.rotation.y += (sk.hang.hips.y - sk.hips.rotation.y) * k;
@@ -553,56 +629,132 @@ export class CharacterNftService {
       if (sk.spine && sk.hang.spine) {
         this.lerpEuler(sk.spine.rotation, sk.hang.spine, k);
       }
-      if (this.visual) {
-        this.visual.position.y += (this.plantY - this.visual.position.y) * k;
-      }
     }
   }
 
   /**
-   * Choisit l’axe local qui avance les mains devant le torse, puis applique ARM_FORWARD.
+   * Calibre la pose au repos : bras le long du corps ou légèrement devant.
    */
-  private poseArmsForward(
-    leftArm: THREE.Object3D,
-    rightArm: THREE.Object3D,
-    hips: THREE.Object3D | null,
-    visual: THREE.Object3D
-  ): 'x' | 'y' | 'z' {
+  private calibrateArmRestPose(
+    arm: THREE.Object3D,
+    root: THREE.Object3D,
+    reference: THREE.Object3D,
+    isLeft: boolean
+  ): { hang: THREE.Euler; swingSign: number; swingMin: number } {
+    const base = cloneEuler(arm.rotation);
     const forward = new THREE.Vector3();
-    visual.getWorldDirection(forward);
-    const origin = new THREE.Vector3();
-    (hips ?? visual).getWorldPosition(origin);
-    const tip = new THREE.Vector3();
-    const pickAxis = (arm: THREE.Object3D): { axis: 'x' | 'y' | 'z'; sign: number } => {
-      const base = cloneEuler(arm.rotation);
-      let bestAxis: 'x' | 'y' | 'z' = 'x';
-      let bestSign = -1;
-      let best = Number.NEGATIVE_INFINITY;
-      for (const axis of ['x', 'y', 'z'] as const) {
-        for (const sign of [-1, 1]) {
-          arm.rotation.copy(base);
-          arm.rotation[axis] += sign * ARM_FORWARD;
-          arm.updateMatrixWorld(true);
-          this.readArmTip(arm, tip);
-          const score =
-            (tip.x - origin.x) * forward.x +
-            (tip.y - origin.y) * forward.y +
-            (tip.z - origin.z) * forward.z;
-          if (score > best) {
-            best = score;
-            bestAxis = axis;
-            bestSign = sign;
-          }
+    const right = new THREE.Vector3();
+    root.updateMatrixWorld(true);
+    root.getWorldDirection(forward);
+    right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
+
+    let bestRot = base.clone();
+    let bestScore = Number.NEGATIVE_INFINITY;
+    let bestSwingSign = -1;
+
+    const zCandidates = isLeft ? [1, -1] : [-1, 1];
+    const fromTpose = this.isArmExtendedHorizontal(arm, reference);
+
+    for (const zSign of zCandidates) {
+      for (let xAdj = -1.05; xAdj <= 0.55; xAdj += 0.07) {
+        arm.rotation.copy(base);
+        if (fromTpose) {
+          arm.rotation.z += zSign * ARM_HANG_Z;
+        }
+        arm.rotation.x += xAdj;
+        arm.updateMatrixWorld(true);
+        const score = this.scoreArmPoseWorld(arm, reference, forward, right);
+        if (score > bestScore) {
+          bestScore = score;
+          bestRot = cloneEuler(arm.rotation);
+          bestSwingSign = xAdj >= 0 ? -1 : 1;
         }
       }
-      arm.rotation.copy(base);
-      arm.rotation[bestAxis] += bestSign * ARM_FORWARD;
-      arm.updateMatrixWorld(true);
-      return { axis: bestAxis, sign: bestSign };
+    }
+
+    arm.rotation.copy(bestRot);
+    arm.updateMatrixWorld(true);
+    return {
+      hang: bestRot,
+      swingSign: bestSwingSign,
+      swingMin: bestRot.x - 0.06,
     };
-    const left = pickAxis(leftArm);
-    pickAxis(rightArm);
-    return left.axis;
+  }
+
+  private applyArmSwing(
+    arm: THREE.Object3D,
+    hang: THREE.Euler,
+    phase: number,
+    amplitude: number,
+    sign: number,
+    minX: number
+  ): void {
+    const delta = phase * amplitude * sign;
+    const x = THREE.MathUtils.clamp(hang.x + delta, minX, hang.x + ARM_FORWARD_X + 0.18);
+    arm.rotation.set(x, hang.y, hang.z, hang.order);
+  }
+
+  private scoreArmPoseWorld(
+    arm: THREE.Object3D,
+    reference: THREE.Object3D,
+    forward: THREE.Vector3,
+    right: THREE.Vector3
+  ): number {
+    const shoulder = new THREE.Vector3();
+    const tip = new THREE.Vector3();
+    arm.getWorldPosition(shoulder);
+    this.readArmTip(arm, tip);
+    const rel = tip.clone().sub(shoulder);
+    const fwd = rel.dot(forward);
+    const side = Math.abs(rel.dot(right));
+    const down = shoulder.y - tip.y;
+
+    if (fwd < -0.04) return -800 + fwd;
+    if (down < 0.04) return -300;
+
+    return down * 2.2 + side * 1.4 + Math.min(Math.max(fwd, 0), 0.3) * 1.1;
+  }
+
+  private isArmExtendedHorizontal(arm: THREE.Object3D, reference: THREE.Object3D): boolean {
+    const origin = new THREE.Vector3();
+    reference.getWorldPosition(origin);
+    const tip = new THREE.Vector3();
+    this.readArmTip(arm, tip);
+    const horiz = Math.hypot(tip.x - origin.x, tip.z - origin.z);
+    const drop = origin.y - tip.y;
+    return horiz > drop * 1.35;
+  }
+
+  /**
+   * T-pose Mixamo : bras étendus latéralement — sinon ne pas forcer le hang Z.
+   */
+  private needsArmHang(
+    leftArm: THREE.Object3D,
+    rightArm: THREE.Object3D,
+    reference: THREE.Object3D
+  ): boolean {
+    const origin = new THREE.Vector3();
+    reference.getWorldPosition(origin);
+    const tipL = new THREE.Vector3();
+    const tipR = new THREE.Vector3();
+    this.readArmTip(leftArm, tipL);
+    this.readArmTip(rightArm, tipR);
+    const horizL = Math.hypot(tipL.x - origin.x, tipL.z - origin.z);
+    const horizR = Math.hypot(tipR.x - origin.x, tipR.z - origin.z);
+    const dropL = origin.y - tipL.y;
+    const dropR = origin.y - tipR.y;
+    return horizL > dropL * 1.35 || horizR > dropR * 1.35;
+  }
+
+  private hasUsableWalkClip(clips: THREE.AnimationClip[]): boolean {
+    if (!this.useClipAnimation || !this.walkAction) return false;
+    const walkClip =
+      this.pickClip(clips, WALK_NAME_RE) ??
+      clips.find((c) => !IDLE_NAME_RE.test(c.name || '')) ??
+      clips[0] ??
+      null;
+    if (!walkClip) return false;
+    return walkClip.duration >= 0.75 && walkClip.tracks.length >= 10;
   }
 
   private readArmTip(arm: THREE.Object3D, target: THREE.Vector3): THREE.Vector3 {
@@ -858,39 +1010,87 @@ export class CharacterNftService {
     return clips.find((c) => re.test(c.name || '')) ?? null;
   }
 
-  private async loadFbxModel(): Promise<THREE.Group> {
+  private async loadCharacterAnonVisual(customAssetPath?: string | null): Promise<{
+    root: THREE.Object3D;
+    clips: THREE.AnimationClip[];
+    kind: 'fbx' | 'stl';
+    source: string;
+  }> {
+    if (customAssetPath) {
+      if (isCharacterFbxPath(customAssetPath)) {
+        const fbx = await this.loadFbxFromPath(customAssetPath);
+        return { root: fbx, clips: fbx.animations ?? [], kind: 'fbx', source: customAssetPath };
+      }
+      if (isCharacterStlPath(customAssetPath)) {
+        const stl = await this.loadStlFromPath(customAssetPath);
+        return { root: stl, clips: [], kind: 'stl', source: customAssetPath };
+      }
+    }
+
+    try {
+      const fbx = await this.loadFbxModel();
+      return { root: fbx, clips: fbx.animations ?? [], kind: 'fbx', source: CHARACTER_FBX_PATHS[0] };
+    } catch (fbxErr) {
+      console.warn('[CharacterNftService] FBX CharacterAnon indisponible, essai STL.', fbxErr);
+    }
+
+    try {
+      const stl = await this.loadStlModel(CHARACTER_STL_PATHS);
+      return { root: stl, clips: [], kind: 'stl', source: CHARACTER_STL_PATHS[0] };
+    } catch (stlErr) {
+      console.warn('[CharacterNftService] STL CharacterAnon indisponible, essai fallback.', stlErr);
+    }
+
+    const fallback = await this.loadStlModel(CHARACTER_ASSETS.fallbackStl);
+    return { root: fallback, clips: [], kind: 'stl', source: CHARACTER_ASSETS.fallbackStl[0] };
+  }
+
+  private async loadFbxFromPath(path: string): Promise<THREE.Group> {
     const loader = new FBXLoader();
+    return await new Promise<THREE.Group>((resolve, reject) => {
+      loader.load(path, resolve, undefined, reject);
+    });
+  }
+
+  private async loadFbxModel(): Promise<THREE.Group> {
+    return this.loadFromPaths(CHARACTER_FBX_PATHS, (path) => this.loadFbxFromPath(path));
+  }
+
+  private async loadStlModel(paths: readonly string[]): Promise<THREE.Group> {
+    return this.loadFromPaths(paths, (path) => this.loadStlFromPath(path));
+  }
+
+  private async loadStlFromPath(path: string): Promise<THREE.Group> {
+    const loader = new STLLoader();
+    const geometry = await new Promise<THREE.BufferGeometry>((resolve, reject) => {
+      loader.load(path, resolve, undefined, reject);
+    });
+    geometry.computeVertexNormals();
+    const group = new THREE.Group();
+    group.name = 'CharacterAnon-stl';
+    const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial());
+    mesh.name = 'CharacterAnon-stl-mesh';
+    group.add(mesh);
+    return group;
+  }
+
+  private async loadFromPaths<T>(
+    paths: readonly string[],
+    loadOne: (path: string) => Promise<T>
+  ): Promise<T> {
     let lastError: unknown;
-    for (const path of CHARACTER_FBX_PATHS) {
+    for (const path of paths) {
       try {
-        return await new Promise<THREE.Group>((resolve, reject) => {
-          loader.load(path, resolve, undefined, reject);
-        });
+        return await loadOne(path);
       } catch (err) {
         lastError = err;
       }
     }
-    throw lastError ?? new Error('CharacterAnon.fbx introuvable');
+    throw lastError ?? new Error('Asset personnage introuvable');
   }
 
-  private fbxBodyMat: THREE.MeshLambertMaterial | null = null;
-
-  private prepareFbxMaterials(root: THREE.Object3D): void {
-    // Un seul Lambert partagé = même blanc/fuchsia, shader bien plus léger que Standard
-    if (!this.fbxBodyMat) {
-      this.fbxBodyMat = new THREE.MeshLambertMaterial({
-        color: 0xffffff,
-        emissive: 0xff2d9a,
-        emissiveIntensity: 0.55,
-        side: THREE.FrontSide,
-        transparent: false,
-        opacity: 1,
-        depthWrite: true,
-        depthTest: true,
-      });
-      this.fbxBodyMat.userData['shared'] = true;
-    }
-
+  private prepareStlMaterial(root: THREE.Object3D): void {
+    const material = this.getCharacterBodyMaterial();
     root.visible = true;
     root.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -899,21 +1099,57 @@ export class CharacterNftService {
         child.receiveShadow = false;
         child.frustumCulled = false;
         const old = child.material;
-        child.material = this.fbxBodyMat!;
-        // Dispose anciens mats FBX (lourds / textures) — pas le shared
-        const oldMats = Array.isArray(old) ? old : old ? [old] : [];
-        for (const m of oldMats) {
-          if (!m || m === this.fbxBodyMat || m.userData?.['shared']) continue;
-          if ('map' in m) {
-            const textured = m as THREE.MeshStandardMaterial;
-            textured.map?.dispose();
-            textured.normalMap?.dispose();
-            textured.emissiveMap?.dispose();
-          }
-          m.dispose();
-        }
+        child.material = material;
+        this.disposeMaterial(old);
       }
     });
+  }
+
+  private fbxBodyMat: THREE.MeshStandardMaterial | null = null;
+
+  private prepareFbxMaterials(root: THREE.Object3D): void {
+    const material = this.getCharacterBodyMaterial();
+    root.visible = true;
+    root.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.visible = true;
+        child.castShadow = false;
+        child.receiveShadow = false;
+        child.frustumCulled = false;
+        const old = child.material;
+        child.material = material;
+        this.disposeMaterial(old);
+      }
+    });
+  }
+
+  private getCharacterBodyMaterial(): THREE.MeshStandardMaterial {
+    if (!this.fbxBodyMat) {
+      this.fbxBodyMat = new THREE.MeshStandardMaterial({
+        color: 0xf0ebe3,
+        roughness: 0.68,
+        metalness: 0.08,
+        emissive: new THREE.Color(0x1a1428),
+        emissiveIntensity: 0.14,
+        side: THREE.FrontSide,
+      });
+      this.fbxBodyMat.userData['shared'] = true;
+    }
+    return this.fbxBodyMat;
+  }
+
+  private disposeMaterial(material: THREE.Material | THREE.Material[]): void {
+    const mats = Array.isArray(material) ? material : [material];
+    for (const m of mats) {
+      if (!m || m === this.fbxBodyMat || m.userData?.['shared']) continue;
+      if ('map' in m) {
+        const textured = m as THREE.MeshStandardMaterial;
+        textured.map?.dispose();
+        textured.normalMap?.dispose();
+        textured.emissiveMap?.dispose();
+      }
+      m.dispose();
+    }
   }
 
   private wrapPlanted(visual: THREE.Object3D): THREE.Group {
@@ -929,7 +1165,7 @@ export class CharacterNftService {
     visual.updateMatrixWorld(true);
 
     const scaled = new THREE.Box3().setFromObject(visual);
-    this.plantY = -scaled.min.y;
+    this.plantY = -scaled.min.y + CHARACTER_ASSETS.plantLiftMeters;
     visual.position.set(0, this.plantY, 0);
 
     console.info('[CharacterNftService] planted height', {

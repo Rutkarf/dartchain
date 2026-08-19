@@ -107,21 +107,27 @@ describe('World streaming and R4V3 cells', () => {
     expect(MIRROR_SECOND_BUILDING_ID).toBe('mirror-adjacent-building-02');
   });
 
-  it('fait evaperer le +1 M4T3R au-dessus de la tete sans crediter de token', () => {
+  it('fait monter un +1 M4T3R au-dessus de la tete sans crediter de token', () => {
     const fx = TestBed.inject(M4t3rPickupFxService);
     const scene = new THREE.Scene();
     const character = new THREE.Object3D();
     character.position.set(2, 0, 4);
     scene.add(character);
     fx.attach(scene);
-    fx.spawn(character, 3);
-    const sprite = scene.children.find((child) => child.name.startsWith('m4t3r-pickup-plus-one'));
-    expect(sprite).toBeTruthy();
-    expect(sprite?.visible).toBe(true);
-    expect((sprite?.position.y ?? 0)).toBeGreaterThan(character.position.y);
-    expect(sprite instanceof THREE.Sprite ? sprite.scale.x : 0).toBeGreaterThan(2);
-    const plusOnes = scene.children.filter((child) => child.name.startsWith('m4t3r-pickup-plus-one') && child.visible);
+    fx.spawnOne(character, 'm4t3r-render:0:0');
+    fx.spawnOne(character, 'm4t3r-render:1:0');
+    fx.spawnOne(character, 'm4t3r-render:2:0');
+    const plusOnes = scene.children.filter(
+      (child) => child.name.startsWith('m4t3r-pickup-plus-one') && child.visible
+    );
     expect(plusOnes.length).toBe(3);
+    expect((plusOnes[0]?.position.y ?? 0)).toBeGreaterThan(character.position.y);
+
+    const sprite = plusOnes[0];
+    const startY = sprite?.position.y ?? 0;
+    fx.update(M4T3R_PICKUP_FX.durationMs / 2000);
+    expect(sprite?.position.y ?? 0).toBeGreaterThan(startY);
+
     fx.update(M4T3R_PICKUP_FX.durationMs / 1000);
     expect(sprite?.visible).toBe(false);
     fx.dispose();

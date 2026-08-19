@@ -30,6 +30,7 @@ import {
 import { WorldStreamingManager } from './world-streaming.manager';
 import { TokenCellService } from './token-cell.service';
 import { M4t3rPickupFxService } from './m4t3r-pickup-fx.service';
+import { M4t3rCoinPickupFxService } from './m4t3r-coin-pickup-fx.service';
 import { M4t3rDebugOverlay } from './m4t3r-debug-overlay';
 import { FootprintTrailManager } from './footprint-trail-manager.service';
 import { M4t3rCollectTrailVisualService } from './m4t3r-collect-trail-visual.service';
@@ -124,6 +125,7 @@ export class MarseilleMapProvider implements MapProvider {
   private readonly streaming = inject(WorldStreamingManager);
   private readonly tokenCells = inject(TokenCellService);
   private readonly pickupFx = inject(M4t3rPickupFxService);
+  private readonly coinPickupFx = inject(M4t3rCoinPickupFxService);
   private readonly footprints = inject(FootprintTrailManager);
   private readonly collectTrailVisual = inject(M4t3rCollectTrailVisualService);
   private readonly debugOverlay = inject(M4t3rDebugOverlay);
@@ -169,6 +171,7 @@ export class MarseilleMapProvider implements MapProvider {
       this.streaming.attach(this.root);
       this.tokenCells.attach(this.root);
       this.pickupFx.attach(scene);
+      this.coinPickupFx.attach(scene);
 
       const spawnPos = this.getStartWorldPosition();
       this.streaming.update(spawnPos);
@@ -280,6 +283,7 @@ export class MarseilleMapProvider implements MapProvider {
     this.collectTrailVisual.dispose();
     this.streaming.dispose();
     this.pickupFx.dispose();
+    this.coinPickupFx.dispose();
     this.debugOverlay.dispose();
     this.root = null;
     this.osmRoot = null;

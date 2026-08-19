@@ -43,9 +43,9 @@ export const RUNNER_CONFIG = {
   /** Graine RNG pour parcours reproductible. */
   seed: 20260815,
 
-  /** Hauteur cible personnage (+50 %). */
-  characterTargetHeight: 4.2,
-  characterRadius: 0.65,
+  /** Hauteur cible personnage (−⅓ vs 4.2 m). */
+  characterTargetHeight: 2.8,
+  characterRadius: 0.43,
 
   /** Échelle / mur plat sur floor XZ (Z négatif = avant). */
   ladderZ: -40,

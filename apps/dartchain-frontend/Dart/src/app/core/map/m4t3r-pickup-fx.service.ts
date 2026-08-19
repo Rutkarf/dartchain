@@ -12,23 +12,18 @@ interface PickupSlot {
   age: number;
   active: boolean;
   follow: THREE.Object3D | null;
-  offsetX: number;
-  offsetZ: number;
+  renderKey: string;
+  stackLane: number;
 }
 
-const SPRITE_START = 2.8;
-const SPRITE_GROW = 0.55;
-
 /**
- * Gros « +1 » vert arcade au-dessus de la tête — un par pièce ramassée.
- * Cosmétique — n'attribue pas de solde.
+ * « +1 » vert arcade — un par pièce visuelle, empilés verticalement sans chevauchement.
  */
 @Injectable({ providedIn: 'root' })
 export class M4t3rPickupFxService {
   private readonly slots: PickupSlot[] = [];
   private scene: THREE.Scene | null = null;
   private readonly head = new THREE.Vector3();
-  private burstIndex = 0;
 
   attach(scene: THREE.Scene): void {
     this.dispose();
@@ -57,7 +52,7 @@ export class M4t3rPickupFxService {
       sprite.frustumCulled = false;
       sprite.renderOrder = 24;
       sprite.center.set(0.5, 0.15);
-      sprite.scale.set(SPRITE_START, SPRITE_START, 1);
+      sprite.scale.set(M4T3R_PICKUP_FX.spriteStartScale, M4T3R_PICKUP_FX.spriteStartScale, 1);
       scene.add(sprite);
       this.slots.push({
         sprite,
@@ -67,18 +62,27 @@ export class M4t3rPickupFxService {
         age: 0,
         active: false,
         follow: null,
-        offsetX: 0,
-        offsetZ: 0,
+        renderKey: '',
+        stackLane: 0,
       });
     }
     this.drawTemplate();
   }
 
-  spawn(character: THREE.Object3D, amount = 1): void {
-    const n = Math.min(Math.max(1, Math.round(amount)), M4T3R_PICKUP_FX.maxBurst);
-    for (let i = 0; i < n; i++) {
-      this.spawnOne(character, i);
-    }
+  spawnOne(character: THREE.Object3D, renderKey: string): boolean {
+    const slot = this.acquireSlot();
+    if (!slot) return false;
+
+    slot.active = true;
+    slot.age = 0;
+    slot.follow = character;
+    slot.renderKey = renderKey;
+    slot.stackLane = this.reserveStackLane();
+    slot.sprite.visible = true;
+    slot.material.opacity = 1;
+    slot.sprite.scale.set(M4T3R_PICKUP_FX.spriteStartScale, M4T3R_PICKUP_FX.spriteStartScale, 1);
+    this.place(slot, 0);
+    return true;
   }
 
   update(deltaSeconds: number): void {
@@ -90,14 +94,14 @@ export class M4t3rPickupFxService {
       const pop = t < 0.12 ? t / 0.12 : 1;
       const fade = t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45;
       slot.material.opacity = Math.max(0, fade);
-      const size = SPRITE_START + pop * 0.35 + t * SPRITE_GROW;
+      const size =
+        M4T3R_PICKUP_FX.spriteStartScale +
+        pop * M4T3R_PICKUP_FX.spritePopBoost +
+        t * M4T3R_PICKUP_FX.spriteGrowScale;
       slot.sprite.scale.set(size, size, 1);
       this.place(slot, t);
       if (t >= 1) {
-        slot.active = false;
-        slot.follow = null;
-        slot.sprite.visible = false;
-        slot.material.opacity = 0;
+        this.releaseSlot(slot);
       }
     }
   }
@@ -112,30 +116,54 @@ export class M4t3rPickupFxService {
     this.scene = null;
   }
 
-  private spawnOne(character: THREE.Object3D, index: number): void {
-    const slot = this.slots.find((item) => !item.active) ?? this.slots[this.burstIndex % this.slots.length];
-    if (!slot) return;
-    this.burstIndex += 1;
-    const angle = this.burstIndex * 1.047 + index * 0.7;
-    slot.active = true;
-    slot.age = 0;
-    slot.follow = character;
-    slot.offsetX = Math.cos(angle) * (0.18 + index * 0.12);
-    slot.offsetZ = Math.sin(angle) * (0.18 + index * 0.12);
-    slot.sprite.visible = true;
-    slot.material.opacity = 1;
-    slot.sprite.scale.set(SPRITE_START, SPRITE_START, 1);
-    this.place(slot, 0);
+  private acquireSlot(): PickupSlot | undefined {
+    let slot = this.slots.find((item) => !item.active);
+    if (slot) return slot;
+    const oldest = this.findOldestActiveSlot();
+    if (oldest) this.releaseSlot(oldest);
+    return this.slots.find((item) => !item.active);
+  }
+
+  private findOldestActiveSlot(): PickupSlot | undefined {
+    let oldest: PickupSlot | undefined;
+    for (const slot of this.slots) {
+      if (!slot.active) continue;
+      if (!oldest || slot.age > oldest.age) oldest = slot;
+    }
+    return oldest;
+  }
+
+  private releaseSlot(slot: PickupSlot): void {
+    slot.active = false;
+    slot.follow = null;
+    slot.renderKey = '';
+    slot.stackLane = 0;
+    slot.sprite.visible = false;
+    slot.material.opacity = 0;
+  }
+
+  /** Chaque +1 reçoit une lane unique — empilement vertical strict. */
+  private reserveStackLane(): number {
+    let maxLane = -1;
+    for (const slot of this.slots) {
+      if (!slot.active) continue;
+      maxLane = Math.max(maxLane, slot.stackLane);
+    }
+    return maxLane + 1;
   }
 
   private place(slot: PickupSlot, t: number): void {
     if (!slot.follow) return;
     getPlayerHeadWorldPosition(slot.follow, this.head);
     const lift = Math.max(0, t);
+    const laneLift = slot.stackLane * M4T3R_PICKUP_FX.stackLaneSpacingMeters;
     slot.sprite.position.set(
-      this.head.x + slot.offsetX,
-      this.head.y + M4T3R_PICKUP_FX.headOffsetMeters + lift * M4T3R_PICKUP_FX.riseMeters,
-      this.head.z + slot.offsetZ
+      this.head.x,
+      this.head.y +
+        M4T3R_PICKUP_FX.headOffsetMeters +
+        laneLift +
+        lift * M4T3R_PICKUP_FX.riseMeters,
+      this.head.z
     );
   }
 
