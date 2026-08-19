@@ -23,6 +23,13 @@ case "${SHOWCASE_ENABLED}" in
   *) SHOWCASE_TS="false" ;;
 esac
 
+# Qualité carte / Star Conquest (medium = défaut prod)
+MAP_QUALITY="${MAP_QUALITY:-medium}"
+case "${MAP_QUALITY}" in
+  low|medium|high) ;;
+  *) MAP_QUALITY="medium" ;;
+esac
+
 cat > "${ROOT}/src/environments/environment.prod.ts" <<EOF
 /** Généré par scripts/build-cloudflare.sh — ne pas éditer manuellement avant un déploiement CF. */
 export const environment = {
@@ -33,6 +40,13 @@ export const environment = {
   commercial: true,
   faucetEnabled: true,
   showcaseEnabled: ${SHOWCASE_TS},
+  mapEnabled: true,
+  mapProvider: 'marseille-osm-three',
+  enableOsmBuildings: true,
+  enableTerrain: true,
+  mapDebug: false,
+  mapQuality: '${MAP_QUALITY}' as 'low' | 'medium' | 'high',
+  opentopographyApiKey: '',
 };
 EOF
 
