@@ -198,7 +198,7 @@ html.vp-compact .app-main-layout {
   gap: var(--stack-section-gap, 2px) !important;
   row-gap: var(--stack-section-gap, 2px) !important;
   padding-bottom: calc(
-    var(--floor-peek-height, 64px) + var(--graph-floor-gap, 6px)
+    var(--floor-peek-height, 220px) + var(--graph-floor-gap, 6px)
   ) !important;
 }
 

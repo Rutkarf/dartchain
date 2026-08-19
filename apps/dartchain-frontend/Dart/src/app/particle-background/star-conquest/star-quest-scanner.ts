@@ -60,7 +60,7 @@ export class StarQuestScannerComponent {
     if (!z) {
       return {
         left: '50%',
-        bottom: `max(12px, calc(var(--floor-peek-height, 64px) * 0.15 + 8px))`,
+        bottom: `max(12px, calc(var(--floor-peek-height, 220px) * 0.15 + 8px))`,
         top: 'auto',
         transform: 'translateX(-50%)',
       };

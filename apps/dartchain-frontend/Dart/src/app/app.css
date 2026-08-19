@@ -685,7 +685,7 @@ app-three-floor {
   margin-block-end: 0;
   padding-inline: var(--band-inline-pad);
   padding-bottom: calc(
-    var(--floor-peek-height, var(--floor-canvas-height, 64px)) + var(--graph-floor-gap, 6px)
+    var(--floor-peek-height, var(--floor-canvas-height, 220px)) + var(--graph-floor-gap, 6px)
   );
   width: 100%;
   min-width: 0;

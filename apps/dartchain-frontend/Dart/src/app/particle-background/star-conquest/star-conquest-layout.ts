@@ -36,7 +36,7 @@ const MIN_LABEL_DIST_PX = 20;
 const MAX_BOTTOM_OFFSCREEN = 1;
 
 /** Sommet du floor : mesure DOM du wrapper peek, sinon token. */
-export function measureFloorTopPx(floorPeekPx = 64, viewportH = window.innerHeight): number {
+export function measureFloorTopPx(floorPeekPx = 220, viewportH = window.innerHeight): number {
   const floor =
     document.querySelector('app-three-floor .floor-wrapper') ??
     document.querySelector('app-three-floor');
@@ -71,7 +71,7 @@ export function measureAngularStackBottomPx(): number {
  * Zone libre entre le bas des composants et l’horizon du floor
  * (emplacement croix rouge / particules basses).
  */
-export function measureGapAboveFloor(floorPeekPx = 64): {
+export function measureGapAboveFloor(floorPeekPx = 220): {
   left: number;
   right: number;
   top: number;
@@ -106,7 +106,7 @@ export function measureGapAboveFloor(floorPeekPx = 64): {
  * Zone jouable : sous Navbar+Swap → horizon du floor.
  * Monde horizontal plus large que le viewport (fenêtre sur la galaxie).
  */
-export function measurePlayableBand(floorPeekPx = 64): StarConquestBand {
+export function measurePlayableBand(floorPeekPx = 220): StarConquestBand {
   const viewportW = Math.max(window.innerWidth, 32);
   const viewportH = Math.max(window.innerHeight, 32);
 
@@ -149,14 +149,14 @@ export function measurePlayableBand(floorPeekPx = 64): StarConquestBand {
 }
 
 /** @deprecated → measurePlayableBand */
-export function measureBackgroundBand(floorPeekPx = 64): StarConquestBand {
+export function measureBackgroundBand(floorPeekPx = 220): StarConquestBand {
   return measurePlayableBand(floorPeekPx);
 }
 
 /** @deprecated */
 export function measureInteractiveBand(
   _graphEl: Element | null,
-  floorPeekPx = 64,
+  floorPeekPx = 220,
   _gapBelowGraphPx = 8
 ): StarConquestBand {
   return measurePlayableBand(floorPeekPx);

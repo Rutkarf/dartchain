@@ -5,8 +5,6 @@ import io.dartchain.backend.m4t3r.config.M4t3rRewardConfig;
 import io.dartchain.backend.m4t3r.model.M4t3rReward;
 import io.dartchain.backend.m4t3r.store.M4t3rRewardStore;
 import jakarta.annotation.PostConstruct;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,8 +14,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-@Component
-@ConditionalOnMissingBean(M4t3rRewardStore.class)
 public class JsonM4t3rRewardStore implements M4t3rRewardStore {
 
     private final ObjectMapper objectMapper;

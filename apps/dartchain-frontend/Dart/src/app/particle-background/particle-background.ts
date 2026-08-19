@@ -13,7 +13,6 @@ import {
   StarConquestStateService,
   type StarQuestRewardLabel,
 } from '../core/services/star-conquest-state.service';
-import { StarJoystickBridgeService } from '../core/services/star-joystick-bridge.service';
 import {
   bindContainerResize,
   type ContainerResizeBinding,
@@ -29,15 +28,7 @@ import {
 } from '../core/utils/three-webgl.util';
 import { StarConquestGraph } from './star-conquest/star-conquest-graph';
 import { StarConquestWorld } from './star-conquest/star-conquest-world';
-import { StarConquestJoystick, JOYSTICK_ARIA_LABEL } from './star-conquest/star-conquest-joystick';
-import {
-  clearLabelsFromJoystick,
-  placeQuestPanelNearParticle,
-  pointInJoystickZone,
-  pushPointOutOfJoystick,
-  JOY_UI_PAD_PX,
-  type JoystickExclusionZone,
-} from './star-conquest/star-conquest-joystick-zone';
+import { placeQuestPanelNearParticle } from './star-conquest/star-conquest-joystick-zone';
 import {
   layoutQuestsInBand,
   measurePlayableBand,
@@ -79,7 +70,6 @@ import type { StarConquestUniverseId } from './star-conquest/star-conquest-unive
 export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private readonly hostRef = inject(ElementRef<HTMLElement>);
   private readonly conquestState = inject(StarConquestStateService);
-  private readonly joyBridge = inject(StarJoystickBridgeService);
   private readonly kgOrchestrator = inject(KnowledgeGraphOrchestratorService);
   private readonly universeService = inject(StarConquestUniverseService);
   private readonly zone = inject(NgZone);
@@ -91,8 +81,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private conquest?: StarConquestGraph;
   /** Groupe parent global — constellations uniquement. */
   private world?: StarConquestWorld;
-  /** Joystick dans la bande libre (croix rouge) — hors transform contenu. */
-  private joystick?: StarConquestJoystick;
   private quests: StarQuest[] = STAR_CONQUEST_MOCK_QUESTS.map((q) => ({
     ...q,
     position: { ...q.position },
@@ -124,7 +112,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private lastAnchorY = 0;
   private occlusionAccMs = 0;
   private labelAccMs = 0;
-  private joyHotspot: HTMLElement | null = null;
   private readonly onDismissEvent = (): void => {
     this.zone.run(() => this.clearSelection());
   };
@@ -199,11 +186,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
       this.world = new StarConquestWorld();
       this.scene.add(this.world.root);
-      this.joystick = new StarConquestJoystick();
-      this.scene.add(this.joystick.group);
-      this.joyBridge.register(this.joystick);
       this.conquest = new StarConquestGraph(this.quests);
       this.world.attachContent(this.conquest.group);
+      this.conquest.clearJoystickExclusion();
 
       const vizMode = DEFAULT_QUEST_VISUALIZATION_MODE;
       this.conquest.setVisualizationMode(vizMode);
@@ -273,16 +258,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
     this.conquest?.dispose();
     this.kgOrchestrator.destroy();
-    if (this.joystick) {
-      this.joyBridge.unregister(this.joystick);
-      this.scene?.remove(this.joystick.group);
-      this.joystick.dispose();
-      this.joystick = undefined;
-    }
-    if (this.joyHotspot) {
-      this.joyHotspot.remove();
-      this.joyHotspot = null;
-    }
     if (this.world) {
       this.world.dispose();
       this.scene?.remove(this.world.root);
@@ -354,7 +329,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     const floorPeek =
       parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
-      ) || 64;
+      ) || 220;
     const band = measurePlayableBand(floorPeek);
     layoutQuestsInBand(this.quests, band, this.camera, 0);
     this.conquest.applyPositions(this.quests);
@@ -367,7 +342,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.updateTravelBoundsFromQuests();
   }
 
-  /** Joystick / occlusion / panel — suit l’UI sans bouger la constellation. */
+  /** Occlusion / panel — suit l’UI sans bouger la constellation. */
   private syncUiChrome(): void {
     if (!this.camera) return;
     this.refreshOcclusion();
@@ -401,11 +376,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.world.setTravelBounds(txMax, tyMax, 32);
   }
 
-  private joyPointerId: number | null = null;
-  private joyOriginX = 0;
-  private joyOriginY = 0;
-  private joyMoved = false;
-
   private bindPointer(canvas: HTMLCanvasElement): void {
     this.zone.runOutsideAngular(() => {
       canvas.addEventListener('pointermove', this.onPointerMove, { passive: true });
@@ -422,7 +392,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.canvas.removeEventListener('pointerleave', this.onPointerLeave);
     this.canvas.removeEventListener('pointerdown', this.onPointerDown);
     this.canvas.removeEventListener('wheel', this.onWheel);
-    this.unbindJoyWindow();
     this.pointerActive = false;
   }
 
@@ -433,30 +402,14 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.kgOrchestrator.cameraController.adjustUserZoom(delta);
   };
 
-  private bindJoyWindow(): void {
-    window.addEventListener('pointermove', this.onJoyMove);
-    window.addEventListener('pointerup', this.onJoyUp);
-    window.addEventListener('pointercancel', this.onJoyUp);
-  }
-
-  private unbindJoyWindow(): void {
-    window.removeEventListener('pointermove', this.onJoyMove);
-    window.removeEventListener('pointerup', this.onJoyUp);
-    window.removeEventListener('pointercancel', this.onJoyUp);
-  }
-
   private readonly onPointerMove = (event: PointerEvent): void => {
-    if (this.conquestState.worldNavigating() || this.joyPointerId !== null) return;
+    if (this.conquestState.worldNavigating()) return;
     if (event.pointerType === 'touch') return;
 
     // Sélection ouverte : pas de parallaxe / pull (la structure ne doit pas bouger)
     if (this.conquestState.selected()) {
       this.conquest?.setPointerNdc(null);
-      const joy = this.joyBridge.get();
-      const onJoy = joy?.hitTest(event.clientX, event.clientY) ?? false;
-      joy?.setHover(onJoy);
-      this.syncJoyAria(onJoy && this.joyPointerId === null, joy);
-      if (this.canvas) this.canvas.style.cursor = onJoy ? 'grab' : 'default';
+      if (this.canvas) this.canvas.style.cursor = 'default';
       return;
     }
 
@@ -467,15 +420,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         this.pointerNdc.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
         this.conquest?.setPointerNdc({ x: this.pointerNdc.x, y: this.pointerNdc.y });
       }
-    }
-    const joy = this.joyBridge.get();
-    const onJoy = joy?.hitTest(event.clientX, event.clientY) ?? false;
-    joy?.setHover(onJoy);
-    // Label aria : survol uniquement (pas pendant un click/drag)
-    this.syncJoyAria(onJoy && this.joyPointerId === null, joy);
-    if (onJoy) {
-      if (this.canvas) this.canvas.style.cursor = 'grab';
-      return;
     }
     const hit = this.hitTest(event.clientX, event.clientY);
     if (this.canvas) {
@@ -497,11 +441,8 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   };
 
   private readonly onPointerLeave = (): void => {
-    if (this.joyPointerId !== null) return;
     if (this.canvas) this.canvas.style.cursor = 'default';
     this.conquest?.setPointerNdc(null);
-    this.joyBridge.get()?.setHover(false);
-    this.syncJoyAria(false);
     if (this.conquestState.selected()) return;
     this.zone.run(() => {
       this.hoverPreviewId = null;
@@ -516,10 +457,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     if (!isTouch && event.button !== 0) return;
     if (isScreenPointBlockedByUi(event.clientX, event.clientY)) return;
 
-    // Quests d’abord (y compris sous le floor) — le stick ne doit pas les bloquer
     const questHit = this.hitTest(event.clientX, event.clientY);
-    const joy = this.joyBridge.get();
-    const onJoy = joy?.hitTest(event.clientX, event.clientY) ?? false;
 
     if (questHit) {
       this.zone.run(() => {
@@ -532,21 +470,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    if (onJoy && joy) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.joyPointerId = event.pointerId;
-      this.joyOriginX = event.clientX;
-      this.joyOriginY = event.clientY;
-      this.joyMoved = false;
-      joy.setHover(true);
-      joy.setDragging(true);
-      this.syncJoyAria(false);
-      if (this.canvas) this.canvas.style.cursor = 'grabbing';
-      this.bindJoyWindow();
-      return;
-    }
-
     this.zone.run(() => {
       if (this.conquestState.selected() || this.focusedId) {
         event.preventDefault();
@@ -555,107 +478,12 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     });
   };
 
-  private readonly onJoyMove = (event: PointerEvent): void => {
-    if (this.joyPointerId !== null && event.pointerId !== this.joyPointerId) return;
-    const dx = event.clientX - this.joyOriginX;
-    const dy = event.clientY - this.joyOriginY;
-    const dist = Math.hypot(dx, dy);
-    if (dist >= 7) this.joyMoved = true;
-    if (!this.joyMoved) return;
-    const radius = 22;
-    const len = Math.max(dist, 0.0001);
-    const clamped = Math.min(dist, radius);
-    const nx = (dx / len) * (clamped / radius);
-    const ny = (dy / len) * (clamped / radius);
-    this.zone.run(() => this.conquestState.setStick(nx, ny));
-    this.syncJoyAria(false); // reste masqué pendant le drag
-  };
-
-  private readonly onJoyUp = (event: PointerEvent): void => {
-    if (this.joyPointerId !== null && event.pointerId !== this.joyPointerId) return;
-    const wasDrag = this.joyMoved;
-    this.unbindJoyWindow();
-    this.joyPointerId = null;
-    this.joyMoved = false;
-    const joy = this.joyBridge.get();
-    joy?.clearKnob();
-    joy?.setHover(false);
-    const stillOnJoy = joy?.hitTest(event.clientX, event.clientY) ?? false;
-    joy?.setHover(stillOnJoy);
-    // Réapparaît au survol après le click
-    this.syncJoyAria(stillOnJoy, joy);
-    this.zone.run(() => this.conquestState.endStick());
-    if (this.canvas) this.canvas.style.cursor = stillOnJoy ? 'grab' : 'default';
-    if (!wasDrag) {
-      joy?.pulseTap();
-      this.zone.run(() => this.conquestState.openScanner());
-    } else {
-      // Lâcher après pan → recentrage doux de la caméra (particules mandala intactes)
-      this.world?.resetView(false);
-    }
-  }
-
-  /** Tooltip + aria : survol uniquement, jamais pendant le click. */
-  private syncJoyAria(active: boolean, joy?: StarConquestJoystick | null): void {
-    this.syncJoyHotspot(active, active ? (joy ?? this.joyBridge.get()) : null);
-  }
-
-  private syncJoyHotspot(active: boolean, joy: StarConquestJoystick | null): void {
-    if (!active || !joy) {
-      if (this.joyHotspot) {
-        this.joyHotspot.hidden = true;
-        this.joyHotspot.style.display = 'none';
-        this.joyHotspot.removeAttribute('title');
-        this.joyHotspot.removeAttribute('aria-label');
-        this.joyHotspot.setAttribute('aria-hidden', 'true');
-      }
-      return;
-    }
-    if (!this.joyHotspot) {
-      const tip = document.createElement('div');
-      tip.className = 'star-conquest-joy-hotspot';
-      tip.setAttribute('role', 'tooltip');
-      const label = document.createElement('span');
-      label.className = 'star-conquest-joy-tip';
-      label.textContent = JOYSTICK_ARIA_LABEL;
-      tip.appendChild(label);
-      // Hors host particles (z=0) → au-dessus du floor Three.js (z=1)
-      document.body.appendChild(tip);
-      this.joyHotspot = tip;
-    }
-    const tipEl = this.joyHotspot;
-    const labelEl = tipEl.querySelector('.star-conquest-joy-tip') as HTMLElement | null;
-    const c = joy.getScreenCenter();
-    // Bord bas du disque visuel (hitbox plus large) + 2px
-    const visualR = Math.max(10, Math.min(18, joy.hitRadiusPx() * 0.28));
-    const left = c.x;
-    const top = c.y + visualR + 2;
-    tipEl.hidden = false;
-    tipEl.style.cssText =
-      `position:fixed;left:${left}px;top:${top}px;` +
-      'transform:translate(-50%,0);z-index:2;border:0;padding:0;margin:0;' +
-      'pointer-events:none;display:block;text-align:center;';
-    if (labelEl) {
-      labelEl.textContent = JOYSTICK_ARIA_LABEL;
-      labelEl.style.cssText =
-        'display:inline-block;white-space:nowrap;' +
-        'padding:2px 5px;border-radius:3px;' +
-        'font:600 5px/1.2 ui-monospace,SF Mono,Menlo,monospace;letter-spacing:0.02em;' +
-        'color:#f8fcff;background:rgba(8,12,18,0.94);border:1px solid rgba(232,240,248,0.65);' +
-        'box-shadow:0 1px 8px rgba(0,0,0,0.45),0 0 6px rgba(176,232,240,0.22);' +
-        'pointer-events:none;';
-    }
-    tipEl.setAttribute('aria-hidden', 'false');
-    tipEl.setAttribute('aria-label', JOYSTICK_ARIA_LABEL);
-    tipEl.title = JOYSTICK_ARIA_LABEL;
-  }
-
   private hitTest(clientX: number, clientY: number) {
     if (!this.camera || !this.conquest || !this.canvas) return null;
     const band = measurePlayableBand(
       parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
-      ) || 64
+      ) || 220
     );
     // Autorise toute la hauteur (y compris sous le floor) — seules les Quests hors bande haute sont exclues
     if (clientY < band.topPx - 8) return null;
@@ -704,7 +532,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     const quest = this.conquest.getQuest(questId);
     const world = this.conquest.getWorldPosition(questId, this.worldPos);
     if (!quest || !world) return;
-    // Jamais de pan caméra / déplacement structure au clic — uniquement le joystick
+    // Jamais de pan caméra / déplacement structure au clic
     this.applySelection(quest, world);
     this.conquest.pulseFocus();
   }
@@ -741,7 +569,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     const band = measurePlayableBand(
       parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
-      ) || 64
+      ) || 220
     );
     const hidden: StarQuest[] = [];
     const seen = new Set<string>();
@@ -780,11 +608,10 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     const band = measurePlayableBand(
       parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
-      ) || 64
+      ) || 220
     );
     const focusId = this.focusedId ?? this.hoverPreviewId;
     const rects = collectUiOccluderRects();
-    const joyZone = this.getJoystickExclusionZone();
 
     type L = StarQuestRewardLabel & { x: number; y: number };
     const labels: L[] = [];
@@ -808,28 +635,11 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         p.y > band.viewportH - 18;
       let lx = p.x + 10;
       let ly = p.y;
-      if (joyZone) {
-        const cleared = pushPointOutOfJoystick(lx, ly, joyZone, JOY_UI_PAD_PX + 4);
-        lx = cleared.x;
-        ly = cleared.y;
-        // Si encore trop proche après push (coin étroit) : forcer à droite du stick
-        if (pointInJoystickZone(lx, ly, joyZone, JOY_UI_PAD_PX)) {
-          lx = joyZone.x + joyZone.r + JOY_UI_PAD_PX + 8;
-          ly = Math.min(ly, joyZone.y - joyZone.r * 0.35);
-        }
-      }
       if (lx >= 0 && lx <= band.viewportW) {
         lx = Math.max(10, Math.min(band.viewportW - 10, lx));
       }
       if (ly >= band.topPx && ly <= band.viewportH) {
         ly = Math.max(band.topPx + 2, Math.min(band.viewportH - 4, ly));
-      }
-      // Re-check après clamp viewport
-      if (joyZone && pointInJoystickZone(lx, ly, joyZone, JOY_UI_PAD_PX)) {
-        if (!isFocus) continue;
-        lx = Math.min(band.viewportW - 10, joyZone.x + joyZone.r + JOY_UI_PAD_PX + 10);
-        ly = Math.max(band.topPx + 2, joyZone.y - joyZone.r - JOY_UI_PAD_PX - 8);
-        if (pointInJoystickZone(lx, ly, joyZone, JOY_UI_PAD_PX)) continue;
       }
       labels.push({
         id: p.id,
@@ -848,35 +658,20 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     }
 
     separateLabelPositions(labels, 16, 6);
-    if (joyZone) clearLabelsFromJoystick(labels, joyZone, JOY_UI_PAD_PX + 2);
     for (const l of labels) {
       if (l.x < 4 || l.x > band.viewportW - 4) continue;
       l.x = Math.max(8, Math.min(band.viewportW - 8, l.x));
       l.y = Math.max(band.topPx + 1, Math.min(band.viewportH - 4, l.y));
-      if (joyZone) {
-        const p = pushPointOutOfJoystick(l.x, l.y, joyZone, JOY_UI_PAD_PX + 2);
-        l.x = p.x;
-        l.y = p.y;
-      }
     }
 
     this.zone.run(() =>
       this.conquestState.setRewardLabels(
         labels.filter((l) => {
           if (l.x < 4 || l.x > band.viewportW - 4) return false;
-          if (joyZone && pointInJoystickZone(l.x, l.y, joyZone, JOY_UI_PAD_PX)) {
-            return false;
-          }
           return true;
         })
       )
     );
-  }
-
-  private getJoystickExclusionZone(): JoystickExclusionZone | null {
-    const joy = this.joyBridge.get();
-    if (!joy || !this.camera) return null;
-    return joy.getExclusionZone(this.camera, JOY_UI_PAD_PX);
   }
 
   private projectToScreen(
@@ -892,7 +687,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     let panelW = Math.min(156, vw - 10);
     let panelH = Math.min(112, vh - 10);
     const margin = 6;
-    const joyZone = this.getJoystickExclusionZone();
     const preferred =
       this.lastAnchorX || this.lastAnchorY
         ? { x: this.lastAnchorX, y: this.lastAnchorY }
@@ -903,11 +697,11 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       sy,
       panelW,
       panelH,
-      joyZone,
+      null,
       vw,
       vh,
       margin,
-      JOY_UI_PAD_PX,
+      0,
       preferred
     );
     return { x: placed.x, y: placed.y, compact: placed.compact };
@@ -958,7 +752,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
               getComputedStyle(document.documentElement).getPropertyValue(
                 '--floor-peek-height'
               )
-            ) || 64;
+            ) || 220;
           // Rebond uniquement hors drag — sinon les Quests bas restent inaccessibles
           if (this.conquest && !this.conquestState.worldNavigating()) {
             const band = measurePlayableBand(floorPeek);
@@ -971,44 +765,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
           if (this.conquestState.worldNavigating()) {
             this.updateTravelBoundsFromQuests();
           }
-          this.joystick?.layoutInGapAboveFloor(this.camera, floorPeek);
-        }
-      }
-      if (this.joystick) {
-        const stick = this.conquestState.stick();
-        if (this.conquestState.worldNavigating()) {
-          this.joystick.setKnob(stick.x, stick.y);
-        } else {
-          this.joystick.clearKnob();
-        }
-        this.joystick.tick(delta);
-        if (this.camera) this.joystick.refreshScreenFromCamera(this.camera);
-        const zone = this.getJoystickExclusionZone();
-        if (zone) {
-          const prev = this.conquestState.joyExclusion();
-          if (
-            !prev ||
-            Math.abs(prev.left - zone.left) > 2 ||
-            Math.abs(prev.top - zone.top) > 2 ||
-            Math.abs(prev.right - zone.right) > 2 ||
-            Math.abs(prev.bottom - zone.bottom) > 2
-          ) {
-            this.zone.run(() =>
-              this.conquestState.setJoyExclusion({
-                left: zone.left,
-                top: zone.top,
-                right: zone.right,
-                bottom: zone.bottom,
-                x: zone.x,
-                y: zone.y,
-              })
-            );
-          }
-        }
-        if (zone && this.conquest) {
-          this.conquest.setJoystickExclusion(zone.x, zone.y, zone.r, zone);
-        } else {
-          this.conquest?.clearJoystickExclusion();
         }
       }
       if (this.conquest) {
