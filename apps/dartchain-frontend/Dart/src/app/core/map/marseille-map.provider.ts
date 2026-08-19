@@ -19,6 +19,14 @@ import {
   isHarborWaterAt,
   isHarborWaterBlockedAt,
 } from './vieux-port-layout.util';
+import {
+  createHarborFoamMaterial,
+  createHarborPitWallMaterial,
+  createHarborQuayCapMaterial,
+  createHarborWaterDeepMaterial,
+  createHarborWaterSurfaceMaterial,
+  createHarborWaterTexture,
+} from './marseille-water-visual.util';
 import { WorldStreamingManager } from './world-streaming.manager';
 import { TokenCellService } from './token-cell.service';
 import { M4t3rPickupFxService } from './m4t3r-pickup-fx.service';
@@ -134,6 +142,7 @@ export class MarseilleMapProvider implements MapProvider {
   private prototypeColliderCount = 0;
   private canopyReflector: Reflector | null = null;
   private waterMeshes: THREE.Mesh[] = [];
+  private waterTexture: THREE.CanvasTexture | null = null;
   private validationCamera: THREE.PerspectiveCamera | null = null;
 
   private readonly surfaceProvider: SurfaceProvider = {
@@ -206,10 +215,14 @@ export class MarseilleMapProvider implements MapProvider {
     if (this.waterMeshes.length > 0) {
       const harbor = MARSEILLE_HARBOR_WATER;
       const t = now * 0.00055;
-      const y = harbor.surfaceY + Math.sin(t) * 0.012;
+      const y = harbor.waterSurfaceY + Math.sin(t) * 0.014;
       for (const mesh of this.waterMeshes) {
         mesh.position.y = y;
       }
+    }
+    if (this.waterTexture) {
+      this.waterTexture.offset.x += deltaSeconds * 0.014;
+      this.waterTexture.offset.y += deltaSeconds * 0.009;
     }
     this.streaming.update(cameraPosition);
     this.tokenCells.update(cameraPosition, deltaSeconds);
@@ -223,14 +236,14 @@ export class MarseilleMapProvider implements MapProvider {
     return this.resolveSurfaceHeight(worldPosition.x, worldPosition.z);
   }
 
-  /** Hauteur sol : terre (0), quai (~0.018), eau (surface portuaire). */
+  /** Hauteur sol : terre (0), quai (~0.02), eau (surface en contrebas — non marchable). */
   private resolveSurfaceHeight(x: number, z: number): number {
     const harbor = MARSEILLE_HARBOR_WATER;
-    if (isHarborWaterAt(x, z)) return harbor.surfaceY;
+    if (isHarborWaterAt(x, z)) return harbor.waterSurfaceY;
     if (z >= harbor.quayZ - 1 || (x >= 14 && x <= 50 && z >= harbor.basinMinZ && z <= harbor.basinMaxZ)) {
-      return 0.018;
+      return harbor.quaySurfaceY;
     }
-    return 0;
+    return harbor.walkSurfaceY;
   }
 
   getSurfaceProvider(): SurfaceProvider {
@@ -276,6 +289,8 @@ export class MarseilleMapProvider implements MapProvider {
     this.terrainMaterial = null;
     this.terrainBorderMaterial = null;
     this.waterMeshes.length = 0;
+    this.waterTexture?.dispose();
+    this.waterTexture = null;
     this.validationCamera = null;
     if (this.scene) {
       this.scene.environment = null;
@@ -617,126 +632,154 @@ export class MarseilleMapProvider implements MapProvider {
   private addWaterStrip(): void {
     if (!this.root) return;
     const harbor = MARSEILLE_HARBOR_WATER;
-    const waterMaterial = new THREE.MeshBasicMaterial({
-      color: harbor.surfaceColor,
-      transparent: true,
-      opacity: 0.92,
-      depthWrite: true,
-    });
-    this.buildingMaterials.push(waterMaterial);
+    const waterY = harbor.waterSurfaceY;
+    const deepY = harbor.waterDeepY;
 
-    const addWaterPlane = (name: string, width: number, depth: number, cx: number, cz: number): void => {
-      const geometry = new THREE.PlaneGeometry(width, depth, 1, 1);
+    this.waterTexture = createHarborWaterTexture(3);
+    this.ownedTextures.push(this.waterTexture);
+    const waterMaterial = createHarborWaterSurfaceMaterial(this.waterTexture);
+    this.buildingMaterials.push(waterMaterial);
+    const deepMaterial = createHarborWaterDeepMaterial(harbor.deepColor);
+    this.buildingMaterials.push(deepMaterial);
+    const foamMaterial = createHarborFoamMaterial(harbor.foamColor);
+    this.buildingMaterials.push(foamMaterial);
+    const pitWallMaterial = createHarborPitWallMaterial();
+    this.buildingMaterials.push(pitWallMaterial);
+    const quayCapMaterial = createHarborQuayCapMaterial();
+    this.buildingMaterials.push(quayCapMaterial);
+
+    const addWaterPlane = (
+      name: string,
+      width: number,
+      depth: number,
+      cx: number,
+      cz: number,
+      y: number,
+      material: THREE.Material,
+      animate = false
+    ): void => {
+      const geometry = new THREE.PlaneGeometry(width, depth, 32, 32);
       this.ownedGeometries.push(geometry);
-      const water = new THREE.Mesh(geometry, waterMaterial);
+      const water = new THREE.Mesh(geometry, material);
       water.name = name;
       water.rotation.x = -Math.PI / 2;
-      water.position.set(cx, harbor.surfaceY, cz);
-      water.renderOrder = 1;
+      water.position.set(cx, y, cz);
+      water.renderOrder = 2;
       water.frustumCulled = false;
       this.root!.add(water);
-      this.waterMeshes.push(water);
+      if (animate) this.waterMeshes.push(water);
     };
 
     const basinWidth = harbor.basinMaxX - harbor.basinMinX;
     const basinDepth = harbor.basinMaxZ - harbor.basinMinZ;
-    addWaterPlane(
-      'marseille-water-basin',
-      basinWidth,
-      basinDepth,
-      (harbor.basinMinX + harbor.basinMaxX) * 0.5,
-      (harbor.basinMinZ + harbor.basinMaxZ) * 0.5
-    );
-
+    const basinCx = (harbor.basinMinX + harbor.basinMaxX) * 0.5;
     const channelDepth = harbor.waterMaxZ - harbor.waterMinZ;
-    addWaterPlane(
-      'marseille-water-south-channel',
-      204,
-      channelDepth,
-      0,
-      (harbor.waterMinZ + harbor.waterMaxZ) * 0.5
-    );
+    const channelCz = (harbor.waterMinZ + harbor.waterMaxZ) * 0.5;
 
-    const glowMaterial = new THREE.MeshBasicMaterial({
-      color: harbor.glowColor,
+    this.addHarborBasinCavity(harbor, pitWallMaterial);
+
+    addWaterPlane('marseille-water-deep-basin', basinWidth * 0.96, basinDepth * 0.96, basinCx, (harbor.basinMinZ + harbor.basinMaxZ) * 0.5, deepY, deepMaterial);
+    addWaterPlane('marseille-water-deep-south', 196, channelDepth * 0.96, 0, channelCz, deepY, deepMaterial);
+    addWaterPlane('marseille-water-basin', basinWidth, basinDepth, basinCx, (harbor.basinMinZ + harbor.basinMaxZ) * 0.5, waterY, waterMaterial, true);
+    addWaterPlane('marseille-water-south-channel', 204, channelDepth, 0, channelCz, waterY, waterMaterial, true);
+
+    const foamSouth = new THREE.Mesh(new THREE.PlaneGeometry(58, 2.4), foamMaterial);
+    foamSouth.name = 'marseille-water-foam-south';
+    foamSouth.rotation.x = -Math.PI / 2;
+    foamSouth.position.set(0, waterY + 0.02, harbor.waterMinZ + 1.2);
+    foamSouth.renderOrder = 4;
+    this.root.add(foamSouth);
+
+    const foamBasinNorth = new THREE.Mesh(new THREE.PlaneGeometry(basinWidth * 0.94, 2.2), foamMaterial.clone());
+    foamBasinNorth.name = 'marseille-water-foam-basin-n';
+    foamBasinNorth.rotation.x = -Math.PI / 2;
+    foamBasinNorth.position.set(basinCx, waterY + 0.02, harbor.basinMinZ + 1.1);
+    foamBasinNorth.renderOrder = 4;
+    this.root.add(foamBasinNorth);
+
+    const shimmerMaterial = new THREE.MeshBasicMaterial({
+      color: harbor.shallowColor,
       transparent: true,
-      opacity: 0.32,
+      opacity: 0.22,
+      blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
-    this.buildingMaterials.push(glowMaterial);
-    const southGlow = new THREE.Mesh(
-      new THREE.PlaneGeometry(188, Math.min(channelDepth, 180)),
-      glowMaterial
+    this.buildingMaterials.push(shimmerMaterial);
+    const shimmer = new THREE.Mesh(
+      new THREE.PlaneGeometry(188, Math.min(channelDepth, 160)),
+      shimmerMaterial
     );
-    southGlow.name = 'marseille-water-glow-south';
-    southGlow.rotation.x = -Math.PI / 2;
-    southGlow.position.set(0, harbor.surfaceY + 0.004, harbor.waterMinZ + 90);
-    southGlow.renderOrder = 2;
-    southGlow.frustumCulled = false;
-    this.root.add(southGlow);
+    shimmer.name = 'marseille-water-shimmer-south';
+    shimmer.rotation.x = -Math.PI / 2;
+    shimmer.position.set(0, waterY + 0.018, harbor.waterMinZ + 70);
+    shimmer.renderOrder = 3;
+    this.root.add(shimmer);
 
-    const basinGlowMaterial = glowMaterial.clone();
-    this.buildingMaterials.push(basinGlowMaterial);
-    const basinGlow = new THREE.Mesh(
-      new THREE.PlaneGeometry(basinWidth * 0.96, basinDepth * 0.96),
-      basinGlowMaterial
-    );
-    basinGlow.name = 'marseille-water-glow-basin';
-    basinGlow.rotation.x = -Math.PI / 2;
-    basinGlow.position.set(
-      (harbor.basinMinX + harbor.basinMaxX) * 0.5,
-      harbor.surfaceY + 0.004,
-      (harbor.basinMinZ + harbor.basinMaxZ) * 0.5
-    );
-    basinGlow.renderOrder = 2;
-    basinGlow.frustumCulled = false;
-    this.root.add(basinGlow);
+    this.addBasinRetainingWalls(harbor, pitWallMaterial);
 
+    const waterLight = new THREE.PointLight(0x5ee0f0, 0.72, 130, 2);
+    waterLight.name = 'marseille-water-caustic';
+    waterLight.position.set(0, waterY + 0.6, harbor.waterMinZ + 55);
+    this.root.add(waterLight);
+
+    const quayY = harbor.quaySurfaceY;
     const quayMaterial = new THREE.MeshStandardMaterial({
-      color: 0x8f97a3,
+      color: 0xa8b0bc,
       roughness: CYBERPUNK_ART_DIRECTION.streets.quayRoughness,
       metalness: CYBERPUNK_ART_DIRECTION.streets.quayMetalness,
-      envMapIntensity: 0.6,
+      envMapIntensity: 0.75,
     });
     this.buildingMaterials.push(quayMaterial);
 
-    const quaySouth = new THREE.Mesh(new THREE.PlaneGeometry(54, 14), quayMaterial);
+    const quaySouth = new THREE.Mesh(new THREE.PlaneGeometry(58, 16), quayMaterial);
     quaySouth.name = 'marseille-quai-belges';
     quaySouth.rotation.x = -Math.PI / 2;
-    quaySouth.position.set(0, 0.018, HARBOR_QUAY_Z);
+    quaySouth.position.set(0, quayY, HARBOR_QUAY_Z);
     this.root.add(quaySouth);
 
-    const quayEast = new THREE.Mesh(new THREE.PlaneGeometry(14, basinDepth + 8), quayMaterial);
+    const quayEast = new THREE.Mesh(new THREE.PlaneGeometry(16, basinDepth + 10), quayMaterial);
     quayEast.name = 'marseille-quai-fraternite';
     quayEast.rotation.x = -Math.PI / 2;
-    quayEast.position.set(24, 0.018, 0);
+    quayEast.position.set(26, quayY, 0);
     this.root.add(quayEast);
 
     const quayNorth = new THREE.Mesh(new THREE.PlaneGeometry(basinWidth + 40, 12), quayMaterial);
     quayNorth.name = 'marseille-quai-du-port';
     quayNorth.rotation.x = -Math.PI / 2;
-    quayNorth.position.set((harbor.basinMinX + harbor.basinMaxX) * 0.5, 0.018, harbor.basinMinZ - 6);
+    quayNorth.position.set(basinCx, quayY, harbor.basinMinZ - 6);
     this.root.add(quayNorth);
 
     const quaySouthShore = new THREE.Mesh(new THREE.PlaneGeometry(basinWidth + 40, 12), quayMaterial);
     quaySouthShore.name = 'marseille-quai-rive-neuve';
     quaySouthShore.rotation.x = -Math.PI / 2;
-    quaySouthShore.position.set((harbor.basinMinX + harbor.basinMaxX) * 0.5, 0.018, harbor.basinMaxZ + 6);
+    quaySouthShore.position.set(basinCx, quayY, harbor.basinMaxZ + 6);
     this.root.add(quaySouthShore);
 
     const quayEdge = new THREE.Mesh(
-      new THREE.BoxGeometry(54, 0.38, 1.2),
-      new THREE.MeshStandardMaterial({
-        color: 0xf1d8a4,
-        emissive: 0x6c5c24,
-        emissiveIntensity: 0.22,
-        roughness: 0.62,
-        metalness: 0.12,
-      })
+      new THREE.BoxGeometry(58, harbor.basinWallHeight, 1.05),
+      pitWallMaterial
     );
-    quayEdge.name = 'marseille-quay-edge';
-    quayEdge.position.set(0, 0.22, HARBOR_QUAY_Z + 6.2);
+    quayEdge.name = 'marseille-quay-edge-south';
+    quayEdge.position.set(0, waterY + harbor.basinWallHeight * 0.5, harbor.waterMinZ + 0.45);
     this.root.add(quayEdge);
+
+    const quayCap = new THREE.Mesh(new THREE.BoxGeometry(58, 0.28, 1.35), quayCapMaterial);
+    quayCap.name = 'marseille-quay-cap-south';
+    quayCap.position.set(0, harbor.quaySurfaceY + 0.14, harbor.waterMinZ + 0.45);
+    this.root.add(quayCap);
+
+    const dropShadowMaterial = new THREE.MeshBasicMaterial({
+      color: 0x020810,
+      transparent: true,
+      opacity: 0.38,
+      depthWrite: false,
+    });
+    this.buildingMaterials.push(dropShadowMaterial);
+    const dropShadow = new THREE.Mesh(new THREE.PlaneGeometry(62, 4.5), dropShadowMaterial);
+    dropShadow.name = 'marseille-quay-drop-shadow';
+    dropShadow.rotation.x = -Math.PI / 2;
+    dropShadow.position.set(0, harbor.walkSurfaceY + 0.008, harbor.waterMinZ + 2.2);
+    this.root.add(dropShadow);
 
     const mirror = new THREE.Mesh(
       new THREE.BoxGeometry(18, 0.6, 12),
@@ -801,6 +844,93 @@ export class MarseilleMapProvider implements MapProvider {
       post.name = `marseille-mirror-post-${x}-${z}`;
       this.root.add(post);
     }
+  }
+
+  /** Cavité du bassin — parois intérieures visibles depuis le quai. */
+  private addHarborBasinCavity(
+    harbor: typeof MARSEILLE_HARBOR_WATER,
+    wallMaterial: THREE.Material
+  ): void {
+    if (!this.root) return;
+
+    const h = harbor.basinWallHeight;
+    const wallY = harbor.waterSurfaceY + h * 0.5;
+    const channelLen = harbor.waterMaxZ - harbor.waterMinZ;
+    const channelCz = (harbor.waterMinZ + harbor.waterMaxZ) * 0.5;
+    const basinWidth = harbor.basinMaxX - harbor.basinMinX;
+    const basinCx = (harbor.basinMinX + harbor.basinMaxX) * 0.5;
+    const thickness = 0.42;
+
+    const addWall = (name: string, sx: number, sy: number, sz: number, px: number, py: number, pz: number): void => {
+      const geo = new THREE.BoxGeometry(sx, sy, sz);
+      this.ownedGeometries.push(geo);
+      const wall = new THREE.Mesh(geo, wallMaterial);
+      wall.name = name;
+      wall.position.set(px, py, pz);
+      this.root!.add(wall);
+    };
+
+    addWall('marseille-cavity-channel-n', 208, h, thickness, 0, wallY, harbor.waterMinZ + 0.22);
+    addWall('marseille-cavity-channel-s', 208, h, thickness, 0, wallY, harbor.waterMaxZ - 0.22);
+    addWall('marseille-cavity-channel-w', thickness, h, channelLen, -102, wallY, channelCz);
+    addWall('marseille-cavity-channel-e', thickness, h, channelLen, 102, wallY, channelCz);
+    addWall('marseille-cavity-basin-n', basinWidth, h, thickness, basinCx, wallY, harbor.basinMinZ + 0.2);
+    addWall('marseille-cavity-basin-s', basinWidth, h, thickness, basinCx, wallY, harbor.basinMaxZ - 0.2);
+    addWall(
+      'marseille-cavity-basin-e',
+      thickness,
+      h,
+      harbor.basinMaxZ - harbor.basinMinZ,
+      harbor.basinMaxX - 0.2,
+      wallY,
+      (harbor.basinMinZ + harbor.basinMaxZ) * 0.5
+    );
+  }
+
+  /** Margelles et renforts visibles au bord du quai. */
+  private addBasinRetainingWalls(
+    harbor: typeof MARSEILLE_HARBOR_WATER,
+    wallMaterial: THREE.Material
+  ): void {
+    if (!this.root) return;
+
+    const h = harbor.basinWallHeight;
+    const wallY = harbor.waterSurfaceY + h * 0.5;
+    const thickness = 0.38;
+    const basinWidth = harbor.basinMaxX - harbor.basinMinX;
+    const basinCx = (harbor.basinMinX + harbor.basinMaxX) * 0.5;
+    const capMaterial = createHarborQuayCapMaterial();
+    this.buildingMaterials.push(capMaterial);
+
+    const addCap = (name: string, sx: number, sz: number, px: number, pz: number): void => {
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(sx, 0.24, sz), capMaterial);
+      cap.name = name;
+      cap.position.set(px, harbor.quaySurfaceY + 0.12, pz);
+      this.root!.add(cap);
+    };
+
+    addCap('marseille-quay-cap-channel', 210, 1.2, 0, harbor.waterMinZ + 0.35);
+    addCap('marseille-quay-cap-basin-n', basinWidth + 4, 1.1, basinCx, harbor.basinMinZ + 0.15);
+    addCap('marseille-quay-cap-basin-s', basinWidth + 4, 1.1, basinCx, harbor.basinMaxZ - 0.15);
+
+    const addLip = (name: string, sx: number, sy: number, sz: number, px: number, py: number, pz: number): void => {
+      const geo = new THREE.BoxGeometry(sx, sy, sz);
+      this.ownedGeometries.push(geo);
+      const lip = new THREE.Mesh(geo, wallMaterial);
+      lip.name = name;
+      lip.position.set(px, py, pz);
+      this.root!.add(lip);
+    };
+
+    addLip(
+      'marseille-basin-lip-east',
+      thickness,
+      h,
+      harbor.basinMaxZ - harbor.basinMinZ + 2,
+      harbor.basinMaxX + 0.35,
+      wallY,
+      (harbor.basinMinZ + harbor.basinMaxZ) * 0.5
+    );
   }
 
   private addHarborLandmarks(): void {

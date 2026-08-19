@@ -128,9 +128,23 @@ export const MARSEILLE_HARBOR_WATER = {
   basinMaxZ: 58,
   minX: -880,
   maxX: 102,
-  surfaceY: 0.048,
-  surfaceColor: 0x5ec8ff,
-  glowColor: 0x40e0ff,
+  /** Sol piéton / tapis M4T3R. */
+  walkSurfaceY: 0,
+  /** Quais surélevés par rapport à l'eau. */
+  quaySurfaceY: 0.05,
+  /** Surface de l'eau — ~1,5 m sous le sol (effet bassin portuaire). */
+  waterSurfaceY: -1.45,
+  /** Fond du bassin (couche sombre sous la surface). */
+  waterDeepY: -2.05,
+  /** @deprecated Alias de waterSurfaceY. */
+  surfaceY: -1.45,
+  surfaceColor: 0x3eb8c8,
+  deepColor: 0x0a4a62,
+  shallowColor: 0x7adce8,
+  foamColor: 0xe8f6fa,
+  glowColor: 0x5ee0f0,
+  /** Hauteur visible paroi quai → eau. */
+  basinWallHeight: 1.5,
   quayZ: 8,
   exclusionMinZ: 8,
   softEdgeMeters: 6,
