@@ -16,6 +16,7 @@ import { WorldStreamingManager } from './world-streaming.manager';
 import { TokenCellService } from './token-cell.service';
 import { M4t3rPickupFxService } from './m4t3r-pickup-fx.service';
 import { M4t3rDebugOverlay } from './m4t3r-debug-overlay';
+import { FootprintTrailManager } from './footprint-trail-manager.service';
 
 /** Taille de la zone de test initiale autour du Vieux-Port (mètres). */
 const INITIAL_TERRAIN_SIZE_M = 800;
@@ -117,6 +118,7 @@ export class MarseilleMapProvider implements MapProvider {
   private readonly streaming = inject(WorldStreamingManager);
   private readonly tokenCells = inject(TokenCellService);
   private readonly pickupFx = inject(M4t3rPickupFxService);
+  private readonly footprints = inject(FootprintTrailManager);
   private readonly debugOverlay = inject(M4t3rDebugOverlay);
 
   private scene: THREE.Scene | null = null;
@@ -152,18 +154,30 @@ export class MarseilleMapProvider implements MapProvider {
       this.createPrototypeTerrain();
       this.createPrototypeBuildings();
       this.createOrientationDebugHelpers();
-      await this.loadOsmBuildings();
-      this.createOriginMarker();
-      this.addMetroStation();
-      this.addSceneLighting();
-      this.createValidationCamera();
+
+      // PRIORITÉ SPAWN (faible latence) :
+      // - On attache station + M4T3R avant le chargement OSM lourd, pour éviter le "trop tard" au premier rendu.
       this.streaming.attach(this.root);
       this.tokenCells.attach(this.root);
       this.pickupFx.attach(scene);
-      this.streaming.update(new THREE.Vector3(0, 0, 0));
 
       const spawnPos = this.getStartWorldPosition();
+      this.streaming.update(spawnPos);
       this.tokenCells.initializeField(spawnPos);
+
+      this.footprints.attach(this.root);
+      this.addMetroStation();
+      this.addSceneLighting();
+
+      // IMPORTANT (anti latence) :
+      // Ne pas bloquer l'initialisation du provider sur le chargement OSM lourd.
+      // On le lance en tâche de fond : les contrôles + station + M4T3R peuvent démarrer immédiatement.
+      void this.loadOsmBuildings().catch((err) => {
+        console.warn('[MarseilleMapProvider] (async) Echec chargement OSM.', err);
+      });
+
+      this.createOriginMarker();
+      this.createValidationCamera();
       this.debugOverlay.attach(this.root ?? undefined);
 
       if (this.config.configuration.enableDebug) {
@@ -194,6 +208,7 @@ export class MarseilleMapProvider implements MapProvider {
     }
     this.streaming.update(cameraPosition);
     this.tokenCells.update(cameraPosition, deltaSeconds);
+    this.footprints.tickFade();
     this.debugOverlay.updatePositions(cameraPosition);
     this.debugOverlay.sampleFrame(deltaSeconds * 1000);
   }

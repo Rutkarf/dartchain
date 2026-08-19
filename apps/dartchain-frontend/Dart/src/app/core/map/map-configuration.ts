@@ -108,6 +108,19 @@ export const TRAIL_CONFIG = {
   maxSpeedMetersPerSecond: 32,
 } as const;
 
+export const FOOTPRINT_CONFIG = {
+  minStepDistance: 0.55,
+  minStepIntervalMs: 220,
+  lifetimeMs: 12_000,
+  fadeStartMs: 8_500,
+  maxVisibleFootprints: 300,
+  groundOffset: 0.006,
+  opacity: 0.38,
+  // Empreinte légère orientée (z forward). Le size est calibré pour l’échelle 1u=1m.
+  footprintSizeX: 0.34,
+  footprintSizeZ: 0.20,
+} as const;
+
 export const MOVE_JOYSTICK_CONFIG = {
   walkRing: 0.62,
   runMultiplier: 3,
@@ -168,7 +181,7 @@ export const M4T3R_RENDER_CONFIG = {
 export const R4V3_GROUND_FIELD = {
   cellSize: 1.25,
   visibleRadius: 64,
-  maxVisibleInstances: 4096,
+  maxVisibleInstances: 8192,
   tokenRadius: 0.28,
   tokenThickness: 0.045,
   groundY: 0.34 + 0.05,
@@ -207,7 +220,7 @@ export const WORLD_SCALE = {
   maxLoadedChunks: 24,
   tokenCellSizeMeters: 1.25,
   tokenVisibleRadiusMeters: 64,
-  tokenMaxVisibleInstances: 4096,
+  tokenMaxVisibleInstances: 8192,
 } as const;
 
 export type MarseilleDistrictId =

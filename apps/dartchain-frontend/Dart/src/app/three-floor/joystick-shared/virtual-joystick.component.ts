@@ -77,14 +77,7 @@ export interface JoystickVector {
         box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.12);
       }
       .vj-base-walk-run {
-        background: radial-gradient(
-          circle at center,
-          rgba(64, 224, 255, 0.22) 0%,
-          rgba(64, 224, 255, 0.14) 58%,
-          rgba(255, 62, 207, 0.1) 62%,
-          rgba(255, 62, 207, 0.28) 100%
-        );
-        border-color: rgba(255, 62, 207, 0.55);
+        /* Same base design as VIEW — rings provide the walk/run feedback */
       }
       .vj-ring {
         position: absolute;

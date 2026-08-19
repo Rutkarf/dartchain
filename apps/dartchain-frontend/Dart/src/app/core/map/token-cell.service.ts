@@ -6,6 +6,7 @@ import {
   M4T3R_RENDER_CONFIG,
   R4V3_GROUND_FIELD,
   TRAIL_CONFIG,
+  WORLD_SCALE,
 } from './map-configuration';
 import type { TokenCollectionRequest } from './token-cell.types';
 import {
@@ -90,6 +91,7 @@ export class TokenCellService {
   private instances: THREE.InstancedMesh | null = null;
   private readonly dummy = new THREE.Object3D();
   private readonly scratch = new THREE.Vector3();
+  private readonly anchorCenterScratch = new THREE.Vector3();
   private readonly color = new THREE.Color();
   private readonly hiddenUntil = new Map<string, number>();
   private readonly pending: TokenCollectionRequest[] = [];
@@ -145,7 +147,16 @@ export class TokenCellService {
     if (this.initialized) return;
     this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
     this.visibleCount = 0;
-    this.rebuildGrid(position);
+
+    // Ancrage identique à update() (anti-défilement visuel dès le premier frame).
+    const snap = WORLD_SCALE.chunkSizeMeters;
+    const originX = Math.floor(position.x / snap);
+    const originZ = Math.floor(position.z / snap);
+    this.lastOriginCell = { x: originX, z: originZ };
+    const centerX = originX * snap + snap * 0.5;
+    const centerZ = originZ * snap + snap * 0.5;
+    this.anchorCenterScratch.set(centerX, 0, centerZ);
+    this.rebuildGrid(this.anchorCenterScratch);
     this.initialized = true;
   }
 
@@ -155,9 +166,12 @@ export class TokenCellService {
     this.elapsedTime += deltaSeconds;
     this.expireHidden();
 
-    const size = R4V3_GROUND_FIELD.cellSize;
-    const originX = Math.round(playerPosition.x / size);
-    const originZ = Math.round(playerPosition.z / size);
+    // IMPORTANT (anti-défilement visuel) :
+    // on ancre la "fenêtre de rendu" sur la grille des chunks (128m),
+    // afin que les tokens ne semblent pas glisser lors de micro-déplacements.
+    const snap = WORLD_SCALE.chunkSizeMeters;
+    const originX = Math.floor(playerPosition.x / snap);
+    const originZ = Math.floor(playerPosition.z / snap);
 
     const gridMoved =
       originX !== this.lastOriginCell.x ||
@@ -165,23 +179,27 @@ export class TokenCellService {
 
     if (gridMoved || this.visibleCount === 0) {
       this.lastOriginCell = { x: originX, z: originZ };
-      this.rebuildGrid(playerPosition);
+      const centerX = originX * snap + snap * 0.5;
+      const centerZ = originZ * snap + snap * 0.5;
+      this.anchorCenterScratch.set(centerX, 0, centerZ);
+      this.rebuildGrid(this.anchorCenterScratch);
     } else {
-      this.updateAnimations(playerPosition);
+      // Les animations tournent toujours, mais la sélection visible reste ancrée au même center de chunk.
+      this.updateAnimations(this.anchorCenterScratch);
     }
 
     return this.visibleCount;
   }
 
-  private rebuildGrid(playerPosition: THREE.Vector3): void {
+  private rebuildGrid(centerPosition: THREE.Vector3): void {
     if (!this.instances) return;
 
     const size = R4V3_GROUND_FIELD.cellSize;
     const radius = R4V3_GROUND_FIELD.visibleRadius;
-    const minX = Math.floor((playerPosition.x - radius) / size);
-    const maxX = Math.ceil((playerPosition.x + radius) / size);
-    const minZ = Math.floor((playerPosition.z - radius) / size);
-    const maxZ = Math.ceil((playerPosition.z + radius) / size);
+    const minX = Math.floor((centerPosition.x - radius) / size);
+    const maxX = Math.ceil((centerPosition.x + radius) / size);
+    const minZ = Math.floor((centerPosition.z - radius) / size);
+    const maxZ = Math.ceil((centerPosition.z + radius) / size);
     const now = Date.now();
     const groundY = R4V3_GROUND_FIELD.groundY;
     const tokenY = groundY + STANDING_COIN_HALF_HEIGHT + M4T3R_RENDER_CONFIG.verticalOffset;
@@ -194,7 +212,7 @@ export class TokenCellService {
         const x = (gx + 0.5) * size;
         const z = (gz + 0.5) * size;
         if (z > R4V3_GROUND_FIELD.waterMinZ) continue;
-        if (Math.hypot(x - playerPosition.x, z - playerPosition.z) > radius) continue;
+        if (Math.hypot(x - centerPosition.x, z - centerPosition.z) > radius) continue;
         totalCells++;
 
         if (count >= R4V3_GROUND_FIELD.maxVisibleInstances) continue;

@@ -2,6 +2,7 @@
   <div class="joy-stick-slot">
     <app-virtual-joystick
       [ariaLabel]="'Déplacer le personnage'"
+      [walkRunRings]="true"
       (vectorChange)="onVector($event)"
     />
   </div>

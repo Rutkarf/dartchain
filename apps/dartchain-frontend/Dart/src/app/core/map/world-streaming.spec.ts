@@ -54,7 +54,7 @@ describe('World streaming and R4V3 cells', () => {
     expect(first?.cellId.startsWith('m4t3r-cluster:')).toBe(true);
     const second = service.requestCollect('player-a', player);
     expect(second).toBeNull();
-    expect(WORLD_SCALE.tokenMaxVisibleInstances).toBe(4096);
+    expect(WORLD_SCALE.tokenMaxVisibleInstances).toBe(8192);
     expect(WORLD_SCALE.tokenCellSizeMeters).toBe(1.25);
     expect(WORLD_SCALE.tokenVisibleRadiusMeters).toBe(64);
     expect(WORLD_SCALE.maxLoadedChunks).toBe(24);

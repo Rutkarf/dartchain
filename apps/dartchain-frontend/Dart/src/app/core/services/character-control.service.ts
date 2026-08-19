@@ -13,6 +13,7 @@ import { CameraControlService } from './camera-control.service';
 import { RunnerWorldService } from './runner/runner-world.service';
 import { RunnerStateService } from './runner/runner-state.service';
 import { RUNNER_CONFIG } from './runner/runner.config';
+import { FootprintTrailManager } from '../map/footprint-trail-manager.service';
 
 /**
  * Contrôle personnage — zéro allocation hot-path, collisions proches.
@@ -30,6 +31,10 @@ export class CharacterControlService {
   private readonly mapConfig = inject(MapConfigService);
   private readonly geo = inject(GeoCoordinateService);
   private readonly zone = inject(NgZone);
+  private readonly footprints = inject(FootprintTrailManager);
+
+  /** Lift léger pour éviter les pieds "dans le sol" (modèle vs terrain). */
+  private readonly footClearanceMeters = 0.035;
 
   private moveX = 0;
   private moveY = 0;
@@ -105,7 +110,8 @@ export class CharacterControlService {
       if (this.isMarseilleMode()) {
         const spawn = this.getMarseilleSpawnPosition();
         this.character.setWorldXZ(spawn.x, spawn.z);
-        state.mesh.position.y = spawn.y;
+        const groundY = this.getGroundYAt(spawn.x, spawn.z);
+        state.mesh.position.y = groundY + this.footClearanceMeters;
       } else {
         this.character.setWorldXZ(0, 5);
         state.mesh.position.y = 0;
@@ -248,7 +254,12 @@ export class CharacterControlService {
     }
 
     this.character.setWorldXZ(nextX, nextZ);
-    state.mesh.position.y = 0;
+    if (this.isMarseilleMode()) {
+      const groundY = this.getGroundYAt(nextX, nextZ);
+      state.mesh.position.y = groundY + this.footClearanceMeters;
+    } else {
+      state.mesh.position.y = 0;
+    }
     state.mesh.visible = true;
 
     if (this.velocity.lengthSq() > 1e-8) {
@@ -261,6 +272,8 @@ export class CharacterControlService {
       this.world.update(this.runnerState.progress);
     } else {
       this.mapLoading.update(state.mesh.position);
+      const groundY = this.getGroundYAt(state.mesh.position.x, state.mesh.position.z);
+      this.footprints.update(state.mesh.position, this.velocity, deltaSeconds, groundY);
       this.updateMarseilleTrail(state.mesh, state.userId || 'local', deltaSeconds);
       this.pickupFx.update(deltaSeconds);
     }
@@ -274,6 +287,17 @@ export class CharacterControlService {
       this.isClimbingMode
     );
     this.cameraControl.update(deltaSeconds);
+  }
+
+  private getGroundYAt(x: number, z: number): number {
+    const provider = this.mapLoading.getActiveProvider();
+    const surface = provider?.getSurfaceProvider();
+    const sync = surface?.getSurfaceHeightSync;
+    if (sync) {
+      const y = sync(x, z);
+      if (typeof y === 'number') return y;
+    }
+    return 0;
   }
 
   private updateMarseilleTrail(mesh: THREE.Object3D, playerId: string, deltaSeconds: number): void {
