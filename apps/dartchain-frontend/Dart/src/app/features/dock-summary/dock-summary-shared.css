@@ -19,7 +19,7 @@
   min-width: 0;
   height: 100%;
   max-height: 100%;
-  padding: 0 2px 0 4px;
+  padding: 0 1px 0 2px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -38,7 +38,8 @@
 .dock-summary-main__rail {
   flex: 0 0 2px;
   width: 2px;
-  height: clamp(8px, 3.2vw, 12px);
+  height: 100%;
+  max-height: 100%;
   border-radius: 1px;
   background: linear-gradient(180deg, var(--tab-accent), var(--tab-accent-2));
   box-shadow: none;
@@ -57,7 +58,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 10px;
+  line-height: 1;
   border: 1px solid transparent;
 }
 
@@ -99,14 +100,14 @@
 .dock-summary-badge {
   flex: 0 0 auto;
   min-width: 12px;
-  height: 10px;
+  height: 8px;
   padding: 0 1px;
   border-radius: 999px;
   background: rgba(var(--tab-accent-rgb), 0.18);
   color: var(--text-primary);
   font-size: clamp(0.3375rem, 2vw, 0.4375rem);
   font-weight: 800;
-  line-height: 10px;
+  line-height: 8px;
   text-align: center;
 }
 
@@ -167,7 +168,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 12px;
+  height: 100%;
+  max-height: 100%;
   margin: 0;
   padding: 0 3px;
   border: none;

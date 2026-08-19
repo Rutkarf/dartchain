@@ -24,7 +24,9 @@
   height: var(--bottom-stack-height-collapsed);
   min-height: var(--bottom-stack-height-collapsed);
   max-height: var(--bottom-stack-height-collapsed);
+  margin-top: 0;
   margin-bottom: 0 !important;
+  padding-top: 0;
   padding-bottom: 0;
 }
 
@@ -92,9 +94,9 @@
 
 .app-bottom-stack.is-dock-collapsed .app-bottom-stack__content,
 .app-bottom-stack.is-dock-collapsed .app-bottom-stack__band {
-  height: var(--dock-smart-bar-h, 24px);
-  max-height: var(--dock-smart-bar-h, 24px);
-  min-height: var(--dock-smart-bar-h, 24px);
+  height: var(--dock-smart-bar-h, 11px);
+  max-height: var(--dock-smart-bar-h, 11px);
+  min-height: var(--dock-smart-bar-h, 11px);
   margin-bottom: 0;
   padding-bottom: 0;
 }

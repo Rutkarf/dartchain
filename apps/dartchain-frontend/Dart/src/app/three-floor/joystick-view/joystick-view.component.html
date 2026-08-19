@@ -5,5 +5,14 @@
       (vectorChange)="onVector($event)"
     />
   </div>
-  <span class="joy-label">View</span>
+  <svg class="joy-arc" viewBox="0 0 112 32" aria-hidden="true">
+    <defs>
+      <path id="joy-arc-view" d="M 14 8 A 42 18 0 0 0 98 8" />
+    </defs>
+    <text>
+      <textPath href="#joy-arc-view" startOffset="50%" text-anchor="middle">
+        VIEW
+      </textPath>
+    </text>
+  </svg>
 </div>

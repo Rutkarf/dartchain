@@ -34,7 +34,7 @@
    * Floor peek = canvas Three.js réservé sous Graph (+ --ds-graph-floor-gap).
    * Budgets @ 250×550 : tokens --ds-zone-* (zero-scroll).
    */
-  --floor-canvas-height: var(--ds-zone-floor-peek, 64px);
+  --floor-canvas-height: var(--ds-zone-floor-peek, 220px);
   --floor-peek-height: var(--floor-canvas-height);
   --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
   --app-bottom-footer-space: calc(var(--floor-peek-height) + var(--graph-floor-gap));
@@ -111,9 +111,9 @@
   );
   /* --hub-market-showcase-gap / stack-gap-showcase-dock : 4px (showcase → dock) */
   --showcase-tab-fusion-overlap: 0px;
-  /* Smart bars : compactes mais respirantes (contenu + ~2px air haut/bas) */
-  --showcase-smart-bar-h: 22px;
-  --chart-smart-bar-h: 22px;
+  /* Smart bars repliées : graph flush ; dock/showcase = 2e ligne à ~moitié */
+  --showcase-smart-bar-h: 11px;
+  --chart-smart-bar-h: 11px;
   --swap-smart-bar-h: 32px;
   --chart-stack-header-h: 0px;
   --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
@@ -143,7 +143,7 @@
   --dock-hub-tab-w: 2.5rem;
   --dock-panel-height: var(--mvp-bottom-panel-h);
   --dock-panel-handle-h: 8px;
-  --dock-smart-bar-h: 22px;
+  --dock-smart-bar-h: 11px;
   --dock-toggle-w: 24px;
   --dock-collapsed-band-h: var(--dock-panel-handle-h);
   --app-dock-stack-height: calc(
@@ -1253,7 +1253,9 @@ app-three-floor {
 
 .app-hub-showcase-block.is-showcase-collapsed .showcase-block__shell {
   overflow: visible;
+  margin-top: 0;
   margin-bottom: 0;
+  padding-top: 0;
   padding-bottom: 0;
 }
 
@@ -1263,7 +1265,9 @@ app-three-floor {
   height: var(--showcase-smart-bar-h);
   max-height: var(--showcase-smart-bar-h);
   overflow: visible;
+  margin-top: 0;
   margin-bottom: 0;
+  padding-top: 0;
   padding-bottom: 0;
 }
 
@@ -1496,7 +1500,7 @@ app-three-floor {
   padding: 0;
   box-sizing: border-box;
   overflow: hidden;
-  border-radius: clamp(6px, 1.8vw, 10px);
+  border-radius: 0;
   background: transparent;
   box-shadow: var(--ui-glow);
   transition:
@@ -2042,7 +2046,7 @@ app-block-detail-drawer {
     --market-height: clamp(166px, 28vh, 206px);
     --showcase-hub-tab-h: calc(clamp(12px, 3.6vw, 15px) * var(--bottom-stack-scale));
     --faucet-band-height: auto;
-    --floor-peek-height: var(--floor-canvas-height, 64px);
+    --floor-peek-height: var(--floor-canvas-height);
   }
 }
 
@@ -2130,13 +2134,13 @@ app-block-detail-drawer {
   .app-hub { column-gap: var(--panel-column-gap); }
 }
 @media (max-width: 399px) {
-  .app-showcase-band { border-radius: clamp(4px, 1.5vw, 8px); }
+  .app-showcase-band { border-radius: 0 !important; }
 }
 @media (max-width: 349px) {
   .navbar-faucet-slot { min-width: 0; }
 }
 @media (max-width: 299px) {
-  .app-dock-stack { border-radius: clamp(4px, 1.4vw, 7px); }
+  .app-dock-stack { border-radius: 0 !important; }
 }
 
 /* === Viewport MVP 250×550 — zero-scroll, budgets tokens === */
@@ -2159,9 +2163,9 @@ app-block-detail-drawer {
     --showcase-band-height: var(--mvp-showcase-body-h);
     --showcase-hub-tab-h: var(--ds-zone-showcase-header, 14px);
     --showcase-hub-header-h: var(--ds-zone-showcase-header, 14px);
-    --showcase-smart-bar-h: 20px;
-    --chart-smart-bar-h: 20px;
-    --dock-smart-bar-h: 20px;
+    --showcase-smart-bar-h: 10px;
+    --chart-smart-bar-h: 10px;
+    --dock-smart-bar-h: 10px;
     --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
     --hub-showcase-block-height-collapsed: calc(
       var(--showcase-hub-header-h) + var(--showcase-smart-bar-h)
@@ -2173,7 +2177,7 @@ app-block-detail-drawer {
     --market-chart-block-height-collapsed: var(--chart-smart-bar-h);
     --market-chart-collapsed-h: var(--chart-smart-bar-h);
     --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
-    --floor-canvas-height: var(--ds-zone-floor-peek, 64px);
+    --floor-canvas-height: var(--ds-zone-floor-peek, 220px);
     --floor-peek-height: var(--floor-canvas-height);
     --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
     --showcase-tab-gap: 0px;
@@ -2276,7 +2280,7 @@ app-block-detail-drawer {
     --market-chart-height: var(--mvp-chart-h);
     --showcase-band-height: var(--mvp-showcase-body-h);
     --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
-    --floor-peek-height: var(--ds-zone-floor-peek, 64px);
+    --floor-peek-height: var(--ds-zone-floor-peek, 220px);
     --floor-canvas-height: var(--floor-peek-height);
     --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
     --showcase-tab-gap: 0px;
@@ -2494,9 +2498,9 @@ app-block-detail-drawer {
     --market-exchange-height-estimate: var(--mvp-swap-h);
     --market-chart-height-expanded: var(--mvp-chart-h);
     --chart-stack-header-h: 0px;
-    --chart-smart-bar-h: 20px;
-    --showcase-smart-bar-h: 20px;
-    --dock-smart-bar-h: 20px;
+    --chart-smart-bar-h: 10px;
+    --showcase-smart-bar-h: 10px;
+    --dock-smart-bar-h: 10px;
     --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
     --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
     --hub-showcase-block-height-collapsed: calc(
@@ -2515,7 +2519,7 @@ app-block-detail-drawer {
     --market-height: var(--market-band-height);
     --hub-wallet-gap: 0px;
     --wallet-display-extra: 0px;
-    --floor-peek-height: var(--ds-zone-floor-peek, 64px);
+    --floor-peek-height: var(--ds-zone-floor-peek, 220px);
     --floor-canvas-height: var(--floor-peek-height);
     --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
     --shell-vertical-gaps: 4px;
@@ -2682,9 +2686,9 @@ app-block-detail-drawer {
     --showcase-hub-tab-h: var(--ds-zone-showcase-header, 14px);
     --showcase-hub-header-h: var(--ds-zone-showcase-header, 14px);
     --showcase-band-height: var(--mvp-showcase-body-h);
-    --showcase-smart-bar-h: 20px;
-    --chart-smart-bar-h: 20px;
-    --dock-smart-bar-h: 20px;
+    --showcase-smart-bar-h: 10px;
+    --chart-smart-bar-h: 10px;
+    --dock-smart-bar-h: 10px;
     --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
     --hub-showcase-block-height-collapsed: calc(
       var(--showcase-hub-header-h) + var(--showcase-smart-bar-h)
@@ -2707,7 +2711,7 @@ app-block-detail-drawer {
     --bottom-dock-height: 16px;
     --dock-hub-tab-h: 16px;
     --dock-panel-height: var(--mvp-bottom-panel-h);
-    --floor-peek-height: var(--ds-zone-floor-peek, 64px);
+    --floor-peek-height: var(--ds-zone-floor-peek, 220px);
     --floor-canvas-height: var(--floor-peek-height);
     --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
     --navbar-stack-estimate: calc(var(--ds-zone-navbar, 32px) + var(--ds-navbar-top-inset, 0px));
@@ -2740,7 +2744,7 @@ app-block-detail-drawer {
     max-height: none !important;
     min-height: 0;
     overflow: hidden !important;
-    padding-bottom: calc(var(--floor-peek-height, 64px) + var(--graph-floor-gap, 6px)) !important;
+    padding-bottom: calc(var(--floor-peek-height, 220px) + var(--graph-floor-gap, 6px)) !important;
   }
 
   .app-main-layout > app-swap,

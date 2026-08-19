@@ -26,7 +26,7 @@
   row-gap: var(--stack-section-gap, 4px);
   position: relative;
   z-index: 2;
-  padding-bottom: calc(var(--floor-peek-height, 64px) + var(--graph-floor-gap, 6px));
+  padding-bottom: calc(var(--floor-peek-height, 220px) + var(--graph-floor-gap, 6px));
   box-sizing: border-box;
 }
 
@@ -65,9 +65,9 @@ app-graph.app-graph-section {
 .app-main-layout.is-chart-collapsed > app-graph,
 .app-main-layout > app-graph.is-chart-collapsed,
 app-graph.app-graph-section.is-chart-collapsed {
-  height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 20px)) !important;
-  min-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 20px)) !important;
-  max-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 20px)) !important;
+  height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px)) !important;
+  min-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px)) !important;
+  max-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px)) !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   padding-top: 0;

@@ -23,7 +23,9 @@
           [class.launch-summary-ticker__slide--enter]="carouselAnimating()"
         >
           <span class="launch-summary-ticker__symbol">{{ project.symbol }}</span>
-          <span class="launch-summary-ticker__cap">{{ marketCapLabel(project) }}</span>
+          <span class="launch-summary-ticker__name">{{ projectDisplayName(project) }}</span>
+          <span class="launch-summary-ticker__sep" aria-hidden="true">·</span>
+          <span class="launch-summary-ticker__cap">{{ carouselProjectMeta() }}</span>
         </div>
       </div>
     } @else if (loading()) {

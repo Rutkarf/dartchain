@@ -25,7 +25,7 @@ import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShowcaseLaunchSummaryComponent implements OnInit, OnDestroy {
-  private static readonly CAROUSEL_MS = 3000;
+  private static readonly CAROUSEL_MS = 5000;
 
   protected readonly launchState = inject(ShowcaseLaunchStateService);
 
@@ -65,6 +65,21 @@ export class ShowcaseLaunchSummaryComponent implements OnInit, OnDestroy {
     return projects[index] ?? projects[0];
   });
 
+  readonly carouselProjectMeta = computed(() => {
+    const project = this.carouselProject();
+    if (!project) {
+      return '';
+    }
+
+    const parts = [this.marketCapLabel(project)];
+    if (project.chain?.trim()) {
+      parts.push(project.chain.trim());
+    } else if (project.launchDate?.trim()) {
+      parts.push(project.launchDate.trim());
+    }
+    return parts.filter(Boolean).join(' · ');
+  });
+
   ngOnInit(): void {
     if (this.launchState.projects().length === 0 && !this.launchState.loading()) {
       this.launchState.loadProjects();
@@ -85,6 +100,10 @@ export class ShowcaseLaunchSummaryComponent implements OnInit, OnDestroy {
 
   marketCapLabel(project: LaunchProject): string {
     return this.launchState.marketCapLabel(project);
+  }
+
+  projectDisplayName(project: LaunchProject): string {
+    return project.name?.trim() || project.symbol?.trim() || 'Projet';
   }
 
   onRefresh(event: Event): void {

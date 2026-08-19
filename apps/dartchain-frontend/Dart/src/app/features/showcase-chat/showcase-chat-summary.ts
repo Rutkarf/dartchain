@@ -3,9 +3,12 @@ import {
   Component,
   EventEmitter,
   HostBinding,
+  OnDestroy,
   OnInit,
   Output,
+  effect,
   inject,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -21,9 +24,16 @@ import { ShowcaseChatService } from '../../core/services/showcase-chat.service';
   styleUrls: ['./showcase-chat-summary.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ShowcaseChatSummaryComponent implements OnInit {
+export class ShowcaseChatSummaryComponent implements OnInit, OnDestroy {
+  private static readonly MESSAGE_TRANSITION_MS = 420;
+
   private readonly chat = inject(ShowcaseChatService);
   protected readonly chatState = inject(ShowcaseChatStateService);
+  private transitionTimer: number | null = null;
+  private lastAnimatedMessageId: string | null = null;
+  private lastRenderedAuthor = '';
+  private lastRenderedText = '';
+  private lastRenderedUnreadCount = 0;
 
   @Output() readonly refreshClick = new EventEmitter<void>();
 
@@ -46,12 +56,81 @@ export class ShowcaseChatSummaryComponent implements OnInit {
   readonly statusLabel = this.chatState.statusLabel;
   readonly previewHeadline = this.chatState.previewHeadline;
   readonly lastTimeLabel = this.chatState.lastTimeLabel;
+  readonly lastMessage = this.chatState.lastMessage;
   readonly lastPreviewAuthor = this.chatState.lastPreviewAuthor;
   readonly lastPreviewText = this.chatState.lastPreviewText;
   readonly refreshing = this.chatState.refreshing;
+  readonly previousPreviewAuthor = signal('');
+  readonly previousPreviewText = signal('');
+  readonly previousUnreadCount = signal(0);
+  readonly isMessageTransitioning = signal(false);
+
+  constructor() {
+    effect(() => {
+      const message = this.lastMessage();
+      const currentId = message?.id ?? null;
+      const currentAuthor = this.chatState.lastPreviewAuthor();
+      const currentText = this.chatState.lastPreviewText();
+      const currentUnreadCount = this.unreadCount();
+
+      if (!currentId) {
+        this.lastAnimatedMessageId = null;
+        this.lastRenderedAuthor = '';
+        this.lastRenderedText = '';
+        this.lastRenderedUnreadCount = 0;
+        this.isMessageTransitioning.set(false);
+        this.previousPreviewAuthor.set('');
+        this.previousPreviewText.set('');
+        this.previousUnreadCount.set(0);
+        return;
+      }
+
+      if (this.lastAnimatedMessageId === null) {
+        this.lastAnimatedMessageId = currentId;
+        this.lastRenderedAuthor = currentAuthor;
+        this.lastRenderedText = currentText;
+        this.lastRenderedUnreadCount = currentUnreadCount;
+        return;
+      }
+
+      if (currentId === this.lastAnimatedMessageId) {
+        this.lastRenderedAuthor = currentAuthor;
+        this.lastRenderedText = currentText;
+        this.lastRenderedUnreadCount = currentUnreadCount;
+        return;
+      }
+
+      this.previousPreviewAuthor.set(this.lastRenderedAuthor);
+      this.previousPreviewText.set(this.lastRenderedText);
+      this.previousUnreadCount.set(this.lastRenderedUnreadCount);
+      this.lastAnimatedMessageId = currentId;
+      this.lastRenderedAuthor = currentAuthor;
+      this.lastRenderedText = currentText;
+      this.lastRenderedUnreadCount = currentUnreadCount;
+      this.isMessageTransitioning.set(true);
+
+      if (this.transitionTimer !== null) {
+        window.clearTimeout(this.transitionTimer);
+      }
+      this.transitionTimer = window.setTimeout(() => {
+        this.isMessageTransitioning.set(false);
+        this.previousPreviewAuthor.set('');
+        this.previousPreviewText.set('');
+        this.previousUnreadCount.set(0);
+        this.transitionTimer = null;
+      }, ShowcaseChatSummaryComponent.MESSAGE_TRANSITION_MS);
+    }, { allowSignalWrites: true });
+  }
 
   ngOnInit(): void {
     this.chat.connect();
+  }
+
+  ngOnDestroy(): void {
+    if (this.transitionTimer !== null) {
+      window.clearTimeout(this.transitionTimer);
+      this.transitionTimer = null;
+    }
   }
 
   onRefresh(event: Event): void {

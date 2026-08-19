@@ -16,14 +16,18 @@
   height: auto;
   min-height: 0;
   max-height: none;
+  margin-top: 0;
   margin-bottom: 0 !important;
+  padding-top: 0;
   padding-bottom: 0;
 }
 
 :host(.is-dock-collapsed) .app-bottom-stack,
 :host(.is-dock-collapsed) .showcase-block__shell,
 :host(.is-dock-collapsed) .bottom-stack__shell {
+  margin-top: 0;
   margin-bottom: 0;
+  padding-top: 0;
   padding-bottom: 0;
 }
 

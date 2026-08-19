@@ -4,6 +4,16 @@ export interface ProductEnvironment {
   showcaseEnabled: boolean;
 }
 
+export interface MapEnvironment {
+  mapEnabled?: boolean;
+  mapProvider?: 'legacy-floor' | 'marseille-osm-three';
+  enableOsmBuildings?: boolean;
+  enableTerrain?: boolean;
+  mapDebug?: boolean;
+  mapQuality?: 'low' | 'medium' | 'high';
+  opentopographyApiKey?: string;
+}
+
 function devWsUrl(path: string): string {
   if (typeof globalThis !== 'undefined' && 'location' in globalThis) {
     const location = globalThis.location as Location;
@@ -22,9 +32,17 @@ export const environment = {
   commercial: false,
   faucetEnabled: true,
   showcaseEnabled: true,
-} satisfies ProductEnvironment & {
-  production: boolean;
-  apiUrl: string;
-  liveWsUrl: string;
-  chatWsUrl: string;
-};
+  mapEnabled: true,
+  mapProvider: 'marseille-osm-three',
+  enableOsmBuildings: true,
+  enableTerrain: true,
+  mapDebug: false,
+  mapQuality: 'medium',
+  opentopographyApiKey: '',
+} satisfies ProductEnvironment &
+  MapEnvironment & {
+    production: boolean;
+    apiUrl: string;
+    liveWsUrl: string;
+    chatWsUrl: string;
+  };

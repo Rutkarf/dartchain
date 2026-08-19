@@ -2,6 +2,13 @@
 # Lance frontend + backend en session détachée (survit à la fermeture du shell Cursor/agent).
 set -euo pipefail
 
+# Node/npm via nvm (shell non-interactif : pas de .bashrc)
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+if [[ -s "${NVM_DIR}/nvm.sh" ]]; then
+  # shellcheck disable=SC1091
+  source "${NVM_DIR}/nvm.sh"
+fi
+
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BACKEND_DIR="${REPO_ROOT}/apps/dartchain-backend"
 FRONTEND_DIR="${REPO_ROOT}/apps/dartchain-frontend/Dart"

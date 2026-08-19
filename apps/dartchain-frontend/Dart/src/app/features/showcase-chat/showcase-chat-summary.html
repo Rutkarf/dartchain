@@ -12,8 +12,19 @@
     ></span>
 
     @if (lastPreviewAuthor()) {
-      <span class="showcase-chat-preview__author">{{ lastPreviewAuthor() }}:</span>
-      <span class="showcase-chat-preview__text">{{ lastPreviewText() }}</span>
+      <span class="showcase-chat-preview__stack" [class.is-transitioning]="isMessageTransitioning()">
+        @if (isMessageTransitioning() && previousPreviewAuthor()) {
+          <span class="showcase-chat-preview__line showcase-chat-preview__line--out">
+            <span class="showcase-chat-preview__author">{{ previousPreviewAuthor() }}:</span>
+            <span class="showcase-chat-preview__text">{{ previousPreviewText() }}</span>
+          </span>
+        }
+
+        <span class="showcase-chat-preview__line" [class.showcase-chat-preview__line--in]="isMessageTransitioning()">
+          <span class="showcase-chat-preview__author">{{ lastPreviewAuthor() }}:</span>
+          <span class="showcase-chat-preview__text">{{ lastPreviewText() }}</span>
+        </span>
+      </span>
     } @else {
       <span class="showcase-chat-preview__text showcase-chat-preview__text--muted">
         {{ connected() ? 'Aucun message pour l’instant' : 'Connexion au salon…' }}
@@ -21,8 +32,16 @@
     }
 
     @if (hasUnread()) {
-      <span class="unread-badge" [attr.aria-label]="unreadCount() + ' non lus'">
-        {{ unreadCount() > 99 ? '99+' : unreadCount() }}
+      <span class="unread-badge-stack" [class.is-transitioning]="isMessageTransitioning()">
+        @if (isMessageTransitioning() && previousUnreadCount()) {
+          <span class="unread-badge unread-badge--out" [attr.aria-label]="previousUnreadCount() + ' non lus'">
+            {{ previousUnreadCount() > 99 ? '99+' : previousUnreadCount() }}
+          </span>
+        }
+
+        <span class="unread-badge" [class.unread-badge--in]="isMessageTransitioning()" [attr.aria-label]="unreadCount() + ' non lus'">
+          {{ unreadCount() > 99 ? '99+' : unreadCount() }}
+        </span>
       </span>
     }
   </div>

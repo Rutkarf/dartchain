@@ -1,0 +1,331 @@
+/** Identifiant du fournisseur de carte actif. */
+export type MapProviderId = 'legacy-floor' | 'marseille-osm-three';
+
+/** Niveau de qualité pour le streaming terrain / bâtiments. */
+export type MapQuality = 'low' | 'medium' | 'high';
+
+export interface MapBounds {
+  south: number;
+  north: number;
+  west: number;
+  east: number;
+}
+
+export interface GeoPosition {
+  latitude: number;
+  longitude: number;
+  altitude: number;
+}
+
+export interface MapStartOrientation {
+  /** Rotation du personnage autour de Y. */
+  characterRotationY: number;
+  /** Yaw initial de la caméra orbitale. */
+  cameraYaw: number;
+  /** Pitch initial de la caméra orbitale. */
+  cameraPitch: number;
+  /** Distance initiale caméra-personnage. */
+  cameraDistance: number;
+  /** Regard un peu devant le perso (mètres, vers la Canebière). */
+  cameraLookAhead: number;
+}
+
+export interface WorldAnchor {
+  x: number;
+  y: number;
+  z: number;
+}
+
+/**
+ * Échelle type Google Earth : 1 unité Three.js = 1 mètre réel.
+ * L’origine locale reste le Vieux-Port. Ne pas changer worldScale pour zoomer.
+ */
+export const WORLD_METERS_PER_UNIT = 1;
+
+/**
+ * Ancrage station + miroir + spawn.
+ * Coordonnées monde locales (mètres), nord = −Z, est = +X.
+ */
+export const METRO_SPAWN_ANCHOR = {
+  id: 'vieux-port-metro-mirror',
+  stationName: 'Vieux-Port — Station Miroir',
+  mirror: { x: 0, y: 5.6, z: 0 } satisfies WorldAnchor,
+  offsetFromMirror: { x: -16.4, y: 0, z: -11.2 } satisfies WorldAnchor,
+  spawnOffsetFromMirror: { x: -6.2, y: 0, z: -2.4 } satisfies WorldAnchor,
+} as const;
+
+/** Vue de validation séparée — n’écrase pas la caméra orbitale tant qu’elle n’est pas activée. */
+export const VIEUX_PORT_METRO_MIRROR_VIEW = {
+  id: 'VIEUX_PORT_METRO_MIRROR_VIEW',
+  position: { x: 22, y: 16, z: 32 } satisfies WorldAnchor,
+  lookAt: { x: -6, y: 2.2, z: -8 } satisfies WorldAnchor,
+} as const;
+
+/** Identifiant stable du 2e bâtiment adjacent au miroir (est du Vieux-Port). */
+export const MIRROR_SECOND_BUILDING_ID = 'mirror-adjacent-building-02';
+
+export const SCENE_COPY = {
+  canopyTitle: 'MetaVerseBB',
+  roadMarking: 'Hack The Planet x)',
+  r4v3: 'R4V3',
+  m4t3rPickup: '+1',
+} as const;
+
+/** Feedback visuel de ramassage M4T3R — aucun crédit token côté client. */
+export const M4T3R_PICKUP_FX = {
+  text: '+1',
+  durationMs: 900,
+  riseMeters: 1.55,
+  headOffsetMeters: 0.45,
+  poolSize: 12,
+  maxBurst: 6,
+  batchWindowMs: 40,
+} as const;
+
+/**
+ * Densité logique 1 cm (1 unité = 1 m).
+ * Rendu agrégé par cluster 25 cm — jamais une instance par centimètre.
+ */
+export const M4T3R_DENSITY_CONFIG = {
+  logicalCellSize: 0.01,
+  visualClusterSize: 0.14,
+  pickupRadius: 0.12,
+  visibleRadius: 9,
+  respawnDelayMs: 30_000,
+  maxVisibleInstances: 8192,
+  /** Au-dessus des trottoirs (0.34) + offset visible. */
+  groundY: 0.34 + 0.08,
+  waterMinZ: 14,
+} as const;
+
+export const TRAIL_CONFIG = {
+  width: 0.8,
+  sampleDistance: 0.05,
+  maxCellsPerUpdate: 5000,
+  fadeDurationMs: 350,
+  respawnDelayMs: 30_000,
+  maxStepMeters: 3.6,
+  maxSpeedMetersPerSecond: 32,
+} as const;
+
+export const MOVE_JOYSTICK_CONFIG = {
+  walkRing: 0.62,
+  runMultiplier: 3,
+  deadZone: 0.08,
+} as const;
+
+/** Fusion horizon 3D ↔ ciel QUEST. 1 unité = 1 m. */
+export const WORLD_BACKGROUND_CONFIG = {
+  horizonColor: 0x111a38,
+  zenithColor: 0x02040f,
+  fogColor: 0x16122c,
+  fogNear: 18,
+  fogFar: 140,
+  horizonBlendStart: 0.42,
+  horizonBlendEnd: 0.92,
+  contrastFadeDistance: 120,
+} as const;
+
+export const ORBIT_CONFIG = {
+  enableDamping: true,
+  dampingFactor: 0.08,
+  enablePan: false,
+  enableZoom: true,
+  enableRotate: true,
+  minDistance: 5.2,
+  maxDistance: 11,
+  minPolarAngle: 0.48,
+  maxPolarAngle: 1.32,
+  zoomSpeed: 0.8,
+  rotateSpeed: 0.55,
+  /** Centre du perso (~4.2 m) pour cadrer le corps entier dans le peek. */
+  targetHeight: 2.1,
+} as const;
+
+export type QuestParticleMode = 'quest-field' | 'metaverse-starry-sky';
+export const QUEST_PARTICLE_MODE: QuestParticleMode = 'metaverse-starry-sky';
+
+export const M4T3R_VERTICAL_OFFSET = 0.08;
+
+/**
+ * Tapis R4V3 au sol : grille monde fixe (1 unité = 1 m).
+ * Le streaming ne fait qu’afficher/masquer des cellules déjà ancrées.
+ */
+export const R4V3_GROUND_FIELD = {
+  cellSize: 1.25,
+  visibleRadius: 64,
+  maxVisibleInstances: 4096,
+  tokenRadius: 0.28,
+  tokenThickness: 0.045,
+  groundY: 0.34 + 0.05,
+  waterMinZ: 14,
+} as const;
+
+/**
+ * Caméra 3e personne rapprochée (personnage ~4.2 m).
+ * 1 unité = 1 mètre. Ne pas s’appliquer au runner (camDistance 10).
+ */
+export const THIRD_PERSON_CAMERA_CONFIG = {
+  distance: 6.2,
+  height: 2.35,
+  lookAtHeight: 2.1,
+  shoulderOffset: 0.28,
+  positionSmoothing: 0.14,
+  minDistance: 5.2,
+  maxDistance: 11,
+  minPitch: -0.04,
+  maxPitch: 0.42,
+  collisionPadding: 0.3,
+  wheelZoomSpeed: 0.0028,
+  fov: 48,
+} as const;
+
+/**
+ * Échelle et streaming. 1 unité monde = 1 mètre (worldScale existant).
+ * Distances de génération estimées pour rester fluide sur desktop/mobile.
+ */
+export const WORLD_SCALE = {
+  metersPerWorldUnit: 1,
+  worldUnitsPerMeter: 1,
+  chunkSizeMeters: 128,
+  viewDistanceMeters: 800,
+  generationDistanceMeters: 512,
+  maxLoadedChunks: 24,
+  tokenCellSizeMeters: 1.25,
+  tokenVisibleRadiusMeters: 64,
+  tokenMaxVisibleInstances: 4096,
+} as const;
+
+export type MarseilleDistrictId =
+  | 'vieux-port'
+  | 'canebiere'
+  | 'cours-julien'
+  | 'la-plaine'
+  | 'notre-dame'
+  | 'le-panier'
+  | 'joliette';
+
+/** Centres de quartiers. Coordonnées geo approximatives, marquées estimated. */
+export const MARSEILLE_DISTRICTS: Record<
+  MarseilleDistrictId,
+  GeoPosition & { estimated: boolean; palette: number }
+> = {
+  'vieux-port': {
+    latitude: 43.2965,
+    longitude: 5.3698,
+    altitude: 0,
+    estimated: false,
+    palette: 0x40e0ff,
+  },
+  canebiere: {
+    latitude: 43.2979,
+    longitude: 5.3804,
+    altitude: 12,
+    estimated: true,
+    palette: 0xffe600,
+  },
+  'cours-julien': {
+    latitude: 43.3096,
+    longitude: 5.3872,
+    altitude: 28,
+    estimated: true,
+    palette: 0xff3ecf,
+  },
+  'la-plaine': {
+    latitude: 43.2931,
+    longitude: 5.3859,
+    altitude: 18,
+    estimated: true,
+    palette: 0x7a5cff,
+  },
+  'notre-dame': {
+    latitude: 43.2841,
+    longitude: 5.3712,
+    altitude: 148,
+    estimated: true,
+    palette: 0xf4f0e6,
+  },
+  'le-panier': {
+    latitude: 43.2988,
+    longitude: 5.3672,
+    altitude: 22,
+    estimated: true,
+    palette: 0xc4785a,
+  },
+  joliette: {
+    latitude: 43.3018,
+    longitude: 5.367,
+    altitude: 8,
+    estimated: true,
+    palette: 0x6a8ea8,
+  },
+};
+
+/**
+ * Configuration globale de la carte Marseille.
+ * Toutes les coordonnées géographiques sont centralisées ici.
+ */
+export interface MapConfiguration {
+  enabled: boolean;
+  provider: MapProviderId;
+  latitudeOrigin: number;
+  longitudeOrigin: number;
+  altitudeOrigin: number;
+  worldScale: number;
+  tileRadius: number;
+  maxVisibleTiles: number;
+  enableBuildings: boolean;
+  enableTerrain: boolean;
+  enableDebug: boolean;
+  quality: MapQuality;
+  bounds: MapBounds;
+  startPosition: GeoPosition;
+  startOrientation: MapStartOrientation;
+}
+
+/** Bounding box configurable autour de Marseille. */
+export const MARSEILLE_BOUNDS: MapBounds = {
+  south: 43.2,
+  north: 43.4,
+  west: 5.2,
+  east: 5.55,
+};
+
+/** Position initiale du personnage (Vieux-Port). */
+export const MARSEILLE_START_POSITION: GeoPosition = {
+  latitude: 43.2965,
+  longitude: 5.3698,
+  altitude: 20,
+};
+
+/**
+ * Départ gameplay Marseille :
+ * - personnage tourné vers le nord géographique (−Z)
+ * - caméra au sud, donc dos au Vieux-Port / à l'eau
+ */
+export const MARSEILLE_START_ORIENTATION: MapStartOrientation = {
+  characterRotationY: Math.PI,
+  cameraYaw: 0,
+  cameraPitch: 0.1,
+  cameraDistance: 6.2,
+  cameraLookAhead: 0.2,
+};
+
+/** Valeurs par défaut — provider Marseille avec fallback legacy si échec. */
+export const DEFAULT_MAP_CONFIGURATION: MapConfiguration = {
+  enabled: true,
+  provider: 'marseille-osm-three',
+  latitudeOrigin: MARSEILLE_START_POSITION.latitude,
+  longitudeOrigin: MARSEILLE_START_POSITION.longitude,
+  altitudeOrigin: 0,
+  worldScale: 1,
+  tileRadius: 2,
+  maxVisibleTiles: 25,
+  enableBuildings: true,
+  enableTerrain: true,
+  enableDebug: false,
+  quality: 'medium',
+  bounds: MARSEILLE_BOUNDS,
+  startPosition: MARSEILLE_START_POSITION,
+  startOrientation: MARSEILLE_START_ORIENTATION,
+};

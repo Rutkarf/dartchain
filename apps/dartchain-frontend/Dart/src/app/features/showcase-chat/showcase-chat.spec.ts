@@ -28,6 +28,7 @@ describe('ShowcaseChatComponent (Phase V)', () => {
             refreshingHistory: signal(false).asReadonly(),
             connect: vi.fn(),
             disconnect: vi.fn(),
+            setUsername: vi.fn(),
             sendMessage: vi.fn(),
             refreshMessages: vi.fn(() => Promise.resolve()),
             clearChat: vi.fn(() => Promise.resolve()),

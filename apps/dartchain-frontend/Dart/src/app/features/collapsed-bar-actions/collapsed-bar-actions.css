@@ -1,7 +1,7 @@
 :host {
   --cba-cyan-rgb: var(--tab-push-cyan-rgb, var(--accent-cyan-rgb, var(--ds-neon-cyan-rgb, 46, 196, 214)));
   --cba-item-w: var(--panel-action-item-w, 14px);
-  --cba-h: var(--panel-action-menu-h, 12px);
+  --cba-h: var(--panel-action-menu-h, 7px);
   --cba-menu-w: var(--panel-action-menu-w, 34px);
   --cba-btn-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.14),

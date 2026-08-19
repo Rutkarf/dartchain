@@ -6,6 +6,8 @@ import io.dartchain.backend.auth.security.WebSocketAuthSupport;
 import io.dartchain.backend.model.Block;
 import io.dartchain.backend.model.PendingTransaction;
 import io.dartchain.backend.peer.PeerMetricsRegistry;
+import io.dartchain.backend.quests.QuestService;
+import io.dartchain.backend.quests.model.QuestProgressState;
 import io.dartchain.backend.service.BlockchainService;
 import io.dartchain.backend.service.PendingTransactionService;
 import io.dartchain.backend.service.TransactionPoolService;
@@ -30,6 +32,7 @@ public class P2pService {
     private final P2pSessionRegistry sessionRegistry;
     private final WebSocketAuthSupport webSocketAuthSupport;
     private final PeerMetricsRegistry metricsRegistry;
+    private final QuestService questService;
 
     public P2pService(
             ObjectMapper objectMapper,
@@ -38,7 +41,8 @@ public class P2pService {
             TransactionPoolService transactionPoolService,
             P2pSessionRegistry sessionRegistry,
             WebSocketAuthSupport webSocketAuthSupport,
-            PeerMetricsRegistry metricsRegistry
+            PeerMetricsRegistry metricsRegistry,
+            QuestService questService
     ) {
         this.objectMapper = objectMapper;
         this.blockchainService = blockchainService;
@@ -47,6 +51,7 @@ public class P2pService {
         this.sessionRegistry = sessionRegistry;
         this.webSocketAuthSupport = webSocketAuthSupport;
         this.metricsRegistry = metricsRegistry;
+        this.questService = questService;
     }
 
     public void onOpen(WebSocketSession session) {
@@ -76,6 +81,7 @@ public class P2pService {
                 case RESPONSE_BLOCKCHAIN -> handleBlockchainResponse(session, message.getData());
                 case QUERY_TRANSACTION_POOL -> write(session, responseTransactionPoolMsg());
                 case RESPONSE_TRANSACTION_POOL -> handleTransactionPoolResponse(session, message.getData());
+                case RESPONSE_QUEST_PROGRESS -> handleQuestProgressResponse(session, message.getData());
             }
         } catch (Exception exception) {
             log.warn("[P2P] Invalid message: {}", exception.getMessage());
@@ -247,6 +253,25 @@ public class P2pService {
 
     private boolean requiresAuthentication(P2pMessageType type) {
         return type == P2pMessageType.RESPONSE_BLOCKCHAIN
-                || type == P2pMessageType.RESPONSE_TRANSACTION_POOL;
+                || type == P2pMessageType.RESPONSE_TRANSACTION_POOL
+                || type == P2pMessageType.RESPONSE_QUEST_PROGRESS;
+    }
+
+    private void handleQuestProgressResponse(WebSocketSession session, String rawData) {
+        try {
+            QuestProgressSyncPayload payload = objectMapper.readValue(rawData, QuestProgressSyncPayload.class);
+            if (payload == null || payload.getWalletAddress() == null) {
+                return;
+            }
+
+            QuestProgressState incoming = payload.getState();
+            if (incoming == null) {
+                return;
+            }
+
+            questService.syncQuestProgressForWallet(payload.getWalletAddress(), incoming);
+        } catch (Exception exception) {
+            log.warn("[P2P] Failed to handle quest progress sync: {}", exception.getMessage());
+        }
     }
 }

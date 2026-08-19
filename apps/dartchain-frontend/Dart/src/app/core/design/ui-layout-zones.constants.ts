@@ -31,14 +31,14 @@ export type LayoutZoneId = (typeof READING_ORDER)[number];
  * Chart / dock / activity compacts ; floor peek réservé sous Graph.
  */
 export const LAYOUT_ZONE_BUDGET_PX: Record<LayoutZoneId, { min: number; target: number; max: number }> = {
-  navbar: { min: 28, target: 32, max: 34 },
-  exchange: { min: 12, target: 16, max: 18 },
-  chart: { min: 112, target: 136, max: 148 },
-  'showcase-header': { min: 12, target: 14, max: 16 },
-  'showcase-panel': { min: 88, target: 108, max: 116 },
-  'bottom-panel': { min: 96, target: 118, max: 128 },
-  'bottom-dock': { min: 12, target: 14, max: 16 },
-  'floor-peek': { min: 52, target: 64, max: 72 },
+  navbar: { min: 26, target: 32, max: 34 },
+  exchange: { min: 12, target: 14, max: 16 },
+  chart: { min: 64, target: 80, max: 92 },
+  'showcase-header': { min: 12, target: 12, max: 14 },
+  'showcase-panel': { min: 52, target: 64, max: 72 },
+  'bottom-panel': { min: 52, target: 64, max: 72 },
+  'bottom-dock': { min: 12, target: 12, max: 14 },
+  'floor-peek': { min: 200, target: 220, max: 240 },
 };
 
 /** Écarts entre bandes majeures (grille 2px). */

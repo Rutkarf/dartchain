@@ -6,6 +6,7 @@ import io.dartchain.backend.auth.security.AuthenticatedUser;
 import io.dartchain.backend.auth.security.WebSocketAuthSupport;
 import io.dartchain.backend.model.Block;
 import io.dartchain.backend.peer.PeerMetricsRegistry;
+import io.dartchain.backend.quests.QuestService;
 import io.dartchain.backend.service.BlockchainService;
 import io.dartchain.backend.service.PendingTransactionService;
 import io.dartchain.backend.service.TransactionPoolService;
@@ -46,6 +47,9 @@ class P2pServiceTest {
     @Mock
     private WebSocketAuthSupport webSocketAuthSupport;
 
+    @Mock
+    private QuestService questService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     private PeerMetricsRegistry metricsRegistry;
     private P2pService p2pService;
@@ -60,7 +64,8 @@ class P2pServiceTest {
                 transactionPoolService,
                 sessionRegistry,
                 webSocketAuthSupport,
-                metricsRegistry
+                metricsRegistry,
+                questService
         );
     }
 

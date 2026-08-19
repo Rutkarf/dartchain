@@ -62,6 +62,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/showcase/chat/messages").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/showcase/chat/messages").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/m4t3r/trail-pickup").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

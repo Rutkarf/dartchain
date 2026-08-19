@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { CameraControlService } from '../core/services/camera-control.service';
 import { CharacterControlService } from '../core/services/character-control.service';
 import { ThreeSceneService } from '../core/services/three-scene.service';
+import { WORLD_BACKGROUND_CONFIG } from '../core/map/map-configuration';
 import {
   bindContainerResize,
   type ContainerResizeBinding,
@@ -34,11 +35,8 @@ import { CitySceneComponent } from './city-scene/city-scene.component';
 import { JoystickMoveComponent } from './joystick-move/joystick-move.component';
 import { JoystickViewComponent } from './joystick-view/joystick-view.component';
 
-const FLOOR_HEIGHT_FALLBACK = 140;
+const FLOOR_HEIGHT_FALLBACK = 420;
 const PERF_DEBUG = isPerfDebugEnabled();
-
-/** Noir plein — aligné fond app. */
-const SCENE_BG = 0x000000;
 
 /**
  * Floor Three.js — boucle unique hors NgZone, pixelRatio 1 (même look CSS 100%).
@@ -70,9 +68,6 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private renderer?: THREE.WebGLRenderer;
   private animationId?: number;
 
-  private neonFloor?: THREE.Mesh;
-  private floorTexture?: THREE.CanvasTexture;
-  private pathLine?: THREE.Line;
   private animating = false;
   private visibilityBinding?: { unsubscribe: () => void };
   private resizeBinding?: ContainerResizeBinding;
@@ -87,12 +82,11 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubControl?.();
     this.characterControl.unbindKeys();
+    this.cameraControl.detachOrbit();
     this.threeScene.unregister();
     this.visibilityBinding?.unsubscribe();
     this.resizeBinding?.unsubscribe();
     this.pauseAnimation();
-    this.disposeFloor();
-    this.disposePathLine();
     if (this.renderer) {
       this.renderer.renderLists.dispose();
       this.renderer.dispose();
@@ -115,37 +109,42 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       });
 
       this.scene = new THREE.Scene();
-      // Couleur unie assortie au fond CSS (pas d’alpha canvas = pas de seam CSS/WebGL)
-      this.scene.background = new THREE.Color(SCENE_BG);
-      // Fog lointain uniquement — near > bâtiments proches (évite toits lavés)
-      this.scene.fog = new THREE.Fog(SCENE_BG, 90, 240);
+      this.scene.background = null;
+      this.scene.fog = new THREE.Fog(
+        WORLD_BACKGROUND_CONFIG.fogColor,
+        WORLD_BACKGROUND_CONFIG.fogNear,
+        WORLD_BACKGROUND_CONFIG.fogFar
+      );
 
-      this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 250);
-      this.camera.position.set(0, 2.2, 5);
-      this.camera.lookAt(0, 0.4, -4);
+      this.camera = new THREE.PerspectiveCamera(52, width / height, 0.18, 900);
+      this.camera.position.set(0, 14, 18);
+      this.camera.lookAt(0, 2, -14);
 
-      // Éclairage neutre — sol invert (clair) sur fond noir
-      const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+      const ambient = new THREE.AmbientLight(0xb7c8ff, 0.28);
+      ambient.name = 'floor-night-ambient';
       this.scene.add(ambient);
 
-      const topLight = new THREE.DirectionalLight(0xffffff, 0.7);
+      const topLight = new THREE.DirectionalLight(0xc5d4ff, 0.48);
+      topLight.name = 'floor-moon-key';
       topLight.position.set(2, 10, 4);
       topLight.castShadow = false;
       this.scene.add(topLight);
 
-      const fill = new THREE.DirectionalLight(0xd0d0d0, 0.35);
+      const fill = new THREE.DirectionalLight(0x7aa6ff, 0.22);
+      fill.name = 'floor-urban-fill';
       fill.position.set(-4, 4, -2);
       fill.castShadow = false;
       this.scene.add(fill);
 
-      const accent = new THREE.DirectionalLight(0xa0a0a0, 0.2);
+      const accent = new THREE.DirectionalLight(0xff6ad5, 0.12);
+      accent.name = 'floor-neon-rim';
       accent.position.set(-8, 6, -10);
       accent.castShadow = false;
       this.scene.add(accent);
 
       this.renderer = new THREE.WebGLRenderer({
         canvas,
-        alpha: false,
+        alpha: true,
         antialias: false,
         depth: true,
         stencil: false,
@@ -157,10 +156,10 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       // CSS reste 100% — résolution interne fixe 1× (pas de déformation layout)
       this.renderer.setPixelRatio(1);
       this.renderer.setSize(width, height, false);
-      this.renderer.setClearColor(SCENE_BG, 1);
+      this.renderer.setClearColor(0x000000, 0);
       this.renderer.outputColorSpace = THREE.SRGBColorSpace;
       this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      this.renderer.toneMappingExposure = 1.0;
+      this.renderer.toneMappingExposure = 1.02;
       this.renderer.shadowMap.enabled = false;
       applyCanvasLayerStyles(canvas, 'floor');
 
@@ -176,10 +175,10 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
         console.log('[BACKGROUND] Scene background:', this.scene.background);
       }
 
-      this.createProfessionalFloor();
-      this.createPathLine();
+      // Sol + monde runner : LegacyFloorMapProvider via MapLoadingService (city-scene).
 
       this.threeScene.register(this.scene, this.camera, this.renderer);
+      this.cameraControl.attachOrbit(this.camera, canvas);
       this.cameraControl.resetOrbit();
       this.unsubControl = this.threeScene.registerUpdate((dt) => {
         this.characterControl.update(dt);
@@ -208,134 +207,6 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     } catch (error) {
       console.error('[three-floor] Initialisation impossible.', error);
     }
-  }
-
-  /**
-   * Floor : surface + texture grille dense (maillage + accent soft GridHelper bakés).
-   * Un seul mesh — pas de Lines GridHelper (même look, moins de draw calls).
-   */
-  private createProfessionalFloor(): void {
-    if (!this.scene) return;
-
-    this.floorTexture = this.createDenseGridTexture();
-    this.floorTexture.wrapS = THREE.RepeatWrapping;
-    this.floorTexture.wrapT = THREE.RepeatWrapping;
-    // Maillage serré via repeat élevé
-    this.floorTexture.repeat.set(48, 48);
-    this.floorTexture.anisotropy = 1;
-    this.floorTexture.generateMipmaps = false;
-    this.floorTexture.minFilter = THREE.LinearFilter;
-    this.floorTexture.magFilter = THREE.LinearFilter;
-    this.floorTexture.colorSpace = THREE.SRGBColorSpace;
-
-    // Sol « invert » LCD : base claire, grille sombre (noir↔blanc)
-    const floorMaterial = new THREE.MeshLambertMaterial({
-      color: 0xffffff,
-      map: this.floorTexture,
-      side: THREE.FrontSide,
-      transparent: false,
-      opacity: 1,
-    });
-
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), floorMaterial);
-    floor.name = 'neon-floor';
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = 0;
-    floor.receiveShadow = false;
-    this.neonFloor = floor;
-    this.scene.add(floor);
-
-    if (PERF_DEBUG) {
-      console.log('[PERF] Floor dense texture (grid baked) ready');
-    }
-  }
-
-  /**
-   * Texture grille invert rétro (LCD invert téléphone) :
-   * base claire (ex-noir→blanc), traits sombres (ex-blanc/cyan→noir).
-   */
-  private createDenseGridTexture(): THREE.CanvasTexture {
-    const size = 64;
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = '#f4f4f4';
-    ctx.fillRect(0, 0, size, size);
-    // Maillage serré (8×8) — traits noirs
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.38)';
-    ctx.lineWidth = 1;
-    const step = size / 8;
-    for (let i = 0; i <= 8; i++) {
-      const p = i * step + 0.5;
-      ctx.beginPath();
-      ctx.moveTo(p, 0);
-      ctx.lineTo(p, size);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(0, p);
-      ctx.lineTo(size, p);
-      ctx.stroke();
-    }
-    // Lignes majeures plus marquées
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
-    ctx.beginPath();
-    ctx.moveTo(0.5, 0);
-    ctx.lineTo(0.5, size);
-    ctx.moveTo(0, 0.5);
-    ctx.lineTo(size, 0.5);
-    ctx.stroke();
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
-    ctx.lineWidth = 1.25;
-    ctx.strokeRect(0.5, 0.5, size - 1, size - 1);
-    ctx.strokeStyle = 'rgba(20, 20, 20, 0.5)';
-    ctx.beginPath();
-    ctx.moveTo(size * 0.5 + 0.5, 0);
-    ctx.lineTo(size * 0.5 + 0.5, size);
-    ctx.moveTo(0, size * 0.5 + 0.5);
-    ctx.lineTo(size, size * 0.5 + 0.5);
-    ctx.stroke();
-    return new THREE.CanvasTexture(canvas);
-  }
-
-  private createPathLine(): void {
-    if (!this.scene) return;
-    const geo = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(0, 0.08, 5),
-      new THREE.Vector3(0, 0.08, -40),
-    ]);
-    const pathLine = new THREE.Line(
-      geo,
-      new THREE.LineBasicMaterial({
-        color: 0x111111,
-        transparent: true,
-        opacity: 0.45,
-        depthWrite: false,
-      })
-    );
-    pathLine.name = 'path-line';
-    pathLine.raycast = () => {};
-    this.pathLine = pathLine;
-    this.scene.add(pathLine);
-  }
-
-  private disposePathLine(): void {
-    if (!this.pathLine) return;
-    this.scene?.remove(this.pathLine);
-    this.pathLine.geometry.dispose();
-    (this.pathLine.material as THREE.Material).dispose();
-    this.pathLine = undefined;
-  }
-
-  private disposeFloor(): void {
-    if (this.neonFloor) {
-      this.scene?.remove(this.neonFloor);
-      this.neonFloor.geometry.dispose();
-      (this.neonFloor.material as THREE.Material).dispose();
-      this.neonFloor = undefined;
-    }
-    this.floorTexture?.dispose();
-    this.floorTexture = undefined;
   }
 
   private animate = (): void => {

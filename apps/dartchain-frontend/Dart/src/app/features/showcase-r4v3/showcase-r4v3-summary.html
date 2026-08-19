@@ -8,16 +8,35 @@
   (keydown.enter)="onBarKeydown($event)"
   (keydown.space)="onBarKeydown($event)"
 >
-  <span class="r4v3-summary-bar__status-cluster">
-    <span
-      class="r4v3-summary-bar__led"
-      [class]="systemStatusClass(systemStatus())"
-      aria-hidden="true"
-    ></span>
-    <span class="r4v3-summary-bar__peg" aria-label="1 R4V3 = 1 CHF">
-      <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--token">1 R4V3</span>
-      <span class="r4v3-summary-bar__peg-eq" aria-hidden="true">=</span>
-      <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--fiat">1 CHF</span>
+  <span class="r4v3-summary-bar__peg" aria-label="1 R4V3 = 1 CHF">
+    <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--token">1 R4V3</span>
+    <span class="r4v3-summary-bar__peg-eq" aria-hidden="true">=</span>
+    <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--fiat">1 CHF</span>
+  </span>
+
+  <span
+    class="r4v3-summary-bar__pillar"
+    [attr.title]="pillarLabel() + ' · ' + pillarDetail()"
+    aria-live="polite"
+  >
+    <span class="r4v3-summary-bar__pillar-stack" [class.is-transitioning]="isPillarTransitioning()">
+      @if (isPillarTransitioning() && previousPillarLabel()) {
+        <span class="r4v3-summary-bar__pillar-line r4v3-summary-bar__pillar-line--out">
+          <span class="r4v3-summary-bar__pillar-label">{{ previousPillarLabel() }}</span>
+          @if (previousPillarDetail()) {
+            <span class="r4v3-summary-bar__pillar-sep" aria-hidden="true">·</span>
+            <span class="r4v3-summary-bar__pillar-detail">{{ previousPillarDetail() }}</span>
+          }
+        </span>
+      }
+
+      <span class="r4v3-summary-bar__pillar-line" [class.r4v3-summary-bar__pillar-line--in]="isPillarTransitioning()">
+        <span class="r4v3-summary-bar__pillar-label">{{ pillarLabel() }}</span>
+        @if (pillarDetail()) {
+          <span class="r4v3-summary-bar__pillar-sep" aria-hidden="true">·</span>
+          <span class="r4v3-summary-bar__pillar-detail">{{ pillarDetail() }}</span>
+        }
+      </span>
     </span>
   </span>
 

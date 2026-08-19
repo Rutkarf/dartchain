@@ -7,4 +7,11 @@ export const environment = {
   commercial: true,
   faucetEnabled: true,
   showcaseEnabled: true,
+  mapEnabled: true,
+  mapProvider: 'marseille-osm-three',
+  enableOsmBuildings: true,
+  enableTerrain: true,
+  mapDebug: false,
+  mapQuality: 'medium',
+  opentopographyApiKey: '',
 };

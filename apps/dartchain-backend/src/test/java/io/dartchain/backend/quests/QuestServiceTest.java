@@ -15,6 +15,9 @@ import io.dartchain.backend.showcase.service.MarketChartService;
 import io.dartchain.backend.support.AuthServiceTestSupport;
 import io.dartchain.backend.support.BlockchainTestSupport;
 import io.dartchain.backend.utils.CryptoUtils;
+import io.dartchain.backend.quests.model.QuestProgressState;
+import io.dartchain.backend.quests.model.QuestTaskState;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -35,6 +38,7 @@ class QuestServiceTest {
     private AuthService authService;
     private BlockchainService blockchainService;
     private QuestService questService;
+    private JsonQuestProgressStore questStore;
     private String authHeader;
     private String walletAddress;
     private String userId;
@@ -47,7 +51,7 @@ class QuestServiceTest {
         );
         userStore.loadFromDisk();
 
-        JsonQuestProgressStore questStore = new JsonQuestProgressStore(
+        questStore = new JsonQuestProgressStore(
                 new ObjectMapper(),
                 tempDir.resolve("quest-progress.json").toString()
         );
@@ -68,7 +72,8 @@ class QuestServiceTest {
         );
 
         authService = AuthServiceTestSupport.createJsonAuthService(userStore);
-        questService = new QuestService(authService, questStore, blockchainService);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        questService = new QuestService(authService, questStore, blockchainService, eventPublisher);
         authService = AuthServiceTestSupport.createJsonAuthService(userStore, questService);
 
         authService.register(
@@ -197,7 +202,8 @@ class QuestServiceTest {
                 tempDir.resolve("quest-progress.json").toString()
         );
         reloadedStore.loadFromDisk();
-        QuestService reloadedService = new QuestService(authService, reloadedStore, blockchainService);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        QuestService reloadedService = new QuestService(authService, reloadedStore, blockchainService, eventPublisher);
 
         var state = reloadedService.getState(authHeader);
 
@@ -240,6 +246,31 @@ class QuestServiceTest {
                 .isInstanceOf(QuestException.class)
                 .extracting("statusCode")
                 .isEqualTo(404);
+    }
+
+    @Test
+    void syncQuestProgressForWallet_mergesMaxProgressAndClaimed() {
+        QuestProgressState local = questStore.findByUserId(userId).orElseThrow();
+
+        // Local : swap-tokens partiel (non claim)
+        local.getTasks().put("swap-tokens", new QuestTaskState(3, false));
+        questStore.save(userId, local);
+
+        QuestProgressState incoming = new QuestProgressState();
+        incoming.setDayKey(local.getDayKey());
+        incoming.setWeekKey(local.getWeekKey());
+        incoming.setTotalXp(local.getTotalXp());
+        incoming.setPendingMts(local.getPendingMts());
+        incoming.setMissionClaimed(local.isMissionClaimed());
+        incoming.setWeeklyClaimed(local.isWeeklyClaimed());
+        incoming.setExploredBlockIndices(local.getExploredBlockIndices());
+        incoming.setTasks(java.util.Map.of("swap-tokens", new QuestTaskState(10, true)));
+
+        questService.syncQuestProgressForWallet(walletAddress, incoming);
+
+        var state = questService.getState(authHeader);
+        assertThat(state.tasks().get("swap-tokens").progress()).isEqualTo(10);
+        assertThat(state.tasks().get("swap-tokens").claimed()).isTrue();
     }
 
     @Test

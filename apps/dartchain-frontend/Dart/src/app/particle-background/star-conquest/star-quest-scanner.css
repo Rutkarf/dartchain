@@ -40,6 +40,15 @@
   color: rgba(170, 190, 210, 0.9);
 }
 
+.sc-scanner__network {
+  font-size: 8px;
+  letter-spacing: 0.02em;
+  color: rgba(170, 255, 220, 0.9);
+  text-align: right;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
 .sc-scanner__close {
   width: 18px;
   height: 18px;

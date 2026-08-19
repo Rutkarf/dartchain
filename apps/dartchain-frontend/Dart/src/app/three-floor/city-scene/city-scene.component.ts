@@ -6,13 +6,12 @@ import {
   inject,
 } from '@angular/core';
 import { Subscription, filter, take } from 'rxjs';
-import { RunnerWorldService } from '../../core/services/runner/runner-world.service';
+import { MapLoadingService } from '../../core/map/map-loading.service';
 import { CharacterControlService } from '../../core/services/character-control.service';
 import { ThreeSceneService } from '../../core/services/three-scene.service';
 
 /**
- * Bootstrap monde endless runner (segments courbés + bâtiments latéraux).
- * Remplace l’ancienne ville fixe en arc.
+ * Bootstrap du monde 3D (legacy floor ou Marseille OSM selon configuration).
  */
 @Component({
   selector: 'app-city-scene',
@@ -22,7 +21,7 @@ import { ThreeSceneService } from '../../core/services/three-scene.service';
   styleUrl: './city-scene.component.css',
 })
 export class CitySceneComponent implements AfterViewInit, OnDestroy {
-  private readonly runnerWorld = inject(RunnerWorldService);
+  private readonly mapLoading = inject(MapLoadingService);
   private readonly characterControl = inject(CharacterControlService);
   private readonly threeScene = inject(ThreeSceneService);
   private sub?: Subscription;
@@ -34,23 +33,27 @@ export class CitySceneComponent implements AfterViewInit, OnDestroy {
         filter((ready) => ready),
         take(1)
       )
-      .subscribe(() => this.bootstrap());
+      .subscribe(() => {
+        void this.bootstrap();
+      });
 
     if (this.threeScene.isReady()) {
-      this.bootstrap();
+      void this.bootstrap();
     }
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
-    this.runnerWorld.dispose(this.threeScene.getScene() ?? undefined);
+    this.mapLoading.dispose();
   }
 
-  private bootstrap(): void {
+  private async bootstrap(): Promise<void> {
     if (this.created) return;
     const scene = this.threeScene.getScene();
-    if (!scene) return;
-    this.runnerWorld.start(scene);
+    const camera = this.threeScene.getCamera();
+    if (!scene || !camera) return;
+
+    await this.mapLoading.initialize(scene, camera);
     this.characterControl.resetRunner();
     this.created = true;
   }

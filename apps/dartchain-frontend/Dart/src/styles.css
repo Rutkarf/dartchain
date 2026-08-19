@@ -446,6 +446,48 @@ body {
   box-shadow: none !important;
 }
 
+/* Showcase + dock: shells and tabs stay square */
+.app-hub-showcase-block,
+.app-hub-showcase-block .showcase-block__shell,
+.app-hub-showcase-block .showcase-block__shell.ds-surface.ds-surface--card,
+.app-showcase-band,
+.app-showcase-band__window,
+.showcase-window,
+.showcase-window__body,
+.showcase-tab-panel,
+.showcase-tab-panel.ds-surface.ds-surface--card,
+.app-dock-stack,
+.app-dock-band,
+.app-dock-band app-dock-panel,
+.app-bottom-stack,
+.app-bottom-stack .showcase-block__shell,
+.app-bottom-stack .showcase-block__shell.ds-surface.ds-surface--card,
+.showcase-tabs,
+.app-bottom-stack__tabs,
+.showcase-tab,
+.showcase-tab.ds-surface.ds-surface--showcase-tab,
+.app-bottom-stack .showcase-tab,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab {
+  border-radius: 0 !important;
+}
+
+/* TOUS collapsed: same text sizing as dock collapsed, stronger override */
+app-showcase-news-summary .news-summary-bar,
+app-showcase-news-summary .news-summary-bar__headline-wrap {
+  overflow: hidden !important;
+}
+
+app-showcase-news-summary .news-summary-bar__headline {
+  font-size: clamp(0.375rem, 2.35vw, 0.5625rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+}
+
+app-showcase-news-summary .news-summary-bar__age {
+  font-size: clamp(0.3375rem, 2vw, 0.4375rem) !important;
+  font-weight: 600 !important;
+}
+
 .app-bottom-stack .dock-view,
 .app-bottom-stack .pending-view {
   background: transparent;

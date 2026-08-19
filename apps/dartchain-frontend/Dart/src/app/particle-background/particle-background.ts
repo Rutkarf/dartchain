@@ -179,9 +179,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.scene.add(this.world.root);
       this.conquest = new StarConquestGraph(this.quests);
       this.world.attachContent(this.conquest.group);
-      this.joystick = new StarConquestJoystick();
-      this.scene.add(this.joystick.group);
-      this.joyBridge.register(this.joystick);
       this.relayoutBackground();
       requestAnimationFrame(() => {
         this.relayoutBackground();
@@ -332,11 +329,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   /** Joystick / occlusion / panel — suit l’UI sans bouger la constellation. */
   private syncUiChrome(): void {
     if (!this.camera) return;
-    const floorPeek =
-      parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
-      ) || 64;
-    this.joystick?.layoutInGapAboveFloor(this.camera, floorPeek);
     this.refreshOcclusion();
     this.syncPanelAnchor();
     this.renderFrame();

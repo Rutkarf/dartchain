@@ -2,7 +2,7 @@
 set -euo pipefail
 
 CONTAINER_NAME="dartchain-postgres"
-IMAGE="postgres:16"
+IMAGE="docker.io/library/postgres:16"
 DB_NAME="dartchain"
 DB_USER="dartchain"
 DB_PASSWORD="dartchain"

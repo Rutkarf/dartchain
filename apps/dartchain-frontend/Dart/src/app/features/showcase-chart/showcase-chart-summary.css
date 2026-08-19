@@ -19,12 +19,12 @@
   min-width: 0;
   height: 100%;
   /* Pas de padding vertical — la hauteur vient de la smart-bar */
-  padding: 0 0 0 clamp(2px, 1vw, 4px);
+  padding: 0 0 0 clamp(1px, 0.5vw, 2px);
   box-sizing: border-box;
 }
 
 .chart-summary-bar__actions {
-  --cba-h: var(--panel-action-menu-h, 12px);
+  --cba-h: var(--panel-action-menu-h, 7px);
   --cba-item-w: var(--panel-action-item-w, 14px);
   grid-column: 5;
   position: relative;
@@ -34,9 +34,9 @@
   width: var(--panel-action-menu-w, 34px);
   min-width: var(--panel-action-menu-w, 34px);
   max-width: var(--panel-action-menu-w, 34px);
-  height: var(--panel-action-menu-h, 12px);
-  min-height: var(--panel-action-menu-h, 12px);
-  max-height: var(--panel-action-menu-h, 12px);
+  height: var(--panel-action-menu-h, 7px);
+  min-height: var(--panel-action-menu-h, 7px);
+  max-height: var(--panel-action-menu-h, 7px);
   margin: 0;
   pointer-events: auto;
 }
@@ -115,8 +115,9 @@
   display: flex;
   align-items: stretch;
   min-width: 0;
-  height: clamp(12px, 4.2vw, 16px);
-  min-height: clamp(12px, 4.2vw, 16px);
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
   border-radius: 3px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.22);
@@ -228,8 +229,8 @@
 
   .chart-summary-bar__actions {
     grid-column: 5;
-    height: var(--panel-action-menu-h, 12px);
-    max-height: var(--panel-action-menu-h, 12px);
+    height: var(--panel-action-menu-h, 7px);
+    max-height: var(--panel-action-menu-h, 7px);
   }
 }
 

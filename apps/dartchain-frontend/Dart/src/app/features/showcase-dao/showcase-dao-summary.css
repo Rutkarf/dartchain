@@ -6,6 +6,7 @@
   height: 100%;
   max-height: 100%;
   overflow: visible;
+  container-type: inline-size;
 }
 
 .dao-summary-bar {
@@ -17,7 +18,7 @@
   min-width: 0;
   height: 100%;
   max-height: 100%;
-  padding: 0 2px 0 4px;
+  padding: 0 1px 0 2px;
   box-sizing: border-box;
   overflow: hidden;
   line-height: 1;
@@ -35,7 +36,7 @@
 
 .dao-summary-main--dynamic {
   flex: 0 0 auto;
-  max-width: none;
+  max-width: 42%;
 }
 
 .dao-summary-status {
@@ -43,7 +44,7 @@
   align-items: center;
   flex: 0 1 auto;
   min-width: 0;
-  height: 10px;
+  height: 8px;
   padding: 0 2px;
   border-radius: 999px;
   font-family: var(--font-display);
@@ -183,6 +184,21 @@
   line-height: 1;
 }
 
+.dao-summary-ticker__summary {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  height: 100%;
+  font-size: clamp(0.3375rem, 2vw, 0.4375rem);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.52);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+}
+
 .dao-summary-ticker__access {
   display: inline-flex;
   align-items: center;
@@ -236,6 +252,50 @@
   color: var(--text-muted, rgba(255, 255, 255, 0.5));
 }
 
+@container (max-width: 325px) {
+  .dao-summary-bar {
+    column-gap: 4px;
+  }
+
+  .dao-summary-main--dynamic {
+    max-width: 36%;
+  }
+
+  .dao-summary-ticker__slide {
+    gap: 2px;
+  }
+}
+
+@container (max-width: 280px) {
+  .dao-summary-meta {
+    display: none;
+  }
+
+  .dao-summary-bar {
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  }
+}
+
+@container (max-width: 235px) {
+  .dao-summary-main {
+    display: none;
+  }
+
+  .dao-summary-bar {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: 2px;
+  }
+
+  .dao-summary-ticker {
+    grid-column: 1;
+  }
+
+  .dao-summary-ticker__stats,
+  .dao-summary-ticker__summary {
+    display: none;
+  }
+}
+
 .dao-summary-actions {
   grid-column: 4;
   display: flex;
@@ -253,8 +313,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 12px;
+  width: 12px;
+  height: 100%;
+  max-height: 100%;
   margin: 0;
   padding: 0;
   border: none;

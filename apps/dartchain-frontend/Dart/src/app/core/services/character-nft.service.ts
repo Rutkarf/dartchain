@@ -38,7 +38,9 @@ interface SkeletonWalkBones {
   leftForeArm: THREE.Object3D | null;
   rightForeArm: THREE.Object3D | null;
   hips: THREE.Object3D | null;
-  /** Pose « bras le long du corps » (plus T-pose). */
+  spine: THREE.Object3D | null;
+  armSwingAxis: 'x' | 'y' | 'z';
+  /** Pose « bras en avant du corps » + dandinement. */
   hang: {
     leftArm: THREE.Euler;
     rightArm: THREE.Euler;
@@ -47,6 +49,7 @@ interface SkeletonWalkBones {
     leftForeArm: THREE.Euler | null;
     rightForeArm: THREE.Euler | null;
     hips: THREE.Euler | null;
+    spine: THREE.Euler | null;
   };
 }
 
@@ -60,12 +63,17 @@ export const FLOOR_Y = 0;
 export const CHARACTER_MOVE_SPEED = 1.6;
 export const CHARACTER_RADIUS = 0.65;
 
-const WALK_SPEED = 9;
-const ARM_SWING = Math.PI / 4;
-const LEG_SWING = Math.PI / 6;
+const WALK_SPEED = 6.4;
+const ARM_SWING = 0.32;
+const LEG_SWING = Math.PI / 5;
 /** Abaisse les bras depuis la T-pose Mixamo (perpendiculaires → le long du corps). */
 const ARM_HANG_Z = Math.PI * 0.5;
-const FOREARM_HANG_X = Math.PI * 0.12;
+/** Avance les bras devant le torse (~40°). */
+const ARM_FORWARD = 0.72;
+const FOREARM_HANG_X = Math.PI * 0.38;
+const WADDLE_ROLL = 0.24;
+const WADDLE_YAW = 0.18;
+const WADDLE_BOUNCE = 0.07;
 const IDLE_LERP = 6;
 
 const WALK_NAME_RE = /walk|run|locomotion|move|marche/i;
@@ -78,6 +86,7 @@ const RIGHT_FOREARM_RE = /RightForeArm|rightforearm|lowerarm_r|ForeArm\.R/i;
 const LEFT_LEG_RE = /LeftUpLeg|leftupleg|LeftThigh|thigh_l|UpperLeg\.L|LeftLeg(?!acy)/i;
 const RIGHT_LEG_RE = /RightUpLeg|rightupleg|RightThigh|thigh_r|UpperLeg\.R|RightLeg(?!acy)/i;
 const HIPS_RE = /Hips|pelvis|Hip/i;
+const SPINE_RE = /Spine(?!1|2|3)|spine(?!1|2|3)/i;
 
 function emptyState(userId = ''): CharacterState {
   return {
@@ -167,6 +176,8 @@ export class CharacterNftService {
 
     const root = this.wrapPlanted(visual);
     root.name = `character-nft:${userId}`;
+    root.frustumCulled = false;
+    root.visible = true;
     const spawn = emptyState(userId).position.clone();
     root.position.copy(spawn);
     root.rotation.y = emptyState().rotation;
@@ -332,6 +343,7 @@ export class CharacterNftService {
       leftForeArm: null as THREE.Object3D | null,
       rightForeArm: null as THREE.Object3D | null,
       hips: null as THREE.Object3D | null,
+      spine: null as THREE.Object3D | null,
     };
 
     const boneList: THREE.Object3D[] = [];
@@ -364,6 +376,9 @@ export class CharacterNftService {
       }
       if (!found.hips && HIPS_RE.test(n) && !/Spine/i.test(n)) {
         found.hips = obj;
+      }
+      if (!found.spine && SPINE_RE.test(n) && !/Shoulder|Chest|Head/i.test(n)) {
+        found.spine = obj;
       }
     });
 
@@ -402,26 +417,22 @@ export class CharacterNftService {
     const foreL = found.leftForeArm;
     const foreR = found.rightForeArm;
     const hipsBone = found.hips;
+    const spineBone = found.spine;
 
-    // Bind = souvent T-pose : on construit une pose « bras baissés » + swing
+    // Bind = souvent T-pose : bras baissés, puis avancés devant le torse.
+    const hangSign = this.detectArmHangSign(armL, armR, hipsBone);
+    armL.rotation.z += hangSign.left * ARM_HANG_Z;
+    armR.rotation.z += hangSign.right * ARM_HANG_Z;
+    const armSwingAxis = this.poseArmsForward(armL, armR, hipsBone, root);
+    if (foreL) foreL.rotation.x += FOREARM_HANG_X;
+    if (foreR) foreR.rotation.x += FOREARM_HANG_X;
+
     const hangL = cloneEuler(armL.rotation);
     const hangR = cloneEuler(armR.rotation);
-    const hangSign = this.detectArmHangSign(armL, armR, hipsBone);
-    hangL.z += hangSign.left * ARM_HANG_Z;
-    hangR.z += hangSign.right * ARM_HANG_Z;
-
     const hangForeL = foreL ? cloneEuler(foreL.rotation) : null;
-    if (hangForeL) hangForeL.x += FOREARM_HANG_X;
     const hangForeR = foreR ? cloneEuler(foreR.rotation) : null;
-    if (hangForeR) hangForeR.x += FOREARM_HANG_X;
 
-    // Applique tout de suite la pose baissée (plus de T-pose visible)
-    armL.rotation.copy(hangL);
-    armR.rotation.copy(hangR);
-    if (foreL && hangForeL) foreL.rotation.copy(hangForeL);
-    if (foreR && hangForeR) foreR.rotation.copy(hangForeR);
-
-    console.info('[CharacterNftService] Os marche liés (bras baissés)', {
+    console.info('[CharacterNftService] Os marche liés (bras en avant, dandinement)', {
       leftArm: armL.name,
       rightArm: armR.name,
       leftForeArm: foreL?.name ?? null,
@@ -429,6 +440,8 @@ export class CharacterNftService {
       leftLeg: legL.name,
       rightLeg: legR.name,
       hips: hipsBone?.name ?? null,
+      spine: spineBone?.name ?? null,
+      armSwingAxis,
     });
 
     return {
@@ -439,6 +452,8 @@ export class CharacterNftService {
       leftForeArm: foreL,
       rightForeArm: foreR,
       hips: hipsBone,
+      spine: spineBone,
+      armSwingAxis,
       hang: {
         leftArm: hangL,
         rightArm: hangR,
@@ -447,6 +462,7 @@ export class CharacterNftService {
         leftForeArm: hangForeL,
         rightForeArm: hangForeR,
         hips: hipsBone ? cloneEuler(hipsBone.rotation) : null,
+        spine: spineBone ? cloneEuler(spineBone.rotation) : null,
       },
     };
   }
@@ -455,28 +471,22 @@ export class CharacterNftService {
     const sk = this.skeletonWalk;
     if (!sk) return;
 
-    const armSwing = ARM_SWING * THREE.MathUtils.lerp(0.5, 1, speedNorm);
-    const legSwing = LEG_SWING * THREE.MathUtils.lerp(0.45, 1, speedNorm);
-    const elbow = 0.35 * speedNorm;
+    const axis = sk.armSwingAxis;
+    const armSwing = ARM_SWING * THREE.MathUtils.lerp(0.65, 1, speedNorm);
+    const legSwing = LEG_SWING * THREE.MathUtils.lerp(0.55, 1, speedNorm);
+    const elbow = 0.42 * speedNorm;
+    const waddle = THREE.MathUtils.lerp(0.55, 1, speedNorm);
 
     if (isWalking) {
-      this.walkTime += dt * WALK_SPEED * THREE.MathUtils.lerp(0.7, 1.25, speedNorm);
+      this.walkTime += dt * WALK_SPEED * THREE.MathUtils.lerp(0.75, 1.2, speedNorm);
       const phase = Math.sin(this.walkTime);
       const opposite = -phase;
+      const bounce = Math.abs(Math.sin(this.walkTime * 2));
 
-      // Bras le long du corps (Z fixe) + balancement avant/arrière (X)
-      sk.leftArm.rotation.set(
-        sk.hang.leftArm.x + phase * armSwing,
-        sk.hang.leftArm.y,
-        sk.hang.leftArm.z,
-        sk.hang.leftArm.order
-      );
-      sk.rightArm.rotation.set(
-        sk.hang.rightArm.x + opposite * armSwing,
-        sk.hang.rightArm.y,
-        sk.hang.rightArm.z,
-        sk.hang.rightArm.order
-      );
+      sk.leftArm.rotation.copy(sk.hang.leftArm);
+      sk.rightArm.rotation.copy(sk.hang.rightArm);
+      sk.leftArm.rotation[axis] += phase * armSwing;
+      sk.rightArm.rotation[axis] += opposite * armSwing;
 
       if (sk.leftForeArm && sk.hang.leftForeArm) {
         sk.leftForeArm.rotation.set(
@@ -497,12 +507,32 @@ export class CharacterNftService {
 
       sk.leftLeg.rotation.x = sk.hang.leftLeg.x + opposite * legSwing;
       sk.rightLeg.rotation.x = sk.hang.rightLeg.x + phase * legSwing;
+      sk.leftLeg.rotation.z = sk.hang.leftLeg.z + Math.max(0, phase) * 0.1 * waddle;
+      sk.rightLeg.rotation.z = sk.hang.rightLeg.z - Math.max(0, opposite) * 0.1 * waddle;
 
       if (sk.hips && sk.hang.hips) {
-        sk.hips.rotation.y = sk.hang.hips.y + phase * 0.06 * speedNorm;
+        sk.hips.rotation.set(
+          sk.hang.hips.x + bounce * 0.08 * waddle,
+          sk.hang.hips.y + phase * WADDLE_YAW * waddle,
+          sk.hang.hips.z + phase * WADDLE_ROLL * waddle,
+          sk.hang.hips.order
+        );
+      }
+      if (sk.spine && sk.hang.spine) {
+        sk.spine.rotation.set(
+          sk.hang.spine.x - bounce * 0.04 * waddle,
+          sk.hang.spine.y - phase * WADDLE_YAW * 0.75 * waddle,
+          sk.hang.spine.z - phase * WADDLE_ROLL * 0.55 * waddle,
+          sk.hang.spine.order
+        );
+      }
+      if (this.visual) {
+        this.visual.position.y = this.plantY + bounce * WADDLE_BOUNCE * waddle;
       }
     } else {
       const k = Math.min(1, IDLE_LERP * dt);
+      this.walkTime += dt * 1.4;
+      const idleSway = Math.sin(this.walkTime) * 0.035;
       this.lerpEuler(sk.leftArm.rotation, sk.hang.leftArm, k);
       this.lerpEuler(sk.rightArm.rotation, sk.hang.rightArm, k);
       if (sk.leftForeArm && sk.hang.leftForeArm) {
@@ -513,10 +543,75 @@ export class CharacterNftService {
       }
       sk.leftLeg.rotation.x += (sk.hang.leftLeg.x - sk.leftLeg.rotation.x) * k;
       sk.rightLeg.rotation.x += (sk.hang.rightLeg.x - sk.rightLeg.rotation.x) * k;
+      sk.leftLeg.rotation.z += (sk.hang.leftLeg.z - sk.leftLeg.rotation.z) * k;
+      sk.rightLeg.rotation.z += (sk.hang.rightLeg.z - sk.rightLeg.rotation.z) * k;
       if (sk.hips && sk.hang.hips) {
+        sk.hips.rotation.x += (sk.hang.hips.x - sk.hips.rotation.x) * k;
         sk.hips.rotation.y += (sk.hang.hips.y - sk.hips.rotation.y) * k;
+        sk.hips.rotation.z += (sk.hang.hips.z + idleSway - sk.hips.rotation.z) * k;
+      }
+      if (sk.spine && sk.hang.spine) {
+        this.lerpEuler(sk.spine.rotation, sk.hang.spine, k);
+      }
+      if (this.visual) {
+        this.visual.position.y += (this.plantY - this.visual.position.y) * k;
       }
     }
+  }
+
+  /**
+   * Choisit l’axe local qui avance les mains devant le torse, puis applique ARM_FORWARD.
+   */
+  private poseArmsForward(
+    leftArm: THREE.Object3D,
+    rightArm: THREE.Object3D,
+    hips: THREE.Object3D | null,
+    visual: THREE.Object3D
+  ): 'x' | 'y' | 'z' {
+    const forward = new THREE.Vector3();
+    visual.getWorldDirection(forward);
+    const origin = new THREE.Vector3();
+    (hips ?? visual).getWorldPosition(origin);
+    const tip = new THREE.Vector3();
+    const pickAxis = (arm: THREE.Object3D): { axis: 'x' | 'y' | 'z'; sign: number } => {
+      const base = cloneEuler(arm.rotation);
+      let bestAxis: 'x' | 'y' | 'z' = 'x';
+      let bestSign = -1;
+      let best = Number.NEGATIVE_INFINITY;
+      for (const axis of ['x', 'y', 'z'] as const) {
+        for (const sign of [-1, 1]) {
+          arm.rotation.copy(base);
+          arm.rotation[axis] += sign * ARM_FORWARD;
+          arm.updateMatrixWorld(true);
+          this.readArmTip(arm, tip);
+          const score =
+            (tip.x - origin.x) * forward.x +
+            (tip.y - origin.y) * forward.y +
+            (tip.z - origin.z) * forward.z;
+          if (score > best) {
+            best = score;
+            bestAxis = axis;
+            bestSign = sign;
+          }
+        }
+      }
+      arm.rotation.copy(base);
+      arm.rotation[bestAxis] += bestSign * ARM_FORWARD;
+      arm.updateMatrixWorld(true);
+      return { axis: bestAxis, sign: bestSign };
+    };
+    const left = pickAxis(leftArm);
+    pickAxis(rightArm);
+    return left.axis;
+  }
+
+  private readArmTip(arm: THREE.Object3D, target: THREE.Vector3): THREE.Vector3 {
+    const child = arm.children.find((node) => (node as THREE.Bone).isBone) ?? arm.children[0];
+    if (child) {
+      child.getWorldPosition(target);
+      return target;
+    }
+    return target.setFromMatrixPosition(arm.matrixWorld);
   }
 
   private lerpEuler(current: THREE.Euler, target: THREE.Euler, k: number): void {
@@ -566,30 +661,32 @@ export class CharacterNftService {
     const rig = this.walkRig;
     if (!rig) return;
 
-    const armSwing = ARM_SWING * speedNorm;
-    const legSwing = LEG_SWING * speedNorm;
+    const armSwing = ARM_SWING * THREE.MathUtils.lerp(0.7, 1, speedNorm);
+    const legSwing = LEG_SWING * THREE.MathUtils.lerp(0.55, 1, speedNorm);
 
     if (isWalking) {
-      this.walkTime += dt * WALK_SPEED * THREE.MathUtils.lerp(0.65, 1.15, speedNorm);
+      this.walkTime += dt * WALK_SPEED * THREE.MathUtils.lerp(0.7, 1.15, speedNorm);
       const phase = Math.sin(this.walkTime);
       const opposite = -phase;
-      rig.leftArm.rotation.x = phase * armSwing;
-      rig.rightArm.rotation.x = opposite * armSwing;
+      const bounce = Math.abs(Math.sin(this.walkTime * 2));
+      rig.leftArm.rotation.x = 0.7 + phase * armSwing;
+      rig.rightArm.rotation.x = 0.7 + opposite * armSwing;
       rig.leftLeg.rotation.x = opposite * legSwing;
       rig.rightLeg.rotation.x = phase * legSwing;
 
-      const bodyBob = Math.abs(Math.sin(this.walkTime * 2)) * 0.025 * speedNorm;
-      rig.torso.position.y = rig.torsoBaseY + bodyBob;
+      rig.torso.position.y = rig.torsoBaseY + bounce * 0.06 * speedNorm;
       rig.head.position.y = rig.headBaseY;
-      rig.torso.rotation.y = phase * 0.08 * speedNorm;
+      rig.torso.rotation.y = phase * WADDLE_YAW * speedNorm;
+      rig.torso.rotation.z = phase * WADDLE_ROLL * speedNorm;
     } else {
       const k = Math.min(1, IDLE_LERP * dt);
-      rig.leftArm.rotation.x += (0 - rig.leftArm.rotation.x) * k;
-      rig.rightArm.rotation.x += (0 - rig.rightArm.rotation.x) * k;
+      rig.leftArm.rotation.x += (0.7 - rig.leftArm.rotation.x) * k;
+      rig.rightArm.rotation.x += (0.7 - rig.rightArm.rotation.x) * k;
       rig.leftLeg.rotation.x += (0 - rig.leftLeg.rotation.x) * k;
       rig.rightLeg.rotation.x += (0 - rig.rightLeg.rotation.x) * k;
       rig.torso.position.y += (rig.torsoBaseY - rig.torso.position.y) * k;
       rig.torso.rotation.y += (0 - rig.torso.rotation.y) * k;
+      rig.torso.rotation.z += (0 - rig.torso.rotation.z) * k;
     }
   }
 
@@ -629,6 +726,7 @@ export class CharacterNftService {
     const leftArm = new THREE.Group();
     leftArm.position.set(-0.55, 0.45, 0);
     leftArm.rotation.z = THREE.MathUtils.degToRad(4);
+    leftArm.rotation.x = 0.7;
     const leftArmMesh = new THREE.Mesh(armGeo, bodyMat);
     leftArmMesh.position.y = -0.35;
     leftArm.add(leftArmMesh);
@@ -637,6 +735,7 @@ export class CharacterNftService {
     const rightArm = new THREE.Group();
     rightArm.position.set(0.55, 0.45, 0);
     rightArm.rotation.z = THREE.MathUtils.degToRad(-4);
+    rightArm.rotation.x = 0.7;
     const rightArmMesh = new THREE.Mesh(armGeo, bodyMat);
     rightArmMesh.position.y = -0.35;
     rightArm.add(rightArmMesh);
@@ -798,7 +897,7 @@ export class CharacterNftService {
         child.visible = true;
         child.castShadow = false;
         child.receiveShadow = false;
-        child.frustumCulled = true;
+        child.frustumCulled = false;
         const old = child.material;
         child.material = this.fbxBodyMat!;
         // Dispose anciens mats FBX (lourds / textures) — pas le shared

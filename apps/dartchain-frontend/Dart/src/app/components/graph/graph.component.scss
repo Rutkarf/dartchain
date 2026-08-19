@@ -17,9 +17,9 @@
 
 /* Replié : aucun padding/margin vertical sur le conteneur global */
 :host(.is-chart-collapsed) {
-  height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 22px));
-  min-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 22px));
-  max-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 22px));
+  height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px));
+  min-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px));
+  max-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px));
   margin-top: 0;
   margin-bottom: 0;
   padding-top: 0;

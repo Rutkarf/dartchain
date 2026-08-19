@@ -9,6 +9,7 @@ import io.dartchain.backend.quests.model.QuestProgressState;
 import io.dartchain.backend.quests.model.QuestTaskState;
 import io.dartchain.backend.quests.store.QuestProgressStore;
 import io.dartchain.backend.service.BlockchainService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,15 +29,18 @@ public class QuestService {
     private final AuthService authService;
     private final QuestProgressStore questProgressStore;
     private final BlockchainService blockchainService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public QuestService(
             AuthService authService,
             QuestProgressStore questProgressStore,
-            BlockchainService blockchainService
+            BlockchainService blockchainService,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.authService = authService;
         this.questProgressStore = questProgressStore;
         this.blockchainService = blockchainService;
+        this.eventPublisher = eventPublisher;
     }
 
     public QuestProgressResponse getState(String authorizationHeader) {
@@ -90,7 +94,7 @@ public class QuestService {
             tryAutoClaimTask(account, state, definition, task);
         }
 
-        questProgressStore.save(account.getId(), state);
+        saveAndPublish(account, state);
         return QuestProgressResponse.from(state);
     }
 
@@ -141,7 +145,7 @@ public class QuestService {
             }
 
             if (changed) {
-                questProgressStore.save(userId, state);
+                saveAndPublish(account, state);
             }
         });
     }
@@ -205,7 +209,7 @@ public class QuestService {
         state.setPendingMts(state.getPendingMts().add(definition.rewardMts()));
         state.setTotalXp(state.getTotalXp() + definition.rewardXp());
 
-        questProgressStore.save(account.getId(), state);
+        saveAndPublish(account, state);
         return QuestProgressResponse.from(state);
     }
 
@@ -226,7 +230,7 @@ public class QuestService {
         state.setPendingMts(state.getPendingMts().add(QuestCatalog.MISSION_REWARD_MTS));
         state.setTotalXp(state.getTotalXp() + QuestCatalog.MISSION_REWARD_XP);
 
-        questProgressStore.save(account.getId(), state);
+        saveAndPublish(account, state);
         return QuestProgressResponse.from(state);
     }
 
@@ -246,7 +250,7 @@ public class QuestService {
         mintQuestReward(account, QuestCatalog.WEEKLY_REWARD_MTS, "QUEST_WEEKLY");
         state.setPendingMts(state.getPendingMts().add(QuestCatalog.WEEKLY_REWARD_MTS));
 
-        questProgressStore.save(account.getId(), state);
+        saveAndPublish(account, state);
         return QuestProgressResponse.from(state);
     }
 
@@ -276,7 +280,7 @@ public class QuestService {
             tryAutoClaimTask(account, state, definition, task);
         }
 
-        questProgressStore.save(account.getId(), state);
+        saveAndPublish(account, state);
         return state;
     }
 
@@ -302,12 +306,12 @@ public class QuestService {
         }
 
         if (task.isClaimed() || task.getProgress() < definition.target()) {
-            questProgressStore.save(account.getId(), state);
+            saveAndPublish(account, state);
             return;
         }
 
         completeServerHookedTaskWithoutMint(account, state, definition, task);
-        questProgressStore.save(account.getId(), state);
+        saveAndPublish(account, state);
     }
 
     private void tryAutoClaimTask(
@@ -375,6 +379,90 @@ public class QuestService {
         }
 
         return state;
+    }
+
+    /**
+     * Synchronise la progression quests entre nœuds P2P.
+     *
+     * On fusionne uniquement l'état off-chain (pas de mint on-chain) pour éviter les doubles crédits.
+     */
+    public void syncQuestProgressForWallet(String walletAddress, QuestProgressState incomingState) {
+        if (walletAddress == null || walletAddress.isBlank() || incomingState == null) {
+            return;
+        }
+
+        authService.findAccountByWalletAddress(walletAddress).ifPresent(account -> {
+            QuestProgressState local = loadNormalizedState(account.getId());
+
+            // totalXp / pendingMts sont cumulatives : on prend le max sans condition.
+            if (incomingState.getTotalXp() > local.getTotalXp()) {
+                local.setTotalXp(incomingState.getTotalXp());
+            }
+            if (incomingState.getPendingMts() != null && incomingState.getPendingMts().compareTo(local.getPendingMts()) > 0) {
+                local.setPendingMts(incomingState.getPendingMts());
+            }
+
+            boolean dayMatches = incomingState.getDayKey() != null && incomingState.getDayKey().equals(local.getDayKey());
+            boolean weekMatches = incomingState.getWeekKey() != null && incomingState.getWeekKey().equals(local.getWeekKey());
+
+            if (dayMatches) {
+                local.setMissionClaimed(local.isMissionClaimed() || incomingState.isMissionClaimed());
+
+                if (incomingState.getTasks() != null) {
+                    for (QuestCatalog.DailyQuestDefinition definition : QuestCatalog.DAILY_QUESTS) {
+                        QuestTaskState remoteTask = incomingState.getTasks().get(definition.id());
+                        if (remoteTask == null) continue;
+
+                        QuestTaskState localTask = local.getTasks().get(definition.id());
+                        if (localTask == null) {
+                            localTask = new QuestTaskState(0, false);
+                            local.getTasks().put(definition.id(), localTask);
+                        }
+
+                        if (remoteTask.getProgress() > localTask.getProgress()) {
+                            localTask.setProgress(Math.min(definition.target(), remoteTask.getProgress()));
+                        }
+
+                        if (remoteTask.isClaimed()) {
+                            localTask.setClaimed(true);
+                            localTask.setProgress(Math.max(localTask.getProgress(), definition.target()));
+                        }
+                    }
+                }
+
+                // exploredBlockIndices = union (sans doublons)
+                if (incomingState.getExploredBlockIndices() != null) {
+                    java.util.LinkedHashSet<Integer> union = new java.util.LinkedHashSet<>(local.getExploredBlockIndices());
+                    for (Integer idx : incomingState.getExploredBlockIndices()) {
+                        if (idx == null) continue;
+                        union.add(idx);
+                    }
+                    local.setExploredBlockIndices(new java.util.ArrayList<>(union));
+                }
+            }
+
+            if (weekMatches && incomingState.isWeeklyClaimed()) {
+                local.setWeeklyClaimed(true);
+            }
+
+            questProgressStore.save(account.getId(), local);
+        });
+    }
+
+    private void saveAndPublish(UserAccount account, QuestProgressState state) {
+        if (account == null || state == null) {
+            return;
+        }
+
+        questProgressStore.save(account.getId(), state);
+
+        String walletAddress = account.getWalletAddress();
+        if (walletAddress == null || walletAddress.isBlank()) {
+            return;
+        }
+
+        // Important : pas de clone deep (state n'est plus modifié dans le scope immédiat).
+        eventPublisher.publishEvent(new QuestProgressP2pChangedEvent(walletAddress, state));
     }
 
     private QuestProgressState createDefaultState(String dayKey, String weekKey) {

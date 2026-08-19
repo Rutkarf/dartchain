@@ -21,6 +21,7 @@ import io.dartchain.backend.utils.CryptoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
@@ -114,7 +115,8 @@ class AuthWalletFaucetIntegrationTest {
                 tempDir.resolve("quest-progress-faucet-amount.json").toString()
         );
         questStore.loadFromDisk();
-        QuestService questService = new QuestService(authService, questStore, blockchainService);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        QuestService questService = new QuestService(authService, questStore, blockchainService, eventPublisher);
         authService = AuthServiceTestSupport.createJsonAuthService(userStore, questService);
         faucetService = new FaucetServiceImpl(
                 faucetConfig,
@@ -156,7 +158,8 @@ class AuthWalletFaucetIntegrationTest {
                 tempDir.resolve("quest-progress-faucet.json").toString()
         );
         questStore.loadFromDisk();
-        QuestService questService = new QuestService(authService, questStore, blockchainService);
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        QuestService questService = new QuestService(authService, questStore, blockchainService, eventPublisher);
         authService = AuthServiceTestSupport.createJsonAuthService(userStore, questService);
         faucetService = new FaucetServiceImpl(
                 faucetConfig,

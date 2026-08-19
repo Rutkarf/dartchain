@@ -8,23 +8,93 @@
   (keydown.enter)="onBarKeydown($event)"
   (keydown.space)="onBarKeydown($event)"
 >
+  <span
+    class="news-summary-bar__badge"
+    [attr.data-category]="categorySlug()"
+    [attr.title]="newsState.categoryLabel(activeItem()?.category ?? 'INFO')"
+  >
+    {{ categoryBadge() }}
+  </span>
+
   <div class="news-summary-bar__headline-wrap">
     @if (loading()) {
       <span class="news-summary-bar__headline news-summary-bar__headline--muted">Chargement…</span>
     } @else {
       <span
-        class="news-summary-bar__headline"
-        [class.news-summary-bar__headline--muted]="!newsState.collapsedPrimaryItem()"
-        [attr.title]="newsState.collapsedHeadlineTitle()"
+        class="news-summary-bar__headline-stack"
+        [class.is-transitioning]="isTransitioning()"
+        [attr.data-rotation]="activeHeadlineIndex()"
       >
-        {{ newsState.collapsedHeadlineTitle() }}
+        @if (isTransitioning() && previousHeadlineTitle()) {
+          <span
+            class="news-summary-bar__headline news-summary-bar__headline--out"
+            [attr.title]="previousHeadlineTitle()"
+          >
+            {{ previousHeadlineTitle() }}
+          </span>
+        }
+        <span
+          class="news-summary-bar__headline"
+          [class.news-summary-bar__headline--muted]="!activeItem() && !newsState.collapsedPrimaryItem()"
+          [class.news-summary-bar__headline--in]="isTransitioning()"
+          [attr.title]="headlineTitle()"
+          [style.fontSize]="'clamp(0.375rem, 2.35vw, 0.5625rem)'"
+          [style.fontWeight]="600"
+          [style.lineHeight]="1.1"
+        >
+          {{ headlineTitle() }}
+        </span>
       </span>
     }
   </div>
 
   @if (headlineAge()) {
-    <span class="news-summary-bar__age">{{ headlineAge() }}</span>
+    <span class="news-summary-bar__age-stack" [class.is-transitioning]="isTransitioning()">
+      @if (isTransitioning() && previousHeadlineAge()) {
+        <span
+          class="news-summary-bar__age news-summary-bar__age--out"
+          [style.fontSize]="'clamp(0.3375rem, 2vw, 0.4375rem)'"
+          [style.fontWeight]="600"
+        >{{ previousHeadlineAge() }}</span>
+      }
+      <span
+        class="news-summary-bar__age"
+        [class.news-summary-bar__age--in]="isTransitioning()"
+        [style.fontSize]="'clamp(0.3375rem, 2vw, 0.4375rem)'"
+        [style.fontWeight]="600"
+      >{{ headlineAge() }}</span>
+    </span>
   }
+
+  <div class="news-summary-bar__actions" aria-label="Navigation entre actualités">
+    <button
+      type="button"
+      class="news-summary-bar__action-btn"
+      [disabled]="!canNavigatePrev()"
+      aria-label="Actualité précédente"
+      (click)="navigatePrev($event)"
+    >
+      ‹
+    </button>
+    <button
+      type="button"
+      class="news-summary-bar__action-btn"
+      [disabled]="!canNavigateNext()"
+      aria-label="Actualité suivante"
+      (click)="navigateNext($event)"
+    >
+      ›
+    </button>
+    <button
+      type="button"
+      class="news-summary-bar__action-btn news-summary-bar__action-btn--copy"
+      [attr.aria-live]="copied() || copyFailed() ? 'polite' : null"
+      [attr.aria-label]="copyButtonLabel()"
+      (click)="copyCurrent($event)"
+    >
+      {{ copyButtonLabel() }}
+    </button>
+  </div>
 
   @if (hasUnread()) {
     <button

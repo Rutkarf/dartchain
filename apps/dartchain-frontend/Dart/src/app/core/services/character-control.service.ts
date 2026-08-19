@@ -1,6 +1,13 @@
 import { Injectable, NgZone, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as THREE from 'three';
+import { GeoCoordinateService } from '../map/geo-coordinate.service';
+import { MapConfigService } from '../map/map-config.service';
+import { MapLoadingService } from '../map/map-loading.service';
+import { METRO_SPAWN_ANCHOR, MOVE_JOYSTICK_CONFIG } from '../map/map-configuration';
+import { TokenCellService } from '../map/token-cell.service';
+import { M4t3rPickupFxService } from '../map/m4t3r-pickup-fx.service';
+import { M4t3rTrailApiService } from '../map/m4t3r-trail-api.service';
 import { CharacterNftService } from './character-nft.service';
 import { CameraControlService } from './camera-control.service';
 import { RunnerWorldService } from './runner/runner-world.service';
@@ -16,6 +23,12 @@ export class CharacterControlService {
   private readonly cameraControl = inject(CameraControlService);
   private readonly world = inject(RunnerWorldService);
   private readonly runnerState = inject(RunnerStateService);
+  private readonly mapLoading = inject(MapLoadingService);
+  private readonly tokenCells = inject(TokenCellService);
+  private readonly pickupFx = inject(M4t3rPickupFxService);
+  private readonly trailApi = inject(M4t3rTrailApiService);
+  private readonly mapConfig = inject(MapConfigService);
+  private readonly geo = inject(GeoCoordinateService);
   private readonly zone = inject(NgZone);
 
   private moveX = 0;
@@ -41,6 +54,9 @@ export class CharacterControlService {
   };
 
   private readonly velocity = new THREE.Vector3();
+  private readonly trailPrev = new THREE.Vector3();
+  private trailPrevReady = false;
+  private trailSyncAge = 0;
   private readonly onKeyDown = (e: KeyboardEvent): void => this.setKey(e, true);
   private readonly onKeyUp = (e: KeyboardEvent): void => this.setKey(e, false);
   private keysBound = false;
@@ -75,15 +91,80 @@ export class CharacterControlService {
     this.runnerState.reset();
     this.isClimbingMode = false;
     this.climbHeight = 0;
+    this.trailPrevReady = false;
     this.setClimbPrompt(false);
     this.bindKeys();
-    this.cameraControl.resetOrbit();
+    this.cameraControl.resetOrbit(
+      this.getStartCameraYaw(),
+      this.getStartCameraPitch(),
+      this.getStartCameraDistance(),
+      this.getStartCameraLookAhead()
+    );
     const state = this.character.getState();
     if (state.mesh && state.isLoaded) {
-      this.character.setWorldXZ(0, 5);
-      state.mesh.position.y = 0;
-      this.character.setRotationY(Math.PI);
+      if (this.isMarseilleMode()) {
+        const spawn = this.getMarseilleSpawnPosition();
+        this.character.setWorldXZ(spawn.x, spawn.z);
+        state.mesh.position.y = spawn.y;
+      } else {
+        this.character.setWorldXZ(0, 5);
+        state.mesh.position.y = 0;
+      }
+      this.character.setRotationY(this.getStartCharacterRotationY());
     }
+  }
+
+  private getMarseilleSpawnPosition(): THREE.Vector3 {
+    const start = this.mapConfig.configuration.startPosition;
+    // Prototype terrain plat à y=0 — pieds au sol local (altitude terrain, pas ASL).
+    const world = this.geo.geoToWorld(
+      start.latitude,
+      start.longitude,
+      this.mapConfig.configuration.altitudeOrigin
+    );
+    world.x += METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.x;
+    world.z += METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.z;
+    return world;
+  }
+
+  private isMarseilleMode(): boolean {
+    const state = this.mapLoading.getState();
+    return state.activeProviderId === 'marseille-osm-three' && !state.fallbackActive;
+  }
+
+  private getStartCharacterRotationY(): number {
+    if (this.isMarseilleMode()) {
+      return this.mapConfig.configuration.startOrientation.characterRotationY;
+    }
+    return Math.PI;
+  }
+
+  private getStartCameraYaw(): number {
+    if (this.isMarseilleMode()) {
+      return this.mapConfig.configuration.startOrientation.cameraYaw;
+    }
+    return 0;
+  }
+
+  private getStartCameraPitch(): number {
+    if (this.isMarseilleMode()) {
+      return this.mapConfig.configuration.startOrientation.cameraPitch;
+    }
+    return Math.PI / 6;
+  }
+
+  private getStartCameraDistance(): number {
+    if (this.isMarseilleMode()) {
+      return this.mapConfig.configuration.startOrientation.cameraDistance;
+    }
+    return RUNNER_CONFIG.camDistance;
+  }
+
+  private getStartCameraLookAhead(): number {
+    if (this.isMarseilleMode()) {
+      return this.mapConfig.configuration.startOrientation.cameraLookAhead;
+    }
+    return 0;
   }
 
   update(deltaSeconds: number): void {
@@ -107,7 +188,7 @@ export class CharacterControlService {
     if (this.keys.camU) this.cameraControl.nudge(0, camStep);
     if (this.keys.camD) this.cameraControl.nudge(0, -camStep);
 
-    const dead = RUNNER_CONFIG.deadZone;
+    const dead = MOVE_JOYSTICK_CONFIG.deadZone;
     const jx = Math.abs(this.moveX) < dead ? 0 : this.moveX;
     const jy = Math.abs(this.moveY) < dead ? 0 : this.moveY;
 
@@ -119,9 +200,12 @@ export class CharacterControlService {
     if (this.keys.d) localX += 1;
 
     this.velocity.set(0, 0, 0);
-    let inputMag = 0;
+    let gaitSpeed = this.moveSpeed;
+    const joyMag = Math.hypot(jx, jy);
+    if (joyMag >= MOVE_JOYSTICK_CONFIG.walkRing) {
+      gaitSpeed = this.moveSpeed * MOVE_JOYSTICK_CONFIG.runMultiplier;
+    }
     if (Math.abs(localX) > 1e-4 || Math.abs(localZ) > 1e-4) {
-      inputMag = Math.min(1, Math.hypot(localX, localZ));
       const yaw = this.cameraControl.getYaw();
       const sinY = Math.sin(yaw);
       const cosY = Math.cos(yaw);
@@ -132,33 +216,35 @@ export class CharacterControlService {
 
       this.velocity.x = rightX * localX + forwardX * localZ;
       this.velocity.z = rightZ * localX + forwardZ * localZ;
-      this.velocity.normalize().multiplyScalar(this.moveSpeed * deltaSeconds * inputMag);
+      this.velocity.normalize().multiplyScalar(gaitSpeed * deltaSeconds);
     }
 
-    // Vitesse anim = intention (joystick/touches), pas seulement le déplacement après collision
-    this.lastSpeed = inputMag > 0.08 ? this.moveSpeed * inputMag : 0;
+    this.lastSpeed = this.velocity.length() > 1e-8 ? gaitSpeed : 0;
 
     const prevX = state.mesh.position.x;
     const prevZ = state.mesh.position.z;
     let nextX = prevX + this.velocity.x;
     let nextZ = prevZ + this.velocity.z;
-    const r = RUNNER_CONFIG.characterRadius;
+    const marseille = this.isMarseilleMode();
 
-    nextZ = this.applyStopZone(nextZ);
+    if (!marseille) {
+      const r = RUNNER_CONFIG.characterRadius;
+      nextZ = this.applyStopZone(nextZ);
 
-    if (!this.world.isWalkable(nextX, prevZ, r)) {
-      nextX = prevX;
-    }
-    if (!this.world.isWalkable(nextX, nextZ, r)) {
-      nextZ = prevZ;
-    }
-    if (!this.world.isWalkable(nextX, nextZ, r)) {
-      nextX = prevX;
-      nextZ = prevZ;
-    }
+      if (!this.world.isWalkable(nextX, prevZ, r)) {
+        nextX = prevX;
+      }
+      if (!this.world.isWalkable(nextX, nextZ, r)) {
+        nextZ = prevZ;
+      }
+      if (!this.world.isWalkable(nextX, nextZ, r)) {
+        nextX = prevX;
+        nextZ = prevZ;
+      }
 
-    if (nextZ < RUNNER_CONFIG.ladderStopZ) {
-      nextZ = RUNNER_CONFIG.ladderStopZ;
+      if (nextZ < RUNNER_CONFIG.ladderStopZ) {
+        nextZ = RUNNER_CONFIG.ladderStopZ;
+      }
     }
 
     this.character.setWorldXZ(nextX, nextZ);
@@ -169,17 +255,56 @@ export class CharacterControlService {
       this.character.setRotationY(Math.atan2(this.velocity.x, this.velocity.z));
     }
 
-    this.checkLadderInteraction(nextX, nextZ);
+    if (!marseille) {
+      this.checkLadderInteraction(nextX, nextZ);
+      this.runnerState.progress = Math.max(0, -nextZ);
+      this.world.update(this.runnerState.progress);
+    } else {
+      this.mapLoading.update(state.mesh.position);
+      this.updateMarseilleTrail(state.mesh, state.userId || 'local', deltaSeconds);
+      this.pickupFx.update(deltaSeconds);
+    }
 
-    this.runnerState.progress = Math.max(0, -nextZ);
     this.character.updateAnimation(
       deltaSeconds,
       this.lastSpeed,
-      this.moveSpeed,
+      this.lastSpeed > this.moveSpeed * 1.5
+        ? this.moveSpeed * MOVE_JOYSTICK_CONFIG.runMultiplier
+        : this.moveSpeed,
       this.isClimbingMode
     );
-    this.world.update(this.runnerState.progress);
     this.cameraControl.update(deltaSeconds);
+  }
+
+  private updateMarseilleTrail(mesh: THREE.Object3D, playerId: string, deltaSeconds: number): void {
+    if (!this.trailPrevReady) {
+      this.trailPrev.copy(mesh.position);
+      this.trailPrevReady = true;
+      return;
+    }
+    const trail = this.tokenCells.collectTrail(playerId, this.trailPrev, mesh.position, deltaSeconds);
+    this.trailPrev.copy(mesh.position);
+    if (trail) {
+      this.pickupFx.spawn(mesh, trail.clusterIds.length);
+      const submitted = trail;
+      this.trailApi.submitTrail(playerId, submitted).subscribe((accepted) => {
+        if (!accepted) return;
+        if (accepted.collectedCells.length === 0) {
+          this.tokenCells.restoreClusters(submitted.clusterIds);
+          return;
+        }
+        this.tokenCells.applyServerHide(accepted.collectedCells, accepted.respawnAt);
+      });
+    }
+    this.trailSyncAge += deltaSeconds;
+    if (this.trailSyncAge >= 2) {
+      this.trailSyncAge = 0;
+      this.trailApi.listHidden().subscribe((payload) => {
+        if (payload.cells.length > 0) {
+          this.tokenCells.syncHiddenFromServer(payload.cells);
+        }
+      });
+    }
   }
 
   private applyStopZone(nextZ: number): number {
@@ -258,6 +383,9 @@ export class CharacterControlService {
     if (key === 'a') this.keys.a = down;
     if (key === 'd') this.keys.d = down;
     if (key === 'e') this.keys.e = down;
+    if (key === 'v' && down && !e.repeat && this.isMarseilleMode()) {
+      this.cameraControl.toggleValidationView();
+    }
     if (key === 'arrowleft') this.keys.camL = down;
     if (key === 'arrowright') this.keys.camR = down;
     if (key === 'arrowup') this.keys.camU = down;

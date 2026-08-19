@@ -1,11 +1,13 @@
 import { Component, HostListener, computed, inject } from '@angular/core';
 import { StarConquestStateService } from '../../core/services/star-conquest-state.service';
+import { PeersDataService } from '../../core/services/peers-data.service';
 import {
   STAR_QUEST_FAMILIES,
   type StarQuestFamily,
 } from './star-conquest-families';
 import type { StarQuest } from './star-conquest.model';
 import { formatRewardWithDot } from './star-conquest-visuals';
+import { PeerView } from '../../core/services/blockchain-api.service';
 
 /**
  * Overlay fonctionnel uniquement : liste scanner + labels M4T3R.
@@ -19,6 +21,33 @@ import { formatRewardWithDot } from './star-conquest-visuals';
 })
 export class StarQuestScannerComponent {
   readonly state = inject(StarConquestStateService);
+  private readonly peersData = inject(PeersDataService);
+
+  private readonly peers = computed((): readonly PeerView[] => this.peersData.peers());
+
+  constructor() {
+    // Init "light" pour pouvoir afficher un indicateur P2P même si l'user n'ouvre pas le peer panel.
+    this.peersData.init();
+  }
+
+  readonly connectedCount = computed(() =>
+    this.peers().filter((peer) => peer.status === 'CONNECTED').length
+  );
+
+  readonly networkPeersCount = computed(() => {
+    const fromStats = this.peersData.statsTotal();
+    const current = this.peers().length;
+    // `statsTotal` (server) peut être null en début de vie.
+    return Math.max(fromStats ?? current, current);
+  });
+
+  readonly networkLabel = computed(() => {
+    const connected = this.connectedCount();
+    const total = this.networkPeersCount();
+    if (total <= 0) return 'P2P: 0';
+    if (connected <= 0) return `P2P: ${connected}/${total}`;
+    return `P2P: ${connected}/${total}`;
+  });
 
   /** Place le scanner au-dessus / à côté de la zone joystick (jamais dessus). */
   readonly scannerStyle = computed(() => {

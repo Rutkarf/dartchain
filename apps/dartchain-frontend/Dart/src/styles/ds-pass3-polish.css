@@ -154,7 +154,7 @@ html.vp-compact {
   --ds-panel-gap: var(--ds-band-gap, 2px);
   --stack-section-gap: 2px;
   --stack-section-gap-collapsed: 2px;
-  --floor-canvas-height: var(--ds-zone-floor-peek, 64px);
+  --floor-canvas-height: var(--ds-zone-floor-peek, 220px);
   --floor-peek-height: var(--floor-canvas-height);
   --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
 }

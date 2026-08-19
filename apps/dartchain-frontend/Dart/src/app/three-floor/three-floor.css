@@ -10,25 +10,40 @@
   height: auto !important;
   max-height: none !important;
   min-height: 0 !important;
-  /* Niveau 2 : devant fond CSS (0), derrière Angular (≥2) */
   z-index: 1 !important;
   isolation: isolate;
 }
 
 /*
- * Floor peek — bâtiments / perso pleinement opaques.
- * Pas de mask-image ni d’opacity < 1 (cause de la couture floue au sommet).
+ * Bande metaverse en pied de page : hauteur = peek réservé sous l’UI.
+ * Le perso tient de plein pied dans cette bande, même panneaux dépliés.
  */
 .floor-wrapper {
   position: fixed;
   left: 0;
   bottom: 0;
   width: 100vw;
-  height: var(--floor-canvas-height, var(--ds-zone-floor-peek, 96px));
+  height: var(--floor-peek-height, 220px);
+  min-height: 200px;
+  max-height: min(42vh, 240px);
   z-index: 1;
   pointer-events: none;
-  overflow: visible;
+  overflow: hidden;
   background: transparent;
+  -webkit-mask-image: linear-gradient(
+    to top,
+    #000 0%,
+    #000 78%,
+    rgba(0, 0, 0, 0.85) 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to top,
+    #000 0%,
+    #000 78%,
+    rgba(0, 0, 0, 0.85) 90%,
+    transparent 100%
+  );
 }
 
 .floor-canvas {
@@ -37,23 +52,37 @@
   display: block;
   opacity: 1;
   background: transparent;
-  pointer-events: none !important;
+  pointer-events: auto !important;
+  touch-action: none;
 }
 
 @media (max-width: 349px) {
   .floor-wrapper {
-    height: var(--floor-canvas-height, var(--ds-zone-floor-peek, 88px));
+    height: var(--floor-peek-height, 220px);
+    min-height: var(--floor-peek-height, 220px);
+    max-height: var(--floor-peek-height, 220px);
   }
 }
 
 @media (min-width: 350px) and (max-width: 480px) {
   .floor-wrapper {
-    height: var(--floor-canvas-height, 104px);
+    height: var(--floor-peek-height, 220px);
+    min-height: 200px;
+    max-height: min(38vh, 240px);
   }
 }
 
 @media (min-width: 481px) {
   .floor-wrapper {
-    height: var(--floor-canvas-height, 120px);
+    height: var(--floor-peek-height, 220px);
+    min-height: 200px;
+    max-height: min(36vh, 240px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floor-wrapper {
+    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 82%, rgba(0, 0, 0, 0.4) 94%, transparent 100%);
+    mask-image: linear-gradient(to top, #000 0%, #000 82%, rgba(0, 0, 0, 0.4) 94%, transparent 100%);
   }
 }

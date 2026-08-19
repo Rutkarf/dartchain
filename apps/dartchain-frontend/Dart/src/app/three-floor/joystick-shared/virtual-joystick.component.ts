@@ -32,7 +32,12 @@ export interface JoystickVector {
       role="application"
       (pointerdown)="onPointerDown($event)"
     >
-      <div class="vj-base"></div>
+      <div class="vj-base" [class.vj-base-walk-run]="walkRunRings">
+        @if (walkRunRings) {
+          <div class="vj-ring vj-ring-run" aria-hidden="true"></div>
+          <div class="vj-ring vj-ring-walk" aria-hidden="true"></div>
+        }
+      </div>
       <div #knob class="vj-knob"></div>
     </div>
   `,
@@ -52,6 +57,7 @@ export interface JoystickVector {
         width: 100%;
         height: 100%;
         border-radius: 50%;
+        overflow: hidden;
         cursor: grab;
       }
       .vj-zone:active {
@@ -59,7 +65,7 @@ export interface JoystickVector {
       }
       .vj-base {
         position: absolute;
-        inset: 0;
+        inset: var(--vj-face-inset, 0px);
         border-radius: 50%;
         background: radial-gradient(
           circle at 35% 30%,
@@ -70,14 +76,39 @@ export interface JoystickVector {
         border: 1px solid rgba(0, 180, 220, 0.45);
         box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.12);
       }
+      .vj-base-walk-run {
+        background: radial-gradient(
+          circle at center,
+          rgba(64, 224, 255, 0.22) 0%,
+          rgba(64, 224, 255, 0.14) 58%,
+          rgba(255, 62, 207, 0.1) 62%,
+          rgba(255, 62, 207, 0.28) 100%
+        );
+        border-color: rgba(255, 62, 207, 0.55);
+      }
+      .vj-ring {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        box-sizing: border-box;
+      }
+      .vj-ring-walk {
+        inset: 19%;
+        border: 1px solid rgba(64, 224, 255, 0.85);
+        box-shadow: 0 0 4px rgba(64, 224, 255, 0.35);
+      }
+      .vj-ring-run {
+        inset: 4%;
+        border: 1px dashed rgba(255, 62, 207, 0.7);
+      }
       .vj-knob {
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 42%;
-        height: 42%;
-        margin-left: -21%;
-        margin-top: -21%;
+        width: var(--vj-knob-size, 36%);
+        height: var(--vj-knob-size, 36%);
+        margin-left: calc(var(--vj-knob-size, 36%) / -2);
+        margin-top: calc(var(--vj-knob-size, 36%) / -2);
         border-radius: 50%;
         background: radial-gradient(
           circle at 30% 25%,
@@ -96,9 +127,11 @@ export class VirtualJoystickComponent implements AfterViewInit, OnDestroy {
   @ViewChild('zone', { static: true }) zoneRef!: ElementRef<HTMLElement>;
   @ViewChild('knob', { static: true }) knobRef!: ElementRef<HTMLElement>;
   @Input() ariaLabel = 'Joystick';
+  @Input() walkRunRings = false;
   @Output() readonly vectorChange = new EventEmitter<JoystickVector>();
 
   private readonly zone = inject(NgZone);
+  private readonly host = inject(ElementRef<HTMLElement>);
 
   private activePointer: number | null = null;
   private radius = 48;
@@ -169,7 +202,16 @@ export class VirtualJoystickComponent implements AfterViewInit, OnDestroy {
 
   private measure(): void {
     const el = this.zoneRef.nativeElement;
-    this.radius = Math.max(24, el.clientWidth * 0.38);
+    const size = el.clientWidth;
+    const styles = getComputedStyle(this.host.nativeElement);
+    const inset = Number.parseFloat(styles.getPropertyValue('--vj-face-inset')) || 0;
+    const knobRaw = styles.getPropertyValue('--vj-knob-size').trim();
+    const knobRatio = knobRaw.endsWith('%')
+      ? Number.parseFloat(knobRaw) / 100
+      : Number.parseFloat(knobRaw) / Math.max(1, size);
+    const faceRadius = Math.max(8, size * 0.5 - inset);
+    const knobRadius = (Number.isFinite(knobRatio) ? knobRatio : 0.36) * size * 0.5;
+    this.radius = Math.max(6, faceRadius - knobRadius - 1);
   }
 
   private unbindWindow(): void {
