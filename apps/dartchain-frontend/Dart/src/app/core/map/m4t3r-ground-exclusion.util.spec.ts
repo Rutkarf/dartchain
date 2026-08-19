@@ -25,6 +25,9 @@ describe('M4T3R ground exclusion', () => {
 
   it('combine exclusion et LOD de façon déterministe', () => {
     expect(shouldRenderGroundCell(0, 0, 0, 0, 'near')).toBe(true);
+    expect(shouldRenderGroundCell(1, 0, 1.25, 0, 'near')).toBe(false);
+    expect(shouldRenderGroundCell(0, 1, 0, 1.25, 'near')).toBe(false);
+    expect(shouldRenderGroundCell(2, 2, 2.5, 2.5, 'near')).toBe(true);
     expect(shouldRenderGroundCell(0, 0, 0, 80, 'near')).toBe(false);
   });
 });

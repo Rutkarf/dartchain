@@ -4,6 +4,7 @@ import { TokenCellService, type M4T3RDebugStats } from './token-cell.service';
 import { MapConfigService } from './map-config.service';
 import { FootprintTrailManager } from './footprint-trail-manager.service';
 import { M4t3rCollectTrailVisualService } from './m4t3r-collect-trail-visual.service';
+import { M4t3rRewardRuntimeService } from './m4t3r-reward-runtime.service';
 import { R4V3_GROUND_FIELD } from './map-configuration';
 
 interface MetaversePerformanceMetrics {
@@ -38,6 +39,7 @@ export class M4t3rDebugOverlay {
   private readonly mapConfig = inject(MapConfigService);
   private readonly footprints = inject(FootprintTrailManager);
   private readonly collectTrailVisual = inject(M4t3rCollectTrailVisualService);
+  private readonly rewardRuntime = inject(M4t3rRewardRuntimeService);
 
   private panel: HTMLDivElement | null = null;
   private visible = false;
@@ -141,6 +143,8 @@ export class M4t3rDebugOverlay {
     const playerChunkX = Math.floor(pp.x / gridSize);
     const playerChunkZ = Math.floor(pp.z / gridSize);
 
+    const rewardDebug = this.rewardRuntime.debugInfo();
+
     this.panel.innerHTML = [
       '<b style="color:#ffe600">M4T3R WORLD DEBUG (F9)</b>',
       '',
@@ -192,6 +196,23 @@ export class M4t3rDebugOverlay {
       this.rendererMetrics
         ? `Canvas ${this.rendererMetrics.canvasWidth}x${this.rendererMetrics.canvasHeight} @${this.rendererMetrics.pixelRatio.toFixed(2)}x`
         : 'Canvas: n/a',
+      '',
+      '<b style="color:#ffe600">M4T3R REWARD DEBUG</b>',
+      rewardDebug
+        ? [
+            `rewardId: ${rewardDebug.rewardId}`,
+            `tokenId: ${rewardDebug.tokenId}`,
+            `collectionId: ${this.rewardRuntime.maskProof(rewardDebug.collectionId)}`,
+            `clientSpeedEstimate: ${rewardDebug.clientSpeedEstimate ?? 'n/a'}`,
+            `serverMeasuredSpeed: ${rewardDebug.serverMeasuredSpeed}`,
+            `maxAllowedSpeed: ${rewardDebug.maxAllowedSpeed}`,
+            `proofHash: ${this.rewardRuntime.maskProof(rewardDebug.proofHash)}`,
+            `signatureValid: ${rewardDebug.signatureValid ?? 'n/a'}`,
+            `rewardStatus: ${rewardDebug.rewardStatus}`,
+            `balanceAfter: ${rewardDebug.balanceAfter ?? 'n/a'}`,
+            `transactionId: ${rewardDebug.transactionId ? this.rewardRuntime.maskProof(rewardDebug.transactionId) : 'n/a'}`,
+          ].join('<br>')
+        : 'No reward yet',
     ].join('<br>');
   }
 

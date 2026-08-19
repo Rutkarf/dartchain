@@ -2,6 +2,7 @@ import { isHarborWaterAt, distanceToHarborWaterEdge } from './vieux-port-layout.
 import { MARSEILLE_GROUND_EXCLUSION_ZONES, MARSEILLE_HARBOR_WATER, type GroundExclusionZone } from './map-configuration';
 import type { M4T3RLodBand } from './m4t3r-lod.util';
 import { shouldRenderCellAtLod } from './m4t3r-lod.util';
+import { isOnDiagonalCheckerboard } from './m4t3r-grid.util';
 
 /** Facteur 0 = exclusion totale, 1 = pleine densité, ]0,1[ = transition douce. */
 export function groundExclusionFactorAt(
@@ -49,6 +50,7 @@ export function shouldRenderGroundCell(
 ): boolean {
   const exclusionFactor = groundExclusionFactorAt(x, z, zones);
   if (exclusionFactor <= 0) return false;
+  if (!isOnDiagonalCheckerboard(gx, gz)) return false;
   if (!shouldRenderCellAtLod(gx, gz, band)) return false;
   if (exclusionFactor >= 0.999) return true;
   const hash = ((gx * 73856093) ^ (gz * 19349663)) >>> 0;

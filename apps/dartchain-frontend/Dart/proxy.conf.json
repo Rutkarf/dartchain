@@ -9,5 +9,13 @@
     "secure": false,
     "ws": true,
     "changeOrigin": true
+  },
+  "/overpass": {
+    "target": "https://overpass-api.de",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/overpass": "/api/interpreter"
+    }
   }
 }

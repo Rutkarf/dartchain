@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { DestroyRef, Injectable, computed, effect, inject, signal, untracked } from '@angular/core';
+import { DestroyRef, Injectable, NgZone, computed, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, finalize, map, of } from 'rxjs';
 
@@ -47,12 +47,15 @@ export class FaucetRuntimeService {
   private readonly chainConfig = inject(ChainConfigService);
   private readonly product = inject(ProductConfigService);
   private readonly locale = inject(LocaleService);
+  private readonly zone = inject(NgZone);
 
   private readonly clientId = 'angular-faucet-ui';
   private static readonly COOLDOWN_TICK_MS = 100;
   private static readonly VISUAL_TICK_MS = 1000;
   private static readonly DECIMALS = 26;
   private static readonly VISUAL_INCREMENT = 1n;
+  /** +1 plus petite unité m4t3r par pièce trail validée serveur. */
+  static readonly M4T3R_FAUCET_UNITS_PER_TOKEN = 1n;
   private static readonly META_REFRESH_MS = 15_000;
   private static readonly RETRY_BASE_MS = 2_000;
   private static readonly RETRY_MAX_MS = 30_000;
@@ -296,6 +299,40 @@ export class FaucetRuntimeService {
     this.loadNetworkMeta();
     this.loadClaimsHistory();
     this.refreshWalletBalance();
+  }
+
+  /** Crédite le compteur faucet après validation serveur (nombre de pièces acceptées). */
+  creditM4t3rCollectCount(tokenCount: number): void {
+    if (!Number.isFinite(tokenCount) || tokenCount <= 0) {
+      return;
+    }
+    const added =
+      BigInt(Math.trunc(tokenCount)) * FaucetRuntimeService.M4T3R_FAUCET_UNITS_PER_TOKEN;
+    this.addSmallestUnits(added);
+  }
+
+  /** Crédite depuis un montant m4t3r décimal (ex. « 0.000…001 »). Ne diminue jamais le total. */
+  creditM4t3rAmount(amount: string): void {
+    const units = parseAmountToSmallestUnits(amount);
+    if (units === null || units <= 0n) {
+      return;
+    }
+    this.addSmallestUnits(units);
+  }
+
+  private addSmallestUnits(added: bigint): void {
+    if (added <= 0n) {
+      return;
+    }
+    this.zone.run(() => {
+      const current = this.currentSmallestUnits();
+      const next = current + added;
+      if (next <= current) {
+        return;
+      }
+      this.setFromSmallestUnits(next > this.maxClaimUnits ? this.maxClaimUnits : next);
+      this.triggerBump();
+    });
   }
 
   retryConnection(): void {

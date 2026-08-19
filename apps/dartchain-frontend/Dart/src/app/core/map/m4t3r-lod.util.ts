@@ -20,12 +20,13 @@ export function getLodBand(distanceMeters: number): M4T3RLodBand {
 
 /**
  * Sous-échantillonnage ancré grille monde (gx/gz = indices cellSize 1.25 m).
- * Plus loin → stride plus grand → densité visuelle réduite.
+ * Préserve le damier diagonal : mid/far ne rendent que des sous-ensembles
+ * (gx+gz) % period === 0 sur la même diagonale, jamais une grille pleine.
  */
 export function shouldRenderCellAtLod(gx: number, gz: number, band: M4T3RLodBand): boolean {
   if (band === 'near') return true;
-  const stride = band === 'mid' ? M4T3R_LOD_CONFIG.midGridStride : M4T3R_LOD_CONFIG.farGridStride;
-  return gx % stride === 0 && gz % stride === 0;
+  const period = band === 'mid' ? 4 : 8;
+  return (gx + gz) % period === 0;
 }
 
 export function shouldAnimateLodBand(band: M4T3RLodBand): boolean {

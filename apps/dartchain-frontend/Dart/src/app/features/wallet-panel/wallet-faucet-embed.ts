@@ -37,7 +37,6 @@ export class WalletFaucetEmbedComponent implements AfterViewInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      // Re-fit whenever the displayed amount changes.
       void this.runtime.displayLine();
       queueMicrotask(() => this.fitValueToContainer());
     });
@@ -77,8 +76,6 @@ export class WalletFaucetEmbedComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // Measure at full size, then apply final scale on both signal + inline style
-    // so OnPush / style binding cannot leave an orphaned scale(1).
     fit.style.transform = 'scale(1)';
     const available = Math.max(0, wrap.clientWidth - 1);
     const needed = Math.max(fit.scrollWidth, el.scrollWidth);

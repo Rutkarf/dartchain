@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Configuration;
         ProductProperties.class,
         AuthProperties.class,
         ChainProperties.class,
-        OAuthProperties.class
+        OAuthProperties.class,
+        WigleProperties.class
 })
 public class DartchainConfiguration {
 }

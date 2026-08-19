@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import {
   blendFamilyRgb,
   familyTheme,
+  STAR_QUEST_FAMILY_ORDER,
+  type StarQuestFamily,
 } from './star-conquest-families';
 import type { StarQuest, StarQuestRarity, StarQuestStatus } from './star-conquest.model';
 import {
@@ -13,6 +15,17 @@ import {
   parallaxScaleForViewport,
 } from './star-conquest-depth';
 import { STAR_CONSTELLATIONS } from './star-conquest-constellations';
+import { StarConquestNetworkLayer } from './star-conquest-network.layer';
+import { StarConquestBackground } from './star-conquest-background';
+import { StarConquestEffects } from './star-conquest-effects';
+import type { KnowledgeGraphStore } from '../knowledge-graph/knowledge-graph.store';
+import type { QuestVisualizationMode } from '../../core/map/map-configuration';
+import type { StarConquestUniverseTheme } from './star-conquest-universe.types';
+import {
+  DEFAULT_STAR_CONQUEST_UNIVERSE,
+  starConquestUniverseTheme,
+} from './star-conquest-universes.config';
+import { questZFromStatus } from './star-conquest-universe-layout';
 
 function hashFloat(id: string): number {
   let h = 2166136261;
@@ -43,6 +56,9 @@ const DIM_FACTOR = 0.38;
 const MAX_ENERGY_PACKETS = 10;
 /** Brins par arête — un filament clair (liaison fiable entre particules). */
 const LINE_STRANDS = 1;
+/** Vitesse de rotation mandala (très lent — fractal respirant). */
+const SWARM_MANDALA_ORBIT = 0.055;
+const SWARM_MANDALA_PULSE = 0.22;
 /** Cadre ping-pong hors viewport visible (app 250×550 → table 260×560). */
 export const STAR_PONG_OUTER_W = 260;
 export const STAR_PONG_OUTER_H = 560;
@@ -83,6 +99,12 @@ export class StarConquestGraph {
   readonly connectionLines: THREE.LineSegments;
   readonly constellationGuides: THREE.LineSegments;
   readonly energyPackets: THREE.Points;
+  /** Couche IA/P2P — peers, agents, liens sync (intégrée au même graphe). */
+  readonly networkLayer: StarConquestNetworkLayer;
+  /** Fond aurore + étoiles décoratives. */
+  readonly background: StarConquestBackground;
+  /** Effets par univers (anneaux, grille, portail…). */
+  readonly effects: StarConquestEffects;
 
   private readonly quests: StarQuest[];
   private readonly idToIndex = new Map<string, number>();
@@ -111,6 +133,11 @@ export class StarConquestGraph {
   private readonly linePositions: Float32Array;
   private readonly lineColors: Float32Array;
   private readonly edgePairs: Array<[number, number]> = [];
+  /** Topologie mandala Ruche : anneaux intra-famille, rayons hub, pentagone inter-familles. */
+  private readonly mandalaRingPairs: Array<[number, number]> = [];
+  private readonly mandalaCrossPairs: Array<[number, number]> = [];
+  private readonly mandalaHubQuestIdx: number[] = [];
+  private readonly swarmCentroids = new Map<string, { x: number; y: number; z: number }>();
   private readonly constellationPairs: Array<[number, number]> = [];
   private readonly constellationPositions: Float32Array;
   private readonly discTexture: THREE.CanvasTexture;
@@ -120,6 +147,7 @@ export class StarConquestGraph {
   private pulsePhase = 0;
   private energyPhase = 0;
   private driftTime = 0;
+  private swarmOrbitPhase = 0;
   private pointerNdc: { x: number; y: number } | null = null;
   private readonly tmpProject = new THREE.Vector3();
   private readonly tmpPointer = new THREE.Vector3();
@@ -131,6 +159,10 @@ export class StarConquestGraph {
   private safeRightPx = 9999;
   private idleSignalEdges: number[] = [];
   private idleSignalTimer = 0;
+  private visualizationMode: QuestVisualizationMode = 'hybrid';
+  private universeTheme: StarConquestUniverseTheme = starConquestUniverseTheme(
+    DEFAULT_STAR_CONQUEST_UNIVERSE
+  );
 
   /** Exclusion écran joystick — aucune particule dans / derrière la hitbox. */
   private joyExclX = 0;
@@ -185,10 +217,9 @@ export class StarConquestGraph {
       this.layoutHomes[i3 + 2] = quest.position.z;
 
       const [r, g, b] = this.colorForQuest(quest);
-      // Contraste doux vs fond gris bleuté (cyan / violet / blanc)
-      this.baseColors[i3] = Math.min(1, r * 0.5 + 0.25);
-      this.baseColors[i3 + 1] = Math.min(1, g * 0.55 + 0.55);
-      this.baseColors[i3 + 2] = Math.min(1, b * 0.4 + 0.75);
+      this.baseColors[i3] = Math.min(1, r * 0.94 + 0.04);
+      this.baseColors[i3 + 1] = Math.min(1, g * 0.94 + 0.04);
+      this.baseColors[i3 + 2] = Math.min(1, b * 0.94 + 0.04);
 
       const h = hashFloat(quest.id);
       const h2 = hashFloat(quest.id + ':b');
@@ -222,9 +253,9 @@ export class StarConquestGraph {
 
     // Halo Three.js — points doux, contraste vs fond gris 0x7f8c9b
     const coreMat = new THREE.PointsMaterial({
-      size: Math.max(0.14, Math.min(0.22, this.meanCoreSize * 0.9)),
+      size: Math.max(0.2, Math.min(0.28, this.meanCoreSize * 1.05)),
       map: this.discTexture,
-      color: 0x52e6ed,
+      color: 0xffffff,
       transparent: true,
       opacity: 0.85,
       vertexColors: true,
@@ -239,9 +270,9 @@ export class StarConquestGraph {
     haloGeom.setAttribute('position', geometry.getAttribute('position'));
     haloGeom.setAttribute('color', geometry.getAttribute('color'));
     const haloMat = new THREE.PointsMaterial({
-      size: Math.max(0.28, Math.min(0.45, this.meanCoreSize * 2.0)),
+      size: Math.max(0.36, Math.min(0.58, this.meanCoreSize * 2.35)),
       map: this.discTexture,
-      color: 0xb47cff,
+      color: 0xffffff,
       transparent: true,
       opacity: 0.35,
       vertexColors: true,
@@ -284,6 +315,7 @@ export class StarConquestGraph {
         this.constellationPairs.push([list[ia], list[ib]]);
       }
     }
+    this.buildMandalaTopology(byFamily);
     this.constellationPositions = new Float32Array(
       Math.max(1, this.constellationPairs.length) * 6
     );
@@ -305,7 +337,11 @@ export class StarConquestGraph {
     this.constellationGuides.visible = this.constellationPairs.length > 0;
     this.writeConstellationGuides();
 
-    const edgeCount = this.edgePairs.length;
+    const mandalaEdgeCount =
+      this.mandalaRingPairs.length +
+      this.mandalaCrossPairs.length +
+      this.mandalaHubQuestIdx.length;
+    const edgeCount = Math.max(this.edgePairs.length, mandalaEdgeCount);
     const strandVerts = edgeCount * LINE_STRANDS;
     this.linePositions = new Float32Array(strandVerts * 6);
     this.lineColors = new Float32Array(strandVerts * 6);
@@ -354,16 +390,120 @@ export class StarConquestGraph {
     this.energyPackets.visible = false;
     this.energyPackets.renderOrder = 2;
 
-    // Ordre groupe : halos → cœurs → signaux (pas de décor far/mid)
-    // [starConquest] Lignes neuronales désactivées – effets conservés
-    // Géométrie + update des liens gardés pour energy packets / focus ; mesh non affiché.
-    this.constellationGuides.visible = false;
-    this.connectionLines.visible = false;
-    // this.group.add(this.connectionLines);
-    // this.group.add(this.constellationGuides);
+    this.background = new StarConquestBackground();
+    this.effects = new StarConquestEffects();
+    this.group.add(this.background.group);
+    this.group.add(this.effects.group);
+    this.group.add(this.connectionLines);
+    this.group.add(this.constellationGuides);
     this.group.add(this.haloPoints);
     this.group.add(this.questPoints);
     this.group.add(this.energyPackets);
+    this.networkLayer = new StarConquestNetworkLayer();
+    this.group.add(this.networkLayer.group);
+    this.setUniverse(this.universeTheme);
+    this.applyVisualizationMode();
+  }
+
+  /** Bascule l’univers spatial Star Conquest (100 % autonome, sans metaverse floor). */
+  setUniverse(theme: StarConquestUniverseTheme): void {
+    this.universeTheme = theme;
+    this.background.applyUniverse(theme);
+    this.effects.applyUniverse(theme);
+    this.applyUniverseMaterials(theme);
+    if (theme.id === 'conquest-timeline') {
+      this.applyTimelineQuestDepth();
+    } else {
+      this.restoreQuestDepthFromLayout();
+    }
+    this.applyVisualizationMode();
+  }
+
+  getUniverse(): StarConquestUniverseTheme {
+    return this.universeTheme;
+  }
+
+  /**
+   * Toggle quest neural links visibility without removing geometry or simulation.
+   * legacy-particles → hidden (historical default) ; hybrid/knowledge-graph → visible.
+   */
+  setVisualizationMode(mode: QuestVisualizationMode): void {
+    this.visualizationMode = mode;
+    this.applyVisualizationMode();
+  }
+
+  getVisualizationMode(): QuestVisualizationMode {
+    return this.visualizationMode;
+  }
+
+  syncKnowledgeGraph(store: KnowledgeGraphStore): void {
+    this.networkLayer.setVisualizationMode(this.visualizationMode);
+    this.networkLayer.syncFromStore(store);
+  }
+
+  setNetworkFocus(nodeId: string | null): void {
+    this.networkLayer.setFocus(nodeId);
+  }
+
+  getNetworkNodeWorldPosition(nodeId: string, out = new THREE.Vector3()): THREE.Vector3 | null {
+    return this.networkLayer.getNodeWorldPosition(nodeId, out);
+  }
+
+  private applyVisualizationMode(): void {
+    const theme = this.universeTheme;
+    const showLinks =
+      theme.showNeuralLinks &&
+      (this.visualizationMode === 'knowledge-graph' || this.visualizationMode === 'hybrid');
+    this.connectionLines.visible = showLinks;
+    const guideMat = this.constellationGuides.material as THREE.LineBasicMaterial;
+    guideMat.opacity = theme.constellationOpacity;
+    this.constellationGuides.visible =
+      theme.showConstellations && theme.constellationOpacity > 0;
+    const lineMat = this.connectionLines.material as THREE.LineBasicMaterial;
+    lineMat.opacity = theme.linkOpacity;
+    this.networkLayer.setVisualizationMode(this.visualizationMode);
+  }
+
+  private applyUniverseMaterials(theme: StarConquestUniverseTheme): void {
+    const coreMat = this.questPoints.material as THREE.PointsMaterial;
+    const haloMat = this.haloPoints.material as THREE.PointsMaterial;
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 250;
+    const sizeScale = Math.max(0.9, Math.min(1.4, vw / 250));
+    coreMat.size = Math.max(
+      0.22,
+      Math.min(0.44, this.meanCoreSize * 1.05 * theme.coreSizeMult * sizeScale)
+    );
+    haloMat.size = Math.max(
+      0.38,
+      Math.min(0.82, this.meanCoreSize * 2.35 * theme.haloSizeMult * sizeScale)
+    );
+    coreMat.opacity = theme.coreOpacity;
+    haloMat.opacity = theme.haloOpacity;
+  }
+
+  private applyTimelineQuestDepth(): void {
+    const pos = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
+    for (let i = 0; i < this.quests.length; i++) {
+      const i3 = i * 3;
+      const baseZ = this.layoutHomes[i3 + 2];
+      const z = questZFromStatus(this.quests[i].status, baseZ);
+      this.homePositions[i3 + 2] = z;
+      pos.setZ(i, z);
+      this.quests[i].position.z = z;
+    }
+    pos.needsUpdate = true;
+  }
+
+  private restoreQuestDepthFromLayout(): void {
+    const pos = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
+    for (let i = 0; i < this.quests.length; i++) {
+      const i3 = i * 3;
+      const z = this.layoutHomes[i3 + 2];
+      this.homePositions[i3 + 2] = z;
+      pos.setZ(i, z);
+      this.quests[i].position.z = z;
+    }
+    pos.needsUpdate = true;
   }
 
   get questCount(): number {
@@ -656,26 +796,135 @@ export class StarConquestGraph {
     this.aimZ[i] = az / len;
   }
 
-  tick(deltaMs: number, camera?: THREE.Camera): void {
-    const dt = Math.min(0.05, deltaMs * 0.001);
-    this.driftTime += dt;
-    this.energyPhase += dt * 1.2;
-    this.idleSignalTimer += deltaMs;
-    const pos = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
+  /** Orbite mandala lente — courbes rose/spirographe autour du centre de famille. */
+  private applyQuestSwarmOrbit(dt: number, pos: THREE.BufferAttribute): void {
+    this.swarmOrbitPhase +=
+      dt * SWARM_MANDALA_ORBIT * this.universeTheme.driftSpeedMult;
 
-    let pointerWorld: THREE.Vector3 | null = null;
-    if (this.pointerNdc && camera && 'position' in camera) {
-      const cam = camera as THREE.PerspectiveCamera;
-      this.tmpProject.set(this.pointerNdc.x, this.pointerNdc.y, 0.5).unproject(cam);
-      this.tmpDir.copy(this.tmpProject).sub(cam.position).normalize();
-      if (Math.abs(this.tmpDir.z) > 1e-5) {
-        const distance = (0 - cam.position.z) / this.tmpDir.z;
-        pointerWorld = this.tmpPointer
-          .copy(cam.position)
-          .addScaledVector(this.tmpDir, distance);
+    this.swarmCentroids.clear();
+    const centroidX = new Map<string, number>();
+    const centroidY = new Map<string, number>();
+    const centroidZ = new Map<string, number>();
+    const centroidN = new Map<string, number>();
+
+    for (let i = 0; i < this.quests.length; i++) {
+      const fam = this.quests[i].family;
+      const i3 = i * 3;
+      centroidX.set(fam, (centroidX.get(fam) ?? 0) + this.layoutHomes[i3]);
+      centroidY.set(fam, (centroidY.get(fam) ?? 0) + this.layoutHomes[i3 + 1]);
+      centroidZ.set(fam, (centroidZ.get(fam) ?? 0) + this.layoutHomes[i3 + 2]);
+      centroidN.set(fam, (centroidN.get(fam) ?? 0) + 1);
+    }
+    for (const fam of centroidN.keys()) {
+      const n = centroidN.get(fam)!;
+      const cx = centroidX.get(fam)! / n;
+      const cy = centroidY.get(fam)! / n;
+      const cz = centroidZ.get(fam)! / n;
+      centroidX.set(fam, cx);
+      centroidY.set(fam, cy);
+      centroidZ.set(fam, cz);
+      this.swarmCentroids.set(fam, { x: cx, y: cy, z: cz });
+    }
+
+    for (let i = 0; i < this.quests.length; i++) {
+      const quest = this.quests[i];
+      const i3 = i * 3;
+      const fam = quest.family;
+      const cx = centroidX.get(fam) ?? this.layoutHomes[i3];
+      const cy = centroidY.get(fam) ?? this.layoutHomes[i3 + 1];
+      const cz = centroidZ.get(fam) ?? this.layoutHomes[i3 + 2];
+
+      const ox = this.layoutHomes[i3] - cx;
+      const oy = this.layoutHomes[i3 + 1] - cy;
+      const oz = this.layoutHomes[i3 + 2] - cz;
+      const baseR = Math.max(2, Math.hypot(ox, oy));
+      const baseAngle = Math.atan2(oy, ox);
+
+      const isFocus = this.focusId === quest.id;
+      const stab = this.focusId
+        ? isFocus
+          ? 0.08
+          : 0.12
+        : quest.underFloor || quest.underGraph
+          ? 0.15
+          : 1;
+
+      const fi = Math.max(0, STAR_QUEST_FAMILY_ORDER.indexOf(fam));
+      const t = this.swarmOrbitPhase + this.driftPhase[i];
+      const petals = 3 + (i % 4);
+      const harmonic = 1 + (i % 7) * 0.11 + fi * 0.04;
+
+      // Rose curve — pétales qui se referment/ouvrent lentement
+      const rose =
+        0.5 + 0.5 * Math.abs(Math.cos(petals * (baseAngle + t * harmonic * 0.08)));
+      const r = baseR * rose * (0.42 + stab * 0.58);
+
+      // Épicycle lent (couche fractale spirographe)
+      const mainAngle = baseAngle + t * harmonic * 0.07;
+      const epiR = baseR * 0.16;
+      const epiAngle = t * (harmonic * 0.23 + 0.11) + i * 0.85;
+
+      const x = cx + Math.cos(mainAngle) * r + Math.cos(epiAngle) * epiR;
+      const y = cy + Math.sin(mainAngle) * r + Math.sin(epiAngle) * epiR;
+      const z = cz + oz * stab * 0.45 + Math.sin(t * 0.18 + i * 0.35) * 1.2;
+
+      pos.setXYZ(i, x, y, z);
+      quest.position.x = x;
+      quest.position.y = y;
+      quest.position.z = z;
+    }
+  }
+
+  /** Anneaux + rayons + pentagone inter-familles pour le mandala Ruche. */
+  private buildMandalaTopology(byFamily: Map<string, number[]>): void {
+    for (const fam of STAR_QUEST_FAMILY_ORDER) {
+      const indices = byFamily.get(fam);
+      if (!indices?.length) continue;
+
+      let cx = 0;
+      let cy = 0;
+      for (const idx of indices) {
+        const i3 = idx * 3;
+        cx += this.layoutHomes[i3];
+        cy += this.layoutHomes[i3 + 1];
+      }
+      cx /= indices.length;
+      cy /= indices.length;
+
+      const ring = [...indices].sort((a, b) => {
+        const a3 = a * 3;
+        const b3 = b * 3;
+        return (
+          Math.atan2(this.layoutHomes[a3 + 1] - cy, this.layoutHomes[a3] - cx) -
+          Math.atan2(this.layoutHomes[b3 + 1] - cy, this.layoutHomes[b3] - cx)
+        );
+      });
+
+      for (let k = 0; k < ring.length; k++) {
+        this.mandalaRingPairs.push([ring[k], ring[(k + 1) % ring.length]]);
+        this.mandalaHubQuestIdx.push(ring[k]);
       }
     }
 
+    const reps: number[] = [];
+    for (const fam of STAR_QUEST_FAMILY_ORDER) {
+      const list = byFamily.get(fam);
+      if (!list?.length) continue;
+      const best = [...list].sort(
+        (a, b) => this.quests[b].rewardM4T3R - this.quests[a].rewardM4T3R
+      )[0];
+      reps.push(best);
+    }
+    for (let k = 0; k < reps.length; k++) {
+      this.mandalaCrossPairs.push([reps[k], reps[(k + 1) % reps.length]]);
+    }
+  }
+
+  private tickQuestDrift(
+    dt: number,
+    pos: THREE.BufferAttribute,
+    pointerWorld: THREE.Vector3 | null
+  ): void {
     for (let i = 0; i < this.quests.length; i++) {
       const i3 = i * 3;
       const isFocus = this.focusId === this.quests[i].id;
@@ -784,6 +1033,35 @@ export class StarConquestGraph {
       this.quests[i].position.y = y;
       this.quests[i].position.z = z;
     }
+  }
+
+  tick(deltaMs: number, camera?: THREE.Camera): void {
+    const dt = Math.min(0.05, deltaMs * 0.001);
+    this.driftTime += dt;
+    this.energyPhase +=
+      dt * (this.universeTheme.peerLayout === 'swarm-orbit' ? 0.32 : 1.2);
+    this.idleSignalTimer += deltaMs;
+    const pos = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const swarmOrbit = this.universeTheme.peerLayout === 'swarm-orbit';
+
+    let pointerWorld: THREE.Vector3 | null = null;
+    if (this.pointerNdc && camera && 'position' in camera) {
+      const cam = camera as THREE.PerspectiveCamera;
+      this.tmpProject.set(this.pointerNdc.x, this.pointerNdc.y, 0.5).unproject(cam);
+      this.tmpDir.copy(this.tmpProject).sub(cam.position).normalize();
+      if (Math.abs(this.tmpDir.z) > 1e-5) {
+        const distance = (0 - cam.position.z) / this.tmpDir.z;
+        pointerWorld = this.tmpPointer
+          .copy(cam.position)
+          .addScaledVector(this.tmpDir, distance);
+      }
+    }
+
+    if (swarmOrbit) {
+      this.applyQuestSwarmOrbit(dt, pos);
+    } else {
+      this.tickQuestDrift(dt, pos, pointerWorld);
+    }
 
     // Évitement naturel du joystick : aucune particule devant/derrière la hitbox
     // (les liens peuvent traverser — pas d’atténuation ici).
@@ -880,41 +1158,43 @@ export class StarConquestGraph {
       }
     }
 
-    // Séparation douce entre Quests (évite le pile-up sans bouger la structure globale)
-    const minSep = 3.2;
-    for (let i = 0; i < this.quests.length; i++) {
-      if (this.quests[i].underFloor || this.quests[i].underGraph) continue;
-      let xi = pos.getX(i);
-      let yi = pos.getY(i);
-      for (let j = i + 1; j < this.quests.length; j++) {
-        if (this.quests[j].underFloor || this.quests[j].underGraph) continue;
-        const xj = pos.getX(j);
-        const yj = pos.getY(j);
-        const dx = xj - xi;
-        const dy = yj - yi;
-        const d2 = dx * dx + dy * dy;
-        if (d2 >= minSep * minSep || d2 < 1e-8) continue;
-        const d = Math.sqrt(d2);
-        const push = ((minSep - d) / d) * 0.28;
-        const px = dx * push;
-        const py = dy * push;
-        xi -= px * 0.5;
-        yi -= py * 0.5;
-        pos.setXYZ(j, xj + px * 0.5, yj + py * 0.5, pos.getZ(j));
-        this.quests[j].position.x = xj + px * 0.5;
-        this.quests[j].position.y = yj + py * 0.5;
-        this.velX[i] -= px * 0.15;
-        this.velY[i] -= py * 0.15;
-        this.velX[j] += px * 0.15;
-        this.velY[j] += py * 0.15;
+    // Séparation douce entre Quests — désactivée en mandala (préserve l'orbite)
+    if (!swarmOrbit) {
+      const minSep = 3.2;
+      for (let i = 0; i < this.quests.length; i++) {
+        if (this.quests[i].underFloor || this.quests[i].underGraph) continue;
+        let xi = pos.getX(i);
+        let yi = pos.getY(i);
+        for (let j = i + 1; j < this.quests.length; j++) {
+          if (this.quests[j].underFloor || this.quests[j].underGraph) continue;
+          const xj = pos.getX(j);
+          const yj = pos.getY(j);
+          const dx = xj - xi;
+          const dy = yj - yi;
+          const d2 = dx * dx + dy * dy;
+          if (d2 >= minSep * minSep || d2 < 1e-8) continue;
+          const d = Math.sqrt(d2);
+          const push = ((minSep - d) / d) * 0.28;
+          const px = dx * push;
+          const py = dy * push;
+          xi -= px * 0.5;
+          yi -= py * 0.5;
+          pos.setXYZ(j, xj + px * 0.5, yj + py * 0.5, pos.getZ(j));
+          this.quests[j].position.x = xj + px * 0.5;
+          this.quests[j].position.y = yj + py * 0.5;
+          this.velX[i] -= px * 0.15;
+          this.velY[i] -= py * 0.15;
+          this.velX[j] += px * 0.15;
+          this.velY[j] += py * 0.15;
+        }
+        pos.setXYZ(i, xi, yi, pos.getZ(i));
+        this.quests[i].position.x = xi;
+        this.quests[i].position.y = yi;
       }
-      pos.setXYZ(i, xi, yi, pos.getZ(i));
-      this.quests[i].position.x = xi;
-      this.quests[i].position.y = yi;
     }
 
-    // Ping-pong sur le cadre externe non visible (260×560 autour de 250×550)
-    if (camera && 'position' in camera) {
+    // Ping-pong cadre externe — incompatible avec mandala lent
+    if (camera && 'position' in camera && !swarmOrbit) {
       this.applyOuterBorderPingPong(camera as THREE.PerspectiveCamera, dt);
     }
 
@@ -937,13 +1217,20 @@ export class StarConquestGraph {
       this.writeLineGeometry(this.linkedSet(this.focusId), this.energyPhase);
       this.updateEnergyPackets(this.focusId, this.energyPhase);
     } else {
-      coreMat.size = this.meanCoreSize * 0.5;
-      coreMat.opacity = 0.24 + Math.sin(this.driftTime * 0.35) * 0.03;
-      haloMat.size = this.meanCoreSize * 2.2;
-      haloMat.opacity = 0.08 + Math.sin(this.driftTime * 0.28) * 0.015;
+      const theme = this.universeTheme;
+      coreMat.size = this.meanCoreSize * 0.55 * theme.coreSizeMult;
+      coreMat.opacity =
+        theme.coreOpacity * 0.85 + Math.sin(this.driftTime * 0.35) * 0.04;
+      haloMat.size = this.meanCoreSize * 2.2 * theme.haloSizeMult;
+      haloMat.opacity =
+        theme.haloOpacity * 0.9 + Math.sin(this.driftTime * 0.28) * 0.02;
       this.writeLineGeometry(null, this.energyPhase);
       this.updateIdleEnergyPackets(this.energyPhase, deltaMs);
     }
+
+    this.background.tick(deltaMs);
+    this.effects.tick(deltaMs);
+    this.networkLayer.tick(deltaMs, this.universeTheme);
 
     const linePos = this.connectionLines.geometry.getAttribute(
       'position'
@@ -1026,6 +1313,9 @@ export class StarConquestGraph {
     (this.constellationGuides.material as THREE.Material).dispose();
     this.energyPackets.geometry.dispose();
     (this.energyPackets.material as THREE.Material).dispose();
+    this.networkLayer.dispose();
+    this.background.dispose();
+    this.effects.dispose();
     this.discTexture.dispose();
   }
 
@@ -1257,6 +1547,11 @@ export class StarConquestGraph {
   }
 
   private writeLineGeometry(linked: Set<number> | null, energy: number): void {
+    if (this.universeTheme.peerLayout === 'swarm-orbit') {
+      this.writeSwarmMandalaLines(linked, energy);
+      return;
+    }
+
     const posAttr = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
 
     this.edgePairs.forEach(([i, j], edgeIdx) => {
@@ -1313,6 +1608,107 @@ export class StarConquestGraph {
       void dx;
       void dy;
     });
+
+    const geom = this.connectionLines?.geometry;
+    if (!geom) return;
+    const p = geom.getAttribute('position') as THREE.BufferAttribute | undefined;
+    const c = geom.getAttribute('color') as THREE.BufferAttribute | undefined;
+    if (p) {
+      (p.array as Float32Array).set(this.linePositions);
+      p.needsUpdate = true;
+    }
+    if (c) {
+      (c.array as Float32Array).set(this.lineColors);
+      c.needsUpdate = true;
+    }
+  }
+
+  /** Lignes mandala : rayons hub, polygones intra-famille, pentagone global — pulse lent. */
+  private writeSwarmMandalaLines(linked: Set<number> | null, energy: number): void {
+    const posAttr = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
+    let edgeIdx = 0;
+
+    const writeSegment = (
+      ax: number,
+      ay: number,
+      az: number,
+      bx: number,
+      by: number,
+      bz: number,
+      fam: StarQuestFamily,
+      intensity: number,
+      isCross = false
+    ): void => {
+      const [cr0, cg0, cb0] = familyTheme(fam).rgb;
+      const breathe =
+        0.78 + 0.22 * Math.sin(energy * SWARM_MANDALA_PULSE + edgeIdx * 0.17);
+      const m = intensity * breathe * (isCross ? 0.72 : 1);
+      const o = edgeIdx * 6;
+      this.linePositions[o] = ax;
+      this.linePositions[o + 1] = ay;
+      this.linePositions[o + 2] = az;
+      this.linePositions[o + 3] = bx;
+      this.linePositions[o + 4] = by;
+      this.linePositions[o + 5] = bz;
+      for (let k = 0; k < 2; k++) {
+        const c = o + k * 3;
+        const tip = k === 0 ? 1 : 0.88 + 0.12 * Math.sin(energy * 0.3 + edgeIdx);
+        this.lineColors[c] = Math.min(1.1, cr0 * m * tip);
+        this.lineColors[c + 1] = Math.min(1.1, cg0 * m * tip);
+        this.lineColors[c + 2] = Math.min(1.1, cb0 * m * tip);
+      }
+      edgeIdx++;
+    };
+
+    const writePair = (i: number, j: number, hubIntensity: number, isCross = false): void => {
+      const fa = this.quests[i].family;
+      const focused = linked !== null && linked.has(i) && linked.has(j);
+      const dim = linked !== null && !focused;
+      let intensity = focused ? 0.92 : hubIntensity;
+      if (dim) intensity *= 0.45;
+      writeSegment(
+        posAttr.getX(i),
+        posAttr.getY(i),
+        posAttr.getZ(i),
+        posAttr.getX(j),
+        posAttr.getY(j),
+        posAttr.getZ(j),
+        fa,
+        intensity,
+        isCross
+      );
+    };
+
+    // Rayons hub → centre de famille (étoile mandala)
+    for (const qi of this.mandalaHubQuestIdx) {
+      const fam = this.quests[qi].family;
+      const hub = this.swarmCentroids.get(fam);
+      if (!hub) continue;
+      const focused = linked !== null && linked.has(qi);
+      const dim = linked !== null && !focused;
+      let intensity = focused ? 0.85 : 0.38;
+      if (dim) intensity *= 0.4;
+      writeSegment(
+        posAttr.getX(qi),
+        posAttr.getY(qi),
+        posAttr.getZ(qi),
+        hub.x,
+        hub.y,
+        hub.z,
+        fam,
+        intensity
+      );
+    }
+
+    // Anneaux intra-famille (polygones qui tournent lentement)
+    for (const [i, j] of this.mandalaRingPairs) {
+      writePair(i, j, 0.52);
+    }
+
+    // Pentagone inter-familles (couche fractale globale)
+    for (const [i, j] of this.mandalaCrossPairs) {
+      writePair(i, j, 0.34, true);
+    }
 
     const geom = this.connectionLines?.geometry;
     if (!geom) return;

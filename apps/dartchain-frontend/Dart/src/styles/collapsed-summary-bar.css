@@ -1,0 +1,193 @@
+/**
+ * Barres dynamiques repliées — centrage vertical/horizontal harmonisé.
+ * Showcase (2e ligne), dock smart-bar, graph replié.
+ */
+
+.collapsed-summary-bar {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  max-height: var(--smart-bar-h, var(--showcase-smart-bar-h, 11px));
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+/* Coques internes (grilles / flex des summaries) */
+.collapsed-summary-bar > :first-child,
+.collapsed-summary-bar :is(
+  .showcase-chat-bar__fill,
+  .news-summary-bar,
+  .r4v3-summary-bar,
+  .launch-summary-bar,
+  .dao-summary-bar,
+  .chart-summary-bar,
+  .dock-summary-bar
+) {
+  align-items: center;
+  align-content: center;
+  align-self: center;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+/* Texte — évite la troncature vers le bas (line-height > 1) */
+.collapsed-summary-bar :is(
+  [class*='__text'],
+  [class*='__headline'],
+  [class*='__author'],
+  [class*='__preview'],
+  [class*='__pillar'],
+  [class*='__pillar-label'],
+  [class*='__pillar-detail'],
+  [class*='__name'],
+  [class*='__symbol'],
+  [class*='__price'],
+  [class*='__delta'],
+  [class*='__metric'],
+  [class*='__age'],
+  [class*='__time'],
+  [class*='__status'],
+  [class*='__label'],
+  [class*='__cap'],
+  [class*='__stats'],
+  [class*='__summary'],
+  [class*='__access'],
+  [class*='__fallback'],
+  [class*='__peg'],
+  [class*='__progress__text']
+) {
+  line-height: 1 !important;
+  max-height: 100%;
+}
+
+.collapsed-summary-bar :is(
+  [class*='__text'],
+  [class*='__headline'],
+  [class*='__author'],
+  [class*='__name'],
+  [class*='__symbol'],
+  [class*='__fallback'],
+  [class*='__progress__text']
+) {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+}
+
+/* Conteneurs d’animation / empilement */
+.collapsed-summary-bar :is(
+  [class*='__stack'],
+  [class*='__line'],
+  [class*='__slide'],
+  [class*='__viewport'],
+  [class*='__headline-wrap'],
+  [class*='__main'],
+  [class*='__ticker'],
+  [class*='__progress']
+) {
+  align-items: center;
+  align-self: center;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.collapsed-summary-bar [class*='__headline-wrap'] {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.collapsed-summary-bar [class*='__stack'],
+.collapsed-summary-bar [class*='__line'] {
+  display: inline-flex;
+}
+
+/* Badges, puces, LED — contenus dans la smart-bar */
+.collapsed-summary-bar :is(
+  .unread-badge,
+  .news-summary-bar__badge,
+  .news-summary-bar__action-btn,
+  .news-summary-bar__unread-toast,
+  .launch-summary-status,
+  .dao-summary-status,
+  .dock-summary-status,
+  .dock-summary-badge,
+  .r4v3-summary-bar__peg,
+  .r4v3-summary-bar__wp-btn,
+  .chart-summary-bar__range
+) {
+  align-self: center;
+  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 11px)) - 2px);
+  height: auto;
+  min-height: 0;
+  line-height: 1;
+}
+
+.collapsed-summary-bar :is(
+  [class*='__live-led'],
+  [class*='__led'],
+  .dock-summary-main__rail
+) {
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* Boutons compacts dans la barre */
+.collapsed-summary-bar :is(
+  [class*='__refresh'],
+  [class*='__action-btn'],
+  .dock-summary-actions__btn
+) {
+  align-self: center;
+  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 11px)) - 1px);
+}
+
+/* Zones meta / actions */
+.collapsed-summary-bar :is(
+  [class*='__meta'],
+  [class*='__actions'],
+  .showcase-chat-meta
+) {
+  align-items: center;
+  align-self: center;
+  max-height: 100%;
+}
+
+/* Showcase replié : chaîne flex jusqu’au summary */
+.app-hub-showcase-block.is-showcase-collapsed .app-showcase-band.is-collapsed,
+.app-hub-showcase-block.is-showcase-collapsed .showcase-panel.is-collapsed,
+.app-hub-showcase-block.is-showcase-collapsed .showcase-panel__body--smart-collapsed,
+.app-hub-showcase-block.is-showcase-collapsed .showcase-window,
+.app-hub-showcase-block.is-showcase-collapsed .showcase-window__body,
+.app-hub-showcase-block.is-showcase-collapsed .showcase-tab-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.app-hub-showcase-block.is-showcase-collapsed .showcase-tab-panel > .collapsed-summary-bar {
+  flex: 0 0 100%;
+}
+
+.app-hub-showcase-block.is-showcase-collapsed {
+  --smart-bar-h: var(--showcase-smart-bar-h);
+}
+
+.app-bottom-stack.is-dock-collapsed,
+.app-market-stack--rate.is-chart-collapsed {
+  --smart-bar-h: var(--dock-smart-bar-h, var(--showcase-smart-bar-h, 11px));
+}
+
+.app-market-stack--rate.is-chart-collapsed {
+  --smart-bar-h: var(--chart-smart-bar-h, var(--showcase-smart-bar-h, 11px));
+}

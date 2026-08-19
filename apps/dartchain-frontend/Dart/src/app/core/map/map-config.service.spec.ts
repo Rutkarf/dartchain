@@ -31,7 +31,7 @@ describe('MapConfigService', () => {
     expect(config.bounds).toEqual(MARSEILLE_BOUNDS);
     expect(config.startPosition).toEqual(MARSEILLE_START_POSITION);
     expect(config.startOrientation).toEqual(MARSEILLE_START_ORIENTATION);
-    expect(config.startOrientation.cameraPitch).toBeCloseTo(0.1);
+    expect(config.startOrientation.cameraPitch).toBeCloseTo(0.12);
     expect(config.startOrientation.cameraDistance).toBe(6.2);
     expect(config.startOrientation.cameraDistance).toBeLessThan(8);
     expect(config.startOrientation.cameraLookAhead).toBe(0.2);

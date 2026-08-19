@@ -264,13 +264,17 @@
   pointer-events: none;
 }
 
-/* Fond plein noir — derrière particules (0) et floor (1) */
+/* Fond Star Conquest — dégradé radial par univers (--sc-universe-*). */
 .app-game-background {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: #000000;
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 40%,
+    var(--sc-universe-bg-center, #070504) 0%,
+    var(--sc-universe-bg-edge, #141008) 72%
+  );
 }
 
 .app-shell > app-navbar,

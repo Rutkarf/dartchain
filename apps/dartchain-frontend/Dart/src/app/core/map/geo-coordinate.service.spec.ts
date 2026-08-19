@@ -14,7 +14,7 @@ describe('GeoCoordinateService', () => {
     geo = TestBed.inject(GeoCoordinateService);
   });
 
-  it('place l origine Marseille au centre du monde local', () => {
+  it('place l origine Ombrière au centre du monde local', () => {
     const world = geo.geoToWorld(
       MARSEILLE_START_POSITION.latitude,
       MARSEILLE_START_POSITION.longitude,
@@ -28,8 +28,8 @@ describe('GeoCoordinateService', () => {
 
   it('convertit inversement sans perte significative sur le Vieux-Port', () => {
     const original = {
-      latitude: 43.2965,
-      longitude: 5.3698,
+      latitude: 43.2945995,
+      longitude: 5.3741227,
       altitude: 12,
     };
     const world = geo.geoToWorld(original.latitude, original.longitude, original.altitude);
@@ -55,16 +55,16 @@ describe('GeoCoordinateService', () => {
   });
 
   it('oriente le nord géographique vers −Z', () => {
-    const origin = geo.geoToWorld(43.2965, 5.3698, 0);
-    const north = geo.geoToWorld(43.2975, 5.3698, 0);
+    const origin = geo.geoToWorld(43.2945995, 5.3741227, 0);
+    const north = geo.geoToWorld(43.2955995, 5.3741227, 0);
 
     expect(north.z).toBeLessThan(origin.z);
     expect(north.x).toBeCloseTo(origin.x, 3);
   });
 
   it('oriente l est géographique vers +X', () => {
-    const origin = geo.geoToWorld(43.2965, 5.3698, 0);
-    const east = geo.geoToWorld(43.2965, 5.3708, 0);
+    const origin = geo.geoToWorld(43.2945995, 5.3741227, 0);
+    const east = geo.geoToWorld(43.2945995, 5.3751227, 0);
 
     expect(east.x).toBeGreaterThan(origin.x);
     expect(east.z).toBeCloseTo(origin.z, 3);
@@ -78,8 +78,8 @@ describe('GeoCoordinateService', () => {
   });
 
   it('retourne des Vector3 indépendants à chaque appel', () => {
-    const a = geo.geoToWorld(43.2965, 5.3698, 0);
-    const b = geo.geoToWorld(43.297, 5.37, 5);
+    const a = geo.geoToWorld(43.2945995, 5.3741227, 0);
+    const b = geo.geoToWorld(43.295, 5.3745, 5);
     a.x = 999;
     expect(b).toBeInstanceOf(THREE.Vector3);
     expect(b.x).not.toBe(999);

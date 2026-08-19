@@ -1,11 +1,14 @@
 package io.dartchain.backend.m4t3r;
 
+import io.dartchain.backend.m4t3r.config.M4t3rRewardConfig;
 import io.dartchain.backend.m4t3r.dto.M4t3rHiddenCell;
 import io.dartchain.backend.m4t3r.dto.M4t3rTrailPickupRequest;
 import io.dartchain.backend.m4t3r.dto.M4t3rTrailPickupResponse;
 import io.dartchain.backend.m4t3r.dto.WorldPoint;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,6 +36,11 @@ public class M4t3rTrailService {
     private final Map<String, Long> hiddenUntil = new ConcurrentHashMap<>();
     private final Map<String, RateWindow> rates = new ConcurrentHashMap<>();
     private final Map<String, LastMove> lastMoves = new ConcurrentHashMap<>();
+    private final M4t3rRewardConfig rewardConfig;
+
+    public M4t3rTrailService(M4t3rRewardConfig rewardConfig) {
+        this.rewardConfig = rewardConfig;
+    }
 
     public M4t3rTrailPickupResponse pickup(String playerId, M4t3rTrailPickupRequest request) {
         expireHidden();
@@ -40,18 +48,22 @@ public class M4t3rTrailService {
         WorldPoint previous = request.previousPosition();
         WorldPoint current = request.currentPosition();
         if (previous == null || current == null) {
-            return rejected(playerId);
+            return M4t3rTrailPickupResponse.empty(playerId);
         }
         double step = Math.hypot(current.x() - previous.x(), current.z() - previous.z());
         if (step < 0.02 || step > MAX_STEP_METERS) {
-            return rejected(playerId);
+            return M4t3rTrailPickupResponse.empty(playerId);
         }
+        BigDecimal measuredSpeed = BigDecimal.ZERO;
         LastMove last = lastMoves.get(playerId);
         if (last != null) {
             double dt = (now - last.atMs) / 1000.0;
             double fromLast = Math.hypot(current.x() - last.x, current.z() - last.z);
             if (dt > 0.02 && fromLast / dt > MAX_SPEED_METERS_PER_SECOND) {
-                return rejected(playerId);
+                return M4t3rTrailPickupResponse.empty(playerId);
+            }
+            if (dt > 0.02) {
+                measuredSpeed = BigDecimal.valueOf(fromLast / dt).setScale(3, RoundingMode.HALF_UP);
             }
         }
         lastMoves.put(playerId, new LastMove(current.x(), current.z(), now));
@@ -74,6 +86,10 @@ public class M4t3rTrailService {
             if (!computed.contains(cellId) || !isValidClusterId(cellId)) {
                 continue;
             }
+            int[] grid = M4t3rGridUtils.parseClusterGrid(cellId);
+            if (grid == null || !M4t3rGridUtils.isClusterOnCheckerboard(grid[0], grid[1], CLUSTER_SIZE)) {
+                continue;
+            }
             Long until = hiddenUntil.get(cellId);
             if (until != null && until > now) {
                 continue;
@@ -89,8 +105,12 @@ public class M4t3rTrailService {
                 playerId,
                 accepted,
                 accepted.size(),
-                0,
-                respawnAt
+                respawnAt,
+                "0",
+                measuredSpeed.toPlainString(),
+                rewardConfig.getMaxSpeedMps().toPlainString(),
+                rewardConfig.getSettlementMode(),
+                List.of()
         );
     }
 
@@ -162,17 +182,6 @@ public class M4t3rTrailService {
 
     private static String clusterId(int gridX, int gridZ) {
         return "m4t3r-cluster:" + gridX + ":" + gridZ;
-    }
-
-    private static M4t3rTrailPickupResponse rejected(String playerId) {
-        return new M4t3rTrailPickupResponse(
-                "M4T3R_TRAIL_PICKUP_ACCEPTED",
-                playerId,
-                List.of(),
-                0,
-                0,
-                System.currentTimeMillis()
-        );
     }
 
     private static final class LastMove {

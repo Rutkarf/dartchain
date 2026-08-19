@@ -55,6 +55,16 @@ import {
   isScreenPointBlockedByUi,
 } from './star-conquest/star-conquest-occlusion';
 import { formatRewardShort } from './star-conquest/star-conquest-visuals';
+import {
+  DEFAULT_QUEST_VISUALIZATION_MODE,
+  mapQualityToQuestGraphQuality,
+} from '../core/map/map-configuration';
+import { environment } from '../../environments/environment';
+import { KnowledgeGraphOrchestratorService } from './knowledge-graph/knowledge-graph-orchestrator.service';
+import { QUEST_ORBIT_CONFIG } from './knowledge-graph/knowledge-graph.config';
+import { StarConquestUniverseService } from '../core/services/star-conquest-universe.service';
+import { starConquestUniverseTheme } from './star-conquest/star-conquest-universes.config';
+import type { StarConquestUniverseId } from './star-conquest/star-conquest-universe.types';
 
 /**
  * Arrière-plan global = univers neuronal Star Conquest (z-index 0).
@@ -70,6 +80,8 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private readonly hostRef = inject(ElementRef<HTMLElement>);
   private readonly conquestState = inject(StarConquestStateService);
   private readonly joyBridge = inject(StarJoystickBridgeService);
+  private readonly kgOrchestrator = inject(KnowledgeGraphOrchestratorService);
+  private readonly universeService = inject(StarConquestUniverseService);
   private readonly zone = inject(NgZone);
 
   private scene?: THREE.Scene;
@@ -132,6 +144,15 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       if (this.canvas) this.canvas.style.cursor = id ? 'pointer' : 'default';
     });
   };
+  private readonly onUniverseChangeEvent = (event: Event): void => {
+    const detail = (event as CustomEvent<{ universeId: StarConquestUniverseId }>).detail;
+    if (!detail?.universeId) return;
+    this.zone.runOutsideAngular(() => {
+      const theme = starConquestUniverseTheme(detail.universeId);
+      this.kgOrchestrator.setUniverse(detail.universeId);
+      this.conquest?.setUniverse(theme);
+    });
+  };
 
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => this.initWebGl());
@@ -153,7 +174,8 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.camera.position.z = 160;
 
       this.renderer.setSize(width, height, false);
-      this.renderer.setPixelRatio(1);
+      const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+      this.renderer.setPixelRatio(dpr);
       this.renderer.setClearColor(0x000000, 0);
       this.renderer.autoClear = true;
 
@@ -177,8 +199,24 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
       this.world = new StarConquestWorld();
       this.scene.add(this.world.root);
+      this.joystick = new StarConquestJoystick();
+      this.scene.add(this.joystick.group);
+      this.joyBridge.register(this.joystick);
       this.conquest = new StarConquestGraph(this.quests);
       this.world.attachContent(this.conquest.group);
+
+      const vizMode = DEFAULT_QUEST_VISUALIZATION_MODE;
+      this.conquest.setVisualizationMode(vizMode);
+      this.kgOrchestrator.setVisualizationMode(vizMode);
+      this.kgOrchestrator.setQuality(
+        mapQualityToQuestGraphQuality(environment.mapQuality ?? 'medium')
+      );
+      this.kgOrchestrator.bindGraph(this.conquest);
+      this.kgOrchestrator.start(this.quests);
+      this.universeService.initCssBackground();
+      const initialTheme = this.universeService.theme();
+      this.conquest.setUniverse(initialTheme);
+      this.kgOrchestrator.setUniverse(initialTheme.id);
       this.relayoutBackground();
       requestAnimationFrame(() => {
         this.relayoutBackground();
@@ -191,6 +229,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       window.addEventListener('star-conquest-dismiss', this.onDismissEvent);
       window.addEventListener('star-conquest-select', this.onSelectEvent);
       window.addEventListener('star-conquest-hover', this.onHoverEvent);
+      window.addEventListener('star-conquest-universe-change', this.onUniverseChangeEvent);
 
       this.resizeBinding = bindContainerResize(
         this.hostRef.nativeElement,
@@ -221,6 +260,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     window.removeEventListener('star-conquest-dismiss', this.onDismissEvent);
     window.removeEventListener('star-conquest-select', this.onSelectEvent);
     window.removeEventListener('star-conquest-hover', this.onHoverEvent);
+    window.removeEventListener('star-conquest-universe-change', this.onUniverseChangeEvent);
     window.removeEventListener('resize', this.onWindowLayout);
     this.layoutObserver?.disconnect();
     this.unbindPointer();
@@ -232,6 +272,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.conquestState.setRewardLabels([]);
 
     this.conquest?.dispose();
+    this.kgOrchestrator.destroy();
     if (this.joystick) {
       this.joyBridge.unregister(this.joystick);
       this.scene?.remove(this.joystick.group);
@@ -370,6 +411,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       canvas.addEventListener('pointermove', this.onPointerMove, { passive: true });
       canvas.addEventListener('pointerleave', this.onPointerLeave, { passive: true });
       canvas.addEventListener('pointerdown', this.onPointerDown, { passive: false });
+      canvas.addEventListener('wheel', this.onWheel, { passive: false });
     });
     this.pointerActive = true;
   }
@@ -379,9 +421,17 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.canvas.removeEventListener('pointermove', this.onPointerMove);
     this.canvas.removeEventListener('pointerleave', this.onPointerLeave);
     this.canvas.removeEventListener('pointerdown', this.onPointerDown);
+    this.canvas.removeEventListener('wheel', this.onWheel);
     this.unbindJoyWindow();
     this.pointerActive = false;
   }
+
+  private readonly onWheel = (event: WheelEvent): void => {
+    if (this.conquestState.worldNavigating()) return;
+    event.preventDefault();
+    const delta = event.deltaY * 0.045 * QUEST_ORBIT_CONFIG.zoomSpeed;
+    this.kgOrchestrator.cameraController.adjustUserZoom(delta);
+  };
 
   private bindJoyWindow(): void {
     window.addEventListener('pointermove', this.onJoyMove);
@@ -475,8 +525,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.zone.run(() => {
         event.preventDefault();
         const quest = this.conquest?.getQuest(questHit.questId) ?? null;
-        if (!quest) return;
-        this.applySelection(quest, questHit.worldPosition);
+        if (quest) {
+          this.applySelection(quest, questHit.worldPosition);
+        }
       });
       return;
     }
@@ -539,24 +590,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       joy?.pulseTap();
       this.zone.run(() => this.conquestState.openScanner());
     } else {
-      // Lâcher après pan → vue + particules recentrées dans le viewport app
-      this.recenterAfterJoystick();
+      // Lâcher après pan → recentrage doux de la caméra (particules mandala intactes)
+      this.world?.resetView(false);
     }
-  };
-
-  /** Caméra → centre ; particules → ancrage layout (250×550). */
-  private recenterAfterJoystick(): void {
-    this.world?.resetView(false);
-    this.conquest?.restoreLayoutHomes();
-    if (this.conquest) {
-      const byId = new Map(this.conquest.getAllQuests().map((q) => [q.id, q]));
-      for (const q of this.quests) {
-        const g = byId.get(q.id);
-        if (!g) continue;
-        q.position = { ...g.position };
-      }
-    }
-    this.updateTravelBoundsFromQuests();
   }
 
   /** Tooltip + aria : survol uniquement, jamais pendant le click. */
@@ -650,6 +686,10 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.conquest?.setPointerNdc(null);
     this.conquest?.setFocus(quest.id);
     this.conquest?.pulseFocus();
+    this.kgOrchestrator.focusNode(`quest:${quest.id}`);
+    if (this.world && this.camera) {
+      this.kgOrchestrator.cameraController.focusNode(this.world, this.camera, world);
+    }
     this.lastAnchorX = 0;
     this.lastAnchorY = 0;
     const anchor = this.projectToScreen(world);
@@ -669,10 +709,23 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.conquest.pulseFocus();
   }
 
+  private applyKnowledgeNodeSelection(nodeId: string, world: THREE.Vector3): void {
+    this.kgOrchestrator.focusNode(nodeId);
+    this.conquest?.setNetworkFocus(nodeId);
+    if (this.world && this.camera) {
+      const cluster = nodeId.startsWith('ai-agent:');
+      this.kgOrchestrator.cameraController.focusNode(this.world, this.camera, world, cluster);
+    }
+  }
+
   private clearSelection(): void {
     this.focusedId = null;
     this.hoverPreviewId = null;
     this.conquest?.setFocus(null);
+    this.kgOrchestrator.clearFocus();
+    if (this.world && this.camera) {
+      this.kgOrchestrator.cameraController.restore(this.world, this.camera);
+    }
     this.conquestState.clear();
     if (this.canvas) this.canvas.style.cursor = 'default';
     this.refreshRewardLabels();
@@ -893,12 +946,13 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         if (this.conquestState.worldNavigating()) {
           this.world.setStick(stick.x, stick.y);
         } else if (this.world.isDragging()) {
-          this.world.releaseStick();
+          this.world.releaseStick(false);
         }
         this.world.tick(delta);
         this.world.root.updateMatrixWorld(true);
         if (this.camera) {
-          this.world.applyToCamera(this.camera, 160);
+          this.kgOrchestrator.cameraController.tick(delta, this.camera);
+          this.world.applyToCamera(this.camera, this.camera.position.z);
           const floorPeek =
             parseFloat(
               getComputedStyle(document.documentElement).getPropertyValue(
@@ -970,6 +1024,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
           }
         }
       }
+      const peerConnected =
+        this.kgOrchestrator.adapter.getPeerStates().some((p) => p.status === 'connected');
+      this.kgOrchestrator.tick(delta, peerConnected);
       if (this.focusedId && this.conquestState.selected()) {
         this.syncPanelAnchor();
       }
@@ -1013,7 +1070,8 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height, false);
-    this.renderer.setPixelRatio(1);
+    const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+    this.renderer.setPixelRatio(dpr);
     this.relayoutBackground();
   }
 }

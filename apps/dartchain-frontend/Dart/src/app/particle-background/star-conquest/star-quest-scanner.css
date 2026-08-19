@@ -168,7 +168,7 @@
   -webkit-backdrop-filter: none !important;
   color: rgba(var(--sc-family-rgb, 62, 207, 220), 0.78);
   font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 3.75px;
+  font-size: clamp(8px, 2.4vw, 11px);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
@@ -291,4 +291,66 @@
     width: 3.5px;
     height: 3.5px;
   }
+}
+
+/* Barre sélection univers — toujours visible, haut de l'écran Star Conquest */
+.sc-universe-bar {
+  position: fixed;
+  z-index: 130;
+  top: max(6px, env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  max-width: calc(100vw - 12px);
+}
+
+.sc-universe-bar__label {
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(var(--sc-universe-aurora-rgb, 255, 224, 102), 0.85);
+  text-shadow: 0 0 8px rgba(var(--sc-universe-aurora-rgb, 255, 224, 102), 0.35);
+}
+
+.sc-universe-bar__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  max-width: 100%;
+}
+
+.sc-universe-chip {
+  margin: 0;
+  padding: 3px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(8, 12, 20, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(190, 210, 230, 0.88);
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+
+.sc-universe-chip:hover {
+  border-color: rgba(var(--sc-universe-aurora-rgb, 255, 224, 102), 0.45);
+  color: rgba(240, 250, 255, 0.95);
+}
+
+.sc-universe-chip.is-active {
+  border-color: rgba(var(--sc-universe-aurora-rgb, 255, 224, 102), 0.75);
+  background: rgba(var(--sc-universe-aurora-rgb, 255, 224, 102), 0.12);
+  color: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 0 12px rgba(var(--sc-universe-aurora-rgb, 255, 224, 102), 0.25);
 }

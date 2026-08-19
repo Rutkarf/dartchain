@@ -5,7 +5,16 @@ import {
   METERS_PER_DEGREE_LATITUDE,
   metersPerDegreeLongitude,
 } from './geo-projection.constants';
+import {
+  GEO_REFERENCE_CONFIG,
+  metersToWorld as configMetersToWorld,
+  worldToMeters as configWorldToMeters,
+  type GeoReferenceConfig,
+} from './geo-reference.config';
 import { LocalOriginService } from './local-origin.service';
+
+export { GEO_REFERENCE_CONFIG, type GeoReferenceConfig };
+export { metersToWorld, worldToMeters } from './geo-reference.config';
 
 export interface GeoCoordinates {
   latitude: number;
@@ -39,6 +48,24 @@ export class GeoCoordinateService {
       -deltaLat * METERS_PER_DEGREE_LATITUDE * scale
     );
     return this.scratch.clone();
+  }
+
+  getReferenceConfig(): GeoReferenceConfig {
+    return {
+      ...GEO_REFERENCE_CONFIG,
+      originLatitude: this.origin.latitude,
+      originLongitude: this.origin.longitude,
+      originAltitude: this.origin.altitude,
+      metersPerWorldUnit: this.origin.worldScale,
+    };
+  }
+
+  metersToWorldUnits(meters: number): number {
+    return configMetersToWorld(meters) * (this.origin.worldScale / GEO_REFERENCE_CONFIG.metersPerWorldUnit);
+  }
+
+  worldUnitsToMeters(units: number): number {
+    return configWorldToMeters(units) * (GEO_REFERENCE_CONFIG.metersPerWorldUnit / (this.origin.worldScale || 1));
   }
 
   worldToGeo(position: THREE.Vector3): GeoCoordinates {

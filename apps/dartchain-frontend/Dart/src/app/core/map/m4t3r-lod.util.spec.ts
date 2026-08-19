@@ -18,12 +18,13 @@ describe('M4T3R LOD', () => {
     expect(getLodBand(64)).toBe('far');
   });
 
-  it('sous-échantillonne la grille aux bandes mid/far', () => {
+  it('sous-échantillonne le damier aux bandes mid/far', () => {
     expect(shouldRenderCellAtLod(1, 1, 'near')).toBe(true);
     expect(shouldRenderCellAtLod(1, 1, 'mid')).toBe(false);
-    expect(shouldRenderCellAtLod(2, 4, 'mid')).toBe(true);
-    expect(shouldRenderCellAtLod(2, 4, 'far')).toBe(false);
-    expect(shouldRenderCellAtLod(8, 12, 'far')).toBe(true);
+    expect(shouldRenderCellAtLod(2, 2, 'mid')).toBe(true);
+    expect(shouldRenderCellAtLod(2, 2, 'far')).toBe(false);
+    expect(shouldRenderCellAtLod(8, 8, 'far')).toBe(true);
+    expect(shouldRenderCellAtLod(8, 9, 'mid')).toBe(false);
   });
 
   it('réduit ou coupe animation CPU à distance', () => {

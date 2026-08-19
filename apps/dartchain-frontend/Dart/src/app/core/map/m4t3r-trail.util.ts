@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import { M4T3R_DENSITY_CONFIG, TRAIL_CONFIG, COLLECT_TRAIL_VISUAL_CONFIG } from './map-configuration';
+import { isWorldPositionOnCheckerboard } from './m4t3r-grid.util';
 
 export type M4T3RVisualVariant = 'thin-leaf' | 'vertical-chip' | 'metal-fragment' | 'neon-shard';
 
@@ -102,6 +103,7 @@ export function getCellsAlongMovement(
       const ox = (u - 0.5) * 2 * half;
       const px = x + nx * ox;
       const pz = z + nz * ox;
+      if (!isWorldPositionOnCheckerboard(px, pz)) continue;
       const id = logicalCellId(Math.floor(px / cellSize), Math.floor(pz / cellSize));
       if (!seen.has(id)) {
         seen.add(id);

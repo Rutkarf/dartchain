@@ -61,8 +61,22 @@ export const VIEUX_PORT_METRO_MIRROR_VIEW = {
   lookAt: { x: -6, y: 2.2, z: -8 } satisfies WorldAnchor,
 } as const;
 
+/** Vue alignement bâtiments / quais / mer — debug géoréférencement Vieux-Port. */
+export const VIEUX_PORT_BUILDING_ALIGNMENT_VIEW = {
+  id: 'VIEUX_PORT_BUILDING_ALIGNMENT_VIEW',
+  position: { x: -18, y: 38, z: 52 } satisfies WorldAnchor,
+  lookAt: { x: 8, y: 12, z: -12 } satisfies WorldAnchor,
+} as const;
+
 /** Identifiant stable du 2e bâtiment adjacent au miroir (est du Vieux-Port). */
 export const MIRROR_SECOND_BUILDING_ID = 'mirror-adjacent-building-02';
+
+/** Origine géographique = Ombrière (OSM way/200273945). Voir geo-reference.config.ts. */
+export {
+  MARSEILLE_GEO_ORIGIN,
+  GEO_REFERENCE_CONFIG,
+  GEOGRAPHIC_DATA_SOURCES,
+} from './geo-reference.config';
 
 export const SCENE_COPY = {
   canopyTitle: 'MetaVerseBB',
@@ -254,6 +268,26 @@ export const ORBIT_CONFIG = {
 export type QuestParticleMode = 'quest-field' | 'metaverse-starry-sky';
 export const QUEST_PARTICLE_MODE: QuestParticleMode = 'metaverse-starry-sky';
 
+/** Knowledge graph visualization layered on Star Conquest particles. */
+export type QuestVisualizationMode =
+  | 'legacy-particles'
+  | 'knowledge-graph'
+  | 'hybrid';
+
+export const DEFAULT_QUEST_VISUALIZATION_MODE: QuestVisualizationMode = 'hybrid';
+
+export type QuestGraphQuality = 'ultra-low' | 'low' | 'medium' | 'high';
+
+export const DEFAULT_QUEST_GRAPH_QUALITY: QuestGraphQuality = 'medium';
+
+export function mapQualityToQuestGraphQuality(
+  mapQuality: 'low' | 'medium' | 'high'
+): QuestGraphQuality {
+  if (mapQuality === 'low') return 'low';
+  if (mapQuality === 'high') return 'high';
+  return 'medium';
+}
+
 export const M4T3R_VERTICAL_OFFSET = 0.08;
 
 /**
@@ -432,24 +466,27 @@ export const MARSEILLE_BOUNDS: MapBounds = {
   east: 5.55,
 };
 
-/** Position initiale du personnage (Vieux-Port). */
+/**
+ * Position initiale du personnage — géo de l'Ombrière (origine scène).
+ * Le spawn gameplay ajoute METRO_SPAWN_ANCHOR.spawnOffsetFromMirror en world space.
+ */
 export const MARSEILLE_START_POSITION: GeoPosition = {
-  latitude: 43.2965,
-  longitude: 5.3698,
+  latitude: 43.2945995,
+  longitude: 5.3741227,
   altitude: 20,
 };
 
 /**
  * Départ gameplay Marseille :
- * - personnage tourné vers le nord géographique (−Z)
- * - caméra au sud, donc dos au Vieux-Port / à l'eau
+ * - personnage face au nord (−Z) : arcades à gauche, boutiques à droite, eau derrière
+ * - caméra au sud (+Z), légèrement au-dessus de l'épaule
  */
 export const MARSEILLE_START_ORIENTATION: MapStartOrientation = {
-  characterRotationY: Math.PI,
-  cameraYaw: 0,
-  cameraPitch: 0.1,
+  characterRotationY: 0,
+  cameraYaw: Math.PI,
+  cameraPitch: 0.12,
   cameraDistance: 6.2,
-  cameraLookAhead: 0.2,
+  cameraLookAhead: 0.35,
 };
 
 /** Valeurs par défaut — provider Marseille avec fallback legacy si échec. */

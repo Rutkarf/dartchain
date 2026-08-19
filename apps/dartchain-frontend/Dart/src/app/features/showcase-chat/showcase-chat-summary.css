@@ -58,8 +58,12 @@
 
 .unread-badge {
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 12px;
-  height: 8px;
+  height: auto;
+  max-height: 100%;
   padding: 0 1px;
   border-radius: 999px;
   background: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.2);
@@ -67,7 +71,7 @@
   font-family: var(--font-display);
   font-size: clamp(0.3375rem, 2vw, 0.4375rem);
   font-weight: 700;
-  line-height: 8px;
+  line-height: 1;
   text-align: center;
   white-space: nowrap;
   box-shadow: none;
@@ -84,7 +88,7 @@
   font-family: 'DejaVu Sans Mono', 'Liberation Mono', 'Share Tech Mono', monospace;
   font-size: clamp(0.375rem, 2.35vw, 0.5625rem);
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1;
   color: #b8bcc4;
   white-space: nowrap;
 }
@@ -117,10 +121,11 @@
 .showcase-chat-preview__text {
   flex: 1 1 auto;
   min-width: 0;
-  display: block;
+  display: inline-flex;
+  align-items: center;
   font-size: clamp(0.375rem, 2.35vw, 0.5625rem);
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;

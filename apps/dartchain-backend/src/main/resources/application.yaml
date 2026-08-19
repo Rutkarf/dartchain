@@ -83,6 +83,12 @@ dartchain:
   data-import:
     enabled: false
     exit-after-import: true
+  wigle:
+    mock-enabled: true
+    api-name: ${WIGLE_API_NAME:}
+    api-token: ${WIGLE_API_TOKEN:}
+    cache-ttl-ms: 300000
+    coordinate-precision-degrees: 0.0004
 
 management:
   endpoints:
@@ -149,6 +155,19 @@ quests:
 faucet:
   claims:
     path: ${FAUCET_CLAIMS_PATH:data/faucet-claims.json}
+
+m4t3r:
+  reward:
+    settlement-mode: ${M4T3R_REWARD_SETTLEMENT_MODE:OFFCHAIN}
+    testnet-enabled: ${M4T3R_REWARD_TESTNET_ENABLED:false}
+    mainnet-enabled: ${M4T3R_REWARD_MAINNET_ENABLED:false}
+    amount-per-token: ${M4T3R_REWARD_AMOUNT:0.00000000000000000000000001}
+    signing-key-id: ${M4T3R_REWARD_KEY_ID:dev-reward-key-1}
+    signing-key: ${M4T3R_REWARD_SIGNING_KEY:change-me-m4t3r-reward-dev-only}
+    max-speed-mps: ${M4T3R_REWARD_MAX_SPEED:5.0}
+    world-id: marseille
+  rewards:
+    path: ${M4T3R_REWARDS_PATH:data/m4t3r-rewards.json}
 
 auth:
   users:

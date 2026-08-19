@@ -22,6 +22,12 @@ import {
   rectOverlapsJoystick,
 } from './star-conquest-joystick-zone';
 import * as THREE from 'three';
+import {
+  STAR_CONQUEST_UNIVERSE_ORDER,
+  STAR_CONQUEST_UNIVERSES,
+  starConquestUniverseTheme,
+} from './star-conquest-universes.config';
+import { layoutPeerForUniverse } from './star-conquest-universe-layout';
 
 describe('Star Conquest mock catalog', () => {
   it(`exposes exactly ${STAR_CONQUEST_QUEST_COUNT} interactive quests`, () => {
@@ -450,5 +456,51 @@ describe('Joystick exclusion zone', () => {
       null
     );
     expect(rectOverlapsJoystick(placed.x, placed.y, 140, 100, zone, 8)).toBe(false);
+  });
+});
+
+describe('Star Conquest universes', () => {
+  it('uses Ruche as the sole global universe', () => {
+    expect(STAR_CONQUEST_UNIVERSE_ORDER.length).toBe(1);
+    expect(STAR_CONQUEST_UNIVERSE_ORDER[0]).toBe('agent-swarm');
+    for (const id of STAR_CONQUEST_UNIVERSE_ORDER) {
+      expect(STAR_CONQUEST_UNIVERSES[id]).toBeTruthy();
+      expect(STAR_CONQUEST_UNIVERSES[id].id).toBe(id);
+    }
+  });
+
+  it('layouts peers per universe without geo coordinates', () => {
+    const ring = layoutPeerForUniverse('ring', {
+      seed: 'peer-a',
+      index: 0,
+      total: 3,
+      syncPercent: 90,
+      latencyMs: 50,
+    });
+    expect(Number.isFinite(ring.x)).toBe(true);
+    expect(Number.isFinite(ring.y)).toBe(true);
+    expect(Number.isFinite(ring.z)).toBe(true);
+
+    const grid = layoutPeerForUniverse('grid', {
+      seed: 'peer-b',
+      index: 1,
+      total: 4,
+    });
+    expect(grid.x).not.toBe(ring.x);
+  });
+
+  it('applies universe theme to StarConquestGraph', () => {
+    const quests = STAR_CONQUEST_MOCK_QUESTS.map((q) => ({
+      ...q,
+      position: { ...q.position },
+      slot: { ...q.slot },
+      connections: [...q.connections],
+    }));
+    const graph = new StarConquestGraph(quests);
+    const theme = starConquestUniverseTheme('agent-swarm');
+    graph.setUniverse(theme);
+    expect(graph.getUniverse().id).toBe('agent-swarm');
+    expect(graph.getUniverse().effectKind).toBe('agent-swarm');
+    graph.dispose();
   });
 });

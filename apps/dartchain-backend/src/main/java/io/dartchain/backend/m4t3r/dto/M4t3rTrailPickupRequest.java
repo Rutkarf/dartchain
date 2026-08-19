@@ -8,6 +8,18 @@ public record M4t3rTrailPickupRequest(
         WorldPoint previousPosition,
         WorldPoint currentPosition,
         List<String> candidateCellIds,
-        long timestamp
+        long timestamp,
+        String clientSpeedEstimate,
+        String nonce
 ) {
+    public M4t3rTrailPickupRequest(
+            String type,
+            String playerId,
+            WorldPoint previousPosition,
+            WorldPoint currentPosition,
+            List<String> candidateCellIds,
+            long timestamp
+    ) {
+        this(type, playerId, previousPosition, currentPosition, candidateCellIds, timestamp, null, null);
+    }
 }

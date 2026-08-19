@@ -4,7 +4,7 @@ const STICK_DEADZONE = 0.04;
 const DEFAULT_PAN_MAX_X = 90;
 const DEFAULT_PAN_MAX_Y = 70;
 /** Vitesse de pan caméra (unités monde / s à stick plein). */
-const PAN_SPEED = 96;
+const PAN_SPEED = 52;
 const CAMERA_Z = 160;
 /** Rebond doux hors drag seulement. */
 const EDGE_BOUNCE = 48;
@@ -221,7 +221,7 @@ export class StarConquestWorld {
       this.bounceVY *= Math.pow(0.88, dt * 60);
     }
 
-    const follow = 1 - Math.pow(0.86, dt * 60);
+    const follow = 1 - Math.pow(0.92, dt * 60);
     this.viewX += (this.targetViewX - this.viewX) * follow;
     this.viewY += (this.targetViewY - this.viewY) * follow;
 

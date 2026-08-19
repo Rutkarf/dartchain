@@ -4,6 +4,7 @@
 @import './styles/ds-surface.css';
 @import './styles/showcase-tabs-global.css';
 @import './styles/showcase-meta-shared.css';
+@import './styles/collapsed-summary-bar.css';
 @import './styles/dock-shell.css';
 @import './styles/panel-headers.css';
 @import './styles/shell-stack.css';

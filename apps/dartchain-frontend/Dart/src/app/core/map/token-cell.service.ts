@@ -20,6 +20,7 @@ import {
   type M4T3RLodBand,
 } from './m4t3r-lod.util';
 import { isGroundCellExcluded, shouldRenderGroundCell } from './m4t3r-ground-exclusion.util';
+import { isOnDiagonalCheckerboard, isWorldPositionOnCheckerboard } from './m4t3r-grid.util';
 import {
   clustersAlongMovement,
   worldToCluster,
@@ -311,6 +312,8 @@ export class TokenCellService {
         if (Math.hypot(x - centerPosition.x, z - centerPosition.z) > radius) continue;
         totalCells++;
 
+        if (!isOnDiagonalCheckerboard(gx, gz)) continue;
+
         const dist = lodDistanceFromPlayer(playerPosition.x, playerPosition.z, x, z);
         const lod = getLodBand(dist);
         if (!shouldRenderGroundCell(gx, gz, x, z, lod)) continue;
@@ -472,7 +475,11 @@ export class TokenCellService {
       const parts = id.split(':');
       const z = (Number(parts[2]) + 0.5) * M4T3R_DENSITY_CONFIG.visualClusterSize;
       const x = (Number(parts[1]) + 0.5) * M4T3R_DENSITY_CONFIG.visualClusterSize;
-      return !isGroundCellExcluded(x, z) && (this.hiddenUntil.get(id) ?? 0) <= now;
+      return (
+        isWorldPositionOnCheckerboard(x, z) &&
+        !isGroundCellExcluded(x, z) &&
+        (this.hiddenUntil.get(id) ?? 0) <= now
+      );
     });
     if (clusterIds.length === 0) return null;
 

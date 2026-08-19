@@ -10,6 +10,8 @@ import { M4t3rPickupFxService } from '../map/m4t3r-pickup-fx.service';
 import { M4t3rCoinPickupFxService } from '../map/m4t3r-coin-pickup-fx.service';
 import { M4t3rPickupFxOrchestratorService } from '../map/m4t3r-pickup-fx-orchestrator.service';
 import { M4t3rTrailApiService } from '../map/m4t3r-trail-api.service';
+import { M4t3rRewardRuntimeService } from '../map/m4t3r-reward-runtime.service';
+import { WalletSessionService } from './wallet-session.service';
 import { CharacterNftService } from './character-nft.service';
 import { CHARACTER_ASSETS } from './character-assets.config';
 import { CameraControlService } from './camera-control.service';
@@ -34,6 +36,8 @@ export class CharacterControlService {
   private readonly coinPickupFx = inject(M4t3rCoinPickupFxService);
   private readonly pickupFxOrchestrator = inject(M4t3rPickupFxOrchestratorService);
   private readonly trailApi = inject(M4t3rTrailApiService);
+  private readonly rewardRuntime = inject(M4t3rRewardRuntimeService);
+  private readonly walletSession = inject(WalletSessionService);
   private readonly mapConfig = inject(MapConfigService);
   private readonly geo = inject(GeoCoordinateService);
   private readonly zone = inject(NgZone);
@@ -359,6 +363,7 @@ export class CharacterControlService {
         trail.clusterIds,
         this.getGroundYAt(mesh.position.x, mesh.position.z)
       );
+
       const submitted = trail;
       this.trailApi.submitTrail(playerId, submitted).subscribe((accepted) => {
         if (!accepted) return;
@@ -367,6 +372,17 @@ export class CharacterControlService {
           return;
         }
         this.tokenCells.applyServerHide(accepted.collectedCells, accepted.respawnAt);
+
+        const dx = submitted.currentPosition.x - submitted.previousPosition.x;
+        const dz = submitted.currentPosition.z - submitted.previousPosition.z;
+        const dist = Math.hypot(dx, dz);
+        const clientSpeedEstimate = dist > 0 ? (dist / 0.016).toFixed(3) : '0';
+        this.zone.run(() => {
+          this.rewardRuntime.onTrailAccepted(accepted, clientSpeedEstimate);
+          if (accepted.rewards?.length) {
+            this.walletSession.requestBalanceRefresh();
+          }
+        });
       });
     }
     this.trailSyncAge += deltaSeconds;

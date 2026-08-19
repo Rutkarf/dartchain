@@ -12,7 +12,8 @@ import {
 } from './map-configuration';
 import { clusterId } from './m4t3r-trail.util';
 import { getLodBand, lodDistanceFromPlayer } from './m4t3r-lod.util';
-import { isGroundCellExcluded } from './m4t3r-ground-exclusion.util';
+import { shouldRenderGroundCell } from './m4t3r-ground-exclusion.util';
+import { shouldRenderCellAtLod } from './m4t3r-lod.util';
 import { M4t3rPickupFxService } from './m4t3r-pickup-fx.service';
 import { TokenCellService } from './token-cell.service';
 import { tokenCellId } from './token-cell.types';
@@ -43,7 +44,8 @@ describe('World streaming and R4V3 cells', () => {
     const origin = new THREE.Vector3(-6.2, 0, -2.4);
     expect(getLodBand(lodDistanceFromPlayer(origin.x, origin.z, -5.625, -1.875))).toBe('near');
 
-    let manualNear = 0;
+    let manualFull = 0;
+    let manualCheckerboard = 0;
     const centerX = origin.x;
     const centerZ = origin.z;
     const radius = R4V3_GROUND_FIELD.visibleRadius;
@@ -56,17 +58,21 @@ describe('World streaming and R4V3 cells', () => {
       for (let gx = minX; gx <= maxX; gx++) {
         const x = (gx + 0.5) * size;
         const z = (gz + 0.5) * size;
-        if (isGroundCellExcluded(x, z)) continue;
         if (Math.hypot(x - centerX, z - centerZ) > radius) continue;
         const dist = lodDistanceFromPlayer(origin.x, origin.z, x, z);
-        if (getLodBand(dist) === 'near') manualNear++;
+        const lod = getLodBand(dist);
+        if (!shouldRenderCellAtLod(gx, gz, lod)) continue;
+        manualFull++;
+        if (shouldRenderGroundCell(gx, gz, x, z, lod)) manualCheckerboard++;
       }
     }
-    expect(manualNear).toBeGreaterThan(50);
+    expect(manualFull).toBeGreaterThan(100);
+    expect(manualCheckerboard).toBeGreaterThan(50);
+    expect(manualCheckerboard).toBeLessThan(manualFull * 0.55);
 
     service.initializeField(origin);
     const count = service.update(origin);
-    expect(count).toBeGreaterThan(400);
+    expect(count).toBe(manualCheckerboard);
     expect(root.getObjectByName('r4v3-token-instances')).toBeTruthy();
     const stats = service.getDebugStats();
     expect(stats.lodCounts.near + stats.lodCounts.mid + stats.lodCounts.far).toBe(count);

@@ -68,6 +68,8 @@
 .showcase-panel.is-collapsed .showcase-panel__body--smart-collapsed {
   display: flex;
   flex: 0 0 100%;
+  align-items: center;
+  justify-content: center;
   overflow: visible;
   min-height: 0;
   height: 100%;
