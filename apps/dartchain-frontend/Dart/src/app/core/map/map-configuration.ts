@@ -148,6 +148,20 @@ export const QUEST_PARTICLE_MODE: QuestParticleMode = 'metaverse-starry-sky';
 export const M4T3R_VERTICAL_OFFSET = 0.08;
 
 /**
+ * Configuration centralisée du rendu M4T3R.
+ * heightMultiplier appliqué à l'axe Y du token (1.5 = +50 %).
+ */
+export const M4T3R_RENDER_CONFIG = {
+  heightMultiplier: 1.5,
+  verticalOffset: 0.1,
+  rotationSpeedRadiansPerSecond: 1.25,
+  bobAmplitude: 0.015,
+  bobFrequency: 1.4,
+  /** Phase variation per token to desync animations. */
+  phaseSpread: 6.283,
+} as const;
+
+/**
  * Tapis R4V3 au sol : grille monde fixe (1 unité = 1 m).
  * Le streaming ne fait qu’afficher/masquer des cellules déjà ancrées.
  */

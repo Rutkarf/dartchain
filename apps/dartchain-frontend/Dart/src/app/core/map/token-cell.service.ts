@@ -3,12 +3,15 @@ import * as THREE from 'three';
 
 import {
   M4T3R_DENSITY_CONFIG,
+  M4T3R_RENDER_CONFIG,
   R4V3_GROUND_FIELD,
   TRAIL_CONFIG,
 } from './map-configuration';
 import type { TokenCollectionRequest } from './token-cell.types';
 import {
   clustersAlongMovement,
+  worldToCluster,
+  clusterId as trailClusterId,
 } from './m4t3r-trail.util';
 
 export interface TrailCollectResult {
@@ -21,24 +24,65 @@ export interface TrailCollectResult {
   timestamp: number;
 }
 
+export interface M4T3RDebugStats {
+  totalCells: number;
+  availableTokens: number;
+  collectedTokens: number;
+  respawningTokens: number;
+  visibleInstances: number;
+  chunksInitialized: number;
+  previousTokenHeight: number;
+  currentTokenHeight: number;
+  heightMultiplier: number;
+  rotationSpeed: number;
+  verticalOffset: number;
+  cellsCollectedLastMove: number;
+  trailWidth: number;
+  respawnDelayMs: number;
+}
+
 const R4V3_TOKEN_COLORS = [0x40e0ff, 0xff3ecf, 0x7a5cff, 0xffe600, 0x235789];
 const CELLS_PER_CLUSTER =
   (M4T3R_DENSITY_CONFIG.visualClusterSize / M4T3R_DENSITY_CONFIG.logicalCellSize) ** 2;
+
+const ORIGINAL_TOKEN_THICKNESS = R4V3_GROUND_FIELD.tokenThickness;
+const SCALED_TOKEN_THICKNESS = ORIGINAL_TOKEN_THICKNESS * M4T3R_RENDER_CONFIG.heightMultiplier;
+// After rotateZ(PI/2), the standing coin's visual height = radius * 2 * scaleY.
+const STANDING_COIN_HALF_HEIGHT = R4V3_GROUND_FIELD.tokenRadius * M4T3R_RENDER_CONFIG.heightMultiplier;
 
 function createR4v3TokenGeometry(): THREE.BufferGeometry {
   const geometry = new THREE.CylinderGeometry(
     R4V3_GROUND_FIELD.tokenRadius,
     R4V3_GROUND_FIELD.tokenRadius,
-    R4V3_GROUND_FIELD.tokenThickness,
+    SCALED_TOKEN_THICKNESS,
     6
   );
-  geometry.rotateX(Math.PI / 2);
+  // CylinderGeometry default: Y is the height axis.
+  // Rotate 90° around Z so the flat circular face points forward (visible)
+  // and the height axis becomes horizontal → coin standing upright on the ground.
+  geometry.rotateZ(Math.PI / 2);
   return geometry;
+}
+
+function deterministicPhase(gx: number, gz: number): number {
+  return ((gx * 73 + gz * 137) & 0xffff) / 0xffff * M4T3R_RENDER_CONFIG.phaseSpread;
+}
+
+function deterministicSpeed(gx: number, gz: number): number {
+  const base = M4T3R_RENDER_CONFIG.rotationSpeedRadiansPerSecond;
+  const variation = ((gx * 31 + gz * 97) & 0xff) / 0xff;
+  return base * (0.8 + variation * 0.4);
 }
 
 /**
  * Tapis R4V3 : jetons hexagonaux ancrés sur une grille monde fixe.
  * Pas de crédit token côté client. Le streaming ne déplace jamais une cellule.
+ *
+ * Améliorations :
+ * - Tokens 50 % plus hauts (heightMultiplier)
+ * - Rotation continue autour de Y + léger bob vertical
+ * - Tokens collectés masqués (traînée visible)
+ * - Initialisation possible sans mouvement du joueur
  */
 @Injectable({ providedIn: 'root' })
 export class TokenCellService {
@@ -50,10 +94,14 @@ export class TokenCellService {
   private readonly hiddenUntil = new Map<string, number>();
   private readonly pending: TokenCollectionRequest[] = [];
   private visibleCount = 0;
+  private totalGridCells = 0;
   private lastLogicalCount = 0;
+  private lastCollectedCellCount = 0;
   private rateWindowStart = 0;
   private rateWindowCount = 0;
   private lastOriginCell = { x: Number.NaN, z: Number.NaN };
+  private elapsedTime = 0;
+  private initialized = false;
 
   attach(root: THREE.Group): void {
     this.root = root;
@@ -89,35 +137,78 @@ export class TokenCellService {
     this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
   }
 
-  update(playerPosition: THREE.Vector3): number {
+  /**
+   * Force initial token field build at a given position.
+   * Call this once after terrain is ready, before player moves.
+   */
+  initializeField(position: THREE.Vector3): void {
+    if (this.initialized) return;
+    this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
+    this.visibleCount = 0;
+    this.rebuildGrid(position);
+    this.initialized = true;
+  }
+
+  update(playerPosition: THREE.Vector3, deltaSeconds = 0): number {
     if (!this.instances) return 0;
+
+    this.elapsedTime += deltaSeconds;
+    this.expireHidden();
+
     const size = R4V3_GROUND_FIELD.cellSize;
     const originX = Math.round(playerPosition.x / size);
     const originZ = Math.round(playerPosition.z / size);
-    if (
-      originX === this.lastOriginCell.x &&
-      originZ === this.lastOriginCell.z &&
-      this.visibleCount > 0
-    ) {
-      return this.visibleCount;
+
+    const gridMoved =
+      originX !== this.lastOriginCell.x ||
+      originZ !== this.lastOriginCell.z;
+
+    if (gridMoved || this.visibleCount === 0) {
+      this.lastOriginCell = { x: originX, z: originZ };
+      this.rebuildGrid(playerPosition);
+    } else {
+      this.updateAnimations(playerPosition);
     }
-    this.lastOriginCell = { x: originX, z: originZ };
+
+    return this.visibleCount;
+  }
+
+  private rebuildGrid(playerPosition: THREE.Vector3): void {
+    if (!this.instances) return;
+
+    const size = R4V3_GROUND_FIELD.cellSize;
     const radius = R4V3_GROUND_FIELD.visibleRadius;
     const minX = Math.floor((playerPosition.x - radius) / size);
     const maxX = Math.ceil((playerPosition.x + radius) / size);
     const minZ = Math.floor((playerPosition.z - radius) / size);
     const maxZ = Math.ceil((playerPosition.z + radius) / size);
+    const now = Date.now();
+    const groundY = R4V3_GROUND_FIELD.groundY;
+    const tokenY = groundY + STANDING_COIN_HALF_HEIGHT + M4T3R_RENDER_CONFIG.verticalOffset;
+    const t = this.elapsedTime;
+
     let count = 0;
-    for (let gz = minZ; gz <= maxZ && count < R4V3_GROUND_FIELD.maxVisibleInstances; gz++) {
-      for (let gx = minX; gx <= maxX && count < R4V3_GROUND_FIELD.maxVisibleInstances; gx++) {
+    let totalCells = 0;
+    for (let gz = minZ; gz <= maxZ; gz++) {
+      for (let gx = minX; gx <= maxX; gx++) {
         const x = (gx + 0.5) * size;
         const z = (gz + 0.5) * size;
         if (z > R4V3_GROUND_FIELD.waterMinZ) continue;
         if (Math.hypot(x - playerPosition.x, z - playerPosition.z) > radius) continue;
-        const yaw = (gx * 13 + gz * 7) * 0.11;
-        this.dummy.position.set(x, R4V3_GROUND_FIELD.groundY, z);
-        this.dummy.rotation.set(0, yaw, 0);
-        this.dummy.scale.setScalar(1);
+        totalCells++;
+
+        if (count >= R4V3_GROUND_FIELD.maxVisibleInstances) continue;
+
+        if (this.isRenderCellHidden(x, z, now)) continue;
+
+        const phase = deterministicPhase(gx, gz);
+        const speed = deterministicSpeed(gx, gz);
+        const rotY = t * speed + phase;
+        const bobY = Math.sin(t * M4T3R_RENDER_CONFIG.bobFrequency + phase) * M4T3R_RENDER_CONFIG.bobAmplitude;
+
+        this.dummy.position.set(x, tokenY + bobY, z);
+        this.dummy.rotation.set(0, rotY, 0);
+        this.dummy.scale.set(1, M4T3R_RENDER_CONFIG.heightMultiplier, 1);
         this.dummy.updateMatrix();
         this.instances.setMatrixAt(count, this.dummy.matrix);
         this.color.setHex(R4V3_TOKEN_COLORS[Math.abs(gx * 17 + gz * 5) % R4V3_TOKEN_COLORS.length]);
@@ -125,13 +216,64 @@ export class TokenCellService {
         count += 1;
       }
     }
+    this.totalGridCells = totalCells;
     this.instances.count = count;
     this.instances.instanceMatrix.needsUpdate = true;
     if (this.instances.instanceColor) {
       this.instances.instanceColor.needsUpdate = true;
     }
     this.visibleCount = count;
-    return count;
+  }
+
+  /**
+   * Per-frame animation update without full grid rebuild.
+   * Only updates matrices for rotation + bob.
+   */
+  private updateAnimations(playerPosition: THREE.Vector3): void {
+    if (!this.instances || this.visibleCount === 0) return;
+
+    const size = R4V3_GROUND_FIELD.cellSize;
+    const radius = R4V3_GROUND_FIELD.visibleRadius;
+    const minX = Math.floor((playerPosition.x - radius) / size);
+    const maxX = Math.ceil((playerPosition.x + radius) / size);
+    const minZ = Math.floor((playerPosition.z - radius) / size);
+    const maxZ = Math.ceil((playerPosition.z + radius) / size);
+    const now = Date.now();
+    const groundY = R4V3_GROUND_FIELD.groundY;
+    const tokenY = groundY + STANDING_COIN_HALF_HEIGHT + M4T3R_RENDER_CONFIG.verticalOffset;
+    const t = this.elapsedTime;
+
+    let count = 0;
+    for (let gz = minZ; gz <= maxZ; gz++) {
+      for (let gx = minX; gx <= maxX; gx++) {
+        const x = (gx + 0.5) * size;
+        const z = (gz + 0.5) * size;
+        if (z > R4V3_GROUND_FIELD.waterMinZ) continue;
+        if (Math.hypot(x - playerPosition.x, z - playerPosition.z) > radius) continue;
+
+        if (count >= R4V3_GROUND_FIELD.maxVisibleInstances) continue;
+
+        if (this.isRenderCellHidden(x, z, now)) continue;
+
+        const phase = deterministicPhase(gx, gz);
+        const speed = deterministicSpeed(gx, gz);
+        const rotY = t * speed + phase;
+        const bobY = Math.sin(t * M4T3R_RENDER_CONFIG.bobFrequency + phase) * M4T3R_RENDER_CONFIG.bobAmplitude;
+
+        this.dummy.position.set(x, tokenY + bobY, z);
+        this.dummy.rotation.set(0, rotY, 0);
+        this.dummy.scale.set(1, M4T3R_RENDER_CONFIG.heightMultiplier, 1);
+        this.dummy.updateMatrix();
+        this.instances.setMatrixAt(count, this.dummy.matrix);
+        count += 1;
+      }
+    }
+
+    if (count !== this.visibleCount) {
+      this.instances.count = count;
+      this.visibleCount = count;
+    }
+    this.instances.instanceMatrix.needsUpdate = true;
   }
 
   visibleTokenCount(): number {
@@ -148,6 +290,30 @@ export class TokenCellService {
 
   hiddenClusterCount(): number {
     return this.hiddenUntil.size;
+  }
+
+  getDebugStats(): M4T3RDebugStats {
+    const now = Date.now();
+    let respawning = 0;
+    for (const until of this.hiddenUntil.values()) {
+      if (until > now) respawning++;
+    }
+    return {
+      totalCells: this.totalGridCells,
+      availableTokens: this.visibleCount,
+      collectedTokens: this.hiddenUntil.size,
+      respawningTokens: respawning,
+      visibleInstances: this.visibleCount,
+      chunksInitialized: this.initialized ? 1 : 0,
+      previousTokenHeight: R4V3_GROUND_FIELD.tokenRadius * 2,
+      currentTokenHeight: R4V3_GROUND_FIELD.tokenRadius * 2 * M4T3R_RENDER_CONFIG.heightMultiplier,
+      heightMultiplier: M4T3R_RENDER_CONFIG.heightMultiplier,
+      rotationSpeed: M4T3R_RENDER_CONFIG.rotationSpeedRadiansPerSecond,
+      verticalOffset: M4T3R_RENDER_CONFIG.verticalOffset,
+      cellsCollectedLastMove: this.lastCollectedCellCount,
+      trailWidth: TRAIL_CONFIG.width,
+      respawnDelayMs: TRAIL_CONFIG.respawnDelayMs,
+    };
   }
 
   /**
@@ -194,6 +360,10 @@ export class TokenCellService {
       TRAIL_CONFIG.maxCellsPerUpdate,
       Math.round(accepted.length * CELLS_PER_CLUSTER)
     );
+    this.lastCollectedCellCount = accepted.length;
+
+    this.forceGridDirty();
+
     return {
       type: 'M4T3R_TRAIL_PICKUP_REQUEST',
       clusterIds: accepted,
@@ -214,18 +384,21 @@ export class TokenCellService {
 
   markCollected(cellId: string, respawnAt = Date.now() + TRAIL_CONFIG.respawnDelayMs): void {
     this.hiddenUntil.set(cellId, respawnAt);
+    this.forceGridDirty();
   }
 
   restoreClusters(clusterIds: string[]): void {
     for (const id of clusterIds) {
       this.hiddenUntil.delete(id);
     }
+    this.forceGridDirty();
   }
 
   applyServerHide(clusterIds: string[], respawnAt: number): void {
     for (const id of clusterIds) {
       this.hiddenUntil.set(id, respawnAt);
     }
+    this.forceGridDirty();
   }
 
   applyServerRespawn(clusterIds: string[]): void {
@@ -246,6 +419,7 @@ export class TokenCellService {
         this.hiddenUntil.set(cell.cellId, cell.respawnAt);
       }
     }
+    this.forceGridDirty();
   }
 
   dispose(): void {
@@ -259,15 +433,47 @@ export class TokenCellService {
     this.hiddenUntil.clear();
     this.pending.length = 0;
     this.visibleCount = 0;
+    this.totalGridCells = 0;
+    this.elapsedTime = 0;
+    this.initialized = false;
     this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
   }
 
   private expireHidden(): void {
     const now = Date.now();
+    let expired = false;
     for (const [id, until] of this.hiddenUntil) {
       if (until <= now) {
         this.hiddenUntil.delete(id);
+        expired = true;
       }
     }
+    if (expired) {
+      this.forceGridDirty();
+    }
+  }
+
+  /**
+   * Check if a render cell (1.25m grid) overlaps any hidden trail cluster (0.14m grid).
+   * Samples 9 points (center + edges) to catch any cluster collected within the cell.
+   */
+  private isRenderCellHidden(worldX: number, worldZ: number, now: number): boolean {
+    const half = R4V3_GROUND_FIELD.cellSize * 0.5;
+    const offsets = [-half, 0, half];
+    for (const dx of offsets) {
+      for (const dz of offsets) {
+        const cx = worldToCluster(worldX + dx);
+        const cz = worldToCluster(worldZ + dz);
+        const key = trailClusterId(cx, cz);
+        const until = this.hiddenUntil.get(key);
+        if (until !== undefined && until > now) return true;
+      }
+    }
+    return false;
+  }
+
+  /** Force a full grid rebuild on the next update() call. */
+  private forceGridDirty(): void {
+    this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
   }
 }

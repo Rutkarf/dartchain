@@ -15,6 +15,7 @@ import {
 import { WorldStreamingManager } from './world-streaming.manager';
 import { TokenCellService } from './token-cell.service';
 import { M4t3rPickupFxService } from './m4t3r-pickup-fx.service';
+import { M4t3rDebugOverlay } from './m4t3r-debug-overlay';
 
 /** Taille de la zone de test initiale autour du Vieux-Port (mètres). */
 const INITIAL_TERRAIN_SIZE_M = 800;
@@ -116,6 +117,7 @@ export class MarseilleMapProvider implements MapProvider {
   private readonly streaming = inject(WorldStreamingManager);
   private readonly tokenCells = inject(TokenCellService);
   private readonly pickupFx = inject(M4t3rPickupFxService);
+  private readonly debugOverlay = inject(M4t3rDebugOverlay);
 
   private scene: THREE.Scene | null = null;
   private root: THREE.Group | null = null;
@@ -160,6 +162,10 @@ export class MarseilleMapProvider implements MapProvider {
       this.pickupFx.attach(scene);
       this.streaming.update(new THREE.Vector3(0, 0, 0));
 
+      const spawnPos = this.getStartWorldPosition();
+      this.tokenCells.initializeField(spawnPos);
+      this.debugOverlay.attach(this.root ?? undefined);
+
       if (this.config.configuration.enableDebug) {
         console.info(
           '[MarseilleMapProvider] Carte prototype chargee (terrain plat Vieux-Port).'
@@ -175,13 +181,21 @@ export class MarseilleMapProvider implements MapProvider {
     }
   }
 
+  private lastUpdateTime = 0;
+
   update(cameraPosition: THREE.Vector3): void {
+    const now = performance.now();
+    const deltaSeconds = this.lastUpdateTime > 0 ? (now - this.lastUpdateTime) * 0.001 : 0.016;
+    this.lastUpdateTime = now;
+
     if (this.waterMesh) {
-      const t = performance.now() * 0.00055;
+      const t = now * 0.00055;
       this.waterMesh.position.y = -0.48 + Math.sin(t) * 0.035;
     }
     this.streaming.update(cameraPosition);
-    this.tokenCells.update(cameraPosition);
+    this.tokenCells.update(cameraPosition, deltaSeconds);
+    this.debugOverlay.updatePositions(cameraPosition);
+    this.debugOverlay.sampleFrame(deltaSeconds * 1000);
   }
 
   async getSurfaceHeight(_worldPosition: THREE.Vector3): Promise<number> {
@@ -220,6 +234,7 @@ export class MarseilleMapProvider implements MapProvider {
     this.tokenCells.dispose();
     this.streaming.dispose();
     this.pickupFx.dispose();
+    this.debugOverlay.dispose();
     this.root = null;
     this.osmRoot = null;
     this.prototypeBuildingsLoaded = false;

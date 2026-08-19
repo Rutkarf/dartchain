@@ -1,12 +1,12 @@
 /*
- * Joystick View — coin bas-droite, même taille que Move, arc sous le pad.
+ * Joystick View — coin bas-droite, design unifié avec Move.
  */
 :host {
   position: fixed;
-  right: max(8px, env(safe-area-inset-right, 0px));
-  bottom: max(8px, env(safe-area-inset-bottom, 0px));
-  width: 112px;
-  height: 116px;
+  right: max(2px, env(safe-area-inset-right, 0px));
+  bottom: max(2px, env(safe-area-inset-bottom, 0px));
+  width: 78px;
+  height: 82px;
   z-index: 1000;
   pointer-events: none;
   box-sizing: border-box;
@@ -29,28 +29,28 @@
 
 .joy-stick-slot {
   pointer-events: auto;
-  width: 80px;
-  height: 80px;
+  width: 54px;
+  height: 54px;
 }
 
 .joy-stick-slot app-virtual-joystick {
-  --vj-size: 80px;
-  --vj-face-inset: 5px;
+  --vj-size: 54px;
+  --vj-face-inset: 3px;
   --vj-knob-size: 34%;
 }
 
 .joy-arc {
   display: block;
-  width: 112px;
-  height: 28px;
-  margin-top: -10px;
+  width: 78px;
+  height: 22px;
+  margin-top: -8px;
   overflow: visible;
   pointer-events: none;
 }
 
 .joy-arc text {
   fill: rgba(210, 236, 255, 0.94);
-  font: 700 11px/1 ui-sans-serif, system-ui, sans-serif;
+  font: 700 9px/1 ui-sans-serif, system-ui, sans-serif;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   filter: drop-shadow(0 0 4px rgba(64, 224, 255, 0.5));
@@ -58,7 +58,13 @@
 
 @media (max-width: 480px) {
   :host {
-    right: max(6px, env(safe-area-inset-right, 0px));
-    bottom: max(6px, env(safe-area-inset-bottom, 0px));
+    right: max(2px, env(safe-area-inset-right, 0px));
+    bottom: max(2px, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (min-width: 901px) {
+  :host {
+    opacity: 0.55;
   }
 }
