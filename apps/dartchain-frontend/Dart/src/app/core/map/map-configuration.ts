@@ -80,6 +80,7 @@ export const M4T3R_PICKUP_FX = {
   poolSize: 12,
   maxBurst: 6,
   batchWindowMs: 40,
+  glowOpacity: 0.2,
 } as const;
 
 /**
@@ -95,8 +96,50 @@ export const M4T3R_DENSITY_CONFIG = {
   maxVisibleInstances: 8192,
   /** Au-dessus des trottoirs (0.34) + offset visible. */
   groundY: 0.34 + 0.08,
+  /** @deprecated Utiliser MARSEILLE_GROUND_EXCLUSION_ZONES — conservé pour compat tests. */
   waterMinZ: 14,
 } as const;
+
+/** Zone d'exclusion M4T3R au sol (eau, quais) — remplace la coupure `z > waterMinZ`. */
+export interface GroundExclusionZone {
+  id: string;
+  polygon: ReadonlyArray<{ x: number; z: number }>;
+  /** Transition de densité progressive côté terre (m). */
+  softEdgeMeters: number;
+}
+
+/**
+ * Vieux-Port — géométrie partagée eau / terre / exclusion M4T3R.
+ * 1 unité = 1 m, nord = −Z, est = +X.
+ * Miroir à (0,0) : bassin ouest (−X) + bras sud (+Z) visible depuis l'esplanade.
+ */
+export const MARSEILLE_HARBOR_WATER = {
+  landMinZ: -230,
+  landMaxZ: 10,
+  /** Eau immédiatement au sud de l'Ombrière (+Z). */
+  waterMinZ: 10,
+  waterMaxZ: 460,
+  /** @deprecated Utiliser isHarborWaterAt() — conservé pour tests/debug. */
+  walkBlockMaxZ: 10,
+  /** Bassin rectangulaire (~850 m) vers l'embouchure ouest. */
+  basinMinX: -880,
+  basinMaxX: 18,
+  basinMinZ: -58,
+  basinMaxZ: 58,
+  minX: -880,
+  maxX: 102,
+  surfaceY: 0.048,
+  surfaceColor: 0x5ec8ff,
+  glowColor: 0x40e0ff,
+  quayZ: 8,
+  exclusionMinZ: 8,
+  softEdgeMeters: 6,
+} as const;
+
+/**
+ * Vieux-Port : exclusion M4T3R via `isHarborWaterAt()` (vieux-port-layout.util).
+ */
+export const MARSEILLE_GROUND_EXCLUSION_ZONES: GroundExclusionZone[] = [];
 
 export const TRAIL_CONFIG = {
   width: 0.8,
@@ -108,6 +151,19 @@ export const TRAIL_CONFIG = {
   maxSpeedMetersPerSecond: 32,
 } as const;
 
+/** Glow résiduel au sol après une collecte M4T3R (2–3 s). */
+export const COLLECT_TRAIL_VISUAL_CONFIG = {
+  lifetimeMs: 2_500,
+  fadeStartMs: 1_400,
+  maxVisibleQuads: 384,
+  /** Taille d'un quad glow (aligné sur la largeur de traînée logique). */
+  quadWidth: TRAIL_CONFIG.width * 0.55,
+  quadLength: TRAIL_CONFIG.width * 0.42,
+  segmentSampleSpacing: 0.32,
+  groundOffset: 0.008,
+  opacity: 0.5,
+} as const;
+
 export const FOOTPRINT_CONFIG = {
   minStepDistance: 0.55,
   minStepIntervalMs: 220,
@@ -115,10 +171,11 @@ export const FOOTPRINT_CONFIG = {
   fadeStartMs: 8_500,
   maxVisibleFootprints: 300,
   groundOffset: 0.006,
-  opacity: 0.38,
-  // Empreinte légère orientée (z forward). Le size est calibré pour l’échelle 1u=1m.
-  footprintSizeX: 0.34,
-  footprintSizeZ: 0.20,
+  opacity: 0.42,
+  /** Empreinte calibrée sur TRAIL_CONFIG.width (0.8 m). */
+  footprintSizeX: TRAIL_CONFIG.width * 0.42,
+  footprintSizeZ: TRAIL_CONFIG.width * 0.25,
+  lateralOffset: TRAIL_CONFIG.width * 0.22,
 } as const;
 
 export const MOVE_JOYSTICK_CONFIG = {
@@ -131,11 +188,11 @@ export const MOVE_JOYSTICK_CONFIG = {
 export const WORLD_BACKGROUND_CONFIG = {
   horizonColor: 0x111a38,
   zenithColor: 0x02040f,
-  fogColor: 0x16122c,
-  fogNear: 18,
-  fogFar: 140,
-  horizonBlendStart: 0.42,
-  horizonBlendEnd: 0.92,
+  fogColor: 0x141932,
+  fogNear: 16,
+  fogFar: 152,
+  horizonBlendStart: 0.38,
+  horizonBlendEnd: 0.96,
   contrastFadeDistance: 120,
 } as const;
 
@@ -164,6 +221,18 @@ export const M4T3R_VERTICAL_OFFSET = 0.08;
  * Configuration centralisée du rendu M4T3R.
  * heightMultiplier appliqué à l'axe Y du token (1.5 = +50 %).
  */
+/** LOD visuel M4T3R — distance monde (m), pas direction caméra. */
+export const M4T3R_LOD_CONFIG = {
+  nearMaxDistance: 12,
+  midMaxDistance: 32,
+  farMaxDistance: 64,
+  /** Stride grille gx/gz (cellSize 1.25 m) — ~14 cm / 28 cm / 56 cm clusters visuels. */
+  midGridStride: 2,
+  farGridStride: 4,
+  midBobScale: 0.35,
+  midRotationScale: 0.55,
+} as const;
+
 export const M4T3R_RENDER_CONFIG = {
   heightMultiplier: 1.5,
   verticalOffset: 0.1,
@@ -192,7 +261,6 @@ export const R4V3_GROUND_FIELD = {
   tokenRadius: 0.28,
   tokenThickness: 0.045,
   groundY: 0.34 + 0.05,
-  waterMinZ: 14,
 } as const;
 
 /**

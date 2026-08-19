@@ -11,6 +11,8 @@ import {
   WORLD_SCALE,
 } from './map-configuration';
 import { clusterId } from './m4t3r-trail.util';
+import { getLodBand, lodDistanceFromPlayer } from './m4t3r-lod.util';
+import { isGroundCellExcluded } from './m4t3r-ground-exclusion.util';
 import { M4t3rPickupFxService } from './m4t3r-pickup-fx.service';
 import { TokenCellService } from './token-cell.service';
 import { tokenCellId } from './token-cell.types';
@@ -35,12 +37,41 @@ describe('World streaming and R4V3 cells', () => {
 
   it('etale un tapis de jetons R4V3 fixe autour du joueur', () => {
     const service = TestBed.inject(TokenCellService);
+    service.dispose();
     const root = new THREE.Group();
     service.attach(root);
     const origin = new THREE.Vector3(-6.2, 0, -2.4);
+    expect(getLodBand(lodDistanceFromPlayer(origin.x, origin.z, -5.625, -1.875))).toBe('near');
+
+    let manualNear = 0;
+    const centerX = origin.x;
+    const centerZ = origin.z;
+    const radius = R4V3_GROUND_FIELD.visibleRadius;
+    const size = R4V3_GROUND_FIELD.cellSize;
+    const minX = Math.floor((centerX - radius) / size);
+    const maxX = Math.ceil((centerX + radius) / size);
+    const minZ = Math.floor((centerZ - radius) / size);
+    const maxZ = Math.ceil((centerZ + radius) / size);
+    for (let gz = minZ; gz <= maxZ; gz++) {
+      for (let gx = minX; gx <= maxX; gx++) {
+        const x = (gx + 0.5) * size;
+        const z = (gz + 0.5) * size;
+        if (isGroundCellExcluded(x, z)) continue;
+        if (Math.hypot(x - centerX, z - centerZ) > radius) continue;
+        const dist = lodDistanceFromPlayer(origin.x, origin.z, x, z);
+        if (getLodBand(dist) === 'near') manualNear++;
+      }
+    }
+    expect(manualNear).toBeGreaterThan(50);
+
+    service.initializeField(origin);
     const count = service.update(origin);
     expect(count).toBeGreaterThan(400);
     expect(root.getObjectByName('r4v3-token-instances')).toBeTruthy();
+    const stats = service.getDebugStats();
+    expect(stats.lodCounts.near + stats.lodCounts.mid + stats.lodCounts.far).toBe(count);
+    expect(stats.lodCounts.near, JSON.stringify(stats)).toBeGreaterThan(0);
+    expect(stats.lodCounts.mid + stats.lodCounts.far).toBeGreaterThan(0);
     const again = service.update(origin);
     expect(again).toBe(count);
     service.dispose();

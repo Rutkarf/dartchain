@@ -2,7 +2,31 @@ import { Injectable, inject } from '@angular/core';
 import * as THREE from 'three';
 import { TokenCellService, type M4T3RDebugStats } from './token-cell.service';
 import { MapConfigService } from './map-config.service';
+import { FootprintTrailManager } from './footprint-trail-manager.service';
+import { M4t3rCollectTrailVisualService } from './m4t3r-collect-trail-visual.service';
 import { R4V3_GROUND_FIELD } from './map-configuration';
+
+interface MetaversePerformanceMetrics {
+  mapQuality: 'low' | 'medium' | 'high';
+  fps: number;
+  averageFrameTimeMs: number;
+  p95FrameTimeMs: number;
+  drawCalls: number;
+  triangles: number;
+  geometries: number;
+  textures: number;
+  programs?: number;
+  visibleM4T3RInstances: number;
+  activeM4T3RChunks: number;
+  tokenAnimationFrequencyHz: number;
+  activeFootprints: number;
+  activeM4T3RTrailQuads: number;
+  visibleBuildings: number;
+  activeLights: number;
+  canvasWidth: number;
+  canvasHeight: number;
+  pixelRatio: number;
+}
 
 /**
  * Dev-only overlay showing M4T3R field stats + world coordinate diagnostics.
@@ -12,6 +36,8 @@ import { R4V3_GROUND_FIELD } from './map-configuration';
 export class M4t3rDebugOverlay {
   private readonly tokenCells = inject(TokenCellService);
   private readonly mapConfig = inject(MapConfigService);
+  private readonly footprints = inject(FootprintTrailManager);
+  private readonly collectTrailVisual = inject(M4t3rCollectTrailVisualService);
 
   private panel: HTMLDivElement | null = null;
   private visible = false;
@@ -19,6 +45,7 @@ export class M4t3rDebugOverlay {
   private keyHandler: ((e: KeyboardEvent) => void) | null = null;
   private fps = 0;
   private frameTimes: number[] = [];
+  private rendererMetrics: MetaversePerformanceMetrics | null = null;
   private lastPlayerPos = new THREE.Vector3();
   private lastCameraPos = new THREE.Vector3();
   private m4t3rRoot: THREE.Group | null = null;
@@ -45,6 +72,10 @@ export class M4t3rDebugOverlay {
     if (this.frameTimes.length > 60) this.frameTimes.shift();
     const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
     this.fps = avg > 0 ? 1000 / avg : 0;
+  }
+
+  setRendererMetrics(metrics: MetaversePerformanceMetrics): void {
+    this.rendererMetrics = metrics;
   }
 
   private toggle(): void {
@@ -116,7 +147,7 @@ export class M4t3rDebugOverlay {
       '<b>Hierarchy</b>',
       `m4t3rRoot parent: <span style="color:#7f7">${rootParent}</span>`,
       `m4t3rRoot worldPos: ${this.fv(rootWorldPos)}`,
-      `frustumCulled: false (forced)`,
+      `frustumCulled: variant-based (default true)`,
       '',
       '<b>Positions</b>',
       `Player world: ${this.fv(pp)}`,
@@ -141,12 +172,26 @@ export class M4t3rDebugOverlay {
       '<b>Collection</b>',
       `Last collect: ${s.cellsCollectedLastMove} clusters`,
       `Trail width: ${s.trailWidth}m`,
+      `Footprints actives: ${this.footprints.activeFootprintCount()}`,
+      `Trail glow quads: ${this.collectTrailVisual.activeQuadCount()}`,
       `Respawn: ${s.respawnDelayMs}ms`,
       `Render→trail grid: 9-point sample`,
       '',
       '<b>Performance</b>',
       `FPS: ${this.fps.toFixed(1)}`,
+      `Token anim Hz: ${s.tokenAnimationFrequencyHz}`,
+      `R4V3 tokens: ${s.variantCounts['r4v3-token'] ?? s.visibleInstances}`,
+      `LOD near/mid/far: ${s.lodCounts.near}/${s.lodCounts.mid}/${s.lodCounts.far}`,
       `Init at startup: ${s.chunksInitialized ? '<span style="color:#7f7">YES</span>' : '<span style="color:#f77">NO</span>'}`,
+      this.rendererMetrics
+        ? `Renderer calls/triangles: ${this.rendererMetrics.drawCalls}/${this.rendererMetrics.triangles}`
+        : 'Renderer calls/triangles: n/a',
+      this.rendererMetrics
+        ? `Geom/tex/programs: ${this.rendererMetrics.geometries}/${this.rendererMetrics.textures}/${this.rendererMetrics.programs ?? 0}`
+        : 'Geom/tex/programs: n/a',
+      this.rendererMetrics
+        ? `Canvas ${this.rendererMetrics.canvasWidth}x${this.rendererMetrics.canvasHeight} @${this.rendererMetrics.pixelRatio.toFixed(2)}x`
+        : 'Canvas: n/a',
     ].join('<br>');
   }
 

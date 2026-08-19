@@ -14,6 +14,7 @@ import { RunnerWorldService } from './runner/runner-world.service';
 import { RunnerStateService } from './runner/runner-state.service';
 import { RUNNER_CONFIG } from './runner/runner.config';
 import { FootprintTrailManager } from '../map/footprint-trail-manager.service';
+import { M4t3rCollectTrailVisualService } from '../map/m4t3r-collect-trail-visual.service';
 
 /**
  * Contrôle personnage — zéro allocation hot-path, collisions proches.
@@ -32,6 +33,7 @@ export class CharacterControlService {
   private readonly geo = inject(GeoCoordinateService);
   private readonly zone = inject(NgZone);
   private readonly footprints = inject(FootprintTrailManager);
+  private readonly collectTrailVisual = inject(M4t3rCollectTrailVisualService);
 
   /** Lift léger pour éviter les pieds "dans le sol" (modèle vs terrain). */
   private readonly footClearanceMeters = 0.035;
@@ -232,18 +234,22 @@ export class CharacterControlService {
     let nextX = prevX + this.velocity.x;
     let nextZ = prevZ + this.velocity.z;
     const marseille = this.isMarseilleMode();
+    const walkRadius = RUNNER_CONFIG.characterRadius;
 
-    if (!marseille) {
-      const r = RUNNER_CONFIG.characterRadius;
+    if (marseille) {
+      const clamped = this.clampWalkableMarseille(prevX, prevZ, nextX, nextZ, walkRadius);
+      nextX = clamped.x;
+      nextZ = clamped.z;
+    } else {
       nextZ = this.applyStopZone(nextZ);
 
-      if (!this.world.isWalkable(nextX, prevZ, r)) {
+      if (!this.world.isWalkable(nextX, prevZ, walkRadius)) {
         nextX = prevX;
       }
-      if (!this.world.isWalkable(nextX, nextZ, r)) {
+      if (!this.world.isWalkable(nextX, nextZ, walkRadius)) {
         nextZ = prevZ;
       }
-      if (!this.world.isWalkable(nextX, nextZ, r)) {
+      if (!this.world.isWalkable(nextX, nextZ, walkRadius)) {
         nextX = prevX;
         nextZ = prevZ;
       }
@@ -300,6 +306,28 @@ export class CharacterControlService {
     return 0;
   }
 
+  /** Collisions XZ via le SurfaceProvider actif (Marseille : bord de quai / eau). */
+  private clampWalkableMarseille(
+    prevX: number,
+    prevZ: number,
+    nextX: number,
+    nextZ: number,
+    radius: number
+  ): { x: number; z: number } {
+    const surface = this.mapLoading.getActiveProvider()?.getSurfaceProvider();
+    if (!surface) return { x: nextX, z: nextZ };
+
+    let x = nextX;
+    let z = nextZ;
+    if (!surface.isWalkable(x, prevZ, radius)) x = prevX;
+    if (!surface.isWalkable(x, z, radius)) z = prevZ;
+    if (!surface.isWalkable(x, z, radius)) {
+      x = prevX;
+      z = prevZ;
+    }
+    return { x, z };
+  }
+
   private updateMarseilleTrail(mesh: THREE.Object3D, playerId: string, deltaSeconds: number): void {
     if (!this.trailPrevReady) {
       this.trailPrev.copy(mesh.position);
@@ -310,6 +338,12 @@ export class CharacterControlService {
     this.trailPrev.copy(mesh.position);
     if (trail) {
       this.pickupFx.spawn(mesh, trail.clusterIds.length);
+      this.collectTrailVisual.addCollectSegment(
+        trail.previousPosition,
+        { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z },
+        trail.clusterIds,
+        this.getGroundYAt(mesh.position.x, mesh.position.z)
+      );
       const submitted = trail;
       this.trailApi.submitTrail(playerId, submitted).subscribe((accepted) => {
         if (!accepted) return;

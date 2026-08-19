@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { M4T3R_DENSITY_CONFIG, TRAIL_CONFIG } from './map-configuration';
+import { M4T3R_DENSITY_CONFIG, TRAIL_CONFIG, COLLECT_TRAIL_VISUAL_CONFIG } from './map-configuration';
 
 export type M4T3RVisualVariant = 'thin-leaf' | 'vertical-chip' | 'metal-fragment' | 'neon-shard';
 
@@ -29,6 +29,46 @@ export function getDeterministicVariant(cellId: string): M4T3RVisualVariant {
 
 export function worldToCluster(world: number): number {
   return Math.floor(world / M4T3R_DENSITY_CONFIG.visualClusterSize);
+}
+
+/** Centre monde XZ d'un cluster visuel `m4t3r-cluster:gx:gz`. */
+export function clusterWorldCenter(clusterKey: string): { x: number; z: number } | null {
+  const parts = clusterKey.split(':');
+  if (parts.length < 3 || parts[0] !== 'm4t3r-cluster') return null;
+  const gx = Number(parts[1]);
+  const gz = Number(parts[2]);
+  if (!Number.isFinite(gx) || !Number.isFinite(gz)) return null;
+  const size = M4T3R_DENSITY_CONFIG.visualClusterSize;
+  return { x: (gx + 0.5) * size, z: (gz + 0.5) * size };
+}
+
+/**
+ * Points le long d'un segment de déplacement pour le glow visuel de collecte.
+ * Largeur calée sur TRAIL_CONFIG.width.
+ */
+export function sampleCollectTrailVisualPoints(
+  previousPosition: THREE.Vector3,
+  currentPosition: THREE.Vector3,
+  spacing = COLLECT_TRAIL_VISUAL_CONFIG.segmentSampleSpacing
+): Array<{ x: number; z: number; yaw: number }> {
+  const dx = currentPosition.x - previousPosition.x;
+  const dz = currentPosition.z - previousPosition.z;
+  const dist = Math.hypot(dx, dz);
+  const yaw = dist > 1e-5 ? Math.atan2(dx, dz) : 0;
+  if (dist < 1e-5) {
+    return [{ x: currentPosition.x, z: currentPosition.z, yaw }];
+  }
+  const samples = Math.max(1, Math.ceil(dist / spacing));
+  const points: Array<{ x: number; z: number; yaw: number }> = [];
+  for (let s = 0; s <= samples; s++) {
+    const t = s / samples;
+    points.push({
+      x: previousPosition.x + dx * t,
+      z: previousPosition.z + dz * t,
+      yaw,
+    });
+  }
+  return points;
 }
 
 /**

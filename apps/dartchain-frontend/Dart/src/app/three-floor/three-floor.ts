@@ -13,6 +13,7 @@ import { CameraControlService } from '../core/services/camera-control.service';
 import { CharacterControlService } from '../core/services/character-control.service';
 import { ThreeSceneService } from '../core/services/three-scene.service';
 import { WORLD_BACKGROUND_CONFIG } from '../core/map/map-configuration';
+import { MapConfigService } from '../core/map/map-config.service';
 import {
   bindContainerResize,
   type ContainerResizeBinding,
@@ -38,6 +39,15 @@ import { JoystickViewComponent } from './joystick-view/joystick-view.component';
 const FLOOR_HEIGHT_FALLBACK = 420;
 const PERF_DEBUG = isPerfDebugEnabled();
 
+function getTargetPixelRatio(
+  quality: 'low' | 'medium' | 'high',
+  devicePixelRatio: number
+): number {
+  if (quality === 'low') return 1;
+  if (quality === 'high') return Math.min(devicePixelRatio, 2);
+  return Math.min(devicePixelRatio, 1.5);
+}
+
 /**
  * Floor Three.js — boucle unique hors NgZone, pixelRatio 1 (même look CSS 100%).
  */
@@ -61,6 +71,7 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private readonly threeScene = inject(ThreeSceneService);
   private readonly characterControl = inject(CharacterControlService);
   private readonly cameraControl = inject(CameraControlService);
+  private readonly mapConfig = inject(MapConfigService);
   private readonly zone = inject(NgZone);
 
   private scene?: THREE.Scene;
@@ -72,6 +83,7 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private visibilityBinding?: { unsubscribe: () => void };
   private resizeBinding?: ContainerResizeBinding;
   private lastFrameMs = 0;
+  private lastPerfReportMs = 0;
   private unsubControl?: () => void;
   private readonly profiler = new PerfProfiler();
 
@@ -142,6 +154,10 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       accent.castShadow = false;
       this.scene.add(accent);
 
+      const hemi = new THREE.HemisphereLight(0x111a38, 0x0a0f1a, 0.2);
+      hemi.name = 'floor-hemi-fill';
+      this.scene.add(hemi);
+
       this.renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: true,
@@ -153,8 +169,9 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
         logarithmicDepthBuffer: false,
         failIfMajorPerformanceCaveat: false,
       });
-      // CSS reste 100% — résolution interne fixe 1× (pas de déformation layout)
-      this.renderer.setPixelRatio(1);
+      this.renderer.setPixelRatio(
+        getTargetPixelRatio(this.mapConfig.configuration.quality, window.devicePixelRatio || 1)
+      );
       this.renderer.setSize(width, height, false);
       this.renderer.setClearColor(0x000000, 0);
       this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -229,6 +246,22 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     if (PERF_DEBUG) {
       this.profiler.sample(deltaSeconds * 1000);
       this.profiler.maybeReport(this.renderer, this.scene.children.length, 'floor');
+      if (now - this.lastPerfReportMs > 1000) {
+        this.lastPerfReportMs = now;
+        console.log('[METAVERSE:BASELINE]', {
+          mapQuality: this.mapConfig.configuration.quality,
+          fps: Math.round(deltaSeconds > 0 ? 1 / deltaSeconds : 0),
+          drawCalls: this.renderer.info.render.calls,
+          triangles: this.renderer.info.render.triangles,
+          geometries: this.renderer.info.memory.geometries,
+          textures: this.renderer.info.memory.textures,
+          programs: this.renderer.info.programs?.length,
+          canvasWidth: this.renderer.domElement.width,
+          canvasHeight: this.renderer.domElement.height,
+          pixelRatio: this.renderer.getPixelRatio(),
+          firstRenderReady: this.scene.children.length > 0,
+        });
+      }
     }
   };
 
@@ -259,6 +292,9 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     if (!this.camera || !this.renderer) return;
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
+    this.renderer.setPixelRatio(
+      getTargetPixelRatio(this.mapConfig.configuration.quality, window.devicePixelRatio || 1)
+    );
     this.renderer.setSize(width, height, false);
     this.renderFrame();
   }

@@ -4,12 +4,22 @@ import { MapConfigService } from './map-config.service';
 
 import {
   M4T3R_DENSITY_CONFIG,
+  M4T3R_LOD_CONFIG,
   M4T3R_RENDER_CONFIG,
   R4V3_GROUND_FIELD,
   TRAIL_CONFIG,
   WORLD_SCALE,
 } from './map-configuration';
 import type { TokenCollectionRequest } from './token-cell.types';
+import {
+  getLodBand,
+  lodBobAmplitude,
+  lodDistanceFromPlayer,
+  lodRotationSpeed,
+  shouldAnimateLodBand,
+  type M4T3RLodBand,
+} from './m4t3r-lod.util';
+import { isGroundCellExcluded, shouldRenderGroundCell } from './m4t3r-ground-exclusion.util';
 import {
   clustersAlongMovement,
   worldToCluster,
@@ -41,6 +51,9 @@ export interface M4T3RDebugStats {
   cellsCollectedLastMove: number;
   trailWidth: number;
   respawnDelayMs: number;
+  tokenAnimationFrequencyHz: number;
+  variantCounts: Record<string, number>;
+  lodCounts: Record<M4T3RLodBand, number>;
 }
 
 const R4V3_TOKEN_COLORS = [0x40e0ff, 0xff3ecf, 0x7a5cff, 0xffe600, 0x235789];
@@ -51,6 +64,24 @@ const ORIGINAL_TOKEN_THICKNESS = R4V3_GROUND_FIELD.tokenThickness;
 const SCALED_TOKEN_THICKNESS = ORIGINAL_TOKEN_THICKNESS * M4T3R_RENDER_CONFIG.heightMultiplier;
 // After rotateZ(PI/2), the standing coin's visual height = radius * 2 * scaleY.
 const STANDING_COIN_HALF_HEIGHT = R4V3_GROUND_FIELD.tokenRadius * M4T3R_RENDER_CONFIG.heightMultiplier;
+const R4V3_TOKEN_MESH_KEY = 'r4v3-token';
+
+interface VisibleTokenCell {
+  x: number;
+  z: number;
+  phase: number;
+  speed: number;
+  lod: M4T3RLodBand;
+}
+
+interface GridCandidate {
+  gx: number;
+  gz: number;
+  x: number;
+  z: number;
+  dist: number;
+  lod: M4T3RLodBand;
+}
 
 function createR4v3TokenGeometry(): THREE.BufferGeometry {
   const geometry = new THREE.CylinderGeometry(
@@ -89,7 +120,8 @@ function deterministicSpeed(gx: number, gz: number): number {
 @Injectable({ providedIn: 'root' })
 export class TokenCellService {
   private root: THREE.Group | null = null;
-  private instances: THREE.InstancedMesh | null = null;
+  private variantRoot: THREE.Group | null = null;
+  private tokenMesh: THREE.InstancedMesh | null = null;
   private readonly dummy = new THREE.Object3D();
   private readonly scratch = new THREE.Vector3();
   private readonly anchorCenterScratch = new THREE.Vector3();
@@ -100,12 +132,11 @@ export class TokenCellService {
   private visibleCount = 0;
   // Liste stable des instances visibles (remplie lors de rebuildGrid()).
   // Permet d'éviter de rescanner la grille à chaque frame.
-  private visibleCells: Array<{
-    x: number;
-    z: number;
-    phase: number;
-    speed: number;
-  }> = [];
+  private visibleCells: VisibleTokenCell[] = [];
+  private readonly lastPlayerPosition = new THREE.Vector3();
+  private readonly lodCounts: Record<M4T3RLodBand, number> = { near: 0, mid: 0, far: 0 };
+  private lastRebuildPlayerX = Number.NaN;
+  private lastRebuildPlayerZ = Number.NaN;
   private totalGridCells = 0;
   private lastLogicalCount = 0;
   private lastCollectedCellCount = 0;
@@ -120,38 +151,44 @@ export class TokenCellService {
    */
   private tokenAnimAccumulatorSeconds = 0;
   private tokenAnimIntervalSeconds = 1 / M4T3R_RENDER_CONFIG.animationUpdateHzMedium;
+  private readonly variantCounts: Record<string, number> = {};
+
+  private getMaxInstancesForQuality(): number {
+    const q = this.mapConfig.configuration.quality;
+    if (q === 'low') return 4096;
+    if (q === 'high') return 8192;
+    return 6144;
+  }
 
   attach(root: THREE.Group): void {
     this.root = root;
+    this.variantRoot = new THREE.Group();
+    this.variantRoot.name = 'r4v3-token-instances';
+    root.add(this.variantRoot);
+    const maxInstances = this.getMaxInstancesForQuality();
     const geometry = createR4v3TokenGeometry();
     const material = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      roughness: 0.28,
-      metalness: 0.72,
-      emissive: 0x1a3048,
-      emissiveIntensity: 0.7,
+      roughness: 0.34,
+      metalness: 0.52,
+      emissive: 0x2d3f66,
+      emissiveIntensity: 0.9,
       polygonOffset: true,
       polygonOffsetFactor: -2,
       polygonOffsetUnits: -2,
     });
-    this.instances = new THREE.InstancedMesh(
-      geometry,
-      material,
-      R4V3_GROUND_FIELD.maxVisibleInstances
-    );
-    this.instances.name = 'r4v3-token-instances';
-    this.instances.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    this.instances.instanceColor = new THREE.InstancedBufferAttribute(
-      new Float32Array(R4V3_GROUND_FIELD.maxVisibleInstances * 3),
-      3
-    );
-    this.instances.count = 0;
-    this.instances.frustumCulled = false;
-    this.instances.castShadow = false;
-    this.instances.receiveShadow = false;
-    this.instances.renderOrder = 2;
-    this.instances.raycast = () => {};
-    root.add(this.instances);
+    const mesh = new THREE.InstancedMesh(geometry, material, maxInstances);
+    mesh.name = 'r4v3-token-instances-mesh';
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(maxInstances * 3), 3);
+    mesh.count = 0;
+    mesh.frustumCulled = true;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    mesh.renderOrder = 2;
+    mesh.raycast = () => {};
+    this.variantRoot.add(mesh);
+    this.tokenMesh = mesh;
     this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
 
     // Throttle selon la qualité demandée (low-end-friendly).
@@ -180,22 +217,23 @@ export class TokenCellService {
     const originX = Math.floor(position.x / snap);
     const originZ = Math.floor(position.z / snap);
     this.lastOriginCell = { x: originX, z: originZ };
-    const centerX = originX * snap + snap * 0.5;
-    const centerZ = originZ * snap + snap * 0.5;
-    this.anchorCenterScratch.set(centerX, 0, centerZ);
-    this.rebuildGrid(this.anchorCenterScratch);
+    this.lastRebuildPlayerX = position.x;
+    this.lastRebuildPlayerZ = position.z;
+    this.anchorCenterScratch.set(position.x, 0, position.z);
+    this.lastPlayerPosition.copy(position);
+    this.rebuildGrid(this.anchorCenterScratch, position);
     this.initialized = true;
   }
 
   update(playerPosition: THREE.Vector3, deltaSeconds = 0): number {
-    if (!this.instances) return 0;
+    if (!this.tokenMesh) return 0;
 
+    this.lastPlayerPosition.copy(playerPosition);
     this.elapsedTime += deltaSeconds;
     this.expireHidden();
 
-    // IMPORTANT (anti-défilement visuel) :
-    // on ancre la "fenêtre de rendu" sur la grille des chunks (128m),
-    // afin que les tokens ne semblent pas glisser lors de micro-déplacements.
+    // Rebuild quand on change de chunk ou que le joueur s'éloigne du centre
+    // de la dernière fenêtre (≈ moitié du rayon near LOD) pour garder la densité près du perso.
     const snap = WORLD_SCALE.chunkSizeMeters;
     const originX = Math.floor(playerPosition.x / snap);
     const originZ = Math.floor(playerPosition.z / snap);
@@ -203,28 +241,35 @@ export class TokenCellService {
     const gridMoved =
       originX !== this.lastOriginCell.x ||
       originZ !== this.lastOriginCell.z;
+    const rebuildTravelThreshold = M4T3R_LOD_CONFIG.nearMaxDistance * 0.5;
+    const playerMoved =
+      Number.isFinite(this.lastRebuildPlayerX) &&
+      Math.hypot(
+        playerPosition.x - this.lastRebuildPlayerX,
+        playerPosition.z - this.lastRebuildPlayerZ
+      ) >= rebuildTravelThreshold;
 
-    if (gridMoved || this.visibleCount === 0) {
+    if (gridMoved || this.visibleCount === 0 || playerMoved) {
       this.lastOriginCell = { x: originX, z: originZ };
-      const centerX = originX * snap + snap * 0.5;
-      const centerZ = originZ * snap + snap * 0.5;
-      this.anchorCenterScratch.set(centerX, 0, centerZ);
-      this.rebuildGrid(this.anchorCenterScratch);
+      this.lastRebuildPlayerX = playerPosition.x;
+      this.lastRebuildPlayerZ = playerPosition.z;
+      this.anchorCenterScratch.set(playerPosition.x, 0, playerPosition.z);
+      this.rebuildGrid(this.anchorCenterScratch, playerPosition);
       this.tokenAnimAccumulatorSeconds = 0;
     } else {
-      // Les animations tournent toujours, mais la sélection visible reste ancrée au même center de chunk.
       this.tokenAnimAccumulatorSeconds += deltaSeconds;
       if (this.tokenAnimAccumulatorSeconds >= this.tokenAnimIntervalSeconds) {
         this.tokenAnimAccumulatorSeconds = 0;
-        this.updateAnimations(this.anchorCenterScratch);
+        this.updateAnimations();
       }
     }
 
     return this.visibleCount;
   }
 
-  private rebuildGrid(centerPosition: THREE.Vector3): void {
-    if (!this.instances) return;
+  private rebuildGrid(centerPosition: THREE.Vector3, playerPosition: THREE.Vector3): void {
+    const mesh = this.tokenMesh;
+    if (!mesh) return;
 
     const size = R4V3_GROUND_FIELD.cellSize;
     const radius = R4V3_GROUND_FIELD.visibleRadius;
@@ -236,43 +281,75 @@ export class TokenCellService {
     const groundY = R4V3_GROUND_FIELD.groundY;
     const tokenY = groundY + STANDING_COIN_HALF_HEIGHT + M4T3R_RENDER_CONFIG.verticalOffset;
     const t = this.elapsedTime;
+    const maxInstances = this.getMaxInstancesForQuality();
 
     let count = 0;
     let totalCells = 0;
     this.visibleCells.length = 0;
+    this.lodCounts.near = 0;
+    this.lodCounts.mid = 0;
+    this.lodCounts.far = 0;
+    for (const key of Object.keys(this.variantCounts)) delete this.variantCounts[key];
+
+    const candidates: GridCandidate[] = [];
     for (let gz = minZ; gz <= maxZ; gz++) {
       for (let gx = minX; gx <= maxX; gx++) {
         const x = (gx + 0.5) * size;
         const z = (gz + 0.5) * size;
-        if (z > R4V3_GROUND_FIELD.waterMinZ) continue;
         if (Math.hypot(x - centerPosition.x, z - centerPosition.z) > radius) continue;
         totalCells++;
 
-        if (count >= R4V3_GROUND_FIELD.maxVisibleInstances) continue;
-
+        const dist = lodDistanceFromPlayer(playerPosition.x, playerPosition.z, x, z);
+        const lod = getLodBand(dist);
+        if (!shouldRenderGroundCell(gx, gz, x, z, lod)) continue;
         if (this.isRenderCellHidden(x, z, now)) continue;
-
-        const phase = deterministicPhase(gx, gz);
-        const speed = deterministicSpeed(gx, gz);
-        const rotY = t * speed + phase;
-        const bobY = Math.sin(t * M4T3R_RENDER_CONFIG.bobFrequency + phase) * M4T3R_RENDER_CONFIG.bobAmplitude;
-
-        this.dummy.position.set(x, tokenY + bobY, z);
-        this.dummy.rotation.set(0, rotY, 0);
-        this.dummy.scale.set(1, M4T3R_RENDER_CONFIG.heightMultiplier, 1);
-        this.dummy.updateMatrix();
-        this.instances.setMatrixAt(count, this.dummy.matrix);
-        this.color.setHex(R4V3_TOKEN_COLORS[Math.abs(gx * 17 + gz * 5) % R4V3_TOKEN_COLORS.length]);
-        this.instances.setColorAt(count, this.color);
-        this.visibleCells.push({ x, z, phase, speed });
-        count += 1;
+        candidates.push({ gx, gz, x, z, dist, lod });
       }
     }
+
+    candidates.sort((a, b) => a.dist - b.dist);
+
+    for (const candidate of candidates) {
+      if (count >= maxInstances) break;
+
+      const { gx, gz, x, z, lod } = candidate;
+      const phase = deterministicPhase(gx, gz);
+      const speed = deterministicSpeed(gx, gz);
+      const animSpeed = lodRotationSpeed(speed, lod);
+      const bobAmp = lodBobAmplitude(lod);
+      const rotY = shouldAnimateLodBand(lod) ? t * animSpeed + phase : phase;
+      const bobY = shouldAnimateLodBand(lod)
+        ? Math.sin(t * M4T3R_RENDER_CONFIG.bobFrequency + phase) * bobAmp
+        : 0;
+
+      this.dummy.position.set(x, tokenY + bobY, z);
+      this.dummy.rotation.set(0, rotY, 0);
+      this.dummy.scale.set(1, M4T3R_RENDER_CONFIG.heightMultiplier, 1);
+      this.dummy.updateMatrix();
+      mesh.setMatrixAt(count, this.dummy.matrix);
+      this.color.setHex(R4V3_TOKEN_COLORS[Math.abs(gx * 17 + gz * 5) % R4V3_TOKEN_COLORS.length]);
+      if (lod === 'far') {
+        this.color.multiplyScalar(0.82);
+      } else if (lod === 'mid') {
+        this.color.multiplyScalar(0.92);
+      }
+      mesh.setColorAt(count, this.color);
+      const cell: VisibleTokenCell = { x, z, phase, speed, lod };
+      this.visibleCells.push(cell);
+      this.lodCounts[lod] += 1;
+      count += 1;
+    }
+
     this.totalGridCells = totalCells;
-    this.instances.count = count;
-    this.instances.instanceMatrix.needsUpdate = true;
-    if (this.instances.instanceColor) {
-      this.instances.instanceColor.needsUpdate = true;
+    mesh.count = count;
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    if (count > 0) {
+      mesh.computeBoundingSphere();
+    }
+    this.variantCounts[R4V3_TOKEN_MESH_KEY] = count;
+    if (this.variantRoot && count > 0) {
+      this.variantRoot.frustumCulled = true;
     }
     this.visibleCount = count;
   }
@@ -281,27 +358,31 @@ export class TokenCellService {
    * Per-frame animation update without full grid rebuild.
    * Only updates matrices for rotation + bob.
    */
-  private updateAnimations(playerPosition: THREE.Vector3): void {
-    if (!this.instances || this.visibleCount === 0) return;
+  private updateAnimations(): void {
+    const mesh = this.tokenMesh;
+    if (!mesh || this.visibleCount === 0) return;
 
-    // Sélection déjà figée dans visibleCells : pas de rescanner la grille.
     const groundY = R4V3_GROUND_FIELD.groundY;
     const tokenY = groundY + STANDING_COIN_HALF_HEIGHT + M4T3R_RENDER_CONFIG.verticalOffset;
     const t = this.elapsedTime;
+    let changed = false;
 
-    const count = this.visibleCells.length;
-    this.instances.instanceMatrix.needsUpdate = true;
-
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < this.visibleCells.length; i++) {
       const c = this.visibleCells[i];
-      const rotY = t * c.speed + c.phase;
-      const bobY = Math.sin(t * M4T3R_RENDER_CONFIG.bobFrequency + c.phase) * M4T3R_RENDER_CONFIG.bobAmplitude;
-
+      if (!shouldAnimateLodBand(c.lod)) continue;
+      changed = true;
+      const animSpeed = lodRotationSpeed(c.speed, c.lod);
+      const bobAmp = lodBobAmplitude(c.lod);
+      const rotY = t * animSpeed + c.phase;
+      const bobY = Math.sin(t * M4T3R_RENDER_CONFIG.bobFrequency + c.phase) * bobAmp;
       this.dummy.position.set(c.x, tokenY + bobY, c.z);
       this.dummy.rotation.set(0, rotY, 0);
       this.dummy.scale.set(1, M4T3R_RENDER_CONFIG.heightMultiplier, 1);
       this.dummy.updateMatrix();
-      this.instances.setMatrixAt(i, this.dummy.matrix);
+      mesh.setMatrixAt(i, this.dummy.matrix);
+    }
+    if (changed) {
+      mesh.instanceMatrix.needsUpdate = true;
     }
   }
 
@@ -342,6 +423,9 @@ export class TokenCellService {
       cellsCollectedLastMove: this.lastCollectedCellCount,
       trailWidth: TRAIL_CONFIG.width,
       respawnDelayMs: TRAIL_CONFIG.respawnDelayMs,
+      tokenAnimationFrequencyHz: Math.round(1 / this.tokenAnimIntervalSeconds),
+      variantCounts: { ...this.variantCounts },
+      lodCounts: { ...this.lodCounts },
     };
   }
 
@@ -373,7 +457,8 @@ export class TokenCellService {
     const clusterIds = clustersAlongMovement(previous, current).filter((id) => {
       const parts = id.split(':');
       const z = (Number(parts[2]) + 0.5) * M4T3R_DENSITY_CONFIG.visualClusterSize;
-      return z <= M4T3R_DENSITY_CONFIG.waterMinZ && (this.hiddenUntil.get(id) ?? 0) <= now;
+      const x = (Number(parts[1]) + 0.5) * M4T3R_DENSITY_CONFIG.visualClusterSize;
+      return !isGroundCellExcluded(x, z) && (this.hiddenUntil.get(id) ?? 0) <= now;
     });
     if (clusterIds.length === 0) return null;
     const remaining = Math.max(0, 250 - this.rateWindowCount);
@@ -452,13 +537,16 @@ export class TokenCellService {
   }
 
   dispose(): void {
-    if (this.instances && this.root) {
-      this.root.remove(this.instances);
-      this.instances.geometry.dispose();
-      (this.instances.material as THREE.Material).dispose();
+    if (this.root && this.variantRoot) {
+      this.root.remove(this.variantRoot);
+      if (this.tokenMesh) {
+        this.tokenMesh.geometry.dispose();
+        (this.tokenMesh.material as THREE.Material).dispose();
+      }
     }
-    this.instances = null;
+    this.tokenMesh = null;
     this.root = null;
+    this.variantRoot = null;
     this.hiddenUntil.clear();
     this.pending.length = 0;
     this.visibleCount = 0;
@@ -467,6 +555,8 @@ export class TokenCellService {
     this.elapsedTime = 0;
     this.initialized = false;
     this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
+    this.lastRebuildPlayerX = Number.NaN;
+    this.lastRebuildPlayerZ = Number.NaN;
   }
 
   private expireHidden(): void {

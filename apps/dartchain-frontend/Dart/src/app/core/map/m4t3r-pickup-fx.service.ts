@@ -158,6 +158,13 @@ export class M4t3rPickupFxService {
     ctx.miterLimit = 2;
     const x = width / 2;
     const y = height / 2 + 12;
+    const glow = ctx.createRadialGradient(x, y, 18, x, y, width * 0.44);
+    glow.addColorStop(0, `rgba(130,255,182,${M4T3R_PICKUP_FX.glowOpacity})`);
+    glow.addColorStop(1, 'rgba(130,255,182,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(x, y, width * 0.42, 0, Math.PI * 2);
+    ctx.fill();
     ctx.lineWidth = 36;
     ctx.strokeStyle = '#041208';
     ctx.strokeText(M4T3R_PICKUP_FX.text, x, y);
@@ -166,5 +173,7 @@ export class M4t3rPickupFxService {
     ctx.strokeText(M4T3R_PICKUP_FX.text, x, y);
     ctx.fillStyle = '#1cff4a';
     ctx.fillText(M4T3R_PICKUP_FX.text, x, y);
+    ctx.fillStyle = 'rgba(118, 244, 255, 0.34)';
+    ctx.fillRect(x - 8, y + 20, 16, 86);
   }
 }

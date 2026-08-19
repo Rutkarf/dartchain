@@ -7,29 +7,27 @@ import { GeoCoordinateService } from './geo-coordinate.service';
 import { OSMBuildingProvider } from './osm-building.provider';
 import type { MapProvider, SurfaceProvider } from './map-provider.interface';
 import {
+  MARSEILLE_HARBOR_WATER,
   METRO_SPAWN_ANCHOR,
   MIRROR_SECOND_BUILDING_ID,
   SCENE_COPY,
   VIEUX_PORT_METRO_MIRROR_VIEW,
 } from './map-configuration';
+import {
+  colliderIntersectsStreetCorridor,
+  isHarborLandAt,
+  isHarborWaterAt,
+  isHarborWaterBlockedAt,
+} from './vieux-port-layout.util';
 import { WorldStreamingManager } from './world-streaming.manager';
 import { TokenCellService } from './token-cell.service';
 import { M4t3rPickupFxService } from './m4t3r-pickup-fx.service';
 import { M4t3rDebugOverlay } from './m4t3r-debug-overlay';
 import { FootprintTrailManager } from './footprint-trail-manager.service';
+import { M4t3rCollectTrailVisualService } from './m4t3r-collect-trail-visual.service';
 
-/** Taille de la zone de test initiale autour du Vieux-Port (mètres). */
-const INITIAL_TERRAIN_SIZE_M = 800;
-const STREET_HALF_WIDTH = 16;
-const CANEBIERE_CORRIDOR = {
-  minX: -34,
-  maxX: 34,
-  minZ: -230,
-  maxZ: 18,
-} as const;
-const HARBOR_QUAY_Z = 16;
-const HARBOR_WATER_CENTER_Z = 54;
-const HARBOR_WATER_DEPTH = 96;
+const LAND_TERRAIN_WIDTH = 260;
+const HARBOR_QUAY_Z = MARSEILLE_HARBOR_WATER.quayZ;
 const CYBERPUNK_ART_DIRECTION = {
   lights: {
     moonColor: 0xb7c8ff,
@@ -119,6 +117,7 @@ export class MarseilleMapProvider implements MapProvider {
   private readonly tokenCells = inject(TokenCellService);
   private readonly pickupFx = inject(M4t3rPickupFxService);
   private readonly footprints = inject(FootprintTrailManager);
+  private readonly collectTrailVisual = inject(M4t3rCollectTrailVisualService);
   private readonly debugOverlay = inject(M4t3rDebugOverlay);
 
   private scene: THREE.Scene | null = null;
@@ -134,12 +133,13 @@ export class MarseilleMapProvider implements MapProvider {
   private prototypeBuildingsLoaded = false;
   private prototypeColliderCount = 0;
   private canopyReflector: Reflector | null = null;
-  private waterMesh: THREE.Mesh | null = null;
+  private waterMeshes: THREE.Mesh[] = [];
   private validationCamera: THREE.PerspectiveCamera | null = null;
 
   private readonly surfaceProvider: SurfaceProvider = {
-    getSurfaceHeight: async (worldPosition) => this.getSurfaceHeight(worldPosition),
-    getSurfaceHeightSync: () => 0,
+    getSurfaceHeight: async (worldPosition) =>
+      this.resolveSurfaceHeight(worldPosition.x, worldPosition.z),
+    getSurfaceHeightSync: (x, z) => this.resolveSurfaceHeight(x, z),
     isWalkable: (x, z, radius) => this.isWalkable(x, z, radius),
   };
 
@@ -166,6 +166,7 @@ export class MarseilleMapProvider implements MapProvider {
       this.tokenCells.initializeField(spawnPos);
 
       this.footprints.attach(this.root);
+      this.collectTrailVisual.attach(this.root);
       this.addMetroStation();
       this.addSceneLighting();
 
@@ -202,18 +203,33 @@ export class MarseilleMapProvider implements MapProvider {
     const deltaSeconds = this.lastUpdateTime > 0 ? (now - this.lastUpdateTime) * 0.001 : 0.016;
     this.lastUpdateTime = now;
 
-    if (this.waterMesh) {
+    if (this.waterMeshes.length > 0) {
+      const harbor = MARSEILLE_HARBOR_WATER;
       const t = now * 0.00055;
-      this.waterMesh.position.y = -0.48 + Math.sin(t) * 0.035;
+      const y = harbor.surfaceY + Math.sin(t) * 0.012;
+      for (const mesh of this.waterMeshes) {
+        mesh.position.y = y;
+      }
     }
     this.streaming.update(cameraPosition);
     this.tokenCells.update(cameraPosition, deltaSeconds);
     this.footprints.tickFade();
+    this.collectTrailVisual.tickFade();
     this.debugOverlay.updatePositions(cameraPosition);
     this.debugOverlay.sampleFrame(deltaSeconds * 1000);
   }
 
-  async getSurfaceHeight(_worldPosition: THREE.Vector3): Promise<number> {
+  async getSurfaceHeight(worldPosition: THREE.Vector3): Promise<number> {
+    return this.resolveSurfaceHeight(worldPosition.x, worldPosition.z);
+  }
+
+  /** Hauteur sol : terre (0), quai (~0.018), eau (surface portuaire). */
+  private resolveSurfaceHeight(x: number, z: number): number {
+    const harbor = MARSEILLE_HARBOR_WATER;
+    if (isHarborWaterAt(x, z)) return harbor.surfaceY;
+    if (z >= harbor.quayZ - 1 || (x >= 14 && x <= 50 && z >= harbor.basinMinZ && z <= harbor.basinMaxZ)) {
+      return 0.018;
+    }
     return 0;
   }
 
@@ -247,6 +263,8 @@ export class MarseilleMapProvider implements MapProvider {
     this.ownedTextures.length = 0;
     this.prototypeColliders.length = 0;
     this.tokenCells.dispose();
+    this.footprints.dispose();
+    this.collectTrailVisual.dispose();
     this.streaming.dispose();
     this.pickupFx.dispose();
     this.debugOverlay.dispose();
@@ -257,7 +275,7 @@ export class MarseilleMapProvider implements MapProvider {
     this.terrainMesh = null;
     this.terrainMaterial = null;
     this.terrainBorderMaterial = null;
-    this.waterMesh = null;
+    this.waterMeshes.length = 0;
     this.validationCamera = null;
     if (this.scene) {
       this.scene.environment = null;
@@ -275,19 +293,27 @@ export class MarseilleMapProvider implements MapProvider {
     if (!this.root) return;
 
     const terrainTexture = this.createTerrainGroundTexture();
+    const normalMap =
+      this.config.configuration.quality === 'low' ? null : this.createTerrainNormalTexture();
     this.terrainMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
       map: terrainTexture,
-      roughness: 0.92,
-      metalness: 0.03,
+      roughness: 0.85,
+      metalness: 0.05,
+      normalMap: normalMap ?? null,
+      normalScale: normalMap ? new THREE.Vector2(0.3, 0.3) : undefined,
       side: THREE.FrontSide,
     });
 
-    const geometry = new THREE.PlaneGeometry(INITIAL_TERRAIN_SIZE_M, INITIAL_TERRAIN_SIZE_M, 1, 1);
+    const harbor = MARSEILLE_HARBOR_WATER;
+    const landDepth = harbor.landMaxZ - harbor.landMinZ;
+    const landCenterZ = (harbor.landMinZ + harbor.landMaxZ) * 0.5;
+
+    const geometry = new THREE.PlaneGeometry(LAND_TERRAIN_WIDTH, landDepth, 1, 1);
     this.terrainMesh = new THREE.Mesh(geometry, this.terrainMaterial);
     this.terrainMesh.name = 'marseille-terrain-prototype';
     this.terrainMesh.rotation.x = -Math.PI / 2;
-    this.terrainMesh.position.y = 0;
+    this.terrainMesh.position.set(0, 0, landCenterZ);
     this.terrainMesh.receiveShadow = false;
     this.root.add(this.terrainMesh);
 
@@ -361,6 +387,34 @@ export class MarseilleMapProvider implements MapProvider {
     return texture;
   }
 
+  private createTerrainNormalTexture(): THREE.CanvasTexture {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      const fallback = new THREE.CanvasTexture(canvas);
+      this.ownedTextures.push(fallback);
+      return fallback;
+    }
+
+    const image = ctx.createImageData(canvas.width, canvas.height);
+    for (let i = 0; i < image.data.length; i += 4) {
+      const n = Math.floor(Math.random() * 16) - 8;
+      image.data[i] = 128 + n;
+      image.data[i + 1] = 128 + n;
+      image.data[i + 2] = 255;
+      image.data[i + 3] = 255;
+    }
+    ctx.putImageData(image, 0, 0);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(5.4, 5.4);
+    this.ownedTextures.push(texture);
+    return texture;
+  }
+
   private createPrototypeBuildings(): void {
     if (!this.root) return;
 
@@ -381,7 +435,7 @@ export class MarseilleMapProvider implements MapProvider {
       { x: -68, z: 8, width: 26, depth: 24, height: 15, color: 0xd8c3a5 },
       { x: 72, z: 2, width: 32, depth: 28, height: 19, color: 0xc7b299 },
       { x: 112, z: 18, width: 28, depth: 28, height: 16, color: 0xe5d2b8 },
-      { x: -10, z: 118, width: 120, depth: 22, height: 9, color: 0xd8c3a5 },
+      { x: -10, z: 58, width: 120, depth: 22, height: 9, color: 0xd8c3a5 },
     ];
 
     for (const spec of specs) {
@@ -423,7 +477,7 @@ export class MarseilleMapProvider implements MapProvider {
     roof.frustumCulled = true;
     this.root.add(roof);
 
-    this.addColliderIfOutsideCanebiere({
+    this.addPrototypeColliderIfClear({
       minX: spec.x - spec.width / 2,
       maxX: spec.x + spec.width / 2,
       minZ: spec.z - spec.depth / 2,
@@ -552,7 +606,7 @@ export class MarseilleMapProvider implements MapProvider {
     );
     const xs = worldPoints.map((point) => point.x);
     const zs = worldPoints.map((point) => point.z);
-    this.addColliderIfOutsideCanebiere({
+    this.addPrototypeColliderIfClear({
       minX: Math.min(...xs),
       maxX: Math.max(...xs),
       minZ: Math.min(...zs),
@@ -562,39 +616,82 @@ export class MarseilleMapProvider implements MapProvider {
 
   private addWaterStrip(): void {
     if (!this.root) return;
-    const waterGeometry = new THREE.PlaneGeometry(420, 220, 1, 1);
-    this.ownedGeometries.push(waterGeometry);
-    const waterMaterial = new THREE.MeshStandardMaterial({
-      color: 0x16344f,
-      roughness: 0.22,
-      metalness: 0.48,
-      envMapIntensity: 0.85,
+    const harbor = MARSEILLE_HARBOR_WATER;
+    const waterMaterial = new THREE.MeshBasicMaterial({
+      color: harbor.surfaceColor,
       transparent: true,
-      opacity: 0.96,
+      opacity: 0.92,
+      depthWrite: true,
     });
     this.buildingMaterials.push(waterMaterial);
-    const water = new THREE.Mesh(waterGeometry, waterMaterial);
-    water.name = 'marseille-water-strip';
-    water.rotation.x = -Math.PI / 2;
-    water.position.set(0, -0.48, HARBOR_WATER_CENTER_Z + 28);
-    this.root.add(water);
-    this.waterMesh = water;
 
-    const waterGlow = new THREE.Mesh(
-      new THREE.PlaneGeometry(228, HARBOR_WATER_DEPTH - 8),
-      new THREE.MeshBasicMaterial({
-        color: 0x3a88b8,
-        transparent: true,
-        opacity: 0.07,
-      })
+    const addWaterPlane = (name: string, width: number, depth: number, cx: number, cz: number): void => {
+      const geometry = new THREE.PlaneGeometry(width, depth, 1, 1);
+      this.ownedGeometries.push(geometry);
+      const water = new THREE.Mesh(geometry, waterMaterial);
+      water.name = name;
+      water.rotation.x = -Math.PI / 2;
+      water.position.set(cx, harbor.surfaceY, cz);
+      water.renderOrder = 1;
+      water.frustumCulled = false;
+      this.root!.add(water);
+      this.waterMeshes.push(water);
+    };
+
+    const basinWidth = harbor.basinMaxX - harbor.basinMinX;
+    const basinDepth = harbor.basinMaxZ - harbor.basinMinZ;
+    addWaterPlane(
+      'marseille-water-basin',
+      basinWidth,
+      basinDepth,
+      (harbor.basinMinX + harbor.basinMaxX) * 0.5,
+      (harbor.basinMinZ + harbor.basinMaxZ) * 0.5
     );
-    waterGlow.name = 'marseille-water-glow';
-    waterGlow.rotation.x = -Math.PI / 2;
-    waterGlow.position.set(0, -0.42, HARBOR_WATER_CENTER_Z + 1);
-    this.root.add(waterGlow);
 
-    const quayGeometry = new THREE.PlaneGeometry(240, 24);
-    this.ownedGeometries.push(quayGeometry);
+    const channelDepth = harbor.waterMaxZ - harbor.waterMinZ;
+    addWaterPlane(
+      'marseille-water-south-channel',
+      204,
+      channelDepth,
+      0,
+      (harbor.waterMinZ + harbor.waterMaxZ) * 0.5
+    );
+
+    const glowMaterial = new THREE.MeshBasicMaterial({
+      color: harbor.glowColor,
+      transparent: true,
+      opacity: 0.32,
+      depthWrite: false,
+    });
+    this.buildingMaterials.push(glowMaterial);
+    const southGlow = new THREE.Mesh(
+      new THREE.PlaneGeometry(188, Math.min(channelDepth, 180)),
+      glowMaterial
+    );
+    southGlow.name = 'marseille-water-glow-south';
+    southGlow.rotation.x = -Math.PI / 2;
+    southGlow.position.set(0, harbor.surfaceY + 0.004, harbor.waterMinZ + 90);
+    southGlow.renderOrder = 2;
+    southGlow.frustumCulled = false;
+    this.root.add(southGlow);
+
+    const basinGlowMaterial = glowMaterial.clone();
+    this.buildingMaterials.push(basinGlowMaterial);
+    const basinGlow = new THREE.Mesh(
+      new THREE.PlaneGeometry(basinWidth * 0.96, basinDepth * 0.96),
+      basinGlowMaterial
+    );
+    basinGlow.name = 'marseille-water-glow-basin';
+    basinGlow.rotation.x = -Math.PI / 2;
+    basinGlow.position.set(
+      (harbor.basinMinX + harbor.basinMaxX) * 0.5,
+      harbor.surfaceY + 0.004,
+      (harbor.basinMinZ + harbor.basinMaxZ) * 0.5
+    );
+    basinGlow.renderOrder = 2;
+    basinGlow.frustumCulled = false;
+    this.root.add(basinGlow);
+
     const quayMaterial = new THREE.MeshStandardMaterial({
       color: 0x8f97a3,
       roughness: CYBERPUNK_ART_DIRECTION.streets.quayRoughness,
@@ -602,29 +699,33 @@ export class MarseilleMapProvider implements MapProvider {
       envMapIntensity: 0.6,
     });
     this.buildingMaterials.push(quayMaterial);
-    const quay = new THREE.Mesh(quayGeometry, quayMaterial);
-    quay.name = 'marseille-old-port-quay';
-    quay.rotation.x = -Math.PI / 2;
-    quay.position.set(0, 0.018, HARBOR_QUAY_Z);
-    this.root.add(quay);
 
-    const quaySheenGeometry = new THREE.PlaneGeometry(236, 10);
-    this.ownedGeometries.push(quaySheenGeometry);
-    const quaySheenMaterial = new THREE.MeshBasicMaterial({
-      color: CYBERPUNK_ART_DIRECTION.lights.harborCyan,
-      transparent: true,
-      opacity: CYBERPUNK_ART_DIRECTION.streets.quaySheenOpacity,
-      depthWrite: false,
-    });
-    this.buildingMaterials.push(quaySheenMaterial);
-    const quaySheen = new THREE.Mesh(quaySheenGeometry, quaySheenMaterial);
-    quaySheen.name = 'marseille-quay-sheen';
-    quaySheen.rotation.x = -Math.PI / 2;
-    quaySheen.position.set(0, 0.024, HARBOR_QUAY_Z + 4);
-    this.root.add(quaySheen);
+    const quaySouth = new THREE.Mesh(new THREE.PlaneGeometry(54, 14), quayMaterial);
+    quaySouth.name = 'marseille-quai-belges';
+    quaySouth.rotation.x = -Math.PI / 2;
+    quaySouth.position.set(0, 0.018, HARBOR_QUAY_Z);
+    this.root.add(quaySouth);
+
+    const quayEast = new THREE.Mesh(new THREE.PlaneGeometry(14, basinDepth + 8), quayMaterial);
+    quayEast.name = 'marseille-quai-fraternite';
+    quayEast.rotation.x = -Math.PI / 2;
+    quayEast.position.set(24, 0.018, 0);
+    this.root.add(quayEast);
+
+    const quayNorth = new THREE.Mesh(new THREE.PlaneGeometry(basinWidth + 40, 12), quayMaterial);
+    quayNorth.name = 'marseille-quai-du-port';
+    quayNorth.rotation.x = -Math.PI / 2;
+    quayNorth.position.set((harbor.basinMinX + harbor.basinMaxX) * 0.5, 0.018, harbor.basinMinZ - 6);
+    this.root.add(quayNorth);
+
+    const quaySouthShore = new THREE.Mesh(new THREE.PlaneGeometry(basinWidth + 40, 12), quayMaterial);
+    quaySouthShore.name = 'marseille-quai-rive-neuve';
+    quaySouthShore.rotation.x = -Math.PI / 2;
+    quaySouthShore.position.set((harbor.basinMinX + harbor.basinMaxX) * 0.5, 0.018, harbor.basinMaxZ + 6);
+    this.root.add(quaySouthShore);
 
     const quayEdge = new THREE.Mesh(
-      new THREE.BoxGeometry(240, 0.38, 1.2),
+      new THREE.BoxGeometry(54, 0.38, 1.2),
       new THREE.MeshStandardMaterial({
         color: 0xf1d8a4,
         emissive: 0x6c5c24,
@@ -634,21 +735,8 @@ export class MarseilleMapProvider implements MapProvider {
       })
     );
     quayEdge.name = 'marseille-quay-edge';
-    quayEdge.position.set(0, 0.22, HARBOR_QUAY_Z + 11.4);
+    quayEdge.position.set(0, 0.22, HARBOR_QUAY_Z + 6.2);
     this.root.add(quayEdge);
-
-    const quayWallGeometry = new THREE.BoxGeometry(240, 1.15, 0.7);
-    this.ownedGeometries.push(quayWallGeometry);
-    const quayWallMaterial = new THREE.MeshStandardMaterial({
-      color: 0x6d7380,
-      roughness: 0.78,
-      metalness: 0.08,
-    });
-    this.buildingMaterials.push(quayWallMaterial);
-    const quayWall = new THREE.Mesh(quayWallGeometry, quayWallMaterial);
-    quayWall.name = 'marseille-quay-wall';
-    quayWall.position.set(0, -0.28, HARBOR_QUAY_Z + 12.05);
-    this.root.add(quayWall);
 
     const mirror = new THREE.Mesh(
       new THREE.BoxGeometry(18, 0.6, 12),
@@ -743,8 +831,8 @@ export class MarseilleMapProvider implements MapProvider {
     const landmarks = [
       { x: -54, z: -22, width: 22, depth: 16, height: 20, material: glassMaterial, id: 'mirror-adjacent-building-01' },
       { x: 56, z: -18, width: 24, depth: 18, height: 24, material: warmMaterial, id: MIRROR_SECOND_BUILDING_ID },
-      { x: -58, z: 24, width: 18, depth: 16, height: 18, material: warmMaterial, id: 'harbor-west-building' },
-      { x: 58, z: 26, width: 18, depth: 18, height: 19, material: glassMaterial, id: 'harbor-east-building' },
+      { x: -58, z: -48, width: 18, depth: 16, height: 18, material: warmMaterial, id: 'harbor-west-building' },
+      { x: 58, z: 48, width: 18, depth: 18, height: 19, material: glassMaterial, id: 'harbor-east-building' },
     ] as const;
 
     for (const landmark of landmarks) {
@@ -768,7 +856,7 @@ export class MarseilleMapProvider implements MapProvider {
         this.addR4v3FacadeSign(landmark.x, landmark.height * 0.55, landmark.z, landmark.width, landmark.depth);
       }
 
-      this.addColliderIfOutsideCanebiere({
+      this.addPrototypeColliderIfClear({
         minX: landmark.x - landmark.width / 2,
         maxX: landmark.x + landmark.width / 2,
         minZ: landmark.z - landmark.depth / 2,
@@ -1369,7 +1457,12 @@ export class MarseilleMapProvider implements MapProvider {
     );
     makeMarker('marseille-debug-road', 0, -40, 0x9aa3ad);
     makeMarker('marseille-debug-crosswalk', 0, -18, 0xf2efe6);
-    makeMarker('marseille-debug-sea', 0, HARBOR_WATER_CENTER_Z + 28, 0x2b67ff);
+    makeMarker(
+      'marseille-debug-sea',
+      0,
+      (MARSEILLE_HARBOR_WATER.waterMinZ + MARSEILLE_HARBOR_WATER.waterMaxZ) * 0.5,
+      0x2b67ff
+    );
   }
 
   private createBuildingMaterial(color: number): THREE.MeshLambertMaterial {
@@ -1974,18 +2067,7 @@ export class MarseilleMapProvider implements MapProvider {
   }
 
   private isWalkable(x: number, z: number, radius: number): boolean {
-    if (
-      x >= CANEBIERE_CORRIDOR.minX &&
-      x <= CANEBIERE_CORRIDOR.maxX &&
-      z >= CANEBIERE_CORRIDOR.minZ &&
-      z <= CANEBIERE_CORRIDOR.maxZ
-    ) {
-      return true;
-    }
-
-    if (Math.abs(x) <= STREET_HALF_WIDTH || Math.abs(z) <= STREET_HALF_WIDTH) {
-      return true;
-    }
+    if (isHarborWaterBlockedAt(x, z, radius)) return false;
 
     for (const collider of this.prototypeColliders) {
       const nearestX = THREE.MathUtils.clamp(x, collider.minX, collider.maxX);
@@ -1997,7 +2079,12 @@ export class MarseilleMapProvider implements MapProvider {
       }
     }
 
-    return true;
+    return isHarborLandAt(x, z);
+  }
+
+  private addPrototypeColliderIfClear(collider: PrototypeCollider): void {
+    if (colliderIntersectsStreetCorridor(collider)) return;
+    this.prototypeColliders.push(collider);
   }
 
   private stableIndexFromPoints(
@@ -2017,19 +2104,6 @@ export class MarseilleMapProvider implements MapProvider {
     x = Math.imul(x ^ (x >>> 13), 0xc2b2ae35);
     return ((x ^ (x >>> 16)) >>> 0) / 4294967296;
   }
-
-  private addColliderIfOutsideCanebiere(collider: PrototypeCollider): void {
-    const intersectsCanebiere =
-      collider.maxX > CANEBIERE_CORRIDOR.minX &&
-      collider.minX < CANEBIERE_CORRIDOR.maxX &&
-      collider.maxZ > CANEBIERE_CORRIDOR.minZ &&
-      collider.minZ < CANEBIERE_CORRIDOR.maxZ;
-
-    if (!intersectsCanebiere) {
-      this.prototypeColliders.push(collider);
-    }
-  }
-
   private removePrototypeBuildingMeshes(): void {
     if (!this.root || !this.prototypeBuildingsLoaded) return;
 
