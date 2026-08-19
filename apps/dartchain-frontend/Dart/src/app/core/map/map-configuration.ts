@@ -170,6 +170,13 @@ export const M4T3R_RENDER_CONFIG = {
   rotationSpeedRadiansPerSecond: 1.25,
   bobAmplitude: 0.015,
   bobFrequency: 1.4,
+  /**
+   * Throttle CPU pour l’animation InstancedMesh :
+   * fréquence de recalcul des matrices (rotation + bob) selon la qualité.
+   */
+  animationUpdateHzLow: 24,
+  animationUpdateHzMedium: 30,
+  animationUpdateHzHigh: 60,
   /** Phase variation per token to desync animations. */
   phaseSpread: 6.283,
 } as const;

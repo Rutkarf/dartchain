@@ -34,6 +34,9 @@ export class FootprintTrailManager {
   private lastFootprintPos = new THREE.Vector2(Number.NaN, Number.NaN);
   private nextSide: -1 | 1 = 1;
   private lastFadeTickMs = 0;
+  // Maintient la liste des empreintes actives pour éviter de parcourir 300 slots à vide.
+  private activeIndices: number[] = [];
+  private activeIndexPos: number[] = [];
 
   attach(root: THREE.Group): void {
     this.root = root;
@@ -77,6 +80,8 @@ export class FootprintTrailManager {
       yaw: 0,
       side: 1 as const,
     }));
+    this.activeIndices.length = 0;
+    this.activeIndexPos = Array.from({ length: FOOTPRINT_CONFIG.maxVisibleFootprints }, () => -1);
 
     for (let i = 0; i < this.slots.length; i++) {
       this.dummy.position.set(0, -1e6, 0);
@@ -147,6 +152,12 @@ export class FootprintTrailManager {
     const yawJitter = slot.side * 0.18;
     slot.yaw = yaw + yawJitter;
 
+    // Ajout dans la liste active si nécessaire.
+    if (this.activeIndexPos[this.nextIndex] === -1) {
+      this.activeIndexPos[this.nextIndex] = this.activeIndices.length;
+      this.activeIndices.push(this.nextIndex);
+    }
+
     this.dummy.position.set(slot.x, slot.y, slot.z);
     this.dummy.rotation.set(0, slot.yaw + yawJitter, 0);
     this.dummy.scale.set(1, 1, 1);
@@ -169,18 +180,26 @@ export class FootprintTrailManager {
     this.lastFadeTickMs = nowMs;
 
     let changed = false;
-    for (let i = 0; i < this.slots.length; i++) {
+    for (let ai = 0; ai < this.activeIndices.length; ) {
+      const i = this.activeIndices[ai];
       const s = this.slots[i];
-      if (!s.active) continue;
 
       if (nowMs >= s.expiresAtMs) {
         s.active = false;
+        // Remove from active list via swap-pop.
+        const last = this.activeIndices[this.activeIndices.length - 1];
+        this.activeIndices[ai] = last;
+        this.activeIndices.pop();
+        this.activeIndexPos[last] = ai;
+        this.activeIndexPos[i] = -1;
+
         this.dummy.position.set(0, -1e6, 0);
         this.dummy.rotation.set(0, 0, 0);
         this.dummy.scale.set(0, 0, 0);
         this.dummy.updateMatrix();
         this.mesh.setMatrixAt(i, this.dummy.matrix);
         changed = true;
+        // Element swapped in at same index: re-check without increment.
         continue;
       }
 
@@ -196,6 +215,8 @@ export class FootprintTrailManager {
         this.mesh.setMatrixAt(i, this.dummy.matrix);
         changed = true;
       }
+
+      ai++;
     }
 
     if (changed) {

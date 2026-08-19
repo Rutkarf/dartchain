@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import * as THREE from 'three';
+import { MapConfigService } from './map-config.service';
 
 import {
   M4T3R_DENSITY_CONFIG,
@@ -93,9 +94,18 @@ export class TokenCellService {
   private readonly scratch = new THREE.Vector3();
   private readonly anchorCenterScratch = new THREE.Vector3();
   private readonly color = new THREE.Color();
+  private readonly mapConfig = inject(MapConfigService);
   private readonly hiddenUntil = new Map<string, number>();
   private readonly pending: TokenCollectionRequest[] = [];
   private visibleCount = 0;
+  // Liste stable des instances visibles (remplie lors de rebuildGrid()).
+  // Permet d'éviter de rescanner la grille à chaque frame.
+  private visibleCells: Array<{
+    x: number;
+    z: number;
+    phase: number;
+    speed: number;
+  }> = [];
   private totalGridCells = 0;
   private lastLogicalCount = 0;
   private lastCollectedCellCount = 0;
@@ -104,6 +114,12 @@ export class TokenCellService {
   private lastOriginCell = { x: Number.NaN, z: Number.NaN };
   private elapsedTime = 0;
   private initialized = false;
+  /**
+   * Accumulateur pour throttle CPU des updates rotation/bobbing
+   * (rotation est lente, donc 20–30Hz suffit visuellement).
+   */
+  private tokenAnimAccumulatorSeconds = 0;
+  private tokenAnimIntervalSeconds = 1 / M4T3R_RENDER_CONFIG.animationUpdateHzMedium;
 
   attach(root: THREE.Group): void {
     this.root = root;
@@ -137,6 +153,17 @@ export class TokenCellService {
     this.instances.raycast = () => {};
     root.add(this.instances);
     this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
+
+    // Throttle selon la qualité demandée (low-end-friendly).
+    this.tokenAnimIntervalSeconds = 1 / this.resolveTokenAnimationHz();
+    this.tokenAnimAccumulatorSeconds = 0;
+  }
+
+  private resolveTokenAnimationHz(): number {
+    const q = this.mapConfig.configuration.quality;
+    if (q === 'low') return M4T3R_RENDER_CONFIG.animationUpdateHzLow;
+    if (q === 'high') return M4T3R_RENDER_CONFIG.animationUpdateHzHigh;
+    return M4T3R_RENDER_CONFIG.animationUpdateHzMedium;
   }
 
   /**
@@ -183,9 +210,14 @@ export class TokenCellService {
       const centerZ = originZ * snap + snap * 0.5;
       this.anchorCenterScratch.set(centerX, 0, centerZ);
       this.rebuildGrid(this.anchorCenterScratch);
+      this.tokenAnimAccumulatorSeconds = 0;
     } else {
       // Les animations tournent toujours, mais la sélection visible reste ancrée au même center de chunk.
-      this.updateAnimations(this.anchorCenterScratch);
+      this.tokenAnimAccumulatorSeconds += deltaSeconds;
+      if (this.tokenAnimAccumulatorSeconds >= this.tokenAnimIntervalSeconds) {
+        this.tokenAnimAccumulatorSeconds = 0;
+        this.updateAnimations(this.anchorCenterScratch);
+      }
     }
 
     return this.visibleCount;
@@ -207,6 +239,7 @@ export class TokenCellService {
 
     let count = 0;
     let totalCells = 0;
+    this.visibleCells.length = 0;
     for (let gz = minZ; gz <= maxZ; gz++) {
       for (let gx = minX; gx <= maxX; gx++) {
         const x = (gx + 0.5) * size;
@@ -231,6 +264,7 @@ export class TokenCellService {
         this.instances.setMatrixAt(count, this.dummy.matrix);
         this.color.setHex(R4V3_TOKEN_COLORS[Math.abs(gx * 17 + gz * 5) % R4V3_TOKEN_COLORS.length]);
         this.instances.setColorAt(count, this.color);
+        this.visibleCells.push({ x, z, phase, speed });
         count += 1;
       }
     }
@@ -250,48 +284,25 @@ export class TokenCellService {
   private updateAnimations(playerPosition: THREE.Vector3): void {
     if (!this.instances || this.visibleCount === 0) return;
 
-    const size = R4V3_GROUND_FIELD.cellSize;
-    const radius = R4V3_GROUND_FIELD.visibleRadius;
-    const minX = Math.floor((playerPosition.x - radius) / size);
-    const maxX = Math.ceil((playerPosition.x + radius) / size);
-    const minZ = Math.floor((playerPosition.z - radius) / size);
-    const maxZ = Math.ceil((playerPosition.z + radius) / size);
-    const now = Date.now();
+    // Sélection déjà figée dans visibleCells : pas de rescanner la grille.
     const groundY = R4V3_GROUND_FIELD.groundY;
     const tokenY = groundY + STANDING_COIN_HALF_HEIGHT + M4T3R_RENDER_CONFIG.verticalOffset;
     const t = this.elapsedTime;
 
-    let count = 0;
-    for (let gz = minZ; gz <= maxZ; gz++) {
-      for (let gx = minX; gx <= maxX; gx++) {
-        const x = (gx + 0.5) * size;
-        const z = (gz + 0.5) * size;
-        if (z > R4V3_GROUND_FIELD.waterMinZ) continue;
-        if (Math.hypot(x - playerPosition.x, z - playerPosition.z) > radius) continue;
-
-        if (count >= R4V3_GROUND_FIELD.maxVisibleInstances) continue;
-
-        if (this.isRenderCellHidden(x, z, now)) continue;
-
-        const phase = deterministicPhase(gx, gz);
-        const speed = deterministicSpeed(gx, gz);
-        const rotY = t * speed + phase;
-        const bobY = Math.sin(t * M4T3R_RENDER_CONFIG.bobFrequency + phase) * M4T3R_RENDER_CONFIG.bobAmplitude;
-
-        this.dummy.position.set(x, tokenY + bobY, z);
-        this.dummy.rotation.set(0, rotY, 0);
-        this.dummy.scale.set(1, M4T3R_RENDER_CONFIG.heightMultiplier, 1);
-        this.dummy.updateMatrix();
-        this.instances.setMatrixAt(count, this.dummy.matrix);
-        count += 1;
-      }
-    }
-
-    if (count !== this.visibleCount) {
-      this.instances.count = count;
-      this.visibleCount = count;
-    }
+    const count = this.visibleCells.length;
     this.instances.instanceMatrix.needsUpdate = true;
+
+    for (let i = 0; i < count; i++) {
+      const c = this.visibleCells[i];
+      const rotY = t * c.speed + c.phase;
+      const bobY = Math.sin(t * M4T3R_RENDER_CONFIG.bobFrequency + c.phase) * M4T3R_RENDER_CONFIG.bobAmplitude;
+
+      this.dummy.position.set(c.x, tokenY + bobY, c.z);
+      this.dummy.rotation.set(0, rotY, 0);
+      this.dummy.scale.set(1, M4T3R_RENDER_CONFIG.heightMultiplier, 1);
+      this.dummy.updateMatrix();
+      this.instances.setMatrixAt(i, this.dummy.matrix);
+    }
   }
 
   visibleTokenCount(): number {
@@ -451,6 +462,7 @@ export class TokenCellService {
     this.hiddenUntil.clear();
     this.pending.length = 0;
     this.visibleCount = 0;
+    this.visibleCells.length = 0;
     this.totalGridCells = 0;
     this.elapsedTime = 0;
     this.initialized = false;
