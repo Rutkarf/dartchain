@@ -34,12 +34,14 @@ interface OverpassResponse {
   elements: Array<OverpassNode | OverpassWay>;
 }
 
+import { environment } from '../../../environments/environment';
+
 const DEFAULT_BUILDING_HEIGHT = 8;
 const FLOOR_HEIGHT = 3;
 const MAX_BUILDING_HEIGHT = 120;
 const METERS_PER_DEGREE_LAT = 111_320;
-/** Proxy Vite en dev, puis endpoint public CORS-friendly. */
-const OVERPASS_ENDPOINTS = ['/overpass', 'https://overpass-api.de/api/interpreter'];
+/** Same-origin only — never hit overpass-api.de from the browser (CORS). */
+const OVERPASS_ENDPOINTS = [`${environment.apiUrl}/metaverse/overpass`, '/overpass', '/overpass-alt'];
 
 @Injectable({ providedIn: 'root' })
 export class OSMBuildingProvider {

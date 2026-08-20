@@ -29,6 +29,16 @@ import { MarseilleGeoDebugService } from './marseille-geo-debug.service';
 import { buildVieuxPortSpawnFacades, VIEUX_PORT_SPAWN_FACADES } from './vieux-port-spawn-facades.util';
 import { buildVieuxPortMirrorCanopy, MIRROR_CANOPY } from './vieux-port-mirror-canopy.util';
 import {
+  createCyberpunkOverlayGroup,
+  disposeCyberpunkOverlay,
+  type CyberpunkOverlayBuild,
+} from './marseille-twin/cyberpunk-overlay.factory';
+import { shouldAttachCyberpunkOverlay } from './marseille-twin/cyberpunk-overlay.config';
+import {
+  disableOverlayOnCamera,
+  enableOverlayOnCamera,
+} from './marseille-twin/overlay-layer';
+import {
   colliderIntersectsStreetCorridor,
   isHarborLandAt,
   isHarborWaterAt,
@@ -151,6 +161,7 @@ export class MarseilleMapProvider implements MapProvider {
   private readonly geoDebug = inject(MarseilleGeoDebugService);
 
   private scene: THREE.Scene | null = null;
+  private gameplayCamera: THREE.Camera | null = null;
   private root: THREE.Group | null = null;
   private terrainMesh: THREE.Mesh | null = null;
   private terrainMaterial: THREE.MeshStandardMaterial | null = null;
@@ -168,6 +179,7 @@ export class MarseilleMapProvider implements MapProvider {
   private validationCamera: THREE.PerspectiveCamera | null = null;
   private alignmentCamera: THREE.PerspectiveCamera | null = null;
   private readonly placementAudits: BuildingPlacementAudit[] = [];
+  private cyberpunkOverlay: CyberpunkOverlayBuild | null = null;
 
   private readonly surfaceProvider: SurfaceProvider = {
     getSurfaceHeight: async (worldPosition) =>
@@ -176,10 +188,11 @@ export class MarseilleMapProvider implements MapProvider {
     isWalkable: (x, z, radius) => this.isWalkable(x, z, radius),
   };
 
-  async initialize(scene: THREE.Scene, _camera: THREE.Camera): Promise<void> {
+  async initialize(scene: THREE.Scene, camera: THREE.Camera): Promise<void> {
     try {
       this.removeLegacyMeshes(scene);
       this.scene = scene;
+      this.gameplayCamera = camera;
       this.root = new THREE.Group();
       this.root.name = 'marseille-map-root';
       scene.add(this.root);
@@ -203,6 +216,7 @@ export class MarseilleMapProvider implements MapProvider {
       this.collectTrailVisual.attach(this.root);
       this.addMetroStation();
       this.addSceneLighting();
+      this.attachCyberpunkOverlayLayer();
 
       // IMPORTANT (anti latence) :
       // Ne pas bloquer l'initialisation du provider sur le chargement OSM lourd.
@@ -310,6 +324,14 @@ export class MarseilleMapProvider implements MapProvider {
     this.debugOverlay.dispose();
     this.wigleRegistry.clear();
     this.geoDebug.dispose();
+    if (this.cyberpunkOverlay) {
+      disposeCyberpunkOverlay(this.cyberpunkOverlay);
+      this.cyberpunkOverlay = null;
+    }
+    if (this.gameplayCamera) {
+      disableOverlayOnCamera(this.gameplayCamera);
+      this.gameplayCamera = null;
+    }
     this.placementAudits.length = 0;
     this.root = null;
     this.osmRoot = null;
@@ -456,6 +478,10 @@ export class MarseilleMapProvider implements MapProvider {
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(5.4, 5.4);
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+    texture.needsUpdate = true;
     this.ownedTextures.push(texture);
     return texture;
   }
@@ -1965,6 +1991,19 @@ export class MarseilleMapProvider implements MapProvider {
     this.root.add(seaArrow);
   }
 
+  /**
+   * Overlay cyberpunk additif. Flag on : hologrammes enseigne, layer 1.
+   * Spawn, colliders et raycast RDC inchangés (raycast no-op + layer isolé).
+   */
+  private attachCyberpunkOverlayLayer(): void {
+    if (!this.root || !shouldAttachCyberpunkOverlay()) return;
+    this.cyberpunkOverlay = createCyberpunkOverlayGroup(true);
+    this.root.add(this.cyberpunkOverlay.group);
+    if (this.gameplayCamera) {
+      enableOverlayOnCamera(this.gameplayCamera);
+    }
+  }
+
   private addSceneLighting(): void {
     if (!this.root || !this.scene) return;
     const nightEnv = this.createNightEnvironmentMap();
@@ -2069,6 +2108,8 @@ export class MarseilleMapProvider implements MapProvider {
       makeFace('#143848', '#1c2848'),
     ]);
     texture.colorSpace = THREE.SRGBColorSpace;
+    texture.generateMipmaps = false;
+    texture.minFilter = THREE.LinearFilter;
     texture.needsUpdate = true;
     this.ownedTextures.push(texture);
     return texture;

@@ -1,3 +1,11 @@
+@if (state.runtimePhase() !== 'ready') {
+  <div class="sc-runtime" role="alert" [attr.data-phase]="state.runtimePhase()">
+    {{ state.runtimeMessage() }}
+  </div>
+}
+
+<app-star-conquest-pan-stick />
+
 @if (state.scannerOpen()) {
   <div
     class="sc-scanner__panel"
@@ -14,13 +22,6 @@
   >
     <header class="sc-scanner__head">
       <span id="sc-scanner-title" class="sc-scanner__title">Quest · hors vue</span>
-      <span class="sc-scanner__conquest" aria-label="Quêtes conquises et live">
-        {{ progress.claimedCount() }}/{{ progress.catalogCount }}
-        · Live {{ progress.liveCompletedCount() }}/{{ progress.liveLinkCount }}
-      </span>
-      <span class="sc-scanner__network" [attr.aria-label]="networkLabel()">{{
-        networkLabel()
-      }}</span>
       <button
         type="button"
         class="sc-scanner__close"
@@ -29,6 +30,15 @@
       >
         ×
       </button>
+      <span class="sc-scanner__stats">
+        <span class="sc-scanner__conquest" aria-label="Quêtes conquises et live">
+          {{ progress.claimedCount() }}/{{ progress.catalogCount }}
+          · Live {{ progress.liveCompletedCount() }}/{{ progress.liveLinkCount }}
+        </span>
+        <span class="sc-scanner__network" [attr.aria-label]="networkLabel()">{{
+          networkLabel()
+        }}</span>
+      </span>
     </header>
     @if (kpiDebug) {
       <p

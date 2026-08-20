@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { STAR_CONQUEST_SCALE } from './star-conquest-scale';
+import { STAR_CONQUEST_CONTROLS } from './star-conquest-controls.config';
+import { applyAxisDeadzone } from './star-conquest-input';
 
-const STICK_DEADZONE = 0.04;
+const STICK_DEADZONE = STAR_CONQUEST_CONTROLS.stickDeadzone;
 const DEFAULT_PAN_MAX_X = 90;
 const DEFAULT_PAN_MAX_Y = 70;
 /** Vitesse de pan caméra (unités monde / s à stick plein). */
@@ -82,8 +84,21 @@ export class StarConquestWorld {
     this.bounceVY = 0;
   }
 
+  panByDelta(dxWorld: number, dyWorld: number): void {
+    this.dragging = true;
+    this.focusActive = false;
+    this.bounceVX = 0;
+    this.bounceVY = 0;
+    this.targetViewX = clamp(this.targetViewX + dxWorld, -this.panMaxX, this.panMaxX);
+    this.targetViewY = clamp(this.targetViewY + dyWorld, -this.panMaxY, this.panMaxY);
+  }
+
+  getPanMax(): { x: number; y: number } {
+    return { x: this.panMaxX, y: this.panMaxY };
+  }
+
   /** Relâche le stick. Par défaut recentre la vue (viewport app 250×550). */
-  releaseStick(recenter = true): void {
+  releaseStick(recenter: boolean = STAR_CONQUEST_CONTROLS.recenterOnRelease): void {
     this.dragging = false;
     this.stickX = 0;
     this.stickY = 0;
@@ -181,8 +196,8 @@ export class StarConquestWorld {
     const dt = Math.min(0.05, deltaMs * 0.001);
 
     if (this.dragging) {
-      const sx = Math.abs(this.stickX) < STICK_DEADZONE ? 0 : this.stickX;
-      const sy = Math.abs(this.stickY) < STICK_DEADZONE ? 0 : this.stickY;
+      const sx = applyAxisDeadzone(this.stickX, STICK_DEADZONE);
+      const sy = applyAxisDeadzone(this.stickY, STICK_DEADZONE);
       this.targetViewX = clamp(
         this.targetViewX + sx * PAN_SPEED * dt,
         -this.panMaxX,

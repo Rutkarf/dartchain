@@ -47,6 +47,7 @@ describe('PlacementDetailsPanel', () => {
     facade.select('dev-placement-01');
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.placement-panel')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('OpenStreetMap');
     fixture.nativeElement.querySelector('.ghost')?.click();
     fixture.detectChanges();
     expect(facade.selectedPlacementId()).toBeNull();

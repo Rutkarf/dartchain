@@ -11,6 +11,11 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
+import {
+  isJoystickPointerStart,
+  JoystickEmitCoalescer,
+  latestPointerSample,
+} from './virtual-joystick.pointer';
 
 export interface JoystickVector {
   x: number;
@@ -30,7 +35,6 @@ export interface JoystickVector {
       class="vj-zone"
       [attr.aria-label]="ariaLabel"
       role="application"
-      (pointerdown)="onPointerDown($event)"
     >
       <div class="vj-base" [class.vj-base-walk-run]="walkRunRings">
         @if (walkRunRings) {
@@ -51,6 +55,9 @@ export interface JoystickVector {
         touch-action: none;
         user-select: none;
         -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior: none;
       }
       .vj-zone {
         position: relative;
@@ -128,22 +135,47 @@ export class VirtualJoystickComponent implements AfterViewInit, OnDestroy {
 
   private activePointer: number | null = null;
   private radius = 48;
+  private originX = 0;
+  private originY = 0;
+  private guardsBound = false;
+  private readonly coalescer = new JoystickEmitCoalescer((x, y) =>
+    this.vectorChange.emit({ x, y })
+  );
+  private readonly onDown = (e: PointerEvent): void => this.onPointerDown(e);
   private readonly onMove = (e: PointerEvent): void => this.onPointerMove(e);
   private readonly onUp = (e: PointerEvent): void => this.onPointerUp(e);
+  private readonly onLostCapture = (e: Event): void => this.onLostPointerCapture(e);
+  private readonly onWindowBlur = (): void => this.resetToNeutral();
+  private readonly onContextMenu = (e: Event): void => {
+    e.preventDefault();
+  };
+  private readonly onLayout = (): void => {
+    this.measure();
+    this.cacheOrigin();
+  };
+  private readonly onVisibilityChange = (): void => {
+    if (typeof document !== 'undefined' && document.hidden) {
+      this.resetToNeutral();
+    }
+  };
 
   ngAfterViewInit(): void {
     this.measure();
+    this.cacheOrigin();
+    this.bindGuards();
   }
 
   ngOnDestroy(): void {
-    this.unbindWindow();
-    this.emit(0, 0);
+    this.unbindGuards();
+    this.resetToNeutral();
+    this.coalescer.dispose();
   }
 
-  onPointerDown(event: PointerEvent): void {
-    if (this.activePointer !== null) return;
+  private onPointerDown(event: PointerEvent): void {
+    if (!isJoystickPointerStart(event, this.activePointer)) return;
     event.preventDefault();
     this.measure();
+    this.cacheOrigin();
     this.activePointer = event.pointerId;
     this.zoneRef.nativeElement.setPointerCapture?.(event.pointerId);
     this.zone.runOutsideAngular(() => {
@@ -151,29 +183,51 @@ export class VirtualJoystickComponent implements AfterViewInit, OnDestroy {
       window.addEventListener('pointerup', this.onUp);
       window.addEventListener('pointercancel', this.onUp);
     });
-    this.updateFromEvent(event);
+    this.updateFromEvent(event, true);
   }
 
   private onPointerMove(event: PointerEvent): void {
     if (event.pointerId !== this.activePointer) return;
     event.preventDefault();
-    this.updateFromEvent(event);
+    this.updateFromEvent(latestPointerSample(event), false);
   }
 
   private onPointerUp(event: PointerEvent): void {
     if (event.pointerId !== this.activePointer) return;
-    this.activePointer = null;
-    this.unbindWindow();
-    this.setKnob(0, 0);
-    this.emit(0, 0);
+    this.resetToNeutral();
   }
 
-  private updateFromEvent(event: PointerEvent): void {
-    const rect = this.zoneRef.nativeElement.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    let dx = event.clientX - cx;
-    let dy = event.clientY - cy;
+  private onLostPointerCapture(event: Event): void {
+    if (!(event instanceof PointerEvent)) return;
+    if (event.pointerId !== this.activePointer) return;
+    this.resetToNeutral();
+  }
+
+  /**
+   * Neutralise le stick : release, cancel, blur, onglet caché, destroy.
+   * Idempotent — lostpointercapture après releasePointerCapture est ignoré.
+   */
+  private resetToNeutral(): void {
+    const pointerId = this.activePointer;
+    this.activePointer = null;
+    this.unbindWindow();
+    if (pointerId !== null) {
+      const el = this.zoneRef?.nativeElement;
+      if (el?.hasPointerCapture?.(pointerId)) {
+        try {
+          el.releasePointerCapture(pointerId);
+        } catch {
+          /* capture déjà relâchée */
+        }
+      }
+    }
+    this.setKnob(0, 0);
+    this.coalescer.now(0, 0);
+  }
+
+  private updateFromEvent(event: PointerEvent, immediate: boolean): void {
+    let dx = event.clientX - this.originX;
+    let dy = event.clientY - this.originY;
     const len = Math.hypot(dx, dy) || 1;
     const max = this.radius;
     if (len > max) {
@@ -182,15 +236,16 @@ export class VirtualJoystickComponent implements AfterViewInit, OnDestroy {
     }
     this.setKnob(dx, dy);
     // y inversé : haut écran = avance (y>0)
-    this.emit(dx / max, -dy / max);
+    const x = dx / max;
+    const y = -dy / max;
+    if (immediate) this.coalescer.now(x, y);
+    else this.coalescer.later(x, y);
   }
 
   private setKnob(dx: number, dy: number): void {
-    this.knobRef.nativeElement.style.transform = `translate(${dx}px, ${dy}px)`;
-  }
-
-  private emit(x: number, y: number): void {
-    this.vectorChange.emit({ x, y });
+    const knob = this.knobRef?.nativeElement;
+    if (!knob) return;
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
   }
 
   private measure(): void {
@@ -205,6 +260,49 @@ export class VirtualJoystickComponent implements AfterViewInit, OnDestroy {
     const faceRadius = Math.max(8, size * 0.5 - inset);
     const knobRadius = (Number.isFinite(knobRatio) ? knobRatio : 0.36) * size * 0.5;
     this.radius = Math.max(6, faceRadius - knobRadius - 1);
+  }
+
+  private cacheOrigin(): void {
+    const rect = this.zoneRef.nativeElement.getBoundingClientRect();
+    this.originX = rect.left + rect.width / 2;
+    this.originY = rect.top + rect.height / 2;
+  }
+
+  private bindGuards(): void {
+    if (this.guardsBound || typeof window === 'undefined') return;
+    this.guardsBound = true;
+    const zoneEl = this.zoneRef.nativeElement;
+    this.zone.runOutsideAngular(() => {
+      zoneEl.addEventListener('pointerdown', this.onDown, { passive: false });
+      zoneEl.addEventListener('lostpointercapture', this.onLostCapture);
+      zoneEl.addEventListener('contextmenu', this.onContextMenu);
+      window.addEventListener('blur', this.onWindowBlur);
+      window.addEventListener('pagehide', this.onWindowBlur);
+      window.addEventListener('resize', this.onLayout);
+      window.addEventListener('orientationchange', this.onLayout);
+      window.visualViewport?.addEventListener('resize', this.onLayout);
+      document.addEventListener('visibilitychange', this.onVisibilityChange);
+    });
+  }
+
+  private unbindGuards(): void {
+    if (!this.guardsBound) return;
+    this.guardsBound = false;
+    this.zoneRef?.nativeElement?.removeEventListener('pointerdown', this.onDown);
+    this.zoneRef?.nativeElement?.removeEventListener(
+      'lostpointercapture',
+      this.onLostCapture
+    );
+    this.zoneRef?.nativeElement?.removeEventListener(
+      'contextmenu',
+      this.onContextMenu
+    );
+    window.removeEventListener('blur', this.onWindowBlur);
+    window.removeEventListener('pagehide', this.onWindowBlur);
+    window.removeEventListener('resize', this.onLayout);
+    window.removeEventListener('orientationchange', this.onLayout);
+    window.visualViewport?.removeEventListener('resize', this.onLayout);
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
   }
 
   private unbindWindow(): void {

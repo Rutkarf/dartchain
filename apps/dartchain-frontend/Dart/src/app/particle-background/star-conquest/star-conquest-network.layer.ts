@@ -60,10 +60,10 @@ export class StarConquestNetworkLayer {
     nodeGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(0), 3));
     nodeGeom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(0), 3));
     const nodeMat = new THREE.PointsMaterial({
-      size: 2.4 * STAR_CONQUEST_SCALE.visual,
+      size: 0.55 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       transparent: true,
-      opacity: 0.82,
+      opacity: 0.16,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -76,10 +76,10 @@ export class StarConquestNetworkLayer {
 
     const haloGeom = nodeGeom.clone();
     const haloMat = new THREE.PointsMaterial({
-      size: 4.8 * STAR_CONQUEST_SCALE.visual,
+      size: 1.05 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       transparent: true,
-      opacity: 0.28,
+      opacity: 0.12,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,

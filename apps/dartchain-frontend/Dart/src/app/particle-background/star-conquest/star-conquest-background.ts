@@ -13,11 +13,16 @@ import {
   questEchoOffset,
   type StarQuestAnchor,
 } from './star-conquest-anchors';
+import {
+  STAR_CONQUEST_REST_GLOW,
+  starConquestGalaxyRadius,
+  starConquestMobileQuality,
+} from './star-conquest-ui-maturity.config';
 
 const LAYER_IDS: StarDepthLayerId[] = ['far', 'mid', 'near'];
 const ECHOES_PER_QUEST: Record<StarDepthLayerId, number> = {
-  far: 3,
-  mid: 2,
+  far: 1,
+  mid: 1,
   near: 1,
   interactive: 0,
 };
@@ -40,15 +45,14 @@ export class StarConquestBackground {
   private theme: StarConquestUniverseTheme | null = null;
   private anchors: readonly StarQuestAnchor[] = [];
   private echoSignature = '';
+  private pointerNdc: { x: number; y: number } | null = null;
 
   constructor() {
     this.group.name = 'star-conquest-background';
     this.discTexture = createSoftDiscTexture(scaledTextureSize(48));
     this.auroraMat = createStarConquestAuroraMaterial();
-    const auroraGeom = new THREE.PlaneGeometry(
-      Math.round(520 * STAR_CONQUEST_SCALE.worldExtent),
-      Math.round(920 * STAR_CONQUEST_SCALE.worldExtent)
-    );
+    const bowlR = starConquestGalaxyRadius() * 1.18;
+    const auroraGeom = new THREE.CircleGeometry(bowlR, 64);
     this.auroraMesh = new THREE.Mesh(auroraGeom, this.auroraMat);
     this.auroraMesh.name = 'sc-aurora-plane';
     this.auroraMesh.position.z = -180 * STAR_CONQUEST_SCALE.worldExtent;
@@ -79,10 +83,16 @@ export class StarConquestBackground {
       theme.auroraSecondaryRgb[2]
     );
     this.auroraTint = theme.auroraRgb;
-    this.auroraMat.uniforms['uIntensity'].value = theme.showDepthStars ? 0.54 : 0.34;
+    this.auroraMat.uniforms['uIntensity'].value =
+      (theme.showDepthStars ? 0.42 : 0.28) * STAR_CONQUEST_REST_GLOW.auroraRestMul;
+    this.auroraMat.uniforms['uContain'].value = 0.42;
     this.auroraMesh.visible = true;
     this.echoSignature = '';
     this.rebuildQuestEchoes();
+  }
+
+  setPointerNdc(ndc: { x: number; y: number } | null): void {
+    this.pointerNdc = ndc;
   }
 
   /** Recale les étoiles de fond sur les Quests (1 écho = 1 Quest). */
@@ -141,10 +151,11 @@ export class StarConquestBackground {
     geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     const mat = new THREE.PointsMaterial({
-      size: cfg.size * (id === 'near' ? 1.42 : 1.18) * STAR_CONQUEST_SCALE.visual,
+      // Brume de profondeur — clairement distincte des nœuds QUEST (cores flarés)
+      size: cfg.size * 0.45 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       transparent: true,
-      opacity: Math.min(1, cfg.opacity * 1.35),
+      opacity: Math.min(0.45, cfg.opacity * 0.85),
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -200,14 +211,26 @@ export class StarConquestBackground {
       const perQuest = Math.max(1, Math.floor(pos.count / n));
       const t = this.time * cfg.driftSpeed;
       const radius = (id === 'far' ? 22 : id === 'mid' ? 14 : 8) * STAR_CONQUEST_SCALE.layout;
+      const galaxy = starConquestGalaxyRadius();
+      const contain =
+        id === 'far' ? galaxy * 0.96 : id === 'mid' ? galaxy * 0.72 : galaxy * 0.5;
+      const mq = starConquestMobileQuality(this.gpuQuality);
+      const px = (this.pointerNdc?.x ?? 0) * cfg.parallax * 20 * mq.echoParallax;
+      const py = (this.pointerNdc?.y ?? 0) * cfg.parallax * 16 * mq.echoParallax;
       for (let i = 0; i < pos.count; i++) {
         const quest = this.anchors[Math.floor(i / perQuest) % n];
         const echo = i % perQuest;
         const off = questEchoOffset(quest.id, `${id}:${echo}`, radius);
         const phase = i * 0.37;
-        const x = quest.x + off.x + Math.sin(t + phase) * 0.35 * cfg.driftAmp;
-        const y = quest.y + off.y + Math.cos(t * 0.8 + phase) * 0.28 * cfg.driftAmp;
-        const z = quest.z + off.z + cfg.zCenter * 0.35;
+        let x = quest.x + off.x + Math.sin(t + phase) * 0.35 * cfg.driftAmp + px;
+        let y = quest.y + off.y + Math.cos(t * 0.8 + phase) * 0.28 * cfg.driftAmp + py;
+        const z = quest.z + off.z + cfg.zCenter * 0.42;
+        const span = Math.hypot(x, y);
+        if (span > contain && span > 0.001) {
+          const s = contain / span;
+          x *= s;
+          y *= s;
+        }
         pos.setXYZ(i, x, y, z);
         if (storeBase && colors) {
           colors.setXYZ(

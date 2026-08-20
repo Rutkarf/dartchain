@@ -19,6 +19,8 @@ export class StarConquestFacade {
   readonly dismiss$ = new Subject<void>();
   readonly progress$ = new Subject<string | undefined>();
   readonly universeChange$ = new Subject<StarConquestUniverseId>();
+  /** Additif : recentre la vue monde sans changer la sélection. */
+  readonly resetView$ = new Subject<void>();
 
   selectQuest(questId: string): void {
     this.select$.next(questId);
@@ -38,5 +40,9 @@ export class StarConquestFacade {
 
   notifyUniverseChange(universeId: StarConquestUniverseId): void {
     this.universeChange$.next(universeId);
+  }
+
+  resetView(): void {
+    this.resetView$.next();
   }
 }

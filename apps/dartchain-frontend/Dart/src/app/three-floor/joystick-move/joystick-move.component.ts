@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CharacterControlService } from '../../core/services/character-control.service';
+import { mapMoveJoystickVector } from '../joystick-shared/move-joystick.input';
 import {
   VirtualJoystickComponent,
   type JoystickVector,
 } from '../joystick-shared/virtual-joystick.component';
 
 /**
- * Zone bas-gauche 250×550 : déplacement CharacterAnon.
- * Stick visuel réduit (~60px) centré dans la moitié basse de la zone.
+ * Zone bas-gauche : déplacement CharacterAnon.
+ * Intention MOVE typée ; gait walk/run et collisions restent dans le service.
  */
 @Component({
   selector: 'app-joystick-move',
@@ -21,6 +22,7 @@ export class JoystickMoveComponent {
   private readonly control = inject(CharacterControlService);
 
   onVector(vector: JoystickVector): void {
-    this.control.onMovementJoystickUpdate(vector);
+    const move = mapMoveJoystickVector(vector);
+    this.control.onMovementJoystickUpdate({ x: move.x, y: move.y });
   }
 }

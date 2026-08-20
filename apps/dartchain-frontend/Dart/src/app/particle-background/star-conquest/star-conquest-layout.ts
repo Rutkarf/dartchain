@@ -129,8 +129,9 @@ export function measurePlayableBand(floorPeekPx = 220): StarConquestBand {
   // Bas viewport : particules visibles sous le floor (z-order), quasiment au ras
   const bottomPx = Math.max(topPx + 96, viewportH - 4);
 
+  // Débord léger uniquement — cible affichage 250×550 (presque tout visible)
   const overflowXPx = Math.round(
-    Math.max(28, viewportW * STAR_WORLD_OVERFLOW_RATIO)
+    Math.max(6, viewportW * STAR_WORLD_OVERFLOW_RATIO)
   );
 
   return {
@@ -243,8 +244,8 @@ export function layoutQuestsInBand(
       (hash01(quest.id, 3) - 0.5) * 0.1 +
       (hash01(quest.id, 7) - 0.5) * 0.06;
 
-    let sx = left + clamp(u, -0.08, 1.08) * w;
-    let sy = top + clamp(v, 0.02, 0.98) * h;
+    let sx = left + clamp(u, 0.02, 0.98) * w;
+    let sy = top + clamp(v, 0.04, 0.96) * h;
     sx = clamp(sx, left, right);
     sy = clamp(sy, top, bottom);
 

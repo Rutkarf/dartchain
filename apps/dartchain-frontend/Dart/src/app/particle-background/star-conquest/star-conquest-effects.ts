@@ -7,6 +7,16 @@ import {
   questEchoOffset,
   type StarQuestAnchor,
 } from './star-conquest-anchors';
+import {
+  hiveCellCenter,
+  hiveHexPoints,
+  starConquestHiveCells,
+} from './star-conquest-hive.layout';
+import {
+  starConquestGalaxyRadius,
+  starConquestMobileQuality,
+  starConquestRingDepthAmp,
+} from './star-conquest-ui-maturity.config';
 
 /**
  * Effets visuels décoratifs par univers.
@@ -17,6 +27,8 @@ export class StarConquestEffects {
   private effectKind: StarConquestEffectKind = 'none';
   private readonly discTexture: THREE.CanvasTexture;
   private orbitalRings: THREE.Line[] = [];
+  private structureRing: THREE.Line | null = null;
+  private galaxyOrbitPhase = 0;
   private gridLines: THREE.LineSegments | null = null;
   private portalRing: THREE.Line | null = null;
   private portalShards: THREE.Points | null = null;
@@ -25,6 +37,8 @@ export class StarConquestEffects {
   private nebulaClouds: THREE.Points | null = null;
   private synapticPulse: THREE.Points | null = null;
   private swarmMotes: THREE.Points | null = null;
+  private hiveCells: THREE.Line[] = [];
+  private galaxyBowl: THREE.Line | null = null;
   private time = 0;
   private anchors: readonly StarQuestAnchor[] = [];
   private fxSignature = '';
@@ -49,7 +63,8 @@ export class StarConquestEffects {
         this.buildNexusPortal();
         break;
       case 'agent-swarm':
-        this.buildOrbitalRings();
+        // Cercle structurel des 5 galaxies (pas d’hex / bol confus).
+        this.buildGalaxyStructureRing();
         break;
       case 'galaxy-spiral':
         this.buildGalaxySpiral();
@@ -86,7 +101,22 @@ export class StarConquestEffects {
     this.time += deltaMs * 0.001;
 
     for (let ri = 0; ri < this.orbitalRings.length; ri++) {
-      this.orbitalRings[ri].rotation.z += deltaMs * 0.00008 * (1 + ri * 0.3);
+      const ring = this.orbitalRings[ri];
+      const isStructure = ring === this.structureRing;
+      if (isStructure) {
+        // Micro-bascule en profondeur (cercle vivant) — galaxies restent sur la courbe via setOrbitPhase
+        const breath = Math.sin(this.time * 0.28 + this.galaxyOrbitPhase * 0.2) * 0.055;
+        ring.rotation.x = breath;
+        ring.rotation.y = Math.cos(this.time * 0.21) * 0.028;
+        const mat = ring.material as THREE.LineBasicMaterial;
+        mat.opacity = 0.17 + Math.sin(this.time * 0.4) * 0.04;
+        continue;
+      }
+      ring.rotation.z += deltaMs * 0.00006 * (1 + ri * 0.25);
+      ring.rotation.x = Math.sin(this.time * 0.22) * 0.16;
+      ring.rotation.y = Math.cos(this.time * 0.17) * 0.07;
+      const mat = ring.material as THREE.LineBasicMaterial;
+      mat.opacity = 0.11 + Math.sin(this.time * 0.35 + ri) * 0.025;
     }
 
     if (this.portalRing) {
@@ -104,12 +134,12 @@ export class StarConquestEffects {
 
     if (this.synapticPulse) {
       const mat = this.synapticPulse.material as THREE.PointsMaterial;
-      mat.opacity = 0.15 + Math.sin(this.time * 2.5) * 0.08;
+      mat.opacity = 0.035 + Math.sin(this.time * 1.6) * 0.02;
     }
 
     if (this.swarmMotes) {
       const mat = this.swarmMotes.material as THREE.PointsMaterial;
-      mat.opacity = 0.26 + Math.sin(this.time * 1.4) * 0.08;
+      mat.opacity = 0.04 + Math.sin(this.time * 1.1) * 0.02;
     }
 
     if (this.nebulaClouds) {
@@ -141,6 +171,10 @@ export class StarConquestEffects {
       }
     }
     this.orbitalRings = [];
+    this.structureRing = null;
+    this.galaxyOrbitPhase = 0;
+    this.hiveCells = [];
+    this.galaxyBowl = null;
     this.gridLines = null;
     this.portalRing = null;
     this.portalShards = null;
@@ -149,6 +183,109 @@ export class StarConquestEffects {
     this.nebulaClouds = null;
     this.synapticPulse = null;
     this.swarmMotes = null;
+  }
+
+  private buildGalaxyBowl(): void {
+    const segments = 80;
+    const r = starConquestGalaxyRadius();
+    const pts: THREE.Vector3[] = [];
+    for (let s = 0; s <= segments; s++) {
+      const a = (s / segments) * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r * 0.82, -22));
+    }
+    const geom = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat = new THREE.LineBasicMaterial({
+      color: 0x6ad4f0,
+      transparent: true,
+      opacity: 0.14,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    this.galaxyBowl = new THREE.Line(geom, mat);
+    this.galaxyBowl.name = 'sc-galaxy-bowl';
+    this.galaxyBowl.raycast = () => {};
+    this.group.add(this.galaxyBowl);
+  }
+
+  private buildHiveCells(): void {
+    const mq = starConquestMobileQuality('medium');
+    const cells = starConquestHiveCells();
+    for (const cell of cells) {
+      const c = hiveCellCenter(cell);
+      const hexR = starConquestGalaxyRadius() * 0.2;
+      const pts = hiveHexPoints(c.x, c.y, c.z, hexR).map(
+        (p) => new THREE.Vector3(p.x, p.y, p.z)
+      );
+      const geom = new THREE.BufferGeometry().setFromPoints(pts);
+      const fam = STAR_QUEST_FAMILIES[cell.family];
+      const mat = new THREE.LineBasicMaterial({
+        color: new THREE.Color(fam.rgb[0], fam.rgb[1], fam.rgb[2]),
+        transparent: true,
+        opacity: mq.hiveOpacity,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const line = new THREE.Line(geom, mat);
+      line.name = `sc-hive-cell-${cell.family}`;
+      line.raycast = () => {};
+      this.hiveCells.push(line);
+      this.group.add(line);
+    }
+  }
+
+  /** Anneau unique = orbite des 5 galaxies (même courbe / profondeur). */
+  private buildGalaxyStructureRing(): void {
+    const r = starConquestGalaxyRadius() * 0.62;
+    const depthAmp = starConquestRingDepthAmp();
+    const segments = 96;
+    const pts: THREE.Vector3[] = [];
+    for (let s = 0; s <= segments; s++) {
+      // Aligné sur starConquestGalaxiesOnRing (phase 0) — rotation sync via setOrbitPhase
+      const a = -Math.PI / 2 + (s / segments) * Math.PI * 2;
+      pts.push(
+        new THREE.Vector3(
+          Math.cos(a) * r,
+          Math.sin(a) * r * 0.72,
+          Math.sin(a) * depthAmp
+        )
+      );
+    }
+    const geom = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat = new THREE.LineBasicMaterial({
+      color: 0x7ad4f0,
+      transparent: true,
+      opacity: 0.2,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    const ring = new THREE.Line(geom, mat);
+    ring.name = 'sc-galaxy-structure-ring';
+    ring.raycast = () => {};
+    this.structureRing = ring;
+    this.orbitalRings.push(ring);
+    this.group.add(ring);
+  }
+
+  /** Sync le cercle 3D avec l’orbite des 5 galaxies (même paramétrage). */
+  setOrbitPhase(phase: number): void {
+    this.galaxyOrbitPhase = phase;
+    if (!this.structureRing) return;
+    const r = starConquestGalaxyRadius() * 0.62;
+    const depthAmp = starConquestRingDepthAmp();
+    const pos = this.structureRing.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const segments = Math.max(1, pos.count - 1);
+    for (let s = 0; s < pos.count; s++) {
+      const a = -Math.PI / 2 + (s / segments) * Math.PI * 2 + phase;
+      pos.setXYZ(
+        s,
+        Math.cos(a) * r,
+        Math.sin(a) * r * 0.72,
+        Math.sin(a) * depthAmp
+      );
+    }
+    pos.needsUpdate = true;
+    // Pas de rotation.z : la courbe est déjà en phase avec les galaxies
+    this.structureRing.rotation.set(0, 0, 0);
   }
 
   private buildOrbitalRings(): void {
@@ -350,7 +487,7 @@ export class StarConquestEffects {
     const wantMotes = this.effectKind === 'agent-swarm';
     if (wantPulse) this.ensureSynapticPulse(n);
     else this.disposePulse();
-    if (wantMotes) this.ensureSwarmMotes(n * 2);
+    if (wantMotes) this.ensureSwarmMotes(n);
     else this.disposeMotes();
     this.writeQuestFx(anchors);
   }
@@ -372,14 +509,14 @@ export class StarConquestEffects {
       const pos = this.swarmMotes.geometry.getAttribute('position') as THREE.BufferAttribute;
       const colors = this.swarmMotes.geometry.getAttribute('color') as THREE.BufferAttribute;
       for (let i = 0; i < pos.count; i++) {
-        const quest = anchors[Math.floor(i / 2) % n];
-        const off = questEchoOffset(quest.id, `mote:${i % 2}`, 9 * layout);
-        const spin = this.time * 0.55 + i * 0.7;
+        const quest = anchors[i % n];
+        const off = questEchoOffset(quest.id, `mote:${i}`, 7 * layout);
+        const spin = this.time * 0.35 + i * 0.7;
         pos.setXYZ(
           i,
-          quest.x + off.x + Math.cos(spin) * 1.8,
-          quest.y + off.y + Math.sin(spin) * 1.8,
-          quest.z + off.z - 2
+          quest.x + off.x + Math.cos(spin) * 1.2,
+          quest.y + off.y + Math.sin(spin) * 1.2,
+          quest.z + off.z - 3
         );
         colors.setXYZ(i, quest.rgb[0], quest.rgb[1], quest.rgb[2]);
       }
@@ -400,7 +537,18 @@ export class StarConquestEffects {
     }
     const inv = 1 / anchors.length;
     for (const ring of this.orbitalRings) {
+      // Structure ring déjà en coords monde (sync phase) — ne pas recentrer
+      if (ring === this.structureRing) {
+        ring.position.set(0, 0, 0);
+        continue;
+      }
       ring.position.set(cx * inv, cy * inv, cz * inv - 8);
+    }
+    if (this.galaxyBowl) {
+      this.galaxyBowl.position.set(cx * inv, cy * inv, cz * inv - 16);
+    }
+    for (const cell of this.hiveCells) {
+      cell.position.set(cx * inv * 0.15, cy * inv * 0.15, 0);
     }
   }
 
@@ -414,11 +562,11 @@ export class StarConquestEffects {
     const geom = new THREE.BufferGeometry();
     geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
     const mat = new THREE.PointsMaterial({
-      size: 6.4 * STAR_CONQUEST_SCALE.visual,
+      size: 1.4 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       color: 0x52e6ed,
       transparent: true,
-      opacity: 0.2,
+      opacity: 0.05,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       sizeAttenuation: true,
@@ -440,10 +588,10 @@ export class StarConquestEffects {
     geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
     geom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
     const mat = new THREE.PointsMaterial({
-      size: 4.8 * STAR_CONQUEST_SCALE.visual,
+      size: 0.95 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       transparent: true,
-      opacity: 0.32,
+      opacity: 0.06,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,

@@ -68,10 +68,10 @@ describe('geo-reference', () => {
 
   it('place les landmarks proches de positions OSM attendues (< 15 m)', () => {
     const expected: Record<string, THREE.Vector3> = {
-      'mirror-adjacent-building-01': new THREE.Vector3(58.1, 0, -7.5),
-      'mirror-adjacent-building-02': new THREE.Vector3(52.6, 0, -26.2),
-      'harbor-west-building': new THREE.Vector3(-28.7, 0, 85.2),
-      'harbor-east-building': new THREE.Vector3(113.4, 0, -9.9),
+      'mirror-adjacent-building-01': new THREE.Vector3(57.75, 0, -6.58),
+      'mirror-adjacent-building-02': new THREE.Vector3(51.99, 0, -25.36),
+      'harbor-west-building': new THREE.Vector3(-27.58, 0, 85.98),
+      'harbor-east-building': new THREE.Vector3(113.7, 0, -10.96),
     };
 
     for (const def of MARSEILLE_LANDMARK_BUILDINGS) {
@@ -79,7 +79,7 @@ describe('geo-reference', () => {
       const exp = expected[def.id];
       expect(exp).toBeDefined();
       const err = Math.hypot(center.x - exp!.x, center.z - exp!.z);
-      expect(err).toBeLessThan(15);
+      expect(err).toBeLessThan(2);
     }
   });
 

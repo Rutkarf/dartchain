@@ -8,7 +8,12 @@
   width: 78px;
   height: 82px;
   z-index: 1000;
-  pointer-events: none;
+  pointer-events: auto;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  user-select: none;
   box-sizing: border-box;
 }
 
@@ -16,7 +21,7 @@
   width: 100%;
   height: 100%;
   position: relative;
-  pointer-events: none;
+  pointer-events: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -60,6 +65,27 @@
   :host {
     right: max(2px, env(safe-area-inset-right, 0px));
     bottom: max(2px, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (orientation: landscape) and (max-width: 900px) {
+  :host {
+    width: 96px;
+    height: 102px;
+  }
+
+  .joy-stick-slot {
+    width: 68px;
+    height: 68px;
+  }
+
+  .joy-stick-slot app-virtual-joystick {
+    --vj-size: 68px;
+  }
+
+  .joy-arc {
+    width: 96px;
+    height: 24px;
   }
 }
 

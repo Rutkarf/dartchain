@@ -7,11 +7,12 @@ import {
 } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Subscription, filter, take } from 'rxjs';
-import { AuthService } from '../../core/services/auth.service';
 import { CharacterNftApiService } from '../../core/services/character-nft-api.service';
 import { CharacterNftService } from '../../core/services/character-nft.service';
 import { CharacterControlService } from '../../core/services/character-control.service';
 import { ThreeSceneService } from '../../core/services/three-scene.service';
+import { FloorSessionAdapter } from '../floor-runtime/floor-session.adapter';
+import { FloorSessionBinder } from '../floor-runtime/floor-session.binder';
 
 /**
  * Point d’entrée CharacterAnon.fbx + caméra View joystick.
@@ -29,7 +30,8 @@ export class CharacterComponent implements AfterViewInit, OnDestroy {
   private readonly characterApi = inject(CharacterNftApiService);
   private readonly characterControl = inject(CharacterControlService);
   private readonly threeScene = inject(ThreeSceneService);
-  private readonly auth = inject(AuthService);
+  private readonly session = inject(FloorSessionAdapter);
+  private readonly sessionBinder = inject(FloorSessionBinder);
 
   readonly climbPrompt$ = this.characterControl.climbPrompt$;
 
@@ -58,7 +60,8 @@ export class CharacterComponent implements AfterViewInit, OnDestroy {
     const scene = this.threeScene.getScene();
     if (!scene) return;
     this.bootstrapped = true;
-    const userId = this.auth.user()?.id ?? 'guest';
+    void this.sessionBinder;
+    const userId = this.session.playerId();
     const nft = await this.characterApi.fetchMine(userId);
     await this.characterNft.loadCharacterForUser(userId, scene, nft?.stlPath);
     this.characterControl.resetRunner();

@@ -21,3 +21,8 @@ export {
 export { PlacementFacade } from './placement.facade';
 export { emitPlacementTelemetry } from './placement-telemetry';
 export type { PlacementTelemetryEvent } from './placement-telemetry';
+export {
+  groundFloorAnchorFromGeoFootprint,
+  groundFloorAnchorFromWorldRing,
+} from './ground-floor-anchor.util';
+export type { GroundFloorAnchor } from './ground-floor-anchor.util';

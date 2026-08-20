@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
+import { OSM_ODBL_ATTRIBUTION } from '../../core/map/marseille-twin/osm-attribution';
 import { PlacementFacade } from '../../core/map/placements/placement.facade';
 import type { PlacementInventoryStatus } from '../../core/map/placements/placement.model';
 
@@ -22,6 +23,7 @@ const STATUS_LABEL: Record<PlacementInventoryStatus, string> = {
 })
 export class PlacementDetailsPanel {
   readonly facade = inject(PlacementFacade);
+  readonly osmAttribution = OSM_ODBL_ATTRIBUTION;
 
   statusLabel(status: PlacementInventoryStatus): string {
     return STATUS_LABEL[status];

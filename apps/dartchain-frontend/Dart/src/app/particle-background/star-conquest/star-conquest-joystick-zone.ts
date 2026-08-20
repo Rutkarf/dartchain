@@ -3,6 +3,8 @@
  * Calculée depuis le rectangle réel projeté (anneau + halo + marge drag/clic).
  */
 
+import { STAR_CONQUEST_OVERLAY } from './star-conquest-scale';
+
 export type JoystickExclusionZone = {
   /** Centre écran (px). */
   x: number;
@@ -83,11 +85,14 @@ function clampPanel(
   panelH: number,
   vw: number,
   vh: number,
-  margin: number
+  margin: number,
+  reserveBottom = 0
 ): { x: number; y: number } {
+  const maxX = Math.max(margin, vw - margin - panelW);
+  const maxY = Math.max(margin, vh - margin - panelH - reserveBottom);
   return {
-    x: Math.max(margin, Math.min(vw - margin - panelW, px)),
-    y: Math.max(margin, Math.min(vh - margin - panelH, py)),
+    x: Math.max(margin, Math.min(maxX, px)),
+    y: Math.max(margin, Math.min(maxY, py)),
   };
 }
 
@@ -120,7 +125,8 @@ export function placeQuestPanelNearParticle(
   vh: number,
   margin = 6,
   pad = JOY_UI_PAD_PX,
-  preferred: { x: number; y: number } | null = null
+  preferred: { x: number; y: number } | null = null,
+  reserveBottom: number = STAR_CONQUEST_OVERLAY.floorChromeH
 ): { x: number; y: number; compact: boolean } {
   const gap = 10;
 
@@ -149,14 +155,14 @@ export function placeQuestPanelNearParticle(
     let best: { x: number; y: number; score: number } | null = null;
 
     for (const c of candidates) {
-      const p = clampPanel(c.x, c.y, pw, ph, vw, vh, margin);
+      const p = clampPanel(c.x, c.y, pw, ph, vw, vh, margin, reserveBottom);
       if (zone && rectOverlapsJoystick(p.x, p.y, pw, ph, zone, pad)) continue;
       const score = scoreNearParticle(p.x, p.y, pw, ph, particleX, particleY);
       if (!best || score < best.score) best = { x: p.x, y: p.y, score };
     }
 
     if (preferred) {
-      const p = clampPanel(preferred.x, preferred.y, pw, ph, vw, vh, margin);
+      const p = clampPanel(preferred.x, preferred.y, pw, ph, vw, vh, margin, reserveBottom);
       const ok = !zone || !rectOverlapsJoystick(p.x, p.y, pw, ph, zone, pad);
       if (ok) {
         const prefScore = scoreNearParticle(
@@ -180,8 +186,8 @@ export function placeQuestPanelNearParticle(
   const full = resolve(panelW, panelH, false);
   if (full) return full;
 
-  const cw = Math.max(118, panelW * 0.85);
-  const ch = Math.max(84, panelH * 0.88);
+  const cw = Math.min(STAR_CONQUEST_OVERLAY.panelCompactW, Math.max(64, panelW * 0.92));
+  const ch = Math.min(STAR_CONQUEST_OVERLAY.panelCompactH, Math.max(84, panelH * 0.88));
   const small = resolve(cw, ch, true);
   if (small) return small;
 
@@ -192,7 +198,8 @@ export function placeQuestPanelNearParticle(
     ch,
     vw,
     vh,
-    margin
+    margin,
+    reserveBottom
   );
   return { x: fallback.x, y: fallback.y, compact: true };
 }

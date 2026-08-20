@@ -3,189 +3,95 @@
   pointer-events: none;
 }
 
-/* Glassmorphisme sobre — accent famille via --sc-family-* */
+/* Panneau compact ~½ — laisse cliquer les autres quêtes autour */
 .star-quest-panel {
   --sc-family-rgb: 79, 224, 236;
   --sc-family-hex: #4fe0ec;
 
   position: fixed;
   z-index: 140;
-  pointer-events: auto;
-  box-sizing: border-box;
-  width: min(calc(176px * var(--sc-ui-scale, 1)), calc(100vw - 10px));
-  max-width: calc(100vw - 10px);
-  padding: 8px 9px 9px;
-  border-radius: 12px;
-  border: 1px solid rgba(var(--sc-family-rgb), 0.38);
-  background:
-    linear-gradient(180deg, rgba(22, 16, 28, 0.78) 0%, rgba(6, 4, 10, 0.88) 100%);
-  box-shadow:
-    0 12px 36px rgba(0, 0, 0, 0.58),
-    0 0 28px rgba(var(--sc-family-rgb), 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  color: rgba(236, 242, 250, 0.94);
-  animation: star-quest-panel-in 160ms ease-out;
-  overflow: hidden;
-}
-
-.star-quest-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(
-    165deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    transparent 42%
-  );
-  box-shadow: inset 0 0 28px rgba(var(--sc-family-rgb), 0.14);
-}
-
-.star-quest-panel > * {
-  position: relative;
-  z-index: 1;
+  box-sizing: border-box;
+  width: min(var(--sc-overlay-panel-w, 74px), calc(100vw - 12px));
+  max-width: 120px;
+  max-height: min(88px, calc(100vh - var(--sc-overlay-floor-chrome, 86px) - 12px));
+  padding: 4px 5px 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  border-radius: 8px;
+  border: 1px solid rgba(var(--sc-family-rgb), 0.36);
+  background:
+    linear-gradient(180deg, rgba(18, 14, 24, 0.9) 0%, rgba(6, 4, 10, 0.94) 100%);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  color: rgba(236, 242, 250, 0.94);
+  animation: star-quest-panel-in 140ms ease-out;
 }
 
 .star-quest-panel--compact {
-  width: min(calc(142px * var(--sc-ui-scale, 1)), calc(100vw - 10px));
-  padding: 5px 6px 6px;
-  font-size: 0.92em;
+  width: min(var(--sc-overlay-panel-compact-w, 70px), calc(100vw - 12px));
 }
 
-.star-quest-panel__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 6px;
-  margin-bottom: 5px;
-}
-
-.star-quest-panel__meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-}
-
-.star-quest-panel__badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 1px 5px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(180, 196, 210, 0.9);
-  line-height: 1.4;
-}
-
-.star-quest-panel__badge--family {
-  border-color: rgba(var(--sc-family-rgb), 0.35);
-  background: rgba(var(--sc-family-rgb), 0.12);
-  color: rgba(var(--sc-family-rgb), 0.95);
-}
-
-.star-quest-panel__badge--status {
-  color: rgba(150, 165, 180, 0.85);
-}
-
-.star-quest-panel__badge--live {
-  border-color: rgba(79, 224, 236, 0.45);
-  background: rgba(79, 224, 236, 0.12);
-  color: rgba(190, 245, 255, 0.95);
-}
-
-.star-quest-panel[data-live='true'] {
-  border-color: rgba(79, 224, 236, 0.42);
+.star-quest-panel__close,
+.star-quest-panel__claim {
+  pointer-events: auto;
 }
 
 .star-quest-panel__close {
-  flex: 0 0 auto;
-  width: 18px;
-  height: 18px;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
   margin: 0;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(180, 196, 210, 0.85);
-  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(180, 196, 210, 0.9);
+  font-size: 12px;
   line-height: 1;
   cursor: pointer;
+  z-index: 2;
 }
 
 .star-quest-panel__close:hover,
 .star-quest-panel__close:focus-visible {
-  color: rgba(232, 238, 245, 0.95);
-  background: rgba(var(--sc-family-rgb), 0.1);
-  border-color: rgba(var(--sc-family-rgb), 0.28);
+  color: rgba(236, 242, 248, 0.98);
+  background: rgba(var(--sc-family-rgb), 0.14);
   outline: none;
 }
 
 .star-quest-panel__title {
-  margin: 0 0 4px;
+  margin: 0;
+  padding-right: 18px;
   font-family: var(--ds-font-ui, var(--font-display, 'Orbit', system-ui, sans-serif));
-  font-size: clamp(10px, 3.2vw, 12px);
+  font-size: 9px;
   font-weight: 650;
-  letter-spacing: 0.03em;
-  line-height: 1.25;
-  color: rgba(236, 242, 248, 0.94);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: rgba(236, 242, 248, 0.96);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.star-quest-panel__desc {
-  margin: 0 0 7px;
-  font-size: clamp(8px, 2.5vw, 9.5px);
-  line-height: 1.4;
-  color: rgba(150, 168, 186, 0.88);
+.star-quest-panel__info {
+  margin: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  font-size: 7.5px;
+  line-height: 1.25;
+  color: rgba(160, 178, 196, 0.9);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-}
-
-.star-quest-panel__reward {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 6px;
-  margin: 0;
-  padding-top: 6px;
-  border-top: 1px solid rgba(var(--sc-family-rgb), 0.18);
-}
-
-.star-quest-panel__reward-label {
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(130, 148, 166, 0.8);
-}
-
-.star-quest-panel__reward-value {
-  font-size: clamp(8px, 2.6vw, 9px);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  color: var(--sc-family-hex);
-}
-
-.star-quest-panel__badge--status[data-status='completed'] {
-  color: rgba(120, 220, 170, 0.95);
-  border-color: rgba(120, 220, 170, 0.28);
-}
-
-.star-quest-panel__badge--status[data-status='locked'],
-.star-quest-panel__badge--status[data-status='future'] {
-  color: rgba(150, 165, 180, 0.72);
 }
 
 .star-quest-panel__claim {
@@ -193,50 +99,50 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-top: 6px;
-  padding: 5px 6px;
-  border-radius: 7px;
-  border: 1px solid rgba(var(--sc-family-rgb), 0.42);
-  background: rgba(var(--sc-family-rgb), 0.16);
+  min-height: 22px;
+  margin: 0;
+  padding: 3px 4px;
+  border-radius: 5px;
+  border: 1px solid rgba(var(--sc-family-rgb), 0.45);
+  background: rgba(var(--sc-family-rgb), 0.18);
   color: rgba(236, 242, 248, 0.96);
-  font-size: clamp(8px, 2.5vw, 9px);
+  font-size: 8px;
   font-weight: 650;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
 }
 
 .star-quest-panel__claim:hover:not(:disabled),
 .star-quest-panel__claim:focus-visible:not(:disabled) {
-  background: rgba(var(--sc-family-rgb), 0.26);
+  background: rgba(var(--sc-family-rgb), 0.28);
   outline: none;
 }
 
 .star-quest-panel__claim:disabled {
   cursor: default;
-  opacity: 0.62;
+  opacity: 0.55;
   border-color: rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
 }
 
-.star-quest-panel__hint {
-  margin: 5px 0 0;
-  font-size: 10px;
-  line-height: 1.35;
-  color: rgba(130, 148, 166, 0.82);
-}
-
 .star-quest-panel__error {
-  margin: 4px 0 0;
-  font-size: 10px;
-  line-height: 1.35;
+  margin: 0;
+  font-size: 7px;
+  line-height: 1.2;
   color: rgba(232, 160, 140, 0.95);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @keyframes star-quest-panel-in {
   from {
     opacity: 0;
-    transform: translateY(3px);
+    transform: translateY(2px);
   }
   to {
     opacity: 1;
@@ -244,26 +150,8 @@
   }
 }
 
-@media (max-width: 349px) {
+@media (prefers-reduced-motion: reduce) {
   .star-quest-panel {
-    width: min(138px, calc(100vw - 8px));
-    padding: 5px 6px 6px;
-    border-radius: 8px;
-  }
-
-  .star-quest-panel__title {
-    font-size: 10px;
-  }
-
-  .star-quest-panel__desc {
-    font-size: 10px;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    margin-bottom: 5px;
-  }
-
-  .star-quest-panel__close {
-    width: 16px;
-    height: 16px;
+    animation: none;
   }
 }

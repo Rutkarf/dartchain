@@ -136,3 +136,9 @@
 .placement-feedback.is-error {
   color: #ff8fab;
 }
+
+.placement-osm {
+  margin: 0.35rem 0 0;
+  font-size: 0.62rem;
+  color: #6b7c90;
+}

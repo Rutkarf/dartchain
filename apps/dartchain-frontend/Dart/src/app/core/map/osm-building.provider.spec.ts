@@ -75,4 +75,20 @@ describe('OSMBuildingProvider cache', () => {
     const nearby = provider.filterCachedAround(43.2965, 5.37, 500);
     expect(nearby.map((fp) => fp.id)).toEqual(['osm-way-1']);
   });
+
+  it('never calls overpass-api.de from the browser', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('fail'));
+    await expect(
+      provider.loadBuildings({
+        south: 43.2937,
+        north: 43.2999,
+        west: 5.3642,
+        east: 5.3778,
+      })
+    ).rejects.toThrow();
+    expect(fetchSpy.mock.calls.length).toBeGreaterThan(0);
+    for (const call of fetchSpy.mock.calls) {
+      expect(String(call[0])).not.toContain('overpass-api.de');
+    }
+  });
 });

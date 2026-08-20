@@ -7,7 +7,6 @@ import {
   signal,
 } from '@angular/core';
 
-import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
 import { AuthService } from '../../core/services/auth.service';
 import {
   DockNavigationService,
@@ -26,7 +25,6 @@ import {
 @Component({
   selector: 'app-star-quest-panel',
   standalone: true,
-  imports: [FocusTrapDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './star-quest-panel.html',
   styleUrl: './star-quest-panel.css',

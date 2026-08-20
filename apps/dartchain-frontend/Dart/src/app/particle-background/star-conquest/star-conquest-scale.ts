@@ -9,11 +9,62 @@
 export type StarConquestScaleTier = 'rd' | 'product' | 'company';
 export type StarConquestGpuQuality = 'ultra-low' | 'low' | 'medium' | 'high';
 
-/** Viewport de design (shell one-page). */
+/** Viewport exclusif (dev + prod). Aucun autre palier d’écran. */
 export const STAR_CONQUEST_DESIGN_VIEWPORT = {
   w: 250,
   h: 550,
 } as const;
+
+/**
+ * Overlays HTML cadré 250×550 — indépendant du palier visuel 3D.
+ * Le monde Three peut déborder (pan stick) ; le chrome UI jamais.
+ */
+export const STAR_CONQUEST_OVERLAY = {
+  marginPx: 6,
+  panelW: 74,
+  panelH: 78,
+  panelCompactW: 70,
+  panelCompactH: 70,
+  scannerW: 176,
+  scannerMaxH: 156,
+  /** Bande bas viewport réservée aux sticks floor MOVE/VIEW. */
+  floorChromeH: 86,
+  labelFontPx: 8.5,
+  labelSepPx: 14,
+  joystickHitPx: 32,
+} as const;
+
+export interface StarConquestOverlayBox {
+  margin: number;
+  panelW: number;
+  panelH: number;
+  compactW: number;
+  compactH: number;
+  scannerW: number;
+  scannerH: number;
+  floorChromeH: number;
+  usableBottom: number;
+}
+
+export function starConquestOverlayBox(
+  viewportW: number = STAR_CONQUEST_DESIGN_VIEWPORT.w,
+  viewportH: number = STAR_CONQUEST_DESIGN_VIEWPORT.h
+): StarConquestOverlayBox {
+  const m = STAR_CONQUEST_OVERLAY.marginPx;
+  const floor = STAR_CONQUEST_OVERLAY.floorChromeH;
+  const maxW = Math.max(96, viewportW - m * 2);
+  return {
+    margin: m,
+    panelW: Math.min(STAR_CONQUEST_OVERLAY.panelW, maxW),
+    panelH: Math.min(STAR_CONQUEST_OVERLAY.panelH, Math.max(88, viewportH - floor - m * 2)),
+    compactW: Math.min(STAR_CONQUEST_OVERLAY.panelCompactW, maxW),
+    compactH: Math.min(STAR_CONQUEST_OVERLAY.panelCompactH, Math.max(80, viewportH - floor - m * 2)),
+    scannerW: Math.min(STAR_CONQUEST_OVERLAY.scannerW, maxW),
+    scannerH: Math.min(STAR_CONQUEST_OVERLAY.scannerMaxH, Math.round(viewportH * 0.28)),
+    floorChromeH: floor,
+    usableBottom: viewportH - floor - m,
+  };
+}
 
 export interface StarConquestScaleProfile {
   /** Sprite / halo / bloom (monde Three). */
@@ -32,7 +83,7 @@ export interface StarConquestScaleProfile {
   filamentWidthPx: number;
   /** Hit-test particules (px). */
   pickRadiusPx: number;
-  /** Joystick + overlays HTML. */
+  /** Facteur overlay HTML — 1 = cadré 250×550 (`STAR_CONQUEST_OVERLAY`). */
   ui: number;
   /** Densité étoiles de fond vs thème. */
   depthDensity: number;
@@ -64,7 +115,7 @@ export const STAR_CONQUEST_SCALE_PROFILES: Record<
     drift: 1.28,
     filamentWidthPx: 9.2,
     pickRadiusPx: 24,
-    ui: 1.18,
+    ui: 1,
     depthDensity: 1.55,
     panSpeed: 60,
     minSeparation: 5.2,
@@ -74,18 +125,20 @@ export const STAR_CONQUEST_SCALE_PROFILES: Record<
   product: {
     visual: 2.74,
     cameraZ: 108,
-    worldExtent: 1.64,
-    overflowRatio: 0.34,
-    layout: 1.62,
-    drift: 1.34,
+    /** Monde pan légèrement plus large ; contenu au repos cadré 250×550. */
+    worldExtent: 1.28,
+    /** Débord min — constellations quasi entièrement dans le viewport. */
+    overflowRatio: 0.06,
+    layout: 1.12,
+    drift: 1.12,
     filamentWidthPx: 13,
-    pickRadiusPx: 34,
-    ui: 1.42,
-    depthDensity: 2.18,
+    pickRadiusPx: 28,
+    ui: 1,
+    depthDensity: 1.85,
     panSpeed: 66,
-    minSeparation: 6.6,
+    minSeparation: 5.4,
     textureSize: 2,
-    maxOffscreen: 9,
+    maxOffscreen: 2,
   },
   company: {
     visual: 3.02,
@@ -95,8 +148,8 @@ export const STAR_CONQUEST_SCALE_PROFILES: Record<
     layout: 1.78,
     drift: 1.55,
     filamentWidthPx: 14,
-    pickRadiusPx: 36,
-    ui: 1.48,
+    pickRadiusPx: 30,
+    ui: 1,
     depthDensity: 2.42,
     panSpeed: 76,
     minSeparation: 7.8,

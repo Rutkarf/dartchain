@@ -34,6 +34,17 @@ import {
 } from './star-conquest-universes.config';
 import { questZFromStatus } from './star-conquest-universe-layout';
 import {
+  STAR_CONQUEST_FOCUS_GLOW,
+  STAR_CONQUEST_REST_GLOW,
+  starConquestGalaxyRadius,
+  starConquestMobileQuality,
+} from './star-conquest-ui-maturity.config';
+import {
+  starQuestVisualState,
+  starQuestVisualTone,
+} from './star-conquest-visual-state';
+import { starConquestGalaxiesOnRing } from './star-conquest-hive.layout';
+import {
   STAR_CONQUEST_SCALE,
   scaledTextureSize,
   starConquestPongSize,
@@ -513,6 +524,7 @@ export class StarConquestGraph {
     this.group.add(this.networkLayer.group);
     this.setUniverse(this.universeTheme);
     this.applyVisualizationMode();
+    this.applyFocusVisuals();
   }
 
   setGpuQuality(quality: StarConquestGpuQuality): void {
@@ -583,8 +595,14 @@ export class StarConquestGraph {
     guideMat.color.setRGB(theme.auroraRgb[0], theme.auroraRgb[1], theme.auroraRgb[2]);
     this.constellationGuides.visible =
       theme.showConstellations && theme.constellationOpacity > 0;
-    this.lineCoreMat.uniforms['uOpacity'].value = Math.min(0.98, theme.linkOpacity + 0.32);
-    this.filamentMat.uniforms['uOpacity'].value = Math.min(0.88, theme.linkOpacity + 0.22);
+    this.lineCoreMat.uniforms['uOpacity'].value = Math.min(
+      0.4,
+      theme.linkOpacity * STAR_CONQUEST_REST_GLOW.filamentRestMul
+    );
+    this.filamentMat.uniforms['uOpacity'].value = Math.min(
+      0.2,
+      theme.linkOpacity * STAR_CONQUEST_REST_GLOW.filamentRestMul
+    );
     this.filamentMat.uniforms['uWidthPx'].value = STAR_CONQUEST_SCALE.filamentWidthPx;
     this.networkLayer.setVisualizationMode(this.visualizationMode);
   }
@@ -600,6 +618,7 @@ export class StarConquestGraph {
         y: pos.getY(i),
         z: pos.getZ(i),
         rgb,
+        family: this.quests[i].family,
       });
     }
     return anchors;
@@ -620,10 +639,10 @@ export class StarConquestGraph {
   } {
     const visual = STAR_CONQUEST_SCALE.visual;
     const theme = this.universeTheme;
-    const core = this.meanCoreSize * 1.02 * theme.coreSizeMult * visual * pulse;
-    const halo = this.meanCoreSize * 3.35 * theme.haloSizeMult * visual * pulse;
-    const bloom = this.meanCoreSize * 6.9 * theme.haloSizeMult * visual * pulse;
-    return { core, halo, bloom, ghost: core * 0.92 };
+    const core = this.meanCoreSize * 0.92 * theme.coreSizeMult * visual * pulse;
+    const halo = this.meanCoreSize * 2.35 * theme.haloSizeMult * visual * pulse;
+    const bloom = this.meanCoreSize * 3.8 * theme.haloSizeMult * visual * pulse;
+    return { core, halo, bloom, ghost: core * 0.7 };
   }
 
   private applyQuestPointSizes(pulse = 1): void {
@@ -641,10 +660,16 @@ export class StarConquestGraph {
     const haloMat = this.haloPoints.material as THREE.PointsMaterial;
     const bloomMat = this.bloomPoints.material as THREE.PointsMaterial;
     const ghostMat = this.ghostPoints.material as THREE.PointsMaterial;
-    coreMat.opacity = Math.min(1, theme.coreOpacity + 0.08);
-    haloMat.opacity = Math.min(0.68, theme.haloOpacity + 0.22);
-    bloomMat.opacity = 0.3 + theme.haloOpacity * 0.5;
-    ghostMat.opacity = 0.14;
+    coreMat.opacity = Math.min(
+      1,
+      (theme.coreOpacity + 0.08) * STAR_CONQUEST_REST_GLOW.coreMul
+    );
+    haloMat.opacity = Math.min(
+      0.42,
+      (theme.haloOpacity + 0.08) * STAR_CONQUEST_REST_GLOW.haloMul
+    );
+    bloomMat.opacity = (0.18 + theme.haloOpacity * 0.28) * STAR_CONQUEST_REST_GLOW.bloomMul;
+    ghostMat.opacity = 0.08 * STAR_CONQUEST_REST_GLOW.ghostMul;
   }
 
   private applyTimelineQuestDepth(): void {
@@ -987,77 +1012,84 @@ export class StarConquestGraph {
     this.aimZ[i] = az / len;
   }
 
-  /** Orbite mandala lente — courbes rose/spirographe autour du centre de famille. */
+  /** 5 galaxies sur le cercle — profondeur + rotation lente. */
   private applyQuestSwarmOrbit(dt: number, pos: THREE.BufferAttribute): void {
     this.swarmOrbitPhase +=
       dt * SWARM_MANDALA_ORBIT * this.universeTheme.driftSpeedMult;
 
-    this.swarmCentroids.clear();
-    const centroidX = new Map<string, number>();
-    const centroidY = new Map<string, number>();
-    const centroidZ = new Map<string, number>();
-    const centroidN = new Map<string, number>();
+    const layoutCx = new Map<string, number>();
+    const layoutCy = new Map<string, number>();
+    const layoutCz = new Map<string, number>();
+    const layoutN = new Map<string, number>();
 
     for (let i = 0; i < this.quests.length; i++) {
       const fam = this.quests[i].family;
       const i3 = i * 3;
-      centroidX.set(fam, (centroidX.get(fam) ?? 0) + this.layoutHomes[i3]);
-      centroidY.set(fam, (centroidY.get(fam) ?? 0) + this.layoutHomes[i3 + 1]);
-      centroidZ.set(fam, (centroidZ.get(fam) ?? 0) + this.layoutHomes[i3 + 2]);
-      centroidN.set(fam, (centroidN.get(fam) ?? 0) + 1);
+      layoutCx.set(fam, (layoutCx.get(fam) ?? 0) + this.layoutHomes[i3]);
+      layoutCy.set(fam, (layoutCy.get(fam) ?? 0) + this.layoutHomes[i3 + 1]);
+      layoutCz.set(fam, (layoutCz.get(fam) ?? 0) + this.layoutHomes[i3 + 2]);
+      layoutN.set(fam, (layoutN.get(fam) ?? 0) + 1);
     }
-    for (const fam of centroidN.keys()) {
-      const n = centroidN.get(fam)!;
-      const cx = centroidX.get(fam)! / n;
-      const cy = centroidY.get(fam)! / n;
-      const cz = centroidZ.get(fam)! / n;
-      centroidX.set(fam, cx);
-      centroidY.set(fam, cy);
-      centroidZ.set(fam, cz);
-      this.swarmCentroids.set(fam, { x: cx, y: cy, z: cz });
+    for (const fam of layoutN.keys()) {
+      const n = layoutN.get(fam)!;
+      layoutCx.set(fam, layoutCx.get(fam)! / n);
+      layoutCy.set(fam, layoutCy.get(fam)! / n);
+      layoutCz.set(fam, layoutCz.get(fam)! / n);
+    }
+
+    const onRing = starConquestGalaxiesOnRing(this.swarmOrbitPhase);
+    this.effects.setOrbitPhase(this.swarmOrbitPhase);
+    const byFamily = new Map(onRing.map((g) => [g.family, g]));
+    this.swarmCentroids.clear();
+    for (const g of onRing) {
+      this.swarmCentroids.set(g.family, { x: g.x, y: g.y, z: g.z });
     }
 
     for (let i = 0; i < this.quests.length; i++) {
       const quest = this.quests[i];
       const i3 = i * 3;
       const fam = quest.family;
-      const cx = centroidX.get(fam) ?? this.layoutHomes[i3];
-      const cy = centroidY.get(fam) ?? this.layoutHomes[i3 + 1];
-      const cz = centroidZ.get(fam) ?? this.layoutHomes[i3 + 2];
+      const g = byFamily.get(fam);
+      const lcx = layoutCx.get(fam) ?? this.layoutHomes[i3];
+      const lcy = layoutCy.get(fam) ?? this.layoutHomes[i3 + 1];
+      const lcz = layoutCz.get(fam) ?? this.layoutHomes[i3 + 2];
 
-      const ox = this.layoutHomes[i3] - cx;
-      const oy = this.layoutHomes[i3 + 1] - cy;
-      const oz = this.layoutHomes[i3 + 2] - cz;
-      const baseR = Math.max(2, Math.hypot(ox, oy));
-      const baseAngle = Math.atan2(oy, ox);
+      const ox = this.layoutHomes[i3] - lcx;
+      const oy = this.layoutHomes[i3 + 1] - lcy;
+      const oz = this.layoutHomes[i3 + 2] - lcz;
 
       const isFocus = this.focusId === quest.id;
       const stab = this.focusId
         ? isFocus
-          ? 0.08
-          : 0.12
+          ? 0.2
+          : 0.28
         : quest.underFloor || quest.underGraph
-          ? 0.15
+          ? 0.35
           : 1;
 
-      const fi = Math.max(0, STAR_QUEST_FAMILY_ORDER.indexOf(fam));
-      const t = this.swarmOrbitPhase + this.driftPhase[i];
-      const petals = 3 + (i % 4);
-      const harmonic = 1 + (i % 7) * 0.11 + fi * 0.04;
+      const depthT = g?.depthT ?? 0.5;
+      // Clusters serrés : restent dans le frustum 250×550 autour du cercle
+      const ringR = starConquestGalaxyRadius() * 0.62;
+      const spreadCap = ringR * 0.22;
+      const homeSpan = Math.hypot(ox, oy) || 1;
+      const cluster =
+        Math.min((g?.clusterScale ?? 0.7) * 0.42 * stab, spreadCap / homeSpan);
+      const t = this.swarmOrbitPhase * 0.35 + this.driftPhase[i];
+      const cos = Math.cos(t);
+      const sin = Math.sin(t);
+      const lx = (ox * cos - oy * sin) * cluster;
+      const ly = (ox * sin + oy * cos) * cluster;
+      const lz = oz * cluster * 0.28;
 
-      // Rose curve — pétales qui se referment/ouvrent lentement
-      const rose =
-        0.5 + 0.5 * Math.abs(Math.cos(petals * (baseAngle + t * harmonic * 0.08)));
-      const r = baseR * rose * (0.42 + stab * 0.58);
+      const cx = g?.x ?? 0;
+      const cy = g?.y ?? 0;
+      const cz = g?.z ?? 0;
+      // Micro-respiration dans le plan du cercle (pas de chaos)
+      const breathe = Math.sin(t * 0.7 + i * 0.2) * (0.35 + depthT * 0.45);
 
-      // Épicycle lent (couche fractale spirographe)
-      const mainAngle = baseAngle + t * harmonic * 0.07;
-      const epiR = baseR * 0.16;
-      const epiAngle = t * (harmonic * 0.23 + 0.11) + i * 0.85;
-
-      const x = cx + Math.cos(mainAngle) * r + Math.cos(epiAngle) * epiR;
-      const y = cy + Math.sin(mainAngle) * r + Math.sin(epiAngle) * epiR;
-      const z = cz + oz * stab * 0.45 + Math.sin(t * 0.18 + i * 0.35) * 1.2;
+      const x = cx + lx + breathe * 0.12;
+      const y = cy + ly + breathe * 0.08;
+      const z = cz + lz;
 
       pos.setXYZ(i, x, y, z);
       quest.position.x = x;
@@ -1287,6 +1319,7 @@ export class StarConquestGraph {
     if (swarmOrbit) {
       this.applyQuestSwarmOrbit(dt, pos);
       this.applyEdgeSprings(dt * 0.35, pos);
+      this.applyFocusVisuals();
     } else {
       this.tickQuestDrift(dt, pos, pointerWorld);
     }
@@ -1444,29 +1477,34 @@ export class StarConquestGraph {
       const haloMat = this.haloPoints.material as THREE.PointsMaterial;
       const bloomMat = this.bloomPoints.material as THREE.PointsMaterial;
       const ghostMat = this.ghostPoints.material as THREE.PointsMaterial;
-      coreMat.opacity = 0.92 + Math.sin(this.pulsePhase) * 0.06;
-      haloMat.opacity = 0.34 + Math.sin(this.pulsePhase) * 0.05;
-      bloomMat.opacity = 0.28 + Math.sin(this.pulsePhase) * 0.04;
-      ghostMat.opacity = 0.18;
+      coreMat.opacity = STAR_CONQUEST_FOCUS_GLOW.coreOpacity + Math.sin(this.pulsePhase) * 0.05;
+      haloMat.opacity = STAR_CONQUEST_FOCUS_GLOW.haloOpacity + Math.sin(this.pulsePhase) * 0.04;
+      bloomMat.opacity = STAR_CONQUEST_FOCUS_GLOW.bloomOpacity + Math.sin(this.pulsePhase) * 0.03;
+      ghostMat.opacity = STAR_CONQUEST_FOCUS_GLOW.ghostOpacity;
+      this.ghostPoints.visible = true;
       this.writeLineGeometry(this.linkedSet(this.focusId), this.energyPhase);
       this.updateEnergyPackets(this.focusId, this.energyPhase);
     } else {
       const theme = this.universeTheme;
-      const breathe = Math.sin(this.driftTime * 0.35);
-      this.applyQuestPointSizes();
+      const rest = STAR_CONQUEST_REST_GLOW;
+      const mq = starConquestMobileQuality(this.gpuQuality);
+      const breathe = Math.sin(this.driftTime * 0.28) * rest.breatheAmp;
+      this.applyQuestPointSizes(0.72);
       const coreMat = this.questPoints.material as THREE.PointsMaterial;
       const haloMat = this.haloPoints.material as THREE.PointsMaterial;
       const bloomMat = this.bloomPoints.material as THREE.PointsMaterial;
       const ghostMat = this.ghostPoints.material as THREE.PointsMaterial;
-      coreMat.opacity = Math.min(1, theme.coreOpacity + 0.12 + breathe * 0.04);
-      haloMat.opacity = Math.min(0.5, theme.haloOpacity + 0.18 + breathe * 0.02);
-      bloomMat.opacity = 0.22 + theme.haloOpacity * 0.4;
-      ghostMat.opacity = 0.1 + Math.sin(this.driftTime * 1.1) * 0.025;
+      coreMat.opacity = Math.min(1, theme.coreOpacity * rest.coreMul * mq.restMul + breathe);
+      haloMat.opacity = Math.min(0.2, theme.haloOpacity * rest.haloMul * mq.restMul + breathe * 0.4);
+      bloomMat.opacity = (0.06 + theme.haloOpacity * 0.08) * rest.bloomMul * mq.restMul;
+      ghostMat.opacity = 0.03 * rest.ghostMul;
+      this.ghostPoints.visible = ghostMat.opacity > 0.02;
       this.writeLineGeometry(null, this.energyPhase);
       this.updateIdleEnergyPackets(this.energyPhase, deltaMs);
     }
 
     this.background.tick(deltaMs);
+    this.background.setPointerNdc(this.pointerNdc);
     this.effects.tick(deltaMs);
     this.syncQuestBoundLayers();
     this.networkLayer.tick(deltaMs, this.universeTheme);
@@ -1645,19 +1683,21 @@ export class StarConquestGraph {
       if (linked && focusIdx >= 0 && focusFamily) {
         if (i === focusIdx) {
           const theme = familyTheme(focusFamily);
-          r = Math.min(1, 0.82 + theme.rgb[0] * 0.35);
-          g = Math.min(1, 0.86 + theme.rgb[1] * 0.28);
-          b = Math.min(1, 0.9 + theme.rgb[2] * 0.22);
-          hr = Math.min(1, theme.rgb[0] * 1.45);
-          hg = Math.min(1, theme.rgb[1] * 1.45);
-          hb = Math.min(1, theme.rgb[2] * 1.45);
+          const sel = starQuestVisualTone('selected');
+          r = Math.min(1, (0.82 + theme.rgb[0] * 0.35) * sel.vertex);
+          g = Math.min(1, (0.86 + theme.rgb[1] * 0.28) * sel.vertex);
+          b = Math.min(1, (0.9 + theme.rgb[2] * 0.22) * sel.vertex);
+          hr = Math.min(1, theme.rgb[0] * 1.45 * sel.halo);
+          hg = Math.min(1, theme.rgb[1] * 1.45 * sel.halo);
+          hb = Math.min(1, theme.rgb[2] * 1.45 * sel.halo);
         } else if (linked.has(i)) {
-          r = Math.min(1, r * LINKED_BOOST);
-          g = Math.min(1, g * LINKED_BOOST);
-          b = Math.min(1, b * LINKED_BOOST);
-          hr = Math.min(1, hr * LINKED_BOOST);
-          hg = Math.min(1, hg * LINKED_BOOST);
-          hb = Math.min(1, hb * LINKED_BOOST);
+          const linkedTone = starQuestVisualTone('linked');
+          r = Math.min(1, r * LINKED_BOOST * linkedTone.vertex);
+          g = Math.min(1, g * LINKED_BOOST * linkedTone.vertex);
+          b = Math.min(1, b * LINKED_BOOST * linkedTone.vertex);
+          hr = Math.min(1, hr * LINKED_BOOST * linkedTone.halo);
+          hg = Math.min(1, hg * LINKED_BOOST * linkedTone.halo);
+          hb = Math.min(1, hb * LINKED_BOOST * linkedTone.halo);
         } else {
           r *= DIM_FACTOR;
           g *= DIM_FACTOR;
@@ -1666,6 +1706,24 @@ export class StarConquestGraph {
           hg *= DIM_FACTOR;
           hb *= DIM_FACTOR;
         }
+      } else {
+        const tone = starQuestVisualTone(
+          starQuestVisualState({
+            status: this.quests[i].status,
+            focused: false,
+            hovered: false,
+            linked: false,
+          })
+        );
+        // Profondeur cercle : fond plus sombre / devant plus lisible
+        const z = this.questPoints.geometry.getAttribute('position').getZ(i);
+        const depthFade = Math.max(0.42, Math.min(1.05, 0.72 + z * 0.012));
+        r *= tone.vertex * depthFade;
+        g *= tone.vertex * depthFade;
+        b *= tone.vertex * depthFade;
+        hr *= tone.halo * depthFade;
+        hg *= tone.halo * depthFade;
+        hb *= tone.halo * depthFade;
       }
       colors.setXYZ(i, r, g, b);
       haloCol.setXYZ(i, hr, hg, hb);
@@ -1674,8 +1732,19 @@ export class StarConquestGraph {
     haloCol.needsUpdate = true;
 
     this.writeLineGeometry(linked, this.energyPhase);
-    this.lineCoreMat.uniforms['uOpacity'].value = focusIdx >= 0 ? 0.96 : 0.78;
-    this.filamentMat.uniforms['uOpacity'].value = focusIdx >= 0 ? 0.72 : 0.52;
+    const rest = STAR_CONQUEST_REST_GLOW;
+    this.lineCoreMat.uniforms['uOpacity'].value =
+      focusIdx >= 0 ? 0.88 : 0.12 * rest.filamentRestMul;
+    this.filamentMat.uniforms['uOpacity'].value =
+      focusIdx >= 0 ? 0.55 : 0.04 * rest.filamentRestMul;
+    const guideMat = this.constellationGuides.material as THREE.LineBasicMaterial;
+    const showGuides =
+      this.universeTheme.showConstellations && this.universeTheme.constellationOpacity > 0;
+    this.constellationGuides.visible = showGuides && focusIdx >= 0;
+    guideMat.opacity =
+      focusIdx >= 0
+        ? this.universeTheme.constellationOpacity * 0.7
+        : 0;
   }
 
   private hideEnergyPackets(): void {
@@ -1799,7 +1868,8 @@ export class StarConquestGraph {
     pAttr.needsUpdate = true;
     cAttr.needsUpdate = true;
     this.energyPackets.visible = packet > 0;
-    (this.energyPackets.material as THREE.PointsMaterial).opacity = packet > 0 ? 1 : 0;
+    (this.energyPackets.material as THREE.PointsMaterial).opacity =
+      packet > 0 ? STAR_CONQUEST_REST_GLOW.packetMul : 0;
   }
 
   private writeLineGeometry(linked: Set<number> | null, energy: number): void {

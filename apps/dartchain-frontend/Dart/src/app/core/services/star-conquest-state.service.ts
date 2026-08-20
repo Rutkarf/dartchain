@@ -48,6 +48,13 @@ export class StarConquestStateService {
   } | null>(null);
   /** Panneau Quest en mode compact (viewport étroit près du stick). */
   readonly panelCompact = signal(false);
+  /** Aide contrôles (progressive disclosure). */
+  readonly helpOpen = signal(false);
+  /** Overlay runtime additif (loading/error) — défaut ready. */
+  readonly runtimePhase = signal<'ready' | 'loading' | 'error'>('ready');
+  readonly runtimeMessage = signal<string | null>(null);
+  /** Feuille optionnelle (help/details). */
+  readonly sheetKind = signal<'help' | 'details' | 'none'>('none');
 
   readonly hiddenCount = computed(() => this.hiddenQuests().length);
   /** Joystick toujours visible ; la liste scanner dépend des Quests hors vue. */
@@ -113,5 +120,25 @@ export class StarConquestStateService {
   endStick(): void {
     this.stick.set({ x: 0, y: 0 });
     this.worldNavigating.set(false);
+  }
+
+  openHelp(): void {
+    this.helpOpen.set(true);
+    this.sheetKind.set('help');
+  }
+
+  closeHelp(): void {
+    this.helpOpen.set(false);
+    if (this.sheetKind() === 'help') this.sheetKind.set('none');
+  }
+
+  toggleHelp(): void {
+    if (this.helpOpen()) this.closeHelp();
+    else this.openHelp();
+  }
+
+  setRuntime(phase: 'ready' | 'loading' | 'error', message: string | null = null): void {
+    this.runtimePhase.set(phase);
+    this.runtimeMessage.set(message);
   }
 }

@@ -26,16 +26,23 @@ import {
   createWebGlRenderer,
   viewportSize,
 } from '../core/utils/three-webgl.util';
-import { STAR_CONQUEST_SCALE, STAR_CONQUEST_SCALE_TIER, starConquestDprCap } from './star-conquest/star-conquest-scale';
-import { StarConquestGraph } from './star-conquest/star-conquest-graph';
+import {
+  STAR_CONQUEST_OVERLAY,
+  STAR_CONQUEST_SCALE,
+  STAR_CONQUEST_SCALE_TIER,
+  starConquestDprCap,
+  starConquestOverlayBox,
+} from './star-conquest/star-conquest-scale';
+import { StarConquestGraph, type StarConquestHit } from './star-conquest/star-conquest-graph';
 import { StarConquestWorld, CAMERA_Z } from './star-conquest/star-conquest-world';
-import { placeQuestPanelNearParticle } from './star-conquest/star-conquest-joystick-zone';
+import {
+  placeQuestPanelNearParticle,
+  type JoystickExclusionZone,
+} from './star-conquest/star-conquest-joystick-zone';
 import {
   layoutQuestsInBand,
   measurePlayableBand,
-  separateLabelPositions,
 } from './star-conquest/star-conquest-layout';
-import { labelOpacityFromDepth } from './star-conquest/star-conquest-depth';
 import { STAR_CONQUEST_MOCK_QUESTS } from './star-conquest/star-conquest.mock';
 import type { StarQuest } from './star-conquest/star-conquest.model';
 import {
@@ -55,6 +62,21 @@ import { StarConquestProgressService } from '../core/services/star-conquest-prog
 import { StarConquestUniverseService } from '../core/services/star-conquest-universe.service';
 import { StarConquestFacade } from '../core/services/star-conquest.facade';
 import { starConquestUniverseTheme } from './star-conquest/star-conquest-universes.config';
+import { STAR_CONQUEST_FEATURES } from './star-conquest/star-conquest-features';
+import { mergeStarConquestKeyPan, starConquestKeyToPanDelta } from './star-conquest/star-conquest-keyboard';
+import { idleStarConquestPanIntent } from './star-conquest/star-conquest-input';
+import { recordStarConquestDiag } from './star-conquest/star-conquest-diagnostics';
+import {
+  beginStarConquestPointerStroke,
+  starConquestShouldResetStickOnCancel,
+  updateStarConquestPointerStroke,
+  type StarConquestPointerStroke,
+} from './star-conquest/star-conquest-pointer-safety';
+import {
+  STAR_CONQUEST_ORBIT_DOUBLE_TAP_MS,
+  screenDeltaToWorldPan,
+  starConquestOrbitShouldPick,
+} from './star-conquest/star-conquest-orbit';
 import type { Subscription } from 'rxjs';
 
 /**
@@ -110,6 +132,11 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private lastAnchorY = 0;
   private occlusionAccMs = 0;
   private labelAccMs = 0;
+  private safetyBound = false;
+  private readonly heldPanKeys = new Set<string>();
+  private orbitStroke: StarConquestPointerStroke | null = null;
+  private orbitPendingHit: StarConquestHit | null = null;
+  private lastEmptyTapMs = 0;
   private bindFacade(): void {
     this.facadeSubs = [
       this.facade.dismiss$.subscribe(() => this.zone.run(() => this.clearSelection())),
@@ -134,6 +161,10 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         });
       }),
       this.facade.progress$.subscribe(() => this.zone.run(() => this.applyRuntimeProgress())),
+      this.facade.resetView$.subscribe(() => {
+        this.world?.resetView(false);
+        recordStarConquestDiag('reset-view');
+      }),
     ];
   }
 
@@ -216,6 +247,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
       this.bindPointer(created.canvas);
       this.bindUiWatchers();
+      this.bindSafetyListeners();
       window.addEventListener('resize', this.onWindowLayout, { passive: true });
       this.bindFacade();
 
@@ -242,11 +274,13 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.unbindFacade();
     window.removeEventListener('resize', this.onWindowLayout);
+    this.unbindSafetyListeners();
     this.layoutObserver?.disconnect();
     this.unbindPointer();
     this.visibilityBinding?.unsubscribe();
     this.resizeBinding?.unsubscribe();
     this.pauseAnimation();
+    this.conquestState.endStick();
     this.conquestState.clear();
     this.conquestState.setHiddenQuests([]);
     this.conquestState.setRewardLabels([]);
@@ -373,10 +407,13 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
   private bindPointer(canvas: HTMLCanvasElement): void {
     this.zone.runOutsideAngular(() => {
-      canvas.addEventListener('pointermove', this.onPointerMove, { passive: true });
+      canvas.addEventListener('pointermove', this.onPointerMove, { passive: false });
       canvas.addEventListener('pointerleave', this.onPointerLeave, { passive: true });
       canvas.addEventListener('pointerdown', this.onPointerDown, { passive: false });
+      canvas.addEventListener('pointerup', this.onPointerUp, { passive: false });
+      canvas.addEventListener('pointercancel', this.onPointerCancel, { passive: true });
       canvas.addEventListener('wheel', this.onWheel, { passive: false });
+      canvas.addEventListener('webglcontextlost', this.onContextLost, false);
     });
     this.pointerActive = true;
   }
@@ -386,8 +423,95 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.canvas.removeEventListener('pointermove', this.onPointerMove);
     this.canvas.removeEventListener('pointerleave', this.onPointerLeave);
     this.canvas.removeEventListener('pointerdown', this.onPointerDown);
+    this.canvas.removeEventListener('pointerup', this.onPointerUp);
+    this.canvas.removeEventListener('pointercancel', this.onPointerCancel);
     this.canvas.removeEventListener('wheel', this.onWheel);
+    this.canvas.removeEventListener('webglcontextlost', this.onContextLost);
     this.pointerActive = false;
+  }
+
+  private bindSafetyListeners(): void {
+    if (this.safetyBound || typeof window === 'undefined') return;
+    window.addEventListener('blur', this.onWindowBlur);
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
+    if (STAR_CONQUEST_FEATURES.keyboardPan) {
+      window.addEventListener('keydown', this.onKeyDown);
+      window.addEventListener('keyup', this.onKeyUp);
+    }
+    this.safetyBound = true;
+  }
+
+  private unbindSafetyListeners(): void {
+    if (!this.safetyBound || typeof window === 'undefined') return;
+    window.removeEventListener('blur', this.onWindowBlur);
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
+    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('keyup', this.onKeyUp);
+    this.safetyBound = false;
+    this.heldPanKeys.clear();
+  }
+
+  private readonly onPointerCancel = (): void => {
+    if (this.orbitStroke) {
+      this.orbitStroke = null;
+      this.orbitPendingHit = null;
+    }
+    if (!starConquestShouldResetStickOnCancel('pointercancel')) return;
+    recordStarConquestDiag('pointer-cancel');
+    this.zone.run(() => this.conquestState.endStick());
+    this.world?.releaseStick(false);
+  };
+
+  private readonly onContextLost = (event: Event): void => {
+    event.preventDefault();
+    recordStarConquestDiag('webgl-lost');
+    this.zone.run(() => this.conquestState.setRuntime('error', 'Rendu WebGL interrompu.'));
+  };
+
+  private readonly onWindowBlur = (): void => {
+    if (!starConquestShouldResetStickOnCancel('blur')) return;
+    this.heldPanKeys.clear();
+    this.zone.run(() => this.conquestState.endStick());
+    this.world?.releaseStick(false);
+  };
+
+  private readonly onVisibilityChange = (): void => {
+    if (document.visibilityState !== 'hidden') return;
+    if (!starConquestShouldResetStickOnCancel('visibility')) return;
+    this.heldPanKeys.clear();
+    this.zone.run(() => this.conquestState.endStick());
+    this.world?.releaseStick(false);
+  };
+
+  private readonly onKeyDown = (event: KeyboardEvent): void => {
+    if (!STAR_CONQUEST_FEATURES.keyboardPan) return;
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const target = event.target as HTMLElement | null;
+    if (
+      target &&
+      (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+    ) {
+      return;
+    }
+    if (!starConquestKeyToPanDelta(event.code)) return;
+    event.preventDefault();
+    this.heldPanKeys.add(event.code);
+    this.applyHeldPanKeys();
+  };
+
+  private readonly onKeyUp = (event: KeyboardEvent): void => {
+    if (!this.heldPanKeys.has(event.code)) return;
+    this.heldPanKeys.delete(event.code);
+    this.applyHeldPanKeys();
+  };
+
+  private applyHeldPanKeys(): void {
+    const intent = mergeStarConquestKeyPan(idleStarConquestPanIntent(), this.heldPanKeys);
+    if (!intent.active) {
+      this.zone.run(() => this.conquestState.endStick());
+      return;
+    }
+    this.zone.run(() => this.conquestState.setStick(intent.x, intent.y));
   }
 
   private readonly onWheel = (event: WheelEvent): void => {
@@ -398,6 +522,32 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   };
 
   private readonly onPointerMove = (event: PointerEvent): void => {
+    if (this.orbitStroke && event.pointerId === this.orbitStroke.pointerId) {
+      const prev = this.orbitStroke;
+      this.orbitStroke = updateStarConquestPointerStroke(
+        this.orbitStroke,
+        event.clientX,
+        event.clientY
+      );
+      if (this.orbitStroke.dragging && this.world) {
+        event.preventDefault?.();
+        const panMax = this.world.getPanMax();
+        const vw = this.canvas?.clientWidth || 250;
+        const vh = this.canvas?.clientHeight || 550;
+        const delta = screenDeltaToWorldPan(
+          this.orbitStroke.lastX - prev.lastX,
+          this.orbitStroke.lastY - prev.lastY,
+          panMax.x,
+          panMax.y,
+          vw,
+          vh
+        );
+        this.world.panByDelta(delta.dxWorld, delta.dyWorld);
+        this.zone.run(() => this.conquestState.setStick(0, 0));
+      }
+      return;
+    }
+
     if (this.conquestState.worldNavigating()) return;
     if (event.pointerType === 'touch') return;
 
@@ -447,12 +597,24 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   };
 
   private readonly onPointerDown = (event: PointerEvent): void => {
-    if (this.conquestState.worldNavigating()) return;
+    if (this.conquestState.worldNavigating() && !this.orbitStroke) return;
     const isTouch = event.pointerType === 'touch' || event.pointerType === 'pen';
     if (!isTouch && event.button !== 0) return;
     if (isScreenPointBlockedByUi(event.clientX, event.clientY)) return;
 
     const questHit = this.hitTest(event.clientX, event.clientY);
+
+    if (STAR_CONQUEST_FEATURES.canvasOrbit) {
+      event.preventDefault();
+      (event.currentTarget as HTMLElement | null)?.setPointerCapture?.(event.pointerId);
+      this.orbitStroke = beginStarConquestPointerStroke(
+        event.pointerId,
+        event.clientX,
+        event.clientY
+      );
+      this.orbitPendingHit = questHit;
+      return;
+    }
 
     if (questHit) {
       this.zone.run(() => {
@@ -469,6 +631,48 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       if (this.conquestState.selected() || this.focusedId) {
         event.preventDefault();
         this.clearSelection();
+      }
+    });
+  };
+
+  private readonly onPointerUp = (event: PointerEvent): void => {
+    if (!this.orbitStroke || event.pointerId !== this.orbitStroke.pointerId) return;
+    const stroke = updateStarConquestPointerStroke(
+      this.orbitStroke,
+      event.clientX,
+      event.clientY
+    );
+    const pending = this.orbitPendingHit;
+    this.orbitStroke = null;
+    this.orbitPendingHit = null;
+
+    if (!starConquestOrbitShouldPick(stroke)) {
+      this.zone.run(() => this.conquestState.endStick());
+      this.world?.releaseStick(false);
+      recordStarConquestDiag('stick-end', 'orbit');
+      return;
+    }
+
+    if (pending) {
+      this.zone.run(() => {
+        const quest = this.conquest?.getQuest(pending.questId) ?? null;
+        if (quest) this.applySelection(quest, pending.worldPosition);
+      });
+      return;
+    }
+
+    const now = performance.now();
+    const doubleTap = now - this.lastEmptyTapMs < STAR_CONQUEST_ORBIT_DOUBLE_TAP_MS;
+    this.lastEmptyTapMs = now;
+    this.zone.run(() => {
+      if (this.conquestState.selected() || this.focusedId) {
+        this.clearSelection();
+        return;
+      }
+      if (doubleTap) {
+        this.world?.resetView(false);
+        this.facade.resetView();
+        recordStarConquestDiag('reset-view', 'double-tap');
       }
     });
   };
@@ -621,96 +825,91 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.refreshRewardLabels();
   }
 
+  /**
+   * Labels +M4T3R : uniquement survol / sélection.
+   * Au repos ils polluent la nébuleuse ; la valeur reste dans le panneau Quest.
+   */
   private refreshRewardLabels(): void {
-    if (!this.conquest || !this.camera) return;
+    if (!this.conquest || !this.camera) {
+      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      return;
+    }
+    const focusId = this.focusedId ?? this.hoverPreviewId;
+    if (!focusId) {
+      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      return;
+    }
+
     const projected = this.conquest.projectAllToScreen(this.camera);
     const band = measurePlayableBand(
       parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
       ) || 220
     );
-    const focusId = this.focusedId ?? this.hoverPreviewId;
     const rects = collectUiOccluderRects();
-
-    type L = StarQuestRewardLabel & { x: number; y: number };
-    const labels: L[] = [];
-
-    for (const p of projected) {
-      // Labels hors viewport / hors bande : masqués (pas de clamp centre)
-      if (p.x < -6 || p.x > band.viewportW + 6) continue;
-      if (p.y < band.topPx - 2 || p.y > band.viewportH + 4) continue;
-      const isFocus = focusId === p.id;
-      // Zone très basse : labels autorisés pour les racines underFloor + focus
-      const quest = this.conquest.getQuest(p.id);
-      const underFloor = quest?.underFloor === true;
-      if (p.y > band.floorTopPx + 8 && !isFocus && !underFloor) continue;
-      const occluded = isQuestFullyOccluded(
-        p.x,
-        p.y,
-        rects,
-        Math.round(STAR_CONQUEST_SCALE.pickRadiusPx * 0.36)
-      );
-      // underGraph : souvent sous app-graph — label OK si focus, sinon dim/occulté
-      if (occluded && !isFocus && !quest?.underGraph) continue;
-      const nearEdge =
-        p.x < 10 ||
-        p.x > band.viewportW - 10 ||
-        p.y > band.floorTopPx - 4 ||
-        p.y > band.viewportH - 18;
-      let lx = p.x + 10;
-      let ly = p.y;
-      if (lx >= 0 && lx <= band.viewportW) {
-        lx = Math.max(10, Math.min(band.viewportW - 10, lx));
-      }
-      if (ly >= band.topPx && ly <= band.viewportH) {
-        ly = Math.max(band.topPx + 2, Math.min(band.viewportH - 4, ly));
-      }
-      labels.push({
-        id: p.id,
-        x: lx,
-        y: ly,
-        text: formatRewardShort(p.reward),
-        family: p.family,
-        active: isFocus,
-        dim: nearEdge && !isFocus,
-        reward: p.reward,
-        depth: p.depth,
-        opacity: isFocus
-          ? 1
-          : labelOpacityFromDepth(p.depth, p.reward) * (nearEdge ? 0.55 : 1),
-      });
+    const p = projected.find((row) => row.id === focusId);
+    if (!p) {
+      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      return;
+    }
+    if (p.x < -6 || p.x > band.viewportW + 6 || p.y < band.topPx - 2 || p.y > band.viewportH + 4) {
+      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      return;
     }
 
-    separateLabelPositions(labels, 22, 9);
-    for (const l of labels) {
-      if (l.x < 4 || l.x > band.viewportW - 4) continue;
-      l.x = Math.max(8, Math.min(band.viewportW - 8, l.x));
-      l.y = Math.max(band.topPx + 1, Math.min(band.viewportH - 4, l.y));
+    const quest = this.conquest.getQuest(p.id);
+    const underFloor = quest?.underFloor === true;
+    if (p.y > band.floorTopPx + 8 && !underFloor) {
+      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      return;
     }
-
-    this.zone.run(() =>
-      this.conquestState.setRewardLabels(
-        labels.filter((l) => {
-          if (l.x < 4 || l.x > band.viewportW - 4) return false;
-          return true;
-        })
-      )
+    const occluded = isQuestFullyOccluded(
+      p.x,
+      p.y,
+      rects,
+      Math.round(STAR_CONQUEST_SCALE.pickRadiusPx * 0.36)
     );
+    if (occluded && !quest?.underGraph) {
+      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      return;
+    }
+
+    let lx = Math.max(10, Math.min(band.viewportW - 10, p.x + 12));
+    let ly = Math.max(band.topPx + 4, Math.min(band.viewportH - 8, p.y - 10));
+    const label: StarQuestRewardLabel = {
+      id: p.id,
+      x: lx,
+      y: ly,
+      text: formatRewardShort(p.reward),
+      family: p.family,
+      active: true,
+      dim: false,
+      reward: p.reward,
+      depth: p.depth,
+      opacity: 1,
+    };
+
+    this.zone.run(() => this.conquestState.setRewardLabels([label]));
   }
 
   private projectToScreen(
     world: THREE.Vector3
   ): { x: number; y: number; compact: boolean } {
-    if (!this.camera) return { x: 16, y: 16, compact: false };
+    if (!this.camera) return { x: 16, y: 16, compact: true };
     this.projected.copy(world).project(this.camera);
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const sx = (this.projected.x * 0.5 + 0.5) * vw;
     const sy = (-this.projected.y * 0.5 + 0.5) * vh;
+    const box = starConquestOverlayBox(vw, vh);
+    const joy = this.conquestState.joyExclusion();
+    const zone: JoystickExclusionZone | null = joy
+      ? {
+          ...joy,
+          r: Math.hypot((joy.right - joy.left) * 0.5, (joy.bottom - joy.top) * 0.5),
+        }
+      : null;
 
-    let panelW = Math.min(156, vw - 10);
-    let panelH = Math.min(112, vh - 10);
-    const margin = 6;
     const preferred =
       this.lastAnchorX || this.lastAnchorY
         ? { x: this.lastAnchorX, y: this.lastAnchorY }
@@ -719,16 +918,17 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     const placed = placeQuestPanelNearParticle(
       sx,
       sy,
-      panelW,
-      panelH,
-      null,
+      box.panelW,
+      box.panelH,
+      zone,
       vw,
       vh,
-      margin,
-      0,
-      preferred
+      box.margin,
+      8,
+      preferred,
+      box.floorChromeH
     );
-    return { x: placed.x, y: placed.y, compact: placed.compact };
+    return { x: placed.x, y: placed.y, compact: true };
   }
 
   private syncPanelAnchor(): void {

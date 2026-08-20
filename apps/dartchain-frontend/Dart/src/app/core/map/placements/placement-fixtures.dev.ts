@@ -1,14 +1,99 @@
+import { MARSEILLE_LANDMARK_BUILDINGS } from '../geo-reference.config';
 import { MARSEILLE_COORDINATE_SYSTEM_VERSION } from './coordinate-system';
+import {
+  groundFloorAnchorFromGeoFootprint,
+  projectMarseilleWorldToGeo,
+} from './ground-floor-anchor.util';
 import type { MetaversePlacementsResponseDto } from './placement.dto';
 
 /**
  * Fixtures DEV uniquement — partenaires fictifs, aucun commerçant réel.
  * Ids `dev-*` / `fixture-dev`. Ne jamais servir en production.
+ *
+ * Les ancres RDC sont dérivées du footprint OSM way/* (GEO-FACADE-1 + GEO-WAY-1).
  */
 export const PLACEMENT_FIXTURE_SOURCE = 'fixture-dev' as const;
 
 const DEV_NOTICE =
   'DEV — emplacement fictif, non contractuel, aucun partenaire réel associé.';
+
+interface DevPlacementSpec {
+  id: string;
+  buildingId: string;
+  placementType: 'ground-floor-storefront' | 'entrance-panel';
+  visibilityTier?: 'standard' | 'featured';
+  status: 'available' | 'active' | 'paused';
+  merchantId?: string;
+  campaignId?: string;
+  maxDistanceMeters: number;
+}
+
+const DEV_PLACEMENT_SPECS: readonly DevPlacementSpec[] = [
+  {
+    id: 'dev-placement-01',
+    buildingId: 'mirror-adjacent-building-01',
+    placementType: 'ground-floor-storefront',
+    visibilityTier: 'standard',
+    status: 'available',
+    maxDistanceMeters: 48,
+  },
+  {
+    id: 'dev-placement-02',
+    buildingId: 'mirror-adjacent-building-02',
+    placementType: 'ground-floor-storefront',
+    visibilityTier: 'featured',
+    status: 'active',
+    merchantId: 'dev-merchant-vitrine',
+    campaignId: 'dev-campaign-demo',
+    maxDistanceMeters: 48,
+  },
+  {
+    id: 'dev-placement-03',
+    buildingId: 'harbor-west-building',
+    placementType: 'entrance-panel',
+    status: 'available',
+    merchantId: 'dev-merchant-quai',
+    maxDistanceMeters: 48,
+  },
+  {
+    id: 'dev-placement-04',
+    buildingId: 'harbor-east-building',
+    placementType: 'ground-floor-storefront',
+    status: 'paused',
+    maxDistanceMeters: 36,
+  },
+];
+
+function facadeAnchorDto(buildingId: string) {
+  const landmark = MARSEILLE_LANDMARK_BUILDINGS.find((item) => item.id === buildingId);
+  if (!landmark) {
+    throw new Error(`[placement-fixtures] Landmark OSM introuvable: ${buildingId}`);
+  }
+  const anchor = groundFloorAnchorFromGeoFootprint(landmark.footprint);
+  if (!anchor) {
+    throw new Error(`[placement-fixtures] Façade RDC incalculable: ${buildingId}`);
+  }
+  const geo = projectMarseilleWorldToGeo(
+    anchor.world.x,
+    anchor.world.y,
+    anchor.world.z
+  );
+  return {
+    anchorWorld: {
+      x: anchor.world.x,
+      y: anchor.world.y,
+      z: anchor.world.z,
+      coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
+    },
+    anchorGeo: {
+      latitude: geo.latitude,
+      longitude: geo.longitude,
+      altitude: geo.altitude,
+      source: 'projected' as const,
+    },
+    facing: { facingRad: anchor.facingRad },
+  };
+}
 
 export function createDevPlacementFixtures(
   serverTime = '2026-08-20T12:00:00.000Z'
@@ -22,14 +107,14 @@ export function createDevPlacementFixtures(
         id: 'mirror-adjacent-building-01',
         label: 'DEV — Immeuble nord-est Ombrière',
         geo: {
-          latitude: 43.2946667,
-          longitude: 5.3748399,
+          latitude: 43.2946586,
+          longitude: 5.3748354,
           source: 'verified',
         },
         world: {
-          x: 58.1,
+          x: 57.75,
           y: 0,
-          z: -7.5,
+          z: -6.58,
           coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
         },
         visualVariant: 'ground-storefront-v1',
@@ -39,14 +124,14 @@ export function createDevPlacementFixtures(
         id: 'mirror-adjacent-building-02',
         label: 'DEV — Immeuble nord Ombrière',
         geo: {
-          latitude: 43.2948349,
-          longitude: 5.3747715,
+          latitude: 43.2948273,
+          longitude: 5.3747644,
           source: 'verified',
         },
         world: {
-          x: 52.6,
+          x: 51.99,
           y: 0,
-          z: -26.2,
+          z: -25.36,
           coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
         },
         visualVariant: 'ground-storefront-v1',
@@ -56,14 +141,14 @@ export function createDevPlacementFixtures(
         id: 'harbor-west-building',
         label: 'DEV — Façade ouest Vieux-Port',
         geo: {
-          latitude: 43.2938343,
-          longitude: 5.3737687,
+          latitude: 43.2938272,
+          longitude: 5.3737823,
           source: 'approximate',
         },
         world: {
-          x: -28.7,
+          x: -27.58,
           y: 0,
-          z: 85.2,
+          z: 85.98,
           coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
         },
         visualVariant: 'ground-storefront-v1',
@@ -73,88 +158,37 @@ export function createDevPlacementFixtures(
         id: 'harbor-east-building',
         label: 'DEV — Hôtel des Princes (inventaire fictif)',
         geo: {
-          latitude: 43.2946888,
-          longitude: 5.3755217,
+          latitude: 43.294698,
+          longitude: 5.375526,
           source: 'verified',
         },
         world: {
-          x: 113.4,
+          x: 113.7,
           y: 0,
-          z: -9.9,
+          z: -10.96,
           coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
         },
         visualVariant: 'ground-storefront-v1',
         status: 'active',
       },
     ],
-    placements: [
-      {
-        id: 'dev-placement-01',
-        buildingId: 'mirror-adjacent-building-01',
-        placementType: 'ground-floor-storefront',
-        anchorWorld: {
-          x: 68.3,
-          y: 1.2,
-          z: -7.5,
-          coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
+    placements: DEV_PLACEMENT_SPECS.map((spec) => {
+      const facade = facadeAnchorDto(spec.buildingId);
+      return {
+        id: spec.id,
+        buildingId: spec.buildingId,
+        placementType: spec.placementType,
+        ...facade,
+        visibilityTier: spec.visibilityTier,
+        status: spec.status,
+        merchantId: spec.merchantId,
+        campaignId: spec.campaignId,
+        displayPolicy: {
+          showWhenUnselected: true,
+          maxDistanceMeters: spec.maxDistanceMeters,
         },
-        anchorGeo: {
-          latitude: 43.2946667,
-          longitude: 5.3748399,
-          source: 'projected',
-        },
-        facing: { facingRad: -Math.PI / 2 },
-        visibilityTier: 'standard',
-        status: 'available',
-        displayPolicy: { showWhenUnselected: true, maxDistanceMeters: 48 },
-      },
-      {
-        id: 'dev-placement-02',
-        buildingId: 'mirror-adjacent-building-02',
-        placementType: 'ground-floor-storefront',
-        anchorWorld: {
-          x: 61.8,
-          y: 1.2,
-          z: -26.2,
-          coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
-        },
-        merchantId: 'dev-merchant-vitrine',
-        campaignId: 'dev-campaign-demo',
-        visibilityTier: 'featured',
-        status: 'active',
-        facing: { facingRad: -Math.PI / 2 },
-        displayPolicy: { showWhenUnselected: true, maxDistanceMeters: 48 },
-      },
-      {
-        id: 'dev-placement-03',
-        buildingId: 'harbor-west-building',
-        placementType: 'entrance-panel',
-        anchorWorld: {
-          x: -37.8,
-          y: 1.2,
-          z: 85.2,
-          coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
-        },
-        merchantId: 'dev-merchant-quai',
-        status: 'available',
-        facing: { facingRad: Math.PI / 2 },
-        displayPolicy: { showWhenUnselected: true, maxDistanceMeters: 48 },
-      },
-      {
-        id: 'dev-placement-04',
-        buildingId: 'harbor-east-building',
-        placementType: 'ground-floor-storefront',
-        anchorWorld: {
-          x: 124.5,
-          y: 1.2,
-          z: -9.9,
-          coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
-        },
-        status: 'paused',
-        facing: { facingRad: -Math.PI / 2 },
-        displayPolicy: { showWhenUnselected: true, maxDistanceMeters: 36 },
-      },
-    ],
+      };
+    }),
     merchants: [
       {
         id: 'dev-merchant-vitrine',

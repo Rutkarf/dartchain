@@ -1,7 +1,7 @@
 /**
  * Constellations zodiacales — silhouettes d’ancrage pour Star Conquest (niveau 3).
  * Inspiration formelle uniquement ; les Quests restent des améliorations produit.
- * Hubs étendus : le viewport n’est qu’une fenêtre sur un ciel plus large.
+ * Cadre exclusif 250×550 : hubs et boîtes restent dans le viewport.
  */
 
 import type { StarQuestFamily } from './star-conquest-families';
@@ -17,7 +17,7 @@ export interface StarConstellation {
   /** Nom d’inspiration zodiacale. */
   label: string;
   family: StarQuestFamily;
-  /** Centre dans le monde UV (peut être hors [0–1] pour déborder du viewport). */
+  /** Centre dans le monde UV — contenu dans [0–1] pour 250×550. */
   hubU: number;
   hubV: number;
   /** Demi-largeur / demi-hauteur relative de la boîte. */
@@ -30,17 +30,17 @@ export interface StarConstellation {
 }
 
 /**
- * 5 constellations — étalées gauche / centre / droite (fragments hors champ OK).
+ * 5 constellations — pentagone compact cadré 250×550 (plus de hubs hors champ).
  */
 export const STAR_CONSTELLATIONS: readonly StarConstellation[] = [
   {
     id: 'libra',
     label: 'Balance',
     family: 'interface',
-    hubU: 0.06,
-    hubV: 0.34,
-    halfW: 0.3,
-    halfH: 0.3,
+    hubU: 0.5,
+    hubV: 0.2,
+    halfW: 0.18,
+    halfH: 0.16,
     points: [
       { u: 0.5, v: 0.12 },
       { u: 0.18, v: 0.38 },
@@ -64,10 +64,10 @@ export const STAR_CONSTELLATIONS: readonly StarConstellation[] = [
     id: 'aquarius',
     label: 'Verseau',
     family: 'three',
-    hubU: 0.94,
-    hubV: 0.3,
-    halfW: 0.3,
-    halfH: 0.32,
+    hubU: 0.78,
+    hubV: 0.38,
+    halfW: 0.16,
+    halfH: 0.16,
     points: [
       { u: 0.15, v: 0.25 },
       { u: 0.4, v: 0.12 },
@@ -91,10 +91,10 @@ export const STAR_CONSTELLATIONS: readonly StarConstellation[] = [
     id: 'leo',
     label: 'Lion',
     family: 'blockchain',
-    hubU: 0.5,
-    hubV: 0.2,
-    halfW: 0.36,
-    halfH: 0.28,
+    hubU: 0.62,
+    hubV: 0.7,
+    halfW: 0.17,
+    halfH: 0.15,
     points: [
       { u: 0.5, v: 0.08 },
       { u: 0.22, v: 0.28 },
@@ -118,10 +118,10 @@ export const STAR_CONSTELLATIONS: readonly StarConstellation[] = [
     id: 'taurus',
     label: 'Taureau',
     family: 'backend',
-    hubU: -0.02,
-    hubV: 0.64,
-    halfW: 0.28,
-    halfH: 0.28,
+    hubU: 0.38,
+    hubV: 0.7,
+    halfW: 0.16,
+    halfH: 0.15,
     points: [
       { u: 0.35, v: 0.15 },
       { u: 0.65, v: 0.18 },
@@ -145,10 +145,10 @@ export const STAR_CONSTELLATIONS: readonly StarConstellation[] = [
     id: 'scorpio',
     label: 'Scorpion',
     family: 'quality',
-    hubU: 1.02,
-    hubV: 0.66,
-    halfW: 0.28,
-    halfH: 0.3,
+    hubU: 0.22,
+    hubV: 0.38,
+    halfW: 0.16,
+    halfH: 0.16,
     points: [
       { u: 0.2, v: 0.2 },
       { u: 0.45, v: 0.15 },
@@ -178,7 +178,7 @@ export function constellationForFamily(
   );
 }
 
-/** Convertit un point relatif constellation → UV monde (peut sortir de [0–1]). */
+/** Convertit un point relatif constellation → UV monde (cadré 250×550). */
 export function constellationPointToBandUv(
   c: StarConstellation,
   pointIndex: number
@@ -195,7 +195,7 @@ import {
   STAR_WORLD_OVERFLOW_RATIO as SCALE_OVERFLOW_RATIO,
 } from './star-conquest-scale';
 
-/** Débordement latéral — palier de scale R&D (upgrade produit/société). */
+/** Débordement latéral — palier produit cadré 250×550. */
 export const STAR_WORLD_OVERFLOW_RATIO = SCALE_OVERFLOW_RATIO;
 /** Maximum de particules hors fenêtre à l’initialisation. */
 export const STAR_MAX_OFFSCREEN_AT_INIT = SCALE_MAX_OFFSCREEN;

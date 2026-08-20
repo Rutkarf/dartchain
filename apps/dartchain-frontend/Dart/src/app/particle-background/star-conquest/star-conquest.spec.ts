@@ -21,12 +21,14 @@ import {
 } from './star-conquest-progress';
 import { STAR_QUEST_FAMILIES, STAR_QUEST_FAMILY_ORDER } from './star-conquest-families';
 import {
+  STAR_CONQUEST_OVERLAY,
   STAR_CONQUEST_SCALE,
   STAR_CONQUEST_SCALE_PROFILES,
   STAR_CONQUEST_SCALE_TIER,
   nextStarConquestScaleTier,
   starConquestDepthDensity,
   starConquestDprCap,
+  starConquestOverlayBox,
   starConquestPongSize,
 } from './star-conquest-scale';
 import { StarConquestGraph, STAR_PONG_OUTER_W, STAR_PONG_OUTER_H } from './star-conquest-graph';
@@ -157,11 +159,17 @@ describe('StarConquest zodiac constellations', () => {
     }
   });
 
-  it('spreads constellation hubs across the full horizontal field', () => {
+  it('keeps constellation hubs inside the 250×550 frame', () => {
     const hubs = STAR_CONSTELLATIONS.map((c) => c.hubU).sort((a, b) => a - b);
-    expect(hubs[0]).toBeLessThan(0.1);
-    expect(hubs[hubs.length - 1]).toBeGreaterThan(0.9);
-    expect(hubs[hubs.length - 1] - hubs[0]).toBeGreaterThan(0.85);
+    expect(hubs[0]).toBeGreaterThanOrEqual(0.18);
+    expect(hubs[hubs.length - 1]).toBeLessThanOrEqual(0.82);
+    expect(hubs[hubs.length - 1] - hubs[0]).toBeGreaterThan(0.4);
+    for (const c of STAR_CONSTELLATIONS) {
+      expect(c.hubU - c.halfW).toBeGreaterThanOrEqual(0.02);
+      expect(c.hubU + c.halfW).toBeLessThanOrEqual(0.98);
+      expect(c.hubV - c.halfH).toBeGreaterThanOrEqual(0.02);
+      expect(c.hubV + c.halfH).toBeLessThanOrEqual(0.98);
+    }
   });
 });
 
@@ -179,11 +187,13 @@ describe('StarConquest playable band', () => {
     expect(band.heightPx).toBeGreaterThan(80);
   });
 
-  it('exposes a horizontal world wider than the viewport', () => {
+  it('keeps horizontal world nearly within the 250×550 viewport', () => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 250 });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 550 });
     const band = measurePlayableBand(64);
-    expect(band.overflowXPx).toBeGreaterThan(20);
-    expect(band.worldLeftPx).toBeLessThan(0);
-    expect(band.worldRightPx).toBeGreaterThan(band.viewportW);
+    expect(band.overflowXPx).toBeLessThanOrEqual(20);
+    expect(band.worldLeftPx).toBeGreaterThanOrEqual(-20);
+    expect(band.worldRightPx).toBeLessThanOrEqual(band.viewportW + 20);
     expect(band.floorTopPx).toBeGreaterThan(0);
   });
 
@@ -219,6 +229,19 @@ describe('StarConquestWorld', () => {
     expect(Math.abs(world.getViewOffset().x)).toBeLessThan(8);
     world.resetView(true);
     expect(world.getViewOffset().x).toBe(0);
+    world.dispose();
+  });
+
+  it('keeps canvas orbit pan after release without recenter', () => {
+    const world = new StarConquestWorld();
+    world.setTravelBounds(100, 80);
+    world.panByDelta(40, 0);
+    for (let i = 0; i < 20; i++) world.tick(16);
+    const held = world.getViewOffset().x;
+    expect(held).toBeGreaterThan(8);
+    world.releaseStick(false);
+    for (let i = 0; i < 20; i++) world.tick(16);
+    expect(world.getViewOffset().x).toBeGreaterThan(held * 0.7);
     world.dispose();
   });
 
@@ -371,11 +394,14 @@ describe('StarConquestGraph', () => {
     expect(graph.filamentRibbon).toBeTruthy();
     expect(graph.energyPackets).toBeTruthy();
     expect(graph.constellationGuides).toBeTruthy();
-    expect(graph.constellationGuides.visible).toBe(true);
-    expect(graph.effects.group.children.length).toBeGreaterThanOrEqual(5);
+    // Guides zodiac : masqués au repos, visibles au focus (hiérarchie)
+    expect(graph.constellationGuides.visible).toBe(false);
+    // Ruche : pulse + motes (pas d’anneaux / hex décoratifs)
+    expect(graph.effects.group.children.length).toBeGreaterThanOrEqual(1);
     const first = STAR_CONQUEST_MOCK_QUESTS[0];
     graph.setFocus(first.id);
     expect(graph.getFocusId()).toBe(first.id);
+    expect(graph.constellationGuides.visible).toBe(true);
     const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 2000);
     camera.position.z = 160;
     graph.tick(16, camera);
@@ -569,6 +595,25 @@ describe('Joystick exclusion zone', () => {
     );
     expect(rectOverlapsJoystick(placed.x, placed.y, 140, 100, zone, 8)).toBe(false);
   });
+
+  it('keeps the quest panel inside 250×550 above floor chrome', () => {
+    const box = starConquestOverlayBox(250, 550);
+    const placed = placeQuestPanelNearParticle(
+      120,
+      470,
+      box.panelW,
+      box.panelH,
+      zone,
+      250,
+      550
+    );
+    const w = placed.compact ? box.compactW : box.panelW;
+    const h = placed.compact ? box.compactH : box.panelH;
+    expect(placed.x).toBeGreaterThanOrEqual(box.margin);
+    expect(placed.x + w).toBeLessThanOrEqual(250 - box.margin);
+    expect(placed.y).toBeGreaterThanOrEqual(box.margin);
+    expect(placed.y + h).toBeLessThanOrEqual(box.usableBottom);
+  });
 });
 
 describe('Star Conquest universes', () => {
@@ -654,10 +699,23 @@ describe('Star Conquest product scale', () => {
   it('is visually viable: sprites, filaments and atmosphere read as a product', () => {
     expect(STAR_CONQUEST_SCALE.visual).toBeGreaterThanOrEqual(2.3);
     expect(STAR_CONQUEST_SCALE.filamentWidthPx).toBeGreaterThanOrEqual(10);
-    expect(STAR_CONQUEST_SCALE.ui).toBeGreaterThanOrEqual(1.25);
-    expect(STAR_DEPTH_LAYERS.far.opacity).toBeGreaterThan(0.2);
-    expect(STAR_DEPTH_LAYERS.mid.opacity).toBeGreaterThan(0.25);
+    expect(STAR_CONQUEST_SCALE.ui).toBe(1);
+    expect(STAR_DEPTH_LAYERS.far.opacity).toBeGreaterThan(0.12);
+    expect(STAR_DEPTH_LAYERS.mid.opacity).toBeGreaterThan(0.18);
     expect(STAR_DEPTH_LAYERS.near.size).toBeGreaterThan(STAR_DEPTH_LAYERS.far.size);
+    expect(STAR_DEPTH_LAYERS.far.zCenter).toBeLessThan(STAR_DEPTH_LAYERS.mid.zCenter);
+  });
+
+  it('fits every overlay inside the exclusive 250×550 viewport', () => {
+    const box = starConquestOverlayBox(250, 550);
+    expect(box.panelW + box.margin * 2).toBeLessThanOrEqual(250);
+    expect(box.compactW + box.margin * 2).toBeLessThanOrEqual(250);
+    expect(box.scannerW + box.margin * 2).toBeLessThanOrEqual(250);
+    expect(box.panelH + box.floorChromeH + box.margin * 2).toBeLessThanOrEqual(550);
+    expect(box.scannerH + box.floorChromeH + box.margin * 2).toBeLessThanOrEqual(550);
+    expect(STAR_CONQUEST_OVERLAY.panelW).toBeLessThanOrEqual(90);
+    expect(STAR_CONQUEST_OVERLAY.scannerW).toBeLessThanOrEqual(176);
+    expect(STAR_CONQUEST_OVERLAY.joystickHitPx * 2).toBeLessThanOrEqual(72);
   });
 
   it('keeps ping-pong extents above the 250×550 design viewport', () => {

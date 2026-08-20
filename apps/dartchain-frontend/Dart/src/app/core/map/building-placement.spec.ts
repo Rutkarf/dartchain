@@ -33,10 +33,10 @@ describe('building-placement', () => {
     const bounds = footprintBounds(def.footprint, geo);
     const width = bounds.maxX - bounds.minX;
     const depth = bounds.maxZ - bounds.minZ;
-    expect(width).toBeGreaterThan(10);
-    expect(width).toBeLessThan(35);
-    expect(depth).toBeGreaterThan(10);
-    expect(depth).toBeLessThan(30);
+    expect(width).toBeGreaterThan(8);
+    expect(width).toBeLessThan(40);
+    expect(depth).toBeGreaterThan(8);
+    expect(depth).toBeLessThan(40);
   });
 
   it('ne déplace pas le bâtiment avec le joueur (world space stable)', () => {

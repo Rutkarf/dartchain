@@ -79,7 +79,7 @@ export const GEOGRAPHIC_DATA_SOURCES: readonly GeographicDataSource[] = [
   {
     id: 'osm-overpass-marseille-buildings',
     type: 'osm',
-    pathOrEndpoint: '/overpass (proxy) | overpass-api.de',
+    pathOrEndpoint: '/api/metaverse/overpass (backend) | /overpass (dev proxy)',
     coordinateSystem: 'EPSG:4326',
     unit: 'degrees',
     coverage: 'Vieux-Port bbox OSM_QUERY_BOUNDS',
@@ -105,7 +105,7 @@ export const GEOGRAPHIC_DATA_SOURCES: readonly GeographicDataSource[] = [
     pathOrEndpoint: 'geo-reference.config.ts MARSEILLE_LANDMARK_BUILDINGS',
     coordinateSystem: 'EPSG:4326',
     coverage: 'Miroir + 4 héros bâtiments',
-    accuracy: 'empreintes OSM way/* (centroïde + bbox)',
+    accuracy: 'sommets OSM way/* (cadastre DGI, snapshot API 0.6) — pas une vérité cm',
     license: 'ODbL (empreintes OSM)',
     isAuthorized: true,
     isUsed: true,
@@ -193,14 +193,46 @@ export interface GeoBuilding {
   label?: string;
 }
 
-/** Bâtiments héros géoréférencés — empreintes dérivées d'OSM (way/*). */
+/** Anneau OSM fermé (dernier sommet = premier). */
+export function closedOsmWayFootprint(
+  vertices: ReadonlyArray<readonly [latitude: number, longitude: number]>
+): GeoFootprintPoint[] {
+  const ring = vertices.map(([latitude, longitude]) => ({ latitude, longitude }));
+  const first = ring[0];
+  if (!first) return ring;
+  const last = ring[ring.length - 1];
+  if (
+    !last ||
+    first.latitude !== last.latitude ||
+    first.longitude !== last.longitude
+  ) {
+    ring.push({ latitude: first.latitude, longitude: first.longitude });
+  }
+  return ring;
+}
+
+/**
+ * Bâtiments héros — anneaux OSM way/* (API 0.6, snapshot 2026-08-20).
+ * Licence ODbL. Hauteurs conservées (pas les `building:levels` OSM).
+ */
 export const MARSEILLE_LANDMARK_BUILDINGS: readonly GeoBuilding[] = [
   {
     id: 'mirror-adjacent-building-01',
     sourceId: 'osm-way-67705148',
     label: 'Immeuble nord-est Ombrière',
-    footprint: rectangleFootprintMeters(43.2946667, 5.3748399, 20, 16),
+    footprint: closedOsmWayFootprint([
+      [43.2947401, 5.3748797],
+      [43.2947291, 5.3748431],
+      [43.2947103, 5.3747803],
+      [43.2946987, 5.3747415],
+      [43.2946559, 5.3747517],
+      [43.2945318, 5.3747811],
+      [43.2945637, 5.3749362],
+      [43.2946371, 5.3749074],
+      [43.2946605, 5.374898],
+    ]),
     heightMeters: 20,
+    levels: 7,
     source: 'osm',
     confidence: 'high',
   },
@@ -208,8 +240,16 @@ export const MARSEILLE_LANDMARK_BUILDINGS: readonly GeoBuilding[] = [
     id: 'mirror-adjacent-building-02',
     sourceId: 'osm-way-67704902',
     label: 'Immeuble nord Ombrière (R4V3)',
-    footprint: rectangleFootprintMeters(43.2948349, 5.3747715, 24, 18),
+    footprint: closedOsmWayFootprint([
+      [43.2948804, 5.3748145],
+      [43.2948505, 5.3747038],
+      [43.2948213, 5.3747109],
+      [43.2947839, 5.3747199],
+      [43.2948057, 5.3747917],
+      [43.294822, 5.3748454],
+    ]),
     heightMeters: 24,
+    levels: 6,
     source: 'osm',
     confidence: 'high',
   },
@@ -217,8 +257,17 @@ export const MARSEILLE_LANDMARK_BUILDINGS: readonly GeoBuilding[] = [
     id: 'harbor-west-building',
     sourceId: 'osm-way-67701479',
     label: 'Façade ouest Vieux-Port',
-    footprint: rectangleFootprintMeters(43.2938343, 5.3737687, 18, 16),
+    footprint: closedOsmWayFootprint([
+      [43.2938842, 5.3736732],
+      [43.2937536, 5.3737278],
+      [43.293723, 5.373741],
+      [43.2937603, 5.3738959],
+      [43.2938419, 5.373862],
+      [43.2939237, 5.3738281],
+      [43.2939034, 5.3737484],
+    ]),
     heightMeters: 18,
+    levels: 6,
     source: 'osm',
     confidence: 'medium',
   },
@@ -226,8 +275,26 @@ export const MARSEILLE_LANDMARK_BUILDINGS: readonly GeoBuilding[] = [
     id: 'harbor-east-building',
     sourceId: 'osm-way-67708729',
     label: 'Hôtel des Princes',
-    footprint: rectangleFootprintMeters(43.2946888, 5.3755217, 28, 22),
+    footprint: closedOsmWayFootprint([
+      [43.2945423, 5.3754534],
+      [43.2945623, 5.375533],
+      [43.2945692, 5.3755604],
+      [43.2945957, 5.3756658],
+      [43.2946322, 5.3756554],
+      [43.294683, 5.375641],
+      [43.2947104, 5.3756333],
+      [43.2947698, 5.3756166],
+      [43.2947447, 5.3755251],
+      [43.2947393, 5.3755075],
+      [43.2947423, 5.3755059],
+      [43.2948003, 5.3754718],
+      [43.2948198, 5.3754606],
+      [43.2948127, 5.3754358],
+      [43.2947878, 5.3753465],
+      [43.2946559, 5.3754039],
+    ]),
     heightMeters: 22,
+    levels: 6,
     source: 'osm',
     confidence: 'high',
   },

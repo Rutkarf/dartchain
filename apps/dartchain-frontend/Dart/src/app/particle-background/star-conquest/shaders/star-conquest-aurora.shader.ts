@@ -13,6 +13,7 @@ uniform float uTime;
 uniform vec3 uColorA;
 uniform vec3 uColorB;
 uniform float uIntensity;
+uniform float uContain;
 varying vec2 vUv;
 
 float hash(vec2 p) {
@@ -51,8 +52,10 @@ void main() {
   vec3 col = mix(uColorB, uColorA, mixAmt);
   float glass = pow(max(0.0, n - 0.62), 2.2);
   col += vec3(0.55, 0.78, 1.0) * glass * 0.35;
-  float vignette = pow(max(0.0, 1.0 - length(uv - 0.5) * 1.55), 1.45);
-  float alpha = mixAmt * vignette * uIntensity * 0.28;
+  float radial = length((uv - 0.5) * vec2(1.0, 1.35));
+  float bowl = smoothstep(uContain, uContain - 0.28, radial);
+  float vignette = pow(max(0.0, 1.0 - radial * 1.35), 1.35);
+  float alpha = mixAmt * vignette * bowl * uIntensity * 0.22;
   gl_FragColor = vec4(col, alpha);
 }
 `;
@@ -64,6 +67,7 @@ export function createStarConquestAuroraMaterial(): THREE.ShaderMaterial {
       uColorA: { value: new THREE.Color(0.32, 0.9, 0.93) },
       uColorB: { value: new THREE.Color(0.65, 0.35, 0.98) },
       uIntensity: { value: 0.54 },
+      uContain: { value: 0.48 },
     },
     vertexShader: STAR_CONQUEST_AURORA_VERTEX,
     fragmentShader: STAR_CONQUEST_AURORA_FRAGMENT,

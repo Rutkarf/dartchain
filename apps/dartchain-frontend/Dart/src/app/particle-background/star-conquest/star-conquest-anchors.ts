@@ -9,6 +9,7 @@ export interface StarQuestAnchor {
   y: number;
   z: number;
   rgb: readonly [number, number, number];
+  family?: string;
 }
 
 export function hash01(id: string): number {

@@ -12,6 +12,7 @@ import {
 } from './geo-reference.config';
 import { classifyPlacementError } from './geo-building.util';
 import { METRO_SPAWN_ANCHOR } from './map-configuration';
+import { captureCalibrationSnapshot } from './marseille-twin/calibration-diagnostics';
 
 export interface MarseilleGeoDebugSnapshot {
   geoSourceCount: number;
@@ -29,6 +30,9 @@ export interface MarseilleGeoDebugSnapshot {
   estimatedBuildingCount: number;
   criticalPlacementErrors: number;
   audits: BuildingPlacementAudit[];
+  ombriereLengthDeltaMeters: number;
+  ombriereWidthDeltaMeters: number;
+  spawnApplyAtRuntime: false;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -86,6 +90,7 @@ export class MarseilleGeoDebugService {
     const critical = this.audits.filter(
       (a) => (a.errorMeters ?? 0) >= 15 || a.intersectsWater
     ).length;
+    const calibration = captureCalibrationSnapshot();
 
     return {
       geoSourceCount: GEOGRAPHIC_DATA_SOURCES.length,
@@ -107,6 +112,9 @@ export class MarseilleGeoDebugService {
       estimatedBuildingCount: this.estimatedBuildingCount,
       criticalPlacementErrors: critical,
       audits: this.audits,
+      ombriereLengthDeltaMeters: calibration.ombriereLengthDeltaMeters,
+      ombriereWidthDeltaMeters: calibration.ombriereWidthDeltaMeters,
+      spawnApplyAtRuntime: calibration.spawnApplyAtRuntime,
     };
   }
 
@@ -148,7 +156,9 @@ export class MarseilleGeoDebugService {
       `mirrorErrorMeters: ${snap.mirrorErrorMeters.toFixed(2)}\n\n` +
       `buildingCount: ${snap.buildingCount}\n` +
       `estimatedBuildingCount: ${snap.estimatedBuildingCount}\n` +
-      `criticalPlacementErrors: ${snap.criticalPlacementErrors}\n\n` +
+      `criticalPlacementErrors: ${snap.criticalPlacementErrors}\n` +
+      `ombriereDelta: ${snap.ombriereLengthDeltaMeters.toFixed(1)}×${snap.ombriereWidthDeltaMeters.toFixed(1)} m\n` +
+      `spawnApplyAtRuntime: ${snap.spawnApplyAtRuntime}\n\n` +
       (auditLines || '(no building audits yet)');
   }
 }

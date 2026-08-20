@@ -7,6 +7,8 @@ import {
   storeUniverse,
 } from '../../particle-background/star-conquest/star-conquest-universes.config';
 import {
+  STAR_CONQUEST_DESIGN_VIEWPORT,
+  STAR_CONQUEST_OVERLAY,
   STAR_CONQUEST_SCALE,
   STAR_CONQUEST_SCALE_TIER,
 } from '../../particle-background/star-conquest/star-conquest-scale';
@@ -53,6 +55,16 @@ export class StarConquestUniverseService {
     root.style.setProperty('--sc-scale', String(STAR_CONQUEST_SCALE.visual));
     root.style.setProperty('--sc-ui-scale', String(STAR_CONQUEST_SCALE.ui));
     root.style.setProperty('--sc-scale-tier', STAR_CONQUEST_SCALE_TIER);
+    root.style.setProperty('--sc-vp-w', `${STAR_CONQUEST_DESIGN_VIEWPORT.w}px`);
+    root.style.setProperty('--sc-vp-h', `${STAR_CONQUEST_DESIGN_VIEWPORT.h}px`);
+    root.style.setProperty('--sc-overlay-panel-w', `${STAR_CONQUEST_OVERLAY.panelW}px`);
+    root.style.setProperty(
+      '--sc-overlay-panel-compact-w',
+      `${STAR_CONQUEST_OVERLAY.panelCompactW}px`
+    );
+    root.style.setProperty('--sc-overlay-scanner-w', `${STAR_CONQUEST_OVERLAY.scannerW}px`);
+    root.style.setProperty('--sc-overlay-scanner-h', `${STAR_CONQUEST_OVERLAY.scannerMaxH}px`);
+    root.style.setProperty('--sc-overlay-floor-chrome', `${STAR_CONQUEST_OVERLAY.floorChromeH}px`);
     root.style.setProperty(
       '--sc-universe-aurora-rgb',
       `${Math.round(theme.auroraRgb[0] * 255)}, ${Math.round(theme.auroraRgb[1] * 255)}, ${Math.round(theme.auroraRgb[2] * 255)}`

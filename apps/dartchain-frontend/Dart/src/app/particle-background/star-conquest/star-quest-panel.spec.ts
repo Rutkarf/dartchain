@@ -79,7 +79,10 @@ describe('StarQuestPanelComponent', () => {
     ) as HTMLButtonElement;
     expect(cta.disabled).toBe(false);
     expect(cta.textContent).toContain('Conquérir');
-    expect(fixture.nativeElement.textContent).toContain('pas de crédit faucet');
+    // Hint produit (pas de faucet) reste dans le view model — panneau compact ne l’affiche plus
+    expect(fixture.componentInstance.view()?.hint).toContain('pas de crédit faucet');
+    expect(fixture.nativeElement.querySelector('.star-quest-panel__status')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.star-quest-panel__live')).toBeNull();
     cta.click();
     fixture.detectChanges();
     const progress = TestBed.inject(StarConquestProgressService);
