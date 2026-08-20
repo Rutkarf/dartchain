@@ -1,6 +1,8 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { QuestsPanelService } from '../../features/quests-panel/quests-panel.service';
+import { StarConquestFacade } from './star-conquest.facade';
 import type { QuestTaskView } from '../../features/quests-panel/quests-panel.model';
 import { STAR_CONQUEST_MOCK_QUESTS } from '../../particle-background/star-conquest/star-conquest.mock';
 import type { StarQuest } from '../../particle-background/star-conquest/star-conquest.model';
@@ -36,6 +38,8 @@ import {
 @Injectable({ providedIn: 'root' })
 export class StarConquestProgressService {
   private readonly questsPanel = inject(QuestsPanelService);
+  private readonly facade = inject(StarConquestFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly catalog = STAR_CONQUEST_MOCK_QUESTS;
   readonly catalogCount = STAR_CONQUEST_MOCK_QUESTS.length;
@@ -59,9 +63,11 @@ export class StarConquestProgressService {
   readonly kpiLine = computed(() => formatStarConquestKpiLine(this.commercial()));
 
   constructor() {
-    this.questsPanel.state$.subscribe((state) => {
-      this.syncFromLiveQuests(this.questsPanel.buildTaskViews(state));
-    });
+    this.questsPanel.state$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((state) => {
+        this.syncFromLiveQuests(this.questsPanel.buildTaskViews(state));
+      });
   }
 
   hydrateCatalog(
@@ -117,11 +123,7 @@ export class StarConquestProgressService {
     }
     const next = markStarQuestsClaimed(this.catalog, this.store(), [questId]);
     this.persist(next);
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(
-        new CustomEvent('star-conquest-progress', { detail: { questId } })
-      );
-    }
+    this.facade.notifyProgress(questId);
     const claimed = this.hydrateCatalog().find((item) => item.id === questId);
     if (!claimed) {
       return { ok: false, reason: 'missing', snapshot: this.store() };
@@ -144,9 +146,7 @@ export class StarConquestProgressService {
     );
     if (next === this.store()) return;
     this.persist(next);
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('star-conquest-progress'));
-    }
+    this.facade.notifyProgress();
   }
 
   private persist(snapshot: StarConquestProgressSnapshot): void {

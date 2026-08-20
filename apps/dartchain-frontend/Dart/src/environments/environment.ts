@@ -2,6 +2,10 @@ export interface ProductEnvironment {
   commercial: boolean;
   faucetEnabled: boolean;
   showcaseEnabled: boolean;
+  /** Overlays panel + scanner. Le canvas WebGL reste monté. */
+  starConquestOverlayEnabled?: boolean;
+  /** Ligne KPI R&D dans le scanner — pas un UX utilisateur. */
+  starConquestKpiDebug?: boolean;
 }
 
 export interface MapEnvironment {
@@ -32,6 +36,8 @@ export const environment = {
   commercial: false,
   faucetEnabled: true,
   showcaseEnabled: true,
+  starConquestOverlayEnabled: true,
+  starConquestKpiDebug: true,
   mapEnabled: true,
   mapProvider: 'marseille-osm-three',
   enableOsmBuildings: true,

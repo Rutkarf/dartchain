@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { KNOWLEDGE_GRAPH_COLORS } from '../knowledge-graph/knowledge-graph.config';
 import type { KnowledgeGraphStore } from '../knowledge-graph/knowledge-graph.store';
 import type {
-  KnowledgeEdge,
   KnowledgeNode,
   QuestVisualizationMode,
   VirtualAIAgent,
@@ -10,9 +9,13 @@ import type {
 import type { StarConquestUniverseTheme } from './star-conquest-universe.types';
 import { createSoftDiscTexture } from './star-conquest-visuals';
 import { STAR_CONQUEST_SCALE, scaledTextureSize } from './star-conquest-scale';
+import {
+  questEchoOffset,
+  questIndexForId,
+  type StarQuestAnchor,
+} from './star-conquest-anchors';
 
 const MAX_NETWORK_NODES = 48;
-const MAX_NETWORK_EDGES = 96;
 
 function hexToRgb01(hex: string): [number, number, number] {
   const h = hex.replace('#', '');
@@ -25,8 +28,8 @@ function hexToRgb01(hex: string): [number, number, number] {
 }
 
 /**
- * Couche réseau IA/P2P intégrée au graphe Star Conquest (même groupe, même langage visuel).
- * Les quêtes restent les particules principales ; peers/agents/system = satellites neuronal.
+ * Couche réseau IA/P2P intégrée au graphe Star Conquest.
+ * Chaque satellite (peer / agent / system) orbite une Quest — pas de nœud orphelin.
  */
 export class StarConquestNetworkLayer {
   readonly group = new THREE.Group();
@@ -46,6 +49,8 @@ export class StarConquestNetworkLayer {
   private orbitPhase = 0;
   private nodeIds: string[] = [];
   private basePositions = new Float32Array(0);
+  private questIndexByNode: number[] = [];
+  private anchors: readonly StarQuestAnchor[] = [];
 
   constructor() {
     this.group.name = 'star-conquest-network';
@@ -67,6 +72,7 @@ export class StarConquestNetworkLayer {
     this.nodePoints = new THREE.Points(nodeGeom, nodeMat);
     this.nodePoints.name = 'sc-network-nodes';
     this.nodePoints.frustumCulled = false;
+    this.nodePoints.raycast = () => {};
 
     const haloGeom = nodeGeom.clone();
     const haloMat = new THREE.PointsMaterial({
@@ -113,8 +119,9 @@ export class StarConquestNetworkLayer {
     this.focusId = nodeId;
   }
 
-  syncFromStore(store: KnowledgeGraphStore): void {
-    if (this.mode === 'legacy-particles') {
+  syncFromStore(store: KnowledgeGraphStore, anchors: readonly StarQuestAnchor[] = []): void {
+    this.anchors = anchors;
+    if (this.mode === 'legacy-particles' || anchors.length === 0) {
       this.clearBuffers();
       return;
     }
@@ -123,23 +130,16 @@ export class StarConquestNetworkLayer {
     if (this.mode === 'hybrid') {
       nodes = nodes.filter((n) => ['peer', 'ai-agent', 'system', 'cluster'].includes(n.type));
     }
-    nodes = nodes.slice(0, MAX_NETWORK_NODES);
-
-    const nodeIds = new Set(nodes.map((n) => n.id));
-    const edges = store
-      .getPublicEdges()
-      .filter(
-        (e) =>
-          e.type === 'synced-with' ||
-          e.type === 'observed-by' ||
-          e.type === 'connected-to'
-      )
-      .filter((e) => nodeIds.has(e.sourceId) && nodeIds.has(e.targetId))
-      .slice(0, MAX_NETWORK_EDGES);
+    nodes = nodes.slice(0, Math.min(MAX_NETWORK_NODES, anchors.length));
 
     const agents = store.getAllAgents();
-    this.rebuildNodes(nodes, agents);
-    this.rebuildEdges(edges, nodes);
+    this.rebuildNodes(nodes, agents, anchors);
+  }
+
+  followQuestAnchors(anchors: readonly StarQuestAnchor[]): void {
+    this.anchors = anchors;
+    if (anchors.length === 0 || this.questIndexByNode.length === 0) return;
+    this.writeSatellitePositions(anchors);
   }
 
   tick(deltaMs: number, universe?: StarConquestUniverseTheme): void {
@@ -154,29 +154,27 @@ export class StarConquestNetworkLayer {
     const lineMat = this.networkLines.material as THREE.LineBasicMaterial;
     lineMat.opacity = 0.4 + Math.sin(this.pulsePhase * 1.2) * 0.12;
 
-    if (
-      universe?.peerLayout === 'orbital-rings' ||
-      universe?.peerLayout === 'swarm-orbit'
-    ) {
-      this.animateOrbitalPeers(universe.peerLayout);
-    }
+    this.writeSatellitePositions(this.anchors);
+    void universe;
   }
 
-  private animateOrbitalPeers(layout: StarConquestUniverseTheme['peerLayout']): void {
+  private writeSatellitePositions(anchors: readonly StarQuestAnchor[]): void {
+    if (anchors.length === 0 || this.nodeIds.length === 0) return;
     const posAttr = this.nodePoints.geometry.getAttribute('position') as THREE.BufferAttribute;
-    const speed = layout === 'swarm-orbit' ? 0.16 : 0.6;
+    const layout = STAR_CONQUEST_SCALE.layout;
     for (let i = 0; i < this.nodeIds.length; i++) {
+      const qi = this.questIndexByNode[i] ?? questIndexForId(this.nodeIds[i], anchors.length);
+      const quest = anchors[qi % anchors.length];
+      const off = questEchoOffset(this.nodeIds[i], 'sat', 11 * layout);
+      const angle = this.orbitPhase * 0.22 + i * 0.51;
+      const x = quest.x + off.x + Math.cos(angle) * 2.4;
+      const y = quest.y + off.y + Math.sin(angle) * 2.4;
+      const z = quest.z + off.z - 5;
+      posAttr.setXYZ(i, x, y, z);
       const i3 = i * 3;
-      const bx = this.basePositions[i3];
-      const by = this.basePositions[i3 + 1];
-      const bz = this.basePositions[i3 + 2];
-      const angle = this.orbitPhase * speed + i * 0.4;
-      const wobble = Math.sin(angle) * 1.2;
-      const x = bx + Math.cos(angle) * wobble;
-      const y = by + Math.sin(angle) * wobble;
-      posAttr.setXYZ(i, x, y, bz);
       this.positions[i3] = x;
       this.positions[i3 + 1] = y;
+      this.positions[i3 + 2] = z;
     }
     posAttr.needsUpdate = true;
     const haloAttr = this.haloPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
@@ -184,6 +182,30 @@ export class StarConquestNetworkLayer {
       haloAttr.setXYZ(i, posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
     }
     haloAttr.needsUpdate = true;
+
+    const lineCount = this.nodeIds.length;
+    if (this.linePositions.length !== lineCount * 6) {
+      this.linePositions = new Float32Array(lineCount * 6);
+      this.lineColors = new Float32Array(lineCount * 6);
+    }
+    for (let i = 0; i < lineCount; i++) {
+      const qi = this.questIndexByNode[i] ?? 0;
+      const quest = anchors[qi % anchors.length];
+      const i6 = i * 6;
+      this.linePositions[i6] = this.positions[i * 3];
+      this.linePositions[i6 + 1] = this.positions[i * 3 + 1];
+      this.linePositions[i6 + 2] = this.positions[i * 3 + 2];
+      this.linePositions[i6 + 3] = quest.x;
+      this.linePositions[i6 + 4] = quest.y;
+      this.linePositions[i6 + 5] = quest.z;
+      const rgb = quest.rgb;
+      for (let k = 0; k < 6; k += 3) {
+        this.lineColors[i6 + k] = rgb[0] * 0.55;
+        this.lineColors[i6 + k + 1] = rgb[1] * 0.55;
+        this.lineColors[i6 + k + 2] = rgb[2] * 0.7;
+      }
+    }
+    this.applyGeom(this.networkLines, this.linePositions, this.lineColors);
   }
 
   getNodeWorldPosition(nodeId: string, out = new THREE.Vector3()): THREE.Vector3 | null {
@@ -211,8 +233,8 @@ export class StarConquestNetworkLayer {
   }
 
   private clearBuffers(): void {
-    this.idToIndex.clear();
-    this.positions = new Float32Array(0);
+    this.nodeIds = [];
+    this.questIndexByNode = [];
     this.colors = new Float32Array(0);
     this.applyGeom(this.nodePoints, this.positions, this.colors);
     this.applyGeom(this.haloPoints, this.positions, this.colors);
@@ -221,12 +243,17 @@ export class StarConquestNetworkLayer {
     this.applyGeom(this.networkLines, this.linePositions, this.lineColors);
   }
 
-  private rebuildNodes(nodes: KnowledgeNode[], agents: VirtualAIAgent[]): void {
+  private rebuildNodes(
+    nodes: KnowledgeNode[],
+    agents: VirtualAIAgent[],
+    anchors: readonly StarQuestAnchor[]
+  ): void {
     const agentByNode = new Map(agents.map((a) => [a.nodeId, a]));
     this.positions = new Float32Array(nodes.length * 3);
     this.colors = new Float32Array(nodes.length * 3);
     this.basePositions = new Float32Array(nodes.length * 3);
     this.nodeIds = nodes.map((n) => n.id);
+    this.questIndexByNode = nodes.map((n) => questIndexForId(n.id, anchors.length));
     this.idToIndex.clear();
 
     nodes.forEach((node, i) => {
@@ -267,33 +294,7 @@ export class StarConquestNetworkLayer {
 
     this.applyGeom(this.nodePoints, this.positions, this.colors);
     this.applyGeom(this.haloPoints, this.positions, this.colors);
-  }
-
-  private rebuildEdges(edges: KnowledgeEdge[], nodes: KnowledgeNode[]): void {
-    const posById = new Map(nodes.map((n) => [n.id, n.position]));
-    this.linePositions = new Float32Array(edges.length * 6);
-    this.lineColors = new Float32Array(edges.length * 6);
-
-    edges.forEach((edge, i) => {
-      const a = posById.get(edge.sourceId);
-      const b = posById.get(edge.targetId);
-      if (!a || !b) return;
-      const i6 = i * 6;
-      this.linePositions[i6] = a.x;
-      this.linePositions[i6 + 1] = a.y;
-      this.linePositions[i6 + 2] = a.z;
-      this.linePositions[i6 + 3] = b.x;
-      this.linePositions[i6 + 4] = b.y;
-      this.linePositions[i6 + 5] = b.z;
-      const alpha = edge.type === 'synced-with' ? 0.9 : 0.55;
-      for (let k = 0; k < 6; k += 3) {
-        this.lineColors[i6 + k] = 0.35 * alpha;
-        this.lineColors[i6 + k + 1] = 0.85 * alpha;
-        this.lineColors[i6 + k + 2] = 1 * alpha;
-      }
-    });
-
-    this.applyGeom(this.networkLines, this.linePositions, this.lineColors);
+    this.writeSatellitePositions(anchors);
   }
 
   private applyGeom(

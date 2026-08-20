@@ -13,5 +13,7 @@ describe('ProductConfigService', () => {
     expect(typeof service.commercial).toBe('boolean');
     expect(service.faucetEnabled).toBe(true);
     expect(typeof service.showcaseEnabled).toBe('boolean');
+    expect(typeof service.starConquestOverlayEnabled).toBe('boolean');
+    expect(typeof service.starConquestKpiDebug).toBe('boolean');
   });
 });

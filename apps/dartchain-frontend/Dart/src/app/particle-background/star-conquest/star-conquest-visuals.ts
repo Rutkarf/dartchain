@@ -10,27 +10,27 @@ export function createSoftDiscTexture(size = 64): THREE.CanvasTexture {
   ]);
 }
 
-/** Noyau d’étoile : cœur blanc saturé + micro-croix (look produit). */
+/** Noyau d’étoile : verre obsidienne — cœur saturé + micro-spikes de diffraction. */
 export function createStarCoreTexture(size = 64): THREE.CanvasTexture {
   const tex = createRadialDiscTexture(size, [
     [0, 'rgba(255,255,255,1)'],
-    [0.08, 'rgba(255,255,255,1)'],
-    [0.18, 'rgba(255,255,255,0.92)'],
-    [0.36, 'rgba(255,255,255,0.28)'],
-    [0.58, 'rgba(255,255,255,0.06)'],
+    [0.05, 'rgba(255,255,255,1)'],
+    [0.12, 'rgba(236,248,255,0.95)'],
+    [0.26, 'rgba(180,220,255,0.38)'],
+    [0.48, 'rgba(140,170,255,0.08)'],
     [1, 'rgba(255,255,255,0)'],
   ]);
-  paintStarCross(tex, size, 0.55);
+  paintStarCross(tex, size, 0.42);
   return tex;
 }
 
-/** Bloom local (couronne additive large). */
+/** Bloom local (couronne additive serrée — pas de lait). */
 export function createStarBloomTexture(size = 96): THREE.CanvasTexture {
   return createRadialDiscTexture(size, [
-    [0, 'rgba(255,255,255,0.78)'],
-    [0.14, 'rgba(255,255,255,0.42)'],
-    [0.4, 'rgba(255,255,255,0.14)'],
-    [0.72, 'rgba(255,255,255,0.04)'],
+    [0, 'rgba(220,240,255,0.55)'],
+    [0.12, 'rgba(180,210,255,0.28)'],
+    [0.36, 'rgba(140,180,255,0.1)'],
+    [0.68, 'rgba(255,255,255,0.03)'],
     [1, 'rgba(255,255,255,0)'],
   ]);
 }
@@ -77,21 +77,21 @@ function paintStarCross(tex: THREE.CanvasTexture, size: number, alpha: number): 
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
-  ctx.lineWidth = Math.max(1, size * 0.034);
+  ctx.lineWidth = Math.max(1, size * 0.022);
   ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.moveTo(cx, size * 0.08);
-  ctx.lineTo(cx, size * 0.92);
-  ctx.moveTo(size * 0.08, cx);
-  ctx.lineTo(size * 0.92, cx);
+  ctx.moveTo(cx, size * 0.16);
+  ctx.lineTo(cx, size * 0.84);
+  ctx.moveTo(size * 0.16, cx);
+  ctx.lineTo(size * 0.84, cx);
   ctx.stroke();
-  ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.45})`;
-  ctx.lineWidth = Math.max(1, size * 0.016);
+  ctx.strokeStyle = `rgba(210,230,255,${alpha * 0.38})`;
+  ctx.lineWidth = Math.max(1, size * 0.012);
   ctx.beginPath();
-  ctx.moveTo(size * 0.22, size * 0.22);
-  ctx.lineTo(size * 0.78, size * 0.78);
-  ctx.moveTo(size * 0.78, size * 0.22);
-  ctx.lineTo(size * 0.22, size * 0.78);
+  ctx.moveTo(size * 0.28, size * 0.28);
+  ctx.lineTo(size * 0.72, size * 0.72);
+  ctx.moveTo(size * 0.72, size * 0.28);
+  ctx.lineTo(size * 0.28, size * 0.72);
   ctx.stroke();
   ctx.restore();
   tex.needsUpdate = true;
@@ -99,7 +99,7 @@ function paintStarCross(tex: THREE.CanvasTexture, size: number, alpha: number): 
 
 /** Taille visuelle liée au gain M4T3R (discret, plan interactif). */
 export function sizeFromReward(reward: number, rarityBoost = 0): number {
-  const base = 1.58 + Math.min(1.35, Math.log10(Math.max(reward, 1) + 1) * 0.68);
+  const base = 1.72 + Math.min(1.48, Math.log10(Math.max(reward, 1) + 1) * 0.72);
   return base + rarityBoost;
 }
 

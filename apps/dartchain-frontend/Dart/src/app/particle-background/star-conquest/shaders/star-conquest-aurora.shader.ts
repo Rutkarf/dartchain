@@ -43,14 +43,16 @@ float fbm(vec2 p) {
 
 void main() {
   vec2 uv = vUv;
-  vec2 p = (uv - 0.5) * vec2(1.7, 1.0);
-  float n = fbm(p * 2.6 + vec2(uTime * 0.035, -uTime * 0.022));
-  float ridges = smoothstep(0.52, 0.78, n) * (0.45 + 0.55 * n);
-  float veins = pow(max(0.0, n - 0.42), 1.6);
-  float mixAmt = clamp(ridges + veins * 0.65, 0.0, 1.0);
+  vec2 p = (uv - 0.5) * vec2(1.85, 1.0);
+  float n = fbm(p * 3.1 + vec2(uTime * 0.028, -uTime * 0.018));
+  float ridges = smoothstep(0.58, 0.84, n) * (0.32 + 0.68 * n);
+  float veins = pow(max(0.0, n - 0.5), 1.85);
+  float mixAmt = clamp(ridges * 0.72 + veins * 0.85, 0.0, 1.0);
   vec3 col = mix(uColorB, uColorA, mixAmt);
-  float vignette = pow(max(0.0, 1.0 - length(uv - 0.5) * 1.42), 1.25);
-  float alpha = mixAmt * vignette * uIntensity * 0.36;
+  float glass = pow(max(0.0, n - 0.62), 2.2);
+  col += vec3(0.55, 0.78, 1.0) * glass * 0.35;
+  float vignette = pow(max(0.0, 1.0 - length(uv - 0.5) * 1.55), 1.45);
+  float alpha = mixAmt * vignette * uIntensity * 0.28;
   gl_FragColor = vec4(col, alpha);
 }
 `;
@@ -61,7 +63,7 @@ export function createStarConquestAuroraMaterial(): THREE.ShaderMaterial {
       uTime: { value: 0 },
       uColorA: { value: new THREE.Color(0.32, 0.9, 0.93) },
       uColorB: { value: new THREE.Color(0.65, 0.35, 0.98) },
-      uIntensity: { value: 0.58 },
+      uIntensity: { value: 0.54 },
     },
     vertexShader: STAR_CONQUEST_AURORA_VERTEX,
     fragmentShader: STAR_CONQUEST_AURORA_FRAGMENT,

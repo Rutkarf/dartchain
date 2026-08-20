@@ -46,15 +46,16 @@ varying float vAlong;
 varying float vSide;
 
 void main() {
-  float fade = smoothstep(0.0, 0.12, vAlong) * smoothstep(1.0, 0.88, vAlong);
+  float fade = smoothstep(0.0, 0.1, vAlong) * smoothstep(1.0, 0.9, vAlong);
   float edge = 1.0 - abs(vSide);
-  float core = smoothstep(0.15, 0.92, edge);
-  float glow = pow(max(edge, 0.0), 1.45);
-  float sparkT = fract(vAlong * 1.35 - uTime * 0.38);
-  float spark = smoothstep(0.0, 0.08, sparkT) * smoothstep(0.22, 0.1, sparkT);
-  float pulse = 0.78 + 0.22 * sin(uTime * 2.05 + vAlong * 12.566);
-  float alpha = uOpacity * fade * (glow * 0.5 + core * 0.85 + spark * 0.95) * pulse;
-  vec3 col = vColor * (0.55 + core * 0.85 + spark * 1.35);
+  float core = smoothstep(0.22, 0.96, edge);
+  float glow = pow(max(edge, 0.0), 1.7);
+  float sparkT = fract(vAlong * 1.55 - uTime * 0.42);
+  float spark = smoothstep(0.0, 0.06, sparkT) * smoothstep(0.18, 0.08, sparkT);
+  float pulse = 0.82 + 0.18 * sin(uTime * 1.85 + vAlong * 12.566);
+  float alpha = uOpacity * fade * (glow * 0.38 + core * 1.05 + spark * 1.15) * pulse;
+  vec3 col = vColor * (0.42 + core * 1.15 + spark * 1.55);
+  col += vec3(0.45, 0.78, 1.0) * spark * 0.35;
   gl_FragColor = vec4(col, alpha);
 }
 `;
@@ -90,7 +91,7 @@ export function createFilamentRibbonMaterial(): THREE.ShaderMaterial {
     uniforms: {
       uResolution: { value: new THREE.Vector2(250, 550) },
       uWidthPx: { value: STAR_CONQUEST_SCALE.filamentWidthPx },
-      uOpacity: { value: 0.68 },
+      uOpacity: { value: 0.86 },
       uTime: { value: 0 },
       uQuantum: { value: 0.38 },
     },

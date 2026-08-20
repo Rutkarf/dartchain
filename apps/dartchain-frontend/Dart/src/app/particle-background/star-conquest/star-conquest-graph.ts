@@ -24,6 +24,7 @@ import { STAR_CONSTELLATIONS } from './star-conquest-constellations';
 import { StarConquestNetworkLayer } from './star-conquest-network.layer';
 import { StarConquestBackground } from './star-conquest-background';
 import { StarConquestEffects } from './star-conquest-effects';
+import type { StarQuestAnchor } from './star-conquest-anchors';
 import type { KnowledgeGraphStore } from '../knowledge-graph/knowledge-graph.store';
 import type { QuestVisualizationMode } from '../../core/map/map-configuration';
 import type { StarConquestUniverseTheme } from './star-conquest-universe.types';
@@ -51,24 +52,24 @@ function hashFloat(id: string): number {
 }
 
 const RARITY_BOOST: Record<StarQuestRarity, number> = {
-  common: 0,
-  rare: 0.15,
-  epic: 0.28,
-  legendary: 0.42,
+  common: 0.04,
+  rare: 0.2,
+  epic: 0.34,
+  legendary: 0.5,
 };
 
 const STATUS_BRIGHT: Record<StarQuestStatus, number> = {
-  available: 1.05,
-  locked: 0.42,
-  active: 1.12,
-  completed: 0.9,
-  future: 0.38,
+  available: 1.1,
+  locked: 0.38,
+  active: 1.2,
+  completed: 0.88,
+  future: 0.34,
 };
 
 const LINKED_BOOST = 1.22;
 /** Voisinage Obsidian : hors 1-hop le graphe s’éteint. */
 const DIM_FACTOR = 0.08;
-const MAX_ENERGY_PACKETS = 16;
+const MAX_ENERGY_PACKETS = 24;
 /** Brins par arête — un filament clair (liaison fiable entre particules). */
 const LINE_STRANDS = 1;
 /** Ressort léger le long des arêtes (respiration type Obsidian). */
@@ -299,7 +300,7 @@ export class StarConquestGraph {
       map: this.coreTexture,
       color: 0xffffff,
       transparent: true,
-      opacity: 0.98,
+      opacity: 1,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -316,7 +317,7 @@ export class StarConquestGraph {
       map: this.discTexture,
       color: 0xffffff,
       transparent: true,
-      opacity: 0.38,
+      opacity: 0.3,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -334,7 +335,7 @@ export class StarConquestGraph {
       map: this.bloomTexture,
       color: 0xffffff,
       transparent: true,
-      opacity: 0.26,
+      opacity: 0.18,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -403,9 +404,9 @@ export class StarConquestGraph {
       new THREE.BufferAttribute(this.constellationPositions, 3)
     );
     const guideMat = new THREE.LineBasicMaterial({
-      color: 0x6a7a99,
+      color: 0x88d4f0,
       transparent: true,
-      opacity: 0.07,
+      opacity: 0.16,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -480,7 +481,7 @@ export class StarConquestGraph {
     );
     packetGeom.setAttribute('color', new THREE.BufferAttribute(this.packetColors, 3));
     const packetMat = new THREE.PointsMaterial({
-      size: 5.2 * STAR_CONQUEST_SCALE.visual,
+      size: 6.8 * STAR_CONQUEST_SCALE.visual,
       map: this.coreTexture,
       color: 0xffffff,
       transparent: true,
@@ -537,6 +538,7 @@ export class StarConquestGraph {
       this.restoreQuestDepthFromLayout();
     }
     this.applyVisualizationMode();
+    this.syncQuestBoundLayers();
   }
 
   getUniverse(): StarConquestUniverseTheme {
@@ -558,7 +560,7 @@ export class StarConquestGraph {
 
   syncKnowledgeGraph(store: KnowledgeGraphStore): void {
     this.networkLayer.setVisualizationMode(this.visualizationMode);
-    this.networkLayer.syncFromStore(store);
+    this.networkLayer.syncFromStore(store, this.collectQuestAnchors());
   }
 
   setNetworkFocus(nodeId: string | null): void {
@@ -578,12 +580,36 @@ export class StarConquestGraph {
     this.filamentRibbon.visible = showLinks;
     const guideMat = this.constellationGuides.material as THREE.LineBasicMaterial;
     guideMat.opacity = theme.constellationOpacity;
+    guideMat.color.setRGB(theme.auroraRgb[0], theme.auroraRgb[1], theme.auroraRgb[2]);
     this.constellationGuides.visible =
       theme.showConstellations && theme.constellationOpacity > 0;
     this.lineCoreMat.uniforms['uOpacity'].value = Math.min(0.98, theme.linkOpacity + 0.32);
     this.filamentMat.uniforms['uOpacity'].value = Math.min(0.88, theme.linkOpacity + 0.22);
     this.filamentMat.uniforms['uWidthPx'].value = STAR_CONQUEST_SCALE.filamentWidthPx;
     this.networkLayer.setVisualizationMode(this.visualizationMode);
+  }
+
+  private collectQuestAnchors(): StarQuestAnchor[] {
+    const pos = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const anchors: StarQuestAnchor[] = [];
+    for (let i = 0; i < this.quests.length; i++) {
+      const rgb = familyTheme(this.quests[i].family).rgb;
+      anchors.push({
+        id: this.quests[i].id,
+        x: pos.getX(i),
+        y: pos.getY(i),
+        z: pos.getZ(i),
+        rgb,
+      });
+    }
+    return anchors;
+  }
+
+  private syncQuestBoundLayers(): void {
+    const anchors = this.collectQuestAnchors();
+    this.background.followQuestAnchors(anchors);
+    this.effects.followQuestAnchors(anchors);
+    this.networkLayer.followQuestAnchors(anchors);
   }
 
   private questPointSizes(pulse = 1): {
@@ -594,9 +620,9 @@ export class StarConquestGraph {
   } {
     const visual = STAR_CONQUEST_SCALE.visual;
     const theme = this.universeTheme;
-    const core = this.meanCoreSize * 0.86 * theme.coreSizeMult * visual * pulse;
-    const halo = this.meanCoreSize * 3.45 * theme.haloSizeMult * visual * pulse;
-    const bloom = this.meanCoreSize * 7.6 * theme.haloSizeMult * visual * pulse;
+    const core = this.meanCoreSize * 1.02 * theme.coreSizeMult * visual * pulse;
+    const halo = this.meanCoreSize * 3.35 * theme.haloSizeMult * visual * pulse;
+    const bloom = this.meanCoreSize * 6.9 * theme.haloSizeMult * visual * pulse;
     return { core, halo, bloom, ghost: core * 0.92 };
   }
 
@@ -648,6 +674,12 @@ export class StarConquestGraph {
 
   get questCount(): number {
     return this.quests.length;
+  }
+
+  /** Cœurs interactifs — toujours égal au catalogue (1 particule = 1 Quest). */
+  get questCoreCount(): number {
+    return (this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute)
+      .count;
   }
 
   getQuest(id: string): StarQuest | undefined {
@@ -1436,6 +1468,7 @@ export class StarConquestGraph {
 
     this.background.tick(deltaMs);
     this.effects.tick(deltaMs);
+    this.syncQuestBoundLayers();
     this.networkLayer.tick(deltaMs, this.universeTheme);
 
     const linePos = this.connectionLines.geometry.getAttribute(
@@ -1800,7 +1833,7 @@ export class StarConquestGraph {
       const zAvg = (az + bz) * 0.5;
       const depthFade = 0.8 + Math.max(-0.2, Math.min(0.22, zAvg * 0.008));
       // Hiérarchie : focus > même famille > passif ; dim Obsidian hors voisinage
-      let intensity = focused ? 0.95 : same ? 0.58 : 0.4;
+      let intensity = focused ? 0.98 : same ? 0.68 : 0.5;
       if (dim) intensity = 0.08;
       const flow =
         0.85 +

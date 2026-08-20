@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { StarConquestFacade } from './star-conquest.facade';
 import {
   DEFAULT_STAR_CONQUEST_UNIVERSE,
   loadStoredUniverse,
@@ -19,6 +20,7 @@ import type {
  */
 @Injectable({ providedIn: 'root' })
 export class StarConquestUniverseService {
+  private readonly facade = inject(StarConquestFacade);
   readonly universeId = signal<StarConquestUniverseId>(loadStoredUniverse());
   readonly theme = signal<StarConquestUniverseTheme>(
     starConquestUniverseTheme(loadStoredUniverse())
@@ -33,9 +35,7 @@ export class StarConquestUniverseService {
     if (typeof document !== 'undefined') {
       this.applyCssBackground(this.theme());
     }
-    window.dispatchEvent(
-      new CustomEvent('star-conquest-universe-change', { detail: { universeId: id } })
-    );
+    this.facade.notifyUniverseChange(id);
   }
 
   cycleUniverse(): StarConquestUniverseId {

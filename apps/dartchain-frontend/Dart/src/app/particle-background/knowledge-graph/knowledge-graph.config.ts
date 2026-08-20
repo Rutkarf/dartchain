@@ -33,7 +33,7 @@ export const QUEST_ORBIT_CONFIG = {
 
 /** Cyberpunk palette — debug colors per entity type. */
 export const KNOWLEDGE_GRAPH_COLORS = {
-  localNode: '#3ecfdc',
+  localNode: '#4fe0ec',
   remoteNode: '#9b59ff',
   aiAgentActive: '#ffe066',
   peerSynced: '#3dff8a',

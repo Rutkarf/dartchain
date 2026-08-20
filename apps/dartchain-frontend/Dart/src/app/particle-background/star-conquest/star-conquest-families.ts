@@ -27,17 +27,17 @@ export const STAR_QUEST_FAMILIES: Record<StarQuestFamily, StarQuestFamilyTheme> 
     id: 'interface',
     label: 'Interface',
     // Floor cyan legacy #00F5FF → un cran adouci
-    hex: '#3ECFDC',
-    rgb: [0.24, 0.81, 0.86],
-    rgb255: [62, 207, 220],
+    hex: '#4FE0EC',
+    rgb: [0.31, 0.88, 0.93],
+    rgb255: [79, 224, 236],
   },
   three: {
     id: 'three',
     label: 'Three.js',
     // Violet UI #c77dff / pillar violet
-    hex: '#A78BFA',
-    rgb: [0.65, 0.55, 0.98],
-    rgb255: [167, 139, 250],
+    hex: '#B794FF',
+    rgb: [0.72, 0.58, 1],
+    rgb255: [183, 148, 255],
   },
   blockchain: {
     id: 'blockchain',
@@ -51,9 +51,9 @@ export const STAR_QUEST_FAMILIES: Record<StarQuestFamily, StarQuestFamilyTheme> 
     id: 'backend',
     label: 'Backend',
     // Vert émeraude chat #5dffb1 → adouci
-    hex: '#4ECD9A',
-    rgb: [0.31, 0.8, 0.6],
-    rgb255: [78, 205, 154],
+    hex: '#56DCA8',
+    rgb: [0.34, 0.86, 0.66],
+    rgb255: [86, 220, 168],
   },
   quality: {
     id: 'quality',

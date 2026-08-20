@@ -30,6 +30,18 @@ case "${MAP_QUALITY}" in
   *) MAP_QUALITY="medium" ;;
 esac
 
+STAR_CONQUEST_OVERLAY_ENABLED="${STAR_CONQUEST_OVERLAY_ENABLED:-true}"
+case "${STAR_CONQUEST_OVERLAY_ENABLED}" in
+  true|1|yes|on) STAR_CONQUEST_OVERLAY_TS="true" ;;
+  *) STAR_CONQUEST_OVERLAY_TS="false" ;;
+esac
+
+STAR_CONQUEST_KPI_DEBUG="${STAR_CONQUEST_KPI_DEBUG:-false}"
+case "${STAR_CONQUEST_KPI_DEBUG}" in
+  true|1|yes|on) STAR_CONQUEST_KPI_TS="true" ;;
+  *) STAR_CONQUEST_KPI_TS="false" ;;
+esac
+
 cat > "${ROOT}/src/environments/environment.prod.ts" <<EOF
 /** Généré par scripts/build-cloudflare.sh — ne pas éditer manuellement avant un déploiement CF. */
 export const environment = {
@@ -40,6 +52,8 @@ export const environment = {
   commercial: true,
   faucetEnabled: true,
   showcaseEnabled: ${SHOWCASE_TS},
+  starConquestOverlayEnabled: ${STAR_CONQUEST_OVERLAY_TS},
+  starConquestKpiDebug: ${STAR_CONQUEST_KPI_TS},
   mapEnabled: true,
   mapProvider: 'marseille-osm-three',
   enableOsmBuildings: true,

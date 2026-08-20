@@ -40,7 +40,7 @@ export type StarConquestLiveLink =
   | StarConquestLiveHubLink
   | StarConquestLiveNavigateLink;
 
-/** 4 quêtes serveur + 1 hub + 3 surfaces Dock/Showcase. */
+/** 4 quêtes serveur + 1 hub + 5 surfaces Dock/Showcase. */
 export const STAR_CONQUEST_LIVE_LINKS: readonly StarConquestLiveLink[] = [
   {
     kind: 'task',
@@ -93,6 +93,18 @@ export const STAR_CONQUEST_LIVE_LINKS: readonly StarConquestLiveLink[] = [
     starQuestId: 'sc-showcase-chat',
     action: 'showcase-tours',
     ctaLabel: 'Ouvrir Showcase',
+  },
+  {
+    kind: 'navigate',
+    starQuestId: 'sc-dock-peers',
+    action: 'peers',
+    ctaLabel: 'Ouvrir les peers',
+  },
+  {
+    kind: 'navigate',
+    starQuestId: 'sc-r4v3-market',
+    action: 'market',
+    ctaLabel: 'Ouvrir le market',
   },
 ] as const;
 

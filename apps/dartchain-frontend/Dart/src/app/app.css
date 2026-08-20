@@ -270,15 +270,27 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(
-      ellipse 90% 52% at 50% 30%,
-      rgba(var(--sc-universe-aurora-rgb, 255, 199, 82), 0.16) 0%,
-      transparent 56%
+  background:
+    radial-gradient(
+      ellipse 70% 38% at 50% 22%,
+      rgba(var(--sc-universe-aurora-rgb, 97, 219, 245), 0.18) 0%,
+      transparent 52%
     ),
     radial-gradient(
-      ellipse 120% 80% at 50% 40%,
-      var(--sc-universe-bg-center, #08040a) 0%,
-      var(--sc-universe-bg-edge, #160c08) 78%
+      ellipse 36% 22% at 22% 58%,
+      rgba(90, 210, 240, 0.1) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 48% 28% at 78% 68%,
+      rgba(120, 72, 210, 0.14) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 125% 88% at 50% 42%,
+      var(--sc-universe-bg-center, #040308) 0%,
+      var(--sc-universe-bg-edge, #0a0614) 72%,
+      #010104 100%
     );
 }
 

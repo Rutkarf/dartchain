@@ -53,8 +53,9 @@ import { KnowledgeGraphOrchestratorService } from './knowledge-graph/knowledge-g
 import { QUEST_ORBIT_CONFIG } from './knowledge-graph/knowledge-graph.config';
 import { StarConquestProgressService } from '../core/services/star-conquest-progress.service';
 import { StarConquestUniverseService } from '../core/services/star-conquest-universe.service';
+import { StarConquestFacade } from '../core/services/star-conquest.facade';
 import { starConquestUniverseTheme } from './star-conquest/star-conquest-universes.config';
-import type { StarConquestUniverseId } from './star-conquest/star-conquest-universe.types';
+import type { Subscription } from 'rxjs';
 
 /**
  * Arrière-plan global = univers neuronal Star Conquest (z-index 0).
@@ -72,7 +73,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private readonly kgOrchestrator = inject(KnowledgeGraphOrchestratorService);
   private readonly universeService = inject(StarConquestUniverseService);
   private readonly progress = inject(StarConquestProgressService);
+  private readonly facade = inject(StarConquestFacade);
   private readonly zone = inject(NgZone);
+  private facadeSubs: Subscription[] = [];
 
   private scene?: THREE.Scene;
   private camera?: THREE.PerspectiveCamera;
@@ -107,37 +110,37 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private lastAnchorY = 0;
   private occlusionAccMs = 0;
   private labelAccMs = 0;
-  private readonly onDismissEvent = (): void => {
-    this.zone.run(() => this.clearSelection());
-  };
-  private readonly onSelectEvent = (event: Event): void => {
-    const detail = (event as CustomEvent<{ questId: string }>).detail;
-    if (!detail?.questId) return;
-    this.zone.run(() => this.selectById(detail.questId, true));
-  };
-  private readonly onHoverEvent = (event: Event): void => {
-    const detail = (event as CustomEvent<{ questId: string | null }>).detail;
-    if (this.conquestState.selected()) return;
-    this.zone.run(() => {
-      const id = detail?.questId ?? null;
-      this.hoverPreviewId = id;
-      this.conquest?.setFocus(id);
-      this.refreshRewardLabels();
-      if (this.canvas) this.canvas.style.cursor = id ? 'pointer' : 'default';
-    });
-  };
-  private readonly onUniverseChangeEvent = (event: Event): void => {
-    const detail = (event as CustomEvent<{ universeId: StarConquestUniverseId }>).detail;
-    if (!detail?.universeId) return;
-    this.zone.runOutsideAngular(() => {
-      const theme = starConquestUniverseTheme(detail.universeId);
-      this.kgOrchestrator.setUniverse(detail.universeId);
-      this.conquest?.setUniverse(theme);
-    });
-  };
-  private readonly onProgressEvent = (): void => {
-    this.zone.run(() => this.applyRuntimeProgress());
-  };
+  private bindFacade(): void {
+    this.facadeSubs = [
+      this.facade.dismiss$.subscribe(() => this.zone.run(() => this.clearSelection())),
+      this.facade.select$.subscribe((questId) =>
+        this.zone.run(() => this.selectById(questId, true))
+      ),
+      this.facade.hover$.subscribe((detail) => {
+        if (this.conquestState.selected()) return;
+        this.zone.run(() => {
+          const id = detail.questId ?? null;
+          this.hoverPreviewId = id;
+          this.conquest?.setFocus(id);
+          this.refreshRewardLabels();
+          if (this.canvas) this.canvas.style.cursor = id ? 'pointer' : 'default';
+        });
+      }),
+      this.facade.universeChange$.subscribe((universeId) => {
+        this.zone.runOutsideAngular(() => {
+          const theme = starConquestUniverseTheme(universeId);
+          this.kgOrchestrator.setUniverse(universeId);
+          this.conquest?.setUniverse(theme);
+        });
+      }),
+      this.facade.progress$.subscribe(() => this.zone.run(() => this.applyRuntimeProgress())),
+    ];
+  }
+
+  private unbindFacade(): void {
+    for (const sub of this.facadeSubs) sub.unsubscribe();
+    this.facadeSubs = [];
+  }
 
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => this.initWebGl());
@@ -214,11 +217,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.bindPointer(created.canvas);
       this.bindUiWatchers();
       window.addEventListener('resize', this.onWindowLayout, { passive: true });
-      window.addEventListener('star-conquest-dismiss', this.onDismissEvent);
-      window.addEventListener('star-conquest-select', this.onSelectEvent);
-      window.addEventListener('star-conquest-hover', this.onHoverEvent);
-      window.addEventListener('star-conquest-universe-change', this.onUniverseChangeEvent);
-      window.addEventListener('star-conquest-progress', this.onProgressEvent);
+      this.bindFacade();
 
       this.resizeBinding = bindContainerResize(
         this.hostRef.nativeElement,
@@ -241,11 +240,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('star-conquest-dismiss', this.onDismissEvent);
-    window.removeEventListener('star-conquest-select', this.onSelectEvent);
-    window.removeEventListener('star-conquest-hover', this.onHoverEvent);
-    window.removeEventListener('star-conquest-universe-change', this.onUniverseChangeEvent);
-    window.removeEventListener('star-conquest-progress', this.onProgressEvent);
+    this.unbindFacade();
     window.removeEventListener('resize', this.onWindowLayout);
     this.layoutObserver?.disconnect();
     this.unbindPointer();

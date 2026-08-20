@@ -1,32 +1,33 @@
-@if (state.panel(); as panel) {
+@if (view(); as panel) {
   <aside
     class="star-quest-panel"
-    [class.star-quest-panel--compact]="state.panelCompact()"
+    [class.star-quest-panel--compact]="panel.compact"
     role="dialog"
-    aria-modal="false"
-    aria-label="Star Conquest quest"
+    aria-modal="true"
+    aria-labelledby="star-quest-panel-title"
+    [appFocusTrap]="true"
     [attr.data-family]="panel.quest.family"
-    [attr.data-claim]="claimKind()"
-    [attr.data-live]="liveLink() ? 'true' : null"
+    [attr.data-claim]="panel.claimKind"
+    [attr.data-live]="panel.live ? 'true' : null"
     [style.left.px]="panel.x"
     [style.top.px]="panel.y"
-    [style.--sc-family-rgb]="familyRgb(panel.quest.family)"
-    [style.--sc-family-hex]="familyHex(panel.quest.family)"
+    [style.--sc-family-rgb]="panel.familyRgb"
+    [style.--sc-family-hex]="panel.familyHex"
     (pointerdown)="$event.stopPropagation()"
     (click)="$event.stopPropagation()"
   >
     <header class="star-quest-panel__head">
       <div class="star-quest-panel__meta">
         <span class="star-quest-panel__badge star-quest-panel__badge--family">
-          {{ familyLabel(panel.quest.family) }}
+          {{ panel.familyLabel }}
         </span>
         <span
           class="star-quest-panel__badge star-quest-panel__badge--status"
           [attr.data-status]="panel.quest.status"
         >
-          {{ statusLabel(panel.quest.status) }}
+          {{ panel.statusLabel }}
         </span>
-        @if (liveLink()) {
+        @if (panel.live) {
           <span class="star-quest-panel__badge star-quest-panel__badge--live">Live</span>
         }
       </div>
@@ -41,57 +42,27 @@
       </button>
     </header>
 
-    <h2 class="star-quest-panel__title">{{ panel.quest.title }}</h2>
+    <h2 id="star-quest-panel-title" class="star-quest-panel__title">{{ panel.quest.title }}</h2>
     <p class="star-quest-panel__desc">{{ panel.quest.description }}</p>
 
     <footer class="star-quest-panel__reward">
-      @if (liveTask(); as task) {
-        <span class="star-quest-panel__reward-label">Quête Dock</span>
-        <strong class="star-quest-panel__reward-value"
-          >{{ task.rewardMts }} MTS · {{ task.rewardXp }} XP</strong
-        >
-      } @else if (liveLink()?.kind === 'navigate') {
-        <span class="star-quest-panel__reward-label">Surface produit</span>
-        <strong class="star-quest-panel__reward-value">Ouvrir dans l’app</strong>
-      } @else if (liveLink()) {
-        <span class="star-quest-panel__reward-label">Hub live</span>
-        <strong class="star-quest-panel__reward-value">4 quêtes Dock</strong>
-      } @else {
-        <span class="star-quest-panel__reward-label">
-          {{ claimKind() === 'completed' ? 'Preview local' : 'Gain estimé' }}
-        </span>
-        <strong class="star-quest-panel__reward-value"
-          >{{ panel.quest.rewardM4T3R }} M4T3R</strong
-        >
-      }
+      <span class="star-quest-panel__reward-label">{{ panel.rewardLabel }}</span>
+      <strong class="star-quest-panel__reward-value">{{ panel.rewardValue }}</strong>
     </footer>
 
     <button
       type="button"
       class="star-quest-panel__claim"
-      [disabled]="!ctaEnabled()"
-      [attr.aria-label]="ctaLabel()"
+      [disabled]="!panel.ctaEnabled"
+      [attr.aria-label]="panel.ctaLabel"
       (click)="onCta(); $event.stopPropagation()"
       (pointerdown)="$event.stopPropagation()"
     >
-      {{ ctaLabel() }}
+      {{ panel.ctaLabel }}
     </button>
-    <p class="star-quest-panel__hint">
-      @if (liveLink() && claimKind() === 'completed') {
-        Alignée sur la quête Dock.
-      } @else if (liveLink()) {
-        Fais l’action dans l’app — pas de clic magique.
-      } @else if (claimKind() === 'claim') {
-        Conquête locale — pas de crédit faucet.
-      } @else if (claimKind() === 'locked') {
-        Conquis un voisin pour débloquer.
-      } @else if (claimKind() === 'completed' && isPlayerClaimed(panel.quest.id)) {
-        Enregistrée en preview ({{ progress.previewM4T3R() }} M4T3R).
-      } @else if (claimKind() === 'completed') {
-        Livrée dans le catalogue produit.
-      } @else {
-        Pas encore ouvrable.
-      }
-    </p>
+    <p class="star-quest-panel__hint">{{ panel.hint }}</p>
+    @if (claimErrorMessage(); as error) {
+      <p class="star-quest-panel__error" role="alert">{{ error }}</p>
+    }
   </aside>
 }

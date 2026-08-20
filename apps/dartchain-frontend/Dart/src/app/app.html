@@ -3,8 +3,10 @@
   <!-- Fond organique statique (z-index 0, derrière WebGL) -->
   <div class="app-game-background" aria-hidden="true"></div>
   <app-particle-background class="app-background"></app-particle-background>
-  <app-star-quest-panel />
-  <app-star-quest-scanner />
+  @if (product.starConquestOverlayEnabled) {
+    <app-star-quest-panel />
+    <app-star-quest-scanner />
+  }
 
   <app-navbar
     (exploreBlock)="openBlockDrawer($event)"

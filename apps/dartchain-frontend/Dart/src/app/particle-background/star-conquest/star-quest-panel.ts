@@ -1,4 +1,13 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+
+import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
 import { AuthService } from '../../core/services/auth.service';
 import {
   DockNavigationService,
@@ -6,20 +15,19 @@ import {
 } from '../../core/services/dock-navigation.service';
 import { StarConquestProgressService } from '../../core/services/star-conquest-progress.service';
 import { StarConquestStateService } from '../../core/services/star-conquest-state.service';
-import {
-  STAR_QUEST_FAMILIES,
-  type StarQuestFamily,
-} from './star-conquest-families';
-import {
-  STAR_QUEST_STATUS_LABEL,
-  starQuestClaimKind,
-  type StarQuestClaimKind,
-} from './star-conquest.model';
+import { StarConquestFacade } from '../../core/services/star-conquest.facade';
+import type { StarConquestClaimReason } from './star-conquest-progress';
 import type { StarConquestLiveLink } from './star-conquest-live';
+import {
+  STAR_QUEST_CLAIM_ERROR_MESSAGE,
+  buildStarQuestPanelView,
+} from './star-quest-panel.view';
 
 @Component({
   selector: 'app-star-quest-panel',
   standalone: true,
+  imports: [FocusTrapDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './star-quest-panel.html',
   styleUrl: './star-quest-panel.css',
 })
@@ -28,64 +36,45 @@ export class StarQuestPanelComponent {
   readonly progress = inject(StarConquestProgressService);
   private readonly auth = inject(AuthService);
   private readonly dockNav = inject(DockNavigationService);
+  private readonly facade = inject(StarConquestFacade);
 
-  readonly liveLink = computed((): StarConquestLiveLink | undefined => {
-    const id = this.state.panel()?.quest.id;
-    return id ? this.progress.liveLink(id) : undefined;
+  readonly claimError = signal<StarConquestClaimReason | null>(null);
+
+  readonly view = computed(() => {
+    const panel = this.state.panel();
+    if (!panel) return null;
+    const id = panel.quest.id;
+    return buildStarQuestPanelView({
+      quest: panel.quest,
+      x: panel.x,
+      y: panel.y,
+      compact: this.state.panelCompact(),
+      live: this.progress.liveLink(id),
+      liveTask: this.progress.liveTask(id),
+      playerClaimed: Boolean(this.progress.snapshot().claimed[id]),
+      previewM4T3R: this.progress.previewM4T3R(),
+    });
   });
 
-  readonly liveTask = computed(() => {
-    const id = this.state.panel()?.quest.id;
-    return id ? this.progress.liveTask(id) : undefined;
+  readonly claimErrorMessage = computed(() => {
+    const reason = this.claimError();
+    return reason ? STAR_QUEST_CLAIM_ERROR_MESSAGE[reason] : null;
   });
 
-  readonly claimKind = computed((): StarQuestClaimKind => {
-    const quest = this.state.panel()?.quest;
-    return quest ? starQuestClaimKind(quest.status) : 'locked';
-  });
-
-  readonly ctaEnabled = computed(() => {
-    const quest = this.state.panel()?.quest;
-    if (!quest) return false;
-    if (this.liveLink()) return this.claimKind() !== 'completed';
-    return this.claimKind() === 'claim';
-  });
-
-  familyLabel(family: StarQuestFamily): string {
-    return STAR_QUEST_FAMILIES[family]?.label ?? family;
-  }
-
-  familyHex(family: StarQuestFamily): string {
-    return STAR_QUEST_FAMILIES[family]?.hex ?? '#3ECFDC';
-  }
-
-  familyRgb(family: StarQuestFamily): string {
-    const rgb = STAR_QUEST_FAMILIES[family]?.rgb255 ?? [62, 207, 220];
-    return `${rgb[0]}, ${rgb[1]}, ${rgb[2]}`;
-  }
-
-  statusLabel(status: string): string {
-    return STAR_QUEST_STATUS_LABEL[status as keyof typeof STAR_QUEST_STATUS_LABEL] ?? status;
-  }
-
-  ctaLabel(): string {
-    if (this.claimKind() === 'completed') return 'Conquise';
-    const live = this.liveLink();
-    if (live) return live.ctaLabel;
-    const kind = this.claimKind();
-    if (kind === 'locked') return 'À débloquer';
-    if (kind === 'future') return 'Roadmap';
-    return 'Conquérir';
-  }
-
-  isPlayerClaimed(questId: string): boolean {
-    return Boolean(this.progress.snapshot().claimed[questId]);
+  constructor() {
+    let lastQuestId: string | null = null;
+    effect(() => {
+      const id = this.state.panel()?.quest.id ?? null;
+      if (id === lastQuestId) return;
+      lastQuestId = id;
+      this.claimError.set(null);
+    });
   }
 
   onCta(): void {
     const panel = this.state.panel();
     if (!panel) return;
-    const link = this.liveLink();
+    const link = this.progress.liveLink(panel.quest.id);
     if (link) {
       this.goToLiveAction(link);
       if (link.kind === 'navigate') {
@@ -121,15 +110,18 @@ export class StarQuestPanelComponent {
     const panel = this.state.panel();
     if (!panel) return;
     const result = this.progress.claim(panel.quest.id);
-    if (!result.ok || !result.quest) return;
+    if (!result.ok || !result.quest) {
+      this.claimError.set(result.ok ? 'missing' : result.reason);
+      return;
+    }
+    this.claimError.set(null);
     this.state.show(result.quest, panel.x, panel.y, this.state.panelCompact());
-    window.dispatchEvent(
-      new CustomEvent('star-conquest-progress', { detail: { questId: panel.quest.id } })
-    );
+    this.facade.notifyProgress(panel.quest.id);
   }
 
   dismiss(): void {
+    this.claimError.set(null);
     this.state.clear();
-    window.dispatchEvent(new CustomEvent('star-conquest-dismiss'));
+    this.facade.dismiss();
   }
 }

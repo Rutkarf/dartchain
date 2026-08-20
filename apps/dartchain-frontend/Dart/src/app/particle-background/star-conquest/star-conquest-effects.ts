@@ -3,9 +3,14 @@ import type { StarConquestEffectKind, StarConquestUniverseTheme } from './star-c
 import { createSoftDiscTexture } from './star-conquest-visuals';
 import { STAR_QUEST_FAMILIES, STAR_QUEST_FAMILY_ORDER } from './star-conquest-families';
 import { STAR_CONQUEST_SCALE } from './star-conquest-scale';
+import {
+  questEchoOffset,
+  type StarQuestAnchor,
+} from './star-conquest-anchors';
 
 /**
- * Effets visuels décoratifs par univers (hors Ruche — l’essaim utilise les particules Quest).
+ * Effets visuels décoratifs par univers.
+ * Ruche : anneaux + pulse + motes, tous ancrés sur des Quests.
  */
 export class StarConquestEffects {
   readonly group = new THREE.Group();
@@ -19,7 +24,10 @@ export class StarConquestEffects {
   private timelineAxis: THREE.Line | null = null;
   private nebulaClouds: THREE.Points | null = null;
   private synapticPulse: THREE.Points | null = null;
+  private swarmMotes: THREE.Points | null = null;
   private time = 0;
+  private anchors: readonly StarQuestAnchor[] = [];
+  private fxSignature = '';
 
   constructor() {
     this.group.name = 'star-conquest-effects';
@@ -29,6 +37,7 @@ export class StarConquestEffects {
   applyUniverse(theme: StarConquestUniverseTheme): void {
     this.clearAll();
     this.effectKind = theme.effectKind;
+    this.fxSignature = '';
     switch (theme.effectKind) {
       case 'orbital-rings':
         this.buildOrbitalRings();
@@ -40,6 +49,7 @@ export class StarConquestEffects {
         this.buildNexusPortal();
         break;
       case 'agent-swarm':
+        this.buildOrbitalRings();
         break;
       case 'galaxy-spiral':
         this.buildGalaxySpiral();
@@ -51,13 +61,25 @@ export class StarConquestEffects {
         this.buildNebulaClouds();
         break;
       case 'synaptic-pulse':
-        this.buildSynapticPulse();
         break;
       case 'aurora-waves':
       case 'zodiac-guides':
       case 'none':
         break;
     }
+    this.ensureQuestFx(this.anchors);
+  }
+
+  /** Pulse + motes : une (ou deux) particule par Quest, jamais d’orphelin. */
+  followQuestAnchors(anchors: readonly StarQuestAnchor[]): void {
+    this.anchors = anchors;
+    const signature = `${this.effectKind}:${anchors.length}`;
+    if (signature !== this.fxSignature) {
+      this.fxSignature = signature;
+      this.ensureQuestFx(anchors);
+    }
+    this.writeQuestFx(anchors);
+    this.recenterRings(anchors);
   }
 
   tick(deltaMs: number): void {
@@ -83,6 +105,11 @@ export class StarConquestEffects {
     if (this.synapticPulse) {
       const mat = this.synapticPulse.material as THREE.PointsMaterial;
       mat.opacity = 0.15 + Math.sin(this.time * 2.5) * 0.08;
+    }
+
+    if (this.swarmMotes) {
+      const mat = this.swarmMotes.material as THREE.PointsMaterial;
+      mat.opacity = 0.26 + Math.sin(this.time * 1.4) * 0.08;
     }
 
     if (this.nebulaClouds) {
@@ -121,6 +148,7 @@ export class StarConquestEffects {
     this.timelineAxis = null;
     this.nebulaClouds = null;
     this.synapticPulse = null;
+    this.swarmMotes = null;
   }
 
   private buildOrbitalRings(): void {
@@ -134,9 +162,9 @@ export class StarConquestEffects {
       }
       const geom = new THREE.BufferGeometry().setFromPoints(pts);
       const mat = new THREE.LineBasicMaterial({
-        color: 0x35a8ff,
+        color: i % 2 === 0 ? 0x52e6ed : 0xb078f0,
         transparent: true,
-        opacity: 0.12 + i * 0.04,
+        opacity: 0.16 + i * 0.05,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       });
@@ -315,23 +343,82 @@ export class StarConquestEffects {
     this.group.add(this.nebulaClouds);
   }
 
-  private buildSynapticPulse(): void {
-    const count = 48;
-    const positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const i3 = i * 3;
-      positions[i3] = (Math.random() - 0.5) * 200;
-      positions[i3 + 1] = (Math.random() - 0.5) * 420;
-      positions[i3 + 2] = -25 - Math.random() * 30;
+  private ensureQuestFx(anchors: readonly StarQuestAnchor[]): void {
+    const n = anchors.length;
+    const wantPulse =
+      this.effectKind === 'agent-swarm' || this.effectKind === 'synaptic-pulse';
+    const wantMotes = this.effectKind === 'agent-swarm';
+    if (wantPulse) this.ensureSynapticPulse(n);
+    else this.disposePulse();
+    if (wantMotes) this.ensureSwarmMotes(n * 2);
+    else this.disposeMotes();
+    this.writeQuestFx(anchors);
+  }
+
+  private writeQuestFx(anchors: readonly StarQuestAnchor[]): void {
+    const n = anchors.length;
+    if (n === 0) return;
+    const layout = STAR_CONQUEST_SCALE.layout;
+    if (this.synapticPulse) {
+      const pos = this.synapticPulse.geometry.getAttribute('position') as THREE.BufferAttribute;
+      for (let i = 0; i < pos.count; i++) {
+        const quest = anchors[i % n];
+        const off = questEchoOffset(quest.id, 'pulse', 6 * layout);
+        pos.setXYZ(i, quest.x + off.x, quest.y + off.y, quest.z + off.z - 4);
+      }
+      pos.needsUpdate = true;
     }
+    if (this.swarmMotes) {
+      const pos = this.swarmMotes.geometry.getAttribute('position') as THREE.BufferAttribute;
+      const colors = this.swarmMotes.geometry.getAttribute('color') as THREE.BufferAttribute;
+      for (let i = 0; i < pos.count; i++) {
+        const quest = anchors[Math.floor(i / 2) % n];
+        const off = questEchoOffset(quest.id, `mote:${i % 2}`, 9 * layout);
+        const spin = this.time * 0.55 + i * 0.7;
+        pos.setXYZ(
+          i,
+          quest.x + off.x + Math.cos(spin) * 1.8,
+          quest.y + off.y + Math.sin(spin) * 1.8,
+          quest.z + off.z - 2
+        );
+        colors.setXYZ(i, quest.rgb[0], quest.rgb[1], quest.rgb[2]);
+      }
+      pos.needsUpdate = true;
+      colors.needsUpdate = true;
+    }
+  }
+
+  private recenterRings(anchors: readonly StarQuestAnchor[]): void {
+    if (this.orbitalRings.length === 0 || anchors.length === 0) return;
+    let cx = 0;
+    let cy = 0;
+    let cz = 0;
+    for (const a of anchors) {
+      cx += a.x;
+      cy += a.y;
+      cz += a.z;
+    }
+    const inv = 1 / anchors.length;
+    for (const ring of this.orbitalRings) {
+      ring.position.set(cx * inv, cy * inv, cz * inv - 8);
+    }
+  }
+
+  private ensureSynapticPulse(count: number): void {
+    if (this.synapticPulse) {
+      const current = this.synapticPulse.geometry.getAttribute('position').count;
+      if (current === Math.max(count, 1) && count > 0) return;
+      this.disposePulse();
+    }
+    if (count <= 0) return;
     const geom = new THREE.BufferGeometry();
-    geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
     const mat = new THREE.PointsMaterial({
-      size: 6,
+      size: 6.4 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       color: 0x52e6ed,
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.2,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       sizeAttenuation: true,
@@ -340,5 +427,47 @@ export class StarConquestEffects {
     this.synapticPulse.name = 'sc-synaptic-pulse';
     this.synapticPulse.raycast = () => {};
     this.group.add(this.synapticPulse);
+  }
+
+  private ensureSwarmMotes(count: number): void {
+    if (this.swarmMotes) {
+      const current = this.swarmMotes.geometry.getAttribute('position').count;
+      if (current === Math.max(count, 1) && count > 0) return;
+      this.disposeMotes();
+    }
+    if (count <= 0) return;
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+    geom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+    const mat = new THREE.PointsMaterial({
+      size: 4.8 * STAR_CONQUEST_SCALE.visual,
+      map: this.discTexture,
+      transparent: true,
+      opacity: 0.32,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+    this.swarmMotes = new THREE.Points(geom, mat);
+    this.swarmMotes.name = 'sc-agent-swarm-motes';
+    this.swarmMotes.raycast = () => {};
+    this.group.add(this.swarmMotes);
+  }
+
+  private disposePulse(): void {
+    if (!this.synapticPulse) return;
+    this.group.remove(this.synapticPulse);
+    this.synapticPulse.geometry.dispose();
+    (this.synapticPulse.material as THREE.Material).dispose();
+    this.synapticPulse = null;
+  }
+
+  private disposeMotes(): void {
+    if (!this.swarmMotes) return;
+    this.group.remove(this.swarmMotes);
+    this.swarmMotes.geometry.dispose();
+    (this.swarmMotes.material as THREE.Material).dispose();
+    this.swarmMotes = null;
   }
 }

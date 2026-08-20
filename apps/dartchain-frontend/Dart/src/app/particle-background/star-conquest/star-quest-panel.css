@@ -5,31 +5,54 @@
 
 /* Glassmorphisme sobre — accent famille via --sc-family-* */
 .star-quest-panel {
-  --sc-family-rgb: 62, 207, 220;
-  --sc-family-hex: #3ecfdc;
+  --sc-family-rgb: 79, 224, 236;
+  --sc-family-hex: #4fe0ec;
 
   position: fixed;
   z-index: 140;
   pointer-events: auto;
   box-sizing: border-box;
-  width: min(calc(156px * var(--sc-ui-scale, 1)), calc(100vw - 10px));
+  width: min(calc(176px * var(--sc-ui-scale, 1)), calc(100vw - 10px));
   max-width: calc(100vw - 10px);
-  padding: 7px 8px 8px;
-  border-radius: 10px;
-  border: 1px solid rgba(var(--sc-family-rgb), 0.28);
-  background: rgba(10, 8, 12, 0.58);
+  padding: 8px 9px 9px;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--sc-family-rgb), 0.38);
+  background:
+    linear-gradient(180deg, rgba(22, 16, 28, 0.78) 0%, rgba(6, 4, 10, 0.88) 100%);
   box-shadow:
-    0 6px 22px rgba(0, 0, 0, 0.42),
-    0 0 28px rgba(var(--sc-family-rgb), 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(14px) saturate(115%);
-  -webkit-backdrop-filter: blur(14px) saturate(115%);
-  color: rgba(232, 238, 245, 0.92);
-  animation: star-quest-panel-in 140ms ease-out;
+    0 12px 36px rgba(0, 0, 0, 0.58),
+    0 0 28px rgba(var(--sc-family-rgb), 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  color: rgba(236, 242, 250, 0.94);
+  animation: star-quest-panel-in 160ms ease-out;
+  overflow: hidden;
+}
+
+.star-quest-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    transparent 42%
+  );
+  box-shadow: inset 0 0 28px rgba(var(--sc-family-rgb), 0.14);
+}
+
+.star-quest-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .star-quest-panel--compact {
-  width: min(calc(132px * var(--sc-ui-scale, 1)), calc(100vw - 10px));
+  width: min(calc(142px * var(--sc-ui-scale, 1)), calc(100vw - 10px));
   padding: 5px 6px 6px;
   font-size: 0.92em;
 }
@@ -57,7 +80,7 @@
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
-  font-size: 7px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -76,13 +99,13 @@
 }
 
 .star-quest-panel__badge--live {
-  border-color: rgba(232, 184, 109, 0.42);
-  background: rgba(232, 184, 109, 0.14);
-  color: rgba(255, 220, 160, 0.95);
+  border-color: rgba(79, 224, 236, 0.45);
+  background: rgba(79, 224, 236, 0.12);
+  color: rgba(190, 245, 255, 0.95);
 }
 
 .star-quest-panel[data-live='true'] {
-  border-color: rgba(232, 184, 109, 0.38);
+  border-color: rgba(79, 224, 236, 0.42);
 }
 
 .star-quest-panel__close {
@@ -141,7 +164,7 @@
 }
 
 .star-quest-panel__reward-label {
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: rgba(130, 148, 166, 0.8);
@@ -198,9 +221,16 @@
 
 .star-quest-panel__hint {
   margin: 5px 0 0;
-  font-size: 7px;
+  font-size: 10px;
   line-height: 1.35;
   color: rgba(130, 148, 166, 0.82);
+}
+
+.star-quest-panel__error {
+  margin: 4px 0 0;
+  font-size: 10px;
+  line-height: 1.35;
+  color: rgba(232, 160, 140, 0.95);
 }
 
 @keyframes star-quest-panel-in {
@@ -226,7 +256,7 @@
   }
 
   .star-quest-panel__desc {
-    font-size: 7px;
+    font-size: 10px;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     margin-bottom: 5px;

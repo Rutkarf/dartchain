@@ -77,6 +77,7 @@ import {
 import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { StarConquestProgressService } from '../../core/services/star-conquest-progress.service';
+import { StarConquestFacade } from '../../core/services/star-conquest.facade';
 import { QuestsPanelService } from '../../features/quests-panel/quests-panel.service';
 import type { QuestPersistedState, QuestTaskView } from '../../features/quests-panel/quests-panel.model';
 
@@ -100,7 +101,7 @@ describe('Star Conquest mock catalog', () => {
   });
 
   it('keeps exactly 7 quests per family after reduction', () => {
-    expect(STAR_CONQUEST_REMOVED_QUESTS.length).toBe(15);
+    expect(STAR_CONQUEST_REMOVED_QUESTS.length).toBe(19);
     const counts: Record<string, number> = {};
     for (const quest of STAR_CONQUEST_MOCK_QUESTS) {
       counts[quest.family] = (counts[quest.family] ?? 0) + 1;
@@ -121,6 +122,14 @@ describe('Star Conquest mock catalog', () => {
     expect(formatRewardWithDot(25)).toBe('• +25');
   });
 
+  it('covers current product surfaces in the catalog', () => {
+    expect(starQuestById('sc-map-wigle')?.family).toBe('three');
+    expect(starQuestById('sc-map-pickup')?.family).toBe('blockchain');
+    expect(starQuestById('sc-dock-peers')?.family).toBe('quality');
+    expect(starQuestById('sc-r4v3-market')?.family).toBe('quality');
+    expect(starQuestById('sc-showcase-chat')?.title).toContain('Showcase');
+  });
+
   it('resolves quest by id', () => {
     expect(starQuestById('sc-gamify-map')?.title).toContain('Conquest');
     expect(starQuestById('missing')).toBeUndefined();
@@ -133,7 +142,7 @@ describe('StarConquest depth layers', () => {
     expect(STAR_DEPTH_LAYERS.mid.zCenter).toBeLessThan(STAR_DEPTH_LAYERS.interactive.zCenter);
     expect(STAR_DEPTH_LAYERS.interactive.zCenter).toBeLessThan(STAR_DEPTH_LAYERS.near.zCenter);
     expect(STAR_DEPTH_LAYERS.far.parallax).toBeLessThan(STAR_DEPTH_LAYERS.near.parallax);
-    expect(STAR_DEPTH_LAYERS.interactive.count).toBe(35);
+    expect(STAR_DEPTH_LAYERS.interactive.count).toBe(STAR_CONQUEST_QUEST_COUNT);
   });
 });
 
@@ -350,6 +359,11 @@ describe('StarConquestGraph', () => {
   it('builds graph with halo and energy layers', () => {
     const graph = new StarConquestGraph(STAR_CONQUEST_MOCK_QUESTS);
     expect(graph.questCount).toBe(STAR_CONQUEST_QUEST_COUNT);
+    expect(graph.questCoreCount).toBe(STAR_CONQUEST_QUEST_COUNT);
+    expect(graph.questCoreCount).toBe(graph.questCount);
+    for (const quest of STAR_CONQUEST_MOCK_QUESTS) {
+      expect(graph.getQuest(quest.id)?.interactive).toBe(true);
+    }
     expect(graph.linkEdgeCount).toBeGreaterThan(40);
     expect(graph.haloPoints).toBeTruthy();
     expect(graph.bloomPoints).toBeTruthy();
@@ -357,7 +371,8 @@ describe('StarConquestGraph', () => {
     expect(graph.filamentRibbon).toBeTruthy();
     expect(graph.energyPackets).toBeTruthy();
     expect(graph.constellationGuides).toBeTruthy();
-    expect(graph.constellationGuides.visible).toBe(false);
+    expect(graph.constellationGuides.visible).toBe(true);
+    expect(graph.effects.group.children.length).toBeGreaterThanOrEqual(5);
     const first = STAR_CONQUEST_MOCK_QUESTS[0];
     graph.setFocus(first.id);
     expect(graph.getFocusId()).toBe(first.id);
@@ -603,11 +618,14 @@ describe('Star Conquest universes', () => {
 
   it('keeps Ruche on a near-black void with visible neural links', () => {
     const theme = starConquestUniverseTheme('agent-swarm');
-    expect(theme.bgCenter).toBe('#08040a');
+    expect(theme.bgCenter).toBe('#040308');
     expect(theme.showNeuralLinks).toBe(true);
     expect(theme.linkOpacity).toBeGreaterThan(0.5);
     expect(theme.coreOpacity).toBeGreaterThan(0.9);
     expect(theme.haloSizeMult).toBeGreaterThan(3);
+    expect(theme.showConstellations).toBe(true);
+    expect(theme.constellationOpacity).toBeGreaterThan(0.1);
+    expect(theme.coreSizeMult).toBeGreaterThan(1.5);
   });
 });
 
@@ -771,7 +789,7 @@ describe('Star Conquest product progress', () => {
 
 describe('Star Conquest live Dock mapping', () => {
   it('maps catalog stars onto Dock tasks, hub and product surfaces', () => {
-    expect(STAR_CONQUEST_LIVE_LINKS.length).toBe(8);
+    expect(STAR_CONQUEST_LIVE_LINKS.length).toBe(10);
     expect(STAR_CONQUEST_LIVE_LINKS.length / STAR_CONQUEST_QUEST_COUNT).toBeGreaterThanOrEqual(
       STAR_CONQUEST_COMMERCIAL_THRESHOLDS.minLiveCoverage
     );
@@ -783,9 +801,13 @@ describe('Star Conquest live Dock mapping', () => {
     expect(isStarConquestLiveQuest('sc-wallet-copy')).toBe(true);
     expect(isStarConquestLiveQuest('sc-dock-mempool')).toBe(true);
     expect(isStarConquestLiveQuest('sc-showcase-chat')).toBe(true);
+    expect(isStarConquestLiveQuest('sc-dock-peers')).toBe(true);
+    expect(isStarConquestLiveQuest('sc-r4v3-market')).toBe(true);
     expect(starConquestLiveLink('sc-dock-faucet')?.kind).toBe('task');
     expect(starConquestLiveLink(STAR_CONQUEST_LIVE_HUB_ID)?.kind).toBe('hub');
     expect(starConquestLiveLink('sc-wallet-copy')?.kind).toBe('navigate');
+    expect(starConquestLiveLink('sc-dock-peers')?.action).toBe('peers');
+    expect(starConquestLiveLink('sc-r4v3-market')?.action).toBe('market');
     expect(starQuestById(STAR_CONQUEST_LIVE_HUB_ID)?.status).toBe('available');
     for (const link of STAR_CONQUEST_LIVE_LINKS) {
       expect(starQuestById(link.starQuestId)).toBeTruthy();
@@ -934,6 +956,34 @@ describe('StarConquestProgressService live gate', () => {
     expect(service.snapshot().claimed['sc-wallet-copy']).toBeTruthy();
     expect(service.completeNavigate('sc-dock-faucet').ok).toBe(false);
     expect(service.completeNavigate('sc-wallet-copy').ok).toBe(false);
+  });
+
+  it('preview claim does not issue HTTP and stays on localStorage', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    localStorage.removeItem('star-conquest-progress-v1');
+    const state$ = new BehaviorSubject(emptyState);
+
+    await TestBed.configureTestingModule({
+      providers: [
+        StarConquestProgressService,
+        StarConquestFacade,
+        {
+          provide: QuestsPanelService,
+          useValue: {
+            state$: state$.asObservable(),
+            buildTaskViews: () => [],
+          },
+        },
+      ],
+    }).compileComponents();
+
+    const service = TestBed.inject(StarConquestProgressService);
+    service.resetForTests();
+    const result = service.claim('sc-angular-layout');
+    expect(result.ok).toBe(true);
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(localStorage.getItem('star-conquest-progress-v1')).toContain('sc-angular-layout');
+    fetchSpy.mockRestore();
   });
 });
 

@@ -17,6 +17,8 @@ export const environment = {
   commercial: true,
   faucetEnabled: true,
   showcaseEnabled: true,
+  starConquestOverlayEnabled: true,
+  starConquestKpiDebug: false,
   mapEnabled: true,
   mapProvider: 'marseille-osm-three',
   enableOsmBuildings: true,

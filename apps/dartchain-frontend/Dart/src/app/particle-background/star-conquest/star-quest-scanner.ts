@@ -1,17 +1,27 @@
-import { Component, HostListener, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
+
+import { ProductConfigService } from '../../core/config/product-config.service';
+import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
+import { PeerView } from '../../core/services/blockchain-api.service';
+import { PeersDataService } from '../../core/services/peers-data.service';
 import { StarConquestProgressService } from '../../core/services/star-conquest-progress.service';
 import { StarConquestStateService } from '../../core/services/star-conquest-state.service';
-import { PeersDataService } from '../../core/services/peers-data.service';
+import { StarConquestFacade } from '../../core/services/star-conquest.facade';
 import {
-  STAR_QUEST_FAMILIES,
-  type StarQuestFamily,
-} from './star-conquest-families';
-import {
-  STAR_QUEST_STATUS_LABEL,
-  type StarQuest,
-} from './star-conquest.model';
+  starQuestFamilyLabel,
+  starQuestFamilyRgb,
+  starQuestStatusLabel,
+} from './star-quest-panel.view';
+import type { StarQuestFamily } from './star-conquest-families';
+import type { StarQuest, StarQuestStatus } from './star-conquest.model';
 import { formatRewardWithDot } from './star-conquest-visuals';
-import { PeerView } from '../../core/services/blockchain-api.service';
 
 /**
  * Overlay fonctionnel uniquement : liste scanner + labels M4T3R.
@@ -20,19 +30,26 @@ import { PeerView } from '../../core/services/blockchain-api.service';
 @Component({
   selector: 'app-star-quest-scanner',
   standalone: true,
+  imports: [FocusTrapDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './star-quest-scanner.html',
   styleUrl: './star-quest-scanner.css',
 })
 export class StarQuestScannerComponent {
   readonly state = inject(StarConquestStateService);
   readonly progress = inject(StarConquestProgressService);
+  readonly kpiDebug = inject(ProductConfigService).starConquestKpiDebug;
   private readonly peersData = inject(PeersDataService);
+  private readonly facade = inject(StarConquestFacade);
 
   private readonly peers = computed((): readonly PeerView[] => this.peersData.peers());
 
   constructor() {
-    // Init "light" pour pouvoir afficher un indicateur P2P même si l'user n'ouvre pas le peer panel.
-    this.peersData.init();
+    effect(() => {
+      if (this.state.scannerOpen()) {
+        this.peersData.init();
+      }
+    });
   }
 
   readonly connectedCount = computed(() =>
@@ -42,7 +59,6 @@ export class StarQuestScannerComponent {
   readonly networkPeersCount = computed(() => {
     const fromStats = this.peersData.statsTotal();
     const current = this.peers().length;
-    // `statsTotal` (server) peut être null en début de vie.
     return Math.max(fromStats ?? current, current);
   });
 
@@ -81,7 +97,6 @@ export class StarQuestScannerComponent {
     let top = z.top - estH - 8;
     if (top < 8) {
       top = Math.max(8, Math.min(z.top - 40, vh - estH - 8));
-      // Si encore chevauchement vertical, coller juste au-dessus
       if (top + estH > z.top) top = Math.max(8, z.top - estH - 6);
     }
 
@@ -94,12 +109,11 @@ export class StarQuestScannerComponent {
   });
 
   familyLabel(family: StarQuestFamily): string {
-    return STAR_QUEST_FAMILIES[family]?.label ?? family;
+    return starQuestFamilyLabel(family);
   }
 
   familyRgb(family: StarQuestFamily): string {
-    const rgb = STAR_QUEST_FAMILIES[family]?.rgb255 ?? [62, 207, 220];
-    return `${rgb[0]}, ${rgb[1]}, ${rgb[2]}`;
+    return starQuestFamilyRgb(family);
   }
 
   pulseDelay(id: string): string {
@@ -112,8 +126,8 @@ export class StarQuestScannerComponent {
     return formatRewardWithDot(quest.rewardM4T3R);
   }
 
-  statusLabel(status: string): string {
-    return STAR_QUEST_STATUS_LABEL[status as keyof typeof STAR_QUEST_STATUS_LABEL] ?? status;
+  statusLabel(status: StarQuestStatus): string {
+    return starQuestStatusLabel(status);
   }
 
   closeList(): void {
@@ -122,29 +136,19 @@ export class StarQuestScannerComponent {
 
   pick(quest: StarQuest): void {
     this.state.closeScanner();
-    window.dispatchEvent(
-      new CustomEvent('star-conquest-select', { detail: { questId: quest.id } })
-    );
+    this.facade.selectQuest(quest.id);
   }
 
   pickLabel(questId: string): void {
-    window.dispatchEvent(
-      new CustomEvent('star-conquest-select', { detail: { questId } })
-    );
+    this.facade.selectQuest(questId);
   }
 
   hoverLabel(questId: string): void {
-    window.dispatchEvent(
-      new CustomEvent('star-conquest-hover', { detail: { questId } })
-    );
+    this.facade.hoverQuest(questId);
   }
 
   clearHoverLabel(questId: string): void {
-    window.dispatchEvent(
-      new CustomEvent('star-conquest-hover', {
-        detail: { questId: null, from: questId },
-      })
-    );
+    this.facade.hoverQuest(null, questId);
   }
 
   @HostListener('document:keydown.escape')

@@ -9,11 +9,22 @@ import { STAR_DEPTH_LAYERS, type StarDepthLayerId } from './star-conquest-depth'
 import type { StarConquestUniverseTheme } from './star-conquest-universe.types';
 import { createSoftDiscTexture } from './star-conquest-visuals';
 import { createStarConquestAuroraMaterial } from './shaders/star-conquest-aurora.shader';
+import {
+  questEchoOffset,
+  type StarQuestAnchor,
+} from './star-conquest-anchors';
 
 const LAYER_IDS: StarDepthLayerId[] = ['far', 'mid', 'near'];
+const ECHOES_PER_QUEST: Record<StarDepthLayerId, number> = {
+  far: 3,
+  mid: 2,
+  near: 1,
+  interactive: 0,
+};
 
 /**
- * Fond Star Conquest : aurore shader + couches d’étoiles décoratives (far/mid/near).
+ * Fond Star Conquest : aurore shader + échos de profondeur.
+ * Chaque étoile far/mid/near est rattachée à une Quest du catalogue.
  */
 export class StarConquestBackground {
   readonly group = new THREE.Group();
@@ -26,6 +37,9 @@ export class StarConquestBackground {
   private time = 0;
   private gpuQuality: StarConquestGpuQuality = 'medium';
   private auroraTint: readonly [number, number, number] = [1, 0.78, 0.32];
+  private theme: StarConquestUniverseTheme | null = null;
+  private anchors: readonly StarQuestAnchor[] = [];
+  private echoSignature = '';
 
   constructor() {
     this.group.name = 'star-conquest-background';
@@ -53,6 +67,7 @@ export class StarConquestBackground {
   }
 
   applyUniverse(theme: StarConquestUniverseTheme): void {
+    this.theme = theme;
     this.auroraMat.uniforms['uColorA'].value.set(
       theme.auroraRgb[0],
       theme.auroraRgb[1],
@@ -64,20 +79,22 @@ export class StarConquestBackground {
       theme.auroraSecondaryRgb[2]
     );
     this.auroraTint = theme.auroraRgb;
-    this.auroraMat.uniforms['uIntensity'].value = theme.showDepthStars ? 0.56 : 0.38;
+    this.auroraMat.uniforms['uIntensity'].value = theme.showDepthStars ? 0.54 : 0.34;
     this.auroraMesh.visible = true;
+    this.echoSignature = '';
+    this.rebuildQuestEchoes();
+  }
 
-    const density = starConquestDepthDensity(this.gpuQuality);
-    const counts: Record<StarDepthLayerId, number> = {
-      far: theme.showDepthStars ? Math.round(theme.depthFarCount * density) : 0,
-      mid: theme.showDepthStars ? Math.round(theme.depthMidCount * density) : 0,
-      near: theme.showDepthStars ? Math.round(theme.depthNearCount * density) : 0,
-      interactive: 0,
-    };
-
-    for (const id of LAYER_IDS) {
-      this.rebuildDepthLayer(id, counts[id]);
+  /** Recale les étoiles de fond sur les Quests (1 écho = 1 Quest). */
+  followQuestAnchors(anchors: readonly StarQuestAnchor[]): void {
+    this.anchors = anchors;
+    const signature = `${anchors.length}:${this.gpuQuality}:${this.theme?.id ?? ''}`;
+    if (signature !== this.echoSignature) {
+      this.echoSignature = signature;
+      this.rebuildQuestEchoes();
+      return;
     }
+    this.writeEchoPositions();
   }
 
   tick(deltaMs: number): void {
@@ -88,22 +105,7 @@ export class StarConquestBackground {
     if (this.depthTickAcc < 33) return;
     this.depthTickAcc = 0;
 
-    for (const [id, points] of this.depthLayers) {
-      if (!points.visible) continue;
-      const base = this.depthBasePositions.get(id);
-      if (!base) continue;
-      const cfg = STAR_DEPTH_LAYERS[id];
-      const pos = points.geometry.getAttribute('position') as THREE.BufferAttribute;
-      const t = this.time * cfg.driftSpeed;
-      for (let i = 0; i < pos.count; i++) {
-        const i3 = i * 3;
-        const phase = i * 0.37;
-        pos.setX(i, base[i3] + Math.sin(t + phase) * 0.35 * cfg.driftAmp);
-        pos.setY(i, base[i3 + 1] + Math.cos(t * 0.8 + phase) * 0.28 * cfg.driftAmp);
-        pos.setZ(i, base[i3 + 2]);
-      }
-      pos.needsUpdate = true;
-    }
+    this.writeEchoPositions();
   }
 
   dispose(): void {
@@ -139,7 +141,7 @@ export class StarConquestBackground {
     geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     const mat = new THREE.PointsMaterial({
-      size: cfg.size * (id === 'near' ? 1.28 : 1.12) * STAR_CONQUEST_SCALE.visual,
+      size: cfg.size * (id === 'near' ? 1.42 : 1.18) * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       transparent: true,
       opacity: Math.min(1, cfg.opacity * 1.35),
@@ -170,5 +172,58 @@ export class StarConquestBackground {
     existing.geometry = fresh.geometry;
     existing.material = fresh.material;
     existing.visible = count > 0;
+  }
+
+  private rebuildQuestEchoes(): void {
+    const theme = this.theme;
+    const n = this.anchors.length;
+    const density = starConquestDepthDensity(this.gpuQuality);
+    for (const id of LAYER_IDS) {
+      const perQuest =
+        theme?.showDepthStars && n > 0
+          ? Math.max(1, Math.round(ECHOES_PER_QUEST[id] * Math.min(density, 1.35)))
+          : 0;
+      this.rebuildDepthLayer(id, perQuest * n);
+    }
+    this.writeEchoPositions(true);
+  }
+
+  private writeEchoPositions(storeBase = false): void {
+    const n = this.anchors.length;
+    if (n === 0) return;
+    for (const id of LAYER_IDS) {
+      const points = this.depthLayers.get(id);
+      if (!points?.visible) continue;
+      const cfg = STAR_DEPTH_LAYERS[id];
+      const pos = points.geometry.getAttribute('position') as THREE.BufferAttribute;
+      const colors = points.geometry.getAttribute('color') as THREE.BufferAttribute;
+      const perQuest = Math.max(1, Math.floor(pos.count / n));
+      const t = this.time * cfg.driftSpeed;
+      const radius = (id === 'far' ? 22 : id === 'mid' ? 14 : 8) * STAR_CONQUEST_SCALE.layout;
+      for (let i = 0; i < pos.count; i++) {
+        const quest = this.anchors[Math.floor(i / perQuest) % n];
+        const echo = i % perQuest;
+        const off = questEchoOffset(quest.id, `${id}:${echo}`, radius);
+        const phase = i * 0.37;
+        const x = quest.x + off.x + Math.sin(t + phase) * 0.35 * cfg.driftAmp;
+        const y = quest.y + off.y + Math.cos(t * 0.8 + phase) * 0.28 * cfg.driftAmp;
+        const z = quest.z + off.z + cfg.zCenter * 0.35;
+        pos.setXYZ(i, x, y, z);
+        if (storeBase && colors) {
+          colors.setXYZ(
+            i,
+            quest.rgb[0] * 0.55 + this.auroraTint[0] * 0.45,
+            quest.rgb[1] * 0.55 + this.auroraTint[1] * 0.45,
+            quest.rgb[2] * 0.55 + this.auroraTint[2] * 0.45
+          );
+        }
+      }
+      pos.needsUpdate = true;
+      if (storeBase && colors) colors.needsUpdate = true;
+      if (storeBase) {
+        const packed = pos.array as Float32Array;
+        this.depthBasePositions.set(id, packed.slice());
+      }
+    }
   }
 }

@@ -12,4 +12,7 @@ export class ProductConfigService {
   /** Toujours actif (dev, prod, déploiement Cloudflare/Render). */
   readonly faucetEnabled = true;
   readonly showcaseEnabled = environment.showcaseEnabled ?? true;
+  readonly starConquestOverlayEnabled = environment.starConquestOverlayEnabled ?? true;
+  readonly starConquestKpiDebug =
+    environment.starConquestKpiDebug ?? !environment.production;
 }
