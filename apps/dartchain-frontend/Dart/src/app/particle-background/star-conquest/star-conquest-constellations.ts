@@ -190,7 +190,12 @@ export function constellationPointToBandUv(
   };
 }
 
-/** Débordement latéral — assez pour ≤5 Quests hors viewport à l’init. */
-export const STAR_WORLD_OVERFLOW_RATIO = 0.14;
+import {
+  STAR_MAX_OFFSCREEN_AT_INIT as SCALE_MAX_OFFSCREEN,
+  STAR_WORLD_OVERFLOW_RATIO as SCALE_OVERFLOW_RATIO,
+} from './star-conquest-scale';
+
+/** Débordement latéral — palier de scale R&D (upgrade produit/société). */
+export const STAR_WORLD_OVERFLOW_RATIO = SCALE_OVERFLOW_RATIO;
 /** Maximum de particules hors fenêtre à l’initialisation. */
-export const STAR_MAX_OFFSCREEN_AT_INIT = 5;
+export const STAR_MAX_OFFSCREEN_AT_INIT = SCALE_MAX_OFFSCREEN;

@@ -21,8 +21,9 @@ describe('M4T3R LOD', () => {
   it('sous-échantillonne le damier aux bandes mid/far', () => {
     expect(shouldRenderCellAtLod(1, 1, 'near')).toBe(true);
     expect(shouldRenderCellAtLod(1, 1, 'mid')).toBe(false);
-    expect(shouldRenderCellAtLod(2, 2, 'mid')).toBe(true);
-    expect(shouldRenderCellAtLod(2, 2, 'far')).toBe(false);
+    expect(shouldRenderCellAtLod(2, 2, 'mid')).toBe(false);
+    expect(shouldRenderCellAtLod(4, 4, 'mid')).toBe(true);
+    expect(shouldRenderCellAtLod(4, 4, 'far')).toBe(false);
     expect(shouldRenderCellAtLod(8, 8, 'far')).toBe(true);
     expect(shouldRenderCellAtLod(8, 9, 'mid')).toBe(false);
   });

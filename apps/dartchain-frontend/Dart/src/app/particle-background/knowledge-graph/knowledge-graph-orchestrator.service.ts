@@ -86,6 +86,7 @@ export class KnowledgeGraphOrchestratorService {
 
   setQuality(quality: QuestGraphQuality): void {
     this.quality.set(quality);
+    this.graph?.setGpuQuality(quality);
   }
 
   setUniverse(universeId: StarConquestUniverseId): void {

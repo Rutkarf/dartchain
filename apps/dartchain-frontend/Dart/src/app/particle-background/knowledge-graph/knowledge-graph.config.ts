@@ -1,4 +1,5 @@
 import type { QuestGraphQuality } from './knowledge-graph.types';
+import { STAR_CONQUEST_SCALE } from '../star-conquest/star-conquest-scale';
 
 export const GRAPH_RENDER_LIMITS: Record<
   QuestGraphQuality,
@@ -24,10 +25,10 @@ export const QUEST_ORBIT_CONFIG = {
   minPolarAngle: 0.25,
   maxPolarAngle: 1.5,
   /** Camera Z in Star Conquest world space (default pan view). */
-  defaultCameraZ: 160,
-  overviewCameraZ: 175,
-  nodeFocusCameraZ: 118,
-  clusterFocusCameraZ: 142,
+  defaultCameraZ: STAR_CONQUEST_SCALE.cameraZ,
+  overviewCameraZ: STAR_CONQUEST_SCALE.cameraZ + 15,
+  nodeFocusCameraZ: STAR_CONQUEST_SCALE.cameraZ - 42,
+  clusterFocusCameraZ: STAR_CONQUEST_SCALE.cameraZ - 18,
 } as const;
 
 /** Cyberpunk palette — debug colors per entity type. */

@@ -27,6 +27,7 @@ import {
 } from './geo-building.util';
 import { MarseilleGeoDebugService } from './marseille-geo-debug.service';
 import { buildVieuxPortSpawnFacades, VIEUX_PORT_SPAWN_FACADES } from './vieux-port-spawn-facades.util';
+import { buildVieuxPortMirrorCanopy, MIRROR_CANOPY } from './vieux-port-mirror-canopy.util';
 import {
   colliderIntersectsStreetCorridor,
   isHarborLandAt,
@@ -837,69 +838,20 @@ export class MarseilleMapProvider implements MapProvider {
     dropShadow.position.set(0, harbor.walkSurfaceY + 0.008, harbor.waterMinZ + 2.2);
     this.root.add(dropShadow);
 
-    const mirror = new THREE.Mesh(
-      new THREE.BoxGeometry(18, 0.6, 12),
-      new THREE.MeshPhysicalMaterial({
-        color: 0xd8f3ff,
-        emissive: 0x243850,
-        emissiveIntensity: 0.28,
-        roughness: 0.12,
-        metalness: 0.18,
-        transmission: 0.22,
-        transparent: true,
-        opacity: 0.92,
-      })
-    );
-    mirror.name = 'marseille-mirror-canopy';
-    mirror.position.set(
-      METRO_SPAWN_ANCHOR.mirror.x,
-      METRO_SPAWN_ANCHOR.mirror.y,
-      METRO_SPAWN_ANCHOR.mirror.z
-    );
-    this.root.add(mirror);
-    this.addCanopyReflector(mirror.position.x, 5.28, mirror.position.z);
-    this.addMirrorRoofSign(mirror.position.x, mirror.position.y + 0.42, mirror.position.z);
+    this.addMirrorCanopy();
+  }
 
-    const mirrorAura = new THREE.Mesh(
-      new THREE.RingGeometry(8.6, 10.8, 48),
-      new THREE.MeshBasicMaterial({
-        color: 0x8eeeff,
-        transparent: true,
-        opacity: 0.18,
-        side: THREE.DoubleSide,
-      })
-    );
-    mirrorAura.name = 'marseille-mirror-aura';
-    mirrorAura.rotation.x = -Math.PI / 2;
-    mirrorAura.position.set(0, 0.05, 0);
-    this.root.add(mirrorAura);
-
-    const plaza = new THREE.Mesh(
-      new THREE.CircleGeometry(12.5, 48),
-      new THREE.MeshStandardMaterial({
-        color: 0xc9c1b5,
-        roughness: 0.88,
-        metalness: 0.03,
-      })
-    );
-    plaza.name = 'marseille-mirror-plaza';
-    plaza.rotation.x = -Math.PI / 2;
-    plaza.position.set(0, 0.36, -1.5);
-    this.root.add(plaza);
-
-    const mirrorPosts = [
-      [-7, 2.5, -4],
-      [7, 2.5, -4],
-      [-7, 2.5, 4],
-      [7, 2.5, 4],
-    ] as const;
-    const postMaterial = this.createBuildingMaterial(0x7f8c8d);
-    for (const [x, y, z] of mirrorPosts) {
-      const post = new THREE.Mesh(new THREE.BoxGeometry(0.6, 5, 0.6), postMaterial);
-      post.position.set(x, y, z);
-      post.name = `marseille-mirror-post-${x}-${z}`;
-      this.root.add(post);
-    }
+  /** Ombrière de verre au spawn — indépendante du graphe Star Conquest. */
+  private addMirrorCanopy(): void {
+    if (!this.root) return;
+    const origin = METRO_SPAWN_ANCHOR.mirror;
+    const built = buildVieuxPortMirrorCanopy(this.config.configuration.quality, origin);
+    this.ownedGeometries.push(...built.geometries);
+    this.buildingMaterials.push(...built.materials);
+    this.ownedTextures.push(...built.textures);
+    this.root.add(built.group);
+    this.addCanopyReflector(origin.x, origin.y - MIRROR_CANOPY.thickness * 0.85, origin.z);
+    this.addMirrorRoofSign(origin.x, origin.y + 0.38, origin.z);
   }
 
   /** Cavité du bassin — parois intérieures visibles depuis le quai. */
@@ -1273,13 +1225,16 @@ export class MarseilleMapProvider implements MapProvider {
     if (!this.root) return;
     const quality = this.config.configuration.quality;
     const size = quality === 'high' ? 768 : quality === 'low' ? 256 : 512;
-    const geometry = new THREE.PlaneGeometry(16.6, 10.6);
+    const geometry = new THREE.PlaneGeometry(
+      MIRROR_CANOPY.width - 0.55,
+      MIRROR_CANOPY.depth - 0.55
+    );
     this.ownedGeometries.push(geometry);
     const reflector = new Reflector(geometry, {
       clipBias: 0.003,
       textureWidth: size,
-      textureHeight: Math.round(size * 0.72),
-      color: 0x9eb8c8,
+      textureHeight: Math.round(size * 0.68),
+      color: 0xc5d8e8,
       multisample: 0,
     });
     reflector.name = 'marseille-mirror-reflector';
@@ -2014,7 +1969,7 @@ export class MarseilleMapProvider implements MapProvider {
     if (!this.root || !this.scene) return;
     const nightEnv = this.createNightEnvironmentMap();
     this.scene.environment = nightEnv;
-    this.scene.environmentIntensity = 0.42;
+    this.scene.environmentIntensity = 0.58;
     const moon = new THREE.DirectionalLight(
       CYBERPUNK_ART_DIRECTION.lights.moonColor,
       CYBERPUNK_ART_DIRECTION.lights.moonIntensity

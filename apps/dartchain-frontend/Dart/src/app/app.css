@@ -271,10 +271,15 @@
   z-index: 0;
   pointer-events: none;
   background: radial-gradient(
-    ellipse 120% 80% at 50% 40%,
-    var(--sc-universe-bg-center, #070504) 0%,
-    var(--sc-universe-bg-edge, #141008) 72%
-  );
+      ellipse 90% 52% at 50% 30%,
+      rgba(var(--sc-universe-aurora-rgb, 255, 199, 82), 0.16) 0%,
+      transparent 56%
+    ),
+    radial-gradient(
+      ellipse 120% 80% at 50% 40%,
+      var(--sc-universe-bg-center, #08040a) 0%,
+      var(--sc-universe-bg-edge, #160c08) 78%
+    );
 }
 
 .app-shell > app-navbar,

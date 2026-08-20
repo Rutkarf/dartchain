@@ -11,8 +11,8 @@
   bottom: max(12px, calc(var(--floor-peek-height, 220px) * 0.15 + 8px));
   transform: translateX(-50%);
   pointer-events: auto;
-  width: min(168px, calc(100vw - 14px));
-  max-height: min(180px, 36vh);
+  width: min(calc(168px * var(--sc-ui-scale, 1)), calc(100vw - 14px));
+  max-height: min(calc(180px * var(--sc-ui-scale, 1)), 36vh);
   display: flex;
   flex-direction: column;
   border-radius: 10px;
@@ -40,6 +40,14 @@
   color: rgba(170, 190, 210, 0.9);
 }
 
+.sc-scanner__conquest {
+  font-size: 8px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: rgba(232, 184, 109, 0.92);
+  white-space: nowrap;
+}
+
 .sc-scanner__network {
   font-size: 8px;
   letter-spacing: 0.02em;
@@ -61,6 +69,20 @@
   font-size: 13px;
   line-height: 1;
   cursor: pointer;
+}
+
+.sc-scanner__kpi {
+  margin: 0;
+  padding: 3px 8px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 7px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(190, 210, 230, 0.82);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sc-scanner__empty {
@@ -166,10 +188,10 @@
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  color: rgba(var(--sc-family-rgb, 62, 207, 220), 0.78);
+  color: rgba(var(--sc-family-rgb, 62, 207, 220), 0.88);
   font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 3.75px;
-  font-weight: 600;
+  font-size: calc(8.5px * var(--sc-ui-scale, 1));
+  font-weight: 650;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -195,8 +217,8 @@
 
 .sc-reward-label__dot {
   flex: 0 0 auto;
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
   border: 0;
   border-radius: 50%;
   background: rgb(var(--sc-family-rgb, 62, 207, 220));
@@ -283,12 +305,12 @@
   }
 
   .sc-reward-label {
-    font-size: 3.5px;
+    font-size: calc(8px * var(--sc-ui-scale, 1));
     padding: 6px 8px;
   }
 
   .sc-reward-label__dot {
-    width: 3.5px;
-    height: 3.5px;
+    width: 5.5px;
+    height: 5.5px;
   }
 }

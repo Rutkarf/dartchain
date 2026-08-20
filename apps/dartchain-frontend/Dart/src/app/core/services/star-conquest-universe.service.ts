@@ -5,6 +5,10 @@ import {
   starConquestUniverseTheme,
   storeUniverse,
 } from '../../particle-background/star-conquest/star-conquest-universes.config';
+import {
+  STAR_CONQUEST_SCALE,
+  STAR_CONQUEST_SCALE_TIER,
+} from '../../particle-background/star-conquest/star-conquest-scale';
 import type {
   StarConquestUniverseId,
   StarConquestUniverseTheme,
@@ -46,6 +50,9 @@ export class StarConquestUniverseService {
     const root = document.documentElement;
     root.style.setProperty('--sc-universe-bg-center', theme.bgCenter);
     root.style.setProperty('--sc-universe-bg-edge', theme.bgEdge);
+    root.style.setProperty('--sc-scale', String(STAR_CONQUEST_SCALE.visual));
+    root.style.setProperty('--sc-ui-scale', String(STAR_CONQUEST_SCALE.ui));
+    root.style.setProperty('--sc-scale-tier', STAR_CONQUEST_SCALE_TIER);
     root.style.setProperty(
       '--sc-universe-aurora-rgb',
       `${Math.round(theme.auroraRgb[0] * 255)}, ${Math.round(theme.auroraRgb[1] * 255)}, ${Math.round(theme.auroraRgb[2] * 255)}`

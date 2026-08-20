@@ -12,6 +12,10 @@
   >
     <header class="sc-scanner__head">
       <span class="sc-scanner__title">Signal · hors vue</span>
+      <span class="sc-scanner__conquest" aria-label="Quêtes conquises et live">
+        {{ progress.claimedCount() }}/{{ progress.catalogCount }}
+        · Live {{ progress.liveCompletedCount() }}/{{ progress.liveLinkCount }}
+      </span>
       <span class="sc-scanner__network" aria-hidden="true">{{ networkLabel() }}</span>
       <button
         type="button"
@@ -22,6 +26,14 @@
         ×
       </button>
     </header>
+    <p
+      class="sc-scanner__kpi"
+      [attr.data-sc-stage]="progress.commercial().stage"
+      [attr.data-sc-level-up]="progress.commercial().canLevelUp ? 'true' : 'false'"
+      [attr.title]="progress.commercial().nextMethod"
+    >
+      {{ progress.kpiLine() }}
+    </p>
     @if (state.hiddenCount() === 0) {
       <p class="sc-scanner__empty">Toutes les Quests sont visibles.</p>
     } @else {
@@ -38,7 +50,7 @@
               <span class="sc-scanner__meta">
                 <span class="sc-scanner__item-title">{{ quest.title }}</span>
                 <span class="sc-scanner__item-sub"
-                  >{{ familyLabel(quest.family) }} · {{ quest.status }}</span
+                  >{{ familyLabel(quest.family) }} · {{ statusLabel(quest.status) }}</span
                 >
               </span>
               <span class="sc-scanner__reward">{{ rewardText(quest) }}</span>

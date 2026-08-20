@@ -26,8 +26,9 @@ import {
   createWebGlRenderer,
   viewportSize,
 } from '../core/utils/three-webgl.util';
+import { STAR_CONQUEST_SCALE, STAR_CONQUEST_SCALE_TIER, starConquestDprCap } from './star-conquest/star-conquest-scale';
 import { StarConquestGraph } from './star-conquest/star-conquest-graph';
-import { StarConquestWorld } from './star-conquest/star-conquest-world';
+import { StarConquestWorld, CAMERA_Z } from './star-conquest/star-conquest-world';
 import { placeQuestPanelNearParticle } from './star-conquest/star-conquest-joystick-zone';
 import {
   layoutQuestsInBand,
@@ -35,10 +36,7 @@ import {
   separateLabelPositions,
 } from './star-conquest/star-conquest-layout';
 import { labelOpacityFromDepth } from './star-conquest/star-conquest-depth';
-import {
-  STAR_CONQUEST_MOCK_QUESTS,
-  STAR_CONQUEST_QUEST_COUNT,
-} from './star-conquest/star-conquest.mock';
+import { STAR_CONQUEST_MOCK_QUESTS } from './star-conquest/star-conquest.mock';
 import type { StarQuest } from './star-conquest/star-conquest.model';
 import {
   collectUiOccluderRects,
@@ -53,6 +51,7 @@ import {
 import { environment } from '../../environments/environment';
 import { KnowledgeGraphOrchestratorService } from './knowledge-graph/knowledge-graph-orchestrator.service';
 import { QUEST_ORBIT_CONFIG } from './knowledge-graph/knowledge-graph.config';
+import { StarConquestProgressService } from '../core/services/star-conquest-progress.service';
 import { StarConquestUniverseService } from '../core/services/star-conquest-universe.service';
 import { starConquestUniverseTheme } from './star-conquest/star-conquest-universes.config';
 import type { StarConquestUniverseId } from './star-conquest/star-conquest-universe.types';
@@ -72,6 +71,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private readonly conquestState = inject(StarConquestStateService);
   private readonly kgOrchestrator = inject(KnowledgeGraphOrchestratorService);
   private readonly universeService = inject(StarConquestUniverseService);
+  private readonly progress = inject(StarConquestProgressService);
   private readonly zone = inject(NgZone);
 
   private scene?: THREE.Scene;
@@ -81,12 +81,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private conquest?: StarConquestGraph;
   /** Groupe parent global — constellations uniquement. */
   private world?: StarConquestWorld;
-  private quests: StarQuest[] = STAR_CONQUEST_MOCK_QUESTS.map((q) => ({
-    ...q,
-    position: { ...q.position },
-    slot: { ...q.slot },
-    connections: [...q.connections],
-  }));
+  private quests: StarQuest[] = [];
 
   private animationId = 0;
   private animating = false;
@@ -140,6 +135,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.conquest?.setUniverse(theme);
     });
   };
+  private readonly onProgressEvent = (): void => {
+    this.zone.run(() => this.applyRuntimeProgress());
+  };
 
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => this.initWebGl());
@@ -158,10 +156,14 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.scene = new THREE.Scene();
       this.scene.background = null;
       this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 2000);
-      this.camera.position.z = 160;
+      this.camera.position.z = CAMERA_Z;
 
       this.renderer.setSize(width, height, false);
-      const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+      const gpuQuality = mapQualityToQuestGraphQuality(environment.mapQuality ?? 'medium');
+      const dpr =
+        typeof window !== 'undefined'
+          ? Math.min(window.devicePixelRatio || 1, starConquestDprCap(gpuQuality))
+          : 1;
       this.renderer.setPixelRatio(dpr);
       this.renderer.setClearColor(0x000000, 0);
       this.renderer.autoClear = true;
@@ -180,12 +182,14 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       created.canvas.style.cursor = 'default';
       created.canvas.style.background = 'transparent';
       created.canvas.setAttribute('data-star-conquest', 'canvas');
+      created.canvas.setAttribute('data-sc-tier', STAR_CONQUEST_SCALE_TIER);
       created.canvas.setAttribute('aria-label', 'Univers neuronal Star Conquest');
       created.canvas.removeAttribute('title');
       this.hostRef.nativeElement.appendChild(created.canvas);
 
       this.world = new StarConquestWorld();
       this.scene.add(this.world.root);
+      this.quests = this.progress.hydrateCatalog(STAR_CONQUEST_MOCK_QUESTS);
       this.conquest = new StarConquestGraph(this.quests);
       this.world.attachContent(this.conquest.group);
       this.conquest.clearJoystickExclusion();
@@ -193,9 +197,8 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       const vizMode = DEFAULT_QUEST_VISUALIZATION_MODE;
       this.conquest.setVisualizationMode(vizMode);
       this.kgOrchestrator.setVisualizationMode(vizMode);
-      this.kgOrchestrator.setQuality(
-        mapQualityToQuestGraphQuality(environment.mapQuality ?? 'medium')
-      );
+      this.kgOrchestrator.setQuality(gpuQuality);
+      this.conquest.setGpuQuality(gpuQuality);
       this.kgOrchestrator.bindGraph(this.conquest);
       this.kgOrchestrator.start(this.quests);
       this.universeService.initCssBackground();
@@ -215,6 +218,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       window.addEventListener('star-conquest-select', this.onSelectEvent);
       window.addEventListener('star-conquest-hover', this.onHoverEvent);
       window.addEventListener('star-conquest-universe-change', this.onUniverseChangeEvent);
+      window.addEventListener('star-conquest-progress', this.onProgressEvent);
 
       this.resizeBinding = bindContainerResize(
         this.hostRef.nativeElement,
@@ -230,12 +234,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.lastFrameMs = performance.now();
       this.renderFrame();
       this.resumeAnimation();
-
-      if (this.quests.length !== STAR_CONQUEST_QUEST_COUNT) {
-        console.warn(
-          `[star-conquest] Attendu ${STAR_CONQUEST_QUEST_COUNT} quests, reçu ${this.quests.length}`
-        );
-      }
+      this.progress.recordFunnel('views');
     } catch (error) {
       console.error('[particle-background] Initialisation impossible.', error);
     }
@@ -246,6 +245,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     window.removeEventListener('star-conquest-select', this.onSelectEvent);
     window.removeEventListener('star-conquest-hover', this.onHoverEvent);
     window.removeEventListener('star-conquest-universe-change', this.onUniverseChangeEvent);
+    window.removeEventListener('star-conquest-progress', this.onProgressEvent);
     window.removeEventListener('resize', this.onWindowLayout);
     this.layoutObserver?.disconnect();
     this.unbindPointer();
@@ -370,7 +370,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       maxY = Math.max(maxY, w.y);
     }
     if (!Number.isFinite(minX)) return;
-    const margin = 36;
+    const margin = Math.round(36 * STAR_CONQUEST_SCALE.layout);
     const txMax = Math.max(48, Math.max(Math.abs(minX), Math.abs(maxX)) + margin);
     const tyMax = Math.max(48, Math.max(Math.abs(minY), Math.abs(maxY)) + margin);
     this.world.setTravelBounds(txMax, tyMax, 32);
@@ -494,9 +494,10 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.pointerNdc.y = -((clientY - rect.top) / rect.height) * 2 + 1;
     // Hit plus large en bas (floor) pour les racines underFloor
     const nearFloor = clientY >= band.floorTopPx - 12;
+    const pick = STAR_CONQUEST_SCALE.pickRadiusPx;
     const radiusPx = nearFloor
-      ? Math.max(28, Math.min(40, rect.width * 0.16))
-      : Math.max(18, Math.min(28, rect.width * 0.1));
+      ? Math.max(pick + 8, Math.min(pick + 18, rect.width * 0.16))
+      : Math.max(pick, Math.min(pick + 8, rect.width * 0.1));
     return this.conquest.pick(
       this.raycaster,
       this.camera,
@@ -524,7 +525,25 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.lastAnchorX = anchor.x;
     this.lastAnchorY = anchor.y;
     this.conquestState.show(quest, anchor.x, anchor.y, anchor.compact);
+    this.progress.recordFunnel('picks');
+    this.progress.recordFunnel('panels');
     this.refreshRewardLabels();
+  }
+
+  private applyRuntimeProgress(): void {
+    const hydrated = this.progress.hydrateCatalog(STAR_CONQUEST_MOCK_QUESTS);
+    const byId = new Map(hydrated.map((quest) => [quest.id, quest]));
+    for (const quest of this.quests) {
+      const next = byId.get(quest.id);
+      if (next) quest.status = next.status;
+    }
+    this.conquest?.applyQuestStatuses(this.quests);
+    const panel = this.conquestState.panel();
+    if (!panel) return;
+    const updated = this.conquest?.getQuest(panel.quest.id) ?? byId.get(panel.quest.id);
+    if (updated) {
+      this.conquestState.show(updated, panel.x, panel.y, this.conquestState.panelCompact());
+    }
   }
 
   private selectById(questId: string, _fromScanner = false): void {
@@ -581,7 +600,12 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         p.x > vw + 12 ||
         p.y < band.topPx - 20 ||
         p.y > vh + 8;
-      const occluded = isQuestFullyOccluded(p.x, p.y, rects, 11);
+      const occluded = isQuestFullyOccluded(
+        p.x,
+        p.y,
+        rects,
+        Math.round(STAR_CONQUEST_SCALE.pickRadiusPx * 0.5)
+      );
       if (!offScreen && !occluded) continue;
       if (seen.has(quest.id)) continue;
       seen.add(quest.id);
@@ -625,7 +649,12 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       const quest = this.conquest.getQuest(p.id);
       const underFloor = quest?.underFloor === true;
       if (p.y > band.floorTopPx + 8 && !isFocus && !underFloor) continue;
-      const occluded = isQuestFullyOccluded(p.x, p.y, rects, 8);
+      const occluded = isQuestFullyOccluded(
+        p.x,
+        p.y,
+        rects,
+        Math.round(STAR_CONQUEST_SCALE.pickRadiusPx * 0.36)
+      );
       // underGraph : souvent sous app-graph — label OK si focus, sinon dim/occulté
       if (occluded && !isFocus && !quest?.underGraph) continue;
       const nearEdge =
@@ -657,7 +686,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       });
     }
 
-    separateLabelPositions(labels, 16, 6);
+    separateLabelPositions(labels, 22, 9);
     for (const l of labels) {
       if (l.x < 4 || l.x > band.viewportW - 4) continue;
       l.x = Math.max(8, Math.min(band.viewportW - 8, l.x));

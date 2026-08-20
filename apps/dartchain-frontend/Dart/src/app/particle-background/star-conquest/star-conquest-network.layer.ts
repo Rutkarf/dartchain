@@ -9,6 +9,7 @@ import type {
 } from '../knowledge-graph/knowledge-graph.types';
 import type { StarConquestUniverseTheme } from './star-conquest-universe.types';
 import { createSoftDiscTexture } from './star-conquest-visuals';
+import { STAR_CONQUEST_SCALE, scaledTextureSize } from './star-conquest-scale';
 
 const MAX_NETWORK_NODES = 48;
 const MAX_NETWORK_EDGES = 96;
@@ -48,13 +49,13 @@ export class StarConquestNetworkLayer {
 
   constructor() {
     this.group.name = 'star-conquest-network';
-    this.discTexture = createSoftDiscTexture(64);
+    this.discTexture = createSoftDiscTexture(scaledTextureSize(64));
 
     const nodeGeom = new THREE.BufferGeometry();
     nodeGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(0), 3));
     nodeGeom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(0), 3));
     const nodeMat = new THREE.PointsMaterial({
-      size: 2.4,
+      size: 2.4 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       transparent: true,
       opacity: 0.82,
@@ -69,7 +70,7 @@ export class StarConquestNetworkLayer {
 
     const haloGeom = nodeGeom.clone();
     const haloMat = new THREE.PointsMaterial({
-      size: 4.8,
+      size: 4.8 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       transparent: true,
       opacity: 0.28,
@@ -148,8 +149,8 @@ export class StarConquestNetworkLayer {
     const coreMat = this.nodePoints.material as THREE.PointsMaterial;
     const haloMat = this.haloPoints.material as THREE.PointsMaterial;
     const pulse = 1 + Math.sin(this.pulsePhase) * 0.08;
-    coreMat.size = 2.2 * pulse;
-    haloMat.size = 4.4 * pulse;
+    coreMat.size = 2.2 * STAR_CONQUEST_SCALE.visual * pulse;
+    haloMat.size = 4.4 * STAR_CONQUEST_SCALE.visual * pulse;
     const lineMat = this.networkLines.material as THREE.LineBasicMaterial;
     lineMat.opacity = 0.4 + Math.sin(this.pulsePhase * 1.2) * 0.12;
 

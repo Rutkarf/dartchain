@@ -1,4 +1,5 @@
 import type { StarConquestPeerLayout } from './star-conquest-universe.types';
+import { STAR_CONQUEST_SCALE } from './star-conquest-scale';
 
 export interface PeerLayoutInput {
   seed: string;
@@ -23,18 +24,19 @@ function hashFloat(seed: string): number {
 
 /** Position P2P selon l’univers actif — aucune coordonnée géo réelle. */
 export function layoutPeerForUniverse(
-  layout: StarConquestPeerLayout,
+  kind: StarConquestPeerLayout,
   input: PeerLayoutInput
 ): PeerLayoutResult {
+  const s = STAR_CONQUEST_SCALE.layout;
   const h = hashFloat(input.seed);
   const h2 = hashFloat(input.seed + ':b');
   const sync = (input.syncPercent ?? 50) / 100;
   const lat = input.latencyMs ?? 80;
 
-  switch (layout) {
+  switch (kind) {
     case 'orbital-rings': {
       const ring = Math.floor(h * 3);
-      const radius = 18 + ring * 14 + (1 - sync) * 8;
+      const radius = (18 + ring * 14 + (1 - sync) * 8) * s;
       const angle =
         (input.index / Math.max(input.total, 1)) * Math.PI * 2 + h * Math.PI * 2;
       return {
@@ -49,7 +51,7 @@ export function layoutPeerForUniverse(
       const arms = 5;
       const arm = input.index % arms;
       const angle = t * Math.PI * 4 + (arm / arms) * Math.PI * 2 + h * 0.5;
-      const radius = 12 + t * 42 + h2 * 6;
+      const radius = (12 + t * 42 + h2 * 6) * s;
       return {
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius * 0.72,
@@ -60,18 +62,18 @@ export function layoutPeerForUniverse(
       const cols = Math.ceil(Math.sqrt(Math.max(input.total, 1)));
       const col = input.index % cols;
       const row = Math.floor(input.index / cols);
-      const spacing = 16;
+      const spacing = 16 * s;
       const ox = ((cols - 1) * spacing) / 2;
       const oy = ((Math.ceil(input.total / cols) - 1) * spacing) / 2;
       return {
-        x: col * spacing - ox + (h - 0.5) * 4,
-        y: row * spacing - oy + (h2 - 0.5) * 4,
+        x: col * spacing - ox + (h - 0.5) * 4 * s,
+        y: row * spacing - oy + (h2 - 0.5) * 4 * s,
         z: -8 - lat * 0.005,
       };
     }
     case 'timeline-z': {
       const angle = h * Math.PI * 2;
-      const radius = 22 + h2 * 8;
+      const radius = (22 + h2 * 8) * s;
       const timeSlice = sync * 2 - 1;
       return {
         x: Math.cos(angle) * radius,
@@ -81,18 +83,18 @@ export function layoutPeerForUniverse(
     }
     case 'swarm-orbit': {
       const angle = (input.index / Math.max(input.total, 1)) * Math.PI * 2 + h * 4;
-      const radius = 24 + Math.sin(h2 * Math.PI * 2) * 8;
+      const radius = (24 + Math.sin(h2 * Math.PI * 2) * 8) * s;
       return {
-        x: Math.cos(angle) * radius + (h - 0.5) * 12,
-        y: Math.sin(angle) * radius + (h2 - 0.5) * 12,
+        x: Math.cos(angle) * radius + (h - 0.5) * 12 * s,
+        y: Math.sin(angle) * radius + (h2 - 0.5) * 12 * s,
         z: -6 - lat * 0.01 + Math.sin(angle * 2) * 4,
       };
     }
     case 'nebula-cluster': {
       const cluster = Math.floor(h * 4);
-      const cx = Math.cos(cluster * 1.2) * 30;
-      const cy = Math.sin(cluster * 0.9) * 22;
-      const spread = 8 + h2 * 10;
+      const cx = Math.cos(cluster * 1.2) * 30 * s;
+      const cy = Math.sin(cluster * 0.9) * 22 * s;
+      const spread = (8 + h2 * 10) * s;
       return {
         x: cx + (h - 0.5) * spread * 2,
         y: cy + (h2 - 0.5) * spread * 2,
@@ -102,7 +104,7 @@ export function layoutPeerForUniverse(
     case 'ring':
     default: {
       const angle = h * Math.PI * 2;
-      const radius = 28 + (h2 * 255) * 0.35;
+      const radius = (28 + (h2 * 255) * 0.35) * s;
       return {
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,

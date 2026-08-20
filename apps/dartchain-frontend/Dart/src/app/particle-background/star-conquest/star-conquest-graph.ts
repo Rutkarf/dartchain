@@ -8,8 +8,14 @@ import {
 import type { StarQuest, StarQuestRarity, StarQuestStatus } from './star-conquest.model';
 import {
   createSoftDiscTexture,
+  createStarBloomTexture,
+  createStarCoreTexture,
   sizeFromReward,
 } from './star-conquest-visuals';
+import {
+  createFilamentCoreLineMaterial,
+  createFilamentRibbonMaterial,
+} from './shaders/star-conquest-filament.shader';
 import {
   STAR_DEPTH_LAYERS,
   parallaxScaleForViewport,
@@ -26,6 +32,14 @@ import {
   starConquestUniverseTheme,
 } from './star-conquest-universes.config';
 import { questZFromStatus } from './star-conquest-universe-layout';
+import {
+  STAR_CONQUEST_SCALE,
+  scaledTextureSize,
+  starConquestPongSize,
+  type StarConquestGpuQuality,
+  STAR_PONG_OUTER_H as SCALE_PONG_H,
+  STAR_PONG_OUTER_W as SCALE_PONG_W,
+} from './star-conquest-scale';
 
 function hashFloat(id: string): number {
   let h = 2166136261;
@@ -51,17 +65,21 @@ const STATUS_BRIGHT: Record<StarQuestStatus, number> = {
   future: 0.38,
 };
 
-const LINKED_BOOST = 1.18;
-const DIM_FACTOR = 0.38;
-const MAX_ENERGY_PACKETS = 10;
+const LINKED_BOOST = 1.22;
+/** Voisinage Obsidian : hors 1-hop le graphe s’éteint. */
+const DIM_FACTOR = 0.08;
+const MAX_ENERGY_PACKETS = 16;
 /** Brins par arête — un filament clair (liaison fiable entre particules). */
 const LINE_STRANDS = 1;
+/** Ressort léger le long des arêtes (respiration type Obsidian). */
+const EDGE_SPRING_K = 0.14;
+const GHOST_OFFSET = 0.55;
 /** Vitesse de rotation mandala (très lent — fractal respirant). */
 const SWARM_MANDALA_ORBIT = 0.055;
 const SWARM_MANDALA_PULSE = 0.22;
-/** Cadre ping-pong hors viewport visible (app 250×550 → table 260×560). */
-export const STAR_PONG_OUTER_W = 260;
-export const STAR_PONG_OUTER_H = 560;
+/** Cadre ping-pong hors viewport — dérivé du palier de scale (R&D → produit → société). */
+export const STAR_PONG_OUTER_W = SCALE_PONG_W;
+export const STAR_PONG_OUTER_H = SCALE_PONG_H;
 const PONG_RESTITUTION = 0.92;
 const PONG_RANDOM_KICK = 0.55;
 
@@ -96,7 +114,10 @@ export class StarConquestGraph {
   readonly group = new THREE.Group();
   readonly questPoints: THREE.Points;
   readonly haloPoints: THREE.Points;
+  readonly bloomPoints: THREE.Points;
+  readonly ghostPoints: THREE.Points;
   readonly connectionLines: THREE.LineSegments;
+  readonly filamentRibbon: THREE.Mesh;
   readonly constellationGuides: THREE.LineSegments;
   readonly energyPackets: THREE.Points;
   /** Couche IA/P2P — peers, agents, liens sync (intégrée au même graphe). */
@@ -132,6 +153,18 @@ export class StarConquestGraph {
   private readonly aimTimer: Float32Array;
   private readonly linePositions: Float32Array;
   private readonly lineColors: Float32Array;
+  private readonly lineAlong: Float32Array;
+  private readonly haloColors: Float32Array;
+  private readonly ghostPositions: Float32Array;
+  private readonly filamentPositions: Float32Array;
+  private readonly filamentOthers: Float32Array;
+  private readonly filamentSides: Float32Array;
+  private readonly filamentAlong: Float32Array;
+  private readonly filamentColors: Float32Array;
+  private readonly coreTexture: THREE.CanvasTexture;
+  private readonly bloomTexture: THREE.CanvasTexture;
+  private readonly filamentMat: THREE.ShaderMaterial;
+  private readonly lineCoreMat: THREE.ShaderMaterial;
   private readonly edgePairs: Array<[number, number]> = [];
   /** Topologie mandala Ruche : anneaux intra-famille, rayons hub, pentagone inter-familles. */
   private readonly mandalaRingPairs: Array<[number, number]> = [];
@@ -163,6 +196,7 @@ export class StarConquestGraph {
   private universeTheme: StarConquestUniverseTheme = starConquestUniverseTheme(
     DEFAULT_STAR_CONQUEST_UNIVERSE
   );
+  private gpuQuality: StarConquestGpuQuality = 'medium';
 
   /** Exclusion écran joystick — aucune particule dans / derrière la hitbox. */
   private joyExclX = 0;
@@ -200,7 +234,11 @@ export class StarConquestGraph {
     this.aimY = new Float32Array(count);
     this.aimZ = new Float32Array(count);
     this.aimTimer = new Float32Array(count);
-    this.discTexture = createSoftDiscTexture(64);
+    this.discTexture = createSoftDiscTexture(scaledTextureSize(64));
+    this.coreTexture = createStarCoreTexture(scaledTextureSize(64));
+    this.bloomTexture = createStarBloomTexture(scaledTextureSize(96));
+    this.haloColors = new Float32Array(count * 3);
+    this.ghostPositions = new Float32Array(count * 3);
 
     let sizeSum = 0;
     this.quests.forEach((quest, i) => {
@@ -217,19 +255,23 @@ export class StarConquestGraph {
       this.layoutHomes[i3 + 2] = quest.position.z;
 
       const [r, g, b] = this.colorForQuest(quest);
-      this.baseColors[i3] = Math.min(1, r * 0.94 + 0.04);
-      this.baseColors[i3 + 1] = Math.min(1, g * 0.94 + 0.04);
-      this.baseColors[i3 + 2] = Math.min(1, b * 0.94 + 0.04);
+      this.baseColors[i3] = Math.min(1, r * 0.35 + 0.72);
+      this.baseColors[i3 + 1] = Math.min(1, g * 0.35 + 0.72);
+      this.baseColors[i3 + 2] = Math.min(1, b * 0.28 + 0.78);
+      this.haloColors[i3] = r;
+      this.haloColors[i3 + 1] = g;
+      this.haloColors[i3 + 2] = b;
 
       const h = hashFloat(quest.id);
       const h2 = hashFloat(quest.id + ':b');
       const h3 = hashFloat(quest.id + ':c');
       this.driftPhase[i] = h * Math.PI * 2;
       const layer = STAR_DEPTH_LAYERS.interactive;
+      const drift = STAR_CONQUEST_SCALE.drift;
       // Amplitudes monde — dérive latérale plus large, verticale plus calme
-      this.driftAmpX[i] = layer.driftAmp * (1.15 + h * 0.7) * (0.85 + (i % 5) * 0.1);
-      this.driftAmpY[i] = layer.driftAmp * (0.55 + h2 * 0.45) * (0.7 + (i % 7) * 0.05);
-      this.driftAmpZ[i] = layer.driftAmp * (0.95 + h3 * 0.65);
+      this.driftAmpX[i] = layer.driftAmp * (1.15 + h * 0.7) * (0.85 + (i % 5) * 0.1) * drift;
+      this.driftAmpY[i] = layer.driftAmp * (0.55 + h2 * 0.45) * (0.7 + (i % 7) * 0.05) * drift;
+      this.driftAmpZ[i] = layer.driftAmp * (0.95 + h3 * 0.65) * drift;
       this.driftRadius[i] =
         Math.max(this.driftAmpX[i], this.driftAmpY[i]) * 1.85 + this.driftAmpZ[i] * 0.3;
       this.driftSpeed[i] = 1.15 + h * 1.55 + (i % 6) * 0.18;
@@ -251,13 +293,13 @@ export class StarConquestGraph {
       new THREE.BufferAttribute(this.baseColors.slice(), 3)
     );
 
-    // Halo Three.js — points doux, contraste vs fond gris 0x7f8c9b
+    const sizes = this.questPointSizes();
     const coreMat = new THREE.PointsMaterial({
-      size: Math.max(0.2, Math.min(0.28, this.meanCoreSize * 1.05)),
-      map: this.discTexture,
+      size: sizes.core,
+      map: this.coreTexture,
       color: 0xffffff,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.98,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -268,13 +310,13 @@ export class StarConquestGraph {
 
     const haloGeom = new THREE.BufferGeometry();
     haloGeom.setAttribute('position', geometry.getAttribute('position'));
-    haloGeom.setAttribute('color', geometry.getAttribute('color'));
+    haloGeom.setAttribute('color', new THREE.BufferAttribute(this.haloColors.slice(), 3));
     const haloMat = new THREE.PointsMaterial({
-      size: Math.max(0.36, Math.min(0.58, this.meanCoreSize * 2.35)),
+      size: sizes.halo,
       map: this.discTexture,
       color: 0xffffff,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.38,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -283,6 +325,42 @@ export class StarConquestGraph {
     this.haloPoints = new THREE.Points(haloGeom, haloMat);
     this.haloPoints.name = 'star-conquest-halos';
     this.haloPoints.raycast = () => {};
+
+    const bloomGeom = new THREE.BufferGeometry();
+    bloomGeom.setAttribute('position', geometry.getAttribute('position'));
+    bloomGeom.setAttribute('color', haloGeom.getAttribute('color'));
+    const bloomMat = new THREE.PointsMaterial({
+      size: sizes.bloom,
+      map: this.bloomTexture,
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.26,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+    this.bloomPoints = new THREE.Points(bloomGeom, bloomMat);
+    this.bloomPoints.name = 'star-conquest-bloom';
+    this.bloomPoints.raycast = () => {};
+
+    const ghostGeom = new THREE.BufferGeometry();
+    ghostGeom.setAttribute('position', new THREE.BufferAttribute(this.ghostPositions, 3));
+    ghostGeom.setAttribute('color', haloGeom.getAttribute('color'));
+    const ghostMat = new THREE.PointsMaterial({
+      size: sizes.ghost,
+      map: this.discTexture,
+      color: 0xa8fff8,
+      transparent: true,
+      opacity: 0.14,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+    this.ghostPoints = new THREE.Points(ghostGeom, ghostMat);
+    this.ghostPoints.name = 'star-conquest-ghosts';
+    this.ghostPoints.raycast = () => {};
 
     const seen = new Set<string>();
     this.quests.forEach((quest, i) => {
@@ -345,6 +423,13 @@ export class StarConquestGraph {
     const strandVerts = edgeCount * LINE_STRANDS;
     this.linePositions = new Float32Array(strandVerts * 6);
     this.lineColors = new Float32Array(strandVerts * 6);
+    this.lineAlong = new Float32Array(strandVerts * 2);
+    const ribbonVerts = strandVerts * 4;
+    this.filamentPositions = new Float32Array(ribbonVerts * 3);
+    this.filamentOthers = new Float32Array(ribbonVerts * 3);
+    this.filamentSides = new Float32Array(ribbonVerts);
+    this.filamentAlong = new Float32Array(ribbonVerts);
+    this.filamentColors = new Float32Array(ribbonVerts * 3);
     this.writeLineGeometry(null, 0);
 
     const lineGeom = new THREE.BufferGeometry();
@@ -353,17 +438,38 @@ export class StarConquestGraph {
       new THREE.BufferAttribute(this.linePositions, 3)
     );
     lineGeom.setAttribute('color', new THREE.BufferAttribute(this.lineColors, 3));
-    const lineMat = new THREE.LineBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.48,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    this.connectionLines = new THREE.LineSegments(lineGeom, lineMat);
+    lineGeom.setAttribute('along', new THREE.BufferAttribute(this.lineAlong, 1));
+    this.lineCoreMat = createFilamentCoreLineMaterial();
+    this.connectionLines = new THREE.LineSegments(lineGeom, this.lineCoreMat);
     this.connectionLines.name = 'star-conquest-links';
-    this.connectionLines.renderOrder = 1;
+    this.connectionLines.renderOrder = 2;
     this.connectionLines.frustumCulled = false;
+
+    const ribbonGeom = new THREE.BufferGeometry();
+    ribbonGeom.setAttribute('position', new THREE.BufferAttribute(this.filamentPositions, 3));
+    ribbonGeom.setAttribute('other', new THREE.BufferAttribute(this.filamentOthers, 3));
+    ribbonGeom.setAttribute('side', new THREE.BufferAttribute(this.filamentSides, 1));
+    ribbonGeom.setAttribute('along', new THREE.BufferAttribute(this.filamentAlong, 1));
+    ribbonGeom.setAttribute('color', new THREE.BufferAttribute(this.filamentColors, 3));
+    const ribbonIndex = new Uint16Array(strandVerts * 6);
+    for (let e = 0; e < strandVerts; e++) {
+      const b = e * 4;
+      const o = e * 6;
+      ribbonIndex[o] = b;
+      ribbonIndex[o + 1] = b + 1;
+      ribbonIndex[o + 2] = b + 2;
+      ribbonIndex[o + 3] = b;
+      ribbonIndex[o + 4] = b + 2;
+      ribbonIndex[o + 5] = b + 3;
+    }
+    ribbonGeom.setIndex(new THREE.BufferAttribute(ribbonIndex, 1));
+    this.filamentMat = createFilamentRibbonMaterial();
+    this.filamentRibbon = new THREE.Mesh(ribbonGeom, this.filamentMat);
+    this.filamentRibbon.name = 'star-conquest-filaments';
+    this.filamentRibbon.frustumCulled = false;
+    this.filamentRibbon.renderOrder = 1;
+    this.filamentRibbon.raycast = () => {};
+    this.syncFilamentRibbon();
 
     this.packetPositions = new Float32Array(MAX_ENERGY_PACKETS * 3);
     this.packetColors = new Float32Array(MAX_ENERGY_PACKETS * 3);
@@ -374,11 +480,11 @@ export class StarConquestGraph {
     );
     packetGeom.setAttribute('color', new THREE.BufferAttribute(this.packetColors, 3));
     const packetMat = new THREE.PointsMaterial({
-      size: 3.2,
-      map: this.discTexture,
-      color: 0x00ffff,
+      size: 5.2 * STAR_CONQUEST_SCALE.visual,
+      map: this.coreTexture,
+      color: 0xffffff,
       transparent: true,
-      opacity: 0,
+      opacity: 0.95,
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -387,15 +493,18 @@ export class StarConquestGraph {
     this.energyPackets = new THREE.Points(packetGeom, packetMat);
     this.energyPackets.name = 'star-conquest-energy';
     this.energyPackets.raycast = () => {};
-    this.energyPackets.visible = false;
-    this.energyPackets.renderOrder = 2;
+    this.energyPackets.visible = true;
+    this.energyPackets.renderOrder = 3;
 
     this.background = new StarConquestBackground();
     this.effects = new StarConquestEffects();
     this.group.add(this.background.group);
     this.group.add(this.effects.group);
+    this.group.add(this.filamentRibbon);
     this.group.add(this.connectionLines);
     this.group.add(this.constellationGuides);
+    this.group.add(this.bloomPoints);
+    this.group.add(this.ghostPoints);
     this.group.add(this.haloPoints);
     this.group.add(this.questPoints);
     this.group.add(this.energyPackets);
@@ -405,9 +514,20 @@ export class StarConquestGraph {
     this.applyVisualizationMode();
   }
 
+  setGpuQuality(quality: StarConquestGpuQuality): void {
+    this.gpuQuality = quality;
+    this.background.setGpuQuality(quality);
+    this.background.applyUniverse(this.universeTheme);
+  }
+
+  getGpuQuality(): StarConquestGpuQuality {
+    return this.gpuQuality;
+  }
+
   /** Bascule l’univers spatial Star Conquest (100 % autonome, sans metaverse floor). */
   setUniverse(theme: StarConquestUniverseTheme): void {
     this.universeTheme = theme;
+    this.background.setGpuQuality(this.gpuQuality);
     this.background.applyUniverse(theme);
     this.effects.applyUniverse(theme);
     this.applyUniverseMaterials(theme);
@@ -455,30 +575,50 @@ export class StarConquestGraph {
       theme.showNeuralLinks &&
       (this.visualizationMode === 'knowledge-graph' || this.visualizationMode === 'hybrid');
     this.connectionLines.visible = showLinks;
+    this.filamentRibbon.visible = showLinks;
     const guideMat = this.constellationGuides.material as THREE.LineBasicMaterial;
     guideMat.opacity = theme.constellationOpacity;
     this.constellationGuides.visible =
       theme.showConstellations && theme.constellationOpacity > 0;
-    const lineMat = this.connectionLines.material as THREE.LineBasicMaterial;
-    lineMat.opacity = theme.linkOpacity;
+    this.lineCoreMat.uniforms['uOpacity'].value = Math.min(0.98, theme.linkOpacity + 0.32);
+    this.filamentMat.uniforms['uOpacity'].value = Math.min(0.88, theme.linkOpacity + 0.22);
+    this.filamentMat.uniforms['uWidthPx'].value = STAR_CONQUEST_SCALE.filamentWidthPx;
     this.networkLayer.setVisualizationMode(this.visualizationMode);
   }
 
+  private questPointSizes(pulse = 1): {
+    core: number;
+    halo: number;
+    bloom: number;
+    ghost: number;
+  } {
+    const visual = STAR_CONQUEST_SCALE.visual;
+    const theme = this.universeTheme;
+    const core = this.meanCoreSize * 0.86 * theme.coreSizeMult * visual * pulse;
+    const halo = this.meanCoreSize * 3.45 * theme.haloSizeMult * visual * pulse;
+    const bloom = this.meanCoreSize * 7.6 * theme.haloSizeMult * visual * pulse;
+    return { core, halo, bloom, ghost: core * 0.92 };
+  }
+
+  private applyQuestPointSizes(pulse = 1): void {
+    const sizes = this.questPointSizes(pulse);
+    (this.questPoints.material as THREE.PointsMaterial).size = sizes.core;
+    (this.haloPoints.material as THREE.PointsMaterial).size = sizes.halo;
+    (this.bloomPoints.material as THREE.PointsMaterial).size = sizes.bloom;
+    (this.ghostPoints.material as THREE.PointsMaterial).size = sizes.ghost;
+  }
+
   private applyUniverseMaterials(theme: StarConquestUniverseTheme): void {
+    this.universeTheme = theme;
+    this.applyQuestPointSizes();
     const coreMat = this.questPoints.material as THREE.PointsMaterial;
     const haloMat = this.haloPoints.material as THREE.PointsMaterial;
-    const vw = typeof window !== 'undefined' ? window.innerWidth : 250;
-    const sizeScale = Math.max(0.9, Math.min(1.4, vw / 250));
-    coreMat.size = Math.max(
-      0.22,
-      Math.min(0.44, this.meanCoreSize * 1.05 * theme.coreSizeMult * sizeScale)
-    );
-    haloMat.size = Math.max(
-      0.38,
-      Math.min(0.82, this.meanCoreSize * 2.35 * theme.haloSizeMult * sizeScale)
-    );
-    coreMat.opacity = theme.coreOpacity;
-    haloMat.opacity = theme.haloOpacity;
+    const bloomMat = this.bloomPoints.material as THREE.PointsMaterial;
+    const ghostMat = this.ghostPoints.material as THREE.PointsMaterial;
+    coreMat.opacity = Math.min(1, theme.coreOpacity + 0.08);
+    haloMat.opacity = Math.min(0.68, theme.haloOpacity + 0.22);
+    bloomMat.opacity = 0.3 + theme.haloOpacity * 0.5;
+    ghostMat.opacity = 0.14;
   }
 
   private applyTimelineQuestDepth(): void {
@@ -537,9 +677,12 @@ export class StarConquestGraph {
       this.layoutHomes[i3 + 2] = quest.position.z;
       pos.setXYZ(i, quest.position.x, quest.position.y, quest.position.z);
       const [r, g, b] = this.colorForQuest(this.quests[i]);
-      this.baseColors[i3] = Math.min(1, r * 0.5 + 0.25);
-      this.baseColors[i3 + 1] = Math.min(1, g * 0.55 + 0.55);
-      this.baseColors[i3 + 2] = Math.min(1, b * 0.4 + 0.75);
+      this.baseColors[i3] = Math.min(1, r * 0.35 + 0.72);
+      this.baseColors[i3 + 1] = Math.min(1, g * 0.35 + 0.72);
+      this.baseColors[i3 + 2] = Math.min(1, b * 0.28 + 0.78);
+      this.haloColors[i3] = r;
+      this.haloColors[i3 + 1] = g;
+      this.haloColors[i3 + 2] = b;
       sizeSum += sizeFromReward(quest.rewardM4T3R, RARITY_BOOST[quest.rarity]);
     });
     this.meanCoreSize = sizeSum / Math.max(quests.length, 1);
@@ -547,7 +690,22 @@ export class StarConquestGraph {
     const colors = this.questPoints.geometry.getAttribute('color') as THREE.BufferAttribute;
     (colors.array as Float32Array).set(this.baseColors);
     colors.needsUpdate = true;
+    const haloCol = this.haloPoints.geometry.getAttribute('color') as THREE.BufferAttribute;
+    (haloCol.array as Float32Array).set(this.haloColors);
+    haloCol.needsUpdate = true;
     this.applyFocusVisuals();
+  }
+
+  /** Met à jour les statuts joueur sans relayout (catalogue N, progression séparée). */
+  applyQuestStatuses(quests: readonly StarQuest[]): void {
+    const byId = new Map(quests.map((quest) => [quest.id, quest.status]));
+    for (let i = 0; i < this.quests.length; i++) {
+      const status = byId.get(this.quests[i].id);
+      if (status) this.quests[i].status = status;
+    }
+    if (this.universeTheme.id === 'conquest-timeline') {
+      this.applyTimelineQuestDepth();
+    }
   }
 
   /**
@@ -664,17 +822,18 @@ export class StarConquestGraph {
   }
 
   /**
-   * Rebond type ping-pong sur le cadre externe hors écran app
-   * (260×560 autour du viewport 250×550) — mouvement random sur les 4 bords.
+   * Rebond type ping-pong sur le cadre externe hors écran
+   * (viewport × worldExtent du palier de scale).
    */
   private applyOuterBorderPingPong(cam: THREE.PerspectiveCamera, dt: number): void {
     const pos = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
     const vw = window.innerWidth || 250;
     const vh = window.innerHeight || 550;
-    const left = (vw - STAR_PONG_OUTER_W) * 0.5;
-    const right = left + STAR_PONG_OUTER_W;
-    const top = (vh - STAR_PONG_OUTER_H) * 0.5;
-    const bottom = top + STAR_PONG_OUTER_H;
+    const { w: outerW, h: outerH } = starConquestPongSize(vw, vh);
+    const left = (vw - outerW) * 0.5;
+    const right = left + outerW;
+    const top = (vh - outerH) * 0.5;
+    const bottom = top + outerH;
 
     for (let i = 0; i < this.quests.length; i++) {
       let x = pos.getX(i);
@@ -1033,6 +1192,42 @@ export class StarConquestGraph {
       this.quests[i].position.y = y;
       this.quests[i].position.z = z;
     }
+
+    this.applyEdgeSprings(dt, pos);
+  }
+
+  /** Attraction douce vers la longueur de repos des arêtes — graphe qui respire. */
+  private applyEdgeSprings(dt: number, pos: THREE.BufferAttribute): void {
+    if (this.focusId) return;
+    const pairs =
+      this.universeTheme.peerLayout === 'swarm-orbit'
+        ? this.mandalaRingPairs
+        : this.edgePairs;
+    const k = EDGE_SPRING_K * dt;
+    for (const [i, j] of pairs) {
+      const i3 = i * 3;
+      const j3 = j * 3;
+      const rest = Math.hypot(
+        this.layoutHomes[i3] - this.layoutHomes[j3],
+        this.layoutHomes[i3 + 1] - this.layoutHomes[j3 + 1],
+        this.layoutHomes[i3 + 2] - this.layoutHomes[j3 + 2]
+      );
+      if (rest < 0.4) continue;
+      const dx = pos.getX(j) - pos.getX(i);
+      const dy = pos.getY(j) - pos.getY(i);
+      const dz = pos.getZ(j) - pos.getZ(i);
+      const cur = Math.hypot(dx, dy, dz) || 1e-4;
+      const mag = (cur - rest) * k;
+      const nx = dx / cur;
+      const ny = dy / cur;
+      const nz = dz / cur;
+      this.velX[i] += nx * mag;
+      this.velY[i] += ny * mag;
+      this.velZ[i] += nz * mag;
+      this.velX[j] -= nx * mag;
+      this.velY[j] -= ny * mag;
+      this.velZ[j] -= nz * mag;
+    }
   }
 
   tick(deltaMs: number, camera?: THREE.Camera): void {
@@ -1059,6 +1254,7 @@ export class StarConquestGraph {
 
     if (swarmOrbit) {
       this.applyQuestSwarmOrbit(dt, pos);
+      this.applyEdgeSprings(dt * 0.35, pos);
     } else {
       this.tickQuestDrift(dt, pos, pointerWorld);
     }
@@ -1160,7 +1356,7 @@ export class StarConquestGraph {
 
     // Séparation douce entre Quests — désactivée en mandala (préserve l'orbite)
     if (!swarmOrbit) {
-      const minSep = 3.2;
+      const minSep = STAR_CONQUEST_SCALE.minSeparation;
       for (let i = 0; i < this.quests.length; i++) {
         if (this.quests[i].underFloor || this.quests[i].underGraph) continue;
         let xi = pos.getX(i);
@@ -1199,31 +1395,41 @@ export class StarConquestGraph {
     }
 
     pos.needsUpdate = true;
+    this.writeGhostPositions(pos);
     this.writeConstellationGuides();
 
-    const coreMat = this.questPoints.material as THREE.PointsMaterial;
-    const haloMat = this.haloPoints.material as THREE.PointsMaterial;
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 250;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 550;
+    this.filamentMat.uniforms['uTime'].value = this.driftTime;
+    this.filamentMat.uniforms['uResolution'].value.set(vw, vh);
+    this.lineCoreMat.uniforms['uTime'].value = this.driftTime;
+
     if (this.focusId) {
       this.pulsePhase += deltaMs * 0.0028;
-      const focus = this.getQuest(this.focusId);
-      const base = focus
-        ? sizeFromReward(focus.rewardM4T3R, RARITY_BOOST[focus.rarity]) * 0.55
-        : this.meanCoreSize * 0.55;
-      const pulse = 1 + Math.sin(this.pulsePhase) * 0.1;
-      coreMat.size = base * pulse;
-      coreMat.opacity = 0.38 + Math.sin(this.pulsePhase) * 0.06;
-      haloMat.size = base * 2.6 * pulse;
-      haloMat.opacity = 0.14 + Math.sin(this.pulsePhase) * 0.03;
+      const pulse = 1 + Math.sin(this.pulsePhase) * 0.12;
+      this.applyQuestPointSizes(pulse);
+      const coreMat = this.questPoints.material as THREE.PointsMaterial;
+      const haloMat = this.haloPoints.material as THREE.PointsMaterial;
+      const bloomMat = this.bloomPoints.material as THREE.PointsMaterial;
+      const ghostMat = this.ghostPoints.material as THREE.PointsMaterial;
+      coreMat.opacity = 0.92 + Math.sin(this.pulsePhase) * 0.06;
+      haloMat.opacity = 0.34 + Math.sin(this.pulsePhase) * 0.05;
+      bloomMat.opacity = 0.28 + Math.sin(this.pulsePhase) * 0.04;
+      ghostMat.opacity = 0.18;
       this.writeLineGeometry(this.linkedSet(this.focusId), this.energyPhase);
       this.updateEnergyPackets(this.focusId, this.energyPhase);
     } else {
       const theme = this.universeTheme;
-      coreMat.size = this.meanCoreSize * 0.55 * theme.coreSizeMult;
-      coreMat.opacity =
-        theme.coreOpacity * 0.85 + Math.sin(this.driftTime * 0.35) * 0.04;
-      haloMat.size = this.meanCoreSize * 2.2 * theme.haloSizeMult;
-      haloMat.opacity =
-        theme.haloOpacity * 0.9 + Math.sin(this.driftTime * 0.28) * 0.02;
+      const breathe = Math.sin(this.driftTime * 0.35);
+      this.applyQuestPointSizes();
+      const coreMat = this.questPoints.material as THREE.PointsMaterial;
+      const haloMat = this.haloPoints.material as THREE.PointsMaterial;
+      const bloomMat = this.bloomPoints.material as THREE.PointsMaterial;
+      const ghostMat = this.ghostPoints.material as THREE.PointsMaterial;
+      coreMat.opacity = Math.min(1, theme.coreOpacity + 0.12 + breathe * 0.04);
+      haloMat.opacity = Math.min(0.5, theme.haloOpacity + 0.18 + breathe * 0.02);
+      bloomMat.opacity = 0.22 + theme.haloOpacity * 0.4;
+      ghostMat.opacity = 0.1 + Math.sin(this.driftTime * 1.1) * 0.025;
       this.writeLineGeometry(null, this.energyPhase);
       this.updateIdleEnergyPackets(this.energyPhase, deltaMs);
     }
@@ -1238,8 +1444,13 @@ export class StarConquestGraph {
     const lineColors = this.connectionLines.geometry.getAttribute(
       'color'
     ) as THREE.BufferAttribute;
+    const lineAlong = this.connectionLines.geometry.getAttribute(
+      'along'
+    ) as THREE.BufferAttribute;
     linePos.needsUpdate = true;
     lineColors.needsUpdate = true;
+    if (lineAlong) lineAlong.needsUpdate = true;
+    this.syncFilamentRibbon();
   }
 
   pick(
@@ -1248,7 +1459,7 @@ export class StarConquestGraph {
     ndc: THREE.Vector2,
     clientX?: number,
     clientY?: number,
-    radiusPx = 16
+    radiusPx = STAR_CONQUEST_SCALE.pickRadiusPx
   ): StarConquestHit | null {
     const vw = window.innerWidth || 1;
     const vh = window.innerHeight || 1;
@@ -1307,8 +1518,13 @@ export class StarConquestGraph {
     this.questPoints.geometry.dispose();
     (this.questPoints.material as THREE.Material).dispose();
     (this.haloPoints.material as THREE.Material).dispose();
+    (this.bloomPoints.material as THREE.Material).dispose();
+    this.ghostPoints.geometry.dispose();
+    (this.ghostPoints.material as THREE.Material).dispose();
     this.connectionLines.geometry.dispose();
     (this.connectionLines.material as THREE.Material).dispose();
+    this.filamentRibbon.geometry.dispose();
+    (this.filamentRibbon.material as THREE.Material).dispose();
     this.constellationGuides.geometry.dispose();
     (this.constellationGuides.material as THREE.Material).dispose();
     this.energyPackets.geometry.dispose();
@@ -1317,6 +1533,8 @@ export class StarConquestGraph {
     this.background.dispose();
     this.effects.dispose();
     this.discTexture.dispose();
+    this.coreTexture.dispose();
+    this.bloomTexture.dispose();
   }
 
   /** Guides zodiacaux : suivent les nœuds (70 % live + 30 % ancre) — silhouette respirante. */
@@ -1377,6 +1595,7 @@ export class StarConquestGraph {
 
   private applyFocusVisuals(): void {
     const colors = this.questPoints.geometry.getAttribute('color') as THREE.BufferAttribute;
+    const haloCol = this.haloPoints.geometry.getAttribute('color') as THREE.BufferAttribute;
     const linked = this.focusId ? this.linkedSet(this.focusId) : null;
     const focusIdx = this.focusId ? (this.idToIndex.get(this.focusId) ?? -1) : -1;
     const focusFamily = focusIdx >= 0 ? this.quests[focusIdx].family : null;
@@ -1386,40 +1605,44 @@ export class StarConquestGraph {
       let r = this.baseColors[i3];
       let g = this.baseColors[i3 + 1];
       let b = this.baseColors[i3 + 2];
+      let hr = this.haloColors[i3];
+      let hg = this.haloColors[i3 + 1];
+      let hb = this.haloColors[i3 + 2];
 
       if (linked && focusIdx >= 0 && focusFamily) {
         if (i === focusIdx) {
           const theme = familyTheme(focusFamily);
-          r = Math.min(1, theme.rgb[0] * 1.4);
-          g = Math.min(1, theme.rgb[1] * 1.4);
-          b = Math.min(1, theme.rgb[2] * 1.4);
+          r = Math.min(1, 0.82 + theme.rgb[0] * 0.35);
+          g = Math.min(1, 0.86 + theme.rgb[1] * 0.28);
+          b = Math.min(1, 0.9 + theme.rgb[2] * 0.22);
+          hr = Math.min(1, theme.rgb[0] * 1.45);
+          hg = Math.min(1, theme.rgb[1] * 1.45);
+          hb = Math.min(1, theme.rgb[2] * 1.45);
         } else if (linked.has(i)) {
           r = Math.min(1, r * LINKED_BOOST);
           g = Math.min(1, g * LINKED_BOOST);
           b = Math.min(1, b * LINKED_BOOST);
+          hr = Math.min(1, hr * LINKED_BOOST);
+          hg = Math.min(1, hg * LINKED_BOOST);
+          hb = Math.min(1, hb * LINKED_BOOST);
         } else {
           r *= DIM_FACTOR;
           g *= DIM_FACTOR;
           b *= DIM_FACTOR;
+          hr *= DIM_FACTOR;
+          hg *= DIM_FACTOR;
+          hb *= DIM_FACTOR;
         }
       }
       colors.setXYZ(i, r, g, b);
+      haloCol.setXYZ(i, hr, hg, hb);
     }
     colors.needsUpdate = true;
+    haloCol.needsUpdate = true;
 
     this.writeLineGeometry(linked, this.energyPhase);
-    const lineMat = this.connectionLines.material as THREE.LineBasicMaterial;
-    lineMat.opacity = focusIdx >= 0 ? 0.58 : 0.48;
-
-    if (focusIdx < 0) {
-      const coreMat = this.questPoints.material as THREE.PointsMaterial;
-      const haloMat = this.haloPoints.material as THREE.PointsMaterial;
-      coreMat.size = this.meanCoreSize * 0.55;
-      coreMat.opacity = 0.28;
-      haloMat.size = this.meanCoreSize * 2.4;
-      haloMat.opacity = 0.1;
-      this.hideEnergyPackets();
-    }
+    this.lineCoreMat.uniforms['uOpacity'].value = focusIdx >= 0 ? 0.96 : 0.78;
+    this.filamentMat.uniforms['uOpacity'].value = focusIdx >= 0 ? 0.72 : 0.52;
   }
 
   private hideEnergyPackets(): void {
@@ -1433,9 +1656,9 @@ export class StarConquestGraph {
       this.hideEnergyPackets();
       return;
     }
-    if (this.idleSignalTimer > 3800 || this.idleSignalEdges.length === 0) {
+    if (this.idleSignalTimer > 1600 || this.idleSignalEdges.length === 0) {
       this.idleSignalTimer = 0;
-      const pick = Math.min(5, this.edgePairs.length);
+      const pick = Math.min(10, this.edgePairs.length);
       const next: number[] = [];
       const n = this.edgePairs.length;
       let seed =
@@ -1469,7 +1692,7 @@ export class StarConquestGraph {
         this.quests[j].family,
         0.5
       );
-      const glow = 0.35 + 0.25 * Math.sin(energy * 2 + packet);
+      const glow = 0.55 + 0.4 * Math.sin(energy * 2 + packet);
       this.packetColors[o] = cr * glow;
       this.packetColors[o + 1] = cg * glow;
       this.packetColors[o + 2] = cb * glow;
@@ -1489,7 +1712,7 @@ export class StarConquestGraph {
     pAttr.needsUpdate = true;
     cAttr.needsUpdate = true;
     this.energyPackets.visible = packet > 0;
-    (this.energyPackets.material as THREE.PointsMaterial).opacity = 0.72;
+    (this.energyPackets.material as THREE.PointsMaterial).opacity = 0.92;
     void deltaMs;
   }
 
@@ -1576,9 +1799,9 @@ export class StarConquestGraph {
       const dim = linked !== null && !focused;
       const zAvg = (az + bz) * 0.5;
       const depthFade = 0.8 + Math.max(-0.2, Math.min(0.22, zAvg * 0.008));
-      // Hiérarchie : focus > même famille > passif ; dim léger hors sélection
+      // Hiérarchie : focus > même famille > passif ; dim Obsidian hors voisinage
       let intensity = focused ? 0.95 : same ? 0.58 : 0.4;
-      if (dim) intensity = 0.3;
+      if (dim) intensity = 0.08;
       const flow =
         0.85 +
         0.15 * (0.5 + 0.5 * Math.sin(energy * (focused ? 3.0 : 0.9) + edgeIdx));
@@ -1621,9 +1844,19 @@ export class StarConquestGraph {
       (c.array as Float32Array).set(this.lineColors);
       c.needsUpdate = true;
     }
+    const alongAttr = geom.getAttribute('along') as THREE.BufferAttribute | undefined;
+    if (alongAttr) {
+      const n = Math.min(alongAttr.count, this.lineAlong.length);
+      for (let i = 0; i < n; i += 2) {
+        this.lineAlong[i] = 0;
+        this.lineAlong[i + 1] = 1;
+      }
+      (alongAttr.array as Float32Array).set(this.lineAlong);
+      alongAttr.needsUpdate = true;
+    }
+    this.syncFilamentRibbon();
   }
 
-  /** Lignes mandala : rayons hub, polygones intra-famille, pentagone global — pulse lent. */
   private writeSwarmMandalaLines(linked: Set<number> | null, energy: number): void {
     const posAttr = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
     let edgeIdx = 0;
@@ -1665,7 +1898,7 @@ export class StarConquestGraph {
       const focused = linked !== null && linked.has(i) && linked.has(j);
       const dim = linked !== null && !focused;
       let intensity = focused ? 0.92 : hubIntensity;
-      if (dim) intensity *= 0.45;
+      if (dim) intensity *= 0.14;
       writeSegment(
         posAttr.getX(i),
         posAttr.getY(i),
@@ -1687,7 +1920,7 @@ export class StarConquestGraph {
       const focused = linked !== null && linked.has(qi);
       const dim = linked !== null && !focused;
       let intensity = focused ? 0.85 : 0.38;
-      if (dim) intensity *= 0.4;
+      if (dim) intensity *= 0.12;
       writeSegment(
         posAttr.getX(qi),
         posAttr.getY(qi),
@@ -1722,9 +1955,103 @@ export class StarConquestGraph {
       (c.array as Float32Array).set(this.lineColors);
       c.needsUpdate = true;
     }
+    this.flushLineAlong(geom);
+    this.syncFilamentRibbon();
   }
 
-  /** Nombre d’arêtes de liaison (debug / tests). */
+  private flushLineAlong(geom: THREE.BufferGeometry): void {
+    const alongAttr = geom.getAttribute('along') as THREE.BufferAttribute | undefined;
+    if (!alongAttr) return;
+    const n = Math.min(alongAttr.count, this.lineAlong.length);
+    for (let i = 0; i < n; i += 2) {
+      this.lineAlong[i] = 0;
+      this.lineAlong[i + 1] = 1;
+    }
+    (alongAttr.array as Float32Array).set(this.lineAlong);
+    alongAttr.needsUpdate = true;
+  }
+
+  private writeGhostPositions(pos: THREE.BufferAttribute): void {
+    const t = this.driftTime;
+    for (let i = 0; i < this.quests.length; i++) {
+      const phase = this.driftPhase[i] + t * 1.35;
+      const ox = Math.cos(phase) * GHOST_OFFSET;
+      const oy = Math.sin(phase * 0.87) * GHOST_OFFSET * 0.7;
+      const oz = Math.sin(phase * 0.55) * GHOST_OFFSET * 0.35;
+      const i3 = i * 3;
+      this.ghostPositions[i3] = pos.getX(i) + ox;
+      this.ghostPositions[i3 + 1] = pos.getY(i) + oy;
+      this.ghostPositions[i3 + 2] = pos.getZ(i) + oz;
+    }
+    const ghostPos = this.ghostPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
+    (ghostPos.array as Float32Array).set(this.ghostPositions);
+    ghostPos.needsUpdate = true;
+  }
+
+  private syncFilamentRibbon(): void {
+    if (!this.filamentRibbon) return;
+    const edgeCount = this.linePositions.length / 6;
+    for (let e = 0; e < edgeCount; e++) {
+      const o = e * 6;
+      const ax = this.linePositions[o];
+      const ay = this.linePositions[o + 1];
+      const az = this.linePositions[o + 2];
+      const bx = this.linePositions[o + 3];
+      const by = this.linePositions[o + 4];
+      const bz = this.linePositions[o + 5];
+      const cr0 = this.lineColors[o];
+      const cg0 = this.lineColors[o + 1];
+      const cb0 = this.lineColors[o + 2];
+      const cr1 = this.lineColors[o + 3];
+      const cg1 = this.lineColors[o + 4];
+      const cb1 = this.lineColors[o + 5];
+      const sides = [-1, 1, 1, -1];
+      const alongs = [0, 0, 1, 1];
+      for (let k = 0; k < 4; k++) {
+        const v = e * 4 + k;
+        const i3 = v * 3;
+        const start = k < 2;
+        if (start) {
+          this.filamentPositions[i3] = ax;
+          this.filamentPositions[i3 + 1] = ay;
+          this.filamentPositions[i3 + 2] = az;
+          this.filamentOthers[i3] = bx;
+          this.filamentOthers[i3 + 1] = by;
+          this.filamentOthers[i3 + 2] = bz;
+          this.filamentColors[i3] = cr0;
+          this.filamentColors[i3 + 1] = cg0;
+          this.filamentColors[i3 + 2] = cb0;
+        } else {
+          this.filamentPositions[i3] = bx;
+          this.filamentPositions[i3 + 1] = by;
+          this.filamentPositions[i3 + 2] = bz;
+          this.filamentOthers[i3] = ax;
+          this.filamentOthers[i3 + 1] = ay;
+          this.filamentOthers[i3 + 2] = az;
+          this.filamentColors[i3] = cr1;
+          this.filamentColors[i3 + 1] = cg1;
+          this.filamentColors[i3 + 2] = cb1;
+        }
+        this.filamentSides[v] = sides[k];
+        this.filamentAlong[v] = alongs[k];
+      }
+    }
+    const geom = this.filamentRibbon.geometry;
+    const attrs = ['position', 'other', 'side', 'along', 'color'] as const;
+    const buffers = [
+      this.filamentPositions,
+      this.filamentOthers,
+      this.filamentSides,
+      this.filamentAlong,
+      this.filamentColors,
+    ];
+    for (let i = 0; i < attrs.length; i++) {
+      const attr = geom.getAttribute(attrs[i]) as THREE.BufferAttribute | undefined;
+      if (!attr) continue;
+      (attr.array as Float32Array).set(buffers[i]);
+      attr.needsUpdate = true;
+    }
+  }
   get linkEdgeCount(): number {
     return this.edgePairs.length;
   }

@@ -1,6 +1,6 @@
 /**
  * Couches de profondeur Star Conquest — taille / opacite / vitesse / parallaxe.
- * Camera typique : z ≈ 160. Plus le Z monde est bas, plus l’élément est lointain.
+ * Camera typique : z ≈ 120 (palier produit). Plus le Z monde est bas, plus l’élément est lointain.
  */
 
 export type StarDepthLayerId = 'far' | 'mid' | 'interactive' | 'near';
@@ -42,37 +42,36 @@ export const STAR_DEPTH_LAYERS: Record<StarDepthLayerId, StarDepthLayerConfig> =
     id: 'far',
     zCenter: -110,
     zSpread: 28,
-    size: 0.42,
-    opacity: 0.1,
+    size: 0.62,
+    opacity: 0.28,
     driftSpeed: 0.55,
     driftAmp: 3.5,
     parallax: 0.012,
-    color: 0x3a2f55,
-    /** Décor retiré — seules les 35 quests interactives sont rendues. */
+    color: 0x8a6a48,
     count: 0,
   },
   mid: {
     id: 'mid',
     zCenter: -48,
     zSpread: 18,
-    size: 0.72,
-    opacity: 0.15,
+    size: 1.05,
+    opacity: 0.34,
     driftSpeed: 0.75,
     driftAmp: 6,
     parallax: 0.028,
-    color: 0x4a3d68,
+    color: 0xc49a5a,
     count: 0,
   },
   near: {
     id: 'near',
     zCenter: 28,
     zSpread: 8,
-    size: 1.2,
-    opacity: 0.09,
+    size: 1.7,
+    opacity: 0.22,
     driftSpeed: 0.85,
     driftAmp: 4.5,
     parallax: 0.055,
-    color: 0x5a4a78,
+    color: 0xe8c07a,
     count: 0,
   },
 };
@@ -89,7 +88,7 @@ export function depthFactorFromZ(z: number): number {
 /** Opacité label selon profondeur relative de la Quest. */
 export function labelOpacityFromDepth(depth: number, reward: number): number {
   const rewardBoost = Math.min(0.12, Math.log10(reward + 1) * 0.05);
-  return Math.max(0.42, Math.min(0.88, 0.55 + depth * 0.18 + rewardBoost));
+  return Math.max(0.58, Math.min(0.94, 0.68 + depth * 0.18 + rewardBoost));
 }
 
 /** Parallaxe desktop vs mobile. */

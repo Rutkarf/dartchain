@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { measureGapAboveFloor, screenToWorldOnPlane } from './star-conquest-layout';
 import { createSoftDiscTexture } from './star-conquest-visuals';
 import { isScreenPointBlockedByUi } from './star-conquest-occlusion';
+import { STAR_CONQUEST_SCALE } from './star-conquest-scale';
 import {
   exclusionFromRect,
   type JoystickExclusionZone,
@@ -28,12 +29,11 @@ export const JOYSTICK_ARIA_LABEL = "Déplace l'univers de particules";
 const RING_R = 5.6;
 const KNOB_TRAVEL = 3.2;
 /** Hit stick — un seul disque, aligné sur le bord visuel (pas d’anneaux élargis). */
-const HIT_RADIUS_PX = 38;
+const HIT_RADIUS_PX = Math.round(38 * STAR_CONQUEST_SCALE.ui);
 const DRAG_THRESHOLD_PX = 7;
-/** Légèrement réduit vs ×9 précédent. */
-const SCALE_MIN = 0.58;
-const SCALE_MAX = 0.88;
-const SCALE_REF = 0.7;
+const SCALE_MIN = 0.58 * STAR_CONQUEST_SCALE.ui;
+const SCALE_MAX = 0.88 * STAR_CONQUEST_SCALE.ui;
+const SCALE_REF = 0.7 * STAR_CONQUEST_SCALE.ui;
 /** Décalage écran vers le bas (px). */
 const JOY_Y_OFFSET_PX = 9;
 

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { measureFloorTopPx, screenToWorldOnPlane } from './star-conquest-layout';
 import { createSoftDiscTexture } from './star-conquest-visuals';
+import { STAR_CONQUEST_SCALE } from './star-conquest-scale';
 
 /** Au moins 2 particules sous le floor, sur l’axe vertical central. */
 const COUNT = 2;
@@ -62,7 +63,8 @@ export class StarConquestUnderStackBand {
     const bandH = Math.max(12, bandBottom - bandTop);
     const centerX = vw * 0.5;
 
-    (this.points.material as THREE.PointsMaterial).size = bandH < 36 ? 2.1 : 2.9;
+    (this.points.material as THREE.PointsMaterial).size =
+      (bandH < 36 ? 2.1 : 2.9) * STAR_CONQUEST_SCALE.visual;
     (this.points.material as THREE.PointsMaterial).opacity = 0.7;
 
     for (let i = 0; i < COUNT; i++) {

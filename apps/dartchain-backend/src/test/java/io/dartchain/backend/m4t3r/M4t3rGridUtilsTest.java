@@ -7,13 +7,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 class M4t3rGridUtilsTest {
 
     @Test
-    void keepsHalfDensityOnDiagonalCheckerboard() {
+    void keepsQuarterDensityOnDiagonalCheckerboard() {
         assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(0, 0)).isTrue();
         assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(1, 0)).isFalse();
         assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(0, 1)).isFalse();
+        assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(1, 1)).isFalse();
+        assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(2, 0)).isFalse();
         assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(2, 2)).isTrue();
+        assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(4, 0)).isTrue();
         assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(-1, 0)).isFalse();
-        assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(-1, -1)).isTrue();
+        assertThat(M4t3rGridUtils.isOnDiagonalCheckerboard(-1, -1)).isFalse();
     }
 
     @Test

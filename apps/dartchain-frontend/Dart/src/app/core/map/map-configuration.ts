@@ -299,9 +299,9 @@ export const M4T3R_LOD_CONFIG = {
   nearMaxDistance: 12,
   midMaxDistance: 32,
   farMaxDistance: 64,
-  /** Stride grille gx/gz (cellSize 1.25 m) — ~14 cm / 28 cm / 56 cm clusters visuels. */
-  midGridStride: 2,
-  farGridStride: 4,
+  /** Stride grille gx/gz (cellSize 1.25 m) — sous-ensembles du damier période 4. */
+  midGridStride: 8,
+  farGridStride: 16,
   midBobScale: 0.35,
   midRotationScale: 0.55,
 } as const;

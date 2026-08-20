@@ -1,11 +1,15 @@
 import { Component, HostListener, computed, inject } from '@angular/core';
+import { StarConquestProgressService } from '../../core/services/star-conquest-progress.service';
 import { StarConquestStateService } from '../../core/services/star-conquest-state.service';
 import { PeersDataService } from '../../core/services/peers-data.service';
 import {
   STAR_QUEST_FAMILIES,
   type StarQuestFamily,
 } from './star-conquest-families';
-import type { StarQuest } from './star-conquest.model';
+import {
+  STAR_QUEST_STATUS_LABEL,
+  type StarQuest,
+} from './star-conquest.model';
 import { formatRewardWithDot } from './star-conquest-visuals';
 import { PeerView } from '../../core/services/blockchain-api.service';
 
@@ -21,6 +25,7 @@ import { PeerView } from '../../core/services/blockchain-api.service';
 })
 export class StarQuestScannerComponent {
   readonly state = inject(StarConquestStateService);
+  readonly progress = inject(StarConquestProgressService);
   private readonly peersData = inject(PeersDataService);
 
   private readonly peers = computed((): readonly PeerView[] => this.peersData.peers());
@@ -105,6 +110,10 @@ export class StarQuestScannerComponent {
 
   rewardText(quest: StarQuest): string {
     return formatRewardWithDot(quest.rewardM4T3R);
+  }
+
+  statusLabel(status: string): string {
+    return STAR_QUEST_STATUS_LABEL[status as keyof typeof STAR_QUEST_STATUS_LABEL] ?? status;
   }
 
   closeList(): void {

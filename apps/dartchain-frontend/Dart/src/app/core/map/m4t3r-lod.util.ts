@@ -25,7 +25,7 @@ export function getLodBand(distanceMeters: number): M4T3RLodBand {
  */
 export function shouldRenderCellAtLod(gx: number, gz: number, band: M4T3RLodBand): boolean {
   if (band === 'near') return true;
-  const period = band === 'mid' ? 4 : 8;
+  const period = band === 'mid' ? M4T3R_LOD_CONFIG.midGridStride : M4T3R_LOD_CONFIG.farGridStride;
   return (gx + gz) % period === 0;
 }
 

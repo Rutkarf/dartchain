@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import { STAR_CONQUEST_SCALE } from './star-conquest-scale';
 
 const STICK_DEADZONE = 0.04;
 const DEFAULT_PAN_MAX_X = 90;
 const DEFAULT_PAN_MAX_Y = 70;
 /** Vitesse de pan caméra (unités monde / s à stick plein). */
-const PAN_SPEED = 52;
-const CAMERA_Z = 160;
+const PAN_SPEED = STAR_CONQUEST_SCALE.panSpeed;
+export const CAMERA_Z = STAR_CONQUEST_SCALE.cameraZ;
 /** Rebond doux hors drag seulement. */
 const EDGE_BOUNCE = 48;
 const CENTER_SPRING = 1.2;

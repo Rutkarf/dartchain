@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  STAR_CONQUEST_SCALE,
+  scaledTextureSize,
+  starConquestDepthDensity,
+  type StarConquestGpuQuality,
+} from './star-conquest-scale';
 import { STAR_DEPTH_LAYERS, type StarDepthLayerId } from './star-conquest-depth';
 import type { StarConquestUniverseTheme } from './star-conquest-universe.types';
 import { createSoftDiscTexture } from './star-conquest-visuals';
@@ -18,15 +24,20 @@ export class StarConquestBackground {
   private depthTickAcc = 0;
   private readonly discTexture: THREE.CanvasTexture;
   private time = 0;
+  private gpuQuality: StarConquestGpuQuality = 'medium';
+  private auroraTint: readonly [number, number, number] = [1, 0.78, 0.32];
 
   constructor() {
     this.group.name = 'star-conquest-background';
-    this.discTexture = createSoftDiscTexture(48);
+    this.discTexture = createSoftDiscTexture(scaledTextureSize(48));
     this.auroraMat = createStarConquestAuroraMaterial();
-    const auroraGeom = new THREE.PlaneGeometry(520, 920);
+    const auroraGeom = new THREE.PlaneGeometry(
+      Math.round(520 * STAR_CONQUEST_SCALE.worldExtent),
+      Math.round(920 * STAR_CONQUEST_SCALE.worldExtent)
+    );
     this.auroraMesh = new THREE.Mesh(auroraGeom, this.auroraMat);
     this.auroraMesh.name = 'sc-aurora-plane';
-    this.auroraMesh.position.z = -180;
+    this.auroraMesh.position.z = -180 * STAR_CONQUEST_SCALE.worldExtent;
     this.auroraMesh.renderOrder = -10;
     this.group.add(this.auroraMesh);
 
@@ -35,6 +46,10 @@ export class StarConquestBackground {
       this.depthLayers.set(id, layer);
       this.group.add(layer);
     }
+  }
+
+  setGpuQuality(quality: StarConquestGpuQuality): void {
+    this.gpuQuality = quality;
   }
 
   applyUniverse(theme: StarConquestUniverseTheme): void {
@@ -48,13 +63,15 @@ export class StarConquestBackground {
       theme.auroraSecondaryRgb[1],
       theme.auroraSecondaryRgb[2]
     );
-    this.auroraMat.uniforms['uIntensity'].value = theme.showDepthStars ? 0.72 : 0.48;
+    this.auroraTint = theme.auroraRgb;
+    this.auroraMat.uniforms['uIntensity'].value = theme.showDepthStars ? 0.56 : 0.38;
     this.auroraMesh.visible = true;
 
+    const density = starConquestDepthDensity(this.gpuQuality);
     const counts: Record<StarDepthLayerId, number> = {
-      far: theme.showDepthStars ? theme.depthFarCount : 0,
-      mid: theme.showDepthStars ? theme.depthMidCount : 0,
-      near: theme.showDepthStars ? theme.depthNearCount : 0,
+      far: theme.showDepthStars ? Math.round(theme.depthFarCount * density) : 0,
+      mid: theme.showDepthStars ? Math.round(theme.depthMidCount * density) : 0,
+      near: theme.showDepthStars ? Math.round(theme.depthNearCount * density) : 0,
       interactive: 0,
     };
 
@@ -103,14 +120,14 @@ export class StarConquestBackground {
     const cfg = STAR_DEPTH_LAYERS[id];
     const positions = new Float32Array(Math.max(count, 1) * 3);
     const colors = new Float32Array(Math.max(count, 1) * 3);
-    const r = ((cfg.color >> 16) & 255) / 255;
-    const g = ((cfg.color >> 8) & 255) / 255;
-    const b = (cfg.color & 255) / 255;
+    const r = ((cfg.color >> 16) & 255) / 255 * 0.35 + this.auroraTint[0] * 0.65;
+    const g = ((cfg.color >> 8) & 255) / 255 * 0.35 + this.auroraTint[1] * 0.65;
+    const b = (cfg.color & 255) / 255 * 0.4 + this.auroraTint[2] * 0.6;
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      positions[i3] = (Math.random() - 0.5) * 240;
-      positions[i3 + 1] = (Math.random() - 0.5) * 520;
+      positions[i3] = (Math.random() - 0.5) * 240 * STAR_CONQUEST_SCALE.worldExtent;
+      positions[i3 + 1] = (Math.random() - 0.5) * 520 * STAR_CONQUEST_SCALE.worldExtent;
       positions[i3 + 2] =
         cfg.zCenter + (Math.random() - 0.5) * cfg.zSpread * 2;
       colors[i3] = r;
@@ -122,10 +139,10 @@ export class StarConquestBackground {
     geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     const mat = new THREE.PointsMaterial({
-      size: cfg.size,
+      size: cfg.size * (id === 'near' ? 1.28 : 1.12) * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       transparent: true,
-      opacity: cfg.opacity,
+      opacity: Math.min(1, cfg.opacity * 1.35),
       vertexColors: true,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
@@ -147,12 +164,11 @@ export class StarConquestBackground {
     const existing = this.depthLayers.get(id);
     if (!existing) return;
     existing.geometry.dispose();
+    (existing.material as THREE.Material).dispose();
     this.depthBasePositions.delete(id);
     const fresh = this.buildDepthLayer(id, count);
     existing.geometry = fresh.geometry;
     existing.material = fresh.material;
     existing.visible = count > 0;
-    fresh.geometry.dispose();
-    (fresh.material as THREE.Material).dispose();
   }
 }

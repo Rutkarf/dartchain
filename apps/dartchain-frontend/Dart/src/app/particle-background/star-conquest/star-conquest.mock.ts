@@ -134,7 +134,7 @@ const SEEDS: readonly QuestSeed[] = [
     category: 'swap',
     family: 'interface',
     description:
-      'Confirmation holographique avant exécution swap (exchange-panel), style glass sobre, sans scroll interne.',
+      'Conquête live : exécuter un swap LaunchLab. L’étoile se complète via la quête Dock swap-tokens.',
     rewardM4T3R: 140,
     rarity: 'epic',
     status: 'available',
@@ -310,7 +310,7 @@ const SEEDS: readonly QuestSeed[] = [
     category: 'dock',
     family: 'blockchain',
     description:
-      'États cooldown / erreur faucet lisibles dans le dock, branchés Soft Fail API.',
+      'Conquête live : réclamer le faucet. L’étoile s’aligne sur la quête Dock faucet-claim (1 MTS + XP).',
     rewardM4T3R: 90,
     rarity: 'rare',
     status: 'available',
@@ -337,7 +337,7 @@ const SEEDS: readonly QuestSeed[] = [
     category: 'dock',
     family: 'blockchain',
     description:
-      'Hint contextuel block-composer quand mempool vide ; lien DockChainStateService.',
+      'Conquête live : ouvrir le détail d’un bloc. L’étoile suit la quête Dock explore-blocks.',
     rewardM4T3R: 115,
     rarity: 'rare',
     status: 'available',
@@ -392,10 +392,10 @@ const SEEDS: readonly QuestSeed[] = [
     category: 'backend',
     family: 'backend',
     description:
-      'Préparer le contrat frontend ↔ Spring Boot pour catalogue Quests (DTO prêt, mock local actuel).',
+      'Hub live : les 4 quêtes Dock (login, faucet, swap, blocs) complètent cette étoile. CTA vers l’onglet Quêtes.',
     rewardM4T3R: 190,
     rarity: 'legendary',
-    status: 'future',
+    status: 'available',
     connections: ['sc-data-persist', 'sc-dock-quests', 'sc-showcase-dao'],
     slot: { u: 0.28, depth: -0.15 },
   },
@@ -418,7 +418,7 @@ const SEEDS: readonly QuestSeed[] = [
     category: 'security',
     family: 'backend',
     description:
-      'auth-drawer : autocomplete, erreurs non leaky, restauration focus après fermeture.',
+      'Conquête live : se connecter. L’étoile suit la quête Dock daily-login — pas de clic magique.',
     rewardM4T3R: 145,
     rarity: 'epic',
     status: 'available',
@@ -599,5 +599,6 @@ export function starQuestById(
   return catalog.find((q) => q.id === id);
 }
 
-export const STAR_CONQUEST_QUEST_COUNT = 35;
+/** Taille actuelle du catalogue design — le runtime accepte N quêtes. */
+export const STAR_CONQUEST_QUEST_COUNT = STAR_CONQUEST_MOCK_QUESTS.length;
 export const STAR_CONQUEST_QUESTS_PER_FAMILY = 7;

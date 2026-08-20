@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { StarConquestEffectKind, StarConquestUniverseTheme } from './star-conquest-universe.types';
 import { createSoftDiscTexture } from './star-conquest-visuals';
 import { STAR_QUEST_FAMILIES, STAR_QUEST_FAMILY_ORDER } from './star-conquest-families';
+import { STAR_CONQUEST_SCALE } from './star-conquest-scale';
 
 /**
  * Effets visuels décoratifs par univers (hors Ruche — l’essaim utilise les particules Quest).
@@ -73,7 +74,7 @@ export class StarConquestEffects {
       const pos = this.portalShards.geometry.getAttribute('position') as THREE.BufferAttribute;
       for (let i = 0; i < pos.count; i++) {
         const angle = (i / pos.count) * Math.PI * 2 + this.time * 0.25;
-        const r = 38 + Math.sin(this.time + i) * 4;
+        const r = (38 + Math.sin(this.time + i) * 4) * STAR_CONQUEST_SCALE.layout;
         pos.setXYZ(i, Math.cos(angle) * r, Math.sin(angle) * r * 0.6, -6);
       }
       pos.needsUpdate = true;
@@ -123,7 +124,7 @@ export class StarConquestEffects {
   }
 
   private buildOrbitalRings(): void {
-    const radii = [22, 36, 52];
+    const radii = [22, 36, 52].map((r) => r * STAR_CONQUEST_SCALE.layout);
     for (let i = 0; i < radii.length; i++) {
       const segments = 64;
       const pts: THREE.Vector3[] = [];
@@ -148,8 +149,8 @@ export class StarConquestEffects {
   }
 
   private buildM4t3rGrid(): void {
-    const size = 80;
-    const step = 8;
+    const size = 80 * STAR_CONQUEST_SCALE.layout;
+    const step = 8 * STAR_CONQUEST_SCALE.layout;
     const verts: number[] = [];
     for (let x = -size; x <= size; x += step) {
       verts.push(x, -size, -20, x, size, -20);
@@ -175,7 +176,7 @@ export class StarConquestEffects {
   private buildNexusPortal(): void {
     const segments = 80;
     const pts: THREE.Vector3[] = [];
-    const radius = 28;
+    const radius = 28 * STAR_CONQUEST_SCALE.layout;
     for (let s = 0; s <= segments; s++) {
       const a = (s / segments) * Math.PI * 2;
       pts.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius * 0.55, -8));
@@ -207,7 +208,7 @@ export class StarConquestEffects {
     shardGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     shardGeom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     const shardMat = new THREE.PointsMaterial({
-      size: 3.5,
+      size: 3.5 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
       transparent: true,
       opacity: 0.75,

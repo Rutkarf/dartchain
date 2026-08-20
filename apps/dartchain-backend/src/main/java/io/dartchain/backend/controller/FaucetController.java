@@ -65,6 +65,9 @@ public class FaucetController {
         productFeatures.requireFaucet();
         UserAccount account = authService.requireAuthenticatedAccount(authorization);
         String resolvedWallet = resolveClaimsWallet(account, walletAddress);
+        if (resolvedWallet == null) {
+            return List.of();
+        }
         return faucetService.getClaimsForWallet(resolvedWallet, offset, limit);
     }
 
@@ -75,10 +78,7 @@ public class FaucetController {
         }
 
         if (account.getWalletAddress() == null || account.getWalletAddress().isBlank()) {
-            throw new io.dartchain.backend.auth.AuthException(
-                    400,
-                    "Aucun wallet lié. Liez un wallet ou précisez walletAddress."
-            );
+            return null;
         }
 
         return account.getWalletAddress();

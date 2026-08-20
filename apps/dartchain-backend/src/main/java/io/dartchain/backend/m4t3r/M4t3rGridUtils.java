@@ -3,13 +3,15 @@ package io.dartchain.backend.m4t3r;
 public final class M4t3rGridUtils {
 
     static final double RENDER_CELL_SIZE = 1.25;
+    /** Période du damier (puissance de 2) : 4 = 1 jeton visible sur 4. */
+    static final int CHECKERBOARD_PERIOD = 4;
 
     private M4t3rGridUtils() {
     }
 
     /** Damier diagonal sur la grille de rendu 1,25 m. */
     public static boolean isOnDiagonalCheckerboard(int renderGx, int renderGz) {
-        return ((renderGx + renderGz) & 1) == 0;
+        return ((renderGx + renderGz) & (CHECKERBOARD_PERIOD - 1)) == 0;
     }
 
     public static boolean isClusterOnCheckerboard(int clusterGx, int clusterGz, double clusterSize) {

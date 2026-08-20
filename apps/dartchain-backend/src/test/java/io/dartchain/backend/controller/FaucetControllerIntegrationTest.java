@@ -43,6 +43,17 @@ class FaucetControllerIntegrationTest {
     }
 
     @Test
+    void getClaims_withoutLinkedWallet_returnsEmptyList() throws Exception {
+        Session session = MockMvcIntegrationSupport.register(mockMvc);
+
+        mockMvc.perform(get("/api/faucet/claims")
+                        .header("Authorization", session.authHeader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
     void claim_withoutAuth_isUnauthorized() throws Exception {
         WalletInfo wallet = MockMvcIntegrationSupport.createWallet(mockMvc);
 

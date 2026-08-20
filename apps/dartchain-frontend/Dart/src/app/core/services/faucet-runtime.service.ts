@@ -746,10 +746,14 @@ export class FaucetRuntimeService {
       return;
     }
 
-    const wallet = this.walletAddress();
+    const wallet = this.walletAddress()?.trim();
+    if (!wallet) {
+      this.history.set([]);
+      return;
+    }
 
     this.faucetService
-      .getClaims(this.auth.authHeaders(), wallet ?? undefined, 0, 200)
+      .getClaims(this.auth.authHeaders(), wallet, 0, 200)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (claims) => {
@@ -759,9 +763,14 @@ export class FaucetRuntimeService {
           );
         },
         error: (error: HttpErrorResponse) => {
-          if (!this.handleFeatureDisabled(error)) {
-            this.markOffline(() => this.loadClaimsHistory());
+          if (this.handleFeatureDisabled(error)) {
+            return;
           }
+          if (error.status >= 400 && error.status < 500) {
+            this.history.set([]);
+            return;
+          }
+          this.markOffline(() => this.loadClaimsHistory());
         },
       });
   }

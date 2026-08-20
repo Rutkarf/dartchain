@@ -82,6 +82,32 @@ export interface StarQuestPanelState {
   y: number;
 }
 
+export const STAR_QUEST_STATUS_LABEL: Record<StarQuestStatus, string> = {
+  available: 'Disponible',
+  locked: 'Verrouillée',
+  active: 'En cours',
+  completed: 'Conquise',
+  future: 'Bientôt',
+};
+
+export type StarQuestClaimKind = 'claim' | 'locked' | 'future' | 'completed';
+
+export function starQuestClaimKind(status: StarQuestStatus): StarQuestClaimKind {
+  if (status === 'completed') return 'completed';
+  if (status === 'locked') return 'locked';
+  if (status === 'future') return 'future';
+  return 'claim';
+}
+
+export function cloneStarQuest(quest: StarQuest): StarQuest {
+  return {
+    ...quest,
+    position: { ...quest.position },
+    slot: { ...quest.slot },
+    connections: [...quest.connections],
+  };
+}
+
 export const STAR_QUEST_CATEGORY_LABEL: Record<StarQuestCategory, string> = {
   swap: 'Swap',
   showcase: 'Showcase',

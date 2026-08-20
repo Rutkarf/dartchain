@@ -6,6 +6,8 @@
     aria-modal="false"
     aria-label="Star Conquest quest"
     [attr.data-family]="panel.quest.family"
+    [attr.data-claim]="claimKind()"
+    [attr.data-live]="liveLink() ? 'true' : null"
     [style.left.px]="panel.x"
     [style.top.px]="panel.y"
     [style.--sc-family-rgb]="familyRgb(panel.quest.family)"
@@ -22,8 +24,11 @@
           class="star-quest-panel__badge star-quest-panel__badge--status"
           [attr.data-status]="panel.quest.status"
         >
-          {{ panel.quest.status }}
+          {{ statusLabel(panel.quest.status) }}
         </span>
+        @if (liveLink()) {
+          <span class="star-quest-panel__badge star-quest-panel__badge--live">Live</span>
+        }
       </div>
       <button
         type="button"
@@ -40,10 +45,53 @@
     <p class="star-quest-panel__desc">{{ panel.quest.description }}</p>
 
     <footer class="star-quest-panel__reward">
-      <span class="star-quest-panel__reward-label">Gain probable</span>
-      <strong class="star-quest-panel__reward-value"
-        >{{ panel.quest.rewardM4T3R }} M4T3R</strong
-      >
+      @if (liveTask(); as task) {
+        <span class="star-quest-panel__reward-label">Quête Dock</span>
+        <strong class="star-quest-panel__reward-value"
+          >{{ task.rewardMts }} MTS · {{ task.rewardXp }} XP</strong
+        >
+      } @else if (liveLink()?.kind === 'navigate') {
+        <span class="star-quest-panel__reward-label">Surface produit</span>
+        <strong class="star-quest-panel__reward-value">Ouvrir dans l’app</strong>
+      } @else if (liveLink()) {
+        <span class="star-quest-panel__reward-label">Hub live</span>
+        <strong class="star-quest-panel__reward-value">4 quêtes Dock</strong>
+      } @else {
+        <span class="star-quest-panel__reward-label">
+          {{ claimKind() === 'completed' ? 'Preview local' : 'Gain estimé' }}
+        </span>
+        <strong class="star-quest-panel__reward-value"
+          >{{ panel.quest.rewardM4T3R }} M4T3R</strong
+        >
+      }
     </footer>
+
+    <button
+      type="button"
+      class="star-quest-panel__claim"
+      [disabled]="!ctaEnabled()"
+      [attr.aria-label]="ctaLabel()"
+      (click)="onCta(); $event.stopPropagation()"
+      (pointerdown)="$event.stopPropagation()"
+    >
+      {{ ctaLabel() }}
+    </button>
+    <p class="star-quest-panel__hint">
+      @if (liveLink() && claimKind() === 'completed') {
+        Alignée sur la quête Dock.
+      } @else if (liveLink()) {
+        Fais l’action dans l’app — pas de clic magique.
+      } @else if (claimKind() === 'claim') {
+        Conquête locale — pas de crédit faucet.
+      } @else if (claimKind() === 'locked') {
+        Conquis un voisin pour débloquer.
+      } @else if (claimKind() === 'completed' && isPlayerClaimed(panel.quest.id)) {
+        Enregistrée en preview ({{ progress.previewM4T3R() }} M4T3R).
+      } @else if (claimKind() === 'completed') {
+        Livrée dans le catalogue produit.
+      } @else {
+        Pas encore ouvrable.
+      }
+    </p>
   </aside>
 }
