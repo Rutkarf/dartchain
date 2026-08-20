@@ -19,4 +19,9 @@ describe('ThreeFloor', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('détruit sans throw avant initialisation WebGL', () => {
+    expect(component).toBeTruthy();
+    expect(() => fixture.destroy()).not.toThrow();
+  });
 });

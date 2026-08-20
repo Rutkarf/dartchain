@@ -1,0 +1,138 @@
+:host {
+  display: contents;
+}
+
+.placement-panel {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--floor-peek-height, 220px) + 10px);
+  transform: translateX(-50%);
+  z-index: 1100;
+  width: min(92vw, 320px);
+  max-height: min(46vh, 340px);
+  overflow: auto;
+  pointer-events: auto;
+  padding: 0.7rem 0.8rem 0.75rem;
+  border-radius: 10px;
+  color: #e8f7ff;
+  background: rgba(6, 12, 22, 0.94);
+  border: 1px solid rgba(64, 224, 255, 0.35);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  font: 12px/1.4 ui-sans-serif, system-ui, sans-serif;
+}
+
+.placement-kicker,
+.placement-dev {
+  margin: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  color: #7adce8;
+}
+
+.placement-panel h2 {
+  margin: 0.2rem 0 0.15rem;
+  font-size: 0.92rem;
+}
+
+.placement-status {
+  margin: 0 0 0.35rem;
+  color: #8f9bb3;
+}
+
+.placement-status[data-status='available'] {
+  color: #40e0ff;
+}
+
+.placement-status[data-status='active'] {
+  color: #ffe600;
+}
+
+.placement-status[data-status='reserved'] {
+  color: #ffb347;
+}
+
+.placement-status[data-status='paused'] {
+  color: #ff3ecf;
+}
+
+.placement-dev {
+  color: #ffb347;
+  margin-bottom: 0.4rem;
+}
+
+.placement-meta {
+  display: grid;
+  gap: 0.28rem;
+  margin: 0 0 0.55rem;
+}
+
+.placement-meta div {
+  display: grid;
+  grid-template-columns: 7.2rem 1fr;
+  gap: 0.35rem;
+}
+
+.placement-meta dt {
+  margin: 0;
+  color: #8f9bb3;
+}
+
+.placement-meta dd {
+  margin: 0;
+}
+
+.placement-form,
+.placement-actions {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.placement-form label {
+  display: grid;
+  gap: 0.15rem;
+  color: #c5d4e8;
+}
+
+.placement-form input,
+.placement-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 6px;
+  border: 1px solid rgba(64, 224, 255, 0.25);
+  background: rgba(8, 16, 28, 0.9);
+  color: inherit;
+  padding: 0.35rem 0.45rem;
+}
+
+.placement-actions {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.placement-actions button {
+  border-radius: 6px;
+  border: 1px solid rgba(64, 224, 255, 0.45);
+  background: #123044;
+  color: #e8f7ff;
+  padding: 0.4rem 0.55rem;
+  cursor: pointer;
+}
+
+.placement-actions button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.placement-actions .ghost {
+  background: transparent;
+}
+
+.placement-feedback {
+  margin: 0 0 0.35rem;
+  color: #7adce8;
+}
+
+.placement-feedback.is-error {
+  color: #ff8fab;
+}

@@ -70,6 +70,10 @@ describe('GeoCoordinateService', () => {
     expect(east.z).toBeCloseTo(origin.z, 3);
   });
 
+  it('expose marseille-local-v1 via getReferenceConfig', () => {
+    expect(geo.getReferenceConfig().coordinateSystemVersion).toBe('marseille-local-v1');
+  });
+
   it('expose l origine via LocalOriginService', () => {
     const origin = TestBed.inject(LocalOriginService);
     expect(origin.latitude).toBe(MARSEILLE_START_POSITION.latitude);

@@ -35,6 +35,7 @@ import { CharacterComponent } from './character/character.component';
 import { CitySceneComponent } from './city-scene/city-scene.component';
 import { JoystickMoveComponent } from './joystick-move/joystick-move.component';
 import { JoystickViewComponent } from './joystick-view/joystick-view.component';
+import { PlacementDetailsPanel } from './placement-details-panel/placement-details-panel';
 
 const FLOOR_HEIGHT_FALLBACK = 420;
 const PERF_DEBUG = isPerfDebugEnabled();
@@ -60,6 +61,7 @@ function getTargetPixelRatio(
     CitySceneComponent,
     JoystickMoveComponent,
     JoystickViewComponent,
+    PlacementDetailsPanel,
   ],
   templateUrl: './three-floor.html',
   styleUrl: './three-floor.css',

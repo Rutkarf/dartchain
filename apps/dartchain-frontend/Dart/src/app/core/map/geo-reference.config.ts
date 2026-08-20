@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 
+import {
+  MARSEILLE_COORDINATE_SYSTEM_VERSION,
+  type MarseilleCoordinateSystemVersion,
+} from './placements/coordinate-system';
+
 /**
  * Origine scène = Ombrière du Vieux-Port (OSM way/200273945).
  * Le miroir gameplay reste à world (0, 0) — coïncide avec cette origine géographique.
@@ -14,6 +19,7 @@ export const MARSEILLE_GEO_ORIGIN = {
 };
 
 export interface GeoReferenceConfig {
+  coordinateSystemVersion: MarseilleCoordinateSystemVersion;
   sourceCrs: string;
   worldCrs: string;
   originLatitude: number;
@@ -29,6 +35,7 @@ export interface GeoReferenceConfig {
 }
 
 export const GEO_REFERENCE_CONFIG: GeoReferenceConfig = {
+  coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
   sourceCrs: 'EPSG:4326',
   worldCrs: 'local-equirectangular-meters',
   originLatitude: MARSEILLE_GEO_ORIGIN.latitude,

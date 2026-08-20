@@ -6,6 +6,7 @@ import { MapConfigService } from './map-config.service';
 import { LegacyFloorMapProvider } from './legacy-floor-map.provider';
 import { MarseilleMapProvider } from './marseille-map.provider';
 import { WigleVisualizationService } from './wigle/wigle-visualization.service';
+import { PlacementAnchorLayer } from './placements/placement-anchor.layer';
 import type { MapProvider } from './map-provider.interface';
 import type { MapProviderId } from './map-configuration';
 
@@ -25,6 +26,7 @@ export class MapLoadingService {
   private readonly legacyProvider = inject(LegacyFloorMapProvider);
   private readonly marseilleProvider = inject(MarseilleMapProvider);
   private readonly wigleVisualization = inject(WigleVisualizationService);
+  private readonly placementLayer = inject(PlacementAnchorLayer);
 
   private activeProvider: MapProvider | null = null;
   private initialized = false;
@@ -67,6 +69,7 @@ export class MapLoadingService {
     try {
       await this.switchTo(this.marseilleProvider, false, null, scene, camera);
       this.attachNetworkLayer(scene, camera);
+      void this.attachPlacementLayer(scene);
       this.initialized = true;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -93,9 +96,11 @@ export class MapLoadingService {
       this.lastNetworkUpdateMs = now;
       this.wigleVisualization.update(cameraPosition, deltaSeconds);
     }
+    this.placementLayer.update();
   }
 
   dispose(): void {
+    this.placementLayer.dispose();
     this.wigleVisualization.dispose();
     if (this.networkRoot && this.scene) {
       this.scene.remove(this.networkRoot);
@@ -121,6 +126,14 @@ export class MapLoadingService {
     this.syncNetworkGroundResolver();
     this.wigleVisualization.attach(scene, this.networkRoot, camera);
     console.info('[MapLoadingService] Couche réseau attachée à la scène floor.');
+  }
+
+  private async attachPlacementLayer(scene: THREE.Scene): Promise<void> {
+    const state = this.stateSubject.value;
+    if (state.activeProviderId !== 'marseille-osm-three' || state.fallbackActive) {
+      return;
+    }
+    await this.placementLayer.attach(scene);
   }
 
   /** Chaque point réseau pose Y = sol marchable (quai / terre / eau exclue). */

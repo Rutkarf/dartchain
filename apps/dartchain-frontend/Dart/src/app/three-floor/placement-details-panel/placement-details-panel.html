@@ -1,0 +1,92 @@
+@if (facade.selectedPlacement(); as placement) {
+  @if (facade.selectedBuilding(); as building) {
+    <aside
+      class="placement-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="placement-panel-title"
+      [appFocusTrap]="true"
+    >
+      <header class="placement-panel-head">
+        <p class="placement-kicker">Emplacement rez-de-chaussée</p>
+        <h2 id="placement-panel-title">{{ building.label }}</h2>
+        <p class="placement-status" [attr.data-status]="placement.status">
+          {{ statusLabel(placement.status) }}
+        </p>
+        @if (facade.catalog()?.source === 'fixture-dev') {
+          <p class="placement-dev">Données DEV — aucun commerçant réel.</p>
+        }
+      </header>
+
+      <dl class="placement-meta">
+        <div>
+          <dt>Format</dt>
+          <dd>{{ placement.placementType }}</dd>
+        </div>
+        <div>
+          <dt>Visibilité</dt>
+          <dd>{{ placement.visibilityTier ?? 'standard' }}</dd>
+        </div>
+        @if (facade.selectedMerchant(); as merchant) {
+          <div>
+            <dt>Partenaire</dt>
+            <dd>{{ merchant.displayName }} ({{ merchant.verifiedStatus }})</dd>
+          </div>
+        } @else {
+          <div>
+            <dt>Partenaire</dt>
+            <dd>Emplacement disponible</dd>
+          </div>
+        }
+        @if (facade.selectedCampaign(); as campaign) {
+          <div>
+            <dt>Campagne</dt>
+            <dd>{{ campaign.creative.headline }}</dd>
+          </div>
+        }
+        @if (facade.selectedOffer(); as offer) {
+          <div>
+            <dt>Offre</dt>
+            <dd>{{ offer.commercialModel }}</dd>
+          </div>
+        }
+      </dl>
+
+      @if (facade.inquiryReceived()) {
+        <p class="placement-feedback" role="status">
+          Demande transmise. Cela ne réserve pas l’emplacement.
+        </p>
+      }
+      @if (facade.inquiryError(); as error) {
+        <p class="placement-feedback is-error" role="alert">{{ error }}</p>
+      }
+
+      @if (facade.inquiryCtaEnabled()) {
+        <form
+          class="placement-form"
+          (submit)="$event.preventDefault(); submit(email.value, note.value)"
+        >
+          <label>
+            E-mail (optionnel)
+            <input #email type="email" name="email" autocomplete="email" />
+          </label>
+          <label>
+            Message (optionnel)
+            <textarea #note name="message" rows="3"></textarea>
+          </label>
+          <div class="placement-actions">
+            <button type="submit" [disabled]="facade.inquiryBusy()">
+              {{ facade.inquiryBusy() ? 'Envoi…' : 'Demander un devis' }}
+            </button>
+            <button type="button" class="ghost" (click)="close()">Fermer</button>
+          </div>
+        </form>
+      } @else {
+        <div class="placement-actions">
+          <p class="placement-feedback">Pas de demande en ligne pour cet état.</p>
+          <button type="button" class="ghost" (click)="close()">Fermer</button>
+        </div>
+      }
+    </aside>
+  }
+}

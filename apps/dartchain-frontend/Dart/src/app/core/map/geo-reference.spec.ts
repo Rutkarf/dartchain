@@ -25,6 +25,7 @@ describe('geo-reference', () => {
     expect(GEO_REFERENCE_CONFIG.originLatitude).toBe(MARSEILLE_GEO_ORIGIN.latitude);
     expect(GEO_REFERENCE_CONFIG.originLongitude).toBe(MARSEILLE_GEO_ORIGIN.longitude);
     expect(GEO_REFERENCE_CONFIG.metersPerWorldUnit).toBe(1);
+    expect(GEO_REFERENCE_CONFIG.coordinateSystemVersion).toBe('marseille-local-v1');
     expect(GEO_REFERENCE_CONFIG.axisMapping.north).toBe('-z');
     expect(GEO_REFERENCE_CONFIG.axisMapping.east).toBe('x');
   });

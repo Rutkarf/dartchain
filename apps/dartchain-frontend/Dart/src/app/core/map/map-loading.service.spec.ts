@@ -6,6 +6,7 @@ import { MapConfigService } from './map-config.service';
 import { MapLoadingService } from './map-loading.service';
 import { LegacyFloorMapProvider } from './legacy-floor-map.provider';
 import { MarseilleMapProvider } from './marseille-map.provider';
+import { PlacementAnchorLayer } from './placements/placement-anchor.layer';
 import type { MapProvider } from './map-provider.interface';
 
 function createMockProvider(id: MapProvider['id']): MapProvider {
@@ -27,6 +28,11 @@ describe('MapLoadingService', () => {
   let legacy: MapProvider;
   let marseille: MapProvider;
   let config: MapConfigService;
+  let placementLayer: {
+    attach: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    dispose: ReturnType<typeof vi.fn>;
+  };
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera();
@@ -34,6 +40,11 @@ describe('MapLoadingService', () => {
   beforeEach(() => {
     legacy = createMockProvider('legacy-floor');
     marseille = createMockProvider('marseille-osm-three');
+    placementLayer = {
+      attach: vi.fn().mockResolvedValue(undefined),
+      update: vi.fn(),
+      dispose: vi.fn(),
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -45,6 +56,10 @@ describe('MapLoadingService', () => {
         {
           provide: MarseilleMapProvider,
           useValue: marseille,
+        },
+        {
+          provide: PlacementAnchorLayer,
+          useValue: placementLayer,
         },
       ],
     });
@@ -65,6 +80,7 @@ describe('MapLoadingService', () => {
       fallbackActive: false,
       lastError: null,
     });
+    expect(placementLayer.attach).not.toHaveBeenCalled();
   });
 
   it('tente marseille puis bascule sur legacy en cas d échec', async () => {
@@ -80,6 +96,7 @@ describe('MapLoadingService', () => {
       fallbackActive: true,
       lastError: 'OSM indisponible',
     });
+    expect(placementLayer.attach).not.toHaveBeenCalled();
   });
 
   it('active marseille sans fallback si init réussit', async () => {
@@ -91,6 +108,7 @@ describe('MapLoadingService', () => {
     expect(legacy.initialize).not.toHaveBeenCalled();
     expect(service.getState().fallbackActive).toBe(false);
     expect(service.getState().activeProviderId).toBe('marseille-osm-three');
+    expect(placementLayer.attach).toHaveBeenCalledWith(scene);
   });
 
   it('dispose le provider actif', async () => {
@@ -100,6 +118,7 @@ describe('MapLoadingService', () => {
     service.dispose();
 
     expect(legacy.dispose).toHaveBeenCalled();
+    expect(placementLayer.dispose).toHaveBeenCalled();
     expect(service.getActiveProvider()).toBeNull();
     expect(service.getState().fallbackActive).toBe(false);
   });
