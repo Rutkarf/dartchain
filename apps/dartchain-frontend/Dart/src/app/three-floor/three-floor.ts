@@ -12,8 +12,8 @@ import * as THREE from 'three';
 import { CameraControlService } from '../core/services/camera-control.service';
 import { CharacterControlService } from '../core/services/character-control.service';
 import { ThreeSceneService } from '../core/services/three-scene.service';
-import { WORLD_BACKGROUND_CONFIG } from '../core/map/map-configuration';
 import { MapConfigService } from '../core/map/map-config.service';
+import { FLOOR_HORIZON_BLEND, floorHorizonMaskImage } from './floor-horizon-blend.config';
 import {
   bindContainerResize,
   type ContainerResizeBinding,
@@ -69,6 +69,8 @@ function getTargetPixelRatio(
 export class ThreeFloor implements AfterViewInit, OnDestroy {
   @ViewChild('floorCanvas', { static: true })
   floorCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('floorWrapper', { static: true })
+  floorWrapper!: ElementRef<HTMLElement>;
 
   private readonly threeScene = inject(ThreeSceneService);
   private readonly characterControl = inject(CharacterControlService);
@@ -123,11 +125,11 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       });
 
       this.scene = new THREE.Scene();
-      this.scene.background = null;
+      this.scene.background = new THREE.Color(FLOOR_HORIZON_BLEND.skyColor);
       this.scene.fog = new THREE.Fog(
-        WORLD_BACKGROUND_CONFIG.fogColor,
-        WORLD_BACKGROUND_CONFIG.fogNear,
-        WORLD_BACKGROUND_CONFIG.fogFar
+        FLOOR_HORIZON_BLEND.fog.color,
+        FLOOR_HORIZON_BLEND.fog.near,
+        FLOOR_HORIZON_BLEND.fog.far
       );
 
       this.camera = new THREE.PerspectiveCamera(52, width / height, 0.18, 900);
@@ -156,7 +158,7 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       accent.castShadow = false;
       this.scene.add(accent);
 
-      const hemi = new THREE.HemisphereLight(0x111a38, 0x0a0f1a, 0.2);
+      const hemi = new THREE.HemisphereLight(0x08090c, 0x050508, 0.16);
       hemi.name = 'floor-hemi-fill';
       this.scene.add(hemi);
 
@@ -175,7 +177,11 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
         getTargetPixelRatio(this.mapConfig.configuration.quality, window.devicePixelRatio || 1)
       );
       this.renderer.setSize(width, height, false);
-      this.renderer.setClearColor(0x000000, 0);
+      this.renderer.setClearColor(
+        FLOOR_HORIZON_BLEND.skyColor,
+        FLOOR_HORIZON_BLEND.clearAlpha
+      );
+      this.applyHorizonBlendMask();
       this.renderer.outputColorSpace = THREE.SRGBColorSpace;
       this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
       this.renderer.toneMappingExposure = 1.02;
@@ -299,5 +305,13 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     );
     this.renderer.setSize(width, height, false);
     this.renderFrame();
+  }
+
+  private applyHorizonBlendMask(): void {
+    const wrapper = this.floorWrapper?.nativeElement;
+    if (!wrapper) return;
+    const mask = floorHorizonMaskImage();
+    wrapper.style.setProperty('-webkit-mask-image', mask);
+    wrapper.style.setProperty('mask-image', mask);
   }
 }

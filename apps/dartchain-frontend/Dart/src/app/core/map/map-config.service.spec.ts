@@ -12,6 +12,7 @@ import {
   WORLD_BACKGROUND_CONFIG,
   QUEST_PARTICLE_MODE,
   ORBIT_CONFIG,
+  THIRD_PERSON_CAMERA_CONFIG,
 } from './map-configuration';
 import { MapConfigService } from './map-config.service';
 
@@ -63,8 +64,11 @@ describe('MapConfigService', () => {
     expect(WORLD_SCALE.chunkSizeMeters).toBe(128);
     expect(QUEST_PARTICLE_MODE).toBe('metaverse-starry-sky');
     expect(WORLD_BACKGROUND_CONFIG.fogFar).toBeGreaterThan(WORLD_BACKGROUND_CONFIG.fogNear);
-    expect(ORBIT_CONFIG.maxPolarAngle).toBeLessThan(1.5);
+    // Stick VIEW haut → quasi contre-plongée (un peu au-delà de l’horizon).
+    expect(ORBIT_CONFIG.maxPolarAngle).toBeGreaterThan(Math.PI / 2);
+    expect(ORBIT_CONFIG.maxPolarAngle).toBeLessThan(1.9);
     expect(ORBIT_CONFIG.minPolarAngle).toBeGreaterThan(0.2);
+    expect(THIRD_PERSON_CAMERA_CONFIG.minPitch).toBeLessThan(-0.2);
   });
 
   it('place la station Miroir à côté du miroir, hors chaussée centrale', () => {

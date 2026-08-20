@@ -2,6 +2,7 @@ import { STAR_QUEST_FAMILY_ORDER, type StarQuestFamily } from './star-conquest-f
 import {
   starConquestGalaxyRadius,
   starConquestRingDepthAmp,
+  starConquestRingTilt,
 } from './star-conquest-ui-maturity.config';
 
 export interface StarConquestHiveCell {
@@ -25,8 +26,27 @@ export interface StarConquestGalaxyOnRing {
   clusterScale: number;
 }
 
+/** Point sur l’axe circulaire biaisé (bas = proche, haut = fond). */
+export function starConquestRingPoint(
+  angle: number,
+  ringR = starConquestGalaxyRadius() * 0.62,
+  tilt = starConquestRingTilt()
+): { x: number; y: number; z: number } {
+  const cosT = Math.cos(tilt);
+  const sinT = Math.sin(tilt);
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+  return {
+    x: c * ringR,
+    // Raccourci vertical du biais
+    y: s * ringR * cosT,
+    // Bas (s < 0) → +Z près du joueur ; haut → −Z au fond
+    z: -s * ringR * sinT,
+  };
+}
+
 /**
- * Cinq galaxies (familles) sur le cercle nébuleuse — cadré 250×550.
+ * Cinq galaxies (familles) sur le cercle nébuleuse biaisé — cadré 250×550.
  * `phase` = rotation lente du cercle (radians).
  */
 export function starConquestGalaxiesOnRing(
@@ -38,18 +58,18 @@ export function starConquestGalaxiesOnRing(
   const n = STAR_QUEST_FAMILY_ORDER.length;
   return STAR_QUEST_FAMILY_ORDER.map((family, i) => {
     const angle = -Math.PI / 2 + (i / n) * Math.PI * 2 + phase;
-    const x = Math.cos(angle) * ring;
-    const y = Math.sin(angle) * ring * 0.72;
-    // Devant du cercle = +Z (caméra), fond = −Z
-    const z = Math.sin(angle) * depthAmp;
-    const depthT = Math.max(0, Math.min(1, (z / Math.max(depthAmp, 1e-6) + 1) * 0.5));
+    const p = starConquestRingPoint(angle, ring);
+    const depthT = Math.max(
+      0,
+      Math.min(1, (p.z / Math.max(depthAmp, 1e-6) + 1) * 0.5)
+    );
     return {
       family,
       familyIndex: i,
       angle,
-      x,
-      y,
-      z,
+      x: p.x,
+      y: p.y,
+      z: p.z,
       depthT,
       clusterScale: 0.4 + depthT * 0.6,
     };
@@ -60,11 +80,12 @@ export function starConquestGalaxiesOnRing(
 export function starConquestHiveCells(
   galaxyR = starConquestGalaxyRadius()
 ): readonly StarConquestHiveCell[] {
+  const cosT = Math.cos(starConquestRingTilt());
   return starConquestGalaxiesOnRing(0, galaxyR).map((g) => ({
     family: g.family,
     angle: g.angle,
     depthZ: g.z,
-    radius: Math.hypot(g.x, g.y / 0.72),
+    radius: Math.hypot(g.x, Math.abs(cosT) > 1e-4 ? g.y / cosT : g.y),
   }));
 }
 
@@ -73,11 +94,8 @@ export function hiveCellCenter(cell: StarConquestHiveCell): {
   y: number;
   z: number;
 } {
-  return {
-    x: Math.cos(cell.angle) * cell.radius,
-    y: Math.sin(cell.angle) * cell.radius * 0.78,
-    z: cell.depthZ,
-  };
+  const p = starConquestRingPoint(cell.angle, cell.radius);
+  return { x: p.x, y: p.y, z: p.z };
 }
 
 /** Sommets d’un hexagone (fermé) dans le plan XY. */

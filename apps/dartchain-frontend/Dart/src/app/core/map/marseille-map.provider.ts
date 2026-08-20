@@ -68,9 +68,9 @@ const CYBERPUNK_ART_DIRECTION = {
   lights: {
     moonColor: 0xb7c8ff,
     moonIntensity: 0.82,
-    hemiSky: 0x7a8cff,
-    hemiGround: 0x180f24,
-    hemiIntensity: 0.34,
+    hemiSky: 0x12141c,
+    hemiGround: 0x08060c,
+    hemiIntensity: 0.22,
     harborCyan: 0x42dcff,
     harborCyanIntensity: 0.78,
     harborMagenta: 0xff51c8,
@@ -79,8 +79,8 @@ const CYBERPUNK_ART_DIRECTION = {
     depthBlueIntensity: 0.34,
   },
   atmosphere: {
-    hazeNearOpacity: 0.09,
-    hazeFarOpacity: 0.055,
+    hazeNearOpacity: 0.16,
+    hazeFarOpacity: 0.22,
   },
     streets: {
     centerLineOpacity: 0.82,
@@ -2058,11 +2058,12 @@ export class MarseilleMapProvider implements MapProvider {
     const hazePlane = new THREE.Mesh(
       new THREE.PlaneGeometry(220, 84),
       new THREE.MeshBasicMaterial({
-        color: 0x7aa6ff,
+        color: 0x000000,
         transparent: true,
         opacity: CYBERPUNK_ART_DIRECTION.atmosphere.hazeNearOpacity,
         depthWrite: false,
         side: THREE.DoubleSide,
+        fog: true,
       })
     );
     hazePlane.name = 'marseille-depth-haze';
@@ -2072,11 +2073,12 @@ export class MarseilleMapProvider implements MapProvider {
     const hazePlaneFar = new THREE.Mesh(
       new THREE.PlaneGeometry(260, 110),
       new THREE.MeshBasicMaterial({
-        color: 0x94b6ff,
+        color: 0x000000,
         transparent: true,
         opacity: CYBERPUNK_ART_DIRECTION.atmosphere.hazeFarOpacity,
         depthWrite: false,
         side: THREE.DoubleSide,
+        fog: true,
       })
     );
     hazePlaneFar.name = 'marseille-depth-haze-far';
@@ -2100,12 +2102,12 @@ export class MarseilleMapProvider implements MapProvider {
     };
 
     const texture = new THREE.CubeTexture([
-      makeFace('#243056', '#3a2148'),
-      makeFace('#1c2848', '#2a1838'),
-      makeFace('#6f8cff', '#243056'),
-      makeFace('#090814', '#090814'),
-      makeFace('#2a1848', '#1c2848'),
-      makeFace('#143848', '#1c2848'),
+      makeFace('#0c0d12', '#08080c'),
+      makeFace('#0a0b10', '#07070a'),
+      makeFace('#000000', '#000000'),
+      makeFace('#050508', '#050508'),
+      makeFace('#0a0810', '#07070c'),
+      makeFace('#080c10', '#07070c'),
     ]);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.generateMipmaps = false;

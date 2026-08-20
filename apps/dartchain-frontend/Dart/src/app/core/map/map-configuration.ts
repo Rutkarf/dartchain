@@ -257,8 +257,13 @@ export const ORBIT_CONFIG = {
   enableRotate: true,
   minDistance: 5.2,
   maxDistance: 11,
+  /** Plongée haute (stick VIEW bas). */
   minPolarAngle: 0.48,
-  maxPolarAngle: 1.32,
+  /**
+   * Contre-plongée (stick VIEW haut) : un peu au-delà de l’horizon (π/2)
+   * pour viser quasi vers le ciel depuis bas, sans passer sous le sol.
+   */
+  maxPolarAngle: 1.78,
   zoomSpeed: 0.8,
   rotateSpeed: 0.55,
   /** Centre du perso (~2.8 m) pour cadrer le corps entier dans le peek. */
@@ -348,7 +353,8 @@ export const THIRD_PERSON_CAMERA_CONFIG = {
   positionSmoothing: 0.14,
   minDistance: 5.2,
   maxDistance: 11,
-  minPitch: -0.04,
+  /** Aligné sur ORBIT_CONFIG.maxPolarAngle (π/2 − 1.78) — contre-plongée. */
+  minPitch: -0.28,
   maxPitch: 0.42,
   collisionPadding: 0.3,
   wheelZoomSpeed: 0.0028,

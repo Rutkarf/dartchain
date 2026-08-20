@@ -141,8 +141,9 @@ export class CameraControlService {
     }
 
     this.cameraAngleX -= this.stickX * this.yawSpeed * deltaSeconds;
+    // Stick haut → pitch ↓ → caméra plus basse (contre-plongée), aligné sur l’orbite.
     this.cameraAngleY = THREE.MathUtils.clamp(
-      this.cameraAngleY + this.stickY * this.pitchSpeed * deltaSeconds,
+      this.cameraAngleY - this.stickY * this.pitchSpeed * deltaSeconds,
       this.pitchMin(),
       this.pitchMax()
     );

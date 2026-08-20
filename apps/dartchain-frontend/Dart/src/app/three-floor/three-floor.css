@@ -29,21 +29,28 @@
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
-  background: transparent;
+  background: #000;
+  /* Fallback : le masque runtime (floor-horizon-blend.config) remplace ces stops. */
   -webkit-mask-image: linear-gradient(
     to top,
     #000 0%,
-    #000 78%,
-    rgba(0, 0, 0, 0.85) 90%,
+    #000 50%,
+    rgba(0, 0, 0, 0.88) 64%,
+    rgba(0, 0, 0, 0.52) 76%,
+    rgba(0, 0, 0, 0.18) 88%,
     transparent 100%
   );
   mask-image: linear-gradient(
     to top,
     #000 0%,
-    #000 78%,
-    rgba(0, 0, 0, 0.85) 90%,
+    #000 50%,
+    rgba(0, 0, 0, 0.88) 64%,
+    rgba(0, 0, 0, 0.52) 76%,
+    rgba(0, 0, 0, 0.18) 88%,
     transparent 100%
   );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 
 .floor-canvas {
@@ -82,7 +89,21 @@
 
 @media (prefers-reduced-motion: reduce) {
   .floor-wrapper {
-    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 82%, rgba(0, 0, 0, 0.4) 94%, transparent 100%);
-    mask-image: linear-gradient(to top, #000 0%, #000 82%, rgba(0, 0, 0, 0.4) 94%, transparent 100%);
+    -webkit-mask-image: linear-gradient(
+      to top,
+      #000 0%,
+      #000 58%,
+      rgba(0, 0, 0, 0.7) 80%,
+      rgba(0, 0, 0, 0.22) 92%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to top,
+      #000 0%,
+      #000 58%,
+      rgba(0, 0, 0, 0.7) 80%,
+      rgba(0, 0, 0, 0.22) 92%,
+      transparent 100%
+    );
   }
 }

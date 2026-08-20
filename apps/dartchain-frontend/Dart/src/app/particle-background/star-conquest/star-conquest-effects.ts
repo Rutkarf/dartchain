@@ -11,11 +11,11 @@ import {
   hiveCellCenter,
   hiveHexPoints,
   starConquestHiveCells,
+  starConquestRingPoint,
 } from './star-conquest-hive.layout';
 import {
   starConquestGalaxyRadius,
   starConquestMobileQuality,
-  starConquestRingDepthAmp,
 } from './star-conquest-ui-maturity.config';
 
 /**
@@ -104,12 +104,9 @@ export class StarConquestEffects {
       const ring = this.orbitalRings[ri];
       const isStructure = ring === this.structureRing;
       if (isStructure) {
-        // Micro-bascule en profondeur (cercle vivant) — galaxies restent sur la courbe via setOrbitPhase
-        const breath = Math.sin(this.time * 0.28 + this.galaxyOrbitPhase * 0.2) * 0.055;
-        ring.rotation.x = breath;
-        ring.rotation.y = Math.cos(this.time * 0.21) * 0.028;
+        // Géométrie déjà biaisée — micro pulse d’opacité seulement
         const mat = ring.material as THREE.LineBasicMaterial;
-        mat.opacity = 0.17 + Math.sin(this.time * 0.4) * 0.04;
+        mat.opacity = 0.2 + Math.sin(this.time * 0.4) * 0.045;
         continue;
       }
       ring.rotation.z += deltaMs * 0.00006 * (1 + ri * 0.25);
@@ -233,28 +230,21 @@ export class StarConquestEffects {
     }
   }
 
-  /** Anneau unique = orbite des 5 galaxies (même courbe / profondeur). */
+  /** Anneau unique = orbite des 5 galaxies (même courbe biaisée). */
   private buildGalaxyStructureRing(): void {
     const r = starConquestGalaxyRadius() * 0.62;
-    const depthAmp = starConquestRingDepthAmp();
     const segments = 96;
     const pts: THREE.Vector3[] = [];
     for (let s = 0; s <= segments; s++) {
-      // Aligné sur starConquestGalaxiesOnRing (phase 0) — rotation sync via setOrbitPhase
       const a = -Math.PI / 2 + (s / segments) * Math.PI * 2;
-      pts.push(
-        new THREE.Vector3(
-          Math.cos(a) * r,
-          Math.sin(a) * r * 0.72,
-          Math.sin(a) * depthAmp
-        )
-      );
+      const p = starConquestRingPoint(a, r);
+      pts.push(new THREE.Vector3(p.x, p.y, p.z));
     }
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
     const mat = new THREE.LineBasicMaterial({
       color: 0x7ad4f0,
       transparent: true,
-      opacity: 0.2,
+      opacity: 0.22,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -266,25 +256,19 @@ export class StarConquestEffects {
     this.group.add(ring);
   }
 
-  /** Sync le cercle 3D avec l’orbite des 5 galaxies (même paramétrage). */
+  /** Sync le cercle biaisé avec l’orbite des 5 galaxies. */
   setOrbitPhase(phase: number): void {
     this.galaxyOrbitPhase = phase;
     if (!this.structureRing) return;
     const r = starConquestGalaxyRadius() * 0.62;
-    const depthAmp = starConquestRingDepthAmp();
     const pos = this.structureRing.geometry.getAttribute('position') as THREE.BufferAttribute;
     const segments = Math.max(1, pos.count - 1);
     for (let s = 0; s < pos.count; s++) {
       const a = -Math.PI / 2 + (s / segments) * Math.PI * 2 + phase;
-      pos.setXYZ(
-        s,
-        Math.cos(a) * r,
-        Math.sin(a) * r * 0.72,
-        Math.sin(a) * depthAmp
-      );
+      const p = starConquestRingPoint(a, r);
+      pos.setXYZ(s, p.x, p.y, p.z);
     }
     pos.needsUpdate = true;
-    // Pas de rotation.z : la courbe est déjà en phase avec les galaxies
     this.structureRing.rotation.set(0, 0, 0);
   }
 

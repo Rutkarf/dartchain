@@ -22,21 +22,33 @@ export function starConquestVisibleHalfExtents(
 }
 
 /**
+ * Inclinaison de l’axe circulaire (radians) — bas = proche joueur, haut = fond.
+ * ~58° : ellipse lisible, pas un disque plat.
+ */
+export function starConquestRingTilt(): number {
+  return 1.01;
+}
+
+/**
  * Rayon galaxie / essaim — calé pour que le cercle des 5 galaxies
  * tienne dans 250×550 (marge pour clusters + respiration).
  */
 export function starConquestGalaxyRadius(): number {
   const { halfW, halfH } = starConquestVisibleHalfExtents();
-  const ringY = 0.72;
+  const tilt = starConquestRingTilt();
+  const ringY = Math.cos(tilt);
   const fill = 0.78;
-  const ringMax = Math.min(halfW * fill, (halfH * fill) / ringY);
+  const ringMax = Math.min(
+    halfW * fill,
+    (halfH * fill) / Math.max(ringY, 0.35)
+  );
   // Anneau structurel = radius * 0.62 (hive.layout / effects)
   return ringMax / 0.62;
 }
 
-/** Amplitude Z du cercle (profondeur) — proportionnelle, pas au layout « company ». */
+/** Amplitude Z issue du biais (sin tilt × rayon d’anneau). */
 export function starConquestRingDepthAmp(): number {
-  return starConquestGalaxyRadius() * 0.32;
+  return starConquestGalaxyRadius() * 0.62 * Math.sin(starConquestRingTilt());
 }
 
 /**

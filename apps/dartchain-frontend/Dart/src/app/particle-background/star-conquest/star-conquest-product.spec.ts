@@ -158,12 +158,17 @@ describe('Star Conquest product modules', () => {
     const { halfW, halfH } = starConquestVisibleHalfExtents();
     const cells = starConquestHiveCells();
     expect(cells).toHaveLength(5);
-    const ring = starConquestGalaxiesOnRing(0.4);
+    const ring = starConquestGalaxiesOnRing(0);
     expect(ring).toHaveLength(5);
     for (const g of ring) {
       expect(Math.abs(g.x)).toBeLessThan(halfW * 0.98);
       expect(Math.abs(g.y)).toBeLessThan(halfH * 0.98);
     }
+    // Biais : bas du cercle (+Y négatif) = près joueur (+Z) ; haut = fond (−Z)
+    const bottom = ring.reduce((a, b) => (a.y < b.y ? a : b));
+    const top = ring.reduce((a, b) => (a.y > b.y ? a : b));
+    expect(bottom.z).toBeGreaterThan(top.z);
+    expect(bottom.depthT).toBeGreaterThan(top.depthT);
     const near = [...ring].sort((a, b) => b.depthT - a.depthT)[0];
     const far = [...ring].sort((a, b) => a.depthT - b.depthT)[0];
     expect(near.z).toBeGreaterThan(far.z);
