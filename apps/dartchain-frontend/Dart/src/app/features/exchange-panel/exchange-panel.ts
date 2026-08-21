@@ -241,6 +241,87 @@ export class ExchangePanelComponent implements AfterViewInit {
     () => this.parsedAmount() > 0 && !this.exchangeCollapsed()
   );
 
+  protected readonly showBalanceInline = computed(() => !this.exchangeCollapsed());
+
+  protected readonly compactBalanceLabel = computed(
+    () => `Solde ${this.formatBalance(this.fromBalance())}`
+  );
+
+  protected readonly quoteLockLabel = '30 s';
+  protected readonly quoteLockedAt = signal<number | null>(null);
+
+  protected readonly quoteLockTimestampLabel = computed(() => {
+    const at = this.quoteLockedAt();
+    if (at == null) {
+      return '';
+    }
+
+    const date = new Date(at);
+    const pad = (value: number) => value.toString().padStart(2, '0');
+    return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  });
+
+  protected readonly quoteLockIso = computed(() => {
+    const at = this.quoteLockedAt();
+    return at == null ? '' : new Date(at).toISOString();
+  });
+
+  protected readonly compactRateLabel = computed(() => {
+    const r = this.rate();
+    if (!Number.isFinite(r) || r <= 0) {
+      return '';
+    }
+
+    return `1=${this.formatRateCompact(r)}`;
+  });
+
+  protected readonly metaStatusText = computed(() => {
+    if (this.showSuccessToast() && this.successMessage()) {
+      return this.successMessage();
+    }
+
+    if (this.showStatus() && this.errorMessage()) {
+      return this.errorMessage();
+    }
+
+    if (this.showStatus() && this.successMessage()) {
+      return this.successMessage();
+    }
+
+    return '';
+  });
+
+  protected readonly metaStatusKind = computed((): 'error' | 'success' | '' => {
+    if (this.showSuccessToast() && this.successMessage()) {
+      return 'success';
+    }
+
+    if (this.showStatus() && this.errorMessage()) {
+      return 'error';
+    }
+
+    if (this.showStatus() && this.successMessage()) {
+      return 'success';
+    }
+
+    return '';
+  });
+
+  protected readonly compactMetaHint = computed(() => {
+    switch (this.swapAction()) {
+      case 'create-wallet':
+        return 'Wallet requis';
+      case 'login-required':
+        return 'Connexion requise';
+      case 'enter-amount':
+        return 'Saisissez un montant';
+      case 'insufficient':
+        return this.fromBalance() <= 0 ? 'Obtenir R4V3' : 'Solde insuffisant';
+      default:
+        return '';
+    }
+  });
+
   protected readonly showQuickAmounts = computed(
     () =>
       !this.exchangeCollapsed() &&
@@ -1024,7 +1105,7 @@ export class ExchangePanelComponent implements AfterViewInit {
         next: (response) => {
           this.fromBalance.set(response.fromBalance);
           this.toBalance.set(response.toBalance);
-          this.rate.set(response.rate);
+          this.lockQuoteRate(response.rate);
           this.successMessage.set(
             response.message ||
               `Reçu ${this.formatAmount(response.amountOut)} ${response.toToken}`
@@ -1094,7 +1175,7 @@ export class ExchangePanelComponent implements AfterViewInit {
           }
           this.fromBalance.set(data.fromBalance);
           this.toBalance.set(data.toBalance);
-          this.rate.set(data.rate);
+          this.lockQuoteRate(data.rate);
           this.testnet.set(data.testnet ?? true);
           this.loadingPanel.set(false);
         },
@@ -1104,6 +1185,11 @@ export class ExchangePanelComponent implements AfterViewInit {
           this.loadingPanel.set(false);
         },
       });
+  }
+
+  private lockQuoteRate(rate: number): void {
+    this.rate.set(rate);
+    this.quoteLockedAt.set(Date.now());
   }
 
   private formatAmount(value: number): string {

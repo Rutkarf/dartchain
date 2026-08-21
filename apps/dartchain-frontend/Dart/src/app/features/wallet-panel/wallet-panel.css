@@ -1192,11 +1192,27 @@ button.dock-view__item-row:focus-visible {
 
 .wallet-display__create-slot {
   flex: 0 0 auto;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
+  min-height: 22px;
+  position: relative;
+  z-index: 5;
+}
+
+.wallet-display.needs-wallet-creation .wallet-display__create-slot {
+  flex: 0 0 auto;
+  min-height: 22px;
+}
+
+.wallet-display.needs-wallet-creation .wallet-display__create-slot .wallet-display__create-cta {
+  width: 100%;
+  max-width: 100%;
+  min-height: 22px;
 }
 
 .wallet-display__create-cta {
@@ -1399,6 +1415,28 @@ button.dock-view__item-row:focus-visible {
   min-height: 0;
   height: 100%;
   flex: 1 1 auto;
+}
+
+/* Sans wallet : solde + CTA en grille — la rangée CTA (emplacement des clés) reste visible. */
+.wallet-display.needs-wallet-creation .wallet-display__balance-col {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-content: stretch;
+  overflow: hidden;
+}
+
+.wallet-display.needs-wallet-creation .wallet-display__balance-cyber {
+  min-height: 0;
+  max-height: 100%;
+}
+
+.wallet-display.needs-wallet-creation .wallet-display__balance-glass {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.wallet-display.needs-wallet-creation .wallet-display__create-slot {
+  grid-row: 2;
 }
 
 .wallet-display__balance-cyber {
@@ -3827,6 +3865,14 @@ button.dock-view__item-row:focus-visible {
 
 :host-context(.app-bottom-stack__panel) .wallet-display__balance-col {
   gap: 3px;
+}
+
+:host-context(.app-bottom-stack__panel) .wallet-display.needs-wallet-creation .wallet-display__create-slot {
+  min-height: 22px;
+}
+
+:host-context(.app-bottom-stack__panel) .wallet-display.needs-wallet-creation .wallet-display__create-cta {
+  min-height: 22px;
 }
 
 :host-context(.app-bottom-stack__panel) .wallet-display__faucet-col {

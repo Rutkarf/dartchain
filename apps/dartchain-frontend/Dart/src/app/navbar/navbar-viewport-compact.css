@@ -72,6 +72,13 @@
     margin-inline-start: 0;
   }
 
+  .navbar-brand-chips {
+    gap: 2px;
+    height: var(--nv-brand-chip-h);
+    min-height: var(--nv-brand-chip-h);
+    max-height: var(--nv-brand-chip-h);
+  }
+
   .navbar-brand-row .navbar-brand-select {
     max-width: 2.65rem;
   }
@@ -125,6 +132,14 @@ html.vp-compact app-navbar .navbar-brand-row {
   gap: 0px;
   height: var(--nv-logo-h, 18px);
   max-height: var(--nv-logo-h, 18px);
+  align-items: center;
+}
+
+html.vp-compact app-navbar .navbar-brand-chips {
+  gap: 2px;
+  height: var(--nv-brand-chip-h, 18px);
+  max-height: var(--nv-brand-chip-h, 18px);
+  align-items: center;
 }
 
 html.vp-compact app-navbar .navbar-brand-head {

@@ -34,14 +34,16 @@
                 </div>
               </div>
 
-              <app-brand-crypto-select class="navbar-brand-select" />
+              <div class="navbar-brand-chips" aria-label="Token et statut réseau">
+                <app-brand-crypto-select class="navbar-brand-select" />
 
-              <app-navbar-network-status
-                #networkStatus
-                class="navbar-brand-row__network"
-              />
+                <app-navbar-network-status
+                  #networkStatus
+                  class="navbar-brand-row__network"
+                />
 
-              <app-navbar-node-panel class="navbar-brand-row__node" />
+                <app-navbar-node-panel class="navbar-brand-row__node" />
+              </div>
             </div>
 
             <div class="navbar-ticker-slot">

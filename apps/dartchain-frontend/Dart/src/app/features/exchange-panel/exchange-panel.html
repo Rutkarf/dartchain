@@ -11,7 +11,7 @@
   <div
     class="exchange-panel__rail"
     [class.exchange-panel__rail--collapsed]="exchangeCollapsed()"
-    [class.exchange-panel__rail--has-estimate]="showInlineEstimate()"
+    [class.exchange-panel__rail--picking]="tokenMenuOpen()"
     [formGroup]="amountForm"
     role="group"
     aria-label="Convertir vos tokens LaunchLab"
@@ -33,15 +33,16 @@
       }
     </span>
 
-    <div class="exchange-panel__pair-route" [attr.title]="pairSubtitle()">
+    <div class="exchange-panel__row">
+    <div class="exchange-panel__pair-route">
       <span class="exchange-panel__pair-from">
         <span class="exchange-panel__pair-logo" aria-hidden="true">
           <app-r4v3-three
             class="exchange-panel__pair-logo-three"
             presentation="navbar"
-            [modelTargetSize]="8"
-            [cameraFitFactor]="1.35"
-            [frameBiasY]="-0.06"
+            [modelTargetSize]="10"
+            [cameraFitFactor]="1.22"
+            [frameBiasY]="-0.04"
             [enableOrbit]="true"
           />
         </span>
@@ -59,7 +60,6 @@
           [attr.aria-expanded]="tokenMenuOpen()"
           aria-haspopup="listbox"
           [attr.aria-label]="'Token de destination · ' + tokenDisplayName(toToken())"
-          [title]="tokenDisplayName(toToken())"
         >
           @if (tokenLogoUrl(toToken()); as toLogo) {
             <img
@@ -76,36 +76,6 @@
           <span class="exchange-panel__token-trigger-label">{{ toToken() }}</span>
           <span class="exchange-panel__token-trigger-chevron" aria-hidden="true"></span>
         </button>
-
-        @if (tokenMenuOpen()) {
-          <ul
-            class="exchange-panel__token-menu"
-            role="listbox"
-            aria-label="Choisir le token de destination"
-            (click)="$event.stopPropagation()"
-          >
-            @for (token of launchpadSwapTokens(); track token) {
-              <li
-                role="option"
-                class="exchange-panel__token-menu-item"
-                [class.exchange-panel__token-menu-item--active]="toToken() === token"
-                [attr.aria-selected]="toToken() === token"
-                (click)="selectLaunchFromMenu(token)"
-              >
-                <span class="exchange-panel__token-menu-symbol">{{ token }}</span>
-                <span class="exchange-panel__token-menu-name">{{ tokenDisplayName(token) }}</span>
-              </li>
-            }
-            <li
-              role="option"
-              class="exchange-panel__token-menu-item exchange-panel__token-menu-item--grid"
-              (click)="toggleTokenGrid($event)"
-            >
-              <span class="exchange-panel__token-menu-symbol">⊞</span>
-              <span class="exchange-panel__token-menu-name">Grille tokens</span>
-            </li>
-          </ul>
-        }
       </div>
     </div>
 
@@ -126,7 +96,6 @@
           inputmode="decimal"
           formControlName="amount"
           [placeholder]="amountPlaceholder"
-          [attr.title]="amountInputTitle()"
           [attr.aria-describedby]="exchangeCollapsed() ? 'exchange-collapsed-hint' : 'exchange-convert-hint'"
           (input)="onAmountInput()"
           (keydown.enter)="onAmountEnter($event)"
@@ -142,24 +111,13 @@
         <button
           type="button"
           class="exchange-panel__max-btn"
-          [title]="maxButtonTitle()"
           (click)="setMaxAmount()"
+          [attr.aria-label]="maxButtonTitle()"
         >
           Max
         </button>
       }
     </div>
-
-    @if (showInlineEstimate()) {
-      <span
-        class="exchange-panel__estimate"
-        [class.exchange-panel__estimate--pulse]="estimatePulse()"
-        [title]="quoteDetailsTitle()"
-        aria-live="polite"
-      >
-        {{ compactEstimateLabel() }}
-      </span>
-    }
 
     <button
       type="button"
@@ -173,70 +131,70 @@
       [disabled]="swapButtonDisabled()"
       [attr.aria-label]="swapButtonLabel()"
       [attr.aria-busy]="swapAction() === 'swapping'"
-      [title]="swapCtaHint() || swapButtonLabel()"
     >
       @if (swapAction() === 'swapping') {
         <span class="exchange-panel__cta-spinner" aria-hidden="true"></span>
       }
       <span class="exchange-panel__cta-label">{{ swapCtaVisibleLabel() }}</span>
     </button>
+    </div>
 
-    @if (tokenGridOpen()) {
-      <div
-        class="exchange-panel__grid-popover"
-        role="listbox"
-        aria-label="Choisir le token LaunchLab"
-        (click)="$event.stopPropagation()"
-      >
-        <div class="exchange-panel__targets">
-          @for (slot of launchGridSlots(); track $index) {
-            @if (slot) {
-              <button
-                type="button"
-                role="option"
-                class="exchange-panel__chip"
-                [class.exchange-panel__chip--active]="isLaunchChipActive(slot)"
-                [attr.aria-selected]="isLaunchChipActive(slot)"
-                [attr.aria-label]="'Recevoir ' + tokenDisplayName(slot)"
-                (click)="selectLaunchChipFromGrid(slot)"
-                [title]="tokenDisplayName(slot)"
-              >
-                @if (tokenLogoUrl(slot); as chipLogo) {
-                  <img
-                    class="exchange-panel__chip-icon exchange-panel__chip-icon--img"
-                    [src]="chipLogo"
-                    alt=""
-                    (error)="onTokenLogoError(slot)"
-                  />
-                } @else {
-                  <span class="exchange-panel__chip-icon" aria-hidden="true">{{ tokenIconText(slot) }}</span>
-                }
-                <span class="exchange-panel__chip-label">{{ slot }}</span>
-              </button>
-            } @else {
-              <span class="exchange-panel__chip exchange-panel__chip--empty" aria-hidden="true"></span>
-            }
+    <div class="exchange-panel__meta" aria-live="polite">
+      @if (tokenMenuOpen()) {
+        <div class="exchange-panel__meta-tokens" role="listbox" aria-label="Choisir le token de destination">
+          @for (token of launchpadSwapTokens(); track token) {
+            <button
+              type="button"
+              role="option"
+              class="exchange-panel__meta-chip"
+              [class.exchange-panel__meta-chip--active]="toToken() === token"
+              [attr.aria-selected]="toToken() === token"
+              (click)="selectLaunchFromMenu(token)"
+            >
+              {{ token }}
+            </button>
           }
         </div>
-      </div>
-    }
+      } @else if (metaStatusText()) {
+        <span
+          class="exchange-panel__meta-status"
+          [class.exchange-panel__meta-status--error]="metaStatusKind() === 'error'"
+          [class.exchange-panel__meta-status--success]="metaStatusKind() === 'success'"
+        >
+          {{ metaStatusText() }}
+        </span>
+        @if (showSuccessToast()) {
+          <button type="button" class="exchange-panel__toast-dismiss" (click)="dismissSuccessToast()">×</button>
+        }
+      } @else {
+        @if (showBalanceInline()) {
+          <span class="exchange-panel__balance">{{ compactBalanceLabel() }}</span>
+        }
+        @if (showInlineEstimate()) {
+          <span
+            class="exchange-panel__estimate"
+            [class.exchange-panel__estimate--pulse]="estimatePulse()"
+          >
+            {{ compactEstimateLabel() }}
+          </span>
+        } @else if (compactRateLabel()) {
+          <span class="exchange-panel__rate">{{ compactRateLabel() }}</span>
+        } @else if (compactMetaHint()) {
+          <span class="exchange-panel__meta-hint">{{ compactMetaHint() }}</span>
+        }
+        @if (quoteLockTimestampLabel()) {
+          <span class="exchange-panel__quote-lock">
+            <svg class="exchange-panel__lock-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+              <rect x="3" y="5.5" width="6" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M4.2 5.5V4.1a1.8 1.8 0 0 1 3.6 0v1.4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+            {{ quoteLockLabel }}
+            <time class="exchange-panel__quote-time" [attr.datetime]="quoteLockIso()">
+              {{ quoteLockTimestampLabel() }}
+            </time>
+          </span>
+        }
+      }
+    </div>
   </div>
-}
-
-@if (showSuccessToast() && successMessage()) {
-  <div class="exchange-panel__overlay exchange-panel__toast" role="status">
-    <span>{{ successMessage() }}</span>
-    <button type="button" class="exchange-panel__toast-dismiss" (click)="dismissSuccessToast()">×</button>
-  </div>
-}
-
-@if (showStatus() && (errorMessage() || (successMessage() && !showSuccessToast()))) {
-  <p
-    class="exchange-panel__overlay exchange-panel__status"
-    [class.exchange-panel__status--error]="!!errorMessage()"
-    [class.exchange-panel__status--success]="!!successMessage() && !errorMessage()"
-    [attr.role]="errorMessage() ? 'alert' : 'status'"
-  >
-    {{ errorMessage() || successMessage() }}
-  </p>
 }

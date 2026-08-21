@@ -116,10 +116,22 @@
 :host-context(.navbar-brand-row) {
   flex: 0 0 auto;
   height: var(--nv-brand-chip-h, calc(var(--nv-logo-h, 24px) - 1px));
+  min-height: var(--nv-brand-chip-h, calc(var(--nv-logo-h, 24px) - 1px));
   max-height: var(--nv-brand-chip-h, calc(var(--nv-logo-h, 24px) - 1px));
   align-self: center;
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+:host-context(.navbar-brand-row) .brand-crypto-select.token-select {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  margin: 0;
 }
 
 :host-context(.navbar-brand-row) .token-select__trigger {
@@ -128,7 +140,15 @@
   max-height: 100%;
   display: inline-flex;
   align-items: center;
-  padding: 0 0px 0 0;
+  padding: 0;
+  line-height: 1;
+}
+
+:host-context(.navbar-brand-row) .token-select__value,
+:host-context(.navbar-brand-row) .token-select__chevron {
+  align-self: center;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 :host-context(.navbar-brand-row) .token-select__trigger:hover,

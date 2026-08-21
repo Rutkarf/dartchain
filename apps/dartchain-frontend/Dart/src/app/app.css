@@ -76,8 +76,8 @@
   --market-after-ticker-gap: var(--stack-gap-navbar-market);
 
   /* —— Hiérarchie spatiale MVP 250×550 zero-scroll —— */
-  --mvp-swap-h: var(--ds-zone-exchange, 16px);
-  --mvp-chart-h: var(--ds-zone-chart, 136px);
+  --mvp-swap-h: var(--ds-zone-exchange, 32px);
+  --mvp-chart-h: var(--ds-zone-chart, 120px);
   --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
   --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
 
@@ -2173,8 +2173,8 @@ app-block-detail-drawer {
     overflow: hidden !important;
     --band-air-gap: 2px;
     --section-stack-gap: 0px;
-    --mvp-swap-h: var(--ds-zone-exchange, 16px);
-    --mvp-chart-h: var(--ds-zone-chart, 136px);
+    --mvp-swap-h: var(--ds-zone-exchange, 32px);
+    --mvp-chart-h: var(--ds-zone-chart, 120px);
     --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
     --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
     --market-exchange-strip-h: var(--mvp-swap-h);
@@ -2294,8 +2294,8 @@ app-block-detail-drawer {
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
     --band-air-gap: 2px;
-    --mvp-swap-h: var(--ds-zone-exchange, 16px);
-    --mvp-chart-h: var(--ds-zone-chart, 136px);
+    --mvp-swap-h: var(--ds-zone-exchange, 32px);
+    --mvp-chart-h: var(--ds-zone-chart, 120px);
     --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
     --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
     --market-chart-height: var(--mvp-chart-h);
@@ -2511,8 +2511,8 @@ app-block-detail-drawer {
     --hub-market-internal-gap-collapsed: var(--stack-section-gap-collapsed);
     --showcase-dock-offset: 1px;
     --band-external-gap: 0px;
-    --mvp-swap-h: var(--ds-zone-exchange, 16px);
-    --mvp-chart-h: var(--ds-zone-chart, 136px);
+    --mvp-swap-h: var(--ds-zone-exchange, 32px);
+    --mvp-chart-h: var(--ds-zone-chart, 120px);
     --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
     --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
     --market-exchange-height: var(--mvp-swap-h);
@@ -2691,8 +2691,8 @@ app-block-detail-drawer {
     --stack-gap-showcase-dock-collapsed: var(--stack-section-gap-collapsed);
     --stack-gap-dock-graph-collapsed: var(--stack-section-gap-collapsed);
     --hub-market-internal-gap-collapsed: var(--stack-section-gap-collapsed);
-    --mvp-swap-h: var(--ds-zone-exchange, 16px);
-    --mvp-chart-h: var(--ds-zone-chart, 136px);
+    --mvp-swap-h: var(--ds-zone-exchange, 32px);
+    --mvp-chart-h: var(--ds-zone-chart, 120px);
     --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
     --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
     --market-exchange-strip-h: var(--mvp-swap-h);

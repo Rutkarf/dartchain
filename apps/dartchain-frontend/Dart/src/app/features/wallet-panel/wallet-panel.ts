@@ -124,7 +124,14 @@ export class WalletPanelComponent implements OnInit {
   private messageTimer: ReturnType<typeof setTimeout> | null = null;
   private lastBalanceFetchAddress = '';
 
-  protected readonly hasWallet = computed(() => this.wallet() !== null);
+  protected readonly hasWallet = computed(() => {
+    const local = this.wallet();
+    return Boolean(local?.address?.trim() && local?.privateKey?.trim());
+  });
+
+  /** Affiche le CTA de création (déconnecté ou 1ʳᵉ connexion sans clés locales). */
+  protected readonly needsWalletCreation = computed(() => !this.hasWallet());
+
   protected readonly walletAddress = computed(() => this.wallet()?.address ?? '');
   protected readonly walletPublicKey = computed(() => this.wallet()?.publicKey ?? '');
   protected readonly walletPrivateKey = computed(() => this.wallet()?.privateKey ?? '');
@@ -304,6 +311,9 @@ export class WalletPanelComponent implements OnInit {
     effect(() => {
       const sessionWallet = this.walletSession.wallet();
       if (!sessionWallet) {
+        if (this.wallet() !== null) {
+          this.wallet.set(null);
+        }
         return;
       }
 
@@ -350,7 +360,7 @@ export class WalletPanelComponent implements OnInit {
     void this.chainConfig.load().catch(() => undefined);
 
     const sessionWallet = this.walletSession.wallet();
-    if (sessionWallet) {
+    if (sessionWallet?.address?.trim() && sessionWallet?.privateKey?.trim()) {
       this.wallet.set(sessionWallet);
       this.balanceForm.patchValue(
         { address: this.ownDisplayAddress(sessionWallet.address) },
@@ -359,6 +369,10 @@ export class WalletPanelComponent implements OnInit {
       this.fetchBalance(sessionWallet.address, true, false);
       this.syncLinkedWallet(sessionWallet);
     } else {
+      if (sessionWallet) {
+        this.walletSession.clearWallet();
+      }
+      this.wallet.set(null);
       const linked = this.auth.user()?.walletAddress?.trim();
       if (linked) {
         this.fetchBalance(linked, true, false);

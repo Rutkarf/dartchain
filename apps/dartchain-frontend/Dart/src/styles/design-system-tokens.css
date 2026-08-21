@@ -319,8 +319,8 @@
   --ds-viewport-w: 250px;
   --ds-viewport-h: 550px;
   --ds-zone-navbar: 32px;
-  --ds-zone-exchange: 16px;
-  --ds-zone-chart: 136px;
+  --ds-zone-exchange: 32px;
+  --ds-zone-chart: 120px;
   --ds-zone-showcase-header: 14px;
   --ds-zone-showcase-body: 108px;
   --ds-zone-bottom-panel: 118px;

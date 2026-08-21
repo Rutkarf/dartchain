@@ -1,6 +1,7 @@
 <section
   class="wallet-display ds-surface ds-surface--showcase-body"
   [class.is-wallet-active]="hasWallet()"
+  [class.needs-wallet-creation]="needsWalletCreation()"
   [class.is-action-panel-open]="showSendPanel() || showReceivePanel()"
   aria-label="Wallet"
 >
@@ -90,7 +91,7 @@
         </article>
 
         <div class="wallet-display__create-slot">
-          @if (!hasWallet()) {
+          @if (needsWalletCreation()) {
             <button
               type="button"
               class="wallet-display__create-cta"

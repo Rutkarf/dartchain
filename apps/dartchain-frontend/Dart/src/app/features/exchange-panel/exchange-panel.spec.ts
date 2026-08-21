@@ -40,6 +40,10 @@ describe('ExchangePanelComponent', () => {
 
   function flushBackgroundHttp(): void {
     httpMock
+      .match((request) => request.url.includes('/auth/oauth/providers'))
+      .forEach((request) => request.flush([]));
+
+    httpMock
       .match((request) => request.url.includes('/showcase/launch/projects'))
       .forEach((request) => request.flush([]));
 
@@ -121,6 +125,18 @@ describe('ExchangePanelComponent', () => {
     component['amountValue'].set('0.5');
     expect((component as any).estimatedTo()).toBe(10);
     expect((component as any).formattedEstimatedTo()).toContain('10');
+  });
+
+  it('exposes compact balance and quote lock for the v3 rail', () => {
+    flushPanel({ fromBalance: 1248.5 });
+    expect((component as any).compactBalanceLabel()).toContain('1');
+    expect((component as any).compactBalanceLabel()).toContain('248');
+    expect((component as any).quoteLockLabel).toBe('30 s');
+    expect((component as any).showBalanceInline()).toBe(true);
+    expect((component as any).compactMetaHint()).toBe('Wallet requis');
+    expect((component as any).quoteLockTimestampLabel()).toMatch(
+      /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/
+    );
   });
 
   it('opens wallet dock when clicking create wallet', () => {

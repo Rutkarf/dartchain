@@ -579,6 +579,39 @@
   z-index: calc(var(--nv-layer-brand) + 1);
 }
 
+/* R4V3 dropdown + LIVE + Market Pulse : une seule ligne, même axe */
+.navbar-brand-chips {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  align-self: center;
+  gap: clamp(2px, 0.8vw, 4px);
+  height: var(--nv-brand-chip-h);
+  min-height: var(--nv-brand-chip-h);
+  max-height: var(--nv-brand-chip-h);
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  overflow: visible;
+  transform: translateY(var(--nv-brand-sync-y, 0px));
+}
+
+.navbar-brand-chips > .navbar-brand-select,
+.navbar-brand-chips > .navbar-brand-row__network,
+.navbar-brand-chips > .navbar-brand-row__node {
+  flex: 0 0 auto;
+  align-self: center;
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
 .navbar-brand-row .navbar-brand-select {
   flex: 0 1 auto;
   min-width: 0;
@@ -666,8 +699,8 @@
   align-self: center;
   transform: none;
   overflow: visible;
-  height: var(--nv-brand-chip-h);
-  max-height: var(--nv-brand-chip-h);
+  height: 100%;
+  max-height: 100%;
   display: inline-flex;
   align-items: center;
   line-height: 1;
@@ -751,8 +784,8 @@
   align-self: center;
   flex-shrink: 0;
   transform: none;
-  height: var(--nv-brand-chip-h);
-  max-height: var(--nv-brand-chip-h);
+  height: 100%;
+  max-height: 100%;
   display: inline-flex;
   align-items: center;
 }

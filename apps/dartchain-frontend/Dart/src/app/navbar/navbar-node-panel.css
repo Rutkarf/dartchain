@@ -28,9 +28,12 @@
 }
 
 .navbar-node-panel {
-  display: block;
+  display: inline-flex;
+  align-items: center;
   width: auto;
   height: 100%;
+  min-height: 100%;
+  max-height: 100%;
   min-width: 0;
   max-width: 100%;
   overflow: visible;
@@ -173,9 +176,9 @@
 
   .navbar-node-panel__led {
     width: 4px;
-    height: 0px;
+    height: 4px;
     min-width: 4px;
-    min-height: 0px;
+    min-height: 4px;
   }
 
   .navbar-node-panel__range {
