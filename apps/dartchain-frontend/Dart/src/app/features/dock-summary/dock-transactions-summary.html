@@ -1,47 +1,54 @@
-<div class="dock-summary-bar" role="status" aria-live="polite" aria-label="Résumé transactions">
-  <div class="dock-summary-main">
-    <span class="dock-summary-main__rail" aria-hidden="true"></span>
-    <span
-      class="dock-summary-status"
-      [ngClass]="statusClass()"
-      [attr.aria-label]="'État : ' + statusLabel()"
-    >
-      {{ statusLabel() }}
-    </span>
-    @if (pendingCount() > 0) {
-      <span class="dock-summary-badge" [attr.aria-label]="pendingCount() + ' en attente'">
-        {{ pendingCount() }}
+<div
+  class="mempool-summary-bar"
+  role="status"
+  aria-live="polite"
+  [attr.aria-label]="barAriaLabel()"
+>
+  <span
+    class="mempool-summary-bar__hash"
+    [class.is-empty]="!pendingHash()"
+    [attr.title]="pendingHash() || 'Mempool vide'"
+  >
+    @if (pendingCount() > 1) {
+      <span class="mempool-summary-bar__count" aria-hidden="true">{{ pendingCount() }}×</span>
+    }
+    <span class="mempool-summary-bar__hash-text">{{ hashDisplay() }}</span>
+  </span>
+
+  <div class="mempool-summary-bar__meta">
+    @if (tipTxLabel()) {
+      <span
+        class="mempool-summary-bar__tip-tx"
+        [attr.title]="tipTxLabel() + ' dans le dernier bloc'"
+        [attr.aria-label]="tipTxLabel() + ' dans le dernier bloc'"
+      >
+        {{ tipTxLabel() }}
       </span>
     }
-  </div>
-
-  <div class="dock-summary-progress">
-    <p class="dock-summary-progress__text">
-      @if (loading()) {
-        <span class="dock-summary-progress__text--muted">Chargement…</span>
-      } @else {
-        <span>{{ headline() }}</span>
-        @if (progressLabel()) {
-          <span class="dock-summary-progress__text--muted"> · {{ progressLabel() }}</span>
-        }
-      }
-    </p>
-  </div>
-
-  <div class="dock-summary-meta">
     @if (updatedAgeLabel()) {
-      <span class="dock-summary-meta__time">{{ updatedAgeLabel() }}</span>
+      <span class="mempool-summary-bar__time">{{ updatedAgeLabel() }}</span>
     }
   </div>
 
-  <div class="dock-summary-actions">
+  <div class="mempool-summary-bar__actions">
     <button
       type="button"
-      class="dock-summary-actions__btn dock-summary-actions__primary"
-      (click)="onOpen($event)"
-      aria-label="Ouvrir le panneau Mempool"
+      class="mempool-summary-bar__btn mempool-summary-bar__btn--tx"
+      (click)="onOpenTx($event)"
+      aria-label="Ouvrir le mempool"
+      title="Tx"
     >
       Tx
+    </button>
+    <button
+      type="button"
+      class="mempool-summary-bar__btn mempool-summary-bar__btn--mine"
+      (click)="onMine($event)"
+      [disabled]="!canMine()"
+      [attr.aria-label]="mining() ? 'Minage en cours' : 'Miner le mempool'"
+      [attr.title]="canMine() ? 'Miner' : 'Rien à miner'"
+    >
+      {{ mining() ? '…' : 'Miner' }}
     </button>
   </div>
 </div>

@@ -194,16 +194,41 @@
 .showcase-tab.ds-surface.ds-surface--showcase-tab .showcase-tab__label,
 .dock-tab.ds-surface.ds-surface--showcase-tab .dock-tab-label,
 .app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab .showcase-tab__label {
+  display: inline-block !important;
   color: inherit !important;
   font-weight: 600;
+  font-style: normal;
   letter-spacing: 0.05em;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.55);
+  /* Italique simulé (skew) — animable, plus marqué que italic natif */
+  transform: skewX(-11deg);
+  transform-origin: center center;
+  will-change: transform;
+  transition:
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    font-weight 200ms ease,
+    color 140ms ease,
+    text-shadow 200ms ease;
+}
+
+/* Survol / pressé / actif : texte droit */
+.showcase-tab.ds-surface.ds-surface--showcase-tab:hover .showcase-tab__label,
+.showcase-tab.ds-surface.ds-surface--showcase-tab:active .showcase-tab__label,
+.showcase-tab.ds-surface.ds-surface--showcase-tab.is-active .showcase-tab__label,
+.dock-tab.ds-surface.ds-surface--showcase-tab:hover .dock-tab-label,
+.dock-tab.ds-surface.ds-surface--showcase-tab:active .dock-tab-label,
+.dock-tab.ds-surface.ds-surface--showcase-tab.is-active .dock-tab-label,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab:hover .showcase-tab__label,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab:active .showcase-tab__label,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab.is-active .showcase-tab__label {
+  transform: skewX(0deg);
 }
 
 .showcase-tab.ds-surface.ds-surface--showcase-tab.is-active .showcase-tab__label,
 .dock-tab.ds-surface.ds-surface--showcase-tab.is-active .dock-tab-label,
 .app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab.is-active .showcase-tab__label {
   font-weight: 800 !important;
+  font-style: normal !important;
   text-shadow:
     0 0 6px rgba(var(--tab-push-cyan-rgb), 0.28),
     0 1px 1px rgba(0, 0, 0, 0.65);

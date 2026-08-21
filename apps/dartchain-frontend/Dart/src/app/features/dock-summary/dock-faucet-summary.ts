@@ -4,39 +4,43 @@ import {
   HostBinding,
   OnDestroy,
   OnInit,
+  computed,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
-import {
-  DockFaucetPhase,
-  DockFaucetStateService,
-} from '../../core/services/dock-faucet-state.service';
+import { DockFaucetStateService } from '../../core/services/dock-faucet-state.service';
+import { FaucetRuntimeService } from '../../core/services/faucet-runtime.service';
 
 @Component({
   selector: 'app-dock-faucet-summary',
   standalone: true,
-  imports: [CommonModule],
   templateUrl: './dock-faucet-summary.html',
-  styleUrls: ['./dock-summary-shared.css'],
+  styleUrls: ['./dock-faucet-summary.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DockFaucetSummaryComponent implements OnInit, OnDestroy {
   protected readonly state = inject(DockFaucetStateService);
+  private readonly runtime = inject(FaucetRuntimeService);
 
-  @HostBinding('class')
-  readonly hostClasses = `${COLLAPSED_SUMMARY_BAR_CLASS} dock-summary-bar__content is-faucet`;
+  @HostBinding(`class.${COLLAPSED_SUMMARY_BAR_CLASS}`)
+  readonly collapsedSummaryBar = true;
+
+  @HostBinding('class.dock-summary-bar__content')
+  readonly contentClass = true;
+
+  @HostBinding('class.is-faucet')
+  readonly panelClass = true;
 
   @HostBinding('class.is-collapsed')
   readonly collapsedClass = true;
 
-  readonly phase = this.state.phase;
-  readonly statusLabel = this.state.statusLabel;
   readonly headline = this.state.headline;
-  readonly progressLabel = this.state.progressLabel;
-  readonly updatedAgeLabel = this.state.updatedAgeLabel;
-  readonly loading = this.state.loading;
+  readonly claimDisabled = this.runtime.claimDisabled;
+  readonly isCooling = computed(
+    () => !this.runtime.eligible() && this.runtime.cooldownSeconds() > 0
+  );
+  readonly barAriaLabel = computed(() => `Faucet ${this.headline()}`);
 
   ngOnInit(): void {
     window.addEventListener('dartchain-refresh-dock', this.onGlobalRefresh);
@@ -50,26 +54,8 @@ export class DockFaucetSummaryComponent implements OnInit, OnDestroy {
     this.state.refresh();
   };
 
-  statusClass(phase: DockFaucetPhase): string {
-    const map: Record<DockFaucetPhase, string> = {
-      error: 'error',
-      loading: 'busy',
-      disconnected: 'disconnected',
-      cooldown: 'waiting',
-      ready: 'ready',
-    };
-    return `dock-summary-status--${map[phase]}`;
-  }
-
-  onRefresh(event: Event): void {
+  onClaim(event: Event): void {
     event.stopPropagation();
-    this.state.refresh();
-  }
-
-  onOpen(event: Event): void {
-    event.stopPropagation();
-    window.dispatchEvent(
-      new CustomEvent('dock-open-panel', { detail: { panel: 'faucet' } })
-    );
+    this.runtime.claim();
   }
 }

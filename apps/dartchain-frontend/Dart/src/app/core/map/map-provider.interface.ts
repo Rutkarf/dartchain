@@ -26,5 +26,11 @@ export interface MapProvider {
 
   getSurfaceProvider(): SurfaceProvider;
 
+  /** Nombre de meshes de massing urbain (accurate + OSM). Optionnel. */
+  getCityMassingCount?(): number;
+
+  /** Recharge le catalogue accurate si la scène est vide. Optionnel. */
+  ensureCityMassing?(): void;
+
   dispose(): void;
 }

@@ -1,0 +1,103 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: visible;
+  container-type: inline-size;
+  box-sizing: border-box;
+}
+
+.faucet-summary-bar {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  padding: 0 1px 0 2px;
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.faucet-summary-bar__balance {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  font-family: var(--font-data, ui-monospace, Menlo, monospace);
+  font-size: calc(clamp(0.28rem, 1.7vw, 0.375rem) + 1px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: rgba(244, 251, 255, 0.94);
+}
+
+.faucet-summary-bar__claim {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: 11px;
+  margin: 0;
+  padding: 0 5px;
+  border: 1px solid rgba(61, 214, 140, 0.45);
+  border-radius: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(61, 214, 140, 0.32) 0%,
+    rgba(61, 214, 140, 0.12) 100%
+  );
+  color: rgba(244, 251, 255, 0.96);
+  font-family: var(--font-display, inherit);
+  font-size: clamp(0.26rem, 1.5vw, 0.34rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: 1;
+  touch-action: manipulation;
+}
+
+.faucet-summary-bar__claim:hover:not(:disabled) {
+  color: #fff;
+  border-color: rgba(61, 214, 140, 0.7);
+  background: linear-gradient(
+    180deg,
+    rgba(61, 214, 140, 0.42) 0%,
+    rgba(61, 214, 140, 0.18) 100%
+  );
+}
+
+.faucet-summary-bar__claim:disabled,
+.faucet-summary-bar__claim.is-cooling:disabled {
+  opacity: 0.38;
+  cursor: default;
+  pointer-events: none;
+  border-color: rgba(245, 215, 110, 0.28);
+  background: rgba(245, 215, 110, 0.1);
+  color: rgba(245, 215, 110, 0.75);
+}
+
+.faucet-summary-bar__claim:focus-visible {
+  outline: 1px solid rgba(61, 214, 140, 0.55);
+  outline-offset: 1px;
+}
+
+@container (max-width: 140px) {
+  .faucet-summary-bar__claim {
+    padding: 0 3px;
+    letter-spacing: 0.04em;
+  }
+}

@@ -1,18 +1,21 @@
 import * as THREE from 'three';
 
 import type { MapQuality } from './map-configuration';
+import { SCENE_COPY } from './map-configuration';
 
-/** Emprise gameplay de l’Ombrière — le spawn reste sous le centre (0, y, 0). */
+/** Emprise gameplay de l’Ombrière — spawn juste au sud du centre, avant l’eau. */
 export const MIRROR_CANOPY = {
   width: 18.4,
   depth: 12.2,
   thickness: 0.09,
   /** Y monde du plan verre (METRO_SPAWN_ANCHOR.mirror.y). */
-  deckY: 5.6,
+  deckY: 8.0,
+  /** Cambrure max du verre + marge — titre MetaVerseBB au-dessus. */
+  titleClearance: 0.52,
   postInsetX: 7.35,
   postInsetZ: 4.55,
   postRadius: 0.13,
-  postHeight: 5.42,
+  postHeight: 7.82,
 } as const;
 
 export interface MirrorCanopyBuildResult {
@@ -68,6 +71,10 @@ export function buildVieuxPortMirrorCanopy(
   topSheet.position.y = origin.y + MIRROR_CANOPY.thickness * 0.55;
   group.add(topSheet);
 
+  const titlePlate = buildMetaVerseBbTitlePlate(geometries, materials, textures);
+  titlePlate.position.y = origin.y + MIRROR_CANOPY.titleClearance;
+  group.add(titlePlate);
+
   const frame = buildSteelFrame(geometries, materials);
   frame.position.y = origin.y;
   group.add(frame);
@@ -87,10 +94,10 @@ export function buildVieuxPortMirrorCanopy(
   materials.push(plazaMat);
   const plazaGeo = new THREE.CircleGeometry(13.2, 48);
   geometries.push(plazaGeo);
-  const plaza = new THREE.Mesh(plazaGeo, plazaMat);
+    const plaza = new THREE.Mesh(plazaGeo, plazaMat);
   plaza.name = 'marseille-mirror-plaza';
   plaza.rotation.x = -Math.PI / 2;
-  plaza.position.set(0, 0.36, -1.4);
+  plaza.position.set(0, 0.36, 0);
   group.add(plaza);
 
   const causticTex = createCausticPoolTexture();
@@ -110,7 +117,7 @@ export function buildVieuxPortMirrorCanopy(
   const caustic = new THREE.Mesh(causticGeo, causticMat);
   caustic.name = 'marseille-mirror-caustic';
   caustic.rotation.x = -Math.PI / 2;
-  caustic.position.set(0, 0.38, -0.4);
+  caustic.position.set(0, 0.38, 0);
   caustic.renderOrder = 3;
   group.add(caustic);
 
@@ -356,6 +363,70 @@ function buildUnderCanopyLed(
   addStrip('marseille-mirror-led-w', stripT, d, -w * 0.5, 0);
   addStrip('marseille-mirror-led-e', stripT, d, w * 0.5, 0);
   return led;
+}
+
+function buildMetaVerseBbTitlePlate(
+  geometries: THREE.BufferGeometry[],
+  materials: THREE.Material[],
+  textures: THREE.Texture[]
+): THREE.Mesh {
+  const tex = createMetaVerseBbTitleTexture();
+  textures.push(tex);
+  const mat = new THREE.MeshBasicMaterial({
+    map: tex,
+    transparent: true,
+    opacity: 1,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  });
+  materials.push(mat);
+  const geo = new THREE.PlaneGeometry(16.4, 4.1);
+  geometries.push(geo);
+  const plate = new THREE.Mesh(geo, mat);
+  plate.name = 'marseille-mirror-glass-title';
+  plate.rotation.x = -Math.PI / 2;
+  plate.renderOrder = 8;
+  return plate;
+}
+
+/** Texture « MetaVerseBB » pour le dessus du miroir. */
+export function createMetaVerseBbTitleTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const fill = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    fill.addColorStop(0, '#7ef6ff');
+    fill.addColorStop(0.5, '#ffffff');
+    fill.addColorStop(1, '#ff7ad9');
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '900 220px Arial Black, Arial, sans-serif';
+    ctx.lineJoin = 'round';
+    ctx.miterLimit = 2;
+    ctx.shadowColor = 'rgba(0, 40, 70, 0.85)';
+    ctx.shadowBlur = 12;
+    ctx.strokeStyle = 'rgba(4, 12, 24, 0.95)';
+    ctx.lineWidth = 28;
+    ctx.strokeText(SCENE_COPY.canopyTitle, canvas.width / 2, canvas.height / 2);
+    ctx.shadowColor = '#40e0ff';
+    ctx.shadowBlur = 28;
+    ctx.fillStyle = fill;
+    ctx.fillText(SCENE_COPY.canopyTitle, canvas.width / 2, canvas.height / 2);
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(230, 250, 255, 0.9)';
+    ctx.lineWidth = 6;
+    ctx.strokeText(SCENE_COPY.canopyTitle, canvas.width / 2, canvas.height / 2);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = false;
+  tex.needsUpdate = true;
+  return tex;
 }
 
 function createGlassSkyTexture(): THREE.CanvasTexture {

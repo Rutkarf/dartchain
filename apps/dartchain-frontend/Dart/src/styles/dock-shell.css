@@ -17,6 +17,13 @@
   margin: 0 !important;
   padding: 0;
   gap: 0;
+  transition:
+    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
 }
 
 .app-bottom-stack.is-dock-collapsed {
@@ -32,7 +39,9 @@
 
 .app-bottom-stack.is-dock-collapsed .showcase-block__shell,
 .app-bottom-stack.is-dock-collapsed .bottom-stack__shell {
+  margin-top: 0;
   margin-bottom: 0;
+  padding-top: 0;
   padding-bottom: 0;
 }
 
@@ -67,6 +76,17 @@
   height: var(--bottom-stack-panel-height, 154px);
   max-height: var(--bottom-stack-panel-height, 154px);
   overflow: hidden;
+  margin-block: 0;
+  padding-block: 0;
+  box-sizing: border-box;
+  transition:
+    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
 }
 
 /* Remplit la bande — sinon trou semi-transparent sous le wallet (= faux gap dock→graph) */
@@ -94,10 +114,12 @@
 
 .app-bottom-stack.is-dock-collapsed .app-bottom-stack__content,
 .app-bottom-stack.is-dock-collapsed .app-bottom-stack__band {
-  height: var(--dock-smart-bar-h, 11px);
-  max-height: var(--dock-smart-bar-h, 11px);
-  min-height: var(--dock-smart-bar-h, 11px);
+  height: var(--dock-smart-bar-h, 13.5px);
+  max-height: var(--dock-smart-bar-h, 13.5px);
+  min-height: var(--dock-smart-bar-h, 13.5px);
+  margin-top: 0;
   margin-bottom: 0;
+  padding-top: 0;
   padding-bottom: 0;
 }
 
@@ -163,10 +185,10 @@
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab__label {
-  display: block !important;
-  width: 100% !important;
-  min-width: 0 !important;
+  display: inline-block !important;
+  width: auto !important;
   max-width: 100% !important;
+  min-width: 0 !important;
   overflow: hidden !important;
   text-overflow: clip !important;
   white-space: nowrap !important;
@@ -174,13 +196,27 @@
   font-family: 'Open Sans', var(--font-body, system-ui, sans-serif) !important;
   font-size: clamp(5px, 1.9vw, 7px) !important;
   font-weight: 600 !important;
+  font-style: normal !important;
   line-height: 1.1 !important;
   letter-spacing: 0.04em !important;
+  transform: skewX(-11deg) !important;
+  transform-origin: center center !important;
+  transition:
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    font-weight 200ms ease !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab:hover .showcase-tab__label,
+.app-bottom-stack .showcase-header-tabs .showcase-tab:active .showcase-tab__label,
+.app-bottom-stack .showcase-header-tabs .showcase-tab.is-active .showcase-tab__label {
+  transform: skewX(0deg) !important;
+  font-style: normal !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab.is-active,
 .app-bottom-stack .showcase-header-tabs .showcase-tab.is-active .showcase-tab__label {
   font-weight: 800 !important;
+  font-style: normal !important;
 }
 
 .app-bottom-stack .showcase-header.app-bottom-stack__header {

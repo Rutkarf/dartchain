@@ -40,11 +40,11 @@ export const MARSEILLE_SPAWN_ANCHOR: MarseilleSpawnAnchor = {
     altitude: MARSEILLE_GEO_ORIGIN.altitude,
   },
   worldPosition: spawnWorld,
-  /** Aligné sur MARSEILLE_START_ORIENTATION.characterRotationY = 0 (nord / −Z). */
-  worldHeadingRadians: 0,
+  /** Aligné sur MARSEILLE_START_ORIENTATION.characterRotationY = π (Canebière / −Z). */
+  worldHeadingRadians: Math.PI,
   referenceLandmark: 'Ombrière du Vieux-Port',
   calibrationNotes:
-    'Origin geo = OSM way/200273945. Avatar XZ uses METRO_SPAWN_ANCHOR.spawnOffsetFromMirror on altitudeOrigin (y=0 terrain). Canopy deck remains at y=5.6. Vieux-Port water is +Z (behind heading 0). Not a survey monument.',
+    'Origin geo = OSM way/200273945. Avatar XZ = just south of mirror (0, 5) on esplanade before water. Heading π faces Canebière (−Z); sea (+Z) behind. Canopy deck y=8.0. Not a survey monument.',
   coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
   applyAtRuntime: false,
   runtimeBinding: 'METRO_SPAWN_ANCHOR',

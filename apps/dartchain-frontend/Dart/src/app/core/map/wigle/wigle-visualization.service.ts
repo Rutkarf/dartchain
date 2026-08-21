@@ -11,7 +11,6 @@ import { WIGLEBuildingOverlayManager } from './wigle-building-overlay.manager';
 import { WigleBuildingRegistryService } from './wigle-building-registry.service';
 import { WaveEffectSystem } from './wave-effects';
 import { WigleGeoService } from './wigle-geo.service';
-import { GeoMappingService } from './geo-mapping.service';
 import { WigleOsmFootprintManager } from './wigle-osm-footprint.manager';
 import { HorizonScaleManager } from './horizon-scale.manager';
 import { WigleDebugOverlay } from './wigle-debug-overlay';
@@ -30,7 +29,6 @@ export class WigleVisualizationService {
   private readonly debugOverlay = inject(WigleDebugOverlay);
   private readonly threeScene = inject(ThreeSceneService);
   private readonly buildingRegistry = inject(WigleBuildingRegistryService);
-  private readonly geoMapping = inject(GeoMappingService);
 
   private readonly buildingManager = new WigleBuildingManager();
   private readonly osmFootprints = new WigleOsmFootprintManager();
@@ -49,8 +47,6 @@ export class WigleVisualizationService {
   private effectsEnabled = true;
   private lastVisibleSignature = '';
   private lastLoadCenter = new THREE.Vector3(Number.NaN, 0, Number.NaN);
-  private lastOsmLoadLat = Number.NaN;
-  private lastOsmLoadLon = Number.NaN;
   private lastRegistryCount = 0;
   private groundResolver: ((worldX: number, worldZ: number) => number) | null = null;
 
@@ -256,21 +252,6 @@ export class WigleVisualizationService {
         WIGLE_GEO_CONFIG.loadRadiusMeters
       );
       this.loaded = true;
-      if (this.shouldReloadOsmFootprints(lat, lon)) {
-        this.lastOsmLoadLat = lat;
-        this.lastOsmLoadLon = lon;
-        void this.osmFootprints
-          .loadForPoints(
-            this.allPoints,
-            this.geoMapping,
-            lat,
-            lon,
-            WIGLE_GEO_CONFIG.loadRadiusMeters
-          )
-          .then(() => {
-            this.lastVisibleSignature = '';
-          });
-      }
       console.info(
         '[MetaverseNetwork] Points réseau:',
         this.allPoints.length,
@@ -338,19 +319,6 @@ export class WigleVisualizationService {
   private pointsWithoutOsmFootprint(points: WigleGeoPoint[]): WigleGeoPoint[] {
     const matched = this.osmFootprints.getMatchedPointIds();
     return points.filter((p) => !matched.has(p.id));
-  }
-
-  private shouldReloadOsmFootprints(lat: number, lon: number): boolean {
-    if (!Number.isFinite(this.lastOsmLoadLat) || !Number.isFinite(this.lastOsmLoadLon)) {
-      return true;
-    }
-    const movedMeters = this.geoMapping.haversineMeters(
-      this.lastOsmLoadLat,
-      this.lastOsmLoadLon,
-      lat,
-      lon
-    );
-    return movedMeters >= 120;
   }
 
   private applyEntranceMapping(points: WigleGeoPoint[]): WigleGeoPoint[] {

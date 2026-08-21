@@ -235,7 +235,8 @@ export class PeersDataService {
   }
 
   private applyStats(stats: PeerStatsResponse): void {
-    this.statsTotal.set(Math.max(stats.total, stats.active));
+    const total = Number.isFinite(stats.total) ? Math.max(0, Math.floor(stats.total)) : 0;
+    this.statsTotal.set(total);
     this.serverAvgLatencyMs.set(stats.avgLatencyMs ?? null);
     this.serverNetworkLoadPercent.set(stats.networkLoadPercent ?? null);
   }

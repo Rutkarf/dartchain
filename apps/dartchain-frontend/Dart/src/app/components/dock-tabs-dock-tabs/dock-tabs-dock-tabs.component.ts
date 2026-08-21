@@ -54,9 +54,11 @@ export class DockTabsDockTabsComponent {
   @Output() readonly summaryExpand = new EventEmitter<void>();
   @Output() readonly selectBlock = new EventEmitter<Block>();
 
-  onContentClick(): void {
-    if (this.dockCollapsed) {
-      this.summaryExpand.emit();
+  onContentClick(event?: Event): void {
+    if (!this.dockCollapsed) {
+      return;
     }
+    event?.stopPropagation();
+    this.summaryExpand.emit();
   }
 }

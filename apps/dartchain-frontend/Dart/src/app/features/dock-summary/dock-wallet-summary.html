@@ -1,38 +1,73 @@
-<div class="dock-summary-bar" role="status" aria-live="polite" aria-label="Résumé wallet">
-  <div class="dock-summary-main">
-    <span class="dock-summary-main__rail" aria-hidden="true"></span>
-    <span
-      class="dock-summary-status"
-      [ngClass]="statusClass(phase())"
-      [attr.aria-label]="'État : ' + statusLabel()"
-    >
-      {{ statusLabel() }}
-    </span>
-  </div>
+<div
+  class="wallet-summary-bar"
+  role="status"
+  aria-live="polite"
+  [attr.aria-label]="balanceAriaLabel()"
+>
+  <span class="wallet-summary-bar__balance" [attr.title]="balanceAriaLabel()">
+    <span class="wallet-summary-bar__token">R4V3</span>
+    <span class="wallet-summary-bar__amount">{{ fullBalanceLabel() }}</span>
+    <span class="wallet-summary-bar__eq" aria-hidden="true">≈</span>
+    <span class="wallet-summary-bar__chf">{{ formattedChfValue() }} CHF</span>
+  </span>
 
-  <div class="dock-summary-progress">
-    <p class="dock-summary-progress__text">
-      <span>{{ headline() }}</span>
-      @if (progressLabel()) {
-        <span class="dock-summary-progress__text--muted"> · {{ progressLabel() }}</span>
-      }
-    </p>
-  </div>
-
-  <div class="dock-summary-meta">
-    @if (updatedAgeLabel()) {
-      <span class="dock-summary-meta__time">{{ updatedAgeLabel() }}</span>
-    }
-  </div>
-
-  <div class="dock-summary-actions">
+  <div class="wallet-summary-bar__actions">
     <button
       type="button"
-      class="dock-summary-actions__btn dock-summary-actions__primary"
-      (click)="onOpen($event)"
-      aria-label="Ouvrir le panneau Wallet"
+      class="wallet-summary-bar__icon-btn"
+      (click)="onReceive($event)"
+      [disabled]="!hasWallet()"
+      aria-label="Recevoir"
+      title="Recevoir"
     >
-      Wallet
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M4 4.5 11.5 12" />
+        <path d="M7.5 12H12v-4.5" />
+      </svg>
     </button>
+
+    <button
+      type="button"
+      class="wallet-summary-bar__icon-btn wallet-summary-bar__icon-btn--swap"
+      (click)="onSwap($event)"
+      aria-label="Swap"
+      title="Swap"
+    >
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M3 5h9M9 2l3 3-3 3" />
+        <path d="M13 11H4M7 8l-3 3 3 3" />
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      class="wallet-summary-bar__icon-btn"
+      (click)="onSend($event)"
+      [disabled]="!hasWallet()"
+      aria-label="Envoyer"
+      title="Envoyer"
+    >
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M4 11.5 11.5 4" />
+        <path d="M7.5 4H12v4.5" />
+      </svg>
+    </button>
+
+    @if (showCreateWallet()) {
+      <button
+        type="button"
+        class="wallet-summary-bar__create"
+        (click)="onCreateWallet($event)"
+        [disabled]="!canCreateWallet()"
+        aria-label="Créer un wallet"
+        [attr.title]="
+          canCreateWallet()
+            ? 'Créer un wallet'
+            : 'Connectez-vous pour créer un wallet'
+        "
+      >
+        Créer un wallet
+      </button>
+    }
   </div>
 </div>

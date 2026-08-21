@@ -149,11 +149,6 @@ export class MarketPanelComponent implements OnDestroy {
 
   protected readonly searchPlaceholder = computed(() => 'Rechercher un token…');
 
-  protected readonly resultCountLabel = computed(() => {
-    const count = this.filteredRows().length;
-    return `${count} résultat${count > 1 ? 's' : ''}`;
-  });
-
   protected readonly statusBanner = computed((): { message: string; tone: StatusBannerTone } | null => {
     const error = this.marketError();
     if (error) {

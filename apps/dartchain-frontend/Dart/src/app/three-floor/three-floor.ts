@@ -132,7 +132,7 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
         FLOOR_HORIZON_BLEND.fog.far
       );
 
-      this.camera = new THREE.PerspectiveCamera(52, width / height, 0.18, 900);
+      this.camera = new THREE.PerspectiveCamera(52, width / height, 0.18, 1600);
       this.camera.position.set(0, 14, 18);
       this.camera.lookAt(0, 2, -14);
 

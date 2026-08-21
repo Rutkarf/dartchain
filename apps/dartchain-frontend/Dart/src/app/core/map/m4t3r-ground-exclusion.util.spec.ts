@@ -9,11 +9,11 @@ import {
 
 describe('M4T3R ground exclusion', () => {
   it('exclut le polygone portuaire et laisse le spawn terrestre', () => {
-    expect(isGroundCellExcluded(-6.2, -2.4)).toBe(false);
+    expect(isGroundCellExcluded(0, 0)).toBe(false);
     expect(isGroundCellExcluded(0, 80)).toBe(true);
     expect(isGroundCellExcluded(-420, 0)).toBe(true);
     expect(isGroundCellExcluded(0, MARSEILLE_HARBOR_WATER.waterMinZ + 5)).toBe(true);
-    expect(groundExclusionFactorAt(-6.2, -2.4)).toBe(1);
+    expect(groundExclusionFactorAt(0, 0)).toBe(1);
     expect(groundExclusionFactorAt(0, 80)).toBe(0);
   });
 

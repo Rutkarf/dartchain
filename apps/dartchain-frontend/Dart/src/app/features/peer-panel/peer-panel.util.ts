@@ -144,7 +144,8 @@ export function buildNetworkStats(
         ? Math.round(latencies.reduce((sum, value) => sum + value, 0) / latencies.length)
         : measuredLatencyMs;
 
-  const networkPeers = Math.max(statsTotal ?? 0, peers.length);
+  // Source of truth = peers enregistrés. Ne pas gonfler avec stats WS (sessions UI / loopback).
+  const networkPeers = peers.length > 0 ? peers.length : Math.max(statsTotal ?? 0, 0);
   const computedLoadPercent =
     networkPeers === 0
       ? 0

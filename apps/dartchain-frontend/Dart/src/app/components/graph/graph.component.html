@@ -6,7 +6,7 @@
   <div
     class="app-market-card app-market-card--rate"
     [class.is-summary-expandable]="chartCollapsed"
-    (click)="onCardClick()"
+    (click)="onCardClick($event)"
   >
     <app-rate-panel
       hubGraphOnly

@@ -14,6 +14,18 @@ public record SettlementResult(
         return new SettlementResult(true, "CREDITED_OFFCHAIN", transactionId, chainId, balanceAfter, null);
     }
 
+    /** Pièce accrédée au faucet pending — aucun bloc / mempool. */
+    public static SettlementResult creditedFaucetPending(String accrualId, BigDecimal pendingBalanceAfter) {
+        return new SettlementResult(
+                true,
+                "CREDITED_FAUCET_PENDING",
+                accrualId,
+                "faucet-pending",
+                pendingBalanceAfter,
+                null
+        );
+    }
+
     public static SettlementResult queuedOnChain(String chainId) {
         return new SettlementResult(true, "QUEUED_ONCHAIN", null, chainId, null, null);
     }

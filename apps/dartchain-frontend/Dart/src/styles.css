@@ -6,6 +6,7 @@
 @import './styles/showcase-tabs-global.css';
 @import './styles/showcase-meta-shared.css';
 @import './styles/collapsed-summary-bar.css';
+@import './styles/news-category-chip.css';
 @import './styles/dock-shell.css';
 @import './styles/panel-headers.css';
 @import './styles/shell-stack.css';
@@ -477,6 +478,10 @@ body {
 app-showcase-news-summary .news-summary-bar,
 app-showcase-news-summary .news-summary-bar__headline-wrap {
   overflow: hidden !important;
+}
+
+app-showcase-news-summary .news-summary-bar__cat {
+  flex: 0 0 auto !important;
 }
 
 app-showcase-news-summary .news-summary-bar__headline {

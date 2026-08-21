@@ -6,11 +6,10 @@ import io.dartchain.backend.m4t3r.dto.M4t3rRewardDto;
 import io.dartchain.backend.m4t3r.dto.M4t3rTrailPickupRequest;
 import io.dartchain.backend.m4t3r.dto.WorldPoint;
 import io.dartchain.backend.m4t3r.model.M4t3rReward;
-import io.dartchain.backend.m4t3r.settlement.OffChainSettlementService;
+import io.dartchain.backend.faucet.store.FaucetPendingBalanceStore;
 import io.dartchain.backend.m4t3r.settlement.RewardSettlementService;
 import io.dartchain.backend.m4t3r.settlement.SettlementResult;
 import io.dartchain.backend.m4t3r.store.M4t3rRewardStore;
-import io.dartchain.backend.service.BlockchainService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +30,7 @@ class M4t3rRewardServiceTest {
     private M4t3rProofService proofService;
     private M4t3rRewardConfig config;
     private RewardSettlementService settlementService;
-    private BlockchainService blockchainService;
+    private FaucetPendingBalanceStore pendingBalanceStore;
     private M4t3rRewardValidationService validationService;
     private M4t3rRewardService rewardService;
     private UserAccount account;
@@ -48,13 +47,13 @@ class M4t3rRewardServiceTest {
         setField(config, "settlementMode", "OFFCHAIN");
 
         proofService = new M4t3rProofService(config);
-        blockchainService = mock(BlockchainService.class);
-        when(blockchainService.getBalance(any())).thenReturn(new BigDecimal("1"));
+        pendingBalanceStore = mock(FaucetPendingBalanceStore.class);
+        when(pendingBalanceStore.get(any())).thenReturn(new BigDecimal("1"));
 
         settlementService = mock(RewardSettlementService.class);
         when(settlementService.settle(any())).thenAnswer(invocation -> {
             M4t3rReward reward = invocation.getArgument(0);
-            return SettlementResult.creditedOffChain("tx-hash-1", "offchain", new BigDecimal("2"));
+            return SettlementResult.creditedFaucetPending(reward.getRewardId(), new BigDecimal("2"));
         });
 
         validationService = new M4t3rRewardValidationService(config, new M4t3rNonceStore());
@@ -63,7 +62,7 @@ class M4t3rRewardServiceTest {
                 proofService,
                 config,
                 settlementService,
-                blockchainService,
+                pendingBalanceStore,
                 validationService
         );
 
@@ -83,7 +82,7 @@ class M4t3rRewardServiceTest {
                 new BigDecimal("1.200")
         );
         assertThat(rewards).hasSize(1);
-        assertThat(rewards.get(0).status()).isEqualTo("CREDITED_OFFCHAIN");
+        assertThat(rewards.get(0).status()).isEqualTo("CREDITED_FAUCET_PENDING");
         assertThat(rewards.get(0).proofHash()).startsWith("0x");
         assertThat(rewards.get(0).serverSignature()).startsWith("0x");
         assertThat(rewardService.isSignatureValid(rewards.get(0).rewardId())).isTrue();

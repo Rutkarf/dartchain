@@ -104,7 +104,7 @@
       [class.is-smart-collapsed]="dockCollapsed"
       [class.is-summary-expandable]="dockCollapsed"
       [attr.data-active-tab]="activeTab"
-      (click)="onContentClick()"
+      (click)="onContentClick($event)"
     >
       @if (dockCollapsed) {
         <div class="app-bottom-stack__summary">

@@ -1,47 +1,32 @@
-<div class="dock-summary-bar" role="status" aria-live="polite" aria-label="Résumé quêtes">
-  <div class="dock-summary-main">
-    <span class="dock-summary-main__rail" aria-hidden="true"></span>
-    <span
-      class="dock-summary-status"
-      [ngClass]="statusClass(phase())"
-      [attr.aria-label]="'État : ' + statusLabel()"
-    >
-      {{ statusLabel() }}
-    </span>
-    @if (claimableCount() > 0) {
-      <span class="dock-summary-badge" [attr.aria-label]="claimableCount() + ' à réclamer'">
-        {{ claimableCount() }}
-      </span>
-    }
-  </div>
+<div
+  class="quests-summary-bar"
+  role="status"
+  aria-live="polite"
+  [attr.aria-label]="barAriaLabel()"
+>
+  <span class="quests-summary-bar__mission" title="Network Guardian">
+    Network Guardian
+  </span>
 
-  <div class="dock-summary-progress">
-    <p class="dock-summary-progress__text">
-      @if (loading()) {
-        <span class="dock-summary-progress__text--muted">Chargement…</span>
-      } @else {
-        <span>{{ headline() }}</span>
-        @if (progressLabel()) {
-          <span class="dock-summary-progress__text--muted"> · {{ progressLabel() }}</span>
-        }
-      }
-    </p>
-  </div>
+  <span
+    class="quests-summary-bar__quest"
+    [class.is-empty]="!displayedQuestTitle()"
+    [attr.title]="displayedQuestTitle()"
+  >
+    {{ displayedQuestTitle() }}
+  </span>
 
-  <div class="dock-summary-meta">
-    @if (updatedAgeLabel()) {
-      <span class="dock-summary-meta__time">{{ updatedAgeLabel() }}</span>
-    }
-  </div>
-
-  <div class="dock-summary-actions">
+  <div class="quests-summary-bar__actions">
     <button
       type="button"
-      class="dock-summary-actions__btn dock-summary-actions__primary"
-      (click)="onOpen($event)"
-      aria-label="Ouvrir le panneau Quêtes"
+      class="quests-summary-bar__claim"
+      [disabled]="claimDisabled()"
+      [class.is-ready]="canClaim()"
+      (click)="onClaimQuest($event)"
+      aria-label="Claim quest"
+      title="Claim Quest"
     >
-      Quêtes
+      CLAIM QUEST
     </button>
   </div>
 </div>

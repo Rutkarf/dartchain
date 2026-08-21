@@ -11,7 +11,7 @@
   width: 100%;
   min-width: 0;
   height: 100%;
-  max-height: var(--smart-bar-h, var(--showcase-smart-bar-h, 11px));
+  max-height: var(--smart-bar-h, var(--showcase-smart-bar-h, 13.5px));
   min-height: 0;
   overflow: hidden;
   box-sizing: border-box;
@@ -27,7 +27,14 @@
   .launch-summary-bar,
   .dao-summary-bar,
   .chart-summary-bar,
-  .dock-summary-bar
+  .dock-summary-bar,
+  .market-summary-bar,
+  .wallet-summary-bar,
+  .faucet-summary-bar,
+  .mempool-summary-bar,
+  .chain-summary-bar,
+  .quests-summary-bar,
+  .peers-summary-bar
 ) {
   align-items: center;
   align-content: center;
@@ -103,7 +110,9 @@
 
 .collapsed-summary-bar [class*='__headline-wrap'] {
   display: flex;
+  flex: 1 1 0;
   justify-content: flex-start;
+  min-width: 0;
 }
 
 .collapsed-summary-bar [class*='__stack'],
@@ -111,25 +120,123 @@
   display: inline-flex;
 }
 
+/* Empilement ticker : grille superposée (pas de flex qui double la hauteur → clip bas) */
+.collapsed-summary-bar .news-summary-bar__headline-stack,
+.collapsed-summary-bar .news-summary-bar__age-stack,
+.collapsed-summary-bar .r4v3-summary-bar__pillar-stack,
+.collapsed-summary-bar .showcase-chat-preview__stack,
+.collapsed-summary-bar .unread-badge-stack {
+  display: inline-grid !important;
+  align-items: center;
+  align-content: center;
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.collapsed-summary-bar .news-summary-bar__headline,
+.collapsed-summary-bar .news-summary-bar__age,
+.collapsed-summary-bar .r4v3-summary-bar__pillar-line,
+.collapsed-summary-bar .showcase-chat-preview__stack > *,
+.collapsed-summary-bar .unread-badge-stack > * {
+  grid-area: 1 / 1;
+  max-height: 100%;
+  line-height: 1 !important;
+  overflow: hidden;
+}
+
+.collapsed-summary-bar .r4v3-summary-bar__pillar-line {
+  display: inline-flex !important;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.collapsed-summary-bar .r4v3-summary-bar {
+  overflow: hidden;
+}
+
+.collapsed-summary-bar .r4v3-summary-bar__peg,
+.collapsed-summary-bar .r4v3-summary-bar__pillar,
+.collapsed-summary-bar .r4v3-summary-bar__pillar-label,
+.collapsed-summary-bar .r4v3-summary-bar__pillar-detail {
+  line-height: 1 !important;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.collapsed-summary-bar .news-summary-bar__headline--in,
+.collapsed-summary-bar .news-summary-bar__headline--out,
+.collapsed-summary-bar .news-summary-bar__age--in,
+.collapsed-summary-bar .news-summary-bar__age--out,
+.collapsed-summary-bar .r4v3-summary-bar__pillar-line--in,
+.collapsed-summary-bar .r4v3-summary-bar__pillar-line--out {
+  backface-visibility: hidden;
+}
+
 /* Badges, puces, LED — contenus dans la smart-bar */
 .collapsed-summary-bar :is(
   .unread-badge,
-  .news-summary-bar__badge,
+  .showcase-news__tag,
+  .showcase-news__tag-badge,
   .news-summary-bar__action-btn,
-  .news-summary-bar__unread-toast,
+  .news-summary-bar__cat,
   .launch-summary-status,
+  .launch-summary-line__badge,
+  .launch-summary-line__swap,
+  .launch-summary-line__wp,
   .dao-summary-status,
+  .dao-summary-line__status,
   .dock-summary-status,
   .dock-summary-badge,
+  .market-summary-line__change,
+  .wallet-summary-bar__icon-btn,
+  .wallet-summary-bar__create,
+  .faucet-summary-bar__claim,
+  .mempool-summary-bar__btn,
+  .chain-summary-bar__btn,
+  .quests-summary-bar__claim,
   .r4v3-summary-bar__peg,
-  .r4v3-summary-bar__wp-btn,
   .chart-summary-bar__range
 ) {
   align-self: center;
-  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 11px)) - 2px);
-  height: auto;
+  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 13.5px)) - 2px);
   min-height: 0;
   line-height: 1;
+}
+
+/* WP R4V3 : ancienne icône, sans border */
+.collapsed-summary-bar .r4v3-summary-bar__wp-btn {
+  align-self: center;
+  flex: 0 0 8.5px !important;
+  width: 8.5px !important;
+  height: 8.5px !important;
+  min-width: 8.5px !important;
+  min-height: 8.5px !important;
+  max-width: 8.5px !important;
+  max-height: 8.5px !important;
+  overflow: visible !important;
+  line-height: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.collapsed-summary-bar .r4v3-summary-bar__wp-btn-icon,
+.collapsed-summary-bar .r4v3-summary-bar__wp-btn-icon svg {
+  display: block !important;
+  width: 8.5px !important;
+  height: 8.5px !important;
+  max-width: 8.5px !important;
+  max-height: 8.5px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .collapsed-summary-bar :is(
@@ -148,7 +255,7 @@
   .dock-summary-actions__btn
 ) {
   align-self: center;
-  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 11px)) - 1px);
+  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 13.5px)) - 1px);
 }
 
 /* Zones meta / actions */
@@ -185,9 +292,9 @@
 
 .app-bottom-stack.is-dock-collapsed,
 .app-market-stack--rate.is-chart-collapsed {
-  --smart-bar-h: var(--dock-smart-bar-h, var(--showcase-smart-bar-h, 11px));
+  --smart-bar-h: var(--dock-smart-bar-h, var(--showcase-smart-bar-h, 13.5px));
 }
 
 .app-market-stack--rate.is-chart-collapsed {
-  --smart-bar-h: var(--chart-smart-bar-h, var(--showcase-smart-bar-h, 11px));
+  --smart-bar-h: var(--chart-smart-bar-h, var(--showcase-smart-bar-h, 13.5px));
 }

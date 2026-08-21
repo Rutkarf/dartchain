@@ -18,13 +18,13 @@ describe('height quality, arcades, view, tiles (ITER-028/034/035/031)', () => {
     expect(ARCADES_WEST_PROVENANCE.sourceQuality).toBe('APPROXIMATE');
   });
 
-  it('place l eau du Vieux-Port derrière le heading 0', () => {
+  it('place l eau du Vieux-Port derrière le heading Canebière (π)', () => {
     expect(VIEUX_PORT_VIEW_TARGET.waterDirection.z).toBe(1);
-    expect(VIEUX_PORT_VIEW_TARGET.documentedHeadingRadians).toBe(0);
+    expect(VIEUX_PORT_VIEW_TARGET.documentedHeadingRadians).toBeCloseTo(Math.PI, 6);
   });
 
   it('identifie une tuile cœur au spawn', () => {
-    expect(districtTileId('vieux-port-core', -6.2, -2.4)).toContain('vieux-port-core:');
+    expect(districtTileId('vieux-port-core', 0, 0)).toContain('vieux-port-core:');
   });
 });
 
@@ -42,10 +42,10 @@ describe('overlay isolation, dual mesh, look, HUD (ITER-033/036/037/026/039/040)
     expect(status.centroidDeltaMeters).toBeLessThan(15);
   });
 
-  it('documente yaw caméra π sans muter CameraControlService', () => {
+  it('documente yaw caméra 0 (depuis la mer) sans muter CameraControlService', () => {
     expect(SPAWN_LOOK_DIRECTION.applyAtRuntime).toBe(false);
-    expect(SPAWN_LOOK_DIRECTION.cameraYawRadians).toBe(Math.PI);
-    expect(SPAWN_LOOK_DIRECTION.waterIsBehindAvatarWhenHeading0).toBe(true);
+    expect(SPAWN_LOOK_DIRECTION.cameraYawRadians).toBe(0);
+    expect(SPAWN_LOOK_DIRECTION.waterIsBehindAvatarWhenFacingCanebiere).toBe(true);
   });
 
   it('fournit une ligne ODbL pour le panneau placements', () => {

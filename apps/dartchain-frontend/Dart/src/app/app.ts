@@ -250,8 +250,17 @@ export class AppComponent {
     this.showcaseCollapsed.update((collapsed) => !collapsed);
   }
 
+  /** Clic smart-bar / bande : ouvrir uniquement (pas de toggle — évite expand+repli). */
+  expandShowcaseFromSummary(): void {
+    this.showcaseCollapsed.set(false);
+  }
+
   toggleChartCollapsed(): void {
     this.chartCollapsed.update((collapsed) => !collapsed);
+  }
+
+  expandChartFromSummary(): void {
+    this.chartCollapsed.set(false);
   }
 
   toggleExchangeCollapsed(): void {
@@ -260,6 +269,10 @@ export class AppComponent {
 
   toggleDockCollapsed(): void {
     this.dockCollapsed.update((collapsed) => !collapsed);
+  }
+
+  expandDockFromSummary(): void {
+    this.dockCollapsed.set(false);
   }
 
   /** Refresh isolé Graph — n’impacte ni showcase ni dock. */

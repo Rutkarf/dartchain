@@ -25,9 +25,13 @@ describe('WalletPanel', () => {
   it('should render create wallet CTA under the balance, not in the footer', () => {
     const root = fixture.nativeElement as HTMLElement;
     expect(component['needsWalletCreation']()).toBe(true);
+    expect(component['canCreateWallet']()).toBe(false);
     expect(root.querySelector('.wallet-display.needs-wallet-creation')).toBeTruthy();
-    const cta = root.querySelector('.wallet-display__create-slot .wallet-display__create-cta');
+    const cta = root.querySelector(
+      '.wallet-display__create-slot .wallet-display__create-cta'
+    ) as HTMLButtonElement | null;
     expect(cta).toBeTruthy();
+    expect(cta?.disabled).toBe(true);
     expect(root.querySelector('.wallet-display__create-cta-label')?.textContent).toContain('Créer un wallet');
     expect(root.querySelector('.wallet-display__actions .wallet-display__create-cta')).toBeFalsy();
     expect(root.querySelector('.wallet-display__create-bar')).toBeFalsy();

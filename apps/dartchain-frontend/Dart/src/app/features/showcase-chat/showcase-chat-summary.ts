@@ -25,7 +25,7 @@ import { ShowcaseChatService } from '../../core/services/showcase-chat.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShowcaseChatSummaryComponent implements OnInit, OnDestroy {
-  private static readonly MESSAGE_TRANSITION_MS = 420;
+  private static readonly MESSAGE_TRANSITION_MS = 320;
 
   private readonly chat = inject(ShowcaseChatService);
   protected readonly chatState = inject(ShowcaseChatStateService);

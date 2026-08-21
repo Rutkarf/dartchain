@@ -11,8 +11,9 @@ export const FLOOR_HORIZON_BLEND = {
   clearAlpha: 1,
   fog: {
     color: 0x000000,
-    near: 42,
-    far: 176,
+    /** Visible Canebière / Panier — ne noircit plus le tissu urbain dès 180 m. */
+    near: 520,
+    far: 1400,
   },
   /**
    * Stops du masque, bas → haut de la bande peek (offset 0 = sol, 1 = démarcation).

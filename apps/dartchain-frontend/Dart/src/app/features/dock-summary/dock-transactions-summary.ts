@@ -7,7 +7,6 @@ import {
   computed,
   inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
 import { DockBlockStateService } from '../../core/services/dock-block-state.service';
@@ -17,55 +16,44 @@ import { formatDockRelativeTime } from '../../core/utils/dock-time.util';
 @Component({
   selector: 'app-dock-transactions-summary',
   standalone: true,
-  imports: [CommonModule],
   templateUrl: './dock-transactions-summary.html',
-  styleUrls: ['./dock-summary-shared.css'],
+  styleUrls: ['./dock-transactions-summary.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DockTransactionsSummaryComponent implements OnInit, OnDestroy {
   private readonly pendingState = inject(DockPendingStateService);
   private readonly blockState = inject(DockBlockStateService);
 
-  @HostBinding('class')
-  readonly hostClasses = `${COLLAPSED_SUMMARY_BAR_CLASS} dock-summary-bar__content is-transactions`;
+  @HostBinding(`class.${COLLAPSED_SUMMARY_BAR_CLASS}`)
+  readonly collapsedSummaryBar = true;
+
+  @HostBinding('class.dock-summary-bar__content')
+  readonly contentClass = true;
+
+  @HostBinding('class.is-transactions')
+  readonly panelClass = true;
 
   @HostBinding('class.is-collapsed')
   readonly collapsedClass = true;
 
   readonly pendingCount = this.pendingState.count;
-  readonly pendingHeadline = this.pendingState.headline;
-  readonly blockHeadline = this.blockState.headline;
-  readonly loading = computed(
-    () => this.pendingState.loading() || this.blockState.loading()
-  );
+  readonly pendingHash = this.pendingState.nextHash;
+  readonly canMine = this.pendingState.canMine;
+  readonly mining = this.pendingState.mining;
+  readonly tipTxLabel = this.blockState.tipTxLabel;
 
-  readonly statusLabel = computed(() => {
-    if (this.pendingState.error() || this.blockState.error()) {
-      return 'Erreur';
+  readonly hashDisplay = computed(() => {
+    const hash = this.pendingHash();
+    if (hash) {
+      return hash;
     }
-    if (this.loading()) {
-      return 'Sync…';
+    if (this.pendingState.loading()) {
+      return 'Chargement…';
     }
-    if (this.pendingCount() > 0) {
-      return 'En attente';
+    if (this.pendingState.error()) {
+      return 'Mempool indisponible';
     }
-    return 'Prêt';
-  });
-
-  readonly headline = computed(() => {
-    const pending = this.pendingCount();
-    if (pending > 0) {
-      return `${pending} tx pending · ${this.pendingHeadline()}`;
-    }
-
-    const blockTip = this.blockHeadline();
-    return blockTip || 'Composer ou consulter le mempool';
-  });
-
-  readonly progressLabel = computed(() => {
-    const pendingProgress = this.pendingState.progressLabel();
-    const blockProgress = this.blockState.progressLabel();
-    return [pendingProgress, blockProgress].filter(Boolean).join(' · ');
+    return 'Mempool vide';
   });
 
   readonly updatedAgeLabel = computed(() => {
@@ -73,6 +61,18 @@ export class DockTransactionsSummaryComponent implements OnInit, OnDestroy {
     const blockAt = this.blockState.lastUpdatedAt();
     const latest = Math.max(pendingAt ?? 0, blockAt ?? 0);
     return latest > 0 ? formatDockRelativeTime(latest) : '';
+  });
+
+  readonly barAriaLabel = computed(() => {
+    const hash = this.pendingHash();
+    const tip = this.tipTxLabel();
+    const age = this.updatedAgeLabel();
+    const parts = [
+      hash ? `Tx à miner ${hash}` : 'Mempool vide',
+      tip ? `${tip} dernier bloc` : '',
+      age,
+    ].filter(Boolean);
+    return parts.join(' · ');
   });
 
   ngOnInit(): void {
@@ -90,31 +90,23 @@ export class DockTransactionsSummaryComponent implements OnInit, OnDestroy {
     this.blockState.refresh(true);
   };
 
-  statusClass(): string {
-    if (this.pendingState.error() || this.blockState.error()) {
-      return 'dock-summary-status--error';
-    }
-    if (this.loading()) {
-      return 'dock-summary-status--busy';
-    }
-    if (this.pendingCount() > 0) {
-      return 'dock-summary-status--waiting';
-    }
-    return 'dock-summary-status--ready';
-  }
-
-  onRefresh(event: Event): void {
-    event.stopPropagation();
-    this.pendingState.refresh(true);
-    this.blockState.refresh(true);
-  }
-
-  onOpen(event: Event): void {
+  onOpenTx(event: Event): void {
     event.stopPropagation();
     window.dispatchEvent(
       new CustomEvent('dock-open-panel', {
         detail: { panel: this.pendingCount() > 0 ? 'pending' : 'composer' },
       })
     );
+  }
+
+  onMine(event: Event): void {
+    event.stopPropagation();
+    if (!this.canMine()) {
+      return;
+    }
+    void this.pendingState.mineAll().then(() => {
+      this.blockState.refresh(true);
+      window.dispatchEvent(new CustomEvent('dartchain-refresh-dock'));
+    });
   }
 }

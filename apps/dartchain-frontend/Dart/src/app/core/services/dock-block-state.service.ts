@@ -67,6 +67,20 @@ export class DockBlockStateService {
     return `${txCount} tx dans le dernier bloc`;
   });
 
+  /** Nombre de txs du tip, pour la barre mempool compacte. */
+  readonly tipTxCount = computed(() => {
+    const block = this.latestBlock();
+    if (!block || !Array.isArray(block.transactions)) {
+      return null;
+    }
+    return block.transactions.length;
+  });
+
+  readonly tipTxLabel = computed(() => {
+    const n = this.tipTxCount();
+    return n === null ? '' : `${n}tx`;
+  });
+
   readonly updatedAgeLabel = computed(() =>
     formatDockRelativeTime(this.lastUpdatedAt())
   );

@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import {
   DEFAULT_MAP_CONFIGURATION,
   MARSEILLE_BOUNDS,
+  MARSEILLE_HARBOR_WATER,
   MARSEILLE_START_ORIENTATION,
   MARSEILLE_START_POSITION,
   METRO_SPAWN_ANCHOR,
@@ -35,7 +36,7 @@ describe('MapConfigService', () => {
     expect(config.startOrientation.cameraPitch).toBeCloseTo(0.12);
     expect(config.startOrientation.cameraDistance).toBe(6.2);
     expect(config.startOrientation.cameraDistance).toBeLessThan(8);
-    expect(config.startOrientation.cameraLookAhead).toBe(0.2);
+    expect(config.startOrientation.cameraLookAhead).toBe(0.35);
   });
 
   it('retourne marseille-osm-three comme provider effectif quand activé', () => {
@@ -81,8 +82,10 @@ describe('MapConfigService', () => {
     expect(METRO_SPAWN_ANCHOR.stationName).toContain('Vieux-Port');
     expect(Math.abs(metroX)).toBeGreaterThan(12);
     expect(metroZ).toBeLessThan(0);
-    expect(Math.hypot(spawnX - metroX, spawnZ - metroZ)).toBeLessThan(16);
+    expect(Math.hypot(spawnX - metroX, spawnZ - metroZ)).toBeLessThan(28);
     expect(Math.hypot(spawnX, spawnZ)).toBeLessThan(12);
+    expect(spawnZ).toBeGreaterThan(0);
+    expect(spawnZ).toBeLessThan(MARSEILLE_HARBOR_WATER.waterMinZ);
     expect(VIEUX_PORT_METRO_MIRROR_VIEW.id).toBe('VIEUX_PORT_METRO_MIRROR_VIEW');
   });
 });

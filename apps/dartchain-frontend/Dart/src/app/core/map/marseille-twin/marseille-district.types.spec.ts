@@ -9,6 +9,6 @@ describe('marseille-district.types (ITER-016)', () => {
     expect(MARSEILLE_TILE_STRATEGY.chunkSizeMeters).toBe(WORLD_SCALE.chunkSizeMeters);
     expect(MARSEILLE_TILE_STRATEGY.expandBeyondCore).toBe(false);
     expect(districtForWorld(0, 0)).toBe('vieux-port-core');
-    expect(districtForWorld(400, 400)).toBe('unknown');
+    expect(districtForWorld(1200, 0)).toBe('unknown');
   });
 });

@@ -8,12 +8,24 @@
   (keydown.enter)="onBarKeydown($event)"
   (keydown.space)="onBarKeydown($event)"
 >
-  <span
-    class="news-summary-bar__badge"
-    [attr.data-category]="categorySlug()"
-    [attr.title]="newsState.categoryLabel(activeItem()?.category ?? 'INFO')"
-  >
-    {{ categoryBadge() }}
+  <!-- Chip hors du 1fr : même 22×7 que la liste dépliée, P2P / NET / INFO identiques -->
+  <span class="news-summary-bar__cat" [attr.data-category]="categorySlug()">
+    <span
+      class="news-summary-bar__pastille"
+      aria-hidden="true"
+      [attr.data-category]="categorySlug()"
+    ></span>
+    <span
+      class="showcase-news__tag"
+      [attr.data-category]="categorySlug()"
+    >
+      <span
+        class="showcase-news__tag-badge"
+        [attr.title]="newsState.categoryLabel(activeItem()?.category ?? 'INFO')"
+      >
+        {{ categoryBadge() }}
+      </span>
+    </span>
   </span>
 
   <div class="news-summary-bar__headline-wrap">
@@ -88,23 +100,26 @@
     <button
       type="button"
       class="news-summary-bar__action-btn news-summary-bar__action-btn--copy"
+      [class.is-copied]="copied()"
+      [class.is-failed]="copyFailed()"
       [attr.aria-live]="copied() || copyFailed() ? 'polite' : null"
       [attr.aria-label]="copyButtonLabel()"
+      [attr.title]="copyButtonLabel()"
       (click)="copyCurrent($event)"
     >
-      {{ copyButtonLabel() }}
+      @if (copied()) {
+        <span class="news-summary-bar__copy-ok" aria-hidden="true">✓</span>
+      } @else {
+        <svg
+          class="news-summary-bar__copy-icon"
+          viewBox="0 0 16 16"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <rect x="5" y="5" width="8" height="8" rx="1" />
+          <path d="M5 9H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v1" />
+        </svg>
+      }
     </button>
   </div>
-
-  @if (hasUnread()) {
-    <button
-      type="button"
-      class="news-summary-bar__unread-toast"
-      [class.news-summary-bar__unread-toast--live]="isUnreadToastLive()"
-      [attr.aria-label]="unreadToastAriaLabel()"
-      (click)="onUnreadToastClick($event)"
-    >
-      <span class="news-summary-bar__unread-toast-count" aria-hidden="true">{{ unreadBadgeLabel() }}</span>
-    </button>
-  }
 </div>

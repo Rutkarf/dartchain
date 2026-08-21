@@ -64,15 +64,15 @@
 .dock-panel.is-collapsed.is-wallet,
 .dock-panel.is-collapsed.is-chain,
 .dock-panel.is-collapsed.is-peers {
-  --dock-panel-handle-h: var(--dock-smart-bar-h, 11px);
+  --dock-panel-handle-h: var(--dock-smart-bar-h, 13.5px);
   overflow: visible;
 }
 
 .dock-panel__handle.dock-summary-bar {
-  flex: 0 0 var(--dock-smart-bar-h, 11px);
-  min-height: var(--dock-smart-bar-h, 11px);
-  height: var(--dock-smart-bar-h, 11px);
-  max-height: var(--dock-smart-bar-h, 11px);
+  flex: 0 0 var(--dock-smart-bar-h, 13.5px);
+  min-height: var(--dock-smart-bar-h, 13.5px);
+  height: var(--dock-smart-bar-h, 13.5px);
+  max-height: var(--dock-smart-bar-h, 13.5px);
   flex-direction: row;
   align-items: center;
   gap: 0;

@@ -49,9 +49,13 @@ export const WORLD_METERS_PER_UNIT = 1;
 export const METRO_SPAWN_ANCHOR = {
   id: 'vieux-port-metro-mirror',
   stationName: 'Vieux-Port — Station Miroir',
-  mirror: { x: 0, y: 5.6, z: 0 } satisfies WorldAnchor,
+  mirror: { x: 0, y: 8.0, z: 0 } satisfies WorldAnchor,
   offsetFromMirror: { x: -16.4, y: 0, z: -11.2 } satisfies WorldAnchor,
-  spawnOffsetFromMirror: { x: -6.2, y: 0, z: -2.4 } satisfies WorldAnchor,
+  /**
+   * Spawn juste derrière le miroir (sud / +Z), encore sur l’esplanade avant l’eau.
+   * Face Canebière (−Z), dos à la mer (+Z).
+   */
+  spawnOffsetFromMirror: { x: 0, y: 0, z: 5.0 } satisfies WorldAnchor,
 } as const;
 
 /** Vue de validation séparée — n’écrase pas la caméra orbitale tant qu’elle n’est pas activée. */
@@ -149,39 +153,39 @@ export interface GroundExclusionZone {
  * Miroir à (0,0) : bassin ouest (−X) + bras sud (+Z) visible depuis l'esplanade.
  */
 export const MARSEILLE_HARBOR_WATER = {
-  landMinZ: -230,
-  landMaxZ: 10,
-  /** Eau immédiatement au sud de l'Ombrière (+Z). */
-  waterMinZ: 10,
-  waterMaxZ: 460,
+  landMinZ: -420,
+  landMaxZ: 8,
+  /** Eau juste derrière le miroir (sud = +Z, face personnage nord −Z). */
+  waterMinZ: 6.5,
+  waterMaxZ: 520,
   /** @deprecated Utiliser isHarborWaterAt() — conservé pour tests/debug. */
-  walkBlockMaxZ: 10,
-  /** Bassin rectangulaire (~850 m) vers l'embouchure ouest. */
+  walkBlockMaxZ: 6.5,
+  /** Bassin rectangulaire (~850 m) vers l'embouchure ouest (−X). */
   basinMinX: -880,
-  basinMaxX: 18,
+  basinMaxX: 22,
   basinMinZ: -58,
   basinMaxZ: 58,
   minX: -880,
-  maxX: 102,
+  maxX: 120,
   /** Sol piéton / tapis M4T3R. */
   walkSurfaceY: 0,
   /** Quais surélevés par rapport à l'eau. */
   quaySurfaceY: 0.05,
-  /** Surface de l'eau — ~1,5 m sous le sol (effet bassin portuaire). */
-  waterSurfaceY: -1.45,
+  /** Surface de l'eau — ~1,2 m sous le quai (lisible depuis l'esplanade). */
+  waterSurfaceY: -1.15,
   /** Fond du bassin (couche sombre sous la surface). */
-  waterDeepY: -2.05,
+  waterDeepY: -1.85,
   /** @deprecated Alias de waterSurfaceY. */
-  surfaceY: -1.45,
+  surfaceY: -1.15,
   surfaceColor: 0x3eb8c8,
   deepColor: 0x0a4a62,
   shallowColor: 0x7adce8,
   foamColor: 0xe8f6fa,
   glowColor: 0x5ee0f0,
   /** Hauteur visible paroi quai → eau. */
-  basinWallHeight: 1.5,
-  quayZ: 8,
-  exclusionMinZ: 8,
+  basinWallHeight: 1.35,
+  quayZ: 4.8,
+  exclusionMinZ: 5,
   softEdgeMeters: 6,
 } as const;
 
@@ -484,12 +488,12 @@ export const MARSEILLE_START_POSITION: GeoPosition = {
 
 /**
  * Départ gameplay Marseille :
- * - personnage face au nord (−Z) : arcades à gauche, boutiques à droite, eau derrière
- * - caméra au sud (+Z), légèrement au-dessus de l'épaule
+ * - personnage face à la Canebière (−Z) : rotationY = π (atan2 mouvement)
+ * - dos à la mer (+Z), caméra derrière l’épaule depuis le port
  */
 export const MARSEILLE_START_ORIENTATION: MapStartOrientation = {
-  characterRotationY: 0,
-  cameraYaw: Math.PI,
+  characterRotationY: Math.PI,
+  cameraYaw: 0,
   cameraPitch: 0.12,
   cameraDistance: 6.2,
   cameraLookAhead: 0.35,

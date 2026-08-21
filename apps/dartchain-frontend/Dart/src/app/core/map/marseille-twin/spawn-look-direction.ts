@@ -6,8 +6,9 @@ import { MARSEILLE_SPAWN_ANCHOR } from './marseille-spawn-anchor';
  */
 export const SPAWN_LOOK_DIRECTION = {
   characterHeadingRadians: MARSEILLE_SPAWN_ANCHOR.worldHeadingRadians,
-  cameraYawRadians: Math.PI,
+  cameraYawRadians: 0,
   waterDirection: { x: 0, z: 1 } as const,
-  waterIsBehindAvatarWhenHeading0: true,
+  /** Heading π : −Z = Canebière devant, +Z = mer derrière. */
+  waterIsBehindAvatarWhenFacingCanebiere: true,
   applyAtRuntime: false,
 } as const;

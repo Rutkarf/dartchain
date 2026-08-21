@@ -67,26 +67,16 @@
               class="showcase-news__item showcase-launch__item"
               [class.showcase-launch__item--selected]="selectedProject()?.id === project.id"
             >
-              <div class="showcase-launch__item-row">
-                @if (project.logoUrl) {
-                  <img
-                    class="showcase-launch__logo"
-                    [src]="project.logoUrl"
-                    [alt]="project.name"
-                    width="14"
-                    height="14"
-                  />
-                } @else {
-                  <span
-                    class="showcase-launch__logo showcase-launch__logo--placeholder"
-                    aria-hidden="true"
-                  >
-                    {{ projectInitials(project) }}
-                  </span>
-                }
-
-                <span class="showcase-launch__name" [title]="project.name">{{ project.name }}</span>
-
+              <div
+                class="showcase-launch__item-row"
+                role="button"
+                tabindex="0"
+                [attr.aria-expanded]="selectedProject()?.id === project.id"
+                [attr.aria-label]="'Voir les infos ' + project.name"
+                (click)="openProject(project)"
+                (keydown.enter)="openProject(project)"
+                (keydown.space)="$event.preventDefault(); openProject(project)"
+              >
                 <span
                   class="showcase-launch__badge"
                   [class.showcase-launch__badge--live]="project.status === 'LIVE'"
@@ -96,21 +86,26 @@
                   {{ statusLabel(project.status) }}
                 </span>
 
-                <span class="showcase-launch__metrics">
-                  <span class="showcase-launch__raised" [title]="marketCapLabel(project)">
-                    {{ marketCapLabel(project) }}
-                  </span>
-                  <span
-                    class="showcase-launch__progress"
-                    [class.showcase-launch__progress--empty]="progressPercent(project) === null"
-                    aria-hidden="true"
-                  >
-                    <span
-                      class="showcase-launch__progress-fill"
-                      [style.width.%]="progressPercent(project) ?? 0"
-                    ></span>
-                  </span>
+                <span class="showcase-launch__symbol" [title]="project.symbol">
+                  {{ project.symbol }}
                 </span>
+
+                <span class="showcase-launch__name" [title]="project.name">{{ project.name }}</span>
+
+                <span class="showcase-launch__raised" [title]="marketCapLabel(project)">
+                  {{ marketCapLabel(project) }}
+                </span>
+
+                <button
+                  type="button"
+                  class="showcase-launch__action ds-surface ds-surface--showcase-tab"
+                  [class.showcase-launch__action--muted]="!canSwapProject(project)"
+                  [disabled]="!canSwapProject(project)"
+                  (click)="swapProject(project, $event)"
+                  [attr.aria-label]="swapAriaLabel(project)"
+                >
+                  Swap
+                </button>
 
                 <button
                   type="button"
@@ -123,29 +118,10 @@
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+                    <path d="M14 2v6h6" />
+                    <path d="M12 11v7" />
+                    <path d="M9 15l3 3 3-3" />
                   </svg>
-                </button>
-
-                <button
-                  type="button"
-                  class="showcase-launch__ticker"
-                  (click)="openProject(project)"
-                  [attr.aria-expanded]="selectedProject()?.id === project.id"
-                  [attr.aria-label]="'Voir ' + project.symbol"
-                >
-                  {{ project.symbol }}
-                </button>
-
-                <button
-                  type="button"
-                  class="showcase-launch__action ds-surface ds-surface--showcase-tab"
-                  [class.showcase-launch__action--muted]="!canSwapProject(project)"
-                  [disabled]="!canSwapProject(project)"
-                  (click)="swapProject(project, $event)"
-                  [attr.aria-label]="swapAriaLabel(project)"
-                >
-                  Swap
                 </button>
               </div>
             </li>

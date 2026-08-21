@@ -1,42 +1,61 @@
-<div class="dock-summary-bar" role="status" aria-live="polite" aria-label="Résumé marché">
-  <div class="dock-summary-main">
-    <span class="dock-summary-main__rail" aria-hidden="true"></span>
-    <span
-      class="dock-summary-status"
-      [ngClass]="statusClass(phase())"
-      [attr.aria-label]="'État : ' + statusLabel()"
-    >
-      {{ statusLabel() }}
-    </span>
-  </div>
+<div
+  class="market-summary-bar"
+  role="status"
+  aria-live="polite"
+  [attr.aria-label]="barAriaLabel()"
+>
+  <div class="market-summary-line" aria-live="polite">
+    @if (carouselRow(); as row) {
+      <div
+        class="market-summary-line__slide"
+        [class.market-summary-line__slide--enter]="carouselAnimating()"
+        [attr.title]="rowTitle(row)"
+      >
+        <span class="market-summary-line__symbol">{{ row.config.displaySymbol }}</span>
 
-  <div class="dock-summary-progress">
-    <p class="dock-summary-progress__text">
-      @if (loading()) {
-        <span class="dock-summary-progress__text--muted">Chargement…</span>
-      } @else {
-        <span>{{ headline() }}</span>
-        @if (progressLabel()) {
-          <span class="dock-summary-progress__text--muted"> · {{ progressLabel() }}</span>
-        }
-      }
-    </p>
-  </div>
+        <span class="market-summary-line__name">{{ row.config.name }}</span>
 
-  <div class="dock-summary-meta">
-    @if (updatedAgeLabel()) {
-      <span class="dock-summary-meta__time">{{ updatedAgeLabel() }}</span>
+        <span class="market-summary-line__sep" aria-hidden="true">·</span>
+
+        <span
+          class="market-summary-line__price"
+          [class.is-unavailable]="row.priceUnavailable"
+        >
+          {{ row.price }}
+        </span>
+
+        <span
+          class="market-summary-line__change"
+          [class.is-up]="row.positive"
+          [class.is-down]="!row.positive"
+        >
+          {{ formatChange(row) }}
+        </span>
+
+        <span class="market-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="market-summary-line__stat" [attr.title]="'Vol ' + row.metrics.volumeLabel">
+          V {{ compactMetric(row.metrics.volumeLabel) }}
+        </span>
+
+        <span class="market-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="market-summary-line__stat" [attr.title]="'Liq ' + row.metrics.liquidityLabel">
+          L {{ compactMetric(row.metrics.liquidityLabel) }}
+        </span>
+
+        <span class="market-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="market-summary-line__cap" [attr.title]="'Cap ' + row.metrics.marketCapLabel">
+          Cap {{ compactMetric(row.metrics.marketCapLabel) }}
+        </span>
+      </div>
+    } @else if (loading()) {
+      <span class="market-summary-line__fallback">Synchronisation…</span>
+    } @else if (error()) {
+      <span class="market-summary-line__fallback">Cours indisponibles</span>
+    } @else {
+      <span class="market-summary-line__fallback">Aucun token</span>
     }
-  </div>
-
-  <div class="dock-summary-actions">
-    <button
-      type="button"
-      class="dock-summary-actions__btn dock-summary-actions__primary"
-      (click)="onOpen($event)"
-      aria-label="Ouvrir le panneau Marché"
-    >
-      Marché
-    </button>
   </div>
 </div>

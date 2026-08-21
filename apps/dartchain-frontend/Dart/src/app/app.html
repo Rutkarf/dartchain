@@ -36,7 +36,7 @@
       (tabChange)="onShowcaseTabChange($event)"
       (collapseToggle)="toggleShowcaseCollapsed()"
       (refresh)="refreshShowcasePanel($event)"
-      (summaryExpand)="toggleShowcaseCollapsed()"
+      (summaryExpand)="expandShowcaseFromSummary()"
       (selectBlock)="openBlockFromShowcaseIndex($event)"
     />
 
@@ -48,7 +48,7 @@
       (tabChange)="onBottomTabChange($event)"
       (collapseToggle)="toggleDockCollapsed()"
       (refresh)="refreshDockPanel($event)"
-      (summaryExpand)="toggleDockCollapsed()"
+      (summaryExpand)="expandDockFromSummary()"
       (selectBlock)="openBlockDrawer($event)"
     />
 
@@ -56,7 +56,7 @@
       [chartCollapsed]="chartCollapsed()"
       [collapseAriaLabel]="chartCollapseLabel()"
       (collapseToggle)="toggleChartCollapsed()"
-      (summaryExpand)="toggleChartCollapsed()"
+      (summaryExpand)="expandChartFromSummary()"
     />
   </main>
 

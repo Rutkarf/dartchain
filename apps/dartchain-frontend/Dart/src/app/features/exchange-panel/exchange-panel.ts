@@ -519,12 +519,12 @@ export class ExchangePanelComponent implements AfterViewInit {
       return 'swapping';
     }
 
-    if (!this.hasWallet()) {
-      return 'create-wallet';
-    }
-
     if (!this.auth.isAuthenticated()) {
       return 'login-required';
+    }
+
+    if (!this.hasWallet()) {
+      return 'create-wallet';
     }
 
     const amount = this.parsedAmount();

@@ -55,20 +55,21 @@ export const HORIZON_SCALE_CONFIG: HorizonScaleConfig = {
   visualScale: 1.85,
 };
 
+/** Bbox OSM élargi (~1.6 km) — aligné sur MarseilleMapProvider.OSM_QUERY_BOUNDS. */
 export const WIGLE_OSM_QUERY_BOUNDS = {
-  south: 43.2937,
-  north: 43.2999,
-  west: 5.3642,
-  east: 5.3778,
+  south: 43.2800,
+  north: 43.3095,
+  west: 5.3540,
+  east: 5.3940,
 } as const;
 
 /** Cycle 3 — geo-mapping & effets d'ondes. */
 export const WIGLE_GEO_CONFIG = {
-  loadRadiusMeters: 500,
-  reloadDistanceMeters: 180,
-  maxActivePoints: 100,
-  maxVisiblePoints: 80,
-  buildingBaseSize: 3.2,
+  loadRadiusMeters: 700,
+  reloadDistanceMeters: 220,
+  maxActivePoints: 180,
+  maxVisiblePoints: 140,
+  buildingBaseSize: 1.15,
   buildingHeightMin: 6,
   buildingHeightMax: 22,
   meshLineDistance: 120,
@@ -83,7 +84,7 @@ export const WIGLE_GEO_CONFIG = {
 } as const;
 
 export function maxActivePointsForQuality(quality: MapQuality): number {
-  if (quality === 'low') return 50;
-  if (quality === 'medium') return 75;
-  return 100;
+  if (quality === 'low') return 80;
+  if (quality === 'medium') return 120;
+  return 180;
 }

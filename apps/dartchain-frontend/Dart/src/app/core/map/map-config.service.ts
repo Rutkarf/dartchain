@@ -29,12 +29,16 @@ export class MapConfigService {
 
   readonly configuration: MapConfiguration = this.buildConfiguration();
 
-  /** Provider effectif (legacy si carte désactivée). */
+  /** Provider effectif — Marseille OSM prioritaire dès que la carte est activée. */
   effectiveProvider(): MapProviderId {
     if (!this.configuration.enabled) {
       return 'legacy-floor';
     }
-    return this.configuration.provider;
+    // MetaVerseBB : forcer Marseille sauf demande explicite legacy.
+    if (this.configuration.provider === 'legacy-floor') {
+      return 'legacy-floor';
+    }
+    return 'marseille-osm-three';
   }
 
   isLegacyProvider(): boolean {
@@ -61,6 +65,11 @@ export class MapConfigService {
     }
     if (this.env.mapQuality !== undefined) {
       base.quality = this.env.mapQuality;
+    }
+
+    // Garde-fou : Marseille sans bâtiments = carte vide.
+    if (base.provider === 'marseille-osm-three' && base.enabled) {
+      base.enableBuildings = true;
     }
 
     return base;

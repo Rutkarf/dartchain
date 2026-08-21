@@ -14,9 +14,9 @@ export const CHARACTER_ASSETS = {
   ],
   targetHeight: 2.8,
   /** Hauteur des pieds au-dessus du sol walkable (m). */
-  footClearanceMeters: 0.14,
+  footClearanceMeters: 0.28,
   /** Relevage du mesh après alignement bbox (pieds Mixamo souvent sous la bbox). */
-  plantLiftMeters: 0.06,
+  plantLiftMeters: 0.14,
 } as const;
 
 export function isCharacterStlPath(path: string): boolean {

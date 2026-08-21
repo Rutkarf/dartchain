@@ -129,8 +129,13 @@ export class WalletPanelComponent implements OnInit {
     return Boolean(local?.address?.trim() && local?.privateKey?.trim());
   });
 
-  /** Affiche le CTA de création (déconnecté ou 1ʳᵉ connexion sans clés locales). */
+  /** Affiche le CTA de création tant qu’il n’y a pas de clés locales. */
   protected readonly needsWalletCreation = computed(() => !this.hasWallet());
+
+  /** Création autorisée uniquement si connecté et sans wallet local. */
+  protected readonly canCreateWallet = computed(
+    () => this.auth.isAuthenticated() && !this.hasWallet()
+  );
 
   protected readonly walletAddress = computed(() => this.wallet()?.address ?? '');
   protected readonly walletPublicKey = computed(() => this.wallet()?.publicKey ?? '');
@@ -404,6 +409,16 @@ export class WalletPanelComponent implements OnInit {
   }
 
   protected createWallet(): void {
+    if (!this.auth.isAuthenticated()) {
+      this.errorMessage.set('Connectez-vous pour créer un wallet.');
+      this.auth.promptLogin();
+      return;
+    }
+
+    if (this.hasWallet() || this.creatingWallet()) {
+      return;
+    }
+
     this.clearMessages();
     this.creatingWallet.set(true);
     this.privateKeyVisible.set(false);
@@ -421,9 +436,7 @@ export class WalletPanelComponent implements OnInit {
         );
         this.creatingWallet.set(false);
 
-        if (this.auth.isAuthenticated()) {
-          void this.auth.linkWallet(wallet.address, wallet.publicKey);
-        }
+        void this.auth.linkWallet(wallet.address, wallet.publicKey);
 
         this.successMessage.set('Wallet créé localement (clé privée non envoyée au serveur).');
         this.fetchBalance(wallet.address, true, false);
@@ -450,6 +463,33 @@ export class WalletPanelComponent implements OnInit {
   onDockRefresh(event: Event): void {
     if (refreshEventMatchesTab(event, 'wallet')) {
       this.refreshAll();
+    }
+  }
+
+  @HostListener('window:wallet-panel-action', ['$event'])
+  onWalletPanelAction(event: Event): void {
+    const action = (event as CustomEvent<{ action?: string }>).detail?.action;
+    if (!action) {
+      return;
+    }
+
+    switch (action) {
+      case 'send':
+        this.sendAction();
+        break;
+      case 'receive':
+        this.receiveAction();
+        break;
+      case 'swap':
+        this.swapAction();
+        break;
+      case 'create':
+        if (!this.hasWallet()) {
+          this.createWallet();
+        }
+        break;
+      default:
+        break;
     }
   }
 

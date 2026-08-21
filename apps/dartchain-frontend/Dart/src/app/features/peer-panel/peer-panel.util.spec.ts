@@ -75,5 +75,12 @@ describe('peer-panel.util (Phase U)', () => {
 
     expect(stats.avgLatencyMs).toBe(30);
     expect(stats.networkLoadPercent).toBe(88);
+    // Liste peers = source of truth (ne pas gonfler à 2 via statsTotal)
+    expect(stats.networkPeers).toBe(1);
+  });
+
+  it('falls back to statsTotal only when peer list is empty', () => {
+    const stats = buildNetworkStats([], 3, null, null, null);
+    expect(stats.networkPeers).toBe(3);
   });
 });

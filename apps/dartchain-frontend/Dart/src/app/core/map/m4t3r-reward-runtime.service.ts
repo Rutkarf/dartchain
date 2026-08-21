@@ -146,6 +146,7 @@ export class M4t3rRewardRuntimeService {
   private mapStatusToEvent(status: string): M4t3rRewardEventType {
     switch (status) {
       case 'CREDITED_OFFCHAIN':
+      case 'CREDITED_FAUCET_PENDING':
         return 'M4T3R_REWARD_CREDITED';
       case 'QUEUED_ONCHAIN':
         return 'M4T3R_REWARD_QUEUED';

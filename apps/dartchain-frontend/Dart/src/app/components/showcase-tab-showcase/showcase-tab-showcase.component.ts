@@ -38,9 +38,11 @@ export class ShowcaseTabShowcaseComponent {
   @Output() readonly summaryExpand = new EventEmitter<void>();
   @Output() readonly selectBlock = new EventEmitter<number>();
 
-  onBandClick(): void {
-    if (this.showcaseCollapsed) {
-      this.summaryExpand.emit();
+  onBandClick(event?: Event): void {
+    if (!this.showcaseCollapsed) {
+      return;
     }
+    event?.stopPropagation();
+    this.summaryExpand.emit();
   }
 }

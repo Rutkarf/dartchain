@@ -411,10 +411,11 @@ export class FaucetRuntimeService {
           this.triggerBump();
           this.prependHistoryEntry(response.claimedAt, response.amount, response.txHash);
           void this.questProgress.recordFaucetClaim();
+          // Claim = mempool only ; le solde on-chain monte après mine.
           this.walletSession.requestBalanceRefresh();
-          this.refreshWalletBalance(true);
           this.loadNetworkMeta();
           this.loadClaimsHistory();
+          window.dispatchEvent(new CustomEvent('dartchain-refresh-dock'));
           this.showToast(this.t('faucet.claimSuccess'), 'success');
         },
         error: (error: HttpErrorResponse) => {

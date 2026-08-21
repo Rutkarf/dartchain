@@ -9,6 +9,8 @@ describe('floor-horizon-blend.config', () => {
     expect(FLOOR_HORIZON_BLEND.fog.color).toBe(0x000000);
     expect(FLOOR_HORIZON_BLEND.clearAlpha).toBe(1);
     expect(FLOOR_HORIZON_BLEND.fog.far).toBeGreaterThan(FLOOR_HORIZON_BLEND.fog.near);
+    expect(FLOOR_HORIZON_BLEND.fog.near).toBeGreaterThanOrEqual(400);
+    expect(FLOOR_HORIZON_BLEND.fog.far).toBeGreaterThanOrEqual(1000);
   });
 
   it('fondu masque : opaque au sol, transparent à la démarcation nébuleuse', () => {

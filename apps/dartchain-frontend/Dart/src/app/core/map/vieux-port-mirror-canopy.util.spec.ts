@@ -9,7 +9,7 @@ import {
 
 describe('Vieux-Port mirror canopy', () => {
   it('keeps the glass deck at spawn height and a walkable plaza', () => {
-    expect(MIRROR_CANOPY.deckY).toBe(5.6);
+    expect(MIRROR_CANOPY.deckY).toBe(8.0);
     expect(MIRROR_CANOPY.width).toBeGreaterThan(16);
     expect(MIRROR_CANOPY.depth).toBeGreaterThan(10);
     expect(MIRROR_CANOPY.thickness).toBeLessThan(0.2);
@@ -32,7 +32,7 @@ describe('Vieux-Port mirror canopy', () => {
   });
 
   it('assembles glass, steel posts, plaza and caustics as a named group', () => {
-    const built = buildVieuxPortMirrorCanopy('medium', { x: 0, y: 5.6, z: 0 });
+    const built = buildVieuxPortMirrorCanopy('medium', { x: 0, y: 8.0, z: 0 });
     expect(built.group.name).toBe('marseille-mirror-canopy-group');
     const names: string[] = [];
     built.group.traverse((obj) => {
@@ -40,6 +40,7 @@ describe('Vieux-Port mirror canopy', () => {
     });
     expect(names).toContain('marseille-mirror-canopy');
     expect(names).toContain('marseille-mirror-canopy-top');
+    expect(names).toContain('marseille-mirror-glass-title');
     expect(names).toContain('marseille-mirror-plaza');
     expect(names).toContain('marseille-mirror-caustic');
     expect(names).toContain('marseille-mirror-aura');
@@ -60,7 +61,7 @@ describe('Vieux-Port mirror canopy', () => {
   });
 
   it('skips physical transmission on low quality', () => {
-    const built = buildVieuxPortMirrorCanopy('low', { x: 0, y: 5.6, z: 0 });
+    const built = buildVieuxPortMirrorCanopy('low', { x: 0, y: 8.0, z: 0 });
     const glass = built.group.getObjectByName('marseille-mirror-canopy') as THREE.Mesh;
     const mat = glass.material as THREE.MeshStandardMaterial;
     expect(mat.type).toBe('MeshStandardMaterial');

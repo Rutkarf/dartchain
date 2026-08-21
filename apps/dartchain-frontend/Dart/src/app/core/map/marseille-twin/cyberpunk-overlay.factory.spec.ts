@@ -33,9 +33,9 @@ describe('cyberpunk-overlay.factory (ITER-012/025/032/038)', () => {
     expect(built.registry.counts.geometries).toBe(0);
   });
 
-  it('crée les hologrammes par défaut (flag runtime on)', () => {
+  it('ne crée pas d hologrammes par défaut (flag runtime off)', () => {
     const built = createCyberpunkOverlayGroup();
-    expect(built.group.children.length).toBe(shopsEastNeonSignageZones().length);
+    expect(built.group.children.length).toBe(0);
     expect(built.group.userData['pick'].pickable).toBe(false);
     disposeCyberpunkOverlay(built);
   });

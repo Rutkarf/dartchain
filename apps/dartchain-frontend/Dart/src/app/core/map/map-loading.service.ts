@@ -68,17 +68,48 @@ export class MapLoadingService {
 
     try {
       await this.switchTo(this.marseilleProvider, false, null, scene, camera);
+      this.marseilleProvider.ensureCityMassing?.();
+      const massing = this.marseilleProvider.getCityMassingCount?.() ?? 0;
+      if (massing < 50) {
+        console.error(
+          '[MapLoadingService] Massing Marseille trop faible (',
+          massing,
+          ') — ensureCityMassing relancé.'
+        );
+        this.marseilleProvider.ensureCityMassing?.();
+      } else {
+        console.info('[MapLoadingService] Massing Marseille OK:', massing, 'meshes');
+      }
       this.attachNetworkLayer(scene, camera);
       void this.attachPlacementLayer(scene);
       this.initialized = true;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.warn(
-        '[MapLoadingService] Échec Marseille — fallback legacy-floor.',
+        '[MapLoadingService] Échec Marseille — tentative recovery avant legacy.',
         message
       );
       if (error instanceof Error) {
         console.warn('[MapLoadingService] stack:', error.stack);
+      }
+      // Dernier essai Marseille (init partiel possible) avant fallback legacy.
+      try {
+        this.marseilleProvider.ensureCityMassing?.();
+        if ((this.marseilleProvider.getCityMassingCount?.() ?? 0) >= 50) {
+          this.activeProvider = this.marseilleProvider;
+          this.stateSubject.next({
+            activeProviderId: 'marseille-osm-three',
+            fallbackActive: false,
+            lastError: message,
+          });
+          this.attachNetworkLayer(scene, camera);
+          void this.attachPlacementLayer(scene);
+          this.initialized = true;
+          console.info('[MapLoadingService] Recovery Marseille réussie malgré erreur init.');
+          return;
+        }
+      } catch {
+        /* continue fallback */
       }
       await this.switchTo(this.legacyProvider, true, message, scene, camera);
       this.attachNetworkLayer(scene, camera);

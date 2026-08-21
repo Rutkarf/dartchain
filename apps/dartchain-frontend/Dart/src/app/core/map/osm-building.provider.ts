@@ -26,7 +26,8 @@ interface OverpassNode extends OverpassElementBase {
 
 interface OverpassWay extends OverpassElementBase {
   type: 'way';
-  nodes: number[];
+  nodes?: number[];
+  geometry?: Array<{ lat: number; lon: number }>;
   tags?: Record<string, string>;
 }
 
@@ -36,31 +37,104 @@ interface OverpassResponse {
 
 import { environment } from '../../../environments/environment';
 
-const DEFAULT_BUILDING_HEIGHT = 8;
-const FLOOR_HEIGHT = 3;
-const MAX_BUILDING_HEIGHT = 120;
+const DEFAULT_BUILDING_HEIGHT = 9;
+const FLOOR_HEIGHT = 3.2;
+const MAX_BUILDING_HEIGHT = 160;
 const METERS_PER_DEGREE_LAT = 111_320;
-/** Same-origin only — never hit overpass-api.de from the browser (CORS). */
+/** Same-origin only — never hit overpass hosts from the browser (CORS). */
 const OVERPASS_ENDPOINTS = [`${environment.apiUrl}/metaverse/overpass`, '/overpass', '/overpass-alt'];
+const MAX_AROUND_RADIUS_METERS = 1500;
+/** Tuiles ~900 m — requêtes Overpass fiables (évite timeout / payload tronqué). */
+const TILE_DEG = 0.008;
+/** Pause réseau après un échec complet (tous les endpoints). */
+const CIRCUIT_COOLDOWN_MS = 60_000;
+
+const BUILDING_TYPE_HEIGHTS: Record<string, number> = {
+  house: 6,
+  detached: 7,
+  semidetached_house: 7,
+  terrace: 8,
+  bungalow: 4.5,
+  cabin: 4,
+  static_caravan: 3.5,
+  garage: 3,
+  garages: 3,
+  shed: 3,
+  hut: 3,
+  carport: 3,
+  roof: 3.5,
+  kiosk: 3.5,
+  retail: 8,
+  commercial: 12,
+  office: 18,
+  industrial: 10,
+  warehouse: 9,
+  school: 12,
+  university: 14,
+  hospital: 16,
+  hotel: 20,
+  apartments: 18,
+  residential: 14,
+  yes: 10,
+  church: 16,
+  cathedral: 28,
+  mosque: 14,
+  synagogue: 12,
+  chapel: 8,
+  public: 12,
+  civic: 14,
+  train_station: 14,
+  transportation: 10,
+  stadium: 22,
+  sports_hall: 12,
+  supermarket: 8,
+  church_hall: 8,
+};
 
 @Injectable({ providedIn: 'root' })
 export class OSMBuildingProvider {
   private readonly footprintCache = new Map<string, OSMBuildingFootprint>();
+  private circuitOpenUntil = 0;
+  private loggedCircuitOpen = false;
 
   async loadBuildings(bounds: OSMBuildingBounds): Promise<OSMBuildingFootprint[]> {
-    const query = `
-[out:json][timeout:15];
-(
-  way["building"](${bounds.south},${bounds.west},${bounds.north},${bounds.east});
-);
-out body;
->;
-out skel qt;
-    `.trim();
+    const tiles = splitBoundsIntoTiles(bounds, TILE_DEG);
+    // Canebière / nord du Vieux-Port en premier (lat plus haute = nord OSM).
+    tiles.sort((a, b) => b.north - a.north || a.west - b.west);
 
-    const buildings = await this.fetchOverpass(query);
-    this.mergeIntoCache(buildings);
-    return buildings;
+    let lastError: unknown;
+    let failedTiles = 0;
+    for (const tile of tiles) {
+      if (this.isCircuitOpen()) {
+        break;
+      }
+      try {
+        const batch = await this.fetchTile(tile);
+        this.mergeIntoCache(batch);
+      } catch (error) {
+        lastError = error;
+        failedTiles++;
+        if (failedTiles === 1) {
+          console.warn('[OSMBuildingProvider] Tuile Overpass echouee', tile, error);
+        }
+      }
+    }
+
+    const all = [...this.footprintCache.values()].filter((b) => footprintInBounds(b, bounds));
+    if (all.length === 0 && lastError) {
+      // Soft-fail : le caller (Marseille) conserve le catalogue accurate.
+      console.warn(
+        '[OSMBuildingProvider] Overpass indisponible — cache vide, fallback accurate attendu.',
+        lastError
+      );
+      return [];
+    }
+    if (failedTiles > 1) {
+      console.warn(
+        `[OSMBuildingProvider] ${failedTiles} tuiles Overpass en echec (circuit / reseau).`
+      );
+    }
+    return all;
   }
 
   /** Cycle 4 — footprint OSM autour d'un point GPS (rayon en mètres). */
@@ -69,20 +143,20 @@ out skel qt;
     longitude: number,
     radiusMeters: number
   ): Promise<OSMBuildingFootprint[]> {
-    const radius = Math.min(Math.max(Math.round(radiusMeters), 20), 800);
+    const radius = Math.min(Math.max(Math.round(radiusMeters), 20), MAX_AROUND_RADIUS_METERS);
     const cached = this.filterCachedAround(latitude, longitude, radius);
     if (cached.length >= 3) {
       return cached;
     }
 
+    if (this.isCircuitOpen()) {
+      return cached;
+    }
+
     const query = `
-[out:json][timeout:20];
-(
-  way["building"](around:${radius},${latitude},${longitude});
-);
-out body;
->;
-out skel qt;
+[out:json][timeout:45];
+way["building"](around:${radius},${latitude},${longitude});
+out geom;
     `.trim();
 
     try {
@@ -104,7 +178,7 @@ out skel qt;
     longitude: number,
     radiusMeters: number
   ): OSMBuildingFootprint[] {
-    const radius = Math.min(Math.max(Math.round(radiusMeters), 20), 800);
+    const radius = Math.min(Math.max(Math.round(radiusMeters), 20), MAX_AROUND_RADIUS_METERS);
     const results: OSMBuildingFootprint[] = [];
 
     for (const footprint of this.footprintCache.values()) {
@@ -121,13 +195,46 @@ out skel qt;
     return this.footprintCache.size;
   }
 
+  private async fetchTile(bounds: OSMBuildingBounds): Promise<OSMBuildingFootprint[]> {
+    const query = `
+[out:json][timeout:40];
+way["building"](${bounds.south},${bounds.west},${bounds.north},${bounds.east});
+out geom;
+    `.trim();
+    return this.fetchOverpass(query);
+  }
+
   private mergeIntoCache(buildings: OSMBuildingFootprint[]): void {
     for (const building of buildings) {
       this.footprintCache.set(building.id, building);
     }
   }
 
+  private isCircuitOpen(): boolean {
+    return Date.now() < this.circuitOpenUntil;
+  }
+
+  private openCircuit(reason: unknown): void {
+    this.circuitOpenUntil = Date.now() + CIRCUIT_COOLDOWN_MS;
+    if (!this.loggedCircuitOpen) {
+      this.loggedCircuitOpen = true;
+      console.warn(
+        '[OSMBuildingProvider] Circuit Overpass ouvert 60s — arret des requetes.',
+        reason
+      );
+    }
+  }
+
+  private closeCircuit(): void {
+    this.circuitOpenUntil = 0;
+    this.loggedCircuitOpen = false;
+  }
+
   private async fetchOverpass(query: string): Promise<OSMBuildingFootprint[]> {
+    if (this.isCircuitOpen()) {
+      throw new Error('Overpass circuit open');
+    }
+
     let lastError: unknown;
     for (const endpoint of OVERPASS_ENDPOINTS) {
       try {
@@ -144,11 +251,17 @@ out skel qt;
         }
 
         const data = (await response.json()) as OverpassResponse;
+        if (!Array.isArray(data.elements)) {
+          throw new Error(`Overpass payload invalide via ${endpoint}`);
+        }
+        this.closeCircuit();
         return this.parseBuildings(data);
       } catch (error) {
         lastError = error;
       }
     }
+
+    this.openCircuit(lastError);
     throw lastError ?? new Error('Tous les endpoints Overpass ont echoue.');
   }
 
@@ -165,15 +278,21 @@ out skel qt;
     }
 
     const buildings: OSMBuildingFootprint[] = [];
+    const seenIds = new Set<string>();
 
     for (const way of ways) {
       const tags = way.tags ?? {};
       if (!tags['building']) continue;
 
-      const points = way.nodes
-        .map((nodeId) => nodeMap.get(nodeId))
-        .filter((node): node is OverpassNode => !!node)
-        .map((node) => ({ latitude: node.lat, longitude: node.lon }));
+      let points: Array<{ latitude: number; longitude: number }> = [];
+      if (way.geometry && way.geometry.length >= 4) {
+        points = way.geometry.map((g) => ({ latitude: g.lat, longitude: g.lon }));
+      } else if (way.nodes?.length) {
+        points = way.nodes
+          .map((nodeId) => nodeMap.get(nodeId))
+          .filter((node): node is OverpassNode => !!node)
+          .map((node) => ({ latitude: node.lat, longitude: node.lon }));
+      }
 
       if (points.length < 4) continue;
 
@@ -182,10 +301,16 @@ out skel qt;
       const isClosed =
         Math.abs(first.latitude - last.latitude) < 1e-9 &&
         Math.abs(first.longitude - last.longitude) < 1e-9;
-      if (!isClosed) continue;
+      if (!isClosed) {
+        points = [...points, first];
+      }
+
+      const id = `osm-way-${way.id}`;
+      if (seenIds.has(id)) continue;
+      seenIds.add(id);
 
       buildings.push({
-        id: `osm-way-${way.id}`,
+        id,
         points,
         height: this.resolveBuildingHeight(tags),
       });
@@ -200,13 +325,51 @@ out skel qt;
       return clampHeight(directHeight);
     }
 
+    const estHeight = Number.parseFloat(tags['est_height'] ?? '');
+    if (Number.isFinite(estHeight) && estHeight > 0) {
+      return clampHeight(estHeight);
+    }
+
     const levels = Number.parseFloat(tags['building:levels'] ?? '');
+    const minLevel = Number.parseFloat(tags['building:min_level'] ?? '0');
     if (Number.isFinite(levels) && levels > 0) {
-      return clampHeight(levels * FLOOR_HEIGHT);
+      const effectiveLevels = levels - (Number.isFinite(minLevel) ? Math.max(0, minLevel) : 0);
+      return clampHeight(Math.max(effectiveLevels, 1) * FLOOR_HEIGHT);
+    }
+
+    const buildingType = (tags['building'] ?? 'yes').toLowerCase();
+    const typed = BUILDING_TYPE_HEIGHTS[buildingType];
+    if (typed != null) {
+      return clampHeight(typed);
     }
 
     return DEFAULT_BUILDING_HEIGHT;
   }
+}
+
+function splitBoundsIntoTiles(bounds: OSMBuildingBounds, tileDeg: number): OSMBuildingBounds[] {
+  const tiles: OSMBuildingBounds[] = [];
+  for (let south = bounds.south; south < bounds.north - 1e-9; south += tileDeg) {
+    for (let west = bounds.west; west < bounds.east - 1e-9; west += tileDeg) {
+      tiles.push({
+        south,
+        west,
+        north: Math.min(south + tileDeg, bounds.north),
+        east: Math.min(west + tileDeg, bounds.east),
+      });
+    }
+  }
+  return tiles.length > 0 ? tiles : [bounds];
+}
+
+function footprintInBounds(footprint: OSMBuildingFootprint, bounds: OSMBuildingBounds): boolean {
+  const c = footprintCentroid(footprint);
+  return (
+    c.lat >= bounds.south &&
+    c.lat <= bounds.north &&
+    c.lon >= bounds.west &&
+    c.lon <= bounds.east
+  );
 }
 
 function clampHeight(height: number): number {
@@ -215,6 +378,7 @@ function clampHeight(height: number): number {
 
 function footprintCentroid(footprint: OSMBuildingFootprint): { lat: number; lon: number } {
   const pts = footprint.points.slice(0, -1);
+  if (pts.length === 0) return { lat: 0, lon: 0 };
   const sum = pts.reduce(
     (acc, p) => ({ lat: acc.lat + p.latitude, lon: acc.lon + p.longitude }),
     { lat: 0, lon: 0 }

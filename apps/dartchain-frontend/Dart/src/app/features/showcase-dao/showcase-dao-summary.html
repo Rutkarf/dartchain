@@ -4,54 +4,38 @@
   aria-live="polite"
   [attr.aria-label]="barAriaLabel()"
 >
-  <div class="dao-summary-main dao-summary-main--dynamic">
-    <span
-      class="dao-summary-status dao-summary-status--cluster"
-      [ngClass]="badgeClass()"
-      [attr.aria-label]="statusAriaLabel()"
-      [attr.title]="statusAriaLabel()"
-    >
-      <span
-        class="dao-summary-status__led"
-        [class.dao-summary-status__led--dim]="statusLedDim()"
-        aria-hidden="true"
-      ></span>
-      {{ statusLabel() }}
-    </span>
-  </div>
-
-  <div class="dao-summary-ticker" aria-live="polite">
-    @if (collapsedDaoCard(); as card) {
-      <div class="dao-summary-ticker__viewport">
-        <div class="dao-summary-ticker__slide dao-summary-ticker__slide--selected">
-          <span class="dao-summary-ticker__symbol">{{ card.symbol }}</span>
-          <span class="dao-summary-ticker__name">{{ card.name }}</span>
-          <span class="dao-summary-ticker__stats">{{ collapsedDaoStats() }}</span>
-          <span class="dao-summary-ticker__summary" [attr.title]="collapsedDaoSummary()">
-            {{ collapsedDaoSummary() }}
-          </span>
-        </div>
-      </div>
-    } @else if (carouselCard(); as card) {
-      <div class="dao-summary-ticker__viewport">
-        <div
-          class="dao-summary-ticker__slide"
-          [class.dao-summary-ticker__slide--enter]="carouselAnimating()"
+  <div class="dao-summary-line" aria-live="polite">
+    @if (carouselCard(); as card) {
+      <div
+        class="dao-summary-line__slide"
+        [class.dao-summary-line__slide--enter]="carouselAnimating()"
+        [attr.title]="cardLineTitle(card)"
+      >
+        <span
+          class="dao-summary-line__status"
+          [class.dao-summary-line__status--active]="card.status === 'active'"
+          [class.dao-summary-line__status--creating]="card.status === 'creating'"
+          [class.dao-summary-line__status--closed]="card.status === 'closed'"
         >
-          <span class="dao-summary-ticker__symbol">{{ card.symbol }} DAO</span>
-          <span class="dao-summary-ticker__access">Accès DAO →</span>
-        </div>
+          {{ statusShortLabel(card) }}
+        </span>
+
+        <span class="dao-summary-line__symbol">{{ card.symbol }}</span>
+
+        <span class="dao-summary-line__name">{{ card.name }}</span>
+
+        <span class="dao-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="dao-summary-line__stats">{{ cardStats(card) }}</span>
+
+        <span class="dao-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="dao-summary-line__summary">{{ card.summary }}</span>
       </div>
     } @else if (loading()) {
-      <span class="dao-summary-ticker__fallback">Synchronisation…</span>
+      <span class="dao-summary-line__fallback">Synchronisation…</span>
     } @else {
-      <span class="dao-summary-ticker__fallback">Aucune DAO active</span>
-    }
-  </div>
-
-  <div class="dao-summary-meta">
-    @if (updatedAgeLabel()) {
-      <span class="dao-summary-meta__time">{{ updatedAgeLabel() }}</span>
+      <span class="dao-summary-line__fallback">Aucune DAO active</span>
     }
   </div>
 </div>

@@ -5,6 +5,7 @@ import {
   BlockchainApiService,
   PendingTransaction,
 } from './blockchain-api.service';
+import { AuthService } from './auth.service';
 import { formatDockRelativeTime, shortDockHash } from '../utils/dock-time.util';
 
 export type DockPendingPhase = 'error' | 'loading' | 'empty' | 'ready' | 'busy';
@@ -15,6 +16,7 @@ export class DockPendingStateService {
   private static readonly RATE_LIMIT_BACKOFF_MS = 60_000;
 
   private readonly api = inject(BlockchainApiService);
+  private readonly auth = inject(AuthService);
 
   readonly loading = signal(false);
   readonly error = signal(false);
@@ -46,12 +48,23 @@ export class DockPendingStateService {
         return 'Erreur';
       case 'loading':
       case 'busy':
-        return 'Sync…';
+        return this.mining() ? 'Minage…' : 'Sync…';
       case 'empty':
         return 'Vide';
       default:
         return 'En attente';
     }
+  });
+
+  /** Première tx à miner (plus récente). */
+  readonly nextTransaction = computed(() => this.transactions()[0] ?? null);
+
+  readonly nextHash = computed(() => {
+    const first = this.nextTransaction();
+    if (!first) {
+      return '';
+    }
+    return (first.hash ?? first.id ?? '').trim();
   });
 
   readonly headline = computed(() => {
@@ -79,6 +92,10 @@ export class DockPendingStateService {
 
   readonly updatedAgeLabel = computed(() =>
     formatDockRelativeTime(this.lastUpdatedAt())
+  );
+
+  readonly canMine = computed(
+    () => this.count() > 0 && !this.loading() && !this.mining()
   );
 
   async load(force = false): Promise<void> {
@@ -124,6 +141,37 @@ export class DockPendingStateService {
 
   refresh(force = false): void {
     void this.load(force);
+  }
+
+  /** Mine toutes les txs pending (même logique que le dock mempool). */
+  async mineAll(): Promise<boolean> {
+    if (!this.canMine()) {
+      return false;
+    }
+
+    if (!this.auth.promptLogin()) {
+      return false;
+    }
+
+    this.mining.set(true);
+    let ok = true;
+
+    for (const tx of this.transactions()) {
+      if (!tx.id) {
+        continue;
+      }
+
+      try {
+        await firstValueFrom(this.api.minePendingTransaction({ id: tx.id }));
+      } catch {
+        ok = false;
+        break;
+      }
+    }
+
+    this.mining.set(false);
+    await this.load(true);
+    return ok;
   }
 
   private isRateLimited(): boolean {

@@ -4,22 +4,20 @@ import {
   HostBinding,
   OnDestroy,
   OnInit,
+  computed,
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
-import {
-  DockPeersPhase,
-  DockPeersStateService,
-} from '../../core/services/dock-peers-state.service';
+import { DockPeersStateService } from '../../core/services/dock-peers-state.service';
 
 @Component({
   selector: 'app-dock-peers-summary',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './dock-peers-summary.html',
-  styleUrls: ['./dock-summary-shared.css'],
+  styleUrls: ['./dock-peers-summary.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DockPeersSummaryComponent implements OnInit, OnDestroy {
@@ -37,18 +35,35 @@ export class DockPeersSummaryComponent implements OnInit, OnDestroy {
   @HostBinding('class.is-collapsed')
   readonly collapsedClass = true;
 
-  readonly phase = this.state.phase;
-  readonly statusLabel = this.state.statusLabel;
-  readonly headline = this.state.headline;
-  readonly progressLabel = this.state.progressLabel;
-  readonly updatedAgeLabel = this.state.updatedAgeLabel;
-  readonly loading = this.state.loading;
-  readonly connectedCount = this.state.connectedCount;
+  readonly peerCount = this.state.peerCount;
+  readonly latencyLabel = this.state.latencyLabel;
+  readonly loadLabel = this.state.loadLabel;
+  readonly primaryPeerName = this.state.primaryPeerName;
+  readonly primaryPeerConnectedPeople = this.state.primaryPeerConnectedPeople;
+
+  readonly emptyPeerLabel = computed(() =>
+    this.state.error() ? 'Peers indisponibles' : this.state.loading() ? 'Sync…' : 'Aucun peer'
+  );
+
+  readonly peerTitle = computed(() => {
+    const name = this.primaryPeerName();
+    if (!name) {
+      return this.emptyPeerLabel();
+    }
+    return `${name} · ${this.primaryPeerConnectedPeople()} connecté(s)`;
+  });
+
+  readonly barAriaLabel = computed(() =>
+    [
+      `Peers ${this.peerCount()}`,
+      `Latence ${this.latencyLabel()}`,
+      `Charge ${this.loadLabel()}`,
+      this.peerTitle(),
+    ].join(' · ')
+  );
 
   ngOnInit(): void {
-    if (this.state.peerCount() === 0 && !this.state.loading()) {
-      void this.state.load();
-    }
+    void this.state.load();
     window.addEventListener('dartchain-refresh-dock', this.onGlobalRefresh);
   }
 
@@ -59,27 +74,4 @@ export class DockPeersSummaryComponent implements OnInit, OnDestroy {
   private onGlobalRefresh = (): void => {
     this.state.refresh();
   };
-
-  statusClass(phase: DockPeersPhase): string {
-    const map: Record<DockPeersPhase, string> = {
-      error: 'error',
-      loading: 'loading',
-      empty: 'empty',
-      connected: 'connected',
-      partial: 'partial',
-    };
-    return `dock-summary-status--${map[phase]}`;
-  }
-
-  onRefresh(event: Event): void {
-    event.stopPropagation();
-    this.state.refresh();
-  }
-
-  onOpen(event: Event): void {
-    event.stopPropagation();
-    window.dispatchEvent(
-      new CustomEvent('dock-open-panel', { detail: { panel: 'peers' } })
-    );
-  }
 }

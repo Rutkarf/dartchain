@@ -15,7 +15,6 @@ import { DockWalletStateService } from '../../core/services/dock-wallet-state.se
 import { ShowcaseHubUiService } from '../../core/services/showcase-hub-ui.service';
 import { ShowcaseR4v3StateService } from '../../core/services/showcase-r4v3-state.service';
 import { openR4v3Whitepaper } from '../../core/utils/r4v3-whitepaper.util';
-import { R4v3SystemStatus } from '../../core/models/r4v3-hub.model';
 import { R4V3_HUB_PILLARS } from '../../core/constants/r4v3-hub-pillars.constants';
 
 @Component({
@@ -28,7 +27,7 @@ import { R4V3_HUB_PILLARS } from '../../core/constants/r4v3-hub-pillars.constant
 })
 export class ShowcaseR4v3SummaryComponent implements OnInit, OnDestroy {
   private static readonly PILLAR_ROTATION_MS = 5000;
-  private static readonly PILLAR_TRANSITION_MS = 420;
+  private static readonly PILLAR_TRANSITION_MS = 320;
 
   protected readonly state = inject(ShowcaseR4v3StateService);
   private readonly walletState = inject(DockWalletStateService);
@@ -54,7 +53,6 @@ export class ShowcaseR4v3SummaryComponent implements OnInit, OnDestroy {
   readonly panel = this.state.panel;
   readonly refreshing = this.state.refreshing;
   readonly refreshPulse = this.state.refreshPulse;
-  readonly systemStatus = this.state.systemStatus;
   readonly pegDisplayLabel = this.state.pegDisplayLabel;
   readonly activePillarIndex = signal(0);
   readonly previousPillarLabel = signal('');
@@ -93,23 +91,8 @@ export class ShowcaseR4v3SummaryComponent implements OnInit, OnDestroy {
   }
 
   barAriaLabel(): string {
-    const status = this.systemStatusLabel(this.systemStatus());
-    return `1 R4V3 = 1 CHF. ${status}. Cliquer pour développer.`;
-  }
-
-  systemStatusLabel(status: R4v3SystemStatus): string {
-    switch (status) {
-      case 'ok':
-        return 'Opérationnel';
-      case 'degraded':
-        return 'Dégradé';
-      case 'incident':
-        return 'Incident';
-    }
-  }
-
-  systemStatusClass(status: R4v3SystemStatus): string {
-    return `r4v3-summary-bar__led--${status}`;
+    const pillar = `${this.pillarLabel()}${this.pillarDetail() ? ` · ${this.pillarDetail()}` : ''}`;
+    return `1 R4V3 = 1 CHF. ${pillar}. Cliquer pour développer.`;
   }
 
   pillarLabel(): string {
@@ -125,11 +108,14 @@ export class ShowcaseR4v3SummaryComponent implements OnInit, OnDestroy {
     if (target?.closest('.r4v3-summary-bar__wp-btn, .r4v3-summary-bar__whitepaper')) {
       return;
     }
+    event.preventDefault();
+    event.stopPropagation();
     this.hubUi.requestExpand();
   }
 
   onBarKeydown(event: Event): void {
     event.preventDefault();
+    event.stopPropagation();
     this.hubUi.requestExpand();
   }
 

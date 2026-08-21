@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OverpassProxyServiceTest {
 
@@ -27,5 +29,18 @@ class OverpassProxyServiceTest {
                 ResponseStatusException.class,
                 () -> service.validateBuildingQuery("[out:json];node(1);out;")
         );
+    }
+
+    @Test
+    void prefersFrMirrorThenPrivateCoffee() {
+        assertTrue(OverpassProxyService.ENDPOINTS.get(0).url().contains("openstreetmap.fr"));
+        assertTrue(OverpassProxyService.ENDPOINTS.get(1).url().contains("private.coffee"));
+    }
+
+    @Test
+    void looksLikeOverpassJson_requiresElements() {
+        assertTrue(OverpassProxyService.looksLikeOverpassJson("{\"elements\":[]}"));
+        assertFalse(OverpassProxyService.looksLikeOverpassJson("This service is only available"));
+        assertFalse(OverpassProxyService.looksLikeOverpassJson("<html>502</html>"));
     }
 }

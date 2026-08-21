@@ -141,6 +141,40 @@ function buildArcadeBuilding(
   };
 }
 
+/** Fine bande lumineuse en corniche — signal cyberpunk sans surcharge. */
+function addNeonTrim(
+  group: THREE.Group,
+  center: { x: number; y: number; z: number },
+  width: number,
+  depth: number,
+  height: number,
+  registerGeometry: (g: THREE.BufferGeometry) => void,
+  registerMaterial: (m: THREE.Material) => void
+): void {
+  const neonMat = new THREE.MeshBasicMaterial({
+    color: 0x40e0ff,
+    transparent: true,
+    opacity: 0.85,
+  });
+  registerMaterial(neonMat);
+
+  const stripH = 0.12;
+  const y = height - 1.05;
+  const frontGeo = new THREE.BoxGeometry(width * 0.94, stripH, 0.08);
+  registerGeometry(frontGeo);
+  const front = new THREE.Mesh(frontGeo, neonMat);
+  front.position.set(center.x, y, center.z + depth / 2 + 0.04);
+  group.add(front);
+
+  const sideGeo = new THREE.BoxGeometry(0.08, stripH, depth * 0.9);
+  registerGeometry(sideGeo);
+  for (const side of [-1, 1] as const) {
+    const strip = new THREE.Mesh(sideGeo, neonMat);
+    strip.position.set(center.x + side * (width / 2 + 0.02), y, center.z);
+    group.add(strip);
+  }
+}
+
 function buildShopRowBuilding(
   geo: GeoCoordinateService,
   registerGeometry: (g: THREE.BufferGeometry) => void,
@@ -157,13 +191,12 @@ function buildShopRowBuilding(
     roughness: 0.78,
     metalness: 0.05,
   });
-  const shopColors = [0xff6b6b, 0x4ecdc4, 0xffe66d, 0xa29bfe, 0xff9ff3];
+  const shopColors = [0xb8a888, 0xc4b49a, 0xa89878, 0xd0c0a4, 0xbcac8c];
   registerMaterial(bodyMaterial);
 
   const w = spec.widthMeters;
   const d = spec.depthMeters;
   const h = spec.heightMeters;
-  const groundH = 4.5;
 
   const bodyGeo = new THREE.BoxGeometry(w, h, d);
   registerGeometry(bodyGeo);
@@ -179,10 +212,8 @@ function buildShopRowBuilding(
 
     const winMat = new THREE.MeshStandardMaterial({
       color: shopColors[i % shopColors.length],
-      emissive: shopColors[i % shopColors.length],
-      emissiveIntensity: 0.58,
-      roughness: 0.28,
-      metalness: 0.22,
+      roughness: 0.55,
+      metalness: 0.12,
     });
     registerMaterial(winMat);
     const winGeo = new THREE.PlaneGeometry(bayW * 0.72, 2.8);
@@ -192,10 +223,9 @@ function buildShopRowBuilding(
     group.add(win);
 
     const awningMat = new THREE.MeshStandardMaterial({
-      color: 0x0a1628,
-      emissive: 0x40e0ff,
-      emissiveIntensity: 0.62,
-      roughness: 0.35,
+      color: 0x4a4038,
+      roughness: 0.7,
+      metalness: 0.08,
       side: THREE.DoubleSide,
     });
     registerMaterial(awningMat);
@@ -207,8 +237,6 @@ function buildShopRowBuilding(
     group.add(awning);
   }
 
-  addNeonTrim(group, center, w, d, h, registerGeometry, registerMaterial);
-
   return {
     group,
     collider: {
@@ -218,44 +246,4 @@ function buildShopRowBuilding(
       maxZ: center.z + d / 2,
     },
   };
-}
-
-function addNeonTrim(
-  group: THREE.Group,
-  center: THREE.Vector3,
-  w: number,
-  d: number,
-  h: number,
-  registerGeometry: (g: THREE.BufferGeometry) => void,
-  registerMaterial: (m: THREE.Material) => void
-): void {
-  const neonColors = [0x40e0ff, 0xff3ecf, 0x7a5cff];
-  for (let i = 0; i < 3; i++) {
-    const mat = new THREE.MeshBasicMaterial({
-      color: neonColors[i],
-      transparent: true,
-      opacity: 0.78,
-      toneMapped: false,
-    });
-    registerMaterial(mat);
-    const stripGeo = new THREE.BoxGeometry(w * 0.94, 0.12, 0.08);
-    registerGeometry(stripGeo);
-    const strip = new THREE.Mesh(stripGeo, mat);
-    strip.position.set(center.x, h * (0.42 + i * 0.18), center.z + d / 2 + 0.06);
-    group.add(strip);
-  }
-
-  const crownMat = new THREE.MeshStandardMaterial({
-    color: 0x6ff7ff,
-    emissive: 0x40e0ff,
-    emissiveIntensity: 0.85,
-    metalness: 0.4,
-    roughness: 0.2,
-  });
-  registerMaterial(crownMat);
-  const crownGeo = new THREE.BoxGeometry(w * 0.22, 0.55, 0.22);
-  registerGeometry(crownGeo);
-  const crown = new THREE.Mesh(crownGeo, crownMat);
-  crown.position.set(center.x, h + 0.35, center.z + d / 2 - 0.4);
-  group.add(crown);
 }

@@ -1,11 +1,6 @@
 <section class="market-panel ds-surface ds-surface--showcase-body" aria-label="Marché" tabindex="0">
   <header class="market-panel__toolbar">
     <div class="market-panel__meta-bar">
-      <span class="market-panel__live" title="Flux marché">
-        <span class="market-panel__live-led" aria-hidden="true"></span>
-        <span class="market-panel__live-text">LIVE</span>
-      </span>
-
       <label class="market-panel__search">
         <span class="sr-only">Rechercher un token</span>
         <span class="market-panel__search-icon" aria-hidden="true">
@@ -36,8 +31,6 @@
           aria-label="Rechercher un token"
         />
       </label>
-
-      <span class="market-panel__count" [attr.title]="resultCountLabel()">{{ filteredRows().length }}</span>
     </div>
 
     @if (statusBanner(); as banner) {

@@ -115,9 +115,9 @@ describe('ExchangePanelComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('shows create wallet label when no wallet', () => {
+  it('shows login label when no session even without wallet', () => {
     flushPanel();
-    expect((component as any).swapButtonLabel()).toBe('Créer un wallet');
+    expect((component as any).swapButtonLabel()).toBe('Se connecter');
   });
 
   it('computes estimated To amount from rate', () => {
@@ -133,17 +133,18 @@ describe('ExchangePanelComponent', () => {
     expect((component as any).compactBalanceLabel()).toContain('248');
     expect((component as any).quoteLockLabel).toBe('30 s');
     expect((component as any).showBalanceInline()).toBe(true);
-    expect((component as any).compactMetaHint()).toBe('Wallet requis');
+    expect((component as any).compactMetaHint()).toBe('Connexion requise');
     expect((component as any).quoteLockTimestampLabel()).toMatch(
       /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/
     );
   });
 
-  it('opens wallet dock when clicking create wallet', () => {
+  it('opens login drawer when clicking without session', () => {
     flushPanel();
-    const spy = vi.spyOn(nav, 'dispatchNewsAction');
+    const auth = (component as any).auth;
+    const spy = vi.spyOn(auth, 'openDrawer');
     component['onSwapClick']();
-    expect(spy).toHaveBeenCalledWith('OPEN_WALLET');
+    expect(spy).toHaveBeenCalledWith('login');
   });
 
   it('syncs launch token when rate panel requests exchange symbol', () => {

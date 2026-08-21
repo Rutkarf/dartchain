@@ -97,8 +97,13 @@
               class="wallet-display__create-cta"
               [class.wallet-display__create-cta--loading]="creatingWallet()"
               (click)="createWallet()"
-              [disabled]="creatingWallet()"
+              [disabled]="!canCreateWallet() || creatingWallet()"
               [attr.aria-label]="locale.t('wallet.create')"
+              [attr.title]="
+                canCreateWallet()
+                  ? locale.t('wallet.create')
+                  : 'Connectez-vous pour créer un wallet'
+              "
             >
               @if (creatingWallet()) {
                 <span class="wallet-display__create-cta-spinner" aria-hidden="true"></span>
@@ -346,14 +351,15 @@
       <button
         type="button"
         class="wallet-display__action-btn"
-        (click)="sendAction()"
-        [disabled]="!hasWallet() || sending()"
-        [class.is-active]="showSendPanel()"
+        (click)="receiveAction()"
+        [disabled]="!hasWallet()"
+        [class.is-active]="showReceivePanel()"
       >
         <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M2 8h10M8 3l4 5-4 5" />
+          <path d="M4 4.5 11.5 12" />
+          <path d="M7.5 12H12v-4.5" />
         </svg>
-        {{ locale.t('wallet.send') }}
+        {{ locale.t('wallet.receive') }}
       </button>
       <button
         type="button"
@@ -369,14 +375,15 @@
       <button
         type="button"
         class="wallet-display__action-btn"
-        (click)="receiveAction()"
-        [disabled]="!hasWallet()"
-        [class.is-active]="showReceivePanel()"
+        (click)="sendAction()"
+        [disabled]="!hasWallet() || sending()"
+        [class.is-active]="showSendPanel()"
       >
         <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M2 8h10M8 13l4-5-4-5" />
+          <path d="M4 11.5 11.5 4" />
+          <path d="M7.5 4H12v4.5" />
         </svg>
-        {{ locale.t('wallet.receive') }}
+        {{ locale.t('wallet.send') }}
       </button>
     </div>
   </footer>

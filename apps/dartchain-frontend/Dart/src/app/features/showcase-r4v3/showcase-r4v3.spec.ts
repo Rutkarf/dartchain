@@ -154,7 +154,7 @@ describe('ShowcaseR4v3Component', () => {
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__wp-btn-hint')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-meta__refresh')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__live-quote')).toBeFalsy();
-    expect(fixture.nativeElement.querySelector('.showcase-r4v3__status-led--banner')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.showcase-r4v3__status-led--banner')).toBeFalsy();
   });
 
   it('should open hub drawer from pillar click', async () => {

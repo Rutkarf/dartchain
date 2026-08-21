@@ -28,7 +28,7 @@
         [class.is-collapsed]="showcaseCollapsed"
         [class.is-summary-expandable]="showcaseCollapsed"
         [attr.data-active-tab]="activeTab"
-        (click)="onBandClick()"
+        (click)="onBandClick($event)"
       >
         <app-showcase-panel
           [activeTab]="activeTab"

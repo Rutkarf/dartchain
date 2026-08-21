@@ -344,6 +344,44 @@ public class BlockchainService {
         return creditTx;
     }
 
+    /**
+     * Crédit SYSTEM placé dans le mempool (PENDING) — aucun bloc tant qu'on ne mine pas.
+     */
+    public synchronized Transaction enqueueSystemCredit(
+            String recipientAddress,
+            BigDecimal amount,
+            String payload
+    ) {
+        if (recipientAddress == null || recipientAddress.isBlank()) {
+            throw new RuntimeException("Adresse destinataire obligatoire");
+        }
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Le montant doit être supérieur à 0");
+        }
+
+        Transaction creditTx = new Transaction();
+        creditTx.setId(UUID.randomUUID().toString());
+        creditTx.setSender("SYSTEM");
+        creditTx.setRecipient(recipientAddress);
+        creditTx.setAmount(amount);
+        creditTx.setTimestamp(System.currentTimeMillis());
+        creditTx.setSignature("SYSTEM");
+        creditTx.setSystemReward(true);
+        creditTx.setStatus("PENDING");
+        creditTx.setPayload(payload != null ? payload : "SYSTEM_CREDIT");
+        creditTx.setHash(HashUtils.sha256(
+                creditTx.getId()
+                        + "|" + creditTx.getSender()
+                        + "|" + creditTx.getRecipient()
+                        + "|" + creditTx.getAmount().toPlainString()
+                        + "|" + creditTx.getTimestamp()
+                        + "|" + creditTx.getPayload()
+        ));
+
+        return addTransaction(creditTx, null);
+    }
+
     public synchronized boolean addBlockFromPeer(Block block) {
         if (block == null) {
             return false;

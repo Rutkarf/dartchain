@@ -107,9 +107,9 @@ describe('ShowcaseLaunchComponent (Phase V)', () => {
     expect(root.querySelector('.showcase-launch__cta')).toBeTruthy();
   });
 
-  it('should open project drawer when ticker is clicked', () => {
-    const ticker = fixture.nativeElement.querySelector('.showcase-launch__ticker') as HTMLButtonElement;
-    ticker.click();
+  it('should open project drawer when row is clicked', () => {
+    const row = fixture.nativeElement.querySelector('.showcase-launch__item-row') as HTMLElement;
+    row.click();
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.launch-project-drawer')).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain('PXD');

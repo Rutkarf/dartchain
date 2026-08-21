@@ -7,6 +7,7 @@ import {
   WORLD_SCALE,
   type MarseilleDistrictId,
 } from './map-configuration';
+import { VIEUX_PORT_CORE_BUILDING_RADIUS } from './geo-reference.config';
 import {
   chunkBounds,
   chunkIdFromGrid,
@@ -183,7 +184,7 @@ export class WorldStreamingManager {
     const centerX = (bounds.minX + bounds.maxX) * 0.5;
     const centerZ = (bounds.minZ + bounds.maxZ) * 0.5;
 
-    const inCore = Math.hypot(centerX, centerZ) < 180;
+    const inCore = Math.hypot(centerX, centerZ) < VIEUX_PORT_CORE_BUILDING_RADIUS;
     const district = this.nearestDistrict(centerX, centerZ);
     let buildingCount = 0;
 

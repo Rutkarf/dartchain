@@ -4,18 +4,18 @@ type Rect = { minX: number; maxX: number; minZ: number; maxZ: number };
 
 /** Esplanade Ombrière + quai des Belges (marche autorisée, pas d'eau). */
 export const VIEUX_PORT_ESPLANADE: Rect = {
-  minX: -26,
-  maxX: 26,
-  minZ: -14,
-  maxZ: 10,
+  minX: -32,
+  maxX: 32,
+  minZ: -18,
+  maxZ: 8,
 };
 
-/** La Canebière — débouché nord du Vieux-Port. */
+/** La Canebière — débouché nord du Vieux-Port (ne chevauche pas le bras d'eau sud). */
 export const VIEUX_PORT_CANEBIERE: Rect = {
-  minX: -34,
-  maxX: 34,
-  minZ: -230,
-  maxZ: 12,
+  minX: -28,
+  maxX: 28,
+  minZ: -280,
+  maxZ: 6,
 };
 
 /** Quai du Port (rive nord du bassin). */
@@ -60,7 +60,9 @@ const SOUTH_CHANNEL: Rect = {
 export const VIEUX_PORT_STREET_CORRIDORS: readonly Rect[] = [
   VIEUX_PORT_CANEBIERE,
   VIEUX_PORT_ESPLANADE,
-  { minX: -62, maxX: 62, minZ: -2, maxZ: 18 },
+  { minX: -70, maxX: 70, minZ: -8, maxZ: 10 },
+  /** Anneau libre autour du miroir / spawn. */
+  { minX: -14, maxX: 14, minZ: -14, maxZ: 14 },
 ];
 
 function isInStreetCorridor(x: number, z: number, margin = 0): boolean {

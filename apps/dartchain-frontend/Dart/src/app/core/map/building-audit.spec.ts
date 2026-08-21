@@ -35,10 +35,10 @@ describe('building-audit', () => {
     }
   });
 
-  it('exclut les prototypes du cœur Vieux-Port (< 180 m)', () => {
+  it('exclut les prototypes du cœur OSM (< rayon cœur)', () => {
     const nearMirror = { x: 72, z: 2 };
-    const farCanebiere = { x: -88, z: -180 };
+    const farOutside = { x: 1400, z: 0 };
     expect(Math.hypot(nearMirror.x, nearMirror.z)).toBeLessThan(VIEUX_PORT_CORE_BUILDING_RADIUS);
-    expect(Math.hypot(farCanebiere.x, farCanebiere.z)).toBeGreaterThan(VIEUX_PORT_CORE_BUILDING_RADIUS);
+    expect(Math.hypot(farOutside.x, farOutside.z)).toBeGreaterThan(VIEUX_PORT_CORE_BUILDING_RADIUS);
   });
 });

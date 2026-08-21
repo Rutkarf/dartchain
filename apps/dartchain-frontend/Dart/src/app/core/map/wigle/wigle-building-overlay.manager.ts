@@ -84,25 +84,8 @@ export class WIGLEBuildingOverlayManager {
       );
       this.ringMesh.setColorAt(i, this.scratchColor);
 
-      const columnHeight =
-        this.quality === 'low'
-          ? 0.001
-          : Math.min(
-              WIGLE_VISUAL_CONFIG.maxIndicatorHeight,
-              1.5 + entry.aggregate.observationCount * 0.9
-            );
-      const pulse =
-        this.quality === 'high' ? 1 + Math.sin(elapsedSeconds * 1.4 + i) * 0.04 : 1;
-      this.composeInstance(
-        this.columnMesh,
-        i,
-        door.x,
-        door.y + columnHeight * 0.5 * pulse,
-        door.z,
-        0.12 * scale,
-        columnHeight * pulse * scale,
-        0.12 * scale
-      );
+      // Colonnes verticales désactivées — zones de connexion au sol uniquement.
+      this.composeInstance(this.columnMesh, i, door.x, door.y, door.z, 0.001, 0.001, 0.001);
       this.columnMesh.setColorAt(i, this.scratchColor);
 
       if (visible) visibleCount++;

@@ -18,7 +18,10 @@ export class DockWalletStateService {
   readonly balance = signal<string | null>(null);
   readonly lastUpdatedAt = signal<number | null>(null);
 
-  readonly hasWallet = computed(() => this.walletSession.wallet() !== null);
+  readonly hasWallet = computed(() => {
+    const wallet = this.walletSession.wallet();
+    return Boolean(wallet?.address?.trim() && wallet?.privateKey?.trim());
+  });
   readonly address = computed(() => this.walletSession.address() ?? '');
 
   readonly phase = computed((): DockWalletPhase => {

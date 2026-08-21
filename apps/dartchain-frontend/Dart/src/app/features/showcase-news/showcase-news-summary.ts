@@ -31,7 +31,7 @@ import {
 })
 export class ShowcaseNewsSummaryComponent implements OnInit, OnDestroy {
   private static readonly ROTATION_MS = 5000;
-  private static readonly TRANSITION_MS = 520;
+  private static readonly TRANSITION_MS = 320;
 
   protected readonly newsState = inject(ShowcaseNewsStateService);
   private readonly hubUi = inject(ShowcaseHubUiService);
@@ -54,7 +54,6 @@ export class ShowcaseNewsSummaryComponent implements OnInit, OnDestroy {
 
   readonly unreadCount = this.newsState.unreadCount;
   readonly loading = this.newsState.loading;
-  readonly hasUnread = this.newsState.hasUnread;
   readonly activeHeadlineIndex = signal(0);
   readonly previousHeadlineTitle = signal('');
   readonly previousHeadlineAge = signal('');
@@ -86,10 +85,6 @@ export class ShowcaseNewsSummaryComponent implements OnInit, OnDestroy {
     return item ? this.formatRelativeTime(item.relativeTime) : this.newsState.collapsedHeadlineAge();
   });
 
-  readonly isUnreadToastLive = computed(
-    () => this.newsState.newItemsToast() || this.newsState.refreshPulse()
-  );
-
   ngOnInit(): void {
     this.newsState.ensureFeedLoaded();
     this.startRotation();
@@ -118,11 +113,14 @@ export class ShowcaseNewsSummaryComponent implements OnInit, OnDestroy {
     if (target?.closest('.news-summary-bar__action-btn')) {
       return;
     }
+    event.preventDefault();
+    event.stopPropagation();
     this.hubUi.requestExpand();
   }
 
   onBarKeydown(event: Event): void {
     event.preventDefault();
+    event.stopPropagation();
     this.hubUi.requestExpand();
   }
 
@@ -208,22 +206,6 @@ export class ShowcaseNewsSummaryComponent implements OnInit, OnDestroy {
     return stripped.replace(/(\d)\s+(\w)/g, '$1$2');
   }
 
-  unreadBadgeLabel(): string {
-    const count = this.unreadCount();
-    return count > 99 ? '99+' : String(count);
-  }
-
-  unreadToastAriaLabel(): string {
-    const count = this.unreadCount();
-    return `${count} actualité${count > 1 ? 's' : ''} non lue${count > 1 ? 's' : ''}. Cliquer pour ouvrir le showcase.`;
-  }
-
-  onUnreadToastClick(event: Event): void {
-    event.stopPropagation();
-    this.newsState.dismissNewItemsToast();
-    this.hubUi.requestExpand();
-  }
-
   categoryBadge(): string {
     const item = this.activeItem();
     if (!item) {
@@ -234,7 +216,13 @@ export class ShowcaseNewsSummaryComponent implements OnInit, OnDestroy {
 
   categorySlug(): string {
     const item = this.activeItem();
-    return normalizeNewsCategorySlug(item?.category ?? 'info');
+    if (!item) {
+      return 'info';
+    }
+    if (item.source === 'EDITORIAL') {
+      return 'info';
+    }
+    return normalizeNewsCategorySlug(item.category);
   }
 
   canNavigatePrev(): boolean {

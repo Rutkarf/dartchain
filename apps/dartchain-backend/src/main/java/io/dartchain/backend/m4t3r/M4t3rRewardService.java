@@ -1,6 +1,7 @@
 package io.dartchain.backend.m4t3r;
 
 import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.faucet.store.FaucetPendingBalanceStore;
 import io.dartchain.backend.m4t3r.config.M4t3rRewardConfig;
 import io.dartchain.backend.m4t3r.dto.M4t3rRewardDto;
 import io.dartchain.backend.m4t3r.dto.M4t3rTrailPickupRequest;
@@ -9,7 +10,6 @@ import io.dartchain.backend.m4t3r.model.MovementValidation;
 import io.dartchain.backend.m4t3r.settlement.RewardSettlementService;
 import io.dartchain.backend.m4t3r.settlement.SettlementResult;
 import io.dartchain.backend.m4t3r.store.M4t3rRewardStore;
-import io.dartchain.backend.service.BlockchainService;
 import io.dartchain.backend.utils.WalletValidator;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class M4t3rRewardService {
     private final M4t3rProofService proofService;
     private final M4t3rRewardConfig config;
     private final RewardSettlementService settlementService;
-    private final BlockchainService blockchainService;
+    private final FaucetPendingBalanceStore pendingBalanceStore;
     private final M4t3rRewardValidationService validationService;
 
     public M4t3rRewardService(
@@ -35,14 +35,14 @@ public class M4t3rRewardService {
             M4t3rProofService proofService,
             M4t3rRewardConfig config,
             RewardSettlementService settlementService,
-            BlockchainService blockchainService,
+            FaucetPendingBalanceStore pendingBalanceStore,
             M4t3rRewardValidationService validationService
     ) {
         this.rewardStore = rewardStore;
         this.proofService = proofService;
         this.config = config;
         this.settlementService = settlementService;
-        this.blockchainService = blockchainService;
+        this.pendingBalanceStore = pendingBalanceStore;
         this.validationService = validationService;
     }
 
@@ -142,7 +142,9 @@ public class M4t3rRewardService {
         if (account == null || account.getWalletAddress() == null || account.getWalletAddress().isBlank()) {
             return "0";
         }
-        return blockchainService.getBalance(WalletValidator.normalize(account.getWalletAddress())).toPlainString();
+        return pendingBalanceStore
+                .get(WalletValidator.normalize(account.getWalletAddress()))
+                .toPlainString();
     }
 
     private M4t3rReward buildReward(

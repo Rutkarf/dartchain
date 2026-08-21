@@ -22,9 +22,16 @@ import {
   type BuildingPlacementAudit,
 } from './geo-reference.config';
 import {
-  createBuildingFromGeoData,
+  createBoxBuildingFromGeoData,
   footprintCentroid,
 } from './geo-building.util';
+import {
+  ACCURATE_CITY_BUILDING_MIN_COUNT,
+  ACCURATE_CITY_BUILDINGS,
+  generateCanebiereSegment,
+  worldToCanebiereAlong,
+} from './accurate-city-buildings.data';
+import type { GeoBuilding } from './geo-reference.config';
 import { MarseilleGeoDebugService } from './marseille-geo-debug.service';
 import { buildVieuxPortSpawnFacades, VIEUX_PORT_SPAWN_FACADES } from './vieux-port-spawn-facades.util';
 import { buildVieuxPortMirrorCanopy, MIRROR_CANOPY } from './vieux-port-mirror-canopy.util';
@@ -43,6 +50,7 @@ import {
   isHarborLandAt,
   isHarborWaterAt,
   isHarborWaterBlockedAt,
+  VIEUX_PORT_ESPLANADE,
 } from './vieux-port-layout.util';
 import {
   createHarborFoamMaterial,
@@ -62,8 +70,10 @@ import { M4t3rCollectTrailVisualService } from './m4t3r-collect-trail-visual.ser
 import { WigleBuildingRegistryService } from './wigle/wigle-building-registry.service';
 import { WigleVisualizationService } from './wigle/wigle-visualization.service';
 
-const LAND_TERRAIN_WIDTH = 260;
-const HARBOR_QUAY_Z = MARSEILLE_HARBOR_WATER.quayZ;
+/** Hauteur esplanade / place Ombrière (dalle visuelle ~0.36). */
+const ESPLANADE_SURFACE_Y = 0.36;
+/** Zone libre autour du spawn — aucun collider bâtiment. */
+const SPAWN_COLLIDER_CLEARANCE_M = 12;
 const CYBERPUNK_ART_DIRECTION = {
   lights: {
     moonColor: 0xb7c8ff,
@@ -108,11 +118,15 @@ const CYBERPUNK_ART_DIRECTION = {
   },
 } as const;
 const OSM_QUERY_BOUNDS = {
-  south: 43.2937,
-  north: 43.2999,
-  west: 5.3642,
-  east: 5.3778,
+  // ~1.6 km autour de l'Ombrière — Vieux-Port / Panier / Joliette / Pharo proche
+  south: 43.2800,
+  north: 43.3095,
+  west: 5.3540,
+  east: 5.3940,
 } as const;
+
+/** Cap soft : assez haut pour charger tous les footprints OSM du bbox. */
+const OSM_BUILDING_MESH_CAP = 8000;
 
 interface PrototypeBuildingSpec {
   x: number;
@@ -171,6 +185,11 @@ export class MarseilleMapProvider implements MapProvider {
   private readonly ownedGeometries: THREE.BufferGeometry[] = [];
   private readonly ownedTextures: THREE.Texture[] = [];
   private osmRoot: THREE.Group | null = null;
+  private readonly placedBuildingIds = new Set<string>();
+  private accurateWallMaterials: THREE.MeshStandardMaterial[] = [];
+  private accurateRoofMaterial: THREE.MeshStandardMaterial | null = null;
+  private lastStreamAlongBucket = Number.NaN;
+  private lastOsmStreamAt = 0;
   private prototypeBuildingsLoaded = false;
   private prototypeColliderCount = 0;
   private canopyReflector: Reflector | null = null;
@@ -229,13 +248,17 @@ export class MarseilleMapProvider implements MapProvider {
       this.createValidationCamera();
       this.geoDebug.attach();
       this.debugOverlay.attach(this.root ?? undefined);
+      this.ensureCityMassing();
 
       if (this.config.configuration.enableDebug) {
         console.info(
           '[MarseilleMapProvider] Carte prototype chargee (terrain plat Vieux-Port).'
         );
       } else {
-        console.info('[MarseilleMapProvider] init() ok (prototype visible).');
+        console.info(
+          '[MarseilleMapProvider] init() ok — massing:',
+          this.getCityMassingCount()
+        );
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -265,6 +288,7 @@ export class MarseilleMapProvider implements MapProvider {
       this.waterTexture.offset.y += deltaSeconds * 0.009;
     }
     this.streaming.update(cameraPosition);
+    this.streamCityBuildingsAround(cameraPosition);
     this.tokenCells.update(cameraPosition, deltaSeconds);
     this.footprints.tickFade();
     this.collectTrailVisual.tickFade();
@@ -276,12 +300,22 @@ export class MarseilleMapProvider implements MapProvider {
     return this.resolveSurfaceHeight(worldPosition.x, worldPosition.z);
   }
 
-  /** Hauteur sol : terre (0), quai (~0.02), eau (surface en contrebas — non marchable). */
+  /** Hauteur sol : terre, esplanade Ombrière, quai, eau. */
   private resolveSurfaceHeight(x: number, z: number): number {
     const harbor = MARSEILLE_HARBOR_WATER;
     if (isHarborWaterAt(x, z)) return harbor.waterSurfaceY;
+    // Place du miroir — dalle visuelle ~0.36 m (évite pieds dans le sol).
+    if (
+      Math.hypot(x, z) < 16 ||
+      (x >= VIEUX_PORT_ESPLANADE.minX &&
+        x <= VIEUX_PORT_ESPLANADE.maxX &&
+        z >= VIEUX_PORT_ESPLANADE.minZ &&
+        z <= VIEUX_PORT_ESPLANADE.maxZ)
+    ) {
+      return ESPLANADE_SURFACE_Y;
+    }
     if (z >= harbor.quayZ - 1 || (x >= 14 && x <= 50 && z >= harbor.basinMinZ && z <= harbor.basinMaxZ)) {
-      return harbor.quaySurfaceY;
+      return harbor.quaySurfaceY + 0.12;
     }
     return harbor.walkSurfaceY;
   }
@@ -335,6 +369,10 @@ export class MarseilleMapProvider implements MapProvider {
     this.placementAudits.length = 0;
     this.root = null;
     this.osmRoot = null;
+    this.placedBuildingIds.clear();
+    this.accurateWallMaterials = [];
+    this.accurateRoofMaterial = null;
+    this.lastStreamAlongBucket = Number.NaN;
     this.prototypeBuildingsLoaded = false;
     this.prototypeColliderCount = 0;
     this.terrainMesh = null;
@@ -521,11 +559,245 @@ export class MarseilleMapProvider implements MapProvider {
 
     this.addHarborLandmarks();
     this.addSpawnDemarchageFacades();
+    // Catalogue GPS accurate synchrone — ne dépend pas d’Overpass.
+    this.addAccurateCityBuildings();
     void this.wigleVisualization.refreshBuildingMapping();
     this.addWaterStrip();
     this.addStreetCross();
     this.prototypeBuildingsLoaded = true;
     this.prototypeColliderCount = this.prototypeColliders.length;
+  }
+
+  /**
+   * Immeubles géoréférencés (Canebière 62° + quais) en BoxGeometry.
+   * Positions GPS alignées Ombrière / Google Earth / OSM.
+   */
+  private addAccurateCityBuildings(): void {
+    if (!this.root) return;
+    this.ensureAccurateMaterials();
+    if (!this.osmRoot) {
+      this.osmRoot = new THREE.Group();
+      this.osmRoot.name = 'marseille-osm-buildings';
+      this.root.add(this.osmRoot);
+    }
+
+    const added = this.placeGeoBuildings(ACCURATE_CITY_BUILDINGS);
+    this.geoDebug.setBuildingStats(added + MARSEILLE_LANDMARK_BUILDINGS.length, 0);
+    console.info(
+      '[MarseilleMapProvider] Batiments accurate GPS:',
+      added,
+      '/',
+      ACCURATE_CITY_BUILDINGS.length,
+      '(min',
+      ACCURATE_CITY_BUILDING_MIN_COUNT,
+      ')'
+    );
+  }
+
+  private ensureAccurateMaterials(): void {
+    if (this.accurateWallMaterials.length > 0 && this.accurateRoofMaterial) return;
+    this.accurateWallMaterials = [
+      new THREE.MeshStandardMaterial({
+        color: 0xd4c4a8,
+        roughness: 0.84,
+        metalness: 0.04,
+        fog: false,
+        emissive: new THREE.Color(0x2a2218),
+        emissiveIntensity: 0.1,
+      }),
+      new THREE.MeshStandardMaterial({
+        color: 0xc7b299,
+        roughness: 0.82,
+        metalness: 0.04,
+        fog: false,
+        emissive: new THREE.Color(0x2a2218),
+        emissiveIntensity: 0.1,
+      }),
+      new THREE.MeshStandardMaterial({
+        color: 0xe0d2bc,
+        roughness: 0.8,
+        metalness: 0.03,
+        fog: false,
+        emissive: new THREE.Color(0x2a2218),
+        emissiveIntensity: 0.09,
+      }),
+      new THREE.MeshStandardMaterial({
+        color: 0xbba890,
+        roughness: 0.86,
+        metalness: 0.05,
+        fog: false,
+        emissive: new THREE.Color(0x2a2218),
+        emissiveIntensity: 0.1,
+      }),
+    ];
+    this.accurateRoofMaterial = new THREE.MeshStandardMaterial({
+      color: 0x6a5e52,
+      roughness: 0.92,
+      metalness: 0.06,
+      fog: false,
+    });
+    this.buildingMaterials.push(...this.accurateWallMaterials, this.accurateRoofMaterial);
+  }
+
+  /** Place des empreintes GPS (skip doublons / eau bassin / spawn). */
+  private placeGeoBuildings(defs: readonly GeoBuilding[]): number {
+    if (!this.osmRoot || !this.accurateRoofMaterial) return 0;
+    let added = 0;
+    let skippedWater = 0;
+    let skippedDup = 0;
+
+    for (const def of defs) {
+      if (this.placedBuildingIds.has(def.id)) {
+        skippedDup++;
+        continue;
+      }
+      const mat =
+        this.accurateWallMaterials[this.placedBuildingIds.size % this.accurateWallMaterials.length];
+      const built = createBoxBuildingFromGeoData(def, this.geo, {
+        wall: mat,
+        roof: this.accurateRoofMaterial,
+      });
+      if (!built) continue;
+
+      // Skip uniquement le cœur bassin (pas les quais / Canebière).
+      if (isHarborWaterAt(built.center.x, built.center.z)) {
+        skippedWater++;
+        continue;
+      }
+      if (Math.hypot(built.center.x, built.center.z) < 18) continue;
+
+      this.osmRoot.add(built.group);
+      this.placedBuildingIds.add(def.id);
+      this.addPrototypeColliderIfClear(built.collider);
+      this.wigleRegistry.registerFromBox({
+        id: def.id,
+        label: def.label,
+        x: built.center.x,
+        z: built.center.z,
+        width: built.collider.maxX - built.collider.minX,
+        depth: built.collider.maxZ - built.collider.minZ,
+        height: def.heightMeters ?? 12,
+      });
+      added++;
+    }
+
+    if (skippedWater > 0 || skippedDup > 0) {
+      console.info(
+        '[MarseilleMapProvider] placeGeoBuildings +',
+        added,
+        'skipWater',
+        skippedWater,
+        'dup',
+        skippedDup
+      );
+    }
+    return added;
+  }
+
+  /**
+   * Streaming : quand le joueur dépasse la zone Canebière déjà générée,
+   * crée la suite des îlots (+ tentative Overpass autour).
+   */
+  private streamCityBuildingsAround(playerPosition: THREE.Vector3): void {
+    if (!this.root || !this.osmRoot) return;
+
+    const along = worldToCanebiereAlong(playerPosition.x, playerPosition.z);
+    const bucket = Math.floor(along / 80);
+    if (bucket === this.lastStreamAlongBucket) {
+      // Overpass périodique même sans changement de bucket.
+      this.maybeStreamOsmAround(playerPosition);
+      return;
+    }
+    this.lastStreamAlongBucket = bucket;
+
+    // Fenêtre glissante : 120 m derrière → 280 m devant le joueur le long de la Canebière.
+    const ahead = Math.max(along + 280, 400);
+    const behind = Math.max(along - 120, 20);
+    const segment = generateCanebiereSegment(behind, ahead, 16);
+    const added = this.placeGeoBuildings(segment);
+    if (added > 0) {
+      console.info(
+        '[MarseilleMapProvider] Stream Canebiere along~',
+        along.toFixed(0),
+        'm +',
+        added,
+        'batiments'
+      );
+    }
+    this.maybeStreamOsmAround(playerPosition);
+  }
+
+  private maybeStreamOsmAround(playerPosition: THREE.Vector3): void {
+    const now = performance.now();
+    if (now - this.lastOsmStreamAt < 8000) return;
+    this.lastOsmStreamAt = now;
+    void this.streamOsmFootprintsAround(playerPosition).catch((err) => {
+      console.warn('[MarseilleMapProvider] Stream OSM autour joueur echoue.', err);
+    });
+  }
+
+  private async streamOsmFootprintsAround(playerPosition: THREE.Vector3): Promise<void> {
+    if (!this.config.configuration.enableBuildings) return;
+    const geo = this.geo.worldToGeo(playerPosition);
+    const footprints = await this.osmBuildings.loadBuildingsAround(
+      geo.latitude,
+      geo.longitude,
+      350
+    );
+    if (!footprints.length) return;
+
+    this.ensureAccurateMaterials();
+    if (!this.osmRoot) return;
+
+    let added = 0;
+    for (const fp of footprints) {
+      if (LANDMARK_OSM_SOURCE_IDS.has(fp.id) || this.placedBuildingIds.has(fp.id)) continue;
+      const center = this.computeFootprintCenter(fp.points);
+      if (isHarborWaterAt(center.x, center.z)) continue;
+
+      const mesh = this.createOsmBoxBuildingMesh(
+        fp.points,
+        fp.height,
+        this.accurateWallMaterials[added % this.accurateWallMaterials.length]
+      );
+      if (!mesh) continue;
+      this.osmRoot.add(mesh);
+      const roof = this.createOsmBoxRoofMesh(
+        fp.points,
+        fp.height,
+        this.accurateRoofMaterial!
+      );
+      if (roof) this.osmRoot.add(roof);
+      this.addFootprintCollider(fp.points);
+      this.placedBuildingIds.add(fp.id);
+      added++;
+    }
+    if (added > 0) {
+      console.info('[MarseilleMapProvider] Stream OSM +', added, 'autour joueur');
+    }
+  }
+
+  /** Compteur massing (groupes bâtiment, pas toits). */
+  getCityMassingCount(): number {
+    return this.placedBuildingIds.size;
+  }
+
+  /** Rejoue le catalogue GPS si Overpass / init a laissé la scène vide. */
+  ensureCityMassing(): void {
+    if (!this.root) return;
+    if (this.getCityMassingCount() >= ACCURATE_CITY_BUILDING_MIN_COUNT) return;
+    console.warn(
+      '[MarseilleMapProvider] Massing insuffisant (',
+      this.getCityMassingCount(),
+      ') — rechargement catalogue accurate.'
+    );
+    if (this.osmRoot) {
+      this.root.remove(this.osmRoot);
+      this.osmRoot = null;
+    }
+    this.placedBuildingIds.clear();
+    this.lastStreamAlongBucket = Number.NaN;
+    this.addAccurateCityBuildings();
   }
 
   private addPrototypeBuilding(
@@ -571,41 +843,64 @@ export class MarseilleMapProvider implements MapProvider {
 
     try {
       const buildings = await this.osmBuildings.loadBuildings(OSM_QUERY_BOUNDS);
-      const filteredBuildings = buildings.filter(
-        (b) => !LANDMARK_OSM_SOURCE_IDS.has(b.id)
-      );
-      if (!filteredBuildings.length) {
-        console.warn('[MarseilleMapProvider] Aucun batiment OSM charge, fallback prototype conserve.');
+      const filteredBuildings = buildings
+        .filter((b) => !LANDMARK_OSM_SOURCE_IDS.has(b.id))
+        .map((building) => {
+          const center = this.computeFootprintCenter(building.points);
+          return { building, distSq: center.x * center.x + center.z * center.z, center };
+        })
+        .sort((a, b) => a.distSq - b.distSq);
+
+      if (filteredBuildings.length === 0) {
+        console.warn(
+          '[MarseilleMapProvider] Overpass vide — catalogue accurate conserve.'
+        );
+        await this.wigleVisualization.refreshBuildingMapping();
         return;
       }
 
-      this.osmRoot = new THREE.Group();
-      this.osmRoot.name = 'marseille-osm-buildings';
-      this.root.add(this.osmRoot);
+      if (!this.osmRoot) {
+        this.osmRoot = new THREE.Group();
+        this.osmRoot.name = 'marseille-osm-buildings';
+        this.root.add(this.osmRoot);
+      }
 
       const wallMaterials = [
         this.createRealisticOsmWallMaterial(11),
         this.createRealisticOsmWallMaterial(29),
         this.createRealisticOsmWallMaterial(47),
       ];
+      for (const mat of wallMaterials) {
+        mat.fog = false;
+        mat.side = THREE.DoubleSide;
+      }
       const roofMaterial = this.createRealisticOsmRoofMaterial();
+      roofMaterial.fog = false;
 
-      let loadedCount = 0;
-      const visuals: OSMVisualMesh[] = [];
-      for (const building of filteredBuildings.slice(0, 200)) {
+      // Additive only : ne jamais retirer le catalogue accurate.
+      // Près du spawn (< 220 m) → BoxGeometry uniquement (pas d’Extrude invisible).
+      const NEAR_SPAWN_BOX_M = 220;
+      let added = 0;
+      for (const entry of filteredBuildings.slice(0, OSM_BUILDING_MESH_CAP)) {
+        const { building, center } = entry;
+        if (this.placedBuildingIds.has(building.id)) continue;
+        const dist = Math.hypot(center.x, center.z);
         const materialIndex = this.stableIndexFromPoints(building.points, wallMaterials.length);
-        const mesh = this.createOsmBuildingMesh(
-          building.points,
-          building.height,
-          wallMaterials[materialIndex]
-        );
+        const wall = wallMaterials[materialIndex];
+
+        let mesh: THREE.Mesh | null;
+        let roof: THREE.Mesh | null;
+        if (dist < NEAR_SPAWN_BOX_M) {
+          mesh = this.createOsmBoxBuildingMesh(building.points, building.height, wall);
+          roof = this.createOsmBoxRoofMesh(building.points, building.height, roofMaterial);
+        } else {
+          mesh = this.createOsmBuildingMesh(building.points, building.height, wall);
+          roof = this.createOsmRoofMesh(building.points, building.height, roofMaterial);
+        }
         if (!mesh) continue;
         this.osmRoot.add(mesh);
-
-        const roof = this.createOsmRoofMesh(building.points, building.height, roofMaterial);
-        if (roof) {
-          this.osmRoot.add(roof);
-        }
+        if (roof) this.osmRoot.add(roof);
+        this.placedBuildingIds.add(building.id);
 
         this.addFootprintCollider(building.points);
         const worldFootprint = building.points.map((point) => {
@@ -617,30 +912,76 @@ export class MarseilleMapProvider implements MapProvider {
           worldPoints: worldFootprint,
           height: building.height,
         });
-        visuals.push({
-          building: mesh,
-          roof,
-          center: this.computeFootprintCenter(building.points),
-          height: building.height,
-        });
-        loadedCount++;
+        added++;
       }
 
-      this.addSynthwaveFacadeDesigns(visuals);
-      this.addSponsorStorefronts(visuals);
-      this.addGroundGlassFacades(visuals);
-      if (loadedCount > 0) {
-        this.removePrototypeBuildingMeshes();
-      }
+      this.removePrototypeBuildingMeshes();
       this.geoDebug.setBuildingStats(
-        loadedCount + MARSEILLE_LANDMARK_BUILDINGS.length,
+        this.placedBuildingIds.size + MARSEILLE_LANDMARK_BUILDINGS.length,
         0
       );
-      console.info('[MarseilleMapProvider] Batiments OSM charges:', loadedCount);
+      console.info(
+        '[MarseilleMapProvider] OSM additif (catalogue accurate conserve):',
+        added,
+        'meshes'
+      );
       await this.wigleVisualization.refreshBuildingMapping();
     } catch (error) {
-      console.warn('[MarseilleMapProvider] Echec chargement OSM, volumes prototype conserves.', error);
+      console.warn(
+        '[MarseilleMapProvider] Echec Overpass — catalogue accurate conserve.',
+        error
+      );
+      await this.wigleVisualization.refreshBuildingMapping();
     }
+  }
+
+  /** AABB toujours visible — utilisé pour le proche spawn. */
+  private createOsmBoxBuildingMesh(
+    points: Array<{ latitude: number; longitude: number }>,
+    height: number,
+    material: THREE.Material
+  ): THREE.Mesh | null {
+    const worldPoints = points.map((point) =>
+      this.geo.geoToWorld(point.latitude, point.longitude, 0)
+    );
+    if (worldPoints.length < 3) return null;
+    const xs = worldPoints.map((p) => p.x);
+    const zs = worldPoints.map((p) => p.z);
+    const width = Math.max(2.5, Math.max(...xs) - Math.min(...xs));
+    const depth = Math.max(2.5, Math.max(...zs) - Math.min(...zs));
+    const cx = (Math.min(...xs) + Math.max(...xs)) * 0.5;
+    const cz = (Math.min(...zs) + Math.max(...zs)) * 0.5;
+    const box = new THREE.BoxGeometry(width, height, depth);
+    this.ownedGeometries.push(box);
+    const mesh = new THREE.Mesh(box, material);
+    mesh.name = 'marseille-osm-building-box';
+    mesh.position.set(cx, height * 0.5, cz);
+    mesh.frustumCulled = true;
+    return mesh;
+  }
+
+  private createOsmBoxRoofMesh(
+    points: Array<{ latitude: number; longitude: number }>,
+    height: number,
+    material: THREE.Material
+  ): THREE.Mesh | null {
+    const worldPoints = points.map((point) =>
+      this.geo.geoToWorld(point.latitude, point.longitude, 0)
+    );
+    if (worldPoints.length < 3) return null;
+    const xs = worldPoints.map((p) => p.x);
+    const zs = worldPoints.map((p) => p.z);
+    const width = Math.max(2.5, Math.max(...xs) - Math.min(...xs));
+    const depth = Math.max(2.5, Math.max(...zs) - Math.min(...zs));
+    const cx = (Math.min(...xs) + Math.max(...xs)) * 0.5;
+    const cz = (Math.min(...zs) + Math.max(...zs)) * 0.5;
+    const box = new THREE.BoxGeometry(width * 1.02, 0.5, depth * 1.02);
+    this.ownedGeometries.push(box);
+    const roof = new THREE.Mesh(box, material);
+    roof.name = 'marseille-osm-roof-box';
+    roof.position.set(cx, height + 0.25, cz);
+    roof.frustumCulled = true;
+    return roof;
   }
 
   private createOsmBuildingMesh(
@@ -651,23 +992,47 @@ export class MarseilleMapProvider implements MapProvider {
     const worldPoints = points.map((point) =>
       this.geo.geoToWorld(point.latitude, point.longitude, 0)
     );
+    if (worldPoints.length < 3) return null;
+
+    const xs = worldPoints.map((p) => p.x);
+    const zs = worldPoints.map((p) => p.z);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minZ = Math.min(...zs);
+    const maxZ = Math.max(...zs);
+    const width = Math.max(2.5, maxX - minX);
+    const depth = Math.max(2.5, maxZ - minZ);
+    const cx = (minX + maxX) * 0.5;
+    const cz = (minZ + maxZ) * 0.5;
+
     const shapePoints = worldPoints
       .slice(0, -1)
       .map((point) => new THREE.Vector2(point.x, -point.z));
 
-    if (shapePoints.length < 3) return null;
+    if (shapePoints.length >= 3) {
+      try {
+        const geometry = new THREE.ExtrudeGeometry(new THREE.Shape(shapePoints), {
+          depth: height,
+          bevelEnabled: false,
+          steps: 1,
+        });
+        geometry.rotateX(-Math.PI / 2);
+        geometry.computeVertexNormals();
+        this.ownedGeometries.push(geometry);
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.name = 'marseille-osm-building';
+        mesh.frustumCulled = true;
+        return mesh;
+      } catch {
+        // fallback AABB ci-dessous
+      }
+    }
 
-    const geometry = new THREE.ExtrudeGeometry(new THREE.Shape(shapePoints), {
-      depth: height,
-      bevelEnabled: false,
-      steps: 1,
-    });
-    geometry.rotateX(-Math.PI / 2);
-    geometry.computeVertexNormals();
-    this.ownedGeometries.push(geometry);
-
-    const mesh = new THREE.Mesh(geometry, material);
+    const box = new THREE.BoxGeometry(width, height, depth);
+    this.ownedGeometries.push(box);
+    const mesh = new THREE.Mesh(box, material);
     mesh.name = 'marseille-osm-building';
+    mesh.position.set(cx, height * 0.5, cz);
     mesh.frustumCulled = true;
     return mesh;
   }
@@ -680,18 +1045,43 @@ export class MarseilleMapProvider implements MapProvider {
     const worldPoints = points.map((point) =>
       this.geo.geoToWorld(point.latitude, point.longitude, 0)
     );
+    if (worldPoints.length < 3) return null;
+
+    const xs = worldPoints.map((p) => p.x);
+    const zs = worldPoints.map((p) => p.z);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minZ = Math.min(...zs);
+    const maxZ = Math.max(...zs);
+    const width = Math.max(2.5, maxX - minX);
+    const depth = Math.max(2.5, maxZ - minZ);
+    const cx = (minX + maxX) * 0.5;
+    const cz = (minZ + maxZ) * 0.5;
+
     const shapePoints = worldPoints
       .slice(0, -1)
       .map((point) => new THREE.Vector2(point.x, -point.z));
 
-    if (shapePoints.length < 3) return null;
+    if (shapePoints.length >= 3) {
+      try {
+        const geometry = new THREE.ShapeGeometry(new THREE.Shape(shapePoints));
+        geometry.rotateX(-Math.PI / 2);
+        this.ownedGeometries.push(geometry);
+        const roof = new THREE.Mesh(geometry, material);
+        roof.name = 'marseille-osm-roof';
+        roof.position.y = height + 0.08;
+        roof.frustumCulled = true;
+        return roof;
+      } catch {
+        // fallback AABB
+      }
+    }
 
-    const geometry = new THREE.ShapeGeometry(new THREE.Shape(shapePoints));
-    geometry.rotateX(-Math.PI / 2);
-    this.ownedGeometries.push(geometry);
-    const roof = new THREE.Mesh(geometry, material);
+    const box = new THREE.BoxGeometry(width * 1.02, 0.5, depth * 1.02);
+    this.ownedGeometries.push(box);
+    const roof = new THREE.Mesh(box, material);
     roof.name = 'marseille-osm-roof';
-    roof.position.y = height + 0.08;
+    roof.position.set(cx, height + 0.25, cz);
     roof.frustumCulled = true;
     return roof;
   }
@@ -765,6 +1155,8 @@ export class MarseilleMapProvider implements MapProvider {
     addWaterPlane('marseille-water-deep-south', 196, channelDepth * 0.96, 0, channelCz, deepY, deepMaterial);
     addWaterPlane('marseille-water-basin', basinWidth, basinDepth, basinCx, (harbor.basinMinZ + harbor.basinMaxZ) * 0.5, waterY, waterMaterial, true);
     addWaterPlane('marseille-water-south-channel', 204, channelDepth, 0, channelCz, waterY, waterMaterial, true);
+    // Nappe d'eau immédiatement derrière le miroir (lisibilité spawn).
+    addWaterPlane('marseille-water-mirror-apron', 54, 28, 0, harbor.waterMinZ + 12, waterY + 0.02, waterMaterial, true);
 
     const foamSouth = new THREE.Mesh(new THREE.PlaneGeometry(58, 2.4), foamMaterial);
     foamSouth.name = 'marseille-water-foam-south';
@@ -877,7 +1269,99 @@ export class MarseilleMapProvider implements MapProvider {
     this.ownedTextures.push(...built.textures);
     this.root.add(built.group);
     this.addCanopyReflector(origin.x, origin.y - MIRROR_CANOPY.thickness * 0.85, origin.z);
-    this.addMirrorRoofSign(origin.x, origin.y + 0.38, origin.z);
+    this.addSpawnMarker(origin.x, origin.z);
+  }
+
+  /** Marqueur sol spawn — centre Ombrière, lisible comme point de départ. */
+  private addSpawnMarker(x: number, z: number): void {
+    if (!this.root) return;
+
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x9efbff,
+      transparent: true,
+      opacity: 0.72,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    this.buildingMaterials.push(ringMat);
+    const ringGeo = new THREE.RingGeometry(1.15, 1.45, 48);
+    this.ownedGeometries.push(ringGeo);
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.name = 'marseille-spawn-ring';
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.set(x, 0.42, z);
+    ring.renderOrder = 5;
+    this.root.add(ring);
+
+    const discMat = new THREE.MeshBasicMaterial({
+      color: 0x40e0ff,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+    });
+    this.buildingMaterials.push(discMat);
+    const discGeo = new THREE.CircleGeometry(1.12, 40);
+    this.ownedGeometries.push(discGeo);
+    const disc = new THREE.Mesh(discGeo, discMat);
+    disc.name = 'marseille-spawn-disc';
+    disc.rotation.x = -Math.PI / 2;
+    disc.position.set(x, 0.41, z);
+    disc.renderOrder = 4;
+    this.root.add(disc);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(4, 12, 22, 0.55)';
+      ctx.fillRect(24, 28, canvas.width - 48, 72);
+      ctx.strokeStyle = 'rgba(158, 251, 255, 0.9)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(24, 28, canvas.width - 48, 72);
+      ctx.fillStyle = '#e8feff';
+      ctx.font = '900 52px Arial Black, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SPAWN', canvas.width / 2, canvas.height / 2);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;
+      this.ownedTextures.push(texture);
+      const labelMat = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        opacity: 0.95,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      });
+      this.buildingMaterials.push(labelMat);
+      const labelGeo = new THREE.PlaneGeometry(3.6, 0.9);
+      this.ownedGeometries.push(labelGeo);
+      const label = new THREE.Mesh(labelGeo, labelMat);
+      label.name = 'marseille-spawn-label';
+      label.rotation.x = -Math.PI / 2;
+      label.position.set(x, 0.43, z + 2.15);
+      label.renderOrder = 6;
+      this.root.add(label);
+    }
+
+    const beaconMat = new THREE.MeshBasicMaterial({
+      color: 0x9efbff,
+      transparent: true,
+      opacity: 0.35,
+      depthWrite: false,
+    });
+    this.buildingMaterials.push(beaconMat);
+    const beaconH = Math.max(5.2, MIRROR_CANOPY.deckY * 0.72);
+    const beaconGeo = new THREE.CylinderGeometry(0.06, 0.1, beaconH, 10);
+    this.ownedGeometries.push(beaconGeo);
+    const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+    beacon.name = 'marseille-spawn-beacon';
+    beacon.position.set(x, beaconH * 0.5 + 0.2, z);
+    beacon.renderOrder = 5;
+    this.root.add(beacon);
   }
 
   /** Cavité du bassin — parois intérieures visibles depuis le quai. */
@@ -970,27 +1454,31 @@ export class MarseilleMapProvider implements MapProvider {
   private addHarborLandmarks(): void {
     if (!this.root) return;
 
-    const glassMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x7edcff,
-      emissive: 0x1d365c,
-      emissiveIntensity: 0.55,
-      roughness: 0.12,
-      metalness: 0.28,
-      transmission: 0.32,
-      transparent: true,
-      opacity: 0.9,
+    const stoneMaterial = new THREE.MeshStandardMaterial({
+      color: 0xd2c2a6,
+      roughness: 0.82,
+      metalness: 0.05,
+      envMapIntensity: 0.45,
+      fog: false,
+      emissive: new THREE.Color(0x2a2218),
+      emissiveIntensity: 0.1,
     });
-    const warmMaterial = new THREE.MeshLambertMaterial({
-      color: 0xffb3d7,
-      emissive: 0x532342,
-      emissiveIntensity: 0.52,
+    const warmMaterial = new THREE.MeshStandardMaterial({
+      color: 0xc8b59a,
+      roughness: 0.78,
+      metalness: 0.04,
+      envMapIntensity: 0.4,
+      fog: false,
+      emissive: new THREE.Color(0x2a2218),
+      emissiveIntensity: 0.1,
     });
-    const roofGlowMaterial = new THREE.MeshBasicMaterial({
-      color: 0x6ff7ff,
-      transparent: true,
-      opacity: 0.72,
+    const roofMaterial = new THREE.MeshStandardMaterial({
+      color: 0x6a5a4a,
+      roughness: 0.88,
+      metalness: 0.08,
+      fog: false,
     });
-    this.buildingMaterials.push(glassMaterial, warmMaterial, roofGlowMaterial);
+    this.buildingMaterials.push(stoneMaterial, warmMaterial, roofMaterial);
 
     this.placementAudits.length = 0;
 
@@ -998,31 +1486,17 @@ export class MarseilleMapProvider implements MapProvider {
       const wallMaterial =
         def.id === MIRROR_SECOND_BUILDING_ID || def.id === 'harbor-east-building'
           ? warmMaterial
-          : glassMaterial;
+          : stoneMaterial;
 
-      const built = createBuildingFromGeoData(def, this.geo, {
+      // BoxGeometry — Extrude FrontSide rendait les landmarks invisibles.
+      const built = createBoxBuildingFromGeoData(def, this.geo, {
         wall: wallMaterial,
-        roof: roofGlowMaterial,
+        roof: roofMaterial,
       });
       if (!built) continue;
 
       this.root.add(built.group);
       this.placementAudits.push(built.audit);
-
-      const crownY =
-        (def.heightMeters ?? 12) +
-        0.44;
-      const crown = new THREE.Mesh(
-        new THREE.BoxGeometry(
-          (built.collider.maxX - built.collider.minX) * 0.92,
-          0.8,
-          (built.collider.maxZ - built.collider.minZ) * 0.92
-        ),
-        roofGlowMaterial
-      );
-      crown.name = `${def.id}-crown`;
-      crown.position.set(built.center.x, crownY, built.center.z);
-      this.root.add(crown);
 
       if (def.id === MIRROR_SECOND_BUILDING_ID) {
         const width = built.collider.maxX - built.collider.minX;
@@ -1090,65 +1564,6 @@ export class MarseilleMapProvider implements MapProvider {
         height: facadeSpec.heightMeters,
       });
     }
-  }
-
-  private addMirrorRoofSign(x: number, y: number, z: number): void {
-    if (!this.root) return;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = 2048;
-    canvas.height = 512;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-    gradient.addColorStop(0, '#ff4fd8');
-    gradient.addColorStop(0.5, '#9dfdff');
-    gradient.addColorStop(1, '#7f6bff');
-    ctx.fillStyle = 'rgba(4, 10, 20, 0.82)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = 'rgba(220, 248, 255, 0.92)';
-    ctx.lineWidth = 18;
-    ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
-    ctx.shadowColor = '#9efbff';
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = gradient;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.lineJoin = 'round';
-    ctx.miterLimit = 2;
-    ctx.font = '900 184px Arial Black, Arial, sans-serif';
-    ctx.strokeStyle = 'rgba(5, 10, 18, 0.96)';
-    ctx.lineWidth = 26;
-    ctx.strokeText(SCENE_COPY.canopyTitle, canvas.width / 2, canvas.height / 2);
-    ctx.shadowColor = '#7efaff';
-    ctx.shadowBlur = 30;
-    ctx.fillText(SCENE_COPY.canopyTitle, canvas.width / 2, canvas.height / 2);
-
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    texture.generateMipmaps = false;
-    texture.needsUpdate = true;
-    this.ownedTextures.push(texture);
-    const material = new THREE.MeshBasicMaterial({
-      map: texture,
-      transparent: true,
-      opacity: 0.96,
-      side: THREE.DoubleSide,
-    });
-    this.buildingMaterials.push(material);
-
-    const geometry = new THREE.PlaneGeometry(18, 4.6);
-    this.ownedGeometries.push(geometry);
-    const sign = new THREE.Mesh(geometry, material);
-    sign.name = 'marseille-mirror-roof-sign';
-    sign.rotation.x = -Math.PI / 2;
-    sign.rotation.z = -0.03;
-    sign.position.set(x, y, z);
-    this.root.add(sign);
   }
 
   private addR4v3FacadeSign(x: number, y: number, z: number, width: number, _depth: number): void {
@@ -1829,8 +2244,8 @@ export class MarseilleMapProvider implements MapProvider {
       map: texture,
       roughness: 0.86,
       metalness: 0.04,
-      emissive: new THREE.Color(0x1c2a44),
-      emissiveIntensity: CYBERPUNK_ART_DIRECTION.buildings.emissiveIntensity,
+      emissive: new THREE.Color(0x000000),
+      emissiveIntensity: 0,
     });
     this.buildingMaterials.push(material);
     return material;
@@ -1843,8 +2258,8 @@ export class MarseilleMapProvider implements MapProvider {
       map: texture,
       roughness: 0.94,
       metalness: 0.06,
-      emissive: new THREE.Color(0x090f18),
-      emissiveIntensity: 0.06,
+      emissive: new THREE.Color(0x000000),
+      emissiveIntensity: 0,
     });
     this.buildingMaterials.push(material);
     return material;
@@ -2414,8 +2829,30 @@ export class MarseilleMapProvider implements MapProvider {
   }
 
   private addPrototypeColliderIfClear(collider: PrototypeCollider): void {
+    // Ne jamais bloquer les rues / esplanade / zone spawn (sinon joystick coincé).
     if (colliderIntersectsStreetCorridor(collider)) return;
-    this.prototypeColliders.push(collider);
+    if (this.colliderBlocksSpawnClearance(collider)) return;
+
+    // Inset léger : laisse un filet de trottoir autour du massing.
+    const pad = 0.55;
+    const width = collider.maxX - collider.minX;
+    const depth = collider.maxZ - collider.minZ;
+    if (width <= pad * 2.5 || depth <= pad * 2.5) {
+      return;
+    }
+    this.prototypeColliders.push({
+      minX: collider.minX + pad,
+      maxX: collider.maxX - pad,
+      minZ: collider.minZ + pad,
+      maxZ: collider.maxZ - pad,
+    });
+  }
+
+  /** AABB trop proche du miroir/spawn → pas de collider (libre de sortir). */
+  private colliderBlocksSpawnClearance(collider: PrototypeCollider): boolean {
+    const nx = THREE.MathUtils.clamp(0, collider.minX, collider.maxX);
+    const nz = THREE.MathUtils.clamp(0, collider.minZ, collider.maxZ);
+    return nx * nx + nz * nz < SPAWN_COLLIDER_CLEARANCE_M * SPAWN_COLLIDER_CLEARANCE_M;
   }
 
   private stableIndexFromPoints(

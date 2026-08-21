@@ -21,7 +21,7 @@ describe('MarseilleSpawnAnchor (ITER-003)', () => {
     expect(MARSEILLE_SPAWN_ANCHOR.worldPosition.y).toBe(0);
   });
 
-  it('oriente le personnage vers le nord (−Z), mer au sud', () => {
-    expect(MARSEILLE_SPAWN_ANCHOR.worldHeadingRadians).toBe(0);
+  it('oriente le personnage vers la Canebière (−Z), mer au sud', () => {
+    expect(MARSEILLE_SPAWN_ANCHOR.worldHeadingRadians).toBeCloseTo(Math.PI, 6);
   });
 });

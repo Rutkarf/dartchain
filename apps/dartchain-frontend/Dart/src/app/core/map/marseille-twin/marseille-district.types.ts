@@ -1,4 +1,5 @@
 import { WORLD_SCALE } from '../map-configuration';
+import { VIEUX_PORT_CORE_BUILDING_RADIUS } from '../geo-reference.config';
 
 export type MarseilleDistrictId = 'vieux-port-core' | 'unknown';
 
@@ -19,5 +20,5 @@ export const MARSEILLE_TILE_STRATEGY = {
 
 export function districtForWorld(x: number, z: number): MarseilleDistrictId {
   const radius = Math.hypot(x, z);
-  return radius <= 180 ? 'vieux-port-core' : 'unknown';
+  return radius <= VIEUX_PORT_CORE_BUILDING_RADIUS ? 'vieux-port-core' : 'unknown';
 }

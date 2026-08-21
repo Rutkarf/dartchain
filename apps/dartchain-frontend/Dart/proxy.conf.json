@@ -11,22 +11,22 @@
     "changeOrigin": true
   },
   "/overpass": {
-    "target": "https://overpass-api.de",
+    "target": "https://overpass.openstreetmap.fr",
     "secure": true,
     "changeOrigin": true,
-    "timeout": 25000,
+    "timeout": 90000,
     "headers": {
-      "User-Agent": "DartChain-MetaverseBB/1.0"
+      "User-Agent": "overpass-turbo"
     },
     "pathRewrite": {
       "^/overpass": "/api/interpreter"
     }
   },
   "/overpass-alt": {
-    "target": "https://overpass.kumi.systems",
+    "target": "https://overpass.private.coffee",
     "secure": true,
     "changeOrigin": true,
-    "timeout": 25000,
+    "timeout": 90000,
     "headers": {
       "User-Agent": "DartChain-MetaverseBB/1.0"
     },

@@ -7,28 +7,42 @@
   height: auto;
   max-height: none;
   overflow: hidden;
+  margin-block: 0;
+  padding-block: 0;
+  box-sizing: border-box;
+  transition:
+    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
 }
 
 :host(:not(.is-showcase-collapsed):not(.is-showcase-disabled)) {
   height: var(--hub-showcase-block-height, 122px);
   min-height: var(--hub-showcase-block-height, 122px);
   max-height: var(--hub-showcase-block-height, 122px);
+  margin-block: 0;
+  padding-block: 0;
+  opacity: 1;
 }
 
 :host(.is-showcase-disabled) {
   display: none;
 }
 
-/* Replié : aucun padding/margin vertical sur le conteneur global (tabs inchangés) */
+/* Replié : padding/margin verticaux à 0 — hauteur minimale (tabs inchangés) */
 :host(.is-showcase-collapsed) {
-  height: var(--hub-showcase-block-height-collapsed, 27px);
-  min-height: var(--hub-showcase-block-height-collapsed, 27px);
-  max-height: var(--hub-showcase-block-height-collapsed, 27px);
+  height: var(--hub-showcase-block-height-collapsed, 29.5px);
+  min-height: var(--hub-showcase-block-height-collapsed, 29.5px);
+  max-height: var(--hub-showcase-block-height-collapsed, 29.5px);
   overflow: visible;
   margin-top: 0;
   margin-bottom: 0;
   padding-top: 0;
   padding-bottom: 0;
+  opacity: 1;
 }
 
 :host(.is-showcase-collapsed) .app-hub-showcase-block,
@@ -37,6 +51,9 @@
   margin-bottom: 0;
   padding-top: 0;
   padding-bottom: 0;
+  transition:
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-hub-showcase-block {
@@ -94,15 +111,27 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
+  margin-block: 0;
+  padding-block: 0;
+  box-sizing: border-box;
+  transition:
+    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
 }
 
 :host(.is-showcase-collapsed) .app-showcase-band.is-collapsed {
-  flex: 0 0 var(--showcase-smart-bar-h, 11px);
-  height: var(--showcase-smart-bar-h, 11px);
-  max-height: var(--showcase-smart-bar-h, 11px);
+  flex: 0 0 var(--showcase-smart-bar-h, 13.5px);
+  height: var(--showcase-smart-bar-h, 13.5px);
+  max-height: var(--showcase-smart-bar-h, 13.5px);
   overflow: visible;
   margin-top: 0;
   margin-bottom: 0;
   padding-top: 0;
   padding-bottom: 0;
+  opacity: 1;
 }

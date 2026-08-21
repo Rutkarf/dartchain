@@ -1,0 +1,108 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: visible;
+  container-type: inline-size;
+  box-sizing: border-box;
+}
+
+.peers-summary-bar {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  padding: 0 2px;
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.peers-summary-bar__item {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: baseline;
+  gap: 0.28em;
+  min-width: 0;
+  max-width: none;
+  white-space: nowrap;
+}
+
+.peers-summary-bar__item--peer {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.peers-summary-bar__sep {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 0.55em;
+  margin: 0 5px;
+  background: rgba(var(--tab-accent-rgb, 0, 217, 255), 0.22);
+}
+
+.peers-summary-bar__label {
+  flex: 0 0 auto;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(0.24rem, 1.35vw, 0.32rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(168, 180, 196, 0.7);
+}
+
+.peers-summary-bar__value {
+  flex: 0 0 auto;
+  font-family: var(--font-data, ui-monospace, Menlo, monospace);
+  font-size: calc(clamp(0.28rem, 1.7vw, 0.375rem) + 1px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: rgba(244, 251, 255, 0.94);
+}
+
+.peers-summary-bar__value--latency {
+  color: rgba(120, 255, 180, 0.92);
+}
+
+.peers-summary-bar__value--load {
+  color: rgba(var(--tab-accent-rgb, 0, 217, 255), 0.95);
+}
+
+.peers-summary-bar__value--name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.peers-summary-bar__value--people {
+  flex: 0 0 auto;
+  font-weight: 800;
+  color: rgba(var(--tab-accent-rgb, 0, 217, 255), 0.95);
+}
+
+.peers-summary-bar__value--muted,
+.peers-summary-bar__item--peer.is-empty .peers-summary-bar__value {
+  color: rgba(168, 180, 196, 0.62);
+  font-weight: 600;
+}
+
+@container (max-width: 180px) {
+  .peers-summary-bar__label {
+    display: none;
+  }
+
+  .peers-summary-bar__sep {
+    margin: 0 3px;
+  }
+}

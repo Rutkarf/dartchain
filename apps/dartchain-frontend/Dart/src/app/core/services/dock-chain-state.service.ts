@@ -6,7 +6,7 @@ import {
   BlockchainApiService,
   BlockchainStats,
 } from './blockchain-api.service';
-import { formatDockRelativeTime, shortDockHash } from '../utils/dock-time.util';
+import { formatDockRelativeTime } from '../utils/dock-time.util';
 
 export type DockChainPhase = 'error' | 'loading' | 'empty' | 'synced';
 
@@ -61,18 +61,12 @@ export class DockChainStateService {
       return this.error() ? 'Chaîne indisponible' : 'Aucun bloc';
     }
 
-    return `Tip #${tip.index} · ${shortDockHash(tip.hash)}`;
+    const hash = (tip.hash ?? '').trim();
+    return `TIP #${tip.index} · ${hash || '—'}`;
   });
 
-  readonly progressLabel = computed(() => {
-    const chainStats = this.stats();
-    if (chainStats?.totalBlocks) {
-      return `${chainStats.totalBlocks} blocs indexés`;
-    }
-
-    const n = this.blockCount();
-    return n > 0 ? `${n} blocs chargés` : '';
-  });
+  /** Ancien libellé « N blocs » — non affiché dans la barre (doublon du badge). */
+  readonly progressLabel = computed(() => '');
 
   readonly updatedAgeLabel = computed(() =>
     formatDockRelativeTime(this.lastUpdatedAt())

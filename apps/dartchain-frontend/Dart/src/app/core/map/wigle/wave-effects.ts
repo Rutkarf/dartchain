@@ -39,7 +39,7 @@ export class WaveEffectPool {
 
 /**
  * Système des effets d'ondes réseau — pooling + shaders unifiés.
- * Chaque point reçoit une ripple de base + un effet signature assigné.
+ * Affiche uniquement des ripples au sol + liens mesh entre points.
  */
 export class WaveEffectSystem {
   private root: THREE.Group | null = null;
@@ -140,42 +140,10 @@ export class WaveEffectSystem {
     const materials: THREE.ShaderMaterial[] = [];
     const meshes: THREE.Object3D[] = [];
 
-    // Ripple de base sur CHAQUE point WiGLE
+    // Zones de connexion au sol uniquement (pas d'hologrammes flottants).
     this.addRipple(color, materials, meshes, 0, 'ripple-ring');
     if (this.quality !== 'low') {
       this.addRipple(color, materials, meshes, 0.04, 'ripple-ring-secondary');
-    }
-
-    switch (point.waveEffect) {
-      case 'ripple-circular':
-        break;
-      case 'pulse-glow':
-        this.addPulseGlow(color, materials, meshes);
-        break;
-      case 'wave-spiral':
-        this.addSpiral(color, materials, meshes);
-        break;
-      case 'radial-burst':
-        this.addRipple(color, materials, meshes, 0.5, 'radial-burst-ring');
-        break;
-      case 'em-field':
-        this.addEmField(color, materials, meshes);
-        break;
-      case 'signal-bars':
-        this.addSignalBars(color, meshes, point.signalStrength);
-        break;
-      case 'data-stream':
-        this.addDataStream(color, meshes);
-        break;
-      case 'holo-dome':
-        this.addHoloDome(color, materials, meshes);
-        break;
-      case 'frequency-wave':
-        this.addFrequencyWave(color, materials, meshes);
-        break;
-      case 'network-mesh':
-        this.addRipple(color, materials, meshes, 0.25, 'network-mesh-ring');
-        break;
     }
 
     group.add(...meshes);
@@ -193,46 +161,13 @@ export class WaveEffectSystem {
     }
 
     slot.burstTimer += delta;
-    if (slot.point.waveEffect === 'radial-burst' && slot.burstTimer >= 3) {
-      slot.burstTimer = 0;
-      for (const mesh of slot.meshes) {
-        if (mesh.name === 'radial-burst-ring') mesh.scale.setScalar(0.5);
-      }
-    }
 
     for (const mesh of slot.meshes) {
-      switch (mesh.name) {
-        case 'ripple-ring':
-        case 'ripple-ring-secondary':
-        case 'network-mesh-ring':
-        case 'radial-burst-ring': {
-          const speed = mesh.name === 'ripple-ring-secondary' ? 0.45 : 0.6;
-          const scale = 1 + ((t * speed) % 1) * 2.5 * intensity;
-          mesh.scale.set(scale, scale, scale);
-          break;
-        }
-        case 'pulse-glow-core':
-          mesh.scale.setScalar((0.7 + Math.sin(t * Math.PI * 2) * 0.3) * intensity);
-          break;
-        case 'signal-bar':
-          mesh.scale.y = 0.5 + Math.abs(Math.sin(t * 3 + index)) * intensity;
-          break;
-        case 'data-stream':
-          mesh.position.y = ((t * 2) % 8) * intensity;
-          break;
-        case 'holo-dome':
-          mesh.rotation.y += delta * 0.4;
-          break;
-        case 'frequency-ribbon':
-          mesh.rotation.z = Math.sin(t * 2) * 0.15;
-          break;
+      if (mesh.name === 'ripple-ring' || mesh.name === 'ripple-ring-secondary') {
+        const speed = mesh.name === 'ripple-ring-secondary' ? 0.45 : 0.6;
+        const scale = 1 + ((t * speed) % 1) * 2.5 * intensity;
+        mesh.scale.set(scale, scale, scale);
       }
-    }
-
-    if (slot.particles) {
-      slot.particles.rotation.y += delta * 0.8;
-      (slot.particles.material as THREE.PointsMaterial).opacity =
-        0.35 + Math.sin(t * 4) * 0.15;
     }
   }
 
@@ -252,151 +187,12 @@ export class WaveEffectSystem {
     meshes.push(ring);
   }
 
-  private addPulseGlow(
-    color: number,
-    materials: THREE.ShaderMaterial[],
-    meshes: THREE.Object3D[]
-  ): void {
-    const mat = createWigleWaveMaterial(color);
-    materials.push(mat);
-    const core = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 10), mat);
-    core.name = 'pulse-glow-core';
-    core.position.y = 1.2;
-    meshes.push(core);
-  }
-
-  private addSpiral(
-    color: number,
-    materials: THREE.ShaderMaterial[],
-    meshes: THREE.Object3D[]
-  ): void {
-    const mat = createWigleWaveMaterial(color);
-    materials.push(mat);
-    const points: THREE.Vector3[] = [];
-    for (let i = 0; i <= 40; i++) {
-      const t = i / 40;
-      const angle = t * Math.PI * 6;
-      const radius = 0.3 + t * 0.8;
-      points.push(new THREE.Vector3(Math.cos(angle) * radius, t * 6, Math.sin(angle) * radius));
-    }
-    meshes.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), mat));
-    meshes[meshes.length - 1].name = 'wave-spiral';
-  }
-
-  private addEmField(
-    color: number,
-    materials: THREE.ShaderMaterial[],
-    meshes: THREE.Object3D[]
-  ): void {
-    const mat = createWigleWaveMaterial(color);
-    materials.push(mat);
-    const torus = new THREE.Mesh(new THREE.TorusGeometry(1.1, 0.04, 8, 20), mat);
-    torus.rotation.x = Math.PI / 2;
-    torus.position.y = 2;
-    torus.name = 'em-field';
-    meshes.push(torus);
-
-    if (this.quality !== 'low') {
-      const count = this.quality === 'high' ? 10 : 5;
-      const positions = new Float32Array(count * 3);
-      for (let i = 0; i < count; i++) {
-        const angle = (i / count) * Math.PI * 2;
-        positions[i * 3] = Math.cos(angle) * 1.1;
-        positions[i * 3 + 1] = 2;
-        positions[i * 3 + 2] = Math.sin(angle) * 1.1;
-      }
-      const pGeo = new THREE.BufferGeometry();
-      pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      const particles = new THREE.Points(
-        pGeo,
-        new THREE.PointsMaterial({
-          color,
-          size: 0.16,
-          transparent: true,
-          opacity: 0.6,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-        })
-      );
-      particles.name = 'em-particles';
-      meshes.push(particles);
-    }
-  }
-
-  private addSignalBars(color: number, meshes: THREE.Object3D[], signal: number): void {
-    const barMat = new THREE.MeshBasicMaterial({
-      color,
-      transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    const strength = THREE.MathUtils.clamp(Math.floor((signal + 90) / 15), 1, 4);
-    for (let i = 0; i < 4; i++) {
-      const h = 0.4 + i * 0.35;
-      const bar = new THREE.Mesh(new THREE.BoxGeometry(0.15, h, 0.15), barMat);
-      bar.position.set(-0.35 + i * 0.22, h / 2 + 0.5, 0.4);
-      bar.name = 'signal-bar';
-      bar.visible = i < strength;
-      meshes.push(bar);
-    }
-  }
-
-  private addDataStream(color: number, meshes: THREE.Object3D[]): void {
-    const particle = new THREE.Mesh(
-      new THREE.OctahedronGeometry(0.12, 0),
-      new THREE.MeshBasicMaterial({
-        color,
-        transparent: true,
-        opacity: 0.65,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
-    );
-    particle.name = 'data-stream';
-    particle.position.y = 0.5;
-    meshes.push(particle);
-  }
-
-  private addHoloDome(
-    color: number,
-    materials: THREE.ShaderMaterial[],
-    meshes: THREE.Object3D[]
-  ): void {
-    const mat = createWigleWaveMaterial(color);
-    mat.uniforms['uOpacity'].value = 0.35;
-    materials.push(mat);
-    const dome = new THREE.Mesh(
-      new THREE.SphereGeometry(1.6, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
-      mat
-    );
-    dome.name = 'holo-dome';
-    dome.position.y = 0.1;
-    meshes.push(dome);
-  }
-
-  private addFrequencyWave(
-    color: number,
-    materials: THREE.ShaderMaterial[],
-    meshes: THREE.Object3D[]
-  ): void {
-    const mat = createWigleWaveMaterial(color);
-    materials.push(mat);
-    const points: THREE.Vector3[] = [];
-    for (let i = 0; i <= 28; i++) {
-      const x = (i / 28 - 0.5) * 3;
-      points.push(new THREE.Vector3(x, 0.15 + Math.sin(i * 0.5) * 0.2, 0));
-    }
-    const ribbon = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), mat);
-    ribbon.name = 'frequency-ribbon';
-    meshes.push(ribbon);
-  }
-
   private rebuildMeshLines(points: WigleGeoPoint[]): void {
     if (!this.root || points.length < 2 || this.quality === 'low') return;
 
     const segments: THREE.Vector3[] = [];
     const radiusSq = WIGLE_GEO_CONFIG.meshConnectRadius ** 2;
+    const linkHeight = 0.35;
 
     for (let i = 0; i < points.length; i++) {
       for (let j = i + 1; j < points.length; j++) {
@@ -406,8 +202,8 @@ export class WaveEffectSystem {
         const dz = a.worldZ - b.worldZ;
         if (dx * dx + dz * dz > radiusSq) continue;
         segments.push(
-          new THREE.Vector3(a.worldX, 1.5, a.worldZ),
-          new THREE.Vector3(b.worldX, 1.5, b.worldZ)
+          new THREE.Vector3(a.worldX, a.worldY + linkHeight, a.worldZ),
+          new THREE.Vector3(b.worldX, b.worldY + linkHeight, b.worldZ)
         );
       }
     }

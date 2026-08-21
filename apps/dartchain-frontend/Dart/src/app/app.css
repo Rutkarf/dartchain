@@ -48,7 +48,7 @@
   --navbar-hub-gap: 2px;
   --hub-market-internal-gap: 2px;
   --stack-section-gap: 2px;
-  --stack-section-gap-collapsed: 2px;
+  --stack-section-gap-collapsed: 0px;
   --hub-swap-showcase-gap: var(--stack-section-gap);
   --hub-market-showcase-gap: var(--stack-section-gap);
   --stack-gap-showcase-dock: var(--stack-section-gap);
@@ -112,7 +112,7 @@
   /* --hub-market-showcase-gap / stack-gap-showcase-dock : 4px (showcase → dock) */
   --showcase-tab-fusion-overlap: 0px;
   /* Smart bars repliées : graph flush ; dock/showcase = 2e ligne à ~moitié */
-  --showcase-smart-bar-h: 11px;
+  --showcase-smart-bar-h: 13.5px;
   --chart-smart-bar-h: 11px;
   --swap-smart-bar-h: 32px;
   --chart-stack-header-h: 0px;
@@ -143,7 +143,7 @@
   --dock-hub-tab-w: 2.5rem;
   --dock-panel-height: var(--mvp-bottom-panel-h);
   --dock-panel-handle-h: 8px;
-  --dock-smart-bar-h: 11px;
+  --dock-smart-bar-h: 13.5px;
   --dock-toggle-w: 24px;
   --dock-collapsed-band-h: var(--dock-panel-handle-h);
   --app-dock-stack-height: calc(
@@ -469,13 +469,16 @@ app-three-floor {
     height 280ms cubic-bezier(0.22, 1, 0.36, 1),
     min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
     max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-bottom-stack.is-dock-collapsed {
   --bottom-stack-active-height: var(--bottom-stack-height-collapsed);
   margin-top: 0;
   margin-bottom: 0;
+  padding-top: 0;
   padding-bottom: 0;
 }
 
@@ -575,6 +578,8 @@ app-three-floor {
     flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
     max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
     min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 220ms ease;
 }
 
@@ -736,6 +741,10 @@ app-three-floor {
   margin-top: 0;
   overflow: hidden;
   order: 2;
+  transition:
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-main-layout > app-showcase-tab-showcase:not(.is-showcase-collapsed):not(.is-showcase-disabled),
@@ -765,6 +774,9 @@ app-three-floor {
   max-height: none;
   margin: 0;
   order: 3;
+  transition:
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-main-layout > app-dock-tabs-dock-tabs.is-dock-collapsed,
@@ -1264,12 +1276,25 @@ app-three-floor {
   max-height: var(--hub-showcase-block-height-collapsed);
   height: var(--hub-showcase-block-height-collapsed);
   overflow: visible;
+  margin-top: 0;
   margin-bottom: 0;
+  padding-top: 0;
   padding-bottom: 0;
   transition:
     min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
     max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app-hub-showcase-block:not(.is-showcase-collapsed) {
+  transition:
+    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-hub-showcase-block.is-showcase-collapsed .showcase-block__shell {
@@ -1356,7 +1381,11 @@ app-three-floor {
   transition:
     height 280ms cubic-bezier(0.22, 1, 0.36, 1),
     max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
 }
 
 .app-hub-showcase-block .app-showcase-band:not(.is-collapsed) {
@@ -2139,6 +2168,21 @@ app-block-detail-drawer {
   * {
     scroll-behavior: auto !important;
   }
+
+  .app-hub-showcase-block,
+  .app-hub-showcase-block.is-showcase-collapsed,
+  .app-hub-showcase-block:not(.is-showcase-collapsed),
+  .app-hub-showcase-block .app-showcase-band,
+  .app-bottom-stack,
+  .app-bottom-stack__content,
+  .app-bottom-stack__band,
+  .bottom-stack__shell,
+  .app-main-layout > app-showcase-tab-showcase,
+  .app-main-layout > .app-showcase-tab-showcase-section,
+  .app-main-layout > app-dock-tabs-dock-tabs,
+  .app-main-layout > .app-dock-tabs-section {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* === Responsive 250–500px (app shell) === */
@@ -2184,9 +2228,9 @@ app-block-detail-drawer {
     --showcase-band-height: var(--mvp-showcase-body-h);
     --showcase-hub-tab-h: var(--ds-zone-showcase-header, 14px);
     --showcase-hub-header-h: var(--ds-zone-showcase-header, 14px);
-    --showcase-smart-bar-h: 10px;
+    --showcase-smart-bar-h: 12.5px;
     --chart-smart-bar-h: 10px;
-    --dock-smart-bar-h: 10px;
+    --dock-smart-bar-h: 12.5px;
     --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
     --hub-showcase-block-height-collapsed: calc(
       var(--showcase-hub-header-h) + var(--showcase-smart-bar-h)
@@ -2520,8 +2564,8 @@ app-block-detail-drawer {
     --market-chart-height-expanded: var(--mvp-chart-h);
     --chart-stack-header-h: 0px;
     --chart-smart-bar-h: 10px;
-    --showcase-smart-bar-h: 10px;
-    --dock-smart-bar-h: 10px;
+    --showcase-smart-bar-h: 12.5px;
+    --dock-smart-bar-h: 12.5px;
     --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
     --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
     --hub-showcase-block-height-collapsed: calc(
@@ -2707,9 +2751,9 @@ app-block-detail-drawer {
     --showcase-hub-tab-h: var(--ds-zone-showcase-header, 14px);
     --showcase-hub-header-h: var(--ds-zone-showcase-header, 14px);
     --showcase-band-height: var(--mvp-showcase-body-h);
-    --showcase-smart-bar-h: 10px;
+    --showcase-smart-bar-h: 12.5px;
     --chart-smart-bar-h: 10px;
-    --dock-smart-bar-h: 10px;
+    --dock-smart-bar-h: 12.5px;
     --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
     --hub-showcase-block-height-collapsed: calc(
       var(--showcase-hub-header-h) + var(--showcase-smart-bar-h)

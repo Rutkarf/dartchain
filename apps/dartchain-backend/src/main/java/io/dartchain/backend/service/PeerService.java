@@ -75,9 +75,14 @@ public class PeerService {
     }
 
     public PeerStatsResponse getStats() {
-        int active = sessionRegistry.count();
-        int total = Math.max(knownPeers.size(), peers.size());
+        // Compte uniquement les peers enregistrés (pas les sessions WS UI / inbound).
+        // Sinon un peer local (ws://localhost) compte 2 : outbound + inbound.
         List<PeerConnection> allPeers = getAll();
+        int total = allPeers.size();
+        long connected = allPeers.stream()
+                .filter(peer -> peer.getStatus() == PeerStatus.CONNECTED)
+                .count();
+        int active = (int) connected;
 
         List<Long> latencies = allPeers.stream()
                 .filter(peer -> peer.getStatus() == PeerStatus.CONNECTED)
@@ -88,10 +93,6 @@ public class PeerService {
         Long avgLatencyMs = latencies.isEmpty()
                 ? null
                 : Math.round(latencies.stream().mapToLong(Long::longValue).average().orElse(0));
-
-        long connected = allPeers.stream()
-                .filter(peer -> peer.getStatus() == PeerStatus.CONNECTED)
-                .count();
 
         Integer networkLoadPercent = total == 0
                 ? 0

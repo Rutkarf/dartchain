@@ -1,0 +1,175 @@
+/**
+ * Chip catégorie NEWS (NET / P2P / R4 / INFO / DAO)
+ * Partagé liste dépliée TOUS + smart-bar repliée — largeur fixe 22×7.
+ * Ne pas placer ce chip dans une piste `1fr` : le label s’étire (P2P vs NET).
+ */
+:root {
+  --news-tag-w: 22px;
+  --news-tag-h: 7px;
+  --news-cat-reseau: var(--accent-cyan-rgb, 46, 196, 214);
+  --news-cat-peers: 120, 132, 178;
+  --news-cat-r4v3: var(--warning-rgb, 230, 184, 77);
+  --news-cat-dao: 160, 140, 180;
+  --news-cat-info: 148, 168, 188;
+  --news-cat-default: 139, 155, 176;
+}
+
+.showcase-news__tag {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 var(--news-tag-w) !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  width: var(--news-tag-w) !important;
+  min-width: var(--news-tag-w) !important;
+  max-width: var(--news-tag-w) !important;
+  height: var(--news-tag-h) !important;
+  min-height: var(--news-tag-h) !important;
+  max-height: var(--news-tag-h) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  overflow: hidden;
+  justify-self: start;
+}
+
+.showcase-news__tag-badge {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto !important;
+  width: var(--news-tag-w) !important;
+  min-width: 0 !important;
+  max-width: var(--news-tag-w) !important;
+  height: var(--news-tag-h) !important;
+  max-height: var(--news-tag-h) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: 5px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(var(--news-cat-default), 0.9);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+}
+
+.showcase-news__tag[data-category='reseau'] .showcase-news__tag-badge {
+  color: rgba(var(--news-cat-reseau), 0.95);
+  border-color: rgba(var(--news-cat-reseau), 0.4);
+  background: rgba(var(--news-cat-reseau), 0.08);
+}
+
+.showcase-news__tag[data-category='peers'] .showcase-news__tag-badge {
+  color: rgba(var(--news-cat-peers), 0.95);
+  border-color: rgba(var(--news-cat-peers), 0.4);
+  background: rgba(var(--news-cat-peers), 0.08);
+}
+
+.showcase-news__tag[data-category='r4v3'] .showcase-news__tag-badge {
+  color: rgba(var(--news-cat-r4v3), 0.92);
+  border-color: rgba(var(--news-cat-r4v3), 0.35);
+  background: rgba(var(--news-cat-r4v3), 0.08);
+}
+
+.showcase-news__tag[data-category='ecosysteme'] .showcase-news__tag-badge,
+.showcase-news__tag[data-category='d-a-o'] .showcase-news__tag-badge {
+  color: rgba(var(--news-cat-dao), 0.95);
+  border-color: rgba(var(--news-cat-dao), 0.38);
+  background: rgba(var(--news-cat-dao), 0.08);
+}
+
+.showcase-news__tag[data-category='info'] .showcase-news__tag-badge,
+.showcase-news__item[data-source='editorial'] .showcase-news__tag-badge {
+  color: rgba(var(--news-cat-info), 0.92);
+  border-color: rgba(var(--news-cat-info), 0.32);
+  background: rgba(var(--news-cat-info), 0.06);
+}
+
+/* Pastille LED smart-bar (hors chip, à gauche) */
+.news-summary-bar__pastille {
+  --news-summary-pastille-rgb: var(--accent-cyan-rgb, 46, 196, 214);
+  flex: 0 0 3px !important;
+  display: block;
+  width: 3px !important;
+  height: 3px !important;
+  min-width: 3px !important;
+  max-width: 3px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50%;
+  background: rgba(var(--news-summary-pastille-rgb), 0.75);
+  box-shadow: 0 0 3px rgba(var(--news-summary-pastille-rgb), 0.35);
+  pointer-events: none;
+  justify-self: center;
+  align-self: center;
+}
+
+.news-summary-bar__pastille[data-category='peers'] {
+  --news-summary-pastille-rgb: var(--news-cat-peers);
+}
+
+.news-summary-bar__pastille[data-category='r4v3'] {
+  --news-summary-pastille-rgb: var(--news-cat-r4v3);
+}
+
+.news-summary-bar__pastille[data-category='ecosysteme'],
+.news-summary-bar__pastille[data-category='d-a-o'] {
+  --news-summary-pastille-rgb: var(--news-cat-dao);
+}
+
+.news-summary-bar__pastille[data-category='info'] {
+  --news-summary-pastille-rgb: var(--news-cat-info);
+  box-shadow: none;
+}
+
+/* Smart-bar TOUS : flex, le chip ne peut plus tomber dans un 1fr */
+app-showcase-news-summary .news-summary-bar {
+  display: flex !important;
+  flex-flow: row nowrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 3px !important;
+  width: 100% !important;
+}
+
+app-showcase-news-summary .news-summary-bar__cat {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  align-items: center !important;
+  gap: 3px !important;
+  width: max-content !important;
+  max-width: max-content !important;
+}
+
+app-showcase-news-summary .news-summary-bar__cat .showcase-news__tag,
+app-showcase-news-summary .news-summary-bar .showcase-news__tag {
+  flex: 0 0 var(--news-tag-w, 22px) !important;
+  width: var(--news-tag-w, 22px) !important;
+  min-width: var(--news-tag-w, 22px) !important;
+  max-width: var(--news-tag-w, 22px) !important;
+}
+
+app-showcase-news-summary .news-summary-bar__headline-wrap {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+app-showcase-news-summary .news-summary-bar__age-stack,
+app-showcase-news-summary .news-summary-bar__actions {
+  flex: 0 0 auto !important;
+  flex-shrink: 0 !important;
+}

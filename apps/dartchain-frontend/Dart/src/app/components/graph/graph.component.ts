@@ -29,9 +29,11 @@ export class GraphComponent {
   @Output() readonly collapseToggle = new EventEmitter<void>();
   @Output() readonly summaryExpand = new EventEmitter<void>();
 
-  onCardClick(): void {
-    if (this.chartCollapsed) {
-      this.summaryExpand.emit();
+  onCardClick(event?: Event): void {
+    if (!this.chartCollapsed) {
+      return;
     }
+    event?.stopPropagation();
+    this.summaryExpand.emit();
   }
 }

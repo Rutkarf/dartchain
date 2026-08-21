@@ -79,7 +79,7 @@ export const GEOGRAPHIC_DATA_SOURCES: readonly GeographicDataSource[] = [
   {
     id: 'osm-overpass-marseille-buildings',
     type: 'osm',
-    pathOrEndpoint: '/api/metaverse/overpass (backend) | /overpass (dev proxy)',
+    pathOrEndpoint: '/api/metaverse/overpass (backend) | /overpass (dev proxy → openstreetmap.fr)',
     coordinateSystem: 'EPSG:4326',
     unit: 'degrees',
     coverage: 'Vieux-Port bbox OSM_QUERY_BOUNDS',
@@ -475,7 +475,7 @@ export const MARSEILLE_VALIDATION_ANCHORS: readonly MarseilleValidationAnchor[] 
     name: 'Spawn joueur (offset local)',
     latitude: MARSEILLE_GEO_ORIGIN.latitude,
     longitude: MARSEILLE_GEO_ORIGIN.longitude,
-    expectedWorldPosition: new THREE.Vector3(-6.2, 0, -2.4),
+    expectedWorldPosition: new THREE.Vector3(0, 0, 5),
     toleranceMeters: 2,
     confidence: 'high',
     source: 'METRO_SPAWN_ANCHOR.spawnOffsetFromMirror',
@@ -485,8 +485,8 @@ export const MARSEILLE_VALIDATION_ANCHORS: readonly MarseilleValidationAnchor[] 
     name: 'Centre bras sud eau',
     latitude: MARSEILLE_GEO_ORIGIN.latitude,
     longitude: MARSEILLE_GEO_ORIGIN.longitude,
-    expectedWorldPosition: new THREE.Vector3(0, -1.45, 235),
-    toleranceMeters: 15,
+    expectedWorldPosition: new THREE.Vector3(0, -1.15, 263),
+    toleranceMeters: 20,
     confidence: 'medium',
     source: 'MARSEILLE_HARBOR_WATER (estimated layout)',
   },
@@ -502,8 +502,8 @@ export const MARSEILLE_VALIDATION_ANCHORS: readonly MarseilleValidationAnchor[] 
   },
 ];
 
-/** Rayon du cœur Vieux-Port : pas de bâtiments prototype (OSM + landmarks uniquement). */
-export const VIEUX_PORT_CORE_BUILDING_RADIUS = 180;
+/** Rayon cœur Vieux-Port : streaming procédural hors zone, accurate GPS dedans. */
+export const VIEUX_PORT_CORE_BUILDING_RADIUS = 420;
 
 /** Positions manuelles historiques (avant géoréférencement OSM) — audit uniquement. */
 export const LEGACY_HAND_PLACED_LANDMARKS: Readonly<

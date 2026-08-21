@@ -9,6 +9,7 @@ import io.dartchain.backend.dto.FaucetConfigResponse;
 import io.dartchain.backend.dto.FaucetStateResponse;
 import io.dartchain.backend.exception.FaucetException;
 import io.dartchain.backend.faucet.store.FaucetClaimStore;
+import io.dartchain.backend.faucet.store.FaucetPendingBalanceStore;
 import io.dartchain.backend.model.FaucetClaim;
 import io.dartchain.backend.model.Transaction;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class FaucetServiceImpl implements FaucetService {
 
     private final FaucetClaimStore claimStore;
+    private final FaucetPendingBalanceStore pendingBalanceStore;
     private final FaucetConfig faucetConfig;
     private final BlockchainService blockchainService;
     private final AuthService authService;
@@ -37,9 +39,10 @@ public class FaucetServiceImpl implements FaucetService {
             FaucetConfig faucetConfig,
             BlockchainService blockchainService,
             AuthService authService,
-            FaucetClaimStore claimStore
+            FaucetClaimStore claimStore,
+            FaucetPendingBalanceStore pendingBalanceStore
     ) {
-        this(faucetConfig, blockchainService, authService, claimStore, null, null);
+        this(faucetConfig, blockchainService, authService, claimStore, pendingBalanceStore, null, null);
     }
 
     public FaucetServiceImpl(
@@ -47,9 +50,10 @@ public class FaucetServiceImpl implements FaucetService {
             BlockchainService blockchainService,
             AuthService authService,
             FaucetClaimStore claimStore,
+            FaucetPendingBalanceStore pendingBalanceStore,
             QuestService questService
     ) {
-        this(faucetConfig, blockchainService, authService, claimStore, questService, null);
+        this(faucetConfig, blockchainService, authService, claimStore, pendingBalanceStore, questService, null);
     }
 
     @Autowired
@@ -58,10 +62,12 @@ public class FaucetServiceImpl implements FaucetService {
             BlockchainService blockchainService,
             AuthService authService,
             FaucetClaimStore claimStore,
+            FaucetPendingBalanceStore pendingBalanceStore,
             @Lazy QuestService questService,
             ApplicationMetricsCollector metricsCollector
     ) {
         this.claimStore = claimStore;
+        this.pendingBalanceStore = pendingBalanceStore;
         this.faucetConfig = faucetConfig;
         this.blockchainService = blockchainService;
         this.authService = authService;
@@ -93,24 +99,40 @@ public class FaucetServiceImpl implements FaucetService {
             );
         }
 
+        BigDecimal pending = pendingBalanceStore.get(normalizedWallet);
+        if (pending.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new FaucetException("Aucune pièce M4T3R à claim — ramassez des pièces d'abord");
+        }
+
+        BigDecimal requested = resolveClaimAmount(request);
+        BigDecimal amount = requested.min(pending).min(BigDecimal.ONE);
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new FaucetException("Montant claim invalide");
+        }
+
+        BigDecimal debited = pendingBalanceStore.debit(normalizedWallet, amount);
+        if (debited.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new FaucetException("Solde faucet pending insuffisant");
+        }
+
         long now = System.currentTimeMillis();
         long nextEligibleAt = now + faucetConfig.getCooldownDuration().toMillis();
-        BigDecimal amount = resolveClaimAmount(request);
 
-        Transaction onChainTx = blockchainService.mintSystemCredit(
+        // Mempool only — le bloc est créé au mine manuel / mine mempool.
+        Transaction pendingTx = blockchainService.enqueueSystemCredit(
                 normalizedWallet,
-                amount,
+                debited,
                 "FAUCET_CLAIM"
         );
 
         FaucetClaim claim = new FaucetClaim();
         claim.setId(UUID.randomUUID().toString());
         claim.setWalletAddress(normalizedWallet);
-        claim.setAmount(amount);
+        claim.setAmount(debited);
         claim.setClaimedAt(now);
         claim.setNextEligibleAt(nextEligibleAt);
         claim.setClientId(request.getClientId());
-        claim.setTxHash(onChainTx.getHash());
+        claim.setTxHash(pendingTx.getHash());
 
         claimStore.save(claim);
 
@@ -124,7 +146,7 @@ public class FaucetServiceImpl implements FaucetService {
 
         FaucetClaimResponse response = new FaucetClaimResponse();
         response.setSuccess(true);
-        response.setMessage("Faucet claim credited on-chain");
+        response.setMessage("Faucet claim placé dans le mempool — miner pour confirmer");
         response.setWalletAddress(claim.getWalletAddress());
         response.setAmount(claim.getAmount().toPlainString());
         response.setClaimedAt(FaucetTimeUtils.toIso(claim.getClaimedAt()));
@@ -176,6 +198,7 @@ public class FaucetServiceImpl implements FaucetService {
         response.setWalletAddress(normalizedWallet);
         response.setDefaultClaimAmount(faucetConfig.getAmount().toPlainString());
         response.setConfigCooldownSeconds(faucetConfig.getCooldownSeconds());
+        response.setPendingAmount(pendingBalanceStore.get(normalizedWallet).toPlainString());
 
         if (lastClaim == null) {
             response.setEligible(true);

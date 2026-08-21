@@ -8,6 +8,8 @@ import io.dartchain.backend.blockchain.JsonBlockchainStateStore;
 import io.dartchain.backend.config.FaucetConfig;
 import io.dartchain.backend.dto.FaucetClaimRequest;
 import io.dartchain.backend.faucet.JsonFaucetClaimStore;
+import io.dartchain.backend.faucet.JsonFaucetPendingBalanceStore;
+import io.dartchain.backend.faucet.store.FaucetPendingBalanceStore;
 import io.dartchain.backend.quests.JsonQuestProgressStore;
 import io.dartchain.backend.quests.QuestService;
 import io.dartchain.backend.service.BlockchainService;
@@ -45,7 +47,9 @@ class AuthWalletFaucetIntegrationTest {
     private BlockchainService blockchainService;
     private FaucetConfig faucetConfig;
     private JsonFaucetClaimStore claimStore;
+    private FaucetPendingBalanceStore pendingBalanceStore;
     private FaucetServiceImpl faucetService;
+    private TransactionPoolService transactionPoolService;
 
     @BeforeEach
     void setUp() {
@@ -63,7 +67,7 @@ class AuthWalletFaucetIntegrationTest {
         );
         blockchainStore.loadFromDisk();
         MarketChartService marketChartService = mock(MarketChartService.class);
-        TransactionPoolService transactionPoolService = BlockchainTestSupport.newTransactionPool(blockchainStore);
+        transactionPoolService = BlockchainTestSupport.newTransactionPool(blockchainStore);
         blockchainService = BlockchainTestSupport.newBlockchainService(
                 blockchainStore,
                 new BlockchainValidationService(),
@@ -81,7 +85,19 @@ class AuthWalletFaucetIntegrationTest {
         );
         claimStore.loadFromDisk();
 
-        faucetService = new FaucetServiceImpl(faucetConfig, blockchainService, authService, claimStore);
+        pendingBalanceStore = new JsonFaucetPendingBalanceStore(
+                objectMapper,
+                tempDir.resolve("faucet-pending.json").toString()
+        );
+        ((JsonFaucetPendingBalanceStore) pendingBalanceStore).loadFromDisk();
+
+        faucetService = new FaucetServiceImpl(
+                faucetConfig,
+                blockchainService,
+                authService,
+                claimStore,
+                pendingBalanceStore
+        );
     }
 
     @Test
@@ -101,7 +117,8 @@ class AuthWalletFaucetIntegrationTest {
                 faucetConfig,
                 blockchainService,
                 authService,
-                reloadedStore
+                reloadedStore,
+                pendingBalanceStore
         );
 
         assertThat(reloadedService.getState(walletAddress).isEligible()).isFalse();
@@ -109,7 +126,7 @@ class AuthWalletFaucetIntegrationTest {
     }
 
     @Test
-    void faucetClaimWithQuestServiceCreditsOnlyFaucetAmountOnChain() throws Exception {
+    void faucetClaimQueuesMempoolThenMineCreditsBalance() throws Exception {
         JsonQuestProgressStore questStore = new JsonQuestProgressStore(
                 objectMapper,
                 tempDir.resolve("quest-progress-faucet-amount.json").toString()
@@ -123,6 +140,7 @@ class AuthWalletFaucetIntegrationTest {
                 blockchainService,
                 authService,
                 claimStore,
+                pendingBalanceStore,
                 questService
         );
 
@@ -141,14 +159,25 @@ class AuthWalletFaucetIntegrationTest {
                 new LinkWalletRequest(walletAddress, CryptoUtils.publicKeyToBase64(keyPair.getPublic()))
         );
 
+        BigDecimal claimAmount = new BigDecimal("0.00000000000000000000000001");
+        pendingBalanceStore.add(walletAddress, claimAmount);
+
         BigDecimal balanceAfterLink = blockchainService.getBalance(walletAddress);
+        int tipBefore = blockchainService.getLatestBlock().getIndex();
         faucetService.claim(
-                faucetClaimRequest(walletAddress, "client-amount-user", "0.00000000000000000000000001"),
+                faucetClaimRequest(walletAddress, "client-amount-user", claimAmount.toPlainString()),
                 "Bearer " + login.token()
         );
 
+        // Claim ne mine pas : solde inchangé, tip inchangé, tx en mempool.
+        assertThat(blockchainService.getBalance(walletAddress)).isEqualByComparingTo(balanceAfterLink);
+        assertThat(blockchainService.getLatestBlock().getIndex()).isEqualTo(tipBefore);
+        assertThat(transactionPoolService.getAll().size()).isGreaterThan(0);
+
+        blockchainService.minePendingTransactions(walletAddress);
         assertThat(blockchainService.getBalance(walletAddress))
-                .isEqualByComparingTo(balanceAfterLink.add(new BigDecimal("0.00000000000000000000000001")));
+                .isGreaterThanOrEqualTo(balanceAfterLink.add(claimAmount));
+        assertThat(blockchainService.getLatestBlock().getIndex()).isGreaterThan(tipBefore);
     }
 
     @Test
@@ -166,6 +195,7 @@ class AuthWalletFaucetIntegrationTest {
                 blockchainService,
                 authService,
                 claimStore,
+                pendingBalanceStore,
                 questService
         );
 
@@ -179,7 +209,7 @@ class AuthWalletFaucetIntegrationTest {
     }
 
     @Test
-    void linkWalletAndCreditFaucetOnChain() throws Exception {
+    void linkWalletAndClaimQueuesMempool() throws Exception {
         authService.register(new RegisterRequest("alice", "alice@dartchain.dev", "password123"), AuthServiceTestSupport.LOCAL_IP);
         var login = authService.login(new LoginRequest("alice", "password123"), AuthServiceTestSupport.LOCAL_IP);
 
@@ -192,17 +222,22 @@ class AuthWalletFaucetIntegrationTest {
                 new LinkWalletRequest(walletAddress, publicKey)
         );
 
+        BigDecimal claimAmount = new BigDecimal("0.00000000000000000000000042");
+        pendingBalanceStore.add(walletAddress, claimAmount);
+
         BigDecimal balanceAfterLink = blockchainService.getBalance(walletAddress);
+        int tipBefore = blockchainService.getLatestBlock().getIndex();
         var claim = faucetService.claim(
-                faucetClaimRequest(walletAddress, "test-client", "0.00000000000000000000000042"),
+                faucetClaimRequest(walletAddress, "test-client", claimAmount.toPlainString()),
                 "Bearer " + login.token()
         );
 
         assertThat(claim.isSuccess()).isTrue();
         assertThat(claim.getTxHash()).isNotBlank();
-        assertThat(claim.getAmount()).isEqualTo("0.00000000000000000000000042");
-        assertThat(blockchainService.getBalance(walletAddress))
-                .isEqualByComparingTo(balanceAfterLink.add(new BigDecimal("0.00000000000000000000000042")));
+        assertThat(claim.getAmount()).isEqualTo(claimAmount.toPlainString());
+        assertThat(blockchainService.getBalance(walletAddress)).isEqualByComparingTo(balanceAfterLink);
+        assertThat(blockchainService.getLatestBlock().getIndex()).isEqualTo(tipBefore);
+        assertThat(transactionPoolService.getAll().size()).isGreaterThan(0);
     }
 
     @Test
@@ -236,6 +271,7 @@ class AuthWalletFaucetIntegrationTest {
                 )
         );
 
+        pendingBalanceStore.add(walletAddress, new BigDecimal("0.00000000000000000000000001"));
         faucetService.claim(
                 faucetClaimRequest(walletAddress, "client-" + username, "0.00000000000000000000000001"),
                 "Bearer " + login.token()

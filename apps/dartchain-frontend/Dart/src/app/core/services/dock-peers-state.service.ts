@@ -1,30 +1,73 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Injectable, computed, inject } from '@angular/core';
 
-import { BlockchainApiService, PeerView } from './blockchain-api.service';
-import { formatDockRelativeTime } from '../utils/dock-time.util';
+import { PeersDataService } from './peers-data.service';
+import {
+  buildNetworkStats,
+  buildPeerRowView,
+  parsePeerEndpoint,
+} from '../../features/peer-panel/peer-panel.util';
 
 export type DockPeersPhase = 'error' | 'loading' | 'empty' | 'connected' | 'partial';
 
 @Injectable({ providedIn: 'root' })
 export class DockPeersStateService {
-  private readonly api = inject(BlockchainApiService);
+  private readonly peersData = inject(PeersDataService);
 
-  readonly loading = signal(false);
-  readonly error = signal(false);
-  readonly peers = signal<PeerView[]>([]);
-  readonly lastUpdatedAt = signal<number | null>(null);
+  readonly loading = this.peersData.loading;
+  readonly peers = this.peersData.peers;
+
+  readonly error = computed(() => this.peersData.error() === 'load');
 
   readonly peerCount = computed(() => this.peers().length);
   readonly connectedCount = computed(
     () => this.peers().filter((peer) => peer.status === 'CONNECTED').length
   );
 
+  readonly networkStats = computed(() =>
+    buildNetworkStats(
+      this.peers(),
+      this.peersData.statsTotal(),
+      this.peersData.measuredLatencyMs(),
+      this.peersData.serverAvgLatencyMs(),
+      this.peersData.serverNetworkLoadPercent()
+    )
+  );
+
+  /** Premier peer CONNECTED, sinon le premier de la liste. */
+  readonly primaryPeer = computed(() => {
+    const list = this.peers();
+    return list.find((peer) => peer.status === 'CONNECTED') ?? list[0] ?? null;
+  });
+
+  readonly primaryPeerName = computed(() => {
+    const peer = this.primaryPeer();
+    if (!peer) {
+      return '';
+    }
+    return parsePeerEndpoint(peer.url).nodeName;
+  });
+
+  /** Connexions actives vers le peer affiché (1 si CONNECTED, sinon 0). */
+  readonly primaryPeerConnectedPeople = computed(() => {
+    const peer = this.primaryPeer();
+    if (!peer) {
+      return 0;
+    }
+    return peer.status === 'CONNECTED' ? 1 : 0;
+  });
+
+  readonly latencyLabel = computed(() => {
+    const ms = this.networkStats().avgLatencyMs;
+    return ms === null ? '—' : `${ms} ms`;
+  });
+
+  readonly loadLabel = computed(() => `${this.networkStats().networkLoadPercent}%`);
+
   readonly phase = computed((): DockPeersPhase => {
     if (this.error()) {
       return 'error';
     }
-    if (this.loading()) {
+    if (this.loading() && this.peerCount() === 0) {
       return 'loading';
     }
     if (this.peerCount() === 0) {
@@ -51,56 +94,12 @@ export class DockPeersStateService {
     }
   });
 
-  readonly headline = computed(() => {
-    const connected = this.connectedCount();
-    const total = this.peerCount();
-    if (total === 0) {
-      return this.error() ? 'Peers indisponibles' : 'Ajouter un peer';
-    }
-
-    const latest = this.peers()[0];
-    const endpoint = latest?.url ?? '';
-    const shortEndpoint =
-      endpoint.length > 28 ? `${endpoint.slice(0, 18)}…` : endpoint;
-
-    return shortEndpoint
-      ? `${connected}/${total} · ${shortEndpoint}`
-      : `${connected}/${total} connectés`;
-  });
-
-  readonly progressLabel = computed(() => {
-    const total = this.peerCount();
-    if (total === 0) {
-      return '';
-    }
-    return `${this.connectedCount()} actifs sur ${total}`;
-  });
-
-  readonly updatedAgeLabel = computed(() =>
-    formatDockRelativeTime(this.lastUpdatedAt())
-  );
-
   async load(): Promise<void> {
-    if (this.loading()) {
-      return;
-    }
-
-    this.loading.set(true);
-    this.error.set(false);
-
-    try {
-      const response = await firstValueFrom(this.api.getPeers());
-      this.peers.set(Array.isArray(response) ? response : []);
-      this.lastUpdatedAt.set(Date.now());
-    } catch {
-      this.peers.set([]);
-      this.error.set(true);
-    } finally {
-      this.loading.set(false);
-    }
+    this.peersData.init();
+    await this.peersData.refreshAll(true);
   }
 
   refresh(): void {
-    void this.load();
+    this.peersData.scheduleRefresh(true);
   }
 }

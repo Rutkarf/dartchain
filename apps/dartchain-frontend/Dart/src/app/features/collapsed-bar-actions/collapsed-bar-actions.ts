@@ -24,4 +24,10 @@ export class CollapsedBarActionsComponent {
     event.stopPropagation();
     this.refresh.emit(event);
   }
+
+  onCollapseToggle(event?: Event): void {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.collapseToggle.emit();
+  }
 }

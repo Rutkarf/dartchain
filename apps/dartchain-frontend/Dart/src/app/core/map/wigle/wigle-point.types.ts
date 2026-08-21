@@ -11,16 +11,9 @@ export type WaveEffectType =
   | 'frequency-wave'
   | 'network-mesh';
 
+/** Effets sol uniquement — les variantes holographiques ne sont plus assignées. */
 export const WAVE_EFFECT_TYPES: readonly WaveEffectType[] = [
   'ripple-circular',
-  'pulse-glow',
-  'wave-spiral',
-  'radial-burst',
-  'em-field',
-  'signal-bars',
-  'data-stream',
-  'holo-dome',
-  'frequency-wave',
   'network-mesh',
 ] as const;
 

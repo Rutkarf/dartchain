@@ -3,7 +3,7 @@
  * N’altère pas la géométrie des rues, le spawn, ni les colliders.
  */
 export const MARSEILLE_CYBERPUNK_OVERLAY = {
-  enabled: true,
+  enabled: false,
   layerName: 'marseille-cyberpunk-overlay',
   neonIntensity: 0.55,
   hologramOpacity: 0.28,

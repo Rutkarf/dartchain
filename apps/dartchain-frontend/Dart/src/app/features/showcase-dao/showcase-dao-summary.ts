@@ -27,7 +27,7 @@ import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShowcaseDaoSummaryComponent implements OnInit, OnDestroy {
-  private static readonly CAROUSEL_MS = 3000;
+  private static readonly CAROUSEL_MS = 5000;
 
   protected readonly daoState = inject(ShowcaseDaoStateService);
   private readonly launchState = inject(ShowcaseLaunchStateService);
@@ -61,56 +61,15 @@ export class ShowcaseDaoSummaryComponent implements OnInit, OnDestroy {
       this.community.refreshing()
   );
 
-  readonly updatedAgeLabel = this.daoState.updatedAgeLabel;
-  readonly collapsedHeadline = this.daoState.collapsedHeadline;
-  readonly collapsedDaoCard = this.daoState.collapsedDaoCard;
-  readonly collapsedDaoStats = this.daoState.collapsedDaoStats;
-  readonly collapsedDaoSummary = this.daoState.collapsedDaoSummary;
-
   readonly carouselCards = computed(() => this.daoState.carouselCards());
 
   readonly carouselCard = computed((): DaoShowcaseCard | null => {
-    if (this.collapsedDaoCard()) {
-      return null;
-    }
-
     const cards = this.carouselCards();
     if (cards.length === 0) {
       return null;
     }
     const index = this.carouselIndex() % cards.length;
     return cards[index] ?? cards[0];
-  });
-
-  readonly badgeClass = computed(() => {
-    const selected = this.collapsedDaoCard();
-    if (selected) {
-      return selected.status === 'active'
-        ? 'dao-summary-status--active'
-        : 'dao-summary-status--inactive';
-    }
-
-    return this.daoState.activeCount() > 0
-      ? 'dao-summary-status--active'
-      : 'dao-summary-status--inactive';
-  });
-
-  readonly statusLabel = computed(() => {
-    const selected = this.collapsedDaoCard();
-    if (selected) {
-      return daoStatusLabel(selected.status);
-    }
-
-    return this.collapsedHeadline();
-  });
-
-  readonly statusLedDim = computed(() => {
-    const selected = this.collapsedDaoCard();
-    if (selected) {
-      return selected.status !== 'active';
-    }
-
-    return this.daoState.activeCount() === 0;
   });
 
   ngOnInit(): void {
@@ -127,22 +86,32 @@ export class ShowcaseDaoSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  barAriaLabel(): string {
-    const selected = this.collapsedDaoCard();
-    if (selected) {
-      return `${selected.name} ${selected.symbol}. ${this.collapsedDaoStats()}. ${this.collapsedDaoSummary()}`;
+  statusShortLabel(card: DaoShowcaseCard): string {
+    switch (card.status) {
+      case 'active':
+        return 'ON';
+      case 'closed':
+        return 'OFF';
+      default:
+        return '…';
     }
-
-    return `Résumé gouvernance D.A.O. ${this.collapsedHeadline()}`;
   }
 
-  statusAriaLabel(): string {
-    const selected = this.collapsedDaoCard();
-    if (selected) {
-      return `DAO sélectionnée : ${selected.name}, ${daoStatusLabel(selected.status)}`;
+  cardStats(card: DaoShowcaseCard): string {
+    return `${card.proposalsCount}P · ${card.votesCount}V · ${card.membersActive}M · PWR ${this.daoState.daoPowerPercent(card)}%`;
+  }
+
+  cardLineTitle(card: DaoShowcaseCard): string {
+    return `${daoStatusLabel(card.status)} · ${card.symbol} · ${card.name} · ${this.cardStats(card)} · ${card.summary}`;
+  }
+
+  barAriaLabel(): string {
+    const card = this.carouselCard();
+    if (card) {
+      return this.cardLineTitle(card);
     }
 
-    return `Statut : ${this.collapsedHeadline()}`;
+    return 'Résumé gouvernance D.A.O.';
   }
 
   onRefresh(event: Event): void {
@@ -154,10 +123,6 @@ export class ShowcaseDaoSummaryComponent implements OnInit, OnDestroy {
   private startCarousel(): void {
     this.stopCarousel();
     this.carouselTimer = window.setInterval(() => {
-      if (this.collapsedDaoCard()) {
-        return;
-      }
-
       const cards = this.carouselCards();
       if (cards.length <= 1) {
         return;

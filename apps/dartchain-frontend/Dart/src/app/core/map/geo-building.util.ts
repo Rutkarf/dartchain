@@ -70,12 +70,26 @@ export function createBuildingFromGeoData(
     building.heightMeters ??
     (building.levels != null ? building.levels * 3.1 : 12);
 
-  const shape = new THREE.Shape(shapePoints);
-  const geometry = new THREE.ExtrudeGeometry(shape, {
-    depth: height,
-    bevelEnabled: false,
-  });
-  geometry.rotateX(-Math.PI / 2);
+  const center = footprintCentroid(building.footprint, geo);
+  const bounds = footprintBounds(building.footprint, geo);
+  const width = Math.max(2, bounds.maxX - bounds.minX);
+  const depth = Math.max(2, bounds.maxZ - bounds.minZ);
+
+  let wallMesh: THREE.Mesh;
+  try {
+    const shape = new THREE.Shape(shapePoints);
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth: height,
+      bevelEnabled: false,
+    });
+    geometry.rotateX(-Math.PI / 2);
+    wallMesh = new THREE.Mesh(geometry, materials.wall);
+  } catch {
+    // Polygones OSM dégénérés → AABB fiable.
+    const box = new THREE.BoxGeometry(width, height, depth);
+    wallMesh = new THREE.Mesh(box, materials.wall);
+    wallMesh.position.set(center.x, height * 0.5, center.z);
+  }
 
   const group = new THREE.Group();
   group.name = building.id;
@@ -86,23 +100,30 @@ export function createBuildingFromGeoData(
     geoBuilding: true,
   };
 
-  const mesh = new THREE.Mesh(geometry, materials.wall);
-  mesh.name = building.id;
-  mesh.castShadow = false;
-  mesh.receiveShadow = false;
-  group.add(mesh);
+  wallMesh.name = building.id;
+  wallMesh.castShadow = false;
+  wallMesh.receiveShadow = false;
+  group.add(wallMesh);
 
   if (materials.roof) {
-    const roofGeo = new THREE.ShapeGeometry(new THREE.Shape(shapePoints));
-    roofGeo.rotateX(-Math.PI / 2);
-    const roof = new THREE.Mesh(roofGeo, materials.roof);
-    roof.name = `${building.id}-roof`;
-    roof.position.y = height + 0.08;
-    group.add(roof);
+    try {
+      const roofGeo = new THREE.ShapeGeometry(new THREE.Shape(shapePoints));
+      roofGeo.rotateX(-Math.PI / 2);
+      const roof = new THREE.Mesh(roofGeo, materials.roof);
+      roof.name = `${building.id}-roof`;
+      roof.position.y = height + 0.08;
+      group.add(roof);
+    } catch {
+      const roof = new THREE.Mesh(
+        new THREE.BoxGeometry(width * 1.02, 0.45, depth * 1.02),
+        materials.roof
+      );
+      roof.name = `${building.id}-roof`;
+      roof.position.set(center.x, height + 0.22, center.z);
+      group.add(roof);
+    }
   }
 
-  const center = footprintCentroid(building.footprint, geo);
-  const bounds = footprintBounds(building.footprint, geo);
   const sourceCentroid = building.footprint[0];
 
   const audit: BuildingPlacementAudit = {
@@ -123,6 +144,71 @@ export function createBuildingFromGeoData(
   };
 
   void geoReference;
+
+  return { group, center, collider: bounds, audit };
+}
+
+/** Massing AABB depuis empreinte GPS — toujours visible (pas d’Extrude). */
+export function createBoxBuildingFromGeoData(
+  building: GeoBuilding,
+  geo: GeoCoordinateService,
+  materials: { wall: THREE.Material; roof?: THREE.Material }
+): GeoBuildingMeshResult | null {
+  if (building.footprint.length < 4) return null;
+
+  const height =
+    building.heightMeters ??
+    (building.levels != null ? building.levels * 3.1 : 12);
+  const center = footprintCentroid(building.footprint, geo);
+  const bounds = footprintBounds(building.footprint, geo);
+  const width = Math.max(3, bounds.maxX - bounds.minX);
+  const depth = Math.max(3, bounds.maxZ - bounds.minZ);
+
+  const group = new THREE.Group();
+  group.name = building.id;
+  group.userData = {
+    sourceId: building.sourceId,
+    source: building.source,
+    confidence: building.confidence,
+    geoBuilding: true,
+  };
+
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(width, height, depth),
+    materials.wall
+  );
+  body.name = building.id;
+  body.position.set(center.x, height * 0.5, center.z);
+  body.frustumCulled = true;
+  group.add(body);
+
+  if (materials.roof) {
+    const roof = new THREE.Mesh(
+      new THREE.BoxGeometry(width * 1.02, 0.5, depth * 1.02),
+      materials.roof
+    );
+    roof.name = `${building.id}-roof`;
+    roof.position.set(center.x, height + 0.25, center.z);
+    group.add(roof);
+  }
+
+  const sourceCentroid = building.footprint[0];
+  const audit: BuildingPlacementAudit = {
+    buildingId: building.id,
+    sourcePosition: {
+      latitude: sourceCentroid.latitude,
+      longitude: sourceCentroid.longitude,
+    },
+    worldPosition: center.clone(),
+    expectedWorldPosition: center.clone(),
+    errorMeters: 0,
+    intersectsRoad: false,
+    intersectsWater: isHarborWaterAt(center.x, center.z),
+    floating: false,
+    buried: false,
+    confidence: building.confidence,
+    source: building.sourceId,
+  };
 
   return { group, center, collider: bounds, audit };
 }

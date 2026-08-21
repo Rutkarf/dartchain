@@ -41,7 +41,7 @@ describe('World streaming and R4V3 cells', () => {
     service.dispose();
     const root = new THREE.Group();
     service.attach(root);
-    const origin = new THREE.Vector3(-6.2, 0, -2.4);
+    const origin = new THREE.Vector3(0, 0, 0);
     expect(getLodBand(lodDistanceFromPlayer(origin.x, origin.z, -5.625, -1.875))).toBe('near');
 
     let manualFull = 0;
