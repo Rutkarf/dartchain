@@ -72,6 +72,10 @@ import { WigleVisualizationService } from './wigle/wigle-visualization.service';
 
 /** Hauteur esplanade / place Ombrière (dalle visuelle ~0.36). */
 const ESPLANADE_SURFACE_Y = 0.36;
+/** Largeur du plan terrain prototype (est–ouest). */
+const LAND_TERRAIN_WIDTH = 260;
+/** Position Z du quai sud (Belges), dérivée de la géométrie port. */
+const HARBOR_QUAY_Z = MARSEILLE_HARBOR_WATER.quayZ;
 /** Zone libre autour du spawn — aucun collider bâtiment. */
 const SPAWN_COLLIDER_CLEARANCE_M = 12;
 const CYBERPUNK_ART_DIRECTION = {
