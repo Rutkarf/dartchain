@@ -103,6 +103,15 @@ describe('AppComponent', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
+  it('starts with showcase, dock, and graph collapsed', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+
+    expect(app.showcaseCollapsed()).toBe(true);
+    expect(app.dockCollapsed()).toBe(true);
+    expect(app.chartCollapsed()).toBe(true);
+  });
+
   it('should render the app shell and showcase block', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();

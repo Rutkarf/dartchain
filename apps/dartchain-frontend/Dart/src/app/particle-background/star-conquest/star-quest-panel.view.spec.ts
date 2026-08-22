@@ -10,7 +10,7 @@ import { starConquestLiveLink } from './star-conquest-live';
 
 describe('Star quest panel view-model', () => {
   it('keeps preview CTA distinct from live Dock actions', () => {
-    const preview = starQuestById('sc-angular-layout');
+    const preview = starQuestById('sc-swap-slippage');
     const live = starQuestById('sc-swap-confirm');
     expect(preview).toBeTruthy();
     expect(live).toBeTruthy();

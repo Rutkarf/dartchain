@@ -3,6 +3,8 @@ import { BehaviorSubject } from 'rxjs';
 import * as THREE from 'three';
 
 import { MapConfigService } from './map-config.service';
+import { mapPerfProfile } from './marseille-perf.config';
+import { shouldRunSimTick } from './marseille-sim-throttle.util';
 import { LegacyFloorMapProvider } from './legacy-floor-map.provider';
 import { MarseilleMapProvider } from './marseille-map.provider';
 import { WigleVisualizationService } from './wigle/wigle-visualization.service';
@@ -33,6 +35,9 @@ export class MapLoadingService {
   private scene: THREE.Scene | null = null;
   private networkRoot: THREE.Group | null = null;
   private lastNetworkUpdateMs = 0;
+  private networkFrameIndex = 0;
+  private lastNetworkCameraX = Number.NaN;
+  private lastNetworkCameraZ = Number.NaN;
 
   private readonly stateSubject = new BehaviorSubject<MapLoadState>({
     activeProviderId: 'legacy-floor',
@@ -121,11 +126,30 @@ export class MapLoadingService {
     this.activeProvider?.update(cameraPosition);
 
     if (this.networkRoot && this.scene) {
-      const now = performance.now();
-      const deltaSeconds =
-        this.lastNetworkUpdateMs > 0 ? (now - this.lastNetworkUpdateMs) * 0.001 : 0.016;
-      this.lastNetworkUpdateMs = now;
-      this.wigleVisualization.update(cameraPosition, deltaSeconds);
+      this.networkFrameIndex++;
+      const perf = mapPerfProfile(this.config.configuration.quality);
+      const idle =
+        Number.isFinite(this.lastNetworkCameraX) &&
+        Math.hypot(
+          cameraPosition.x - this.lastNetworkCameraX,
+          cameraPosition.z - this.lastNetworkCameraZ
+        ) < 0.04;
+      const runNetwork = shouldRunSimTick(
+        this.networkFrameIndex,
+        perf.networkTickSkip,
+        perf.networkTickSkip + 1,
+        idle
+      );
+
+      if (runNetwork) {
+        const now = performance.now();
+        const deltaSeconds =
+          this.lastNetworkUpdateMs > 0 ? (now - this.lastNetworkUpdateMs) * 0.001 : 0.016;
+        this.lastNetworkUpdateMs = now;
+        this.lastNetworkCameraX = cameraPosition.x;
+        this.lastNetworkCameraZ = cameraPosition.z;
+        this.wigleVisualization.update(cameraPosition, deltaSeconds);
+      }
     }
     this.placementLayer.update();
   }

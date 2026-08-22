@@ -13,24 +13,31 @@ import { CameraControlService } from '../core/services/camera-control.service';
 import { CharacterControlService } from '../core/services/character-control.service';
 import { ThreeSceneService } from '../core/services/three-scene.service';
 import { MapConfigService } from '../core/map/map-config.service';
-import { FLOOR_HORIZON_BLEND, floorHorizonMaskImage } from './floor-horizon-blend.config';
+import type { MapQuality } from '../core/map/map-configuration';
+import { mapPerfProfile } from '../core/map/marseille-perf.config';
+import { MarseilleAtmosphereService } from '../core/map/marseille-atmosphere.service';
+import {
+  MetaverseBbRenderPipeline,
+  shouldUseRenderPipeline,
+} from '../core/map/metaversebb-render.pipeline';
+import { harmonizedHorizonMaskImage, harmonizedHorizonSkyCssColor } from '../core/map/floor-horizon-atmosphere.util';
+import { FLOOR_HORIZON_BLEND } from './floor-horizon-blend.config';
 import {
   bindContainerResize,
   type ContainerResizeBinding,
   readContainerSize,
 } from '../core/utils/three-container.util';
-import {
-  bindWebGlVisibilityPause,
-  shouldAnimateWebGl,
-} from '../core/utils/three-animation.util';
 import { applyCanvasLayerStyles } from '../core/utils/three-webgl.util';
 import {
   PerfProfiler,
   isPerfDebugEnabled,
-  markRafLoopStart,
-  markRafLoopStop,
   resetCollisionChecks,
 } from '../core/utils/perf-profiler.util';
+import {
+  WebGlAnimationSchedulerService,
+  type WebGlFrameContext,
+} from '../core/utils/web-gl-animation-scheduler.service';
+import { CombinedPerfHudService } from '../core/utils/combined-perf-hud.service';
 import { CharacterComponent } from './character/character.component';
 import { CitySceneComponent } from './city-scene/city-scene.component';
 import { JoystickMoveComponent } from './joystick-move/joystick-move.component';
@@ -41,12 +48,11 @@ const FLOOR_HEIGHT_FALLBACK = 420;
 const PERF_DEBUG = isPerfDebugEnabled();
 
 function getTargetPixelRatio(
-  quality: 'low' | 'medium' | 'high',
+  quality: MapQuality,
   devicePixelRatio: number
 ): number {
-  if (quality === 'low') return 1;
-  if (quality === 'high') return Math.min(devicePixelRatio, 2);
-  return Math.min(devicePixelRatio, 1.5);
+  const cap = mapPerfProfile(quality).pixelRatioCap;
+  return Math.min(devicePixelRatio, cap);
 }
 
 /**
@@ -76,15 +82,17 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private readonly characterControl = inject(CharacterControlService);
   private readonly cameraControl = inject(CameraControlService);
   private readonly mapConfig = inject(MapConfigService);
+  private readonly atmosphere = inject(MarseilleAtmosphereService);
   private readonly zone = inject(NgZone);
+  private readonly animationScheduler = inject(WebGlAnimationSchedulerService);
+  private readonly combinedPerfHud = inject(CombinedPerfHudService);
 
   private scene?: THREE.Scene;
   private camera?: THREE.PerspectiveCamera;
   private renderer?: THREE.WebGLRenderer;
-  private animationId?: number;
+  private renderPipeline?: MetaverseBbRenderPipeline;
+  private schedulerUnregister?: () => void;
 
-  private animating = false;
-  private visibilityBinding?: { unsubscribe: () => void };
   private resizeBinding?: ContainerResizeBinding;
   private lastFrameMs = 0;
   private lastPerfReportMs = 0;
@@ -100,9 +108,10 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     this.characterControl.unbindKeys();
     this.cameraControl.detachOrbit();
     this.threeScene.unregister();
-    this.visibilityBinding?.unsubscribe();
+    this.schedulerUnregister?.();
+    this.schedulerUnregister = undefined;
+    this.animationScheduler.pauseSubscriber('metaverse-floor');
     this.resizeBinding?.unsubscribe();
-    this.pauseAnimation();
     if (this.renderer) {
       this.renderer.renderLists.dispose();
       this.renderer.dispose();
@@ -111,6 +120,9 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     this.scene?.clear();
     this.scene = undefined;
     this.camera = undefined;
+    this.renderPipeline?.dispose();
+    this.renderPipeline = undefined;
+    this.atmosphere.dispose();
   }
 
   private initScene(): void {
@@ -125,42 +137,14 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       });
 
       this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(FLOOR_HORIZON_BLEND.skyColor);
-      this.scene.fog = new THREE.Fog(
-        FLOOR_HORIZON_BLEND.fog.color,
-        FLOOR_HORIZON_BLEND.fog.near,
-        FLOOR_HORIZON_BLEND.fog.far
-      );
 
       this.camera = new THREE.PerspectiveCamera(52, width / height, 0.18, 1600);
       this.camera.position.set(0, 14, 18);
       this.camera.lookAt(0, 2, -14);
 
-      const ambient = new THREE.AmbientLight(0xb7c8ff, 0.28);
-      ambient.name = 'floor-night-ambient';
-      this.scene.add(ambient);
+      const quality = this.mapConfig.configuration.quality;
 
-      const topLight = new THREE.DirectionalLight(0xc5d4ff, 0.48);
-      topLight.name = 'floor-moon-key';
-      topLight.position.set(2, 10, 4);
-      topLight.castShadow = false;
-      this.scene.add(topLight);
-
-      const fill = new THREE.DirectionalLight(0x7aa6ff, 0.22);
-      fill.name = 'floor-urban-fill';
-      fill.position.set(-4, 4, -2);
-      fill.castShadow = false;
-      this.scene.add(fill);
-
-      const accent = new THREE.DirectionalLight(0xff6ad5, 0.12);
-      accent.name = 'floor-neon-rim';
-      accent.position.set(-8, 6, -10);
-      accent.castShadow = false;
-      this.scene.add(accent);
-
-      const hemi = new THREE.HemisphereLight(0x08090c, 0x050508, 0.16);
-      hemi.name = 'floor-hemi-fill';
-      this.scene.add(hemi);
+      console.info('[ThreeFloor] mapQuality:', quality, '(verrouillé ultra-low produit)');
 
       this.renderer = new THREE.WebGLRenderer({
         canvas,
@@ -184,9 +168,21 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       this.applyHorizonBlendMask();
       this.renderer.outputColorSpace = THREE.SRGBColorSpace;
       this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      this.renderer.toneMappingExposure = 1.02;
-      this.renderer.shadowMap.enabled = false;
+
+      this.atmosphere.applyToScene(this.scene, quality);
+      this.atmosphere.buildPmremEnvironment(this.renderer);
+      this.atmosphere.configureRendererShadows(this.renderer, quality);
+      this.renderer.toneMappingExposure = this.atmosphere.getToneMappingExposure();
+
       applyCanvasLayerStyles(canvas, 'floor');
+
+      const pixelRatio = getTargetPixelRatio(quality, window.devicePixelRatio || 1);
+      if (shouldUseRenderPipeline(quality)) {
+        this.renderPipeline = new MetaverseBbRenderPipeline(this.renderer, this.scene, this.camera, {
+          quality,
+          pixelRatio,
+        });
+      }
 
       if (PERF_DEBUG) console.log('[PERF] Three.js renderer created');
 
@@ -217,12 +213,16 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
         { width: window.innerWidth, height: FLOOR_HEIGHT_FALLBACK }
       );
 
-      this.visibilityBinding = bindWebGlVisibilityPause(
-        () => this.pauseAnimation(),
-        () => this.resumeAnimation()
-      );
-      this.lastFrameMs = performance.now();
-      this.resumeAnimation();
+      this.schedulerUnregister = this.animationScheduler.register({
+        id: 'metaverse-floor',
+        order: 20,
+        onFrame: (ctx) => this.onSchedulerFrame(ctx),
+        onPause: () => this.renderFrame(),
+        onResume: () => {
+          this.lastPerfReportMs = performance.now();
+        },
+      });
+      this.animationScheduler.resumeSubscriber('metaverse-floor');
 
       if (PERF_DEBUG) {
         console.log('[PERF] Render loop started');
@@ -234,31 +234,43 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     }
   }
 
-  private animate = (): void => {
-    if (!this.animating || !this.scene || !this.camera || !this.renderer) {
-      return;
-    }
+  private onSchedulerFrame(ctx: WebGlFrameContext): void {
+    if (!this.scene || !this.camera || !this.renderer) return;
 
-    this.animationId = requestAnimationFrame(this.animate);
-
-    const now = performance.now();
-    const deltaSeconds = Math.min(0.05, (now - this.lastFrameMs) / 1000);
-    this.lastFrameMs = now;
-
-    if (shouldAnimateWebGl()) {
+    if (ctx.animating) {
       if (PERF_DEBUG) resetCollisionChecks();
-      this.threeScene.tick(deltaSeconds);
+      this.threeScene.tick(ctx.deltaSeconds);
+      const cam = this.camera.position;
+      this.atmosphere.updateRuntime(
+        cam.x,
+        cam.z,
+        this.mapConfig.configuration.quality,
+        cam.y
+      );
+      if (this.renderPipeline) {
+        this.renderPipeline.updateFrame({
+          focusX: cam.x,
+          focusZ: cam.z,
+          focusY: cam.y,
+          cameraDistance: Math.hypot(cam.x, cam.z),
+          validationDof: this.cameraControl.isValidationViewActive(),
+        });
+      }
       this.renderFrame();
     }
 
+    this.combinedPerfHud.reportFloor(this.renderer.info);
+
     if (PERF_DEBUG) {
-      this.profiler.sample(deltaSeconds * 1000);
+      this.profiler.sample(ctx.deltaMs);
       this.profiler.maybeReport(this.renderer, this.scene.children.length, 'floor');
+      const now = performance.now();
       if (now - this.lastPerfReportMs > 1000) {
         this.lastPerfReportMs = now;
         console.log('[METAVERSE:BASELINE]', {
           mapQuality: this.mapConfig.configuration.quality,
-          fps: Math.round(deltaSeconds > 0 ? 1 / deltaSeconds : 0),
+          fps: Math.round(ctx.deltaMs > 0 ? 1000 / ctx.deltaMs : 0),
+          combinedFrameMs: Math.round(this.animationScheduler.getLastCombinedFrameMs() * 10) / 10,
           drawCalls: this.renderer.info.render.calls,
           triangles: this.renderer.info.render.triangles,
           geometries: this.renderer.info.memory.geometries,
@@ -271,29 +283,15 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
         });
       }
     }
-  };
+  }
 
   private renderFrame(): void {
     if (!this.scene || !this.camera || !this.renderer) return;
-    this.renderer.render(this.scene, this.camera);
-  }
-
-  private pauseAnimation(): void {
-    this.renderFrame();
-    this.animating = false;
-    if (this.animationId != null) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = undefined;
+    if (this.renderPipeline?.usesComposer()) {
+      this.renderPipeline.render();
+      return;
     }
-    markRafLoopStop();
-  }
-
-  private resumeAnimation(): void {
-    if (this.animating) return;
-    this.animating = true;
-    this.lastFrameMs = performance.now();
-    markRafLoopStart();
-    this.animate();
+    this.renderer.render(this.scene, this.camera);
   }
 
   private applyRendererSize(width: number, height: number): void {
@@ -304,14 +302,16 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       getTargetPixelRatio(this.mapConfig.configuration.quality, window.devicePixelRatio || 1)
     );
     this.renderer.setSize(width, height, false);
+    this.renderPipeline?.setSize(width, height, this.renderer.getPixelRatio());
     this.renderFrame();
   }
 
   private applyHorizonBlendMask(): void {
     const wrapper = this.floorWrapper?.nativeElement;
     if (!wrapper) return;
-    const mask = floorHorizonMaskImage();
+    const mask = harmonizedHorizonMaskImage();
     wrapper.style.setProperty('-webkit-mask-image', mask);
     wrapper.style.setProperty('mask-image', mask);
+    wrapper.style.backgroundColor = harmonizedHorizonSkyCssColor();
   }
 }

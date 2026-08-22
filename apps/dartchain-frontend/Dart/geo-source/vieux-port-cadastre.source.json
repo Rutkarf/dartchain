@@ -1,0 +1,396 @@
+{
+  "landmarks": [
+    {
+      "id": "mirror-adjacent-building-01",
+      "sourceId": "osm-way-67705148",
+      "label": "Immeuble nord-est Ombrière",
+      "heightMeters": 20,
+      "levels": 7,
+      "confidence": "high",
+      "ring": [
+        [
+          43.2947401,
+          5.3748797
+        ],
+        [
+          43.2947291,
+          5.3748431
+        ],
+        [
+          43.2947103,
+          5.3747803
+        ],
+        [
+          43.2946987,
+          5.3747415
+        ],
+        [
+          43.2946559,
+          5.3747517
+        ],
+        [
+          43.2945318,
+          5.3747811
+        ],
+        [
+          43.2945637,
+          5.3749362
+        ],
+        [
+          43.2946371,
+          5.3749074
+        ],
+        [
+          43.2946605,
+          5.374898
+        ]
+      ]
+    },
+    {
+      "id": "mirror-adjacent-building-02",
+      "sourceId": "osm-way-67704902",
+      "label": "Immeuble nord Ombrière (R4V3)",
+      "heightMeters": 24,
+      "levels": 6,
+      "confidence": "high",
+      "ring": [
+        [
+          43.2948804,
+          5.3748145
+        ],
+        [
+          43.2948505,
+          5.3747038
+        ],
+        [
+          43.2948213,
+          5.3747109
+        ],
+        [
+          43.2947839,
+          5.3747199
+        ],
+        [
+          43.2948057,
+          5.3747917
+        ],
+        [
+          43.294822,
+          5.3748454
+        ]
+      ]
+    },
+    {
+      "id": "harbor-west-building",
+      "sourceId": "osm-way-67701479",
+      "label": "Façade ouest Vieux-Port",
+      "heightMeters": 18,
+      "levels": 6,
+      "confidence": "medium",
+      "ring": [
+        [
+          43.2938842,
+          5.3736732
+        ],
+        [
+          43.2937536,
+          5.3737278
+        ],
+        [
+          43.293723,
+          5.373741
+        ],
+        [
+          43.2937603,
+          5.3738959
+        ],
+        [
+          43.2938419,
+          5.373862
+        ],
+        [
+          43.2939237,
+          5.3738281
+        ],
+        [
+          43.2939034,
+          5.3737484
+        ]
+      ]
+    },
+    {
+      "id": "harbor-east-building",
+      "sourceId": "osm-way-67708729",
+      "label": "Hôtel des Princes",
+      "heightMeters": 22,
+      "levels": 6,
+      "confidence": "medium",
+      "ring": [
+        [
+          43.2945423,
+          5.3754534
+        ],
+        [
+          43.2945623,
+          5.375533
+        ],
+        [
+          43.2945692,
+          5.3755604
+        ],
+        [
+          43.2945957,
+          5.3756658
+        ],
+        [
+          43.2946322,
+          5.3756554
+        ],
+        [
+          43.294683,
+          5.375641
+        ],
+        [
+          43.2947104,
+          5.3756333
+        ],
+        [
+          43.2947698,
+          5.3756166
+        ],
+        [
+          43.2947447,
+          5.3755251
+        ],
+        [
+          43.2947393,
+          5.3755075
+        ],
+        [
+          43.2947423,
+          5.3755059
+        ],
+        [
+          43.2948003,
+          5.3754718
+        ],
+        [
+          43.2948198,
+          5.3754606
+        ],
+        [
+          43.2948127,
+          5.3754358
+        ],
+        [
+          43.2947878,
+          5.3753465
+        ],
+        [
+          43.2946559,
+          5.3754039
+        ]
+      ]
+    }
+  ],
+  "spawnBlocks": [
+    {
+      "id": "fraternite-ne-0",
+      "sourceId": "geo-fraternite-ne-0",
+      "label": "Fraternité NE 0",
+      "lat": 43.29485102712899,
+      "lon": 5.374591703444696,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 18,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-ne-1",
+      "sourceId": "geo-fraternite-ne-1",
+      "label": "Fraternité NE 1",
+      "lat": 43.29485102712899,
+      "lon": 5.3748138629711315,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 21,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-ne-2",
+      "sourceId": "geo-fraternite-ne-2",
+      "label": "Fraternité NE 2",
+      "lat": 43.29485102712899,
+      "lon": 5.375036022497566,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 24,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-ne-3",
+      "sourceId": "geo-fraternite-ne-3",
+      "label": "Fraternité NE 3",
+      "lat": 43.29485102712899,
+      "lon": 5.375258182024002,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 27,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-ne-4",
+      "sourceId": "geo-fraternite-ne-4",
+      "label": "Fraternité NE 4",
+      "lat": 43.29485102712899,
+      "lon": 5.375480341550436,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 18,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-ne-5",
+      "sourceId": "geo-fraternite-ne-5",
+      "label": "Fraternité NE 5",
+      "lat": 43.29504865558749,
+      "lon": 5.374591703444696,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 21,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-ne-6",
+      "sourceId": "geo-fraternite-ne-6",
+      "label": "Fraternité NE 6",
+      "lat": 43.29504865558749,
+      "lon": 5.3748138629711315,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 24,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-ne-7",
+      "sourceId": "geo-fraternite-ne-7",
+      "label": "Fraternité NE 7",
+      "lat": 43.29504865558749,
+      "lon": 5.375036022497566,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 27,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-ne-8",
+      "sourceId": "geo-fraternite-ne-8",
+      "label": "Fraternité NE 8",
+      "lat": 43.29504865558749,
+      "lon": 5.375258182024002,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 18,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-ne-9",
+      "sourceId": "geo-fraternite-ne-9",
+      "label": "Fraternité NE 9",
+      "lat": 43.29504865558749,
+      "lon": 5.375480341550436,
+      "widthM": 14,
+      "depthM": 16,
+      "heightM": 21,
+      "levels": 6
+    },
+    {
+      "id": "fraternite-se-0",
+      "sourceId": "geo-fraternite-se-0",
+      "label": "Fraternité SE 0",
+      "lat": 43.294383905318,
+      "lon": 5.374641072228348,
+      "widthM": 13,
+      "depthM": 15,
+      "heightM": 16,
+      "levels": 5
+    },
+    {
+      "id": "fraternite-se-1",
+      "sourceId": "geo-fraternite-se-1",
+      "label": "Fraternité SE 1",
+      "lat": 43.294383905318,
+      "lon": 5.374863231754784,
+      "widthM": 13,
+      "depthM": 15,
+      "heightM": 19,
+      "levels": 5
+    },
+    {
+      "id": "fraternite-se-2",
+      "sourceId": "geo-fraternite-se-2",
+      "label": "Fraternité SE 2",
+      "lat": 43.294383905318,
+      "lon": 5.375085391281218,
+      "widthM": 13,
+      "depthM": 15,
+      "heightM": 22,
+      "levels": 5
+    },
+    {
+      "id": "fraternite-se-3",
+      "sourceId": "geo-fraternite-se-3",
+      "label": "Fraternité SE 3",
+      "lat": 43.294383905318,
+      "lon": 5.375307550807654,
+      "widthM": 13,
+      "depthM": 15,
+      "heightM": 16,
+      "levels": 5
+    },
+    {
+      "id": "fraternite-se-4",
+      "sourceId": "geo-fraternite-se-4",
+      "label": "Fraternité SE 4",
+      "lat": 43.294204243083,
+      "lon": 5.374641072228348,
+      "widthM": 13,
+      "depthM": 15,
+      "heightM": 19,
+      "levels": 5
+    },
+    {
+      "id": "fraternite-se-5",
+      "sourceId": "geo-fraternite-se-5",
+      "label": "Fraternité SE 5",
+      "lat": 43.294204243083,
+      "lon": 5.374863231754784,
+      "widthM": 13,
+      "depthM": 15,
+      "heightM": 22,
+      "levels": 5
+    },
+    {
+      "id": "fraternite-se-6",
+      "sourceId": "geo-fraternite-se-6",
+      "label": "Fraternité SE 6",
+      "lat": 43.294204243083,
+      "lon": 5.375085391281218,
+      "widthM": 13,
+      "depthM": 15,
+      "heightM": 16,
+      "levels": 5
+    },
+    {
+      "id": "fraternite-se-7",
+      "sourceId": "geo-fraternite-se-7",
+      "label": "Fraternité SE 7",
+      "lat": 43.294204243083,
+      "lon": 5.375307550807654,
+      "widthM": 13,
+      "depthM": 15,
+      "heightM": 19,
+      "levels": 5
+    }
+  ]
+}

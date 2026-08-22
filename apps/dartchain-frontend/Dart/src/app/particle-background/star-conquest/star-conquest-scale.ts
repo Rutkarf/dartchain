@@ -172,22 +172,23 @@ export const STAR_CONQUEST_GPU_BUDGET: Record<
   StarConquestGpuQuality,
   { depthDensity: number; dprCap: number }
 > = {
-  'ultra-low': { depthDensity: 0.32, dprCap: 1 },
-  low: { depthDensity: 0.55, dprCap: 1.25 },
-  medium: { depthDensity: 1.12, dprCap: 1.85 },
-  high: { depthDensity: 1.22, dprCap: 2 },
+  /** 250×550 natif — fill rate minimal, parité visuelle via densité scalée. */
+  'ultra-low': { depthDensity: 0.24, dprCap: 1 },
+  low: { depthDensity: 0.5, dprCap: 1 },
+  medium: { depthDensity: 0.95, dprCap: 1.25 },
+  high: { depthDensity: 1.1, dprCap: 1.5 },
 };
 
 export function starConquestDepthDensity(
-  quality: StarConquestGpuQuality = 'medium'
+  _quality: StarConquestGpuQuality = 'ultra-low'
 ): number {
-  return STAR_CONQUEST_SCALE.depthDensity * STAR_CONQUEST_GPU_BUDGET[quality].depthDensity;
+  return (
+    STAR_CONQUEST_SCALE.depthDensity * STAR_CONQUEST_GPU_BUDGET['ultra-low'].depthDensity
+  );
 }
 
-export function starConquestDprCap(
-  quality: StarConquestGpuQuality = 'medium'
-): number {
-  return STAR_CONQUEST_GPU_BUDGET[quality].dprCap;
+export function starConquestDprCap(_quality: StarConquestGpuQuality = 'ultra-low'): number {
+  return STAR_CONQUEST_GPU_BUDGET['ultra-low'].dprCap;
 }
 
 export function starConquestPongSize(

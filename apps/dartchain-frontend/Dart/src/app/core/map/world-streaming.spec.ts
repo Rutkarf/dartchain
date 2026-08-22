@@ -80,6 +80,22 @@ describe('World streaming and R4V3 cells', () => {
     expect(stats.lodCounts.mid + stats.lodCounts.far).toBeGreaterThan(0);
     const again = service.update(origin);
     expect(again).toBe(count);
+
+    const mesh = root.getObjectByName('r4v3-token-instances-mesh') as THREE.InstancedMesh;
+    const m0 = new THREE.Matrix4();
+    mesh.getMatrixAt(0, m0);
+    const rot0 = new THREE.Euler().setFromRotationMatrix(m0);
+    for (let i = 0; i < 4; i++) {
+      service.tickVisuals(1 / 60);
+    }
+    const m1 = new THREE.Matrix4();
+    mesh.getMatrixAt(0, m1);
+    const rot1 = new THREE.Euler().setFromRotationMatrix(m1);
+    expect(Math.abs(rot1.y - rot0.y)).toBeGreaterThan(0.01);
+    const animStats = service.getDebugStats();
+    expect(animStats.nearAnimationFrequencyHz).toBe(60);
+    expect(animStats.midAnimationFrequencyHz).toBe(24);
+
     service.dispose();
   });
 

@@ -52,6 +52,12 @@ import {
   STAR_PONG_OUTER_H as SCALE_PONG_H,
   STAR_PONG_OUTER_W as SCALE_PONG_W,
 } from './star-conquest-scale';
+import {
+  starConquestClientToLayout,
+  starConquestLayoutHeight,
+  starConquestLayoutWidth,
+  starConquestNdcToLayout,
+} from './star-conquest-viewport.util';
 
 function hashFloat(id: string): number {
   let h = 2166136261;
@@ -208,7 +214,7 @@ export class StarConquestGraph {
   private universeTheme: StarConquestUniverseTheme = starConquestUniverseTheme(
     DEFAULT_STAR_CONQUEST_UNIVERSE
   );
-  private gpuQuality: StarConquestGpuQuality = 'medium';
+  private gpuQuality: StarConquestGpuQuality = 'ultra-low';
 
   /** Exclusion écran joystick — aucune particule dans / derrière la hitbox. */
   private joyExclX = 0;
@@ -527,14 +533,14 @@ export class StarConquestGraph {
     this.applyFocusVisuals();
   }
 
-  setGpuQuality(quality: StarConquestGpuQuality): void {
-    this.gpuQuality = quality;
-    this.background.setGpuQuality(quality);
+  setGpuQuality(_quality: StarConquestGpuQuality): void {
+    this.gpuQuality = 'ultra-low';
+    this.background.setGpuQuality('ultra-low');
     this.background.applyUniverse(this.universeTheme);
   }
 
   getGpuQuality(): StarConquestGpuQuality {
-    return this.gpuQuality;
+    return 'ultra-low';
   }
 
   /** Bascule l’univers spatial Star Conquest (100 % autonome, sans metaverse floor). */
@@ -801,8 +807,8 @@ export class StarConquestGraph {
 
   /** Positions écran de toutes les Quests (occlusion / labels). */
   projectAllToScreen(camera: THREE.Camera): StarQuestScreenPos[] {
-    const vw = window.innerWidth || 1;
-    const vh = window.innerHeight || 1;
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
     const pos = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
     const out: StarQuestScreenPos[] = [];
     for (let i = 0; i < this.quests.length; i++) {
@@ -884,8 +890,8 @@ export class StarConquestGraph {
    */
   private applyOuterBorderPingPong(cam: THREE.PerspectiveCamera, dt: number): void {
     const pos = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
-    const vw = window.innerWidth || 250;
-    const vh = window.innerHeight || 550;
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
     const { w: outerW, h: outerH } = starConquestPongSize(vw, vh);
     const left = (vw - outerW) * 0.5;
     const right = left + outerW;
@@ -1328,8 +1334,8 @@ export class StarConquestGraph {
     // (les liens peuvent traverser — pas d’atténuation ici).
     if (camera && this.joyExclActive && 'position' in camera) {
       const cam = camera as THREE.PerspectiveCamera;
-      const vw = window.innerWidth || 1;
-      const vh = window.innerHeight || 1;
+      const vw = starConquestLayoutWidth();
+      const vh = starConquestLayoutHeight();
       const soft = 18;
       const jl = this.joyExclL;
       const jt = this.joyExclT;
@@ -1463,8 +1469,8 @@ export class StarConquestGraph {
     this.writeGhostPositions(pos);
     this.writeConstellationGuides();
 
-    const vw = typeof window !== 'undefined' ? window.innerWidth : 250;
-    const vh = typeof window !== 'undefined' ? window.innerHeight : 550;
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
     this.filamentMat.uniforms['uTime'].value = this.driftTime;
     this.filamentMat.uniforms['uResolution'].value.set(vw, vh);
     this.lineCoreMat.uniforms['uTime'].value = this.driftTime;
@@ -1532,10 +1538,14 @@ export class StarConquestGraph {
     clientY?: number,
     radiusPx = STAR_CONQUEST_SCALE.pickRadiusPx
   ): StarConquestHit | null {
-    const vw = window.innerWidth || 1;
-    const vh = window.innerHeight || 1;
-    const sx = clientX !== undefined ? clientX : (ndc.x * 0.5 + 0.5) * vw;
-    const sy = clientY !== undefined ? clientY : (-ndc.y * 0.5 + 0.5) * vh;
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
+    const layoutPt =
+      clientX !== undefined && clientY !== undefined
+        ? starConquestClientToLayout(clientX, clientY)
+        : starConquestNdcToLayout(ndc.x, ndc.y);
+    const sx = layoutPt.x;
+    const sy = layoutPt.y;
 
     const pos = this.questPoints.geometry.getAttribute(
       'position'

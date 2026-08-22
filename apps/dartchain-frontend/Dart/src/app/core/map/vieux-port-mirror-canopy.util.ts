@@ -85,7 +85,7 @@ export function buildVieuxPortMirrorCanopy(
   const plazaTex = createPlazaStoneTexture();
   textures.push(plazaTex);
   const plazaMat = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
+    color: 0xc4bbb0,
     map: plazaTex,
     roughness: 0.42,
     metalness: 0.18,
@@ -99,61 +99,6 @@ export function buildVieuxPortMirrorCanopy(
   plaza.rotation.x = -Math.PI / 2;
   plaza.position.set(0, 0.36, 0);
   group.add(plaza);
-
-  const causticTex = createCausticPoolTexture();
-  textures.push(causticTex);
-  const causticMat = new THREE.MeshBasicMaterial({
-    map: causticTex,
-    color: 0xb8f4ff,
-    transparent: true,
-    opacity: 0.38,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-  });
-  materials.push(causticMat);
-  const causticGeo = new THREE.CircleGeometry(9.4, 40);
-  geometries.push(causticGeo);
-  const caustic = new THREE.Mesh(causticGeo, causticMat);
-  caustic.name = 'marseille-mirror-caustic';
-  caustic.rotation.x = -Math.PI / 2;
-  caustic.position.set(0, 0.38, 0);
-  caustic.renderOrder = 3;
-  group.add(caustic);
-
-  const auraInner = new THREE.Mesh(
-    new THREE.RingGeometry(8.2, 9.1, 56),
-    new THREE.MeshBasicMaterial({
-      color: 0x9ef6ff,
-      transparent: true,
-      opacity: 0.22,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    })
-  );
-  auraInner.name = 'marseille-mirror-aura';
-  auraInner.rotation.x = -Math.PI / 2;
-  auraInner.position.set(0, 0.052, 0);
-  geometries.push(auraInner.geometry);
-  materials.push(auraInner.material);
-  group.add(auraInner);
-
-  const auraOuter = new THREE.Mesh(
-    new THREE.RingGeometry(10.4, 11.6, 56),
-    new THREE.MeshBasicMaterial({
-      color: 0x6ad4ff,
-      transparent: true,
-      opacity: 0.1,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    })
-  );
-  auraOuter.name = 'marseille-mirror-aura-outer';
-  auraOuter.rotation.x = -Math.PI / 2;
-  auraOuter.position.set(0, 0.05, 0);
-  geometries.push(auraOuter.geometry);
-  materials.push(auraOuter.material);
-  group.add(auraOuter);
 
   const led = buildUnderCanopyLed(geometries, materials);
   led.position.y = origin.y - 0.08;
@@ -207,17 +152,17 @@ function createCanopyGlassMaterial(
   quality: MapQuality,
   map: THREE.Texture
 ): THREE.MeshPhysicalMaterial | THREE.MeshStandardMaterial {
-  if (quality === 'low') {
+  if (quality !== 'high') {
     return new THREE.MeshStandardMaterial({
-      color: 0xc8e8ff,
+      color: quality === 'low' ? 0xc8e8ff : 0xd8ecff,
       map,
-      roughness: 0.08,
-      metalness: 0.72,
+      roughness: quality === 'low' ? 0.08 : 0.06,
+      metalness: quality === 'low' ? 0.72 : 0.78,
       transparent: true,
-      opacity: 0.62,
-      envMapIntensity: 1.2,
+      opacity: quality === 'low' ? 0.62 : 0.68,
+      envMapIntensity: quality === 'low' ? 1.2 : 1.32,
       emissive: 0x1a3a55,
-      emissiveIntensity: 0.18,
+      emissiveIntensity: quality === 'low' ? 0.18 : 0.22,
       side: THREE.DoubleSide,
     });
   }
@@ -476,9 +421,9 @@ function createPlazaStoneTexture(): THREE.CanvasTexture {
         ctx.fillRect(ix * tw + 1, iy * tw + 1, tw - 2, tw - 2);
       }
     }
-    const wet = ctx.createRadialGradient(256, 256, 20, 256, 256, 240);
-    wet.addColorStop(0, 'rgba(180, 230, 255, 0.28)');
-    wet.addColorStop(0.55, 'rgba(160, 190, 210, 0.1)');
+    const wet = ctx.createRadialGradient(256, 256, 40, 256, 256, 240);
+    wet.addColorStop(0, 'rgba(140, 168, 188, 0.12)');
+    wet.addColorStop(0.55, 'rgba(120, 148, 168, 0.06)');
     wet.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = wet;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -490,24 +435,3 @@ function createPlazaStoneTexture(): THREE.CanvasTexture {
   return tex;
 }
 
-function createCausticPoolTexture(): THREE.CanvasTexture {
-  const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
-  const ctx = canvas.getContext('2d');
-  if (ctx) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const g = ctx.createRadialGradient(128, 128, 8, 128, 128, 128);
-    g.addColorStop(0, 'rgba(255,255,255,0.95)');
-    g.addColorStop(0.28, 'rgba(160, 240, 255, 0.55)');
-    g.addColorStop(0.62, 'rgba(80, 200, 255, 0.18)');
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.needsUpdate = true;
-  tex.generateMipmaps = false;
-  tex.minFilter = THREE.LinearFilter;
-  return tex;
-}

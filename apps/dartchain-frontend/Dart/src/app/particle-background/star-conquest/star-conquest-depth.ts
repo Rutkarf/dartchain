@@ -93,6 +93,5 @@ export function labelOpacityFromDepth(depth: number, reward: number): number {
 
 /** Parallaxe desktop vs mobile. */
 export function parallaxScaleForViewport(): number {
-  if (typeof window === 'undefined') return 1;
-  return window.innerWidth < 400 ? 0.45 : 1;
+  return 1;
 }

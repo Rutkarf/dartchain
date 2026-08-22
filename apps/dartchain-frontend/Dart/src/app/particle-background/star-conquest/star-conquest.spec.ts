@@ -1037,10 +1037,10 @@ describe('StarConquestProgressService live gate', () => {
 
     const service = TestBed.inject(StarConquestProgressService);
     service.resetForTests();
-    const result = service.claim('sc-angular-layout');
+    const result = service.claim('sc-swap-slippage');
     expect(result.ok).toBe(true);
     expect(fetchSpy).not.toHaveBeenCalled();
-    expect(localStorage.getItem('star-conquest-progress-v1')).toContain('sc-angular-layout');
+    expect(localStorage.getItem('star-conquest-progress-v1')).toContain('sc-swap-slippage');
     fetchSpy.mockRestore();
   });
 });

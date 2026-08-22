@@ -44,7 +44,7 @@ export class DockTabsDockTabsComponent {
   readonly locale = inject(LocaleService);
 
   @Input() activeTab: BottomDockTab = 'wallet';
-  @Input() dockCollapsed = false;
+  @Input() dockCollapsed = true;
   @Input() collapseAriaLabel = 'Replier le dock';
   @Input() refreshBusy = false;
 

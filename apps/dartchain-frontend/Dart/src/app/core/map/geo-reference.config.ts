@@ -152,9 +152,13 @@ export const GEOGRAPHIC_DATA_SOURCES: readonly GeographicDataSource[] = [
   {
     id: 'geojson-files',
     type: 'geojson',
-    pathOrEndpoint: '(aucun fichier .geojson dans le dépôt)',
-    isAuthorized: false,
-    isUsed: false,
+    pathOrEndpoint: 'public/geo/vieux-port/buildings.geojson (Phase 4)',
+    coordinateSystem: 'EPSG:4326',
+    coverage: 'Landmarks + 18 îlots spawn Fraternité',
+    accuracy: 'OSM way rings (DGI nodes) + parcelles projet spawn',
+    license: 'ODbL + projet',
+    isAuthorized: true,
+    isUsed: true,
   },
   {
     id: 'glb-gltf-buildings',
@@ -213,7 +217,7 @@ export function closedOsmWayFootprint(
 
 /**
  * Bâtiments héros — anneaux OSM way/* (API 0.6, snapshot 2026-08-20).
- * Licence ODbL. Hauteurs conservées (pas les `building:levels` OSM).
+ * Licence ODbL. Hauteurs catalogue (hardcoded) — surchargeables via tags OSM au runtime.
  */
 export const MARSEILLE_LANDMARK_BUILDINGS: readonly GeoBuilding[] = [
   {
@@ -537,6 +541,8 @@ export interface BuildingPlacementAudit {
   errorMeters?: number;
   footprintErrorMeters?: number;
   heightErrorMeters?: number;
+  heightMeters?: number;
+  heightSource?: string;
   intersectsRoad: boolean;
   intersectsWater: boolean;
   floating: boolean;

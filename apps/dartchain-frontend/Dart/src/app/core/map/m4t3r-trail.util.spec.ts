@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import * as THREE from 'three';
 

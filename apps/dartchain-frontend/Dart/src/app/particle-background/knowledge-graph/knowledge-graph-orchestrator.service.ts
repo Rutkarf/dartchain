@@ -1,9 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import {
   DEFAULT_QUEST_GRAPH_QUALITY,
   DEFAULT_QUEST_VISUALIZATION_MODE,
-  mapQualityToQuestGraphQuality,
 } from '../../core/map/map-configuration';
 import { PeersDataService } from '../../core/services/peers-data.service';
 import type { StarConquestGraph } from '../star-conquest/star-conquest-graph';
@@ -31,9 +29,7 @@ export class KnowledgeGraphOrchestratorService {
   readonly cameraController = new QuestCameraController();
 
   readonly visualizationMode = signal<QuestVisualizationMode>(DEFAULT_QUEST_VISUALIZATION_MODE);
-  readonly quality = signal<QuestGraphQuality>(
-    mapQualityToQuestGraphQuality(environment.mapQuality ?? 'medium')
-  );
+  readonly quality = signal<QuestGraphQuality>(DEFAULT_QUEST_GRAPH_QUALITY);
   readonly selectedNodeId = signal<string | null>(null);
   readonly focusedNodeId = signal<string | null>(null);
 
@@ -84,9 +80,9 @@ export class KnowledgeGraphOrchestratorService {
     this.pushToGraph();
   }
 
-  setQuality(quality: QuestGraphQuality): void {
-    this.quality.set(quality);
-    this.graph?.setGpuQuality(quality);
+  setQuality(_quality: QuestGraphQuality): void {
+    this.quality.set('ultra-low');
+    this.graph?.setGpuQuality('ultra-low');
   }
 
   setUniverse(universeId: StarConquestUniverseId): void {

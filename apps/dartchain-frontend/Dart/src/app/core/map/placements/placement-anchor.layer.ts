@@ -29,6 +29,7 @@ export class PlacementAnchorLayer {
   private readonly raycaster = new THREE.Raycaster();
   private pointerDown: { x: number; y: number } | null = null;
   private canvas: HTMLCanvasElement | null = null;
+  private lastSelectedPlacementId: string | null | undefined = undefined;
 
   private readonly onPointerDown = (event: PointerEvent): void => {
     if (event.button !== 0) return;
@@ -64,6 +65,8 @@ export class PlacementAnchorLayer {
 
   update(): void {
     const selectedId = this.facade.selectedPlacementId();
+    if (selectedId === this.lastSelectedPlacementId) return;
+    this.lastSelectedPlacementId = selectedId;
     if (!this.root) return;
     for (const child of this.root.children) {
       const mesh = child as THREE.Mesh;

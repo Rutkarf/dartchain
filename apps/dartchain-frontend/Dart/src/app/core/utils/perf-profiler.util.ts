@@ -1,7 +1,11 @@
 /**
- * Profiler léger — actif uniquement si localStorage PERF_DEBUG=1.
+ * Profiler léger — actif si ?perfDebug=1 ou localStorage PERF_DEBUG=1.
  * Ne tourne pas en production sans opt-in explicite.
  */
+
+import { isPerfDebugEnabled } from './perf-debug.util';
+
+export { isPerfDebugEnabled } from './perf-debug.util';
 
 export interface PerfSnapshot {
   fps: number;
@@ -16,28 +20,25 @@ export interface PerfSnapshot {
   rafLoops: number;
 }
 
-const PERF_DEBUG =
-  typeof localStorage !== 'undefined' && localStorage.getItem('PERF_DEBUG') === '1';
-
 let activeRafLoops = 0;
 let collisionChecksThisFrame = 0;
 
-export function isPerfDebugEnabled(): boolean {
-  return PERF_DEBUG;
+export function getActiveRafLoops(): number {
+  return activeRafLoops;
 }
 
 export function markRafLoopStart(): void {
-  if (!PERF_DEBUG) return;
+  if (!isPerfDebugEnabled()) return;
   activeRafLoops++;
 }
 
 export function markRafLoopStop(): void {
-  if (!PERF_DEBUG) return;
+  if (!isPerfDebugEnabled()) return;
   activeRafLoops = Math.max(0, activeRafLoops - 1);
 }
 
 export function addCollisionChecks(n: number): void {
-  if (!PERF_DEBUG) return;
+  if (!isPerfDebugEnabled()) return;
   collisionChecksThisFrame += n;
 }
 
@@ -53,7 +54,7 @@ export class PerfProfiler {
   private sinceReport = 0;
 
   sample(frameMs: number): void {
-    if (!PERF_DEBUG) return;
+    if (!isPerfDebugEnabled()) return;
     this.frames++;
     this.accMs += frameMs;
     this.worstMs = Math.max(this.worstMs, frameMs);
@@ -65,7 +66,7 @@ export class PerfProfiler {
     sceneChildren: number,
     label = 'floor'
   ): PerfSnapshot | null {
-    if (!PERF_DEBUG || this.sinceReport < this.reportEveryMs) return null;
+    if (!isPerfDebugEnabled() || this.sinceReport < this.reportEveryMs) return null;
 
     const avg = this.frames > 0 ? this.accMs / this.frames : 0;
     const snap: PerfSnapshot = {

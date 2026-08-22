@@ -88,13 +88,14 @@ export function createHarborWaterSurfaceMaterial(map: THREE.Texture): THREE.Mesh
 export function createHarborWaterDeepMaterial(deepColor: number): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
     color: deepColor,
-    emissive: new THREE.Color(0x062a3a),
-    emissiveIntensity: 0.35,
+    emissive: new THREE.Color(0x0a4860),
+    emissiveIntensity: 0.62,
     roughness: 0.95,
     metalness: 0.02,
     transparent: true,
-    opacity: 0.96,
+    opacity: 0.98,
     depthWrite: true,
+    side: THREE.DoubleSide,
   });
 }
 
@@ -109,11 +110,11 @@ export function createHarborFoamMaterial(foamColor: number): THREE.MeshBasicMate
 
 export function createHarborPitWallMaterial(): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
-    color: 0x3a4654,
-    roughness: 0.88,
-    metalness: 0.04,
-    emissive: new THREE.Color(0x0a1520),
-    emissiveIntensity: 0.28,
+    color: 0x2a3542,
+    roughness: 0.92,
+    metalness: 0.05,
+    emissive: new THREE.Color(0x061018),
+    emissiveIntensity: 0.42,
   });
 }
 

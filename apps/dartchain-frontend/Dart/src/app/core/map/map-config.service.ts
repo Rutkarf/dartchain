@@ -7,6 +7,7 @@ import {
   type MapProviderId,
   type MapQuality,
 } from './map-configuration';
+import { readMapQualityFromUrl, resolveMapQuality } from './map-quality-resolver.util';
 
 /** Sous-ensemble des variables d'environnement liées à la carte. */
 export interface MapEnvironment {
@@ -66,6 +67,12 @@ export class MapConfigService {
     if (this.env.mapQuality !== undefined) {
       base.quality = this.env.mapQuality;
     }
+
+    base.quality = resolveMapQuality({
+      urlQuality: readMapQualityFromUrl(),
+      envQuality: base.quality,
+      fallback: DEFAULT_MAP_CONFIGURATION.quality,
+    });
 
     // Garde-fou : Marseille sans bâtiments = carte vide.
     if (base.provider === 'marseille-osm-three' && base.enabled) {

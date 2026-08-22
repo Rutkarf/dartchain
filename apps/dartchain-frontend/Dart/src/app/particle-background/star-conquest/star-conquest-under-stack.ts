@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { measureFloorTopPx, screenToWorldOnPlane } from './star-conquest-layout';
 import { createSoftDiscTexture } from './star-conquest-visuals';
 import { STAR_CONQUEST_SCALE } from './star-conquest-scale';
+import {
+  starConquestLayoutHeight,
+  starConquestLayoutWidth,
+} from './star-conquest-viewport.util';
 
 /** Au moins 2 particules sous le floor, sur l’axe vertical central. */
 const COUNT = 2;
@@ -55,8 +59,8 @@ export class StarConquestUnderStackBand {
   }
 
   layout(camera: THREE.PerspectiveCamera, floorPeekPx = 64): void {
-    const vw = Math.max(window.innerWidth, 32);
-    const vh = Math.max(window.innerHeight, 32);
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
     const floorTop = measureFloorTopPx(floorPeekPx, vh);
     const bandTop = floorTop;
     const bandBottom = vh - 4;

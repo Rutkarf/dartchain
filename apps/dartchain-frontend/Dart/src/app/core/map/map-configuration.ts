@@ -1,8 +1,10 @@
+import { groundTopY } from './ground-surface.config';
+
 /** Identifiant du fournisseur de carte actif. */
 export type MapProviderId = 'legacy-floor' | 'marseille-osm-three';
 
 /** Niveau de qualité pour le streaming terrain / bâtiments. */
-export type MapQuality = 'low' | 'medium' | 'high';
+export type MapQuality = 'ultra-low' | 'low' | 'medium' | 'high';
 
 export interface MapBounds {
   south: number;
@@ -122,6 +124,14 @@ export const M4T3R_COIN_PICKUP_FX = {
   emissivePulse: 0.42,
 } as const;
 
+/** Token / pickup légèrement au-dessus du trottoir (Phase 1.5 ground stack). */
+export const M4T3R_ABOVE_SIDEWALK_OFFSET = 0.08;
+
+/** R4V3 tapis — offset au-dessus du trottoir. */
+export const R4V3_ABOVE_SIDEWALK_OFFSET = 0.05;
+
+const SIDEWALK_SURFACE_Y = groundTopY('sidewalk');
+
 /**
  * Densité logique 1 cm (1 unité = 1 m).
  * Rendu agrégé par cluster 25 cm — jamais une instance par centimètre.
@@ -133,8 +143,8 @@ export const M4T3R_DENSITY_CONFIG = {
   visibleRadius: 9,
   respawnDelayMs: 30_000,
   maxVisibleInstances: 8192,
-  /** Au-dessus des trottoirs (0.34) + offset visible. */
-  groundY: 0.34 + 0.08,
+  /** Trottoir Phase 1 + offset visible (tokens / trail). */
+  groundY: SIDEWALK_SURFACE_Y + M4T3R_ABOVE_SIDEWALK_OFFSET,
   /** @deprecated Utiliser MARSEILLE_GROUND_EXCLUSION_ZONES — conservé pour compat tests. */
   waterMinZ: 14,
 } as const;
@@ -287,14 +297,10 @@ export const DEFAULT_QUEST_VISUALIZATION_MODE: QuestVisualizationMode = 'hybrid'
 
 export type QuestGraphQuality = 'ultra-low' | 'low' | 'medium' | 'high';
 
-export const DEFAULT_QUEST_GRAPH_QUALITY: QuestGraphQuality = 'medium';
+export const DEFAULT_QUEST_GRAPH_QUALITY: QuestGraphQuality = 'ultra-low';
 
-export function mapQualityToQuestGraphQuality(
-  mapQuality: 'low' | 'medium' | 'high'
-): QuestGraphQuality {
-  if (mapQuality === 'low') return 'low';
-  if (mapQuality === 'high') return 'high';
-  return 'medium';
+export function mapQualityToQuestGraphQuality(_mapQuality: MapQuality): QuestGraphQuality {
+  return 'ultra-low';
 }
 
 export const M4T3R_VERTICAL_OFFSET = 0.08;
@@ -322,9 +328,10 @@ export const M4T3R_RENDER_CONFIG = {
   bobAmplitude: 0.015,
   bobFrequency: 1.4,
   /**
-   * Throttle CPU pour l’animation InstancedMesh :
-   * fréquence de recalcul des matrices (rotation + bob) selon la qualité.
+   * Phase 35a — near = chaque frame render ; mid = throttle CPU.
+   * `animationUpdateHzNear` informatif (60 = rAF cible).
    */
+  animationUpdateHzNear: 60,
   animationUpdateHzLow: 24,
   animationUpdateHzMedium: 30,
   animationUpdateHzHigh: 60,
@@ -342,7 +349,7 @@ export const R4V3_GROUND_FIELD = {
   maxVisibleInstances: 8192,
   tokenRadius: 0.28,
   tokenThickness: 0.045,
-  groundY: 0.34 + 0.05,
+  groundY: SIDEWALK_SURFACE_Y + R4V3_ABOVE_SIDEWALK_OFFSET,
 } as const;
 
 /**
@@ -499,6 +506,118 @@ export const MARSEILLE_START_ORIENTATION: MapStartOrientation = {
   cameraLookAhead: 0.35,
 };
 
+/** Budgets rendu par tier — Phase 14 : parité visuelle, perf via `mapPerfProfile()`. */
+export const MAP_QUALITY_TIERS = {
+  'ultra-low': {
+    osmStreetCap: 600,
+    osmBuildingCap: 2800,
+    harborSubdivisions: 10,
+    foamPlanes: true,
+    quayProps: true,
+    synthwavePanels: 72,
+    buildingLodEnforce: true,
+    fxaa: true,
+    bloom: true,
+    spawnShadows: false,
+    cyberpunkOverlay: true,
+    ssao: false,
+    streetLamps: true,
+    windowEmissiveScale: 0.5,
+    harborHaze: true,
+    waterEnvReflection: true,
+    waterPlanarReflection: true,
+    wetPavement: true,
+    heroLandmarks: true,
+    urbanPropsScope: 'full',
+    skyDome: true,
+    volumetricFog: true,
+    taa: false,
+    validationDof: false,
+  },
+  low: {
+    osmStreetCap: 600,
+    osmBuildingCap: 2800,
+    harborSubdivisions: 18,
+    foamPlanes: true,
+    quayProps: true,
+    synthwavePanels: 72,
+    buildingLodEnforce: true,
+    fxaa: true,
+    bloom: true,
+    spawnShadows: false,
+    cyberpunkOverlay: true,
+    ssao: false,
+    streetLamps: true,
+    windowEmissiveScale: 0.5,
+    harborHaze: true,
+    waterEnvReflection: true,
+    waterPlanarReflection: true,
+    wetPavement: true,
+    heroLandmarks: true,
+    urbanPropsScope: 'full',
+    skyDome: true,
+    volumetricFog: true,
+    taa: false,
+    validationDof: false,
+  },
+  medium: {
+    osmStreetCap: 600,
+    osmBuildingCap: 2800,
+    harborSubdivisions: 32,
+    foamPlanes: true,
+    quayProps: true,
+    synthwavePanels: 72,
+    buildingLodEnforce: true,
+    fxaa: true,
+    bloom: true,
+    spawnShadows: true,
+    cyberpunkOverlay: true,
+    ssao: false,
+    streetLamps: true,
+    windowEmissiveScale: 0.42,
+    harborHaze: true,
+    waterEnvReflection: true,
+    waterPlanarReflection: true,
+    wetPavement: true,
+    heroLandmarks: true,
+    urbanPropsScope: 'full',
+    skyDome: true,
+    volumetricFog: true,
+    taa: false,
+    validationDof: false,
+  },
+  high: {
+    osmStreetCap: 600,
+    osmBuildingCap: 2800,
+    harborSubdivisions: 36,
+    foamPlanes: true,
+    quayProps: true,
+    synthwavePanels: 72,
+    buildingLodEnforce: true,
+    fxaa: true,
+    bloom: true,
+    spawnShadows: true,
+    cyberpunkOverlay: true,
+    ssao: true,
+    streetLamps: true,
+    windowEmissiveScale: 0.5,
+    harborHaze: true,
+    waterEnvReflection: true,
+    waterPlanarReflection: true,
+    wetPavement: true,
+    heroLandmarks: true,
+    urbanPropsScope: 'full',
+    skyDome: true,
+    volumetricFog: true,
+    taa: true,
+    validationDof: true,
+  },
+} as const;
+
+export function mapQualityTier(quality: MapQuality): (typeof MAP_QUALITY_TIERS)[MapQuality] {
+  return MAP_QUALITY_TIERS[quality];
+}
+
 /** Valeurs par défaut — provider Marseille avec fallback legacy si échec. */
 export const DEFAULT_MAP_CONFIGURATION: MapConfiguration = {
   enabled: true,
@@ -512,7 +631,7 @@ export const DEFAULT_MAP_CONFIGURATION: MapConfiguration = {
   enableBuildings: true,
   enableTerrain: true,
   enableDebug: false,
-  quality: 'medium',
+  quality: 'ultra-low',
   bounds: MARSEILLE_BOUNDS,
   startPosition: MARSEILLE_START_POSITION,
   startOrientation: MARSEILLE_START_ORIENTATION,

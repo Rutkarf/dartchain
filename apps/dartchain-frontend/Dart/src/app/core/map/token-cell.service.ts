@@ -54,6 +54,8 @@ export interface M4T3RDebugStats {
   trailWidth: number;
   respawnDelayMs: number;
   tokenAnimationFrequencyHz: number;
+  nearAnimationFrequencyHz: number;
+  midAnimationFrequencyHz: number;
   variantCounts: Record<string, number>;
   lodCounts: Record<M4T3RLodBand, number>;
 }
@@ -158,12 +160,10 @@ export class TokenCellService {
   private lastOriginCell = { x: Number.NaN, z: Number.NaN };
   private elapsedTime = 0;
   private initialized = false;
-  /**
-   * Accumulateur pour throttle CPU des updates rotation/bobbing
-   * (rotation est lente, donc 20–30Hz suffit visuellement).
-   */
-  private tokenAnimAccumulatorSeconds = 0;
-  private tokenAnimIntervalSeconds = 1 / M4T3R_RENDER_CONFIG.animationUpdateHzMedium;
+  /** Phase 35a — mid LOD throttle ; near = chaque frame via tickVisuals(). */
+  private midAnimAccumulatorSeconds = 0;
+  private midAnimIntervalSeconds = 1 / M4T3R_RENDER_CONFIG.animationUpdateHzMedium;
+  private visualTickCount = 0;
   private readonly variantCounts: Record<string, number> = {};
 
   private getMaxInstancesForQuality(): number {
@@ -204,15 +204,17 @@ export class TokenCellService {
     this.tokenMesh = mesh;
     this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
 
-    // Throttle selon la qualité demandée (low-end-friendly).
-    this.tokenAnimIntervalSeconds = 1 / this.resolveTokenAnimationHz();
-    this.tokenAnimAccumulatorSeconds = 0;
+    this.midAnimIntervalSeconds = 1 / this.resolveMidAnimationHz();
+    this.midAnimAccumulatorSeconds = 0;
+    this.visualTickCount = 0;
   }
 
-  private resolveTokenAnimationHz(): number {
+  private resolveMidAnimationHz(): number {
     const q = this.mapConfig.configuration.quality;
-    if (q === 'low') return M4T3R_RENDER_CONFIG.animationUpdateHzLow;
-    if (q === 'high') return M4T3R_RENDER_CONFIG.animationUpdateHzHigh;
+    if (q === 'ultra-low' || q === 'low') {
+      return M4T3R_RENDER_CONFIG.animationUpdateHzLow;
+    }
+    if (q === 'high') return M4T3R_RENDER_CONFIG.animationUpdateHzMedium;
     return M4T3R_RENDER_CONFIG.animationUpdateHzMedium;
   }
 
@@ -238,11 +240,29 @@ export class TokenCellService {
     this.initialized = true;
   }
 
-  update(playerPosition: THREE.Vector3, deltaSeconds = 0): number {
+  /**
+   * Phase 35a — rotation/bob à fréquence render (near) + mid throttlé.
+   * Indépendant de mapSimTickSkip.
+   */
+  tickVisuals(deltaSeconds: number): void {
+    if (!this.tokenMesh || this.visibleCount === 0) return;
+
+    this.elapsedTime += deltaSeconds;
+    this.visualTickCount += 1;
+    this.updateAnimationsForBands(['near']);
+
+    this.midAnimAccumulatorSeconds += deltaSeconds;
+    if (this.midAnimAccumulatorSeconds >= this.midAnimIntervalSeconds) {
+      this.midAnimAccumulatorSeconds %= this.midAnimIntervalSeconds;
+      this.updateAnimationsForBands(['mid']);
+    }
+  }
+
+  /** Streaming / rebuild grille — sans animation (→ tickVisuals). */
+  update(playerPosition: THREE.Vector3): number {
     if (!this.tokenMesh) return 0;
 
     this.lastPlayerPosition.copy(playerPosition);
-    this.elapsedTime += deltaSeconds;
     this.expireHidden();
 
     // Rebuild quand on change de chunk ou que le joueur s'éloigne du centre
@@ -268,13 +288,6 @@ export class TokenCellService {
       this.lastRebuildPlayerZ = playerPosition.z;
       this.anchorCenterScratch.set(playerPosition.x, 0, playerPosition.z);
       this.rebuildGrid(this.anchorCenterScratch, playerPosition);
-      this.tokenAnimAccumulatorSeconds = 0;
-    } else {
-      this.tokenAnimAccumulatorSeconds += deltaSeconds;
-      if (this.tokenAnimAccumulatorSeconds >= this.tokenAnimIntervalSeconds) {
-        this.tokenAnimAccumulatorSeconds = 0;
-        this.updateAnimations();
-      }
     }
 
     return this.visibleCount;
@@ -369,14 +382,12 @@ export class TokenCellService {
     this.visibleCount = count;
   }
 
-  /**
-   * Per-frame animation update without full grid rebuild.
-   * Only updates matrices for rotation + bob.
-   */
-  private updateAnimations(): void {
+  /** Met à jour rotation + bob pour les bandes LOD demandées. */
+  private updateAnimationsForBands(bands: readonly M4T3RLodBand[]): void {
     const mesh = this.tokenMesh;
     if (!mesh || this.visibleCount === 0) return;
 
+    const bandSet = new Set<M4T3RLodBand>(bands);
     const groundY = R4V3_GROUND_FIELD.groundY;
     const tokenY = groundY + STANDING_COIN_HALF_HEIGHT + M4T3R_RENDER_CONFIG.verticalOffset;
     const t = this.elapsedTime;
@@ -384,7 +395,7 @@ export class TokenCellService {
 
     for (let i = 0; i < this.visibleCells.length; i++) {
       const c = this.visibleCells[i];
-      if (!shouldAnimateLodBand(c.lod)) continue;
+      if (!bandSet.has(c.lod) || !shouldAnimateLodBand(c.lod)) continue;
       changed = true;
       const animSpeed = lodRotationSpeed(c.speed, c.lod);
       const bobAmp = lodBobAmplitude(c.lod);
@@ -439,7 +450,9 @@ export class TokenCellService {
       cellsCollectedLastMove: this.lastCollectedCellCount,
       trailWidth: TRAIL_CONFIG.width,
       respawnDelayMs: TRAIL_CONFIG.respawnDelayMs,
-      tokenAnimationFrequencyHz: Math.round(1 / this.tokenAnimIntervalSeconds),
+      tokenAnimationFrequencyHz: M4T3R_RENDER_CONFIG.animationUpdateHzNear,
+      nearAnimationFrequencyHz: M4T3R_RENDER_CONFIG.animationUpdateHzNear,
+      midAnimationFrequencyHz: Math.round(1 / this.midAnimIntervalSeconds),
       variantCounts: { ...this.variantCounts },
       lodCounts: { ...this.lodCounts },
     };
@@ -588,6 +601,8 @@ export class TokenCellService {
     this.visibleCells.length = 0;
     this.totalGridCells = 0;
     this.elapsedTime = 0;
+    this.midAnimAccumulatorSeconds = 0;
+    this.visualTickCount = 0;
     this.initialized = false;
     this.lastOriginCell = { x: Number.NaN, z: Number.NaN };
     this.lastRebuildPlayerX = Number.NaN;
