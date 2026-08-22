@@ -18,15 +18,12 @@ jobs:
           cache: npm
           cache-dependency-path: apps/dartchain-frontend/Dart/package-lock.json
       - name: Build frontend
-        working-directory: apps/dartchain-frontend/Dart
         env:
           BACKEND_URL: ${{ vars.BACKEND_URL || 'https://dartchain-backend-1-0-0.onrender.com' }}
           SHOWCASE_ENABLED: ${{ vars.SHOWCASE_ENABLED || 'true' }}
-        run: |
-          npm ci
-          npm run build:cloudflare
-      - name: Deploy to Cloudflare Pages
+        run: bash scripts/cloudflare-build.sh
+      - name: Deploy to Cloudflare
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler pages deploy dist/browser --project-name=dartchain
+        run: bash scripts/cloudflare-deploy.sh
