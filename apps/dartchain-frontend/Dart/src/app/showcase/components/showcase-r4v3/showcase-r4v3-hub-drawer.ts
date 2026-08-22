@@ -20,17 +20,17 @@ import {
   R4V3_FAQ_CATEGORIES,
   r4v3FaqCategoryIcon,
   r4v3FaqCategoryLabel,
-} from '../../core/constants/r4v3-faq.constants';
-import { R4v3FaqEntry } from '../../core/models/r4v3-faq.model';
-import { R4v3HubDrawerPayload } from '../../core/models/r4v3-hub.model';
-import { AuthService } from '../../core/services/auth.service';
-import { R4v3CommunityFaqService } from '../../core/services/r4v3-community-faq.service';
+} from '@core/constants/r4v3-faq.constants';
+import { R4v3FaqEntry } from '@core/models/r4v3-faq.model';
+import { R4v3HubDrawerPayload } from '@core/models/r4v3-hub.model';
+import { AuthService } from '@core/services/auth.service';
+import { R4v3CommunityFaqService } from '@core/services/r4v3-community-faq.service';
 import {
   R4v3FaqCategoryFilter,
   R4v3FaqStateService,
-} from '../../core/services/r4v3-faq-state.service';
-import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
-import { copyTextToClipboard } from '../../core/utils/clipboard.util';
+} from '@core/services/r4v3-faq-state.service';
+import { FocusTrapDirective } from '@core/directives/focus-trap.directive';
+import { copyTextToClipboard } from '@core/utils/clipboard.util';
 
 @Component({
   selector: 'app-showcase-r4v3-hub-drawer',

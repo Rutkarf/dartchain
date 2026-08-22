@@ -3,10 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { AuthService } from '../../core/services/auth.service';
-import { ShowcaseChatService } from '../../core/services/showcase-chat.service';
-import { ShowcaseChatStateService } from '../../core/services/showcase-chat-state.service';
-import { ChatStylePreferencesService } from '../../core/services/chat-style-preferences.service';
+import { AuthService } from '@core/services/auth.service';
+import { ShowcaseChatService } from '@core/services/showcase-chat.service';
+import { ShowcaseChatStateService } from '@core/services/showcase-chat-state.service';
+import { ChatStylePreferencesService } from '@core/services/chat-style-preferences.service';
 import { ShowcaseChatComponent } from './showcase-chat';
 
 describe('ShowcaseChatComponent (Phase V)', () => {

@@ -4,9 +4,9 @@ import { CommonModule } from '@angular/common';
 import {
   SHOWCASE_TABS,
   ShowcaseTab,
-} from '../../core/models/showcase-tab.model';
-import { ShowcaseNewsStateService } from '../../core/services/showcase-news-state.service';
-import { BadgeDigit3dComponent } from '../../components/badge-digit-3d/badge-digit-3d';
+} from '@core/models/showcase-tab.model';
+import { ShowcaseNewsStateService } from '@core/services/showcase-news-state.service';
+import { BadgeDigit3dComponent } from '../../../components/badge-digit-3d/badge-digit-3d';
 
 @Component({
   selector: 'app-showcase-tabs',

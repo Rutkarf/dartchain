@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, output } from '@angular/core';
 
-import { ShowcaseTab } from '../../core/models/showcase-tab.model';
+import { ShowcaseTab } from '@core/models/showcase-tab.model';
 import { ShowcaseNewsSummaryComponent } from '../showcase-news/showcase-news-summary';
 import { ShowcaseNewsComponent } from '../showcase-news/showcase-news';
 import { ShowcaseChatSummaryComponent } from '../showcase-chat/showcase-chat-summary';
@@ -11,8 +11,8 @@ import { ShowcaseDaoSummaryComponent } from '../showcase-dao/showcase-dao-summar
 import { ShowcaseDaoComponent } from '../showcase-dao/showcase-dao';
 import { ShowcaseR4v3SummaryComponent } from '../showcase-r4v3/showcase-r4v3-summary';
 import { ShowcaseR4v3Component } from '../showcase-r4v3/showcase-r4v3';
-import { DockMarketSummaryComponent } from '../dock-summary/dock-market-summary';
-import { MarketPanelComponent } from '../market-panel/market-panel';
+import { DockMarketSummaryComponent } from '../../../features/dock-summary/dock-market-summary';
+import { MarketPanelComponent } from '../../../features/market-panel/market-panel';
 
 @Component({
   selector: 'app-showcase-window',

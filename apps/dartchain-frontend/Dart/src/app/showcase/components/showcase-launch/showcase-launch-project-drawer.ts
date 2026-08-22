@@ -10,9 +10,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { LaunchProject, LaunchStatus } from '../../core/models/showcase.model';
-import { isLaunchpadSwapToken } from '../../core/constants/exchange-launchpad.constants';
-import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
+import { LaunchProject, LaunchStatus } from '@core/models/showcase.model';
+import { isLaunchpadSwapToken } from '@core/constants/exchange-launchpad.constants';
+import { FocusTrapDirective } from '@core/directives/focus-trap.directive';
 
 @Component({
   selector: 'app-showcase-launch-project-drawer',

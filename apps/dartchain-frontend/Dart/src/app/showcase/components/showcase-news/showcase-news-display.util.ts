@@ -1,4 +1,4 @@
-import { NewsItem } from '../../core/models/showcase.model';
+import { NewsItem } from '@core/models/showcase.model';
 
 export type NewsTimeGroupKey = 'instant' | 'hour' | 'today' | 'yesterday' | 'earlier';
 

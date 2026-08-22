@@ -1,4 +1,4 @@
-import { NewsItem, NewsSource } from '../../core/models/showcase.model';
+import { NewsItem, NewsSource } from '@core/models/showcase.model';
 import { abbreviateHashesInText } from './showcase-news-display.util';
 
 export type NewsDrawerFieldSection = 'meta' | 'content';

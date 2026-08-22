@@ -10,12 +10,12 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
-import { DockWalletStateService } from '../../core/services/dock-wallet-state.service';
-import { ShowcaseHubUiService } from '../../core/services/showcase-hub-ui.service';
-import { ShowcaseR4v3StateService } from '../../core/services/showcase-r4v3-state.service';
-import { openR4v3Whitepaper } from '../../core/utils/r4v3-whitepaper.util';
-import { R4V3_HUB_PILLARS } from '../../core/constants/r4v3-hub-pillars.constants';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
+import { DockWalletStateService } from '@core/services/dock-wallet-state.service';
+import { ShowcaseHubUiService } from '@core/services/showcase-hub-ui.service';
+import { ShowcaseR4v3StateService } from '@core/services/showcase-r4v3-state.service';
+import { openR4v3Whitepaper } from '@core/utils/r4v3-whitepaper.util';
+import { R4V3_HUB_PILLARS } from '@core/constants/r4v3-hub-pillars.constants';
 
 @Component({
   selector: 'app-showcase-r4v3-summary',

@@ -27,17 +27,17 @@ import {
 import {
   NewsItem,
   NewsSource,
-} from '../../core/models/showcase.model';
-import { ShowcaseApiService } from '../../core/services/showcase-api.service';
-import { ShowcaseNavigationService } from '../../core/services/showcase-navigation.service';
-import { ShowcaseNewsStateService } from '../../core/services/showcase-news-state.service';
-import { BlockchainApiService } from '../../core/services/blockchain-api.service';
+} from '@core/models/showcase.model';
+import { ShowcaseApiService } from '@core/services/showcase-api.service';
+import { ShowcaseNavigationService } from '@core/services/showcase-navigation.service';
+import { ShowcaseNewsStateService } from '@core/services/showcase-news-state.service';
+import { BlockchainApiService } from '@core/services/blockchain-api.service';
 import { ShowcaseNewsDrawerComponent } from './showcase-news-drawer';
-import { buildNewsCopyText, copyTextToClipboard } from '../../core/utils/clipboard.util';
+import { buildNewsCopyText, copyTextToClipboard } from '@core/utils/clipboard.util';
 import {
   SHOWCASE_REFRESH_EVENT,
   refreshEventMatchesTab,
-} from '../../core/constants/panel-refresh.constants';
+} from '@core/constants/panel-refresh.constants';
 import {
   abbreviateHashesInText,
   formatNewsDisplayTitle,

@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ChatMessage } from '../../core/models/showcase.model';
+import { ChatMessage } from '@core/models/showcase.model';
 import {
   CHAT_THEME_COLOR_GRID,
   CHAT_THEME_HIGHLIGHT_GRID,
@@ -23,26 +23,26 @@ import {
   formatFromMessage,
   textNgStyle,
   textNgStyleForLine,
-} from '../../core/constants/chat-format.constants';
+} from '@core/constants/chat-format.constants';
 import {
   CHAT_FONT_OPTIONS,
   ChatFontKey,
-} from '../../core/constants/chat-style.constants';
+} from '@core/constants/chat-style.constants';
 import {
   CHAT_ANONYMOUS_AUTHOR,
   chatLineGradientStyle,
   formatChatDisplayName,
   formatChatMessageTime,
-} from '../../core/constants/chat-display.constants';
-import { ChatRoleMeta, chatRoleFor } from '../../core/constants/chat-role.constants';
-import { ChatStylePreferencesService } from '../../core/services/chat-style-preferences.service';
-import { AuthService } from '../../core/services/auth.service';
-import { ShowcaseChatService } from '../../core/services/showcase-chat.service';
-import { ShowcaseChatStateService } from '../../core/services/showcase-chat-state.service';
+} from '@core/constants/chat-display.constants';
+import { ChatRoleMeta, chatRoleFor } from '@core/constants/chat-role.constants';
+import { ChatStylePreferencesService } from '@core/services/chat-style-preferences.service';
+import { AuthService } from '@core/services/auth.service';
+import { ShowcaseChatService } from '@core/services/showcase-chat.service';
+import { ShowcaseChatStateService } from '@core/services/showcase-chat-state.service';
 import {
   SHOWCASE_REFRESH_EVENT,
   refreshEventMatchesTab,
-} from '../../core/constants/panel-refresh.constants';
+} from '@core/constants/panel-refresh.constants';
 
 type ChatMenuId = 'colors' | null;
 

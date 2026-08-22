@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { ShowcaseTab } from '../../core/models/showcase-tab.model';
 import { ProductConfigService } from '../../core/config/product-config.service';
-import { ShowcaseTabsComponent } from '../../features/showcase-tabs/showcase-tabs';
+import { ShowcaseTabsComponent } from '@showcase/components/showcase-tabs/showcase-tabs';
 import { ShowcasePanelComponent } from '../../features/showcase-panel/showcase-panel';
 import { CollapsedBarActionsComponent } from '../../features/collapsed-bar-actions/collapsed-bar-actions';
 
