@@ -15,14 +15,25 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Phase AA — signale les alias legacy via en-têtes {@code Deprecation} et {@code Link}.
+ * Phase AA — signale les chemins legacy via en-têtes {@code Deprecation} et {@code Link}.
+ * <p>
+ * Chemins encore servis : en-têtes ajoutés sur 2xx.
+ * Chemins retirés (404) : en-têtes ajoutés pour guider vers le successeur v1.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 public class LegacyApiDeprecationFilter extends OncePerRequestFilter {
 
-    private static final Map<String, String> SUCCESSOR_BY_LEGACY_PATH = Map.of(
+    private static final String SUNSET = "2027-01-01";
+
+    /** Legacy GET encore routés — réponse 2xx attendue. */
+    private static final Map<String, String> ACTIVE_LEGACY_PATHS = Map.of(
             ApiRoutes.BLOCKS, ApiRoutes.BLOCKCHAIN_BLOCKS_V1
+    );
+
+    /** Legacy GET retirés — 404 attendu, en-têtes de migration quand même. */
+    private static final Map<String, String> REMOVED_LEGACY_PATHS = Map.of(
+            ApiRoutes.LEGACY_STATS, ApiRoutes.BLOCKCHAIN_STATS_V1
     );
 
     @Override
@@ -38,13 +49,21 @@ public class LegacyApiDeprecationFilter extends OncePerRequestFilter {
         }
 
         String path = resolvePath(request);
-        String successor = SUCCESSOR_BY_LEGACY_PATH.get(path);
-        if (successor == null) {
+        String successor = ACTIVE_LEGACY_PATHS.get(path);
+        if (successor != null && response.getStatus() >= 200 && response.getStatus() < 300) {
+            applyDeprecationHeaders(response, successor);
             return;
         }
 
+        successor = REMOVED_LEGACY_PATHS.get(path);
+        if (successor != null && response.getStatus() == HttpServletResponse.SC_NOT_FOUND) {
+            applyDeprecationHeaders(response, successor);
+        }
+    }
+
+    private void applyDeprecationHeaders(HttpServletResponse response, String successor) {
         response.setHeader("Deprecation", "true");
-        response.setHeader("Sunset", "2027-01-01");
+        response.setHeader("Sunset", SUNSET);
         response.setHeader("Link", "<" + successor + ">; rel=\"successor-version\"");
     }
 

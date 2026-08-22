@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Phase Z — configuration produit commercial vs pédagogique.
- * Les flags désactivent les chemins legacy sans supprimer le code.
+ * Les flags restreignent les raccourcis pédagogiques ; l'API legacy non versionnée est dépréciée.
  */
 @ConfigurationProperties(prefix = "dartchain.product")
 public class ProductProperties {
@@ -36,9 +36,10 @@ public class ProductProperties {
     private boolean showcaseEnabled = true;
 
     /**
-     * Expose les alias API legacy ({@code /api/stats}, etc.).
+     * Politique prod : indique si des alias legacy {@code /api/*} top-level étaient autorisés.
+     * Exposé dans health v1 — les alias retirés (ex. {@code /api/stats}) ne sont pas ré-enregistrés.
      */
-    private boolean legacyApiAliasesEnabled = true;
+    private boolean legacyApiAliasesEnabled = false;
 
     public boolean isCommercial() {
         return commercial;

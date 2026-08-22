@@ -12,15 +12,15 @@ import * as THREE from 'three';
 import { CameraControlService } from '@metaverse/services/camera-control.service';
 import { CharacterControlService } from '@metaverse/services/character-control.service';
 import { ThreeSceneService } from '@metaverse/services/three-scene.service';
-import { MapConfigService } from '../core/map/map-config.service';
-import type { MapQuality } from '../core/map/map-configuration';
-import { mapPerfProfile } from '../core/map/marseille-perf.config';
-import { MarseilleAtmosphereService } from '../core/map/marseille-atmosphere.service';
+import { MapConfigService } from '@world-map/map-config.service';
+import type { MapQuality } from '@world-map/map-configuration';
+import { mapPerfProfile } from '@world-map/marseille-perf.config';
+import { MarseilleAtmosphereService } from '@world-map/marseille-atmosphere.service';
 import {
   MetaverseBbRenderPipeline,
   shouldUseRenderPipeline,
-} from '../core/map/metaversebb-render.pipeline';
-import { harmonizedHorizonMaskImage, harmonizedHorizonSkyCssColor } from '../core/map/floor-horizon-atmosphere.util';
+} from '@world-map/metaversebb-render.pipeline';
+import { harmonizedHorizonMaskImage, harmonizedHorizonSkyCssColor } from '@world-map/floor-horizon-atmosphere.util';
 import { FLOOR_HORIZON_BLEND } from './floor-horizon-blend.config';
 import {
   bindContainerResize,

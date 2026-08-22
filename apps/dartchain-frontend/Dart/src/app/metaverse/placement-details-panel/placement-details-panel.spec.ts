@@ -3,8 +3,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { environment } from '../../../environments/environment';
-import { METAVERSE_PLACEMENT_API } from '../../core/map/placements/placement-api.repository';
-import { PlacementFacade } from '../../core/map/placements/placement.facade';
+import { METAVERSE_PLACEMENT_API } from '@world-map/placements/placement-api.repository';
+import { PlacementFacade } from '@world-map/placements/placement.facade';
 import { PlacementDetailsPanel } from './placement-details-panel';
 
 describe('PlacementDetailsPanel', () => {

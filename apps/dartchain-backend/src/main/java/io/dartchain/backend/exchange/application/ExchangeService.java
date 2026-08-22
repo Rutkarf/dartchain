@@ -7,7 +7,7 @@ import io.dartchain.backend.auth.AuthService;
 import io.dartchain.backend.exchange.dto.ExchangeSwapRequest;
 import io.dartchain.backend.exchange.dto.ExchangeSwapResponse;
 import io.dartchain.backend.exchange.store.ExchangeLedgerStore;
-import io.dartchain.backend.quests.QuestService;
+import io.dartchain.backend.quests.application.QuestService;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
 import io.dartchain.backend.showcase.application.LaunchLabService;
 import io.dartchain.backend.showcase.application.NewsService;

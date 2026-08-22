@@ -6,7 +6,7 @@ import io.dartchain.backend.auth.security.WebSocketAuthSupport;
 import io.dartchain.backend.blockchain.model.Block;
 import io.dartchain.backend.blockchain.model.PendingTransaction;
 import io.dartchain.backend.peer.PeerMetricsRegistry;
-import io.dartchain.backend.quests.QuestService;
+import io.dartchain.backend.quests.application.QuestService;
 import io.dartchain.backend.quests.model.QuestProgressState;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.blockchain.application.PendingTransactionService;

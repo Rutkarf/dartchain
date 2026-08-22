@@ -114,7 +114,7 @@ describe('a11y & UX contract (ex verify-a11y-ux.sh)', () => {
     expect(txController.includes('@CrossOrigin'), '@CrossOrigin on TransactionController').toBe(false);
 
     const explorerController = read(
-      join(backendRoot, 'src/main/java/io/dartchain/backend/explorer/controller/ExplorerController.java'),
+      join(backendRoot, 'src/main/java/io/dartchain/backend/explorer/infrastructure/web/ExplorerController.java'),
     );
     expect(explorerController.includes('GetMapping("/blocks")'), 'GET /api/explorer/blocks').toBe(true);
   });

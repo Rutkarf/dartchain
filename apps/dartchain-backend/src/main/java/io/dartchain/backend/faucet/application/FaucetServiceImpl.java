@@ -13,7 +13,7 @@ import io.dartchain.backend.faucet.store.FaucetPendingBalanceStore;
 import io.dartchain.backend.faucet.model.FaucetClaim;
 import io.dartchain.backend.blockchain.model.Transaction;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
-import io.dartchain.backend.quests.QuestService;
+import io.dartchain.backend.quests.application.QuestService;
 import io.dartchain.backend.utils.FaucetTimeUtils;
 import io.dartchain.backend.shared.utils.WalletValidator;
 import io.dartchain.backend.blockchain.application.BlockchainService;

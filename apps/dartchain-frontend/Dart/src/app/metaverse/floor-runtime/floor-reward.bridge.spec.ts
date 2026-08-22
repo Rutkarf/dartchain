@@ -2,8 +2,8 @@ import { NgZone } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
-import { M4t3rRewardRuntimeService } from '../../core/map/m4t3r-reward-runtime.service';
-import type { M4t3rTrailPickupAccepted } from '../../core/map/m4t3r-trail-api.service';
+import { M4t3rRewardRuntimeService } from '@world-map/m4t3r-reward-runtime.service';
+import type { M4t3rTrailPickupAccepted } from '@world-map/m4t3r-trail-api.service';
 import { FloorRewardBridge } from './floor-reward.bridge';
 import { FloorSessionAdapter } from './floor-session.adapter';
 

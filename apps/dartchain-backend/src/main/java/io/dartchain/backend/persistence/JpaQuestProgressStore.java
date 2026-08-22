@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dartchain.backend.quests.model.QuestProgressState;
 import io.dartchain.backend.quests.model.QuestTaskState;
-import io.dartchain.backend.quests.store.QuestProgressStore;
+import io.dartchain.backend.quests.persistence.QuestProgressStore;
 import io.dartchain.backend.persistence.entity.QuestProgressEntity;
 import io.dartchain.backend.persistence.repository.QuestProgressJpaRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

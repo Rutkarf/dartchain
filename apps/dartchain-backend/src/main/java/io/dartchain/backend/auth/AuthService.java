@@ -12,7 +12,7 @@ import io.dartchain.backend.auth.store.RefreshTokenStore;
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.config.AuthProperties;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
-import io.dartchain.backend.quests.QuestService;
+import io.dartchain.backend.quests.application.QuestService;
 import io.dartchain.backend.shared.utils.CryptoUtils;
 import io.dartchain.backend.shared.utils.WalletValidator;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,11 +2,18 @@ package io.dartchain.backend.config;
 
 /**
  * Chemins API canoniques (Phase K) et versionnés (Phase AA).
- * Les alias legacy restent exposés pour compatibilité — préférer {@code /api/v1/*}.
+ * <p>
+ * Migration : préférer {@code /api/v1/*}. Les chemins top-level retirés ({@code /api/stats})
+ * répondent 404 — voir {@link io.dartchain.backend.api.LegacyApiDeprecationFilter}.
+ * {@code dartchain.product.legacy-api-aliases-enabled} documente la politique prod (health v1)
+ * ; les alias HTTP ne sont pas ré-exposés.
  */
 public final class ApiRoutes {
 
     public static final String API_V1_PREFIX = "/api/v1";
+
+    /** Alias legacy retiré — successeur {@link #BLOCKCHAIN_STATS_V1}. */
+    public static final String LEGACY_STATS = "/api/stats";
 
     public static final String PENDING_TRANSACTIONS = "/api/pending-transactions";
     public static final String BLOCKCHAIN_STATS = "/api/blockchain/stats";

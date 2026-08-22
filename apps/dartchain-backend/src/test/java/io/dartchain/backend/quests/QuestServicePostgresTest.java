@@ -1,5 +1,6 @@
 package io.dartchain.backend.quests;
 
+import io.dartchain.backend.quests.application.QuestService;
 import io.dartchain.backend.auth.dto.LinkWalletRequest;
 import io.dartchain.backend.auth.dto.LoginRequest;
 import io.dartchain.backend.auth.dto.RegisterRequest;

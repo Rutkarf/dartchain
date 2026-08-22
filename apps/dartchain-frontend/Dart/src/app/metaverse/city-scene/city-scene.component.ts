@@ -6,7 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { Subscription, filter, take } from 'rxjs';
-import { MapLoadingService } from '../../core/map/map-loading.service';
+import { MapLoadingService } from '@world-map/map-loading.service';
 import { CharacterControlService } from '@metaverse/services/character-control.service';
 import { ThreeSceneService } from '@metaverse/services/three-scene.service';
 

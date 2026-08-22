@@ -2,9 +2,9 @@ import { NgZone } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
-import { GeoCoordinateService } from '../../core/map/geo-coordinate.service';
-import { MapConfigService } from '../../core/map/map-config.service';
-import { MapLoadingService } from '../../core/map/map-loading.service';
+import { GeoCoordinateService } from '@world-map/geo-coordinate.service';
+import { MapConfigService } from '@world-map/map-config.service';
+import { MapLoadingService } from '@world-map/map-loading.service';
 import { CameraControlService } from '@metaverse/services/camera-control.service';
 import { CharacterNftService } from '@metaverse/services/character-nft.service';
 import { RunnerStateService } from '@metaverse/services/runner/runner-state.service';

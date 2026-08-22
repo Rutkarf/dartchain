@@ -26,7 +26,7 @@ import { StarConquestBackground } from './star-conquest-background';
 import { StarConquestEffects } from './star-conquest-effects';
 import type { StarQuestAnchor } from './star-conquest-anchors';
 import type { KnowledgeGraphStore } from '@star-conquest/components/particle-background/knowledge-graph/knowledge-graph.store';
-import type { QuestVisualizationMode } from '@core/map/map-configuration';
+import type { QuestVisualizationMode } from '@world-map/map-configuration';
 import type { StarConquestUniverseTheme } from './star-conquest-universe.types';
 import {
   DEFAULT_STAR_CONQUEST_UNIVERSE,

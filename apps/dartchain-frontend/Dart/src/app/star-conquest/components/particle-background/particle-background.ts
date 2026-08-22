@@ -60,7 +60,7 @@ import { formatRewardShort } from '@star-conquest/star-conquest-visuals';
 import {
   DEFAULT_QUEST_VISUALIZATION_MODE,
   mapQualityToQuestGraphQuality,
-} from '../../../core/map/map-configuration';
+} from '@world-map/map-configuration';
 import { environment } from '../../../../environments/environment';
 import { KnowledgeGraphOrchestratorService } from './knowledge-graph/knowledge-graph-orchestrator.service';
 import { QUEST_ORBIT_CONFIG } from './knowledge-graph/knowledge-graph.config';

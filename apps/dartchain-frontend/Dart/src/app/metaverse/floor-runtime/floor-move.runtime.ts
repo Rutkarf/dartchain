@@ -2,11 +2,11 @@ import { Injectable, NgZone, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as THREE from 'three';
 
-import { GeoCoordinateService } from '../../core/map/geo-coordinate.service';
-import { MapConfigService } from '../../core/map/map-config.service';
-import { MapLoadingService } from '../../core/map/map-loading.service';
-import { METRO_SPAWN_ANCHOR, MOVE_JOYSTICK_CONFIG } from '../../core/map/map-configuration';
-import { mapPerfProfile } from '../../core/map/marseille-perf.config';
+import { GeoCoordinateService } from '@world-map/geo-coordinate.service';
+import { MapConfigService } from '@world-map/map-config.service';
+import { MapLoadingService } from '@world-map/map-loading.service';
+import { METRO_SPAWN_ANCHOR, MOVE_JOYSTICK_CONFIG } from '@world-map/map-configuration';
+import { mapPerfProfile } from '@world-map/marseille-perf.config';
 import { DualContextGovernorService } from '../../core/utils/dual-context-governor.service';
 import { CHARACTER_ASSETS } from '@metaverse/services/character-assets.config';
 import { CameraControlService } from '@metaverse/services/camera-control.service';

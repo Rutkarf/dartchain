@@ -1,7 +1,7 @@
 package io.dartchain.backend.p2p;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dartchain.backend.quests.QuestProgressP2pChangedEvent;
+import io.dartchain.backend.quests.model.QuestProgressP2pChangedEvent;
 import io.dartchain.backend.quests.model.QuestProgressState;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

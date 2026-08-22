@@ -8,7 +8,7 @@ import {
   ORBIT_CONFIG,
   THIRD_PERSON_CAMERA_CONFIG,
   VIEUX_PORT_METRO_MIRROR_VIEW,
-} from '@core/map/map-configuration';
+} from '@world-map/map-configuration';
 
 /**
  * Caméra 3ᵉ personne : orbite sphérique autour du personnage.

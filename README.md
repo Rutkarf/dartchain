@@ -21,10 +21,11 @@ Chaque domaine sous `src/app/{domaine}/` contient typiquement :
 - `services/` — logique métier injectable
 - `models/` — types et DTOs locaux
 
-**Transversal (`core/`)** : i18n, config produit, map Marseille, utils Three.js, `shell-feedback.service`.
+**Transversal (`core/`)** : i18n, config produit, utils Three.js, `shell-feedback.service`.
 
 | Domaine | Rôle |
 |---------|------|
+| `world-map/` | Carte Marseille OSM/Three.js (M4T3R, placements, WiGLE) |
 | `navbar/` | Barre supérieure, searchbar, ticker, brand crypto |
 | `blockchain/` | Blocs, transactions, API client |
 | `exchange/` | Swap, taux crypto |
@@ -35,7 +36,7 @@ Chaque domaine sous `src/app/{domaine}/` contient typiquement :
 | `r4v3-scene/` | Scènes R4V3 + ladder-climb (démo) |
 | `components/` | Composants **partagés** uniquement (badges 3D, error-banner…) |
 
-Alias TypeScript : `@blockchain/*`, `@navbar/*`, `@metaverse/*`, `@star-conquest/*`, etc. (`tsconfig.json`).
+Alias TypeScript : `@world-map/*`, `@blockchain/*`, `@navbar/*`, `@metaverse/*`, `@star-conquest/*`, etc. (`tsconfig.json`).
 
 ## Architecture backend
 

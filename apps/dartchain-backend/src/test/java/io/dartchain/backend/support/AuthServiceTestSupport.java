@@ -10,7 +10,7 @@ import io.dartchain.backend.auth.audit.InMemoryAuthAuditStore;
 import io.dartchain.backend.auth.jwt.NativeJwtService;
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.config.AuthProperties;
-import io.dartchain.backend.quests.QuestService;
+import io.dartchain.backend.quests.application.QuestService;
 
 public final class AuthServiceTestSupport {
 

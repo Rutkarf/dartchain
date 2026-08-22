@@ -31,7 +31,9 @@
       "@components/*": ["./src/app/components/*"],
       "@r4v3-scene/*": ["./src/app/r4v3-scene/*"],
       "@metaverse/*": ["./src/app/metaverse/*"],
-      "@star-conquest/*": ["./src/app/star-conquest/*"]
+      "@star-conquest/*": ["./src/app/star-conquest/*"],
+      "@world-map/*": ["./src/app/world-map/*"],
+      "@core/map/*": ["./src/app/world-map/*"]
     }
   },
   "angularCompilerOptions": {

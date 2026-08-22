@@ -44,7 +44,9 @@ class ApiV1ContractIntegrationTest {
     @Test
     void removedLegacyStats_returnsNotFound() throws Exception {
         mockMvc.perform(get("/api/stats"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(header().string("Deprecation", "true"))
+                .andExpect(header().string("Link", containsString("/api/v1/blockchain/stats")));
     }
 
     @Test

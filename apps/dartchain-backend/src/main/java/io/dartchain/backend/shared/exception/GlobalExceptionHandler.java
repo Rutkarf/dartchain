@@ -6,7 +6,7 @@ import io.dartchain.backend.auth.AuthException;
 import io.dartchain.backend.shared.dto.ApiErrorResponse;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
 import io.dartchain.backend.ops.RequestCorrelationFilter;
-import io.dartchain.backend.quests.QuestException;
+import io.dartchain.backend.quests.application.QuestException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

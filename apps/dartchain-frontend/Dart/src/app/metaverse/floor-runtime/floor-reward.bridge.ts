@@ -1,7 +1,7 @@
 import { Injectable, NgZone, inject } from '@angular/core';
 
-import { M4t3rRewardRuntimeService } from '../../core/map/m4t3r-reward-runtime.service';
-import type { M4t3rTrailPickupAccepted } from '../../core/map/m4t3r-trail-api.service';
+import { M4t3rRewardRuntimeService } from '@world-map/m4t3r-reward-runtime.service';
+import type { M4t3rTrailPickupAccepted } from '@world-map/m4t3r-trail-api.service';
 import { FloorSessionAdapter } from './floor-session.adapter';
 
 /**

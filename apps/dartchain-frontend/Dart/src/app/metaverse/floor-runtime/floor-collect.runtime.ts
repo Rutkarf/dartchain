@@ -1,14 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import * as THREE from 'three';
 
-import { MapLoadingService } from '../../core/map/map-loading.service';
-import { M4t3rCoinPickupFxService } from '../../core/map/m4t3r-coin-pickup-fx.service';
-import { M4t3rCollectTrailVisualService } from '../../core/map/m4t3r-collect-trail-visual.service';
-import { M4t3rPickupFxOrchestratorService } from '../../core/map/m4t3r-pickup-fx-orchestrator.service';
-import { M4t3rPickupFxService } from '../../core/map/m4t3r-pickup-fx.service';
-import { M4t3rTrailApiService } from '../../core/map/m4t3r-trail-api.service';
-import { FootprintTrailManager } from '../../core/map/footprint-trail-manager.service';
-import { TokenCellService } from '../../core/map/token-cell.service';
+import { MapLoadingService } from '@world-map/map-loading.service';
+import { M4t3rCoinPickupFxService } from '@world-map/m4t3r-coin-pickup-fx.service';
+import { M4t3rCollectTrailVisualService } from '@world-map/m4t3r-collect-trail-visual.service';
+import { M4t3rPickupFxOrchestratorService } from '@world-map/m4t3r-pickup-fx-orchestrator.service';
+import { M4t3rPickupFxService } from '@world-map/m4t3r-pickup-fx.service';
+import { M4t3rTrailApiService } from '@world-map/m4t3r-trail-api.service';
+import { FootprintTrailManager } from '@world-map/footprint-trail-manager.service';
+import { TokenCellService } from '@world-map/token-cell.service';
 import { FloorRewardBridge } from './floor-reward.bridge';
 
 /**

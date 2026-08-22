@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import {
   DEFAULT_QUEST_GRAPH_QUALITY,
   DEFAULT_QUEST_VISUALIZATION_MODE,
-} from '@core/map/map-configuration';
+} from '@world-map/map-configuration';
 import { PeersDataService } from '@peers/services/peers-data.service';
 import type { StarConquestGraph } from '@star-conquest/star-conquest-graph';
 import type { StarQuest } from '@star-conquest/star-conquest.model';
