@@ -79,7 +79,7 @@ export const GEOGRAPHIC_DATA_SOURCES: readonly GeographicDataSource[] = [
   {
     id: 'osm-overpass-marseille-buildings',
     type: 'osm',
-    pathOrEndpoint: '/api/metaverse/overpass (backend) | /overpass (dev proxy → openstreetmap.fr)',
+    pathOrEndpoint: '/api/metaverse/overpass (backend) | /overpass (dev proxy → lz4.overpass-api.de)',
     coordinateSystem: 'EPSG:4326',
     unit: 'degrees',
     coverage: 'Vieux-Port bbox OSM_QUERY_BOUNDS',

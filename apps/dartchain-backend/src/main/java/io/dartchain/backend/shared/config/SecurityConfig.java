@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/showcase/chat/messages").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/m4t3r/trail-pickup").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/metaverse/overpass").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/metaverse/placements/*/inquiries").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(bearerTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

@@ -21,7 +21,7 @@ import {
 import { resolvePlacementDataFallback } from './placement-rules';
 
 /**
- * Contrats API attendus (backend pas encore livré — lot MB-7) :
+ * Contrats API (lot MB-7) :
  *   GET  {apiUrl}/metaverse/placements?south&north&west&east
  *   GET  {apiUrl}/metaverse/placements/:id
  *   POST {apiUrl}/metaverse/placements/:id/inquiries

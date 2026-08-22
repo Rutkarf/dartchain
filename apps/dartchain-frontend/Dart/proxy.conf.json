@@ -11,7 +11,7 @@
     "changeOrigin": true
   },
   "/overpass": {
-    "target": "https://overpass.openstreetmap.fr",
+    "target": "https://lz4.overpass-api.de",
     "secure": true,
     "changeOrigin": true,
     "timeout": 90000,
@@ -23,12 +23,12 @@
     }
   },
   "/overpass-alt": {
-    "target": "https://overpass.private.coffee",
+    "target": "https://overpass-api.de",
     "secure": true,
     "changeOrigin": true,
     "timeout": 90000,
     "headers": {
-      "User-Agent": "DartChain-MetaverseBB/1.0"
+      "User-Agent": "overpass-turbo"
     },
     "pathRewrite": {
       "^/overpass-alt": "/api/interpreter"

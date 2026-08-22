@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import static org.springframework.http.HttpStatus.BAD_GATEWAY;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -22,31 +23,38 @@ public class OverpassProxyService {
     public record OverpassEndpoint(String url, String userAgent) {}
 
     /**
-     * Ordre : miroir FR (réactif) → private.coffee (ex-kumi) → FOSSGIS principal / lz4.
-     * Le miroir FR whitelist « overpass-turbo » ; les autres acceptent notre UA applicatif.
+     * Ordre : lz4 (le plus fiable) → FOSSGIS principal → miroir FR → private.coffee.
+     * UA « overpass-turbo » : le miroir FR le whitelist ; les autres l’acceptent.
      */
     public static final List<OverpassEndpoint> ENDPOINTS = List.of(
+            new OverpassEndpoint(
+                    "https://lz4.overpass-api.de/api/interpreter",
+                    "overpass-turbo"
+            ),
+            new OverpassEndpoint(
+                    "https://overpass-api.de/api/interpreter",
+                    "overpass-turbo"
+            ),
             new OverpassEndpoint(
                     "https://overpass.openstreetmap.fr/api/interpreter",
                     "overpass-turbo"
             ),
             new OverpassEndpoint(
                     "https://overpass.private.coffee/api/interpreter",
-                    "DartChain-MetaverseBB/1.0"
-            ),
-            new OverpassEndpoint(
-                    "https://overpass-api.de/api/interpreter",
-                    "DartChain-MetaverseBB/1.0"
-            ),
-            new OverpassEndpoint(
-                    "https://lz4.overpass-api.de/api/interpreter",
-                    "DartChain-MetaverseBB/1.0"
+                    "overpass-turbo"
             )
     );
 
     private static final int MAX_QUERY_CHARS = 8_192;
-    private static final int CONNECT_TIMEOUT_MS = 8_000;
-    private static final int READ_TIMEOUT_MS = 60_000;
+    private static final int CONNECT_TIMEOUT_MS = 3_000;
+    private static final int READ_TIMEOUT_MS = 25_000;
+    private static final Set<String> ALLOWED_OSM_FEATURES = Set.of(
+            "building",
+            "natural",
+            "water",
+            "waterway",
+            "highway"
+    );
 
     private final RestClient restClient;
 
@@ -92,8 +100,15 @@ public class OverpassProxyService {
             throw new ResponseStatusException(BAD_REQUEST, "Overpass query too large");
         }
         String compact = query.toLowerCase(Locale.ROOT).replace("'", "\"");
-        if (!compact.contains("[out:json]") || !compact.contains("building")) {
-            throw new ResponseStatusException(BAD_REQUEST, "Only OSM building JSON queries are allowed");
+        if (!compact.contains("[out:json]")) {
+            throw new ResponseStatusException(BAD_REQUEST, "Only OSM JSON queries are allowed");
+        }
+        boolean allowedFeature = ALLOWED_OSM_FEATURES.stream().anyMatch(compact::contains);
+        if (!allowedFeature) {
+            throw new ResponseStatusException(
+                    BAD_REQUEST,
+                    "Only OSM building, water or highway JSON queries are allowed"
+            );
         }
         return query.trim();
     }
