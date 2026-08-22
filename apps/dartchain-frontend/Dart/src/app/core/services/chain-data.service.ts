@@ -6,7 +6,7 @@ import {
   BlockchainApiService,
   BlockchainStats,
 } from './blockchain-api.service';
-import { sortBlocksDescending } from '../../features/chain-graph/chain-explorer.util';
+import { sortBlocksDescending } from '@explorer/chain-graph/chain-explorer.util';
 
 export interface ChainExplorerQuery {
   wallet?: string;

@@ -10,11 +10,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
 import {
   DockChainPhase,
   DockChainStateService,
-} from '../../core/services/dock-chain-state.service';
+} from '@core/services/dock-chain-state.service';
 
 @Component({
   selector: 'app-dock-chain-summary',

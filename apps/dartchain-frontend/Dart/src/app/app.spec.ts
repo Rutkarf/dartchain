@@ -8,7 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { AppComponent } from './app';
-import { AuthDrawerComponent } from './features/auth-drawer/auth-drawer';
+import { AuthDrawerComponent } from '@auth/auth-drawer/auth-drawer';
 import { NavbarShellComponent } from './navbar/navbar';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { BrandCryptoSelectComponent } from './navbar/brand-crypto-select';

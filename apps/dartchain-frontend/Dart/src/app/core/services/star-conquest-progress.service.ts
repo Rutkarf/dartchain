@@ -1,9 +1,9 @@
 import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { QuestsPanelService } from '../../features/quests-panel/quests-panel.service';
+import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
 import { StarConquestFacade } from './star-conquest.facade';
-import type { QuestTaskView } from '../../features/quests-panel/quests-panel.model';
+import type { QuestTaskView } from '@quests/quests-panel/quests-panel.model';
 import { STAR_CONQUEST_MOCK_QUESTS } from '../../particle-background/star-conquest/star-conquest.mock';
 import type { StarQuest } from '../../particle-background/star-conquest/star-conquest.model';
 import {

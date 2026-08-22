@@ -3,7 +3,7 @@
  * Preview M4T3R ≠ crédit faucet / MTS Dock.
  */
 
-import type { QuestTaskView } from '../../features/quests-panel/quests-panel.model';
+import type { QuestTaskView } from '@quests/quests-panel/quests-panel.model';
 import { STAR_QUEST_FAMILIES, type StarQuestFamily } from './star-conquest-families';
 import type { StarConquestLiveLink } from './star-conquest-live';
 import type { StarConquestClaimReason } from './star-conquest-progress';

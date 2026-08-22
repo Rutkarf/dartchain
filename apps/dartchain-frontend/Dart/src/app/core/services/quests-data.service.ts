@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { QuestsPanelService } from '../../features/quests-panel/quests-panel.service';
+import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
 
 @Injectable({ providedIn: 'root' })
 export class QuestsDataService {

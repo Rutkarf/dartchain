@@ -7,7 +7,7 @@ import {
   PeerStatsResponse,
   PeerView,
 } from './blockchain-api.service';
-import { PEER_AUTO_REFRESH_MS } from '../../features/peer-panel/peer-panel.constants';
+import { PEER_AUTO_REFRESH_MS } from '@peers/peer-panel/peer-panel.constants';
 
 export type PeersDataErrorCode = 'load' | 'stats' | 'rate-limit' | null;
 

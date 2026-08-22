@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { ExchangePanelComponent } from '../../features/exchange-panel/exchange-panel';
+import { ExchangePanelComponent } from '@exchange/components/exchange-panel/exchange-panel';
 
 @Component({
   selector: 'app-swap',

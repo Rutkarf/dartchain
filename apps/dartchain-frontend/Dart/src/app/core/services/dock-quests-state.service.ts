@@ -1,8 +1,8 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { QuestsPanelService } from '../../features/quests-panel/quests-panel.service';
-import { QuestPersistedState } from '../../features/quests-panel/quests-panel.model';
+import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
+import { QuestPersistedState } from '@quests/quests-panel/quests-panel.model';
 import { formatDockRelativeTime } from '../utils/dock-time.util';
 
 export type DockQuestsPhase = 'error' | 'loading' | 'ready' | 'urgent';

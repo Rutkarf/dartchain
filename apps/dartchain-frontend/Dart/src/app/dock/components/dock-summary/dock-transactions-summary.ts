@@ -8,10 +8,10 @@ import {
   inject,
 } from '@angular/core';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
-import { DockBlockStateService } from '../../core/services/dock-block-state.service';
-import { DockPendingStateService } from '../../core/services/dock-pending-state.service';
-import { formatDockRelativeTime } from '../../core/utils/dock-time.util';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
+import { DockBlockStateService } from '@core/services/dock-block-state.service';
+import { DockPendingStateService } from '@core/services/dock-pending-state.service';
+import { formatDockRelativeTime } from '@core/utils/dock-time.util';
 
 @Component({
   selector: 'app-dock-transactions-summary',

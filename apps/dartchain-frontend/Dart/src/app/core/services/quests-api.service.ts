@@ -3,8 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { QuestPersistedState } from '../../features/quests-panel/quests-panel.model';
-import { QuestCatalogResponse } from '../../features/quests-panel/quests-catalog.model';
+import { QuestPersistedState } from '@quests/quests-panel/quests-panel.model';
+import { QuestCatalogResponse } from '@quests/quests-panel/quests-catalog.model';
 
 const AUTH_TOKEN_KEY = 'dartchain_auth_token';
 

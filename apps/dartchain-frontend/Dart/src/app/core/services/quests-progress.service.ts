@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 
-import { QuestsPanelService } from '../../features/quests-panel/quests-panel.service';
+import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
 import { ShowcaseLaunchStateService } from './showcase-launch-state.service';
 import { WalletSessionService } from './wallet-session.service';
 

@@ -20,12 +20,12 @@ import {
   DOCK_REFRESH_EVENT,
   refreshEventMatchesTab,
 } from '../../core/constants/panel-refresh.constants';
-import { ChainGraphComponent } from '../chain-graph/chain-graph';
+import { ChainGraphComponent } from '@explorer/chain-graph/chain-graph';
 import {
   applyChainFilters,
   downloadBlocksJson,
   sortBlocksDescending,
-} from '../chain-graph/chain-explorer.util';
+} from '@explorer/chain-graph/chain-explorer.util';
 
 type ChainViewMode = 'list' | 'graph';
 type FeedbackKind = 'success' | 'error';

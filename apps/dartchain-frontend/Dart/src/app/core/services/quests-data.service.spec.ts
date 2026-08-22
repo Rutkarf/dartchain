@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { QuestsDataService } from './quests-data.service';
-import { QuestsPanelService } from '../../features/quests-panel/quests-panel.service';
+import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
 
 describe('QuestsDataService', () => {
   let service: QuestsDataService;

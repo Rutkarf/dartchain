@@ -9,7 +9,7 @@ import {
   maxClaimSmallestUnits,
   parseAmountToSmallestUnits,
   smallestUnitsToAmount,
-} from '../../features/faucet/faucet.util';
+} from '@faucet/faucet/faucet.util';
 import { LocaleKey } from '../i18n/locale.messages';
 import { LocaleService } from '../i18n/locale.service';
 import { ProductConfigService } from '../config/product-config.service';

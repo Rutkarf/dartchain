@@ -6,8 +6,8 @@ import { DockNavigationService } from '../../core/services/dock-navigation.servi
 import { StarConquestProgressService } from '../../core/services/star-conquest-progress.service';
 import { StarConquestStateService } from '../../core/services/star-conquest-state.service';
 import { StarConquestFacade } from '../../core/services/star-conquest.facade';
-import { QuestsPanelService } from '../../features/quests-panel/quests-panel.service';
-import type { QuestPersistedState } from '../../features/quests-panel/quests-panel.model';
+import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
+import type { QuestPersistedState } from '@quests/quests-panel/quests-panel.model';
 import { STAR_CONQUEST_PROGRESS_STORAGE_KEY } from './star-conquest-progress';
 import { starQuestById } from './star-conquest.mock';
 import { StarQuestPanelComponent } from './star-quest-panel';

@@ -9,8 +9,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
-import { DockPeersStateService } from '../../core/services/dock-peers-state.service';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
+import { DockPeersStateService } from '@core/services/dock-peers-state.service';
 
 @Component({
   selector: 'app-dock-peers-summary',

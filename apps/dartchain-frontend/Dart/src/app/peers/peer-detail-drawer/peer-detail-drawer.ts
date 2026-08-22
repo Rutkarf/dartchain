@@ -10,7 +10,7 @@ import { PeerRowView } from '../peer-panel/peer-panel.model';
   standalone: true,
   imports: [CommonModule, FocusTrapDirective],
   templateUrl: './peer-detail-drawer.html',
-  styleUrls: ['./peer-detail-drawer.css', '../block-detail-drawer/block-detail-drawer.css'],
+  styleUrls: ['./peer-detail-drawer.css'],
 })
 export class PeerDetailDrawerComponent {
   protected readonly locale = inject(LocaleService);

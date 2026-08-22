@@ -80,8 +80,8 @@ import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { StarConquestProgressService } from '../../core/services/star-conquest-progress.service';
 import { StarConquestFacade } from '../../core/services/star-conquest.facade';
-import { QuestsPanelService } from '../../features/quests-panel/quests-panel.service';
-import type { QuestPersistedState, QuestTaskView } from '../../features/quests-panel/quests-panel.model';
+import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
+import type { QuestPersistedState, QuestTaskView } from '@quests/quests-panel/quests-panel.model';
 
 describe('Star Conquest mock catalog', () => {
   it(`exposes exactly ${STAR_CONQUEST_QUEST_COUNT} interactive quests`, () => {

@@ -1,17 +1,17 @@
 import { ChangeDetectionStrategy, Component, Input, output } from '@angular/core';
 
 import { ShowcaseTab } from '@core/models/showcase-tab.model';
-import { ShowcaseNewsSummaryComponent } from '../showcase-news/showcase-news-summary';
-import { ShowcaseNewsComponent } from '../showcase-news/showcase-news';
-import { ShowcaseChatSummaryComponent } from '../showcase-chat/showcase-chat-summary';
-import { ShowcaseChatComponent } from '../showcase-chat/showcase-chat';
-import { ShowcaseLaunchSummaryComponent } from '../showcase-launch/showcase-launch-summary';
-import { ShowcaseLaunchComponent } from '../showcase-launch/showcase-launch';
-import { ShowcaseDaoSummaryComponent } from '../showcase-dao/showcase-dao-summary';
-import { ShowcaseDaoComponent } from '../showcase-dao/showcase-dao';
-import { ShowcaseR4v3SummaryComponent } from '../showcase-r4v3/showcase-r4v3-summary';
-import { ShowcaseR4v3Component } from '../showcase-r4v3/showcase-r4v3';
-import { DockMarketSummaryComponent } from '../../../features/dock-summary/dock-market-summary';
+import { ShowcaseNewsSummaryComponent } from '@showcase/components/showcase-news/showcase-news-summary';
+import { ShowcaseNewsComponent } from '@showcase/components/showcase-news/showcase-news';
+import { ShowcaseChatSummaryComponent } from '@showcase/components/showcase-chat/showcase-chat-summary';
+import { ShowcaseChatComponent } from '@showcase/components/showcase-chat/showcase-chat';
+import { ShowcaseLaunchSummaryComponent } from '@showcase/components/showcase-launch/showcase-launch-summary';
+import { ShowcaseLaunchComponent } from '@showcase/components/showcase-launch/showcase-launch';
+import { ShowcaseDaoSummaryComponent } from '@showcase/components/showcase-dao/showcase-dao-summary';
+import { ShowcaseDaoComponent } from '@showcase/components/showcase-dao/showcase-dao';
+import { ShowcaseR4v3SummaryComponent } from '@showcase/components/showcase-r4v3/showcase-r4v3-summary';
+import { ShowcaseR4v3Component } from '@showcase/components/showcase-r4v3/showcase-r4v3';
+import { DockMarketSummaryComponent } from '@dock/components/dock-summary/dock-market-summary';
 import { MarketPanelComponent } from '../../../features/market-panel/market-panel';
 
 @Component({

@@ -10,13 +10,13 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
-import { MarketDataService } from '../../core/services/market-data.service';
-import { MarketAssetRow } from '../market-panel/market-panel.model';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
+import { MarketDataService } from '@core/services/market-data.service';
+import { MarketAssetRow } from '../../../features/market-panel/market-panel.model';
 import {
   DOCK_REFRESH_EVENT,
   SHOWCASE_REFRESH_EVENT,
-} from '../../core/constants/panel-refresh.constants';
+} from '@core/constants/panel-refresh.constants';
 
 @Component({
   selector: 'app-dock-market-summary',

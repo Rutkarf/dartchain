@@ -17,7 +17,18 @@
     "baseUrl": ".",
     "paths": {
       "@core/*": ["src/app/core/*"],
-      "@showcase/*": ["src/app/showcase/*"]
+      "@showcase/*": ["src/app/showcase/*"],
+      "@navbar/*": ["src/app/navbar/*"],
+      "@exchange/*": ["src/app/exchange/*"],
+      "@dock/*": ["src/app/dock/*"],
+      "@wallet/*": ["src/app/wallet/*"],
+      "@faucet/*": ["src/app/faucet/*"],
+      "@quests/*": ["src/app/quests/*"],
+      "@peers/*": ["src/app/peers/*"],
+      "@blockchain/*": ["src/app/blockchain/*"],
+      "@explorer/*": ["src/app/explorer/*"],
+      "@admin/*": ["src/app/admin/*"],
+      "@auth/*": ["src/app/auth/*"]
     }
   },
   "angularCompilerOptions": {

@@ -8,22 +8,22 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '../../core/models/collapsed-summary.model';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
 import {
-  DockBlockPhase,
-  DockBlockStateService,
-} from '../../core/services/dock-block-state.service';
+  DockPendingPhase,
+  DockPendingStateService,
+} from '@core/services/dock-pending-state.service';
 
 @Component({
-  selector: 'app-dock-block-summary',
+  selector: 'app-dock-pending-summary',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './dock-block-summary.html',
+  templateUrl: './dock-pending-summary.html',
   styleUrls: ['./dock-summary-shared.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DockBlockSummaryComponent implements OnInit, OnDestroy {
-  protected readonly state = inject(DockBlockStateService);
+export class DockPendingSummaryComponent implements OnInit, OnDestroy {
+  protected readonly state = inject(DockPendingStateService);
 
   @HostBinding(`class.${COLLAPSED_SUMMARY_BAR_CLASS}`)
   readonly collapsedSummaryBar = true;
@@ -31,7 +31,7 @@ export class DockBlockSummaryComponent implements OnInit, OnDestroy {
   @HostBinding('class.dock-summary-bar__content')
   readonly contentClass = true;
 
-  @HostBinding('class.is-block')
+  @HostBinding('class.is-pending')
   readonly panelClass = true;
 
   @HostBinding('class.is-collapsed')
@@ -43,10 +43,10 @@ export class DockBlockSummaryComponent implements OnInit, OnDestroy {
   readonly progressLabel = this.state.progressLabel;
   readonly updatedAgeLabel = this.state.updatedAgeLabel;
   readonly loading = this.state.loading;
-  readonly blockHeight = this.state.blockHeight;
+  readonly count = this.state.count;
 
   ngOnInit(): void {
-    if (!this.state.latestBlock() && !this.state.loading()) {
+    if (this.state.count() === 0 && !this.state.loading()) {
       void this.state.load();
     }
     window.addEventListener('dartchain-refresh-dock', this.onGlobalRefresh);
@@ -60,8 +60,15 @@ export class DockBlockSummaryComponent implements OnInit, OnDestroy {
     this.state.refresh(true);
   };
 
-  statusClass(phase: DockBlockPhase): string {
-    return `dock-summary-status--${phase === 'loading' ? 'loading' : phase === 'error' ? 'error' : 'ready'}`;
+  statusClass(phase: DockPendingPhase): string {
+    const map: Record<DockPendingPhase, string> = {
+      error: 'error',
+      loading: 'busy',
+      empty: 'empty',
+      ready: 'ready',
+      busy: 'busy',
+    };
+    return `dock-summary-status--${map[phase]}`;
   }
 
   onRefresh(event: Event): void {
@@ -69,10 +76,10 @@ export class DockBlockSummaryComponent implements OnInit, OnDestroy {
     this.state.refresh(true);
   }
 
-  onCompose(event: Event): void {
+  onExpand(event: Event): void {
     event.stopPropagation();
     window.dispatchEvent(
-      new CustomEvent('dock-open-panel', { detail: { panel: 'composer' } })
+      new CustomEvent('dock-open-panel', { detail: { panel: 'pending' } })
     );
   }
 }

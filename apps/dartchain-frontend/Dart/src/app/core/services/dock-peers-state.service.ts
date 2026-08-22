@@ -5,7 +5,7 @@ import {
   buildNetworkStats,
   buildPeerRowView,
   parsePeerEndpoint,
-} from '../../features/peer-panel/peer-panel.util';
+} from '@peers/peer-panel/peer-panel.util';
 
 export type DockPeersPhase = 'error' | 'loading' | 'empty' | 'connected' | 'partial';
 

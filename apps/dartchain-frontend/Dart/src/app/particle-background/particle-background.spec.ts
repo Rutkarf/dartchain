@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 
-import { QuestsPanelService } from '../features/quests-panel/quests-panel.service';
+import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
 import { ParticleBackgroundComponent } from './particle-background';
 
 describe('ParticleBackground', () => {

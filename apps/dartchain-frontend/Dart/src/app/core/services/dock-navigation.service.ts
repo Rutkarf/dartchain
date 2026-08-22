@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { OverlayPanel } from '../../features/dock-tabs/dock-tabs';
+import { OverlayPanel } from '@dock/components/dock-tabs/dock-tabs';
 import { TransactionSubTab, TransactionsDockService } from './transactions-dock.service';
 
 export type BottomDockTab =

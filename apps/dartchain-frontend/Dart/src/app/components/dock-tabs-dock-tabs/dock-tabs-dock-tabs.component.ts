@@ -7,14 +7,14 @@ import { ProductConfigService } from '../../core/config/product-config.service';
 import { AuthService } from '../../core/services/auth.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { CollapsedBarActionsComponent } from '../../features/collapsed-bar-actions/collapsed-bar-actions';
-import { DockBottomSummaryComponent } from '../../features/dock-summary/dock-bottom-summary';
-import { WalletPanelComponent } from '../../features/wallet-panel/wallet-panel';
-import { FaucetComponent } from '../../features/faucet/faucet';
+import { DockBottomSummaryComponent } from '@dock/components/dock-summary/dock-bottom-summary';
+import { WalletPanelComponent } from '@wallet/wallet-panel/wallet-panel';
+import { FaucetComponent } from '@faucet/faucet/faucet';
 import { TransactionsDockComponent } from '../../features/transactions-dock/transactions-dock';
-import { BlocksListComponent } from '../../features/blocks-list/blocks-list';
-import { QuestsPanelComponent } from '../../features/quests-panel/quests-panel';
-import { PeerPanelComponent } from '../../features/peer-panel/peer-panel';
-import { AdminPanelComponent } from '../../features/admin-panel/admin-panel';
+import { BlocksListComponent } from '@blockchain/blocks-list/blocks-list';
+import { QuestsPanelComponent } from '@quests/quests-panel/quests-panel';
+import { PeerPanelComponent } from '@peers/peer-panel/peer-panel';
+import { AdminPanelComponent } from '@admin/admin-panel/admin-panel';
 
 @Component({
   selector: 'app-dock-tabs-dock-tabs',
