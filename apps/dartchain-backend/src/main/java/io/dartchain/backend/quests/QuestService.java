@@ -8,7 +8,7 @@ import io.dartchain.backend.quests.dto.QuestProgressResponse;
 import io.dartchain.backend.quests.model.QuestProgressState;
 import io.dartchain.backend.quests.model.QuestTaskState;
 import io.dartchain.backend.quests.store.QuestProgressStore;
-import io.dartchain.backend.service.BlockchainService;
+import io.dartchain.backend.blockchain.application.BlockchainService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 

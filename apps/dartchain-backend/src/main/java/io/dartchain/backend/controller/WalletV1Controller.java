@@ -4,7 +4,7 @@ import io.dartchain.backend.chain.ChainConfigService;
 import io.dartchain.backend.chain.dto.EvmWalletGenerateResponse;
 import io.dartchain.backend.config.ApiRoutes;
 import io.dartchain.backend.config.ChainProperties;
-import io.dartchain.backend.utils.EvmCryptoUtils;
+import io.dartchain.backend.shared.utils.EvmCryptoUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

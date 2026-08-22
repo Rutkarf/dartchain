@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { RatePanelComponent } from '../../features/rate-panel/rate-panel';
+import { RatePanelComponent } from '@exchange/components/rate-panel/rate-panel';
 
 /**
  * Graphique — 4ᵉ enfant de `.app-main-layout` (flex column).

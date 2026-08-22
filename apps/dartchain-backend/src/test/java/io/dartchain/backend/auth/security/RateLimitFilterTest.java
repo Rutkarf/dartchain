@@ -1,6 +1,5 @@
 package io.dartchain.backend.auth.security;
 
-import io.dartchain.backend.auth.security.InMemoryRateLimitCounterStore;
 import io.dartchain.backend.config.RateLimitProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

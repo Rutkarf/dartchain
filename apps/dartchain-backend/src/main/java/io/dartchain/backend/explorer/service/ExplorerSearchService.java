@@ -4,7 +4,7 @@ import io.dartchain.backend.explorer.dto.ExplorerSearchResultDto;
 import io.dartchain.backend.explorer.dto.ExplorerSearchResponse;
 import io.dartchain.backend.model.Block;
 import io.dartchain.backend.model.Transaction;
-import io.dartchain.backend.service.BlockchainService;
+import io.dartchain.backend.blockchain.application.BlockchainService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

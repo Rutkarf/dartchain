@@ -38,7 +38,7 @@ public final class M4t3rGridUtils {
         return "chunk:" + cx + ":" + cz;
     }
 
-    static int[] parseClusterGrid(String cellId) {
+    public static int[] parseClusterGrid(String cellId) {
         if (cellId == null || !cellId.startsWith("m4t3r-cluster:")) {
             return null;
         }

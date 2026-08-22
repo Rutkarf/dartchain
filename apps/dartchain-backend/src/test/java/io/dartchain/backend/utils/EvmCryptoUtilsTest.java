@@ -1,5 +1,8 @@
 package io.dartchain.backend.utils;
 
+import io.dartchain.backend.shared.utils.EvmCryptoUtils;
+import io.dartchain.backend.shared.utils.Keccak256;
+import io.dartchain.backend.shared.utils.WalletValidator;
 import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;

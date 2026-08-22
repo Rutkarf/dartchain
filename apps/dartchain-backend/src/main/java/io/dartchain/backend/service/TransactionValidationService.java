@@ -2,7 +2,7 @@ package io.dartchain.backend.service;
 
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.config.SecurityProperties;
-import io.dartchain.backend.exception.TransactionValidationException;
+import io.dartchain.backend.shared.exception.TransactionValidationException;
 import io.dartchain.backend.model.PendingTransaction;
 import org.springframework.stereotype.Service;
 

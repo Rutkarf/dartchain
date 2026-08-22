@@ -1,0 +1,225 @@
+@if (row(); as item) {
+  <div class="market-token-backdrop" (click)="dismiss()" aria-hidden="true">
+    <aside
+      #drawerPanel
+      class="market-token-drawer ds-surface ds-surface--card ds-surface--drawer"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      [appFocusTrap]="true"
+      [attr.aria-labelledby]="'marketTokenDrawerTitle-' + item.config.exchangeToken"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="market-token-drawer__head">
+        <div class="market-token-drawer__identity">
+          @if (item.metrics.logoUrl) {
+            <img
+              class="market-token-drawer__logo"
+              [src]="item.metrics.logoUrl"
+              [alt]="item.config.name"
+              width="28"
+              height="28"
+            />
+          } @else {
+            <span
+              class="market-token-drawer__logo market-token-drawer__logo--placeholder"
+              [style.--token-accent]="item.config.accent"
+              aria-hidden="true"
+            >
+              {{ initials(item) }}
+            </span>
+          }
+
+          <div class="market-token-drawer__identity-copy">
+            <h3 class="market-token-drawer__title" [id]="'marketTokenDrawerTitle-' + item.config.exchangeToken">
+              <span class="market-token-drawer__symbol">{{ item.config.displaySymbol }}</span>
+              <span class="market-token-drawer__name">{{ item.config.name }}</span>
+            </h3>
+            <p class="market-token-drawer__meta">
+              <span class="market-token-drawer__price">{{ item.price }}</span>
+              <span
+                class="market-token-drawer__change"
+                [class.is-up]="item.positive"
+                [class.is-down]="!item.positive"
+              >
+                {{ formatChange(item) }}
+              </span>
+              <span class="market-token-drawer__status">{{ item.metrics.statusLabel }}</span>
+              <span class="market-token-drawer__age">{{ item.metrics.tokenAgeLabel }}</span>
+            </p>
+          </div>
+        </div>
+
+        <button type="button" class="market-token-drawer__close" aria-label="Fermer" (click)="dismiss()">
+          ×
+        </button>
+      </header>
+
+      <div class="market-token-drawer__actions">
+        <button type="button" class="market-token-drawer__cta market-token-drawer__cta--primary" (click)="onExchangeClick($event)">
+          Ouvrir Exchange
+        </button>
+        <button
+          type="button"
+          class="market-token-drawer__icon-btn"
+          (click)="onFavoriteClick($event)"
+          [attr.aria-pressed]="item.favorite"
+          [attr.aria-label]="item.favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+        >
+          {{ item.favorite ? '★' : '☆' }}
+        </button>
+        <button
+          type="button"
+          class="market-token-drawer__icon-btn"
+          (click)="onAlertClick($event)"
+          [attr.aria-pressed]="alertEnabled()"
+          [attr.aria-label]="alertEnabled() ? 'Désactiver alerte prix' : 'Activer alerte prix'"
+        >
+          {{ alertEnabled() ? '🔔' : '🔕' }}
+        </button>
+      </div>
+
+      <div class="market-token-drawer__metrics">
+        <article class="market-token-drawer__metric">
+          <span class="market-token-drawer__metric-label">Vol</span>
+          <strong>{{ item.metrics.volumeLabel }}</strong>
+        </article>
+        <article class="market-token-drawer__metric">
+          <span class="market-token-drawer__metric-label">Liq</span>
+          <strong>{{ item.metrics.liquidityLabel }}</strong>
+        </article>
+        <article class="market-token-drawer__metric">
+          <span class="market-token-drawer__metric-label">MCap</span>
+          <strong>{{ item.metrics.marketCapLabel }}</strong>
+        </article>
+        <article class="market-token-drawer__metric">
+          <span class="market-token-drawer__metric-label">Holders</span>
+          <strong>{{ item.metrics.holdersLabel }}</strong>
+        </article>
+        <article class="market-token-drawer__metric">
+          <span class="market-token-drawer__metric-label">Activité</span>
+          <strong>{{ item.metrics.recentActivityLabel }}</strong>
+        </article>
+        <article class="market-token-drawer__metric">
+          <span class="market-token-drawer__metric-label">Momentum</span>
+          <strong
+            class="market-token-drawer__momentum"
+            [class.is-hot]="item.metrics.momentum === 'hot'"
+            [class.is-warm]="item.metrics.momentum === 'warm'"
+          >
+            {{ item.metrics.momentumLabel }}
+          </strong>
+        </article>
+        @if (item.metrics.progressPercent !== null) {
+          <article class="market-token-drawer__metric market-token-drawer__metric--wide">
+            <span class="market-token-drawer__metric-label">Launch</span>
+            <div class="market-token-drawer__progress">
+              <span class="market-token-drawer__progress-track" aria-hidden="true">
+                <span
+                  class="market-token-drawer__progress-fill"
+                  [style.width.%]="item.metrics.progressPercent!"
+                ></span>
+              </span>
+              <strong>{{ item.metrics.progressPercent }}%</strong>
+            </div>
+          </article>
+        }
+        <article class="market-token-drawer__metric market-token-drawer__metric--wide">
+          <span class="market-token-drawer__metric-label">Source</span>
+          <strong>{{ item.metrics.creatorLabel }}</strong>
+        </article>
+      </div>
+
+      @if (item.metrics.description) {
+        <p class="market-token-drawer__description">{{ item.metrics.description }}</p>
+      }
+
+      @if (!item.config.native) {
+        <section class="market-token-drawer__trade" aria-label="Trade">
+          <div class="market-token-drawer__trade-row">
+            <div class="market-token-drawer__side-toggle" role="tablist" aria-label="Sens du trade">
+              <button
+                type="button"
+                role="tab"
+                class="market-token-drawer__side-btn"
+                [class.is-active]="tradeSide() === 'buy'"
+                [attr.aria-selected]="tradeSide() === 'buy'"
+                (click)="setSide('buy')"
+              >
+                Achat
+              </button>
+              <button
+                type="button"
+                role="tab"
+                class="market-token-drawer__side-btn market-token-drawer__side-btn--sell"
+                [class.is-active]="tradeSide() === 'sell'"
+                [attr.aria-selected]="tradeSide() === 'sell'"
+                (click)="setSide('sell')"
+              >
+                Vente
+              </button>
+            </div>
+
+            <div class="market-token-drawer__percents">
+              @for (percent of quickPercents; track percent) {
+                <button type="button" class="market-token-drawer__percent" (click)="applyPercent(percent)">
+                  {{ percent === 100 ? 'MAX' : percent + '%' }}
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (loading()) {
+            <p class="market-token-drawer__trade-loading">Chargement…</p>
+          } @else {
+            <div class="market-token-drawer__trade-form">
+              <label class="market-token-drawer__amount">
+                <span>Montant</span>
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  [ngModel]="amountInput()"
+                  (ngModelChange)="onAmountInput($event)"
+                  placeholder="0.00"
+                />
+              </label>
+              <button
+                type="button"
+                class="market-token-drawer__cta"
+                [class.market-token-drawer__cta--sell]="tradeSide() === 'sell'"
+                [disabled]="submitting() || amountPreset() <= 0"
+                (click)="confirmTrade()"
+              >
+                {{ submitting() ? '…' : tradeSide() === 'buy' ? 'Acheter' : 'Vendre' }}
+              </button>
+            </div>
+
+            <p class="market-token-drawer__balance">
+              Solde :
+              <strong>{{ fromBalance() | number: '1.0-4' }}</strong>
+              {{ tradeSide() === 'buy' ? 'R4V3' : item.config.displaySymbol }}
+              @if (estimatedOutput(); as output) {
+                <span class="market-token-drawer__estimate">→ {{ output }}</span>
+              }
+            </p>
+
+            @if (tradeError(); as error) {
+              <p class="market-token-drawer__trade-error" role="alert">{{ error }}</p>
+            }
+          }
+        </section>
+      }
+
+      @if (tokenTrades().length) {
+        <section class="market-token-drawer__activity" aria-label="Activité récente">
+          <h4>Swaps récents</h4>
+          @for (trade of tokenTrades().slice(0, 3); track trade.id) {
+            <div class="market-token-drawer__activity-row">
+              <span>{{ trade.amountIn }} {{ trade.fromToken }} → {{ trade.amountOut }} {{ trade.toToken }}</span>
+            </div>
+          }
+        </section>
+      }
+    </aside>
+  </div>
+}

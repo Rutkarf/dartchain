@@ -1,0 +1,107 @@
+:host {
+  display: inline-flex;
+  align-items: stretch;
+  align-self: stretch;
+  flex: 0 0 auto;
+  height: 100%;
+  min-height: 0;
+  pointer-events: auto;
+}
+
+.panel-collapse-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--panel-collapse-control-w, clamp(18px, 5vw, 22px));
+  min-width: var(--panel-collapse-control-w, clamp(18px, 5vw, 22px));
+  height: 100%;
+  min-height: inherit;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: clamp(3px, 1vw, 5px);
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  touch-action: manipulation;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.panel-collapse-control__icon {
+  display: inline-flex;
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: panel-collapse-nudge-up 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.panel-collapse-control.is-collapsed .panel-collapse-control__icon {
+  animation-name: panel-collapse-nudge-down;
+}
+
+.panel-collapse-control:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.panel-collapse-control:hover .panel-collapse-control__icon,
+.panel-collapse-control:focus-visible .panel-collapse-control__icon {
+  animation-play-state: paused;
+}
+
+.panel-collapse-control:focus {
+  outline: none;
+}
+
+.panel-collapse-control:focus-visible {
+  background: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.08);
+  border-color: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.28);
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+@keyframes panel-collapse-nudge-down {
+  0%,
+  100% {
+    transform: translateY(-0.4px);
+    opacity: 0.82;
+  }
+
+  45% {
+    transform: translateY(1px);
+    opacity: 1;
+  }
+
+  70% {
+    transform: translateY(0.2px);
+    opacity: 0.92;
+  }
+}
+
+@keyframes panel-collapse-nudge-up {
+  0%,
+  100% {
+    transform: translateY(0.4px);
+    opacity: 0.82;
+  }
+
+  45% {
+    transform: translateY(-1px);
+    opacity: 1;
+  }
+
+  70% {
+    transform: translateY(-0.2px);
+    opacity: 0.92;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-collapse-control__icon {
+    animation: none;
+    transition: none;
+  }
+}

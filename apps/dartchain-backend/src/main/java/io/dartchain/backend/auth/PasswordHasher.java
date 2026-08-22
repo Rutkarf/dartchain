@@ -1,6 +1,6 @@
 package io.dartchain.backend.auth;
 
-import io.dartchain.backend.utils.HashUtils;
+import io.dartchain.backend.shared.utils.HashUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.UUID;

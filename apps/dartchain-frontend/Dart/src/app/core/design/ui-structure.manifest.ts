@@ -73,8 +73,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-r4v3-three',
-        template: 'features/r4v3-three/r4v3-three.html',
-        styles: ['features/r4v3-three/r4v3-three.css'],
+        template: 'components/r4v3-three/r4v3-three.html',
+        styles: ['components/r4v3-three/r4v3-three.css'],
         elements: [{ id: 'navbar-logo-three', label: 'Gem logo 3D navbar', kind: 'canvas' }],
         interactions: ['logoTapped', 'Orbit', 'Double-tap → r4v3-scene'],
         dataFields: ['modelTargetSize', 'cameraFitFactor', 'presentation'],
@@ -113,8 +113,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-bandeau-accueil',
-        template: 'features/bandeau-accueil/bandeau-accueil.html',
-        styles: ['features/bandeau-accueil/bandeau-accueil.css'],
+        template: 'navbar/bandeau-accueil/bandeau-accueil.html',
+        styles: ['navbar/bandeau-accueil/bandeau-accueil.css'],
         elements: [
           { id: 'message1', label: 'Annonce bannière', kind: 'text' },
           { id: 'lastTransactionShort', label: 'Dernière transaction', kind: 'text' },
@@ -125,8 +125,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-auth-drawer',
-        template: 'features/auth-drawer/auth-drawer.html',
-        styles: ['features/auth-drawer/auth-drawer.css'],
+        template: 'auth/auth-drawer/auth-drawer.html',
+        styles: ['auth/auth-drawer/auth-drawer.css'],
         elements: [
           { id: 'auth-tabs', label: 'Inscription | Connexion', kind: 'tab' },
           { id: 'login-form', label: 'identifier, password', kind: 'input' },
@@ -144,8 +144,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
     components: [
       {
         selector: 'app-exchange-panel',
-        template: 'features/exchange-panel/exchange-panel.html',
-        styles: ['features/exchange-panel/exchange-panel.css'],
+        template: 'exchange/components/exchange-panel/exchange-panel.html',
+        styles: ['exchange/components/exchange-panel/exchange-panel.css'],
         elements: [
           { id: 'pair-eyebrow', label: 'PAIR / TOKEN', kind: 'label' },
           { id: 'testnet-badge', label: 'Testnet', kind: 'badge' },
@@ -174,8 +174,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-rate-panel',
-        template: 'features/rate-panel/rate-panel.html',
-        styles: ['features/rate-panel/rate-panel.css'],
+        template: 'exchange/components/rate-panel/rate-panel.html',
+        styles: ['exchange/components/rate-panel/rate-panel.css'],
         elements: [{ id: 'hub-graph-zone', label: 'Zone graphique hubGraphOnly', kind: 'chart' }],
         interactions: ['Délègue à showcase-chart en mode hub'],
         dataFields: ['hubGraphOnly'],
@@ -217,8 +217,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
     components: [
       {
         selector: 'app-showcase-tabs',
-        template: 'features/showcase-tabs/showcase-tabs.html',
-        styles: ['features/showcase-tabs/showcase-tabs.css'],
+        template: 'showcase/components/showcase-tabs/showcase-tabs.html',
+        styles: ['showcase/components/showcase-tabs/showcase-tabs.css'],
         elements: [
           { id: 'tab-tours', label: 'TOUS', kind: 'tab' },
           { id: 'tab-r4v3', label: 'R4V3', kind: 'tab' },
@@ -232,8 +232,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'showcase-toggle',
-        template: 'features/panel-collapse-control/panel-collapse-control.html',
-        styles: ['features/panel-collapse-control/panel-collapse-control.css'],
+        template: 'components/panel-collapse-control/panel-collapse-control.html',
+        styles: ['components/panel-collapse-control/panel-collapse-control.css'],
         elements: [
           {
             id: 'showcase-chevron',
@@ -246,16 +246,16 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-showcase-panel',
-        template: 'features/showcase-panel/showcase-panel.html',
-        styles: ['features/showcase-panel/showcase-panel.css'],
+        template: 'showcase/components/showcase-panel/showcase-panel.html',
+        styles: ['showcase/components/showcase-panel/showcase-panel.css'],
         elements: [{ id: 'showcase-window', label: 'Router contenu par onglet', kind: 'panel' }],
         interactions: ['selectBlock emit', 'collapsed handle smart tabs'],
         dataFields: ['activeTab', 'collapsed', 'panelTitle'],
       },
       {
         selector: 'app-showcase-news',
-        template: 'features/showcase-news/showcase-news.html',
-        styles: ['features/showcase-news/showcase-news.css'],
+        template: 'showcase/components/showcase-news/showcase-news.html',
+        styles: ['showcase/components/showcase-news/showcase-news.css'],
         elements: [
           { id: 'live-meta', label: 'Bloc #N · chaîne active · age', kind: 'text' },
           { id: 'unread-badge', label: 'Compteur non lues', kind: 'badge' },
@@ -270,8 +270,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-showcase-chat',
-        template: 'features/showcase-chat/showcase-chat.html',
-        styles: ['features/showcase-chat/showcase-chat.css'],
+        template: 'showcase/components/showcase-chat/showcase-chat.html',
+        styles: ['showcase/components/showcase-chat/showcase-chat.css'],
         elements: [
           { id: 'chat-room', label: 'Room + status LED', kind: 'label' },
           { id: 'chat-formatting', label: 'Ribbon B/I/U/S couleurs', kind: 'button' },
@@ -283,8 +283,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-showcase-launch',
-        template: 'features/showcase-launch/showcase-launch.html',
-        styles: ['features/showcase-launch/showcase-launch.css'],
+        template: 'showcase/components/showcase-launch/showcase-launch.html',
+        styles: ['showcase/components/showcase-launch/showcase-launch.css'],
         elements: [
           { id: 'launch-status-pill', label: 'Phase LIVE/SOON/ENDED', kind: 'badge' },
           { id: 'launch-filters', label: 'Filtres statut projet', kind: 'tab' },
@@ -303,8 +303,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
     components: [
       {
         selector: 'app-wallet-panel',
-        template: 'features/wallet-panel/wallet-panel.html',
-        styles: ['features/wallet-panel/wallet-panel.css'],
+        template: 'wallet/wallet-panel/wallet-panel.html',
+        styles: ['wallet/wallet-panel/wallet-panel.css'],
         elements: [
           { id: 'wallet-title', label: 'WALLET / EXPLORER', kind: 'label' },
           { id: 'wallet-network', label: 'RÉSEAU R4V3 MAINNET', kind: 'text' },
@@ -319,8 +319,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-faucet',
-        template: 'features/faucet/faucet.html',
-        styles: ['features/faucet/faucet.css'],
+        template: 'faucet/faucet/faucet.html',
+        styles: ['faucet/faucet/faucet.css'],
         elements: [
           { id: 'faucet-balance', label: 'Balance m4t3r', kind: 'text' },
           { id: 'faucet-cooldown', label: 'Cooldown ring', kind: 'badge' },
@@ -333,8 +333,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-pending-transactions',
-        template: 'features/pending-transactions/pending-transactions.html',
-        styles: ['features/pending-transactions/pending-transactions.css'],
+        template: 'blockchain/pending-transactions/pending-transactions.html',
+        styles: ['blockchain/pending-transactions/pending-transactions.css'],
         elements: [
           { id: 'pending-count', label: 'N en attente + total R4V3', kind: 'badge' },
           { id: 'pending-filter', label: 'Filtrer', kind: 'input' },
@@ -346,8 +346,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-block-composer',
-        template: 'features/block-composer/block-composer.html',
-        styles: ['features/block-composer/block-composer.css'],
+        template: 'blockchain/block-composer/block-composer.html',
+        styles: ['blockchain/block-composer/block-composer.css'],
         elements: [
           { id: 'composer-tip', label: 'Tip #N / Sync / Mempool', kind: 'text' },
           { id: 'composer-form', label: 'FROM TO AMOUNT MESSAGE', kind: 'input' },
@@ -358,8 +358,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-blocks-list',
-        template: 'features/blocks-list/blocks-list.html',
-        styles: ['features/blocks-list/blocks-list.css'],
+        template: 'blockchain/blocks-list/blocks-list.html',
+        styles: ['blockchain/blocks-list/blocks-list.css'],
         elements: [
           { id: 'chain-view-toggle', label: 'LISTE | GRAPHE', kind: 'tab' },
           { id: 'chain-filters', label: 'Filtrer Wallet De À', kind: 'input' },
@@ -372,8 +372,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-market-panel',
-        template: 'features/market-panel/market-panel.html',
-        styles: ['features/market-panel/market-panel.css'],
+        template: 'showcase/components/market-panel/market-panel.html',
+        styles: ['showcase/components/market-panel/market-panel.css'],
         elements: [
           { id: 'market-featured', label: 'Ticker hero MTS/USD', kind: 'text' },
           { id: 'market-chart', label: 'Mini candlestick', kind: 'chart' },
@@ -385,8 +385,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-quests-panel',
-        template: 'features/quests-panel/quests-panel.html',
-        styles: ['features/quests-panel/quests-panel.css'],
+        template: 'quests/quests-panel/quests-panel.html',
+        styles: ['quests/quests-panel/quests-panel.css'],
         elements: [
           { id: 'quests-xp', label: 'TOTAL XP + RÉCOMPENSES', kind: 'badge' },
           { id: 'quests-mission', label: 'Network Guardian + progress', kind: 'panel' },
@@ -398,8 +398,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-peer-panel',
-        template: 'features/peer-panel/peer-panel.html',
-        styles: ['features/peer-panel/peer-panel.css'],
+        template: 'peers/peer-panel/peer-panel.html',
+        styles: ['peers/peer-panel/peer-panel.css'],
         elements: [
           { id: 'peer-kpi', label: 'NETWORK PEERS LATENCY LOAD', kind: 'badge' },
           { id: 'peer-filters', label: 'ALL CONNECTED FAVORITES +', kind: 'tab' },
@@ -410,8 +410,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-admin-panel',
-        template: 'features/admin-panel/admin-panel.html',
-        styles: ['features/admin-panel/admin-panel.css'],
+        template: 'admin/admin-panel/admin-panel.html',
+        styles: ['admin/admin-panel/admin-panel.css'],
         elements: [
           { id: 'admin-snapshot', label: 'Ops gauges latency counters events', kind: 'panel' },
         ],
@@ -452,32 +452,32 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
     components: [
       {
         selector: 'app-block-detail-drawer',
-        template: 'features/block-detail-drawer/block-detail-drawer.html',
-        styles: ['features/block-detail-drawer/block-detail-drawer.css'],
+        template: 'blockchain/block-detail-drawer/block-detail-drawer.html',
+        styles: ['blockchain/block-detail-drawer/block-detail-drawer.css'],
         elements: [{ id: 'block-detail-grid', label: 'Index Hash Nonce Difficulté…', kind: 'panel' }],
         interactions: ['closeDrawer', 'open from explorer/blocks'],
         dataFields: ['block', 'open'],
       },
       {
         selector: 'app-launch-form-drawer',
-        template: 'features/launch-form-drawer/launch-form-drawer.html',
-        styles: ['features/launch-form-drawer/launch-form-drawer.css'],
+        template: 'showcase/components/launch-form-drawer/launch-form-drawer.html',
+        styles: ['showcase/components/launch-form-drawer/launch-form-drawer.css'],
         elements: [{ id: 'launch-form', label: 'Formulaire token LaunchLab', kind: 'input' }],
         interactions: ['submit create', 'logo upload', 'closeDrawer'],
         dataFields: ['form', 'logoPreview', 'submitting'],
       },
       {
         selector: 'app-status-overlay',
-        template: 'features/status-overlay/status-overlay.html',
-        styles: ['features/status-overlay/status-overlay.css'],
+        template: 'navbar/status-overlay/status-overlay.html',
+        styles: ['navbar/status-overlay/status-overlay.css'],
         elements: [{ id: 'network-health', label: 'Latence service endpoint', kind: 'panel' }],
         interactions: ['refresh health', 'close status drawer'],
         dataFields: ['health', 'latencyLabel'],
       },
       {
         selector: 'app-error-banner',
-        template: 'features/error-banner/error-banner.html',
-        styles: ['features/error-banner/error-banner.css'],
+        template: 'components/error-banner/error-banner.html',
+        styles: ['components/error-banner/error-banner.css'],
         elements: [{ id: 'shell-error', label: 'Message erreur bannière', kind: 'text' }],
         interactions: ['Affichage seul'],
         dataFields: ['message'],
@@ -496,8 +496,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
 
 /** Composants legacy présents dans le repo mais non montés dans app.html actuel. */
 export const LEGACY_ORPHAN_COMPONENTS = [
-  'app-dock-tabs (features/dock-tabs/)',
-  'app-dock-panel (features/dock-panel/)',
+  'app-dock-tabs (dock/components/dock-tabs/)',
+  'app-dock-panel (dock/components/dock-panel/)',
   'app-dock-summary/* (dock-*-summary)',
 ] as const;
 

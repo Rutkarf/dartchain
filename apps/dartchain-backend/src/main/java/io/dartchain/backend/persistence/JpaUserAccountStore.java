@@ -6,7 +6,7 @@ import io.dartchain.backend.auth.UserAccount;
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.persistence.entity.UserEntity;
 import io.dartchain.backend.persistence.repository.UserJpaRepository;
-import io.dartchain.backend.utils.WalletValidator;
+import io.dartchain.backend.shared.utils.WalletValidator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

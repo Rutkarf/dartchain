@@ -6,10 +6,11 @@ import io.dartchain.backend.dto.AddPendingTransactionResponse;
 import io.dartchain.backend.dto.CreatePendingTransactionRequest;
 import io.dartchain.backend.dto.MinePendingTransactionResponse;
 import io.dartchain.backend.dto.PendingTransactionResponse;
-import io.dartchain.backend.exception.TransactionValidationException;
+import io.dartchain.backend.shared.exception.TransactionValidationException;
 import io.dartchain.backend.model.Block;
 import io.dartchain.backend.model.PendingTransaction;
-import io.dartchain.backend.utils.HashUtils;
+import io.dartchain.backend.shared.utils.HashUtils;
+import io.dartchain.backend.blockchain.application.BlockchainService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

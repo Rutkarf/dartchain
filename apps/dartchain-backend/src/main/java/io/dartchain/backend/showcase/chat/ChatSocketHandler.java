@@ -6,7 +6,7 @@ import io.dartchain.backend.auth.security.AuthenticatedUser;
 import io.dartchain.backend.auth.security.WebSocketAuthSupport;
 import io.dartchain.backend.showcase.dto.ChatMessageRequest;
 import io.dartchain.backend.showcase.dto.ChatMessageResponse;
-import io.dartchain.backend.showcase.service.ChatService;
+import io.dartchain.backend.showcase.application.ChatService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;

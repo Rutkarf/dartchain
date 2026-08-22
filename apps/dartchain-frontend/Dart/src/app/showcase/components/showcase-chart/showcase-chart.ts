@@ -14,7 +14,7 @@ import {
   booleanAttribute,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CollapsedBarActionsComponent } from '../../../features/collapsed-bar-actions/collapsed-bar-actions';
+import { CollapsedBarActionsComponent } from '../../../components/collapsed-bar-actions/collapsed-bar-actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
@@ -37,7 +37,7 @@ import { MarketDataService } from '@core/services/market-data.service';
 import { RatePanelPreferencesService } from '@core/services/rate-panel-preferences.service';
 import { ShowcaseLaunchStateService } from '@core/services/showcase-launch-state.service';
 import { ShowcaseR4v3StateService } from '@core/services/showcase-r4v3-state.service';
-import { R4v3ThreeComponent } from '../../../features/r4v3-three/r4v3-three';
+import { R4v3ThreeComponent } from '../../../components/r4v3-three/r4v3-three';
 import { ChartSearchResult } from './chart-token-search.model';
 import { ChartTokenSearchComponent } from './chart-token-search';
 import { readChartWatchlist, upsertChartWatchlist } from './chart-watchlist.util';

@@ -1,0 +1,229 @@
+:host {
+  --cba-cyan-rgb: var(--tab-push-cyan-rgb, var(--accent-cyan-rgb, var(--ds-neon-cyan-rgb, 46, 196, 214)));
+  --cba-item-w: var(--panel-action-item-w, 14px);
+  --cba-h: var(--panel-action-menu-h, 7px);
+  --cba-menu-w: var(--panel-action-menu-w, 34px);
+  --cba-btn-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.48),
+    0 1px 1px rgba(0, 0, 0, 0.42);
+  --cba-btn-shadow-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 2px 3px rgba(0, 0, 0, 0.5);
+  --cba-btn-shadow-pressed:
+    inset 0 2px 3px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  flex: 0 0 var(--cba-menu-w);
+  width: var(--cba-menu-w);
+  min-width: var(--cba-menu-w);
+  max-width: var(--cba-menu-w);
+  height: var(--cba-h);
+  min-height: var(--cba-h);
+  max-height: var(--cba-h);
+  margin: 0;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.collapsed-bar-actions {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1px;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  margin: 0;
+  padding: 1px;
+  border-radius: 0;
+  border: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, transparent 40%),
+    rgba(8, 12, 18, 0.92);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  isolation: isolate;
+  overflow: visible;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.collapsed-bar-actions::before,
+.collapsed-bar-actions::after {
+  content: none;
+  display: none;
+}
+
+.collapsed-bar-actions__refresh {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cba-item-w);
+  min-width: var(--cba-item-w);
+  max-width: var(--cba-item-w);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.025) 42%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
+  color: rgba(168, 190, 204, 0.78);
+  box-shadow: var(--cba-btn-shadow);
+  cursor: pointer;
+  touch-action: manipulation;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.collapsed-bar-actions__refresh svg {
+  display: none;
+}
+
+.collapsed-bar-actions__refresh app-icon-relief-3d {
+  display: inline-flex;
+}
+
+.collapsed-bar-actions__refresh:hover,
+.collapsed-bar-actions__refresh:focus-visible {
+  color: rgba(236, 242, 248, 0.94);
+  box-shadow: var(--cba-btn-shadow-hover);
+  transform: translateY(-0.5px);
+}
+
+.collapsed-bar-actions__refresh:active {
+  color: rgba(190, 200, 214, 0.72);
+  box-shadow: var(--cba-btn-shadow-pressed);
+  transform: translateY(0.5px);
+}
+
+.collapsed-bar-actions__refresh:focus {
+  outline: none;
+}
+
+.collapsed-bar-actions__refresh:focus-visible {
+  outline: 1px solid rgba(var(--cba-cyan-rgb), 0.65);
+  outline-offset: 0;
+}
+
+.collapsed-bar-actions__refresh.is-busy svg {
+  animation: none;
+}
+
+.collapsed-bar-actions__rail {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  width: 1px;
+  align-self: stretch;
+  margin: 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    transparent 8%,
+    rgba(255, 255, 255, 0.16) 50%,
+    transparent 92%
+  );
+  opacity: 0.55;
+}
+
+.collapsed-bar-actions__collapse {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: stretch;
+  justify-content: center;
+  height: 100%;
+  width: var(--cba-item-w);
+  min-width: var(--cba-item-w);
+  max-width: var(--cba-item-w);
+}
+
+:host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control {
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.025) 42%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
+  color: rgba(168, 190, 204, 0.78);
+  box-shadow: var(--cba-btn-shadow);
+  transition:
+    color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control:hover,
+:host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control:focus-visible {
+  color: rgba(236, 242, 248, 0.94);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.11) 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    rgba(0, 0, 0, 0.22) 100%
+  );
+  border-color: transparent;
+  box-shadow: var(--cba-btn-shadow-hover);
+  transform: translateY(-0.5px);
+}
+
+:host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control:active {
+  color: rgba(190, 200, 214, 0.72);
+  box-shadow: var(--cba-btn-shadow-pressed);
+  transform: translateY(0.5px);
+}
+
+:host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control:focus-visible {
+  outline: 1px solid rgba(var(--cba-cyan-rgb), 0.65);
+  outline-offset: 0;
+}
+
+:host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control__chevron {
+  display: none;
+}
+
+:host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control__icon {
+  width: 10px;
+  height: 8px;
+}
+
+@keyframes collapsed-bar-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collapsed-bar-actions__refresh,
+  :host ::ng-deep .collapsed-bar-actions__collapse .panel-collapse-control {
+    transition: none;
+    transform: none;
+  }
+
+  .collapsed-bar-actions__refresh.is-busy svg {
+    animation: none;
+  }
+}

@@ -8,7 +8,7 @@ import io.dartchain.backend.model.PendingTransaction;
 import io.dartchain.backend.peer.PeerMetricsRegistry;
 import io.dartchain.backend.quests.QuestService;
 import io.dartchain.backend.quests.model.QuestProgressState;
-import io.dartchain.backend.service.BlockchainService;
+import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.service.PendingTransactionService;
 import io.dartchain.backend.service.TransactionPoolService;
 import org.slf4j.Logger;

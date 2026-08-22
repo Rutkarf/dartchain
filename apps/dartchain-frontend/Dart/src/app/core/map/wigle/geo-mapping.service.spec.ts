@@ -12,6 +12,7 @@ describe('GeoMappingService', () => {
   const footprint: OSMBuildingFootprint = {
     id: 'osm-way-test',
     height: 12,
+    heightSource: 'height',
     points: [
       { latitude: 43.2965, longitude: 5.3695 },
       { latitude: 43.2965, longitude: 5.3705 },

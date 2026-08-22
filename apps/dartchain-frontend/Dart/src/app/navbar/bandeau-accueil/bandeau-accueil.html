@@ -1,0 +1,40 @@
+<div
+  class="bandeau-accueil"
+  role="region"
+  aria-label="Bandeau d'informations — faites glisser pour parcourir, cliquez pour les détails"
+  [class.bandeau-accueil--dragging]="isDragging"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerCancel($event)"
+>
+  <div #viewport class="bandeau-accueil__viewport">
+    <div #track class="bandeau-accueil__track">
+      <div
+        class="bandeau-accueil__content"
+        *ngFor="let _ of marqueeCopies; let i = index"
+        [attr.aria-hidden]="i > 0 ? 'true' : null"
+      >
+        <ng-container *ngFor="let segment of ticker.segments(); let last = last">
+          <button
+            type="button"
+            [class]="'bandeau-accueil__chip bandeau-accueil__chip--' + segment.id"
+            [class.bandeau-accueil__chip--active]="
+              drawer.open() && drawer.activeSegmentId() === segment.id
+            "
+            [attr.aria-label]="segment.label + ' : ' + segment.value + '. Ouvrir les détails.'"
+            [attr.aria-expanded]="
+              drawer.open() && drawer.activeSegmentId() === segment.id
+            "
+            (pointerdown)="$event.stopPropagation()"
+            (click)="onChipClick(segment.id, $event)"
+          >
+            <span class="bandeau-accueil__label">{{ segment.label }}</span>
+            <span class="bandeau-accueil__value">{{ segment.value }}</span>
+          </button>
+          <span *ngIf="!last" class="bandeau-accueil__sep" aria-hidden="true"></span>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,11 +6,12 @@ import io.dartchain.backend.model.Transaction;
 import io.dartchain.backend.model.Wallet;
 import io.dartchain.backend.chain.AddressScheme;
 import io.dartchain.backend.chain.ChainConfigService;
-import io.dartchain.backend.utils.CryptoUtils;
-import io.dartchain.backend.utils.EvmCryptoUtils;
-import io.dartchain.backend.utils.WalletValidator;
-import io.dartchain.backend.utils.HashUtils;
+import io.dartchain.backend.shared.utils.CryptoUtils;
+import io.dartchain.backend.shared.utils.EvmCryptoUtils;
+import io.dartchain.backend.shared.utils.WalletValidator;
+import io.dartchain.backend.shared.utils.HashUtils;
 import io.dartchain.backend.utils.TransactionPayloadBuilder;
+import io.dartchain.backend.wallet.application.WalletService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

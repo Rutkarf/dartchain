@@ -8,15 +8,15 @@ import {
   MARKET_MAX_RECENT_TRADES,
   MARKET_TRADES_STORAGE_KEY,
   MarketAssetConfig,
-} from '../../features/market-panel/market-panel.constants';
+} from '@showcase/components/market-panel/market-panel.constants';
 import {
   MarketFeaturedChart,
   MarketAssetRow,
   MarketPriceAlert,
   MarketRecentTrade,
   MarketSwapCompleteDetail,
-} from '../../features/market-panel/market-panel.model';
-import { MarketPanelService } from '../../features/market-panel/market-panel.service';
+} from '@showcase/components/market-panel/market-panel.model';
+import { MarketPanelService } from '@showcase/components/market-panel/market-panel.service';
 import { ChartRange } from '../models/showcase.model';
 
 @Injectable({ providedIn: 'root' })

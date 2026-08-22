@@ -3,10 +3,10 @@ package io.dartchain.backend.support;
 import io.dartchain.backend.blockchain.InMemoryBlockchainStateStore;
 import io.dartchain.backend.blockchain.store.BlockchainStateStore;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
-import io.dartchain.backend.service.BlockchainService;
-import io.dartchain.backend.service.BlockchainValidationService;
+import io.dartchain.backend.blockchain.application.BlockchainService;
+import io.dartchain.backend.blockchain.application.BlockchainValidationService;
 import io.dartchain.backend.service.TransactionPoolService;
-import io.dartchain.backend.showcase.service.MarketChartService;
+import io.dartchain.backend.showcase.application.MarketChartService;
 
 public final class BlockchainTestSupport {
 

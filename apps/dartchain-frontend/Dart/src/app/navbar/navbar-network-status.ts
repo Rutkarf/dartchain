@@ -14,7 +14,7 @@ import {
 import { FocusTrapDirective } from '../core/directives/focus-trap.directive';
 import { NetworkTrustService } from '../core/services/network-trust.service';
 import { ShellFeedbackService } from '../core/services/shell-feedback.service';
-import { StatusOverlayComponent } from '../features/status-overlay/status-overlay';
+import { StatusOverlayComponent } from './status-overlay/status-overlay';
 import {
   scheduleNavbarDrawerPin,
   unpinNavbarDrawer,

@@ -16,13 +16,13 @@ import { NavbarPeerStatusComponent } from './navbar-peer-status';
 import { BrandCryptoSelectComponent } from './brand-crypto-select';
 import { ExplorerSearchComponent } from './explorer-search';
 import { SearchbarComponent } from '../searchbar/searchbar';
-import { R4v3ThreeComponent } from '../features/r4v3-three/r4v3-three';
+import { R4v3ThreeComponent } from '../components/r4v3-three/r4v3-three';
 import { AuthService } from '../core/services/auth.service';
 import { ShellFeedbackService } from '../core/services/shell-feedback.service';
 import { LocaleService } from '../core/i18n/locale.service';
 import { NavbarNodePanelComponent } from './navbar-node-panel';
 import { NavbarHintDirective } from './navbar-hint.directive';
-import { NavbarTickerDrawerComponent } from '../features/navbar-ticker-drawer/navbar-ticker-drawer';
+import { NavbarTickerDrawerComponent } from './navbar-ticker-drawer/navbar-ticker-drawer';
 
 @Component({
   selector: 'app-navbar-shell',

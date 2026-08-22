@@ -1,7 +1,7 @@
 package io.dartchain.backend.controller;
 
 import io.dartchain.backend.showcase.dto.ChartResponse;
-import io.dartchain.backend.showcase.service.MarketChartService;
+import io.dartchain.backend.showcase.application.MarketChartService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

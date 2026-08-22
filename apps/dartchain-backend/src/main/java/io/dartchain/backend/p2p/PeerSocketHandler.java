@@ -1,7 +1,7 @@
 package io.dartchain.backend.p2p;
 
 import io.dartchain.backend.config.WebSocketBufferLimits;
-import io.dartchain.backend.service.PeerService;
+import io.dartchain.backend.peers.application.PeerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

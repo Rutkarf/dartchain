@@ -1,7 +1,7 @@
 package io.dartchain.backend.product;
 
 import io.dartchain.backend.config.ProductProperties;
-import io.dartchain.backend.exception.FeatureDisabledException;
+import io.dartchain.backend.shared.exception.FeatureDisabledException;
 import org.springframework.stereotype.Service;
 
 @Service

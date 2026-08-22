@@ -1,0 +1,152 @@
+<section class="market-panel ds-surface ds-surface--showcase-body" aria-label="Marché" tabindex="0">
+  <header class="market-panel__toolbar">
+    <label class="market-panel__search">
+      <span class="market-panel__search-icon" aria-hidden="true">⌕</span>
+      <input
+        type="search"
+        class="market-panel__search-input"
+        [attr.placeholder]="searchPlaceholder()"
+        [ngModel]="searchQuery()"
+        (ngModelChange)="onSearchInput($event)"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Rechercher des tokens"
+      />
+    </label>
+
+    @if (statusBanner(); as banner) {
+      <div
+        class="market-panel__banner"
+        [class.market-panel__banner--error]="banner.tone === 'error'"
+        [class.market-panel__banner--warn]="banner.tone === 'warn'"
+        [class.market-panel__banner--info]="banner.tone === 'info'"
+        role="status"
+      >
+        <span>{{ banner.message }}</span>
+        <button type="button" class="market-panel__banner-dismiss" (click)="dismissStatusBanner()" aria-label="Fermer">
+          ×
+        </button>
+      </div>
+    }
+  </header>
+
+  <div class="market-panel__content">
+    @if (loadingRows() && sortedRows().length === 0) {
+      <div class="market-panel__table" aria-hidden="true">
+        <div class="market-panel__cols" aria-hidden="true">
+          <span>Token</span>
+          <span>Prix</span>
+          <span>24h</span>
+          <span>Vol</span>
+          <span>Liq</span>
+          <span>Cap</span>
+          <span></span>
+        </div>
+        <div class="market-panel__list">
+          @for (slot of skeletonSlots(); track slot) {
+            <div class="market-panel__row market-panel__row--skeleton"></div>
+          }
+        </div>
+      </div>
+    } @else if (sortedRows().length === 0) {
+      <p class="market-panel__empty">{{ emptyStateMessage() }}</p>
+    } @else {
+      <div class="market-panel__table" role="table" aria-label="Tokens disponibles">
+        <div class="market-panel__cols" role="row">
+          <span role="columnheader">Token</span>
+          <span role="columnheader">Prix</span>
+          <span role="columnheader">24h</span>
+          <span role="columnheader">Vol</span>
+          <span role="columnheader">Liq</span>
+          <span role="columnheader">Cap</span>
+          <span role="columnheader" aria-label="Momentum"></span>
+        </div>
+        <div class="market-panel__list" role="rowgroup">
+          @for (row of sortedRows(); track row.config.exchangeToken; let i = $index) {
+            <article
+              class="market-panel__row"
+              role="row"
+              [class.is-selected]="isSelected(row)"
+              [class.is-focused]="focusedRowIndex() === i"
+              [class.is-pinned]="row.config.native"
+              [style.--token-accent]="row.config.accent"
+              [tabindex]="rowTabIndex(i)"
+              (click)="openTokenDrawer(row)"
+              [attr.aria-label]="row.config.displaySymbol + ' ' + row.price"
+            >
+              <div class="market-panel__row-token" role="cell">
+                <span class="market-panel__row-icon" aria-hidden="true">{{ row.config.iconLabel }}</span>
+                <div class="market-panel__row-id">
+                  <strong class="market-panel__row-symbol">{{ row.config.displaySymbol }}</strong>
+                  @if (row.config.native) {
+                    <span class="market-panel__row-tag">NATIF</span>
+                  }
+                </div>
+              </div>
+              <span class="market-panel__row-price" role="cell" [class.is-unavailable]="row.priceUnavailable">
+                {{ row.price }}
+              </span>
+              <span
+                class="market-panel__row-change"
+                role="cell"
+                [class.is-up]="row.positive"
+                [class.is-down]="!row.positive"
+              >
+                {{ formatChange(row) }}
+              </span>
+              <span class="market-panel__row-stat" role="cell" [title]="'Volume ' + row.metrics.volumeLabel">
+                {{ compactMetric(row.metrics.volumeLabel) }}
+              </span>
+              <span class="market-panel__row-stat" role="cell" [title]="'Liquidité ' + row.metrics.liquidityLabel">
+                {{ compactMetric(row.metrics.liquidityLabel) }}
+              </span>
+              <span class="market-panel__row-stat" role="cell" [title]="'Market cap ' + row.metrics.marketCapLabel">
+                {{ compactMetric(row.metrics.marketCapLabel) }}
+              </span>
+              <span
+                class="market-panel__row-momentum"
+                role="cell"
+                [class.is-hot]="row.metrics.momentum === 'hot'"
+                [class.is-warm]="row.metrics.momentum === 'warm'"
+                [attr.title]="row.metrics.momentum"
+              >
+                {{ momentumShort(row) }}
+              </span>
+            </article>
+          }
+        </div>
+      </div>
+    }
+
+    @if (historyExpanded()) {
+      <div class="market-panel__history" aria-label="Historique des trades">
+        @if (filteredTrades().length === 0) {
+          <p class="market-panel__history-empty">Aucun trade récent.</p>
+        } @else {
+          @for (trade of filteredTrades(); track trade.id) {
+            <div class="market-panel__history-row">
+              <span class="market-panel__history-time">{{ formatTradeTime(trade) }}</span>
+              <span class="market-panel__history-label">{{ formatTrade(trade) }}</span>
+              @if (trade.txHash) {
+                <button type="button" class="market-panel__history-tx" (click)="openTradeExplorer(trade, $event)">
+                  tx
+                </button>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+
+  <app-market-token-drawer
+    [row]="drawerRow()"
+    [recentTrades]="recentTrades()"
+    [alertEnabled]="drawerRow() ? isAlertEnabled(drawerRow()!) : false"
+    (closed)="closeTokenDrawer()"
+    (swapped)="onDrawerSwapped($event)"
+    (favoriteToggle)="onDrawerFavoriteToggle()"
+    (alertToggle)="onDrawerAlertToggle()"
+    (exchangeOpen)="onDrawerExchangeOpen()"
+  />
+</section>

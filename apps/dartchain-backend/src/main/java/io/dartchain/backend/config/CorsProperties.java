@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
 import java.util.List;
+import io.dartchain.backend.shared.config.CorsConfig;
 
 @ConfigurationProperties(prefix = "dartchain.cors")
 public class CorsProperties {

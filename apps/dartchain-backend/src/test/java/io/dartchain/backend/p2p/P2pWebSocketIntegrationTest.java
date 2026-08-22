@@ -6,7 +6,7 @@ import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.model.Block;
 import io.dartchain.backend.model.PendingTransaction;
 import io.dartchain.backend.peer.PeerMetricsRegistry;
-import io.dartchain.backend.service.BlockchainService;
+import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.service.PendingTransactionService;
 import io.dartchain.backend.support.InMemoryWebSocketSession;
 import io.dartchain.backend.support.MockMvcIntegrationSupport;

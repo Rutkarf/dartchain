@@ -4,7 +4,7 @@ import io.dartchain.backend.config.ApiRoutes;
 import io.dartchain.backend.dto.StatsResponse;
 import io.dartchain.backend.model.Block;
 import io.dartchain.backend.model.Transaction;
-import io.dartchain.backend.service.BlockchainService;
+import io.dartchain.backend.blockchain.application.BlockchainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

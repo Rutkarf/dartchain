@@ -1,0 +1,83 @@
+@if (drawer.open(); as isOpen) {
+  @if (drawer.activeSegment(); as segment) {
+    <aside
+      class="nv-anchor-drawer nv-anchor-drawer--cyan nv-anchor-drawer--ticker"
+      [class.nv-anchor-drawer--ticker-network]="segment.id === 'network'"
+      [class.nv-anchor-drawer--ticker-token]="segment.id === 'token'"
+      [class.nv-anchor-drawer--ticker-tx]="segment.id === 'tx'"
+      [class.nv-anchor-drawer--ticker-peers]="segment.id === 'peers'"
+      [class.nv-anchor-drawer--ticker-tip]="segment.id === 'tip'"
+      role="dialog"
+      aria-modal="false"
+      [attr.aria-labelledby]="'tickerDrawerTitle-' + segment.id"
+      [appFocusTrap]="isOpen"
+      (click)="onDrawerClick($event)"
+    >
+      <section
+        class="status-drawer status-drawer--ticker"
+        [class.status-drawer--ticker-compact]="drawerMetrics().length <= 1"
+        [attr.aria-label]="segment.label"
+      >
+        <header class="ticker-drawer__head">
+          <div class="ticker-drawer__intro">
+            <span class="ticker-drawer__eyebrow">
+              {{ segment.detail?.eyebrow ?? segment.label }}
+            </span>
+            <h3 class="ticker-drawer__title" [id]="'tickerDrawerTitle-' + segment.id">
+              {{ segment.detail?.title ?? segment.value }}
+            </h3>
+          </div>
+          <div class="ticker-drawer__actions">
+            <button
+              type="button"
+              class="ticker-drawer__icon-btn"
+              (click)="refresh($event)"
+              [disabled]="ticker.loading()"
+              [class.is-spinning]="ticker.loading()"
+              aria-label="Rafraîchir le ticker"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M21 12a9 9 0 0 1-15.5 6.36" />
+                <path d="M3 12a9 9 0 0 1 15.5-6.36" />
+                <path d="M17 4v4h-4" />
+                <path d="M7 20v-4h4" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="ticker-drawer__icon-btn ticker-drawer__icon-btn--close"
+              (click)="close($event)"
+              aria-label="Fermer"
+            >
+              ×
+            </button>
+          </div>
+        </header>
+
+        @if (drawerMetrics().length) {
+          <div
+            class="ticker-drawer__metrics"
+            [class.ticker-drawer__metrics--solo]="drawerMetrics().length === 1"
+            role="list"
+          >
+            @for (metric of drawerMetrics(); track metric.label) {
+              <div class="ticker-drawer__metric" role="listitem">
+                <span class="ticker-drawer__metric-label">{{ metric.label }}</span>
+                <span class="ticker-drawer__metric-value">{{ metric.value }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="ticker-drawer__hero">
+            <span class="ticker-drawer__metric-label">{{ segment.label }}</span>
+            <span class="ticker-drawer__hero-value">{{ segment.value }}</span>
+          </div>
+        }
+
+        @if (segment.detail?.summary; as summary) {
+          <p class="ticker-drawer__summary">{{ summary }}</p>
+        }
+      </section>
+    </aside>
+  }
+}

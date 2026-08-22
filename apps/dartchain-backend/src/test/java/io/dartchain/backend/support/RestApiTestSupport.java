@@ -2,7 +2,7 @@ package io.dartchain.backend.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dartchain.backend.utils.CryptoUtils;
+import io.dartchain.backend.shared.utils.CryptoUtils;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;

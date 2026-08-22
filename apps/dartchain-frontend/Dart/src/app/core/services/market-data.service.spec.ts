@@ -3,8 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { MarketDataService } from './market-data.service';
-import { MarketPanelService } from '../../features/market-panel/market-panel.service';
-import { MARKET_ASSETS } from '../../features/market-panel/market-panel.constants';
+import { MarketPanelService } from '@showcase/components/market-panel/market-panel.service';
+import { MARKET_ASSETS } from '@showcase/components/market-panel/market-panel.constants';
 
 describe('MarketDataService', () => {
   let service: MarketDataService;

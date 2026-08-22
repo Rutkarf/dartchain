@@ -1,5 +1,6 @@
 package io.dartchain.backend.metaverse.overpass;
 
+import io.dartchain.backend.metaverse.infrastructure.web.OverpassProxyService;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 

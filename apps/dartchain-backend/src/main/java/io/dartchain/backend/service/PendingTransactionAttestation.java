@@ -3,8 +3,8 @@ package io.dartchain.backend.service;
 import io.dartchain.backend.auth.UserAccount;
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.model.PendingTransaction;
-import io.dartchain.backend.utils.HashUtils;
-import io.dartchain.backend.utils.WalletValidator;
+import io.dartchain.backend.shared.utils.HashUtils;
+import io.dartchain.backend.shared.utils.WalletValidator;
 
 import java.math.BigDecimal;
 import java.util.Optional;

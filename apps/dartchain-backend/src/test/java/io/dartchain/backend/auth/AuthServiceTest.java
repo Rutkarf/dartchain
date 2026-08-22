@@ -16,7 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.nio.file.Path;
 import java.security.KeyPair;
 
-import io.dartchain.backend.utils.CryptoUtils;
+import io.dartchain.backend.shared.utils.CryptoUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

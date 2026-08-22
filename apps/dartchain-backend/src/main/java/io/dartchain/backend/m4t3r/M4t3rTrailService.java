@@ -31,7 +31,7 @@ public class M4t3rTrailService {
     static final double WATER_MIN_Z = 14;
     static final int MAX_CELLS_PER_UPDATE = 250;
     static final int MAX_CELLS_PER_SECOND = 250;
-    static final long RESPAWN_DELAY_MS = 30_000L;
+    public static final long RESPAWN_DELAY_MS = 30_000L;
 
     private final Map<String, Long> hiddenUntil = new ConcurrentHashMap<>();
     private final Map<String, RateWindow> rates = new ConcurrentHashMap<>();

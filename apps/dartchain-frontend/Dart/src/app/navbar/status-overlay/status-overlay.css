@@ -1,0 +1,14 @@
+@import '../../navbar/navbar-anchor-drawer.css';
+
+:host {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+  font-size: 0.5625rem;
+}

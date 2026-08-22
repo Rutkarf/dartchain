@@ -1,7 +1,8 @@
 package io.dartchain.backend.utils;
 
 import io.dartchain.backend.service.WalletServiceImpl;
-import io.dartchain.backend.utils.EvmCryptoUtils;
+import io.dartchain.backend.shared.utils.EvmCryptoUtils;
+import io.dartchain.backend.shared.utils.CryptoUtils;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

@@ -5,6 +5,7 @@ import io.dartchain.backend.blockchain.store.BlockchainStateStore;
 import io.dartchain.backend.model.Block;
 import io.dartchain.backend.model.Transaction;
 import io.dartchain.backend.showcase.dto.ChartResponse;
+import io.dartchain.backend.showcase.application.MarketChartService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

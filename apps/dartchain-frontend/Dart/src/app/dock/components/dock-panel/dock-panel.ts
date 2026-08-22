@@ -9,13 +9,13 @@ import {
 
 import { Block } from '@core/models/block.model';
 import { OverlayPanel } from '../dock-tabs/dock-tabs';
-import { PendingTransactionsComponent } from '../../../features/pending-transactions/pending-transactions';
+import { PendingTransactionsComponent } from '@blockchain/pending-transactions/pending-transactions';
 import { BlockComposerComponent } from '@blockchain/block-composer/block-composer';
 import { BlocksListComponent } from '@blockchain/blocks-list/blocks-list';
 import { DockPendingSummaryComponent } from '../dock-summary/dock-pending-summary';
 import { DockBlockSummaryComponent } from '../dock-summary/dock-block-summary';
 import { DockChainSummaryComponent } from '../dock-summary/dock-chain-summary';
-import { MiniBarSlideIndicatorComponent } from '../../../features/mini-bar-slide-indicator/mini-bar-slide-indicator';
+import { MiniBarSlideIndicatorComponent } from '@dock/components/mini-bar-slide-indicator/mini-bar-slide-indicator';
 
 @Component({
   selector: 'app-dock-panel',

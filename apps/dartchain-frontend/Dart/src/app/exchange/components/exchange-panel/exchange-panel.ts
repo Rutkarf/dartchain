@@ -41,7 +41,7 @@ import { ShowcaseNavigationService } from '@core/services/showcase-navigation.se
 import { QuestsProgressService } from '@core/services/quests-progress.service';
 import { WalletSessionService } from '@core/services/wallet-session.service';
 import { AuthService } from '@core/services/auth.service';
-import { R4v3ThreeComponent } from '../../../features/r4v3-three/r4v3-three';
+import { R4v3ThreeComponent } from '../../../components/r4v3-three/r4v3-three';
 
 type SwapAction =
   | 'create-wallet'

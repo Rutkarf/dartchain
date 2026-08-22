@@ -10,6 +10,7 @@ import io.dartchain.backend.faucet.store.FaucetPendingBalanceStore;
 import io.dartchain.backend.m4t3r.settlement.RewardSettlementService;
 import io.dartchain.backend.m4t3r.settlement.SettlementResult;
 import io.dartchain.backend.m4t3r.store.M4t3rRewardStore;
+import io.dartchain.backend.m4t3r.application.M4t3rRewardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -12,7 +12,7 @@ import { ShowcaseDaoComponent } from '@showcase/components/showcase-dao/showcase
 import { ShowcaseR4v3SummaryComponent } from '@showcase/components/showcase-r4v3/showcase-r4v3-summary';
 import { ShowcaseR4v3Component } from '@showcase/components/showcase-r4v3/showcase-r4v3';
 import { DockMarketSummaryComponent } from '@dock/components/dock-summary/dock-market-summary';
-import { MarketPanelComponent } from '../../../features/market-panel/market-panel';
+import { MarketPanelComponent } from '@showcase/components/market-panel/market-panel';
 
 @Component({
   selector: 'app-showcase-window',

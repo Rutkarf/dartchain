@@ -3,7 +3,7 @@ package io.dartchain.backend.controller;
 import io.dartchain.backend.support.MockMvcIntegrationSupport;
 import io.dartchain.backend.support.MockMvcIntegrationSupport.Session;
 import io.dartchain.backend.support.MockMvcIntegrationSupport.WalletInfo;
-import io.dartchain.backend.utils.CryptoUtils;
+import io.dartchain.backend.shared.utils.CryptoUtils;
 import io.dartchain.backend.utils.TransactionPayloadBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,7 @@ package io.dartchain.backend.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dartchain.backend.auth.store.UserAccountStore;
-import io.dartchain.backend.utils.WalletValidator;
+import io.dartchain.backend.shared.utils.WalletValidator;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

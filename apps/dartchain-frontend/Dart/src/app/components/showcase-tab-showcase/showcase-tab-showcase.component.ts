@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { ShowcaseTab } from '../../core/models/showcase-tab.model';
 import { ProductConfigService } from '../../core/config/product-config.service';
 import { ShowcaseTabsComponent } from '@showcase/components/showcase-tabs/showcase-tabs';
-import { ShowcasePanelComponent } from '../../features/showcase-panel/showcase-panel';
-import { CollapsedBarActionsComponent } from '../../features/collapsed-bar-actions/collapsed-bar-actions';
+import { ShowcasePanelComponent } from '@showcase/components/showcase-panel/showcase-panel';
+import { CollapsedBarActionsComponent } from '../collapsed-bar-actions/collapsed-bar-actions';
 
 @Component({
   selector: 'app-showcase-tab-showcase',

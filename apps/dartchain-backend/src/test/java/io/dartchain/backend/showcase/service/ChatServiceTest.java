@@ -4,6 +4,7 @@ import io.dartchain.backend.showcase.chat.JsonChatMessageStore;
 import io.dartchain.backend.showcase.dto.ChatMessageRequest;
 import io.dartchain.backend.showcase.dto.ChatMessageResponse;
 import io.dartchain.backend.support.TestObjectMapper;
+import io.dartchain.backend.showcase.application.ChatService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

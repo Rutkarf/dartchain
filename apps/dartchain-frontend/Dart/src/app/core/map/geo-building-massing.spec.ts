@@ -82,7 +82,7 @@ describe('geo-building massing Phase 3', () => {
     expect(childNames.some((n) => n.endsWith('-plinth'))).toBe(true);
     expect(childNames.some((n) => n.endsWith('-cornice'))).toBe(true);
     expect(childNames.some((n) => n.endsWith('-parapet'))).toBe(true);
-    expect(built!.group.userData.visualTier).toBe('cadastre');
+    expect(built!.group.userData['visualTier']).toBe('cadastre');
     built!.group.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
       if (mesh.isMesh && mesh.geometry) mesh.geometry.dispose();

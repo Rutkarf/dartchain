@@ -1,9 +1,9 @@
 package io.dartchain.backend.explorer.service;
 
 import io.dartchain.backend.explorer.dto.ExplorerSearchResponse;
-import io.dartchain.backend.service.BlockchainService;
-import io.dartchain.backend.showcase.service.MarketChartService;
-import io.dartchain.backend.service.BlockchainValidationService;
+import io.dartchain.backend.blockchain.application.BlockchainService;
+import io.dartchain.backend.showcase.application.MarketChartService;
+import io.dartchain.backend.blockchain.application.BlockchainValidationService;
 import io.dartchain.backend.service.TransactionPoolService;
 import io.dartchain.backend.support.BlockchainTestSupport;
 import org.junit.jupiter.api.BeforeEach;

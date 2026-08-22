@@ -3,7 +3,7 @@ package io.dartchain.backend.auth;
 import io.dartchain.backend.auth.dto.LinkWalletRequest;
 import io.dartchain.backend.auth.dto.LoginRequest;
 import io.dartchain.backend.auth.dto.RegisterRequest;
-import io.dartchain.backend.utils.CryptoUtils;
+import io.dartchain.backend.shared.utils.CryptoUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -7,6 +7,7 @@ import io.dartchain.backend.m4t3r.dto.M4t3rHiddenCellsResponse;
 import io.dartchain.backend.m4t3r.dto.M4t3rRewardDto;
 import io.dartchain.backend.m4t3r.dto.M4t3rTrailPickupRequest;
 import io.dartchain.backend.m4t3r.dto.M4t3rTrailPickupResponse;
+import io.dartchain.backend.m4t3r.application.M4t3rRewardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
