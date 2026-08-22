@@ -1,5 +1,5 @@
-import { LaunchProject } from '../../core/models/showcase.model';
-import { MarketRecentTrade } from '../market-panel/market-panel.model';
+import { LaunchProject } from '@core/models/showcase.model';
+import { MarketRecentTrade } from '../../../features/market-panel/market-panel.model';
 
 export type R4v3ChartView = 'auto' | 'flow' | 'pulse' | 'fuel' | 'health';
 

@@ -143,7 +143,7 @@
               "src/app/features/pending-transactions/**/*.ts",
               "src/app/features/block-detail-drawer/**/*.ts",
               "src/app/features/launch-form-drawer/**/*.ts",
-              "src/app/features/showcase-chart/**/*.ts",
+              "src/app/showcase/components/showcase-chart/**/*.ts",
               "src/app/searchbar/**/*.ts",
               "src/app/navbar/explorer-search.ts",
               "src/app/features/peer-panel/**/*.ts",

@@ -1,4 +1,4 @@
-import { ChartRange } from '../../core/models/showcase.model';
+import { ChartRange } from '@core/models/showcase.model';
 import { ChartTimeframeId } from './chart-timeframe.constants';
 
 export type ChartGridProfileKey =

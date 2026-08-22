@@ -182,8 +182,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-showcase-chart',
-        template: 'features/showcase-chart/showcase-chart.html',
-        styles: ['features/showcase-chart/showcase-chart.css'],
+        template: 'showcase/components/showcase-chart/showcase-chart.html',
+        styles: ['showcase/components/showcase-chart/showcase-chart.css'],
         elements: [
           { id: 'hub-title', label: 'Graphique • PAIR/CURRENCY', kind: 'label' },
           { id: 'period-pills', label: '1H 24H 7D 30D', kind: 'tab' },

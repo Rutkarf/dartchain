@@ -14,7 +14,7 @@ import {
   booleanAttribute,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CollapsedBarActionsComponent } from '../collapsed-bar-actions/collapsed-bar-actions';
+import { CollapsedBarActionsComponent } from '../../../features/collapsed-bar-actions/collapsed-bar-actions';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval, of } from 'rxjs';
 import { map, switchMap, take } from 'rxjs/operators';
@@ -23,21 +23,21 @@ import {
   EXCHANGE_NATIVE_TOKEN,
   isExchangeNativeToken,
   isLaunchpadSwapToken,
-} from '../../core/constants/exchange-launchpad.constants';
+} from '@core/constants/exchange-launchpad.constants';
 import {
   R4V3_PEG_DISPLAY_DELTA,
   R4V3_PEG_DISPLAY_PRICE,
-} from '../../core/constants/r4v3-token.constants';
+} from '@core/constants/r4v3-token.constants';
 import {
   formatMarketDelta,
   stripUsdFromMarketLabel,
-} from '../../core/utils/market-display.util';
-import { LaunchProject, ChartRange } from '../../core/models/showcase.model';
-import { MarketDataService } from '../../core/services/market-data.service';
-import { RatePanelPreferencesService } from '../../core/services/rate-panel-preferences.service';
-import { ShowcaseLaunchStateService } from '../../core/services/showcase-launch-state.service';
-import { ShowcaseR4v3StateService } from '../../core/services/showcase-r4v3-state.service';
-import { R4v3ThreeComponent } from '../r4v3-three/r4v3-three';
+} from '@core/utils/market-display.util';
+import { LaunchProject, ChartRange } from '@core/models/showcase.model';
+import { MarketDataService } from '@core/services/market-data.service';
+import { RatePanelPreferencesService } from '@core/services/rate-panel-preferences.service';
+import { ShowcaseLaunchStateService } from '@core/services/showcase-launch-state.service';
+import { ShowcaseR4v3StateService } from '@core/services/showcase-r4v3-state.service';
+import { R4v3ThreeComponent } from '../../../features/r4v3-three/r4v3-three';
 import { ChartSearchResult } from './chart-token-search.model';
 import { ChartTokenSearchComponent } from './chart-token-search';
 import { readChartWatchlist, upsertChartWatchlist } from './chart-watchlist.util';
@@ -49,18 +49,18 @@ import {
   chartBaseSymbol,
   chartPairForSymbol,
   chartQuoteSymbol,
-} from '../../core/constants/rate-panel-symbols';
-import { ChartAlertsService } from '../../core/services/chart-alerts.service';
-import { ChartSummaryStateService } from '../../core/services/chart-summary-state.service';
-import { BrandCryptoSelectionService } from '../../core/services/brand-crypto-selection.service';
+} from '@core/constants/rate-panel-symbols';
+import { ChartAlertsService } from '@core/services/chart-alerts.service';
+import { ChartSummaryStateService } from '@core/services/chart-summary-state.service';
+import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
 import {
   ChartCurrency,
   CryptoRatesService,
   MarketChartData,
   RatePanelData,
-} from '../../core/services/crypto-rate.service';
-import { BlockchainApiService } from '../../core/services/blockchain-api.service';
-import { ShowcaseApiService } from '../../core/services/showcase-api.service';
+} from '@core/services/crypto-rate.service';
+import { BlockchainApiService } from '@core/services/blockchain-api.service';
+import { ShowcaseApiService } from '@core/services/showcase-api.service';
 import {
   CandleSvgLayout,
   ChartDisplayType,

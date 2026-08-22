@@ -39,9 +39,9 @@ import { RatePanelPreferencesService } from '../../core/services/rate-panel-pref
 import {
   buildRatePanelTrendSegments,
   ChartTrendSegment,
-} from '../showcase-chart/chart-display.util';
-import { ShowcaseChartComponent } from '../showcase-chart/showcase-chart';
-import { ShowcaseChartSummaryComponent } from '../showcase-chart/showcase-chart-summary';
+} from '@showcase/components/showcase-chart/chart-display.util';
+import { ShowcaseChartComponent } from '@showcase/components/showcase-chart/showcase-chart';
+import { ShowcaseChartSummaryComponent } from '@showcase/components/showcase-chart/showcase-chart-summary';
 
 export interface RatePanelView {
   featured: RatePanelData;

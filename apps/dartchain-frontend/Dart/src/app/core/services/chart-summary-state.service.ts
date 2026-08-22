@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-import { buildChartTrendSegments, chartYFromNormalizedCoord } from '../../features/showcase-chart/chart-display.util';
+import { buildChartTrendSegments, chartYFromNormalizedCoord } from '@showcase/components/showcase-chart/chart-display.util';
 
 export type ChartSummaryPhase = 'error' | 'loading' | 'ready';
 
