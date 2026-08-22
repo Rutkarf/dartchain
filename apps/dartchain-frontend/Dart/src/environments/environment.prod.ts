@@ -14,6 +14,6 @@ export const environment = {
   enableOsmBuildings: true,
   enableTerrain: true,
   mapDebug: false,
-  mapQuality: 'medium' as 'low' | 'medium' | 'high',
+  mapQuality: 'ultra-low' as 'ultra-low' | 'low' | 'medium' | 'high',
   opentopographyApiKey: '',
 };

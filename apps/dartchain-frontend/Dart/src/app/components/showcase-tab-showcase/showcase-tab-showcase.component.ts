@@ -28,7 +28,7 @@ export class ShowcaseTabShowcaseComponent {
   readonly product = inject(ProductConfigService);
 
   @Input() activeTab: ShowcaseTab = 'tours';
-  @Input() showcaseCollapsed = false;
+  @Input() showcaseCollapsed = true;
   @Input() collapseAriaLabel = 'Replier le showcase';
   @Input() refreshBusy = false;
 

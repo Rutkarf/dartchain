@@ -7,7 +7,7 @@
     "build": "ng build",
     "build:docker": "ng build --configuration docker",
     "build:cloudflare": "bash scripts/build-cloudflare.sh",
-    "build:stats": "bash scripts/bundle-stats.sh",
+    "build:geojson": "node scripts/build-marseille-geojson.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --no-watch --coverage",

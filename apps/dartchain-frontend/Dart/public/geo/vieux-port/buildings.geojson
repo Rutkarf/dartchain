@@ -1,0 +1,1023 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "source": "vieux-port-cadastre-derived",
+    "license": "ODbL (empreintes OSM way) + projet (parcelles spawn)",
+    "generated": "2026-08-22",
+    "phase": "4"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "mirror-adjacent-building-01",
+      "properties": {
+        "id": "mirror-adjacent-building-01",
+        "sourceId": "osm-way-67705148",
+        "label": "Immeuble nord-est Ombrière",
+        "heightMeters": 20,
+        "levels": 7,
+        "confidence": "high",
+        "source": "geojson",
+        "heightSource": "hardcoded",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.3748797,
+              43.2947401
+            ],
+            [
+              5.3748431,
+              43.2947291
+            ],
+            [
+              5.3747803,
+              43.2947103
+            ],
+            [
+              5.3747415,
+              43.2946987
+            ],
+            [
+              5.3747517,
+              43.2946559
+            ],
+            [
+              5.3747811,
+              43.2945318
+            ],
+            [
+              5.3749362,
+              43.2945637
+            ],
+            [
+              5.3749074,
+              43.2946371
+            ],
+            [
+              5.374898,
+              43.2946605
+            ],
+            [
+              5.3748797,
+              43.2947401
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "mirror-adjacent-building-02",
+      "properties": {
+        "id": "mirror-adjacent-building-02",
+        "sourceId": "osm-way-67704902",
+        "label": "Immeuble nord Ombrière (R4V3)",
+        "heightMeters": 24,
+        "levels": 6,
+        "confidence": "high",
+        "source": "geojson",
+        "heightSource": "hardcoded",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.3748145,
+              43.2948804
+            ],
+            [
+              5.3747038,
+              43.2948505
+            ],
+            [
+              5.3747109,
+              43.2948213
+            ],
+            [
+              5.3747199,
+              43.2947839
+            ],
+            [
+              5.3747917,
+              43.2948057
+            ],
+            [
+              5.3748454,
+              43.294822
+            ],
+            [
+              5.3748145,
+              43.2948804
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "harbor-west-building",
+      "properties": {
+        "id": "harbor-west-building",
+        "sourceId": "osm-way-67701479",
+        "label": "Façade ouest Vieux-Port",
+        "heightMeters": 18,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "hardcoded",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.3736732,
+              43.2938842
+            ],
+            [
+              5.3737278,
+              43.2937536
+            ],
+            [
+              5.373741,
+              43.293723
+            ],
+            [
+              5.3738959,
+              43.2937603
+            ],
+            [
+              5.373862,
+              43.2938419
+            ],
+            [
+              5.3738281,
+              43.2939237
+            ],
+            [
+              5.3737484,
+              43.2939034
+            ],
+            [
+              5.3736732,
+              43.2938842
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "harbor-east-building",
+      "properties": {
+        "id": "harbor-east-building",
+        "sourceId": "osm-way-67708729",
+        "label": "Hôtel des Princes",
+        "heightMeters": 22,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "hardcoded",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.3754534,
+              43.2945423
+            ],
+            [
+              5.375533,
+              43.2945623
+            ],
+            [
+              5.3755604,
+              43.2945692
+            ],
+            [
+              5.3756658,
+              43.2945957
+            ],
+            [
+              5.3756554,
+              43.2946322
+            ],
+            [
+              5.375641,
+              43.294683
+            ],
+            [
+              5.3756333,
+              43.2947104
+            ],
+            [
+              5.3756166,
+              43.2947698
+            ],
+            [
+              5.3755251,
+              43.2947447
+            ],
+            [
+              5.3755075,
+              43.2947393
+            ],
+            [
+              5.3755059,
+              43.2947423
+            ],
+            [
+              5.3754718,
+              43.2948003
+            ],
+            [
+              5.3754606,
+              43.2948198
+            ],
+            [
+              5.3754358,
+              43.2948127
+            ],
+            [
+              5.3753465,
+              43.2947878
+            ],
+            [
+              5.3754039,
+              43.2946559
+            ],
+            [
+              5.3754534,
+              43.2945423
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-0",
+      "properties": {
+        "id": "fraternite-ne-0",
+        "sourceId": "geo-fraternite-ne-0",
+        "label": "Fraternité NE 0",
+        "heightMeters": 18,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.37450530771596,
+              43.29492289202299
+            ],
+            [
+              5.3746780991734315,
+              43.29492289202299
+            ],
+            [
+              5.3746780991734315,
+              43.294779162234995
+            ],
+            [
+              5.37450530771596,
+              43.294779162234995
+            ],
+            [
+              5.37450530771596,
+              43.29492289202299
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-1",
+      "properties": {
+        "id": "fraternite-ne-1",
+        "sourceId": "geo-fraternite-ne-1",
+        "label": "Fraternité NE 1",
+        "heightMeters": 21,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.374727467242396,
+              43.29492289202299
+            ],
+            [
+              5.374900258699867,
+              43.29492289202299
+            ],
+            [
+              5.374900258699867,
+              43.294779162234995
+            ],
+            [
+              5.374727467242396,
+              43.294779162234995
+            ],
+            [
+              5.374727467242396,
+              43.29492289202299
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-2",
+      "properties": {
+        "id": "fraternite-ne-2",
+        "sourceId": "geo-fraternite-ne-2",
+        "label": "Fraternité NE 2",
+        "heightMeters": 24,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.374949626768831,
+              43.29492289202299
+            ],
+            [
+              5.375122418226302,
+              43.29492289202299
+            ],
+            [
+              5.375122418226302,
+              43.294779162234995
+            ],
+            [
+              5.374949626768831,
+              43.294779162234995
+            ],
+            [
+              5.374949626768831,
+              43.29492289202299
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-3",
+      "properties": {
+        "id": "fraternite-ne-3",
+        "sourceId": "geo-fraternite-ne-3",
+        "label": "Fraternité NE 3",
+        "heightMeters": 27,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.375171786295266,
+              43.29492289202299
+            ],
+            [
+              5.375344577752737,
+              43.29492289202299
+            ],
+            [
+              5.375344577752737,
+              43.294779162234995
+            ],
+            [
+              5.375171786295266,
+              43.294779162234995
+            ],
+            [
+              5.375171786295266,
+              43.29492289202299
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-4",
+      "properties": {
+        "id": "fraternite-ne-4",
+        "sourceId": "geo-fraternite-ne-4",
+        "label": "Fraternité NE 4",
+        "heightMeters": 18,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.375393945821701,
+              43.29492289202299
+            ],
+            [
+              5.375566737279172,
+              43.29492289202299
+            ],
+            [
+              5.375566737279172,
+              43.294779162234995
+            ],
+            [
+              5.375393945821701,
+              43.294779162234995
+            ],
+            [
+              5.375393945821701,
+              43.29492289202299
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-5",
+      "properties": {
+        "id": "fraternite-ne-5",
+        "sourceId": "geo-fraternite-ne-5",
+        "label": "Fraternité NE 5",
+        "heightMeters": 21,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.374505307435187,
+              43.29512052048149
+            ],
+            [
+              5.374678099454205,
+              43.29512052048149
+            ],
+            [
+              5.374678099454205,
+              43.2949767906935
+            ],
+            [
+              5.374505307435187,
+              43.2949767906935
+            ],
+            [
+              5.374505307435187,
+              43.29512052048149
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-6",
+      "properties": {
+        "id": "fraternite-ne-6",
+        "sourceId": "geo-fraternite-ne-6",
+        "label": "Fraternité NE 6",
+        "heightMeters": 24,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.374727466961622,
+              43.29512052048149
+            ],
+            [
+              5.374900258980641,
+              43.29512052048149
+            ],
+            [
+              5.374900258980641,
+              43.2949767906935
+            ],
+            [
+              5.374727466961622,
+              43.2949767906935
+            ],
+            [
+              5.374727466961622,
+              43.29512052048149
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-7",
+      "properties": {
+        "id": "fraternite-ne-7",
+        "sourceId": "geo-fraternite-ne-7",
+        "label": "Fraternité NE 7",
+        "heightMeters": 27,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.374949626488057,
+              43.29512052048149
+            ],
+            [
+              5.375122418507075,
+              43.29512052048149
+            ],
+            [
+              5.375122418507075,
+              43.2949767906935
+            ],
+            [
+              5.374949626488057,
+              43.2949767906935
+            ],
+            [
+              5.374949626488057,
+              43.29512052048149
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-8",
+      "properties": {
+        "id": "fraternite-ne-8",
+        "sourceId": "geo-fraternite-ne-8",
+        "label": "Fraternité NE 8",
+        "heightMeters": 18,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.3751717860144925,
+              43.29512052048149
+            ],
+            [
+              5.375344578033511,
+              43.29512052048149
+            ],
+            [
+              5.375344578033511,
+              43.2949767906935
+            ],
+            [
+              5.3751717860144925,
+              43.2949767906935
+            ],
+            [
+              5.3751717860144925,
+              43.29512052048149
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-ne-9",
+      "properties": {
+        "id": "fraternite-ne-9",
+        "sourceId": "geo-fraternite-ne-9",
+        "label": "Fraternité NE 9",
+        "heightMeters": 21,
+        "levels": 6,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.375393945540927,
+              43.29512052048149
+            ],
+            [
+              5.375566737559946,
+              43.29512052048149
+            ],
+            [
+              5.375566737559946,
+              43.2949767906935
+            ],
+            [
+              5.375393945540927,
+              43.2949767906935
+            ],
+            [
+              5.375393945540927,
+              43.29512052048149
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-se-0",
+      "properties": {
+        "id": "fraternite-se-0",
+        "sourceId": "geo-fraternite-se-0",
+        "label": "Fraternité SE 0",
+        "heightMeters": 16,
+        "levels": 5,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.374560848239327,
+              43.294451278656126
+            ],
+            [
+              5.37472129621737,
+              43.294451278656126
+            ],
+            [
+              5.37472129621737,
+              43.294316531979874
+            ],
+            [
+              5.374560848239327,
+              43.294316531979874
+            ],
+            [
+              5.374560848239327,
+              43.294451278656126
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-se-1",
+      "properties": {
+        "id": "fraternite-se-1",
+        "sourceId": "geo-fraternite-se-1",
+        "label": "Fraternité SE 1",
+        "heightMeters": 19,
+        "levels": 5,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.374783007765762,
+              43.294451278656126
+            ],
+            [
+              5.374943455743805,
+              43.294451278656126
+            ],
+            [
+              5.374943455743805,
+              43.294316531979874
+            ],
+            [
+              5.374783007765762,
+              43.294316531979874
+            ],
+            [
+              5.374783007765762,
+              43.294451278656126
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-se-2",
+      "properties": {
+        "id": "fraternite-se-2",
+        "sourceId": "geo-fraternite-se-2",
+        "label": "Fraternité SE 2",
+        "heightMeters": 22,
+        "levels": 5,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.375005167292197,
+              43.294451278656126
+            ],
+            [
+              5.37516561527024,
+              43.294451278656126
+            ],
+            [
+              5.37516561527024,
+              43.294316531979874
+            ],
+            [
+              5.375005167292197,
+              43.294316531979874
+            ],
+            [
+              5.375005167292197,
+              43.294451278656126
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-se-3",
+      "properties": {
+        "id": "fraternite-se-3",
+        "sourceId": "geo-fraternite-se-3",
+        "label": "Fraternité SE 3",
+        "heightMeters": 16,
+        "levels": 5,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.375227326818632,
+              43.294451278656126
+            ],
+            [
+              5.375387774796676,
+              43.294451278656126
+            ],
+            [
+              5.375387774796676,
+              43.294316531979874
+            ],
+            [
+              5.375227326818632,
+              43.294316531979874
+            ],
+            [
+              5.375227326818632,
+              43.294451278656126
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-se-4",
+      "properties": {
+        "id": "fraternite-se-4",
+        "sourceId": "geo-fraternite-se-4",
+        "label": "Fraternité SE 4",
+        "heightMeters": 19,
+        "levels": 5,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.374560848476335,
+              43.29427161642113
+            ],
+            [
+              5.374721295980361,
+              43.29427161642113
+            ],
+            [
+              5.374721295980361,
+              43.294136869744875
+            ],
+            [
+              5.374560848476335,
+              43.294136869744875
+            ],
+            [
+              5.374560848476335,
+              43.29427161642113
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-se-5",
+      "properties": {
+        "id": "fraternite-se-5",
+        "sourceId": "geo-fraternite-se-5",
+        "label": "Fraternité SE 5",
+        "heightMeters": 22,
+        "levels": 5,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.374783008002771,
+              43.29427161642113
+            ],
+            [
+              5.374943455506797,
+              43.29427161642113
+            ],
+            [
+              5.374943455506797,
+              43.294136869744875
+            ],
+            [
+              5.374783008002771,
+              43.294136869744875
+            ],
+            [
+              5.374783008002771,
+              43.29427161642113
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-se-6",
+      "properties": {
+        "id": "fraternite-se-6",
+        "sourceId": "geo-fraternite-se-6",
+        "label": "Fraternité SE 6",
+        "heightMeters": 16,
+        "levels": 5,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.375005167529205,
+              43.29427161642113
+            ],
+            [
+              5.375165615033231,
+              43.29427161642113
+            ],
+            [
+              5.375165615033231,
+              43.294136869744875
+            ],
+            [
+              5.375005167529205,
+              43.294136869744875
+            ],
+            [
+              5.375005167529205,
+              43.29427161642113
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fraternite-se-7",
+      "properties": {
+        "id": "fraternite-se-7",
+        "sourceId": "geo-fraternite-se-7",
+        "label": "Fraternité SE 7",
+        "heightMeters": 19,
+        "levels": 5,
+        "confidence": "medium",
+        "source": "geojson",
+        "heightSource": "levels",
+        "building": "yes"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              5.375227327055641,
+              43.29427161642113
+            ],
+            [
+              5.375387774559667,
+              43.29427161642113
+            ],
+            [
+              5.375387774559667,
+              43.294136869744875
+            ],
+            [
+              5.375227327055641,
+              43.294136869744875
+            ],
+            [
+              5.375227327055641,
+              43.29427161642113
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -84,6 +84,7 @@ export const WIGLE_GEO_CONFIG = {
 } as const;
 
 export function maxActivePointsForQuality(quality: MapQuality): number {
+  if (quality === 'ultra-low') return 40;
   if (quality === 'low') return 80;
   if (quality === 'medium') return 120;
   return 180;

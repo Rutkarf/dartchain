@@ -28,6 +28,8 @@ export { districtForWorld } from './marseille-district.types';
 export { captureCalibrationSnapshot } from './calibration-diagnostics';
 export { landmarkFootprintCompatibility } from './footprint-compatibility';
 export { createLandmarkTwinCatalog } from './landmark-twin.catalog';
+export { HERO_SKYLINE_LANDMARKS, heroSkylineWorldAnchor } from './landmark-hero.config';
+export { buildHeroSkylineLandmarkSet } from './landmark-hero-mesh.builder';
 export { shopsEastOsmDeltaMeters } from './spawn-facade-osm-delta';
 export { southFacadeEdgeFromFootprint, footprintCentroidWorld } from './south-facade-edge';
 export { shopsEastNeonSignageZones } from './neon-signage-zones';

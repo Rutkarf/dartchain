@@ -23,11 +23,11 @@ case "${SHOWCASE_ENABLED}" in
   *) SHOWCASE_TS="false" ;;
 esac
 
-# Qualité carte / Star Conquest (medium = défaut prod)
-MAP_QUALITY="${MAP_QUALITY:-medium}"
+# Qualité carte / Star Conquest — ultra-low verrouillé (250×550, fluidité max)
+MAP_QUALITY="${MAP_QUALITY:-ultra-low}"
 case "${MAP_QUALITY}" in
-  low|medium|high) ;;
-  *) MAP_QUALITY="medium" ;;
+  ultra-low) ;;
+  *) MAP_QUALITY="ultra-low" ;;
 esac
 
 STAR_CONQUEST_OVERLAY_ENABLED="${STAR_CONQUEST_OVERLAY_ENABLED:-true}"
@@ -59,7 +59,7 @@ export const environment = {
   enableOsmBuildings: true,
   enableTerrain: true,
   mapDebug: false,
-  mapQuality: '${MAP_QUALITY}' as 'low' | 'medium' | 'high',
+  mapQuality: '${MAP_QUALITY}' as 'ultra-low' | 'low' | 'medium' | 'high',
   opentopographyApiKey: '',
 };
 EOF

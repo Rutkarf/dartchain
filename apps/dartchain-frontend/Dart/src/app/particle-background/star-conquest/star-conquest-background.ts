@@ -66,8 +66,8 @@ export class StarConquestBackground {
     }
   }
 
-  setGpuQuality(quality: StarConquestGpuQuality): void {
-    this.gpuQuality = quality;
+  setGpuQuality(_quality: StarConquestGpuQuality): void {
+    this.gpuQuality = 'ultra-low';
   }
 
   applyUniverse(theme: StarConquestUniverseTheme): void {

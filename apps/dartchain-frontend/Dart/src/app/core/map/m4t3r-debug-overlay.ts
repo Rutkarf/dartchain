@@ -8,7 +8,7 @@ import { M4t3rRewardRuntimeService } from './m4t3r-reward-runtime.service';
 import { R4V3_GROUND_FIELD } from './map-configuration';
 
 interface MetaversePerformanceMetrics {
-  mapQuality: 'low' | 'medium' | 'high';
+  mapQuality: 'low' | 'medium' | 'high' | 'ultra-low';
   fps: number;
   averageFrameTimeMs: number;
   p95FrameTimeMs: number;
@@ -183,7 +183,7 @@ export class M4t3rDebugOverlay {
       '',
       '<b>Performance</b>',
       `FPS: ${this.fps.toFixed(1)}`,
-      `Token anim Hz: ${s.tokenAnimationFrequencyHz}`,
+      `Token anim Hz: near ${s.nearAnimationFrequencyHz} / mid ${s.midAnimationFrequencyHz}`,
       `R4V3 tokens: ${s.variantCounts['r4v3-token'] ?? s.visibleInstances}`,
       `LOD near/mid/far: ${s.lodCounts.near}/${s.lodCounts.mid}/${s.lodCounts.far}`,
       `Init at startup: ${s.chunksInitialized ? '<span style="color:#7f7">YES</span>' : '<span style="color:#f77">NO</span>'}`,

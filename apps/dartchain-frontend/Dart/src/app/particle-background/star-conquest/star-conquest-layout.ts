@@ -9,6 +9,12 @@ import {
 import { STAR_DEPTH_LAYERS, type StarDepthLayerId } from './star-conquest-depth';
 import type { StarQuest } from './star-conquest.model';
 import type { StarQuestFamily } from './star-conquest-families';
+import {
+  starConquestClientToLayout,
+  starConquestLayoutHeight,
+  starConquestLayoutWidth,
+  starConquestScaleDomLength,
+} from './star-conquest-viewport.util';
 
 export interface StarConquestBand {
   /** Limite haute = sous le bas réel de Swap (+ marge). */
@@ -36,13 +42,16 @@ const MIN_LABEL_DIST_PX = 20;
 const MAX_BOTTOM_OFFSCREEN = 1;
 
 /** Sommet du floor : mesure DOM du wrapper peek, sinon token. */
-export function measureFloorTopPx(floorPeekPx = 220, viewportH = window.innerHeight): number {
+export function measureFloorTopPx(
+  floorPeekPx = 220,
+  viewportH = starConquestLayoutHeight()
+): number {
   const floor =
     document.querySelector('app-three-floor .floor-wrapper') ??
     document.querySelector('app-three-floor');
   if (floor) {
     const r = floor.getBoundingClientRect();
-    if (r.height > 4) return r.top;
+    if (r.height > 4) return starConquestScaleDomLength(r.top, 'y');
   }
   return Math.max(0, viewportH - Math.max(28, floorPeekPx));
 }
@@ -62,7 +71,9 @@ export function measureAngularStackBottomPx(): number {
     const el = document.querySelector(sel);
     if (!el) continue;
     const r = el.getBoundingClientRect();
-    if (r.height > 2 && r.width > 2) bottom = Math.max(bottom, r.bottom);
+    if (r.height > 2 && r.width > 2) {
+      bottom = Math.max(bottom, starConquestScaleDomLength(r.bottom, 'y'));
+    }
   }
   return bottom;
 }
@@ -82,8 +93,8 @@ export function measureGapAboveFloor(floorPeekPx = 220): {
   viewportW: number;
   viewportH: number;
 } {
-  const viewportW = Math.max(window.innerWidth, 32);
-  const viewportH = Math.max(window.innerHeight, 32);
+  const viewportW = starConquestLayoutWidth();
+  const viewportH = starConquestLayoutHeight();
   const stackBottom = measureAngularStackBottomPx();
   const floorTop = measureFloorTopPx(floorPeekPx, viewportH);
   const top = Math.min(stackBottom + 4, floorTop - 8);
@@ -106,19 +117,31 @@ export function measureGapAboveFloor(floorPeekPx = 220): {
  * Zone jouable : sous Navbar+Swap → horizon du floor.
  * Monde horizontal plus large que le viewport (fenêtre sur la galaxie).
  */
-export function measurePlayableBand(floorPeekPx = 220): StarConquestBand {
-  const viewportW = Math.max(window.innerWidth, 32);
-  const viewportH = Math.max(window.innerHeight, 32);
+export const DEFAULT_FLOOR_PEEK_PX = 220;
+
+/** Lit --floor-peek-height sans forcer le layout avant chargement CSS. */
+export function readFloorPeekPx(): number {
+  if (typeof document === 'undefined') return DEFAULT_FLOOR_PEEK_PX;
+  if (document.readyState !== 'complete') return DEFAULT_FLOOR_PEEK_PX;
+  const parsed = parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
+  );
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_FLOOR_PEEK_PX;
+}
+
+export function measurePlayableBand(floorPeekPx = readFloorPeekPx()): StarConquestBand {
+  const viewportW = starConquestLayoutWidth();
+  const viewportH = starConquestLayoutHeight();
 
   const swap = document.querySelector('app-swap');
   const navbar = document.querySelector('app-navbar');
   let swapBottom = viewportH * 0.22;
   if (swap) {
     const r = swap.getBoundingClientRect();
-    if (r.height > 0) swapBottom = r.bottom;
+    if (r.height > 0) swapBottom = starConquestScaleDomLength(r.bottom, 'y');
   } else if (navbar) {
     const r = navbar.getBoundingClientRect();
-    if (r.height > 0) swapBottom = r.bottom;
+    if (r.height > 0) swapBottom = starConquestScaleDomLength(r.bottom, 'y');
   }
 
   const floorTopPx = measureFloorTopPx(floorPeekPx, viewportH);
@@ -170,8 +193,11 @@ export function screenToWorldOnPlane(
   planeZ = 0,
   out = new THREE.Vector3()
 ): THREE.Vector3 {
-  const ndcX = (clientX / Math.max(window.innerWidth, 1)) * 2 - 1;
-  const ndcY = -(clientY / Math.max(window.innerHeight, 1)) * 2 + 1;
+  const { x: lx, y: ly } = starConquestClientToLayout(clientX, clientY);
+  const layoutW = starConquestLayoutWidth();
+  const layoutH = starConquestLayoutHeight();
+  const ndcX = (lx / layoutW) * 2 - 1;
+  const ndcY = -(ly / layoutH) * 2 + 1;
   const vector = new THREE.Vector3(ndcX, ndcY, 0.5).unproject(camera);
   const dir = vector.sub(camera.position).normalize();
   const distance = (planeZ - camera.position.z) / dir.z;
@@ -407,12 +433,12 @@ export function measureGraphRect(): {
   const r = el.getBoundingClientRect();
   if (r.width < 8 || r.height < 6) return null;
   return {
-    left: r.left,
-    top: r.top,
-    right: r.right,
-    bottom: r.bottom,
-    width: r.width,
-    height: r.height,
+    left: starConquestScaleDomLength(r.left, 'x'),
+    top: starConquestScaleDomLength(r.top, 'y'),
+    right: starConquestScaleDomLength(r.right, 'x'),
+    bottom: starConquestScaleDomLength(r.bottom, 'y'),
+    width: starConquestScaleDomLength(r.width, 'x'),
+    height: starConquestScaleDomLength(r.height, 'y'),
   };
 }
 

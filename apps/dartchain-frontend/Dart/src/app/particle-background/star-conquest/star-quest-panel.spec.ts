@@ -73,7 +73,7 @@ describe('StarQuestPanelComponent', () => {
   }
 
   it('claims a preview star locally without faucet copy confusion', () => {
-    const fixture = openQuest('sc-angular-layout');
+    const fixture = openQuest('sc-swap-slippage');
     const cta = fixture.nativeElement.querySelector(
       '.star-quest-panel__claim'
     ) as HTMLButtonElement;
@@ -86,7 +86,7 @@ describe('StarQuestPanelComponent', () => {
     cta.click();
     fixture.detectChanges();
     const progress = TestBed.inject(StarConquestProgressService);
-    expect(progress.snapshot().claimed['sc-angular-layout']).toBeTruthy();
+    expect(progress.snapshot().claimed['sc-swap-slippage']).toBeTruthy();
     expect(fixture.nativeElement.querySelector('[data-claim="completed"]')).toBeTruthy();
   });
 

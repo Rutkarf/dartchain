@@ -40,6 +40,7 @@ import { BlockDetailDrawerComponent } from './features/block-detail-drawer/block
 import { LaunchFormDrawerComponent } from './features/launch-form-drawer/launch-form-drawer';
 import { LaunchDrawerService } from './core/services/launch-drawer.service';
 import { ThreeFloor } from './three-floor/three-floor';
+import { CombinedPerfHudComponent } from './core/utils/combined-perf-hud.component';
 import { bindViewportCompactClass } from './core/viewport-compact';
 import { ProductConfigService } from './core/config/product-config.service';
 import { AuthService } from './core/services/auth.service';
@@ -83,6 +84,7 @@ import { PeersDataService } from './core/services/peers-data.service';
     BlockDetailDrawerComponent,
     LaunchFormDrawerComponent,
     ThreeFloor,
+    CombinedPerfHudComponent,
     AuthDrawerComponent,
   ],
   templateUrl: './app.html',
@@ -118,10 +120,11 @@ export class AppComponent {
 
   readonly activeShowcaseTab = signal<ShowcaseTab>('tours');
   readonly activeBottomTab = signal<BottomDockTab>('wallet');
-  readonly showcaseCollapsed = signal(false);
-  readonly chartCollapsed = signal(false);
+  /** Smart-bars repliées au premier paint (dartchain.pages.dev). */
+  readonly showcaseCollapsed = signal(true);
+  readonly chartCollapsed = signal(true);
   readonly exchangeCollapsed = signal(false);
-  readonly dockCollapsed = signal(false);
+  readonly dockCollapsed = signal(true);
   readonly showDrawer = signal(false);
   readonly selectedBlock = signal<Block | null>(null);
   readonly questFeedback = this.questProgress.feedback;

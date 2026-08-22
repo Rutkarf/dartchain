@@ -23,6 +23,7 @@ import type { StarQuestFamily } from './star-conquest-families';
 import type { StarQuest, StarQuestStatus } from './star-conquest.model';
 import { formatRewardWithDot } from './star-conquest-visuals';
 import { starConquestOverlayBox } from './star-conquest-scale';
+import { starConquestLayoutWidth } from './star-conquest-viewport.util';
 import { StarConquestPanStickComponent } from './star-conquest-pan-stick';
 import { recordStarConquestDiag } from './star-conquest-diagnostics';
 
@@ -77,9 +78,7 @@ export class StarQuestScannerComponent {
   /** Place le scanner au-dessus de la bande floor (sticks MOVE/VIEW), hors joystick. */
   readonly scannerStyle = computed(() => {
     const z = this.state.joyExclusion();
-    const vw = typeof window !== 'undefined' ? window.innerWidth : 250;
-    const vh = typeof window !== 'undefined' ? window.innerHeight : 550;
-    const box = starConquestOverlayBox(vw, vh);
+    const box = starConquestOverlayBox();
     const panelW = box.scannerW;
     const estH = box.scannerH;
     const floor = `calc(var(--sc-overlay-floor-chrome, ${box.floorChromeH}px) + ${box.margin}px)`;
@@ -93,6 +92,7 @@ export class StarQuestScannerComponent {
       };
     }
 
+    const vw = starConquestLayoutWidth();
     let left = (vw - panelW) * 0.5;
     if (left < z.right && left + panelW > z.left) {
       const rightSlot = z.right + 6;

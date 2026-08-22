@@ -18,20 +18,25 @@ import {
   type ContainerResizeBinding,
 } from '../core/utils/three-container.util';
 import {
-  bindWebGlVisibilityPause,
-  shouldAnimateWebGl,
-} from '../core/utils/three-animation.util';
-import {
   applyCanvasLayerStyles,
   createWebGlRenderer,
-  viewportSize,
 } from '../core/utils/three-webgl.util';
+import {
+  WebGlAnimationSchedulerService,
+  type WebGlFrameContext,
+} from '../core/utils/web-gl-animation-scheduler.service';
+import { CombinedPerfHudService } from '../core/utils/combined-perf-hud.service';
+import {
+  DualContextGovernorService,
+  shouldRunScActiveSimTick,
+} from '../core/utils/dual-context-governor.service';
 import {
   STAR_CONQUEST_OVERLAY,
   STAR_CONQUEST_SCALE,
   STAR_CONQUEST_SCALE_TIER,
   starConquestDprCap,
   starConquestOverlayBox,
+  type StarConquestGpuQuality,
 } from './star-conquest/star-conquest-scale';
 import { StarConquestGraph, type StarConquestHit } from './star-conquest/star-conquest-graph';
 import { StarConquestWorld, CAMERA_Z } from './star-conquest/star-conquest-world';
@@ -42,6 +47,7 @@ import {
 import {
   layoutQuestsInBand,
   measurePlayableBand,
+  readFloorPeekPx,
 } from './star-conquest/star-conquest-layout';
 import { STAR_CONQUEST_MOCK_QUESTS } from './star-conquest/star-conquest.mock';
 import type { StarQuest } from './star-conquest/star-conquest.model';
@@ -62,6 +68,13 @@ import { StarConquestProgressService } from '../core/services/star-conquest-prog
 import { StarConquestUniverseService } from '../core/services/star-conquest-universe.service';
 import { StarConquestFacade } from '../core/services/star-conquest.facade';
 import { starConquestUniverseTheme } from './star-conquest/star-conquest-universes.config';
+import {
+  starConquestFramePerfHints,
+  starConquestLayoutHeight,
+  starConquestLayoutWidth,
+  starConquestNdcToLayout,
+  starConquestRenderSize,
+} from './star-conquest/star-conquest-viewport.util';
 import { STAR_CONQUEST_FEATURES } from './star-conquest/star-conquest-features';
 import { mergeStarConquestKeyPan, starConquestKeyToPanDelta } from './star-conquest/star-conquest-keyboard';
 import { idleStarConquestPanIntent } from './star-conquest/star-conquest-input';
@@ -97,6 +110,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private readonly progress = inject(StarConquestProgressService);
   private readonly facade = inject(StarConquestFacade);
   private readonly zone = inject(NgZone);
+  private readonly animationScheduler = inject(WebGlAnimationSchedulerService);
+  private readonly dualContextGovernor = inject(DualContextGovernorService);
+  private readonly combinedPerfHud = inject(CombinedPerfHudService);
   private facadeSubs: Subscription[] = [];
 
   private scene?: THREE.Scene;
@@ -108,11 +124,13 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private world?: StarConquestWorld;
   private quests: StarQuest[] = [];
 
-  private animationId = 0;
-  private animating = false;
-  private visibilityBinding?: { unsubscribe: () => void };
+  private schedulerUnregister?: () => void;
   private resizeBinding?: ContainerResizeBinding;
   private layoutObserver?: ResizeObserver;
+  private uiChromeRafId = 0;
+  private gpuQuality: StarConquestGpuQuality = 'ultra-low';
+  private hiddenQuestSignature = '';
+  private rewardLabelSignature = '';
   private lastViewportW = 0;
   private lastViewportH = 0;
   /** Après init (quelques frames), la structure Quests est figée hors resize viewport. */
@@ -122,7 +140,6 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private readonly pointerNdc = new THREE.Vector2();
   private readonly worldPos = new THREE.Vector3();
   private readonly projected = new THREE.Vector3();
-  private lastFrameMs = 0;
   /** Accu sim particules : ~30 Hz idle (rendu reste 60 Hz). */
   private conquestSimAccMs = 0;
   private pointerActive = false;
@@ -132,6 +149,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private lastAnchorY = 0;
   private occlusionAccMs = 0;
   private labelAccMs = 0;
+  private renderSkipCounter = 0;
   private safetyBound = false;
   private readonly heldPanKeys = new Set<string>();
   private orbitStroke: StarConquestPointerStroke | null = null;
@@ -185,7 +203,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     try {
       this.renderer = created.renderer;
       this.canvas = created.canvas;
-      const { width, height } = viewportSize();
+      const { width, height } = starConquestRenderSize();
 
       this.scene = new THREE.Scene();
       this.scene.background = null;
@@ -193,7 +211,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.camera.position.z = CAMERA_Z;
 
       this.renderer.setSize(width, height, false);
-      const gpuQuality = mapQualityToQuestGraphQuality(environment.mapQuality ?? 'medium');
+      this.renderer.sortObjects = false;
+      const gpuQuality = mapQualityToQuestGraphQuality('ultra-low');
+      this.gpuQuality = gpuQuality;
       const dpr =
         typeof window !== 'undefined'
           ? Math.min(window.devicePixelRatio || 1, starConquestDprCap(gpuQuality))
@@ -239,11 +259,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       const initialTheme = this.universeService.theme();
       this.conquest.setUniverse(initialTheme);
       this.kgOrchestrator.setUniverse(initialTheme.id);
-      this.relayoutBackground();
-      requestAnimationFrame(() => {
-        this.relayoutBackground();
-        requestAnimationFrame(() => this.relayoutBackground());
-      });
+      this.scheduleInitialRelayout();
 
       this.bindPointer(created.canvas);
       this.bindUiWatchers();
@@ -253,18 +269,23 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
       this.resizeBinding = bindContainerResize(
         this.hostRef.nativeElement,
-        (nextWidth, nextHeight) => this.applyRendererSize(nextWidth, nextHeight),
-        viewportSize()
+        () => this.applyFixedRendererSize(),
+        starConquestRenderSize()
       );
 
-      this.visibilityBinding = bindWebGlVisibilityPause(
-        () => this.pauseAnimation(),
-        () => this.resumeAnimation()
-      );
-
-      this.lastFrameMs = performance.now();
+      this.schedulerUnregister = this.animationScheduler.register({
+        id: 'star-conquest',
+        order: 10,
+        onFrame: (ctx) => this.onSchedulerFrame(ctx),
+        onPause: () => this.renderFrame(),
+        onResume: () => {
+          this.conquestSimAccMs = 0;
+          this.occlusionAccMs = 0;
+          this.labelAccMs = 0;
+        },
+      });
       this.renderFrame();
-      this.resumeAnimation();
+      this.animationScheduler.resumeSubscriber('star-conquest');
       this.progress.recordFunnel('views');
     } catch (error) {
       console.error('[particle-background] Initialisation impossible.', error);
@@ -276,10 +297,15 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     window.removeEventListener('resize', this.onWindowLayout);
     this.unbindSafetyListeners();
     this.layoutObserver?.disconnect();
+    if (this.uiChromeRafId) {
+      cancelAnimationFrame(this.uiChromeRafId);
+      this.uiChromeRafId = 0;
+    }
     this.unbindPointer();
-    this.visibilityBinding?.unsubscribe();
+    this.schedulerUnregister?.();
+    this.schedulerUnregister = undefined;
+    this.animationScheduler.pauseSubscriber('star-conquest');
     this.resizeBinding?.unsubscribe();
-    this.pauseAnimation();
     this.conquestState.endStick();
     this.conquestState.clear();
     this.conquestState.setHiddenQuests([]);
@@ -287,6 +313,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
     this.conquest?.dispose();
     this.kgOrchestrator.destroy();
+    this.camera?.clearViewOffset();
     if (this.world) {
       this.world.dispose();
       this.scene?.remove(this.world.root);
@@ -306,9 +333,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
   private bindUiWatchers(): void {
     if (typeof ResizeObserver === 'undefined') return;
-    // Repli/dépli Angular : chrome only — jamais de relayout de la structure Quests
+    // Repli/dépli Angular : debounce 1 rAF — évite rafales renderFrame.
     this.layoutObserver = new ResizeObserver(() => {
-      this.syncUiChrome();
+      this.scheduleSyncUiChrome();
     });
     for (const sel of [
       'app-navbar',
@@ -327,11 +354,27 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
    * Relayout structure uniquement à l’init (quelques passes) ou si le viewport change.
    * Déplier/replier les onglets ne doit pas déplacer les particules.
    */
+  /** Init layout après chargement CSS — évite « Layout was forced before the page was fully loaded ». */
+  private scheduleInitialRelayout(): void {
+    const run = (): void => {
+      this.relayoutBackground();
+      requestAnimationFrame(() => {
+        this.relayoutBackground();
+        requestAnimationFrame(() => this.relayoutBackground());
+      });
+    };
+    if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+      window.addEventListener('load', run, { once: true });
+      return;
+    }
+    run();
+  }
+
   private relayoutBackground(): void {
     if (!this.camera || !this.conquest) return;
 
-    const vw = window.innerWidth || 1;
-    const vh = window.innerHeight || 1;
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
     const viewportChanged =
       Math.abs(vw - this.lastViewportW) > 1 || Math.abs(vh - this.lastViewportH) > 1;
     const allowStructure =
@@ -355,11 +398,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   /** Placement monde des Quests — ancré, indépendant de l’état des panneaux Angular. */
   private layoutQuestStructure(): void {
     if (!this.camera || !this.conquest) return;
-    const floorPeek =
-      parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
-      ) || 220;
-    const band = measurePlayableBand(floorPeek);
+    const band = measurePlayableBand(readFloorPeekPx());
     layoutQuestsInBand(this.quests, band, this.camera, 0);
     this.conquest.applyPositions(this.quests);
     this.conquest.setSafeScreenBand(
@@ -377,6 +416,15 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.refreshOcclusion();
     this.syncPanelAnchor();
     this.renderFrame();
+  }
+
+  /** Phase 18 — coalesce ResizeObserver callbacks. */
+  private scheduleSyncUiChrome(): void {
+    if (this.uiChromeRafId) return;
+    this.uiChromeRafId = requestAnimationFrame(() => {
+      this.uiChromeRafId = 0;
+      this.syncUiChrome();
+    });
   }
 
   /**
@@ -532,8 +580,8 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       if (this.orbitStroke.dragging && this.world) {
         event.preventDefault?.();
         const panMax = this.world.getPanMax();
-        const vw = this.canvas?.clientWidth || 250;
-        const vh = this.canvas?.clientHeight || 550;
+        const vw = starConquestLayoutWidth();
+        const vh = starConquestLayoutHeight();
         const delta = screenDeltaToWorldPan(
           this.orbitStroke.lastX - prev.lastX,
           this.orbitStroke.lastY - prev.lastY,
@@ -679,11 +727,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
   private hitTest(clientX: number, clientY: number) {
     if (!this.camera || !this.conquest || !this.canvas) return null;
-    const band = measurePlayableBand(
-      parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
-      ) || 220
-    );
+    const band = measurePlayableBand(readFloorPeekPx());
     // Autorise toute la hauteur (y compris sous le floor) — seules les Quests hors bande haute sont exclues
     if (clientY < band.topPx - 8) return null;
 
@@ -782,13 +826,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.world?.content.updateMatrixWorld(true);
     const rects = collectUiOccluderRects();
     const projected = this.conquest.projectAllToScreen(this.camera);
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const band = measurePlayableBand(
-      parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
-      ) || 220
-    );
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
+    const band = measurePlayableBand(readFloorPeekPx());
     const hidden: StarQuest[] = [];
     const seen = new Set<string>();
     for (const p of projected) {
@@ -821,7 +861,14 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         hidden.push(q);
       }
     }
-    this.zone.run(() => this.conquestState.setHiddenQuests(hidden));
+    const signature = hidden
+      .map((q) => q.id)
+      .sort()
+      .join('|');
+    if (signature !== this.hiddenQuestSignature) {
+      this.hiddenQuestSignature = signature;
+      this.conquestState.setHiddenQuests(hidden);
+    }
     this.refreshRewardLabels();
   }
 
@@ -831,36 +878,32 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
    */
   private refreshRewardLabels(): void {
     if (!this.conquest || !this.camera) {
-      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      this.setRewardLabelsIfChanged([]);
       return;
     }
     const focusId = this.focusedId ?? this.hoverPreviewId;
     if (!focusId) {
-      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      this.setRewardLabelsIfChanged([]);
       return;
     }
 
     const projected = this.conquest.projectAllToScreen(this.camera);
-    const band = measurePlayableBand(
-      parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--floor-peek-height')
-      ) || 220
-    );
+    const band = measurePlayableBand(readFloorPeekPx());
     const rects = collectUiOccluderRects();
     const p = projected.find((row) => row.id === focusId);
     if (!p) {
-      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      this.setRewardLabelsIfChanged([]);
       return;
     }
     if (p.x < -6 || p.x > band.viewportW + 6 || p.y < band.topPx - 2 || p.y > band.viewportH + 4) {
-      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      this.setRewardLabelsIfChanged([]);
       return;
     }
 
     const quest = this.conquest.getQuest(p.id);
     const underFloor = quest?.underFloor === true;
     if (p.y > band.floorTopPx + 8 && !underFloor) {
-      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      this.setRewardLabelsIfChanged([]);
       return;
     }
     const occluded = isQuestFullyOccluded(
@@ -870,12 +913,12 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       Math.round(STAR_CONQUEST_SCALE.pickRadiusPx * 0.36)
     );
     if (occluded && !quest?.underGraph) {
-      this.zone.run(() => this.conquestState.setRewardLabels([]));
+      this.setRewardLabelsIfChanged([]);
       return;
     }
 
-    let lx = Math.max(10, Math.min(band.viewportW - 10, p.x + 12));
-    let ly = Math.max(band.topPx + 4, Math.min(band.viewportH - 8, p.y - 10));
+    const lx = Math.max(10, Math.min(band.viewportW - 10, p.x + 12));
+    const ly = Math.max(band.topPx + 4, Math.min(band.viewportH - 8, p.y - 10));
     const label: StarQuestRewardLabel = {
       id: p.id,
       x: lx,
@@ -889,7 +932,18 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       opacity: 1,
     };
 
-    this.zone.run(() => this.conquestState.setRewardLabels([label]));
+    this.setRewardLabelsIfChanged([label]);
+  }
+
+  /** Signals Angular — safe hors NgZone, évite CD globale (Phase 18). */
+  private setRewardLabelsIfChanged(labels: StarQuestRewardLabel[]): void {
+    const signature =
+      labels.length === 0
+        ? ''
+        : `${labels[0]!.id}:${labels[0]!.x.toFixed(1)}:${labels[0]!.y.toFixed(1)}:${labels[0]!.text}`;
+    if (signature === this.rewardLabelSignature) return;
+    this.rewardLabelSignature = signature;
+    this.conquestState.setRewardLabels(labels);
   }
 
   private projectToScreen(
@@ -897,10 +951,11 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   ): { x: number; y: number; compact: boolean } {
     if (!this.camera) return { x: 16, y: 16, compact: true };
     this.projected.copy(world).project(this.camera);
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const sx = (this.projected.x * 0.5 + 0.5) * vw;
-    const sy = (-this.projected.y * 0.5 + 0.5) * vh;
+    const layout = starConquestNdcToLayout(this.projected.x, this.projected.y);
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
+    const sx = layout.x;
+    const sy = layout.y;
     const box = starConquestOverlayBox(vw, vh);
     const joy = this.conquestState.joyExclusion();
     const zone: JoystickExclusionZone | null = joy
@@ -945,19 +1000,15 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     }
     this.lastAnchorX = anchor.x;
     this.lastAnchorY = anchor.y;
-    this.zone.run(() =>
-      this.conquestState.move(anchor.x, anchor.y, anchor.compact)
-    );
+    this.conquestState.move(anchor.x, anchor.y, anchor.compact);
   }
 
-  private animate = (): void => {
-    if (!this.animating || !this.scene || !this.camera || !this.renderer) return;
-    this.animationId = requestAnimationFrame(this.animate);
-    const now = performance.now();
-    const delta = now - this.lastFrameMs;
-    this.lastFrameMs = now;
+  private onSchedulerFrame(ctx: WebGlFrameContext): void {
+    if (!this.scene || !this.camera || !this.renderer) return;
 
-    if (shouldAnimateWebGl()) {
+    const delta = ctx.deltaMs;
+
+    if (ctx.animating) {
       // Stick → transform globale du contenu (pas le floor / joystick)
       if (this.world) {
         const stick = this.conquestState.stick();
@@ -971,15 +1022,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         if (this.camera) {
           this.kgOrchestrator.cameraController.tick(delta, this.camera);
           this.world.applyToCamera(this.camera, this.camera.position.z);
-          const floorPeek =
-            parseFloat(
-              getComputedStyle(document.documentElement).getPropertyValue(
-                '--floor-peek-height'
-              )
-            ) || 220;
+          const band = measurePlayableBand(readFloorPeekPx());
           // Rebond uniquement hors drag — sinon les Quests bas restent inaccessibles
           if (this.conquest && !this.conquestState.worldNavigating()) {
-            const band = measurePlayableBand(floorPeek);
             const projected = this.conquest.projectAllToScreen(this.camera);
             this.world.applyViewportEdgeBounce(projected, band);
           } else {
@@ -992,13 +1037,18 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         }
       }
       if (this.conquest) {
-        // Navigation stick : sim pleine ; idle : ~30 Hz (même look, moins CPU)
+        // Navigation stick : sim pleine (décimée si floor actif) ; idle throttle via gouverneur P21
         if (this.conquestState.worldNavigating()) {
-          this.conquest.tick(delta, this.camera);
+          if (shouldRunScActiveSimTick(ctx.frameIndex, ctx.dual.decimateScActiveSim)) {
+            this.conquest.tick(delta, this.camera);
+          }
           this.conquestSimAccMs = 0;
         } else {
           this.conquestSimAccMs += delta;
-          if (this.conquestSimAccMs >= 33.3) {
+          if (
+            !ctx.dual.deferScIdleSim &&
+            this.conquestSimAccMs >= ctx.dual.scIdleSimIntervalMs
+          ) {
             this.conquest.tick(this.conquestSimAccMs, this.camera);
             this.conquestSimAccMs = 0;
           }
@@ -1012,45 +1062,60 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       }
       this.occlusionAccMs += delta;
       this.labelAccMs += delta;
-      if (this.occlusionAccMs > 280) {
+      const perfHints = starConquestFramePerfHints(this.gpuQuality);
+      if (this.occlusionAccMs > perfHints.occlusionIntervalMs) {
         this.occlusionAccMs = 0;
         this.labelAccMs = 0;
         this.refreshOcclusion();
-      } else if (this.labelAccMs > 48) {
+      } else if (this.labelAccMs > perfHints.labelIntervalMs) {
         this.labelAccMs = 0;
         this.refreshRewardLabels();
       }
     }
-    this.renderFrame();
-  };
+    this.dualContextGovernor.setScWorldNavigating(this.conquestState.worldNavigating());
+    if (this.shouldRenderThisFrame(ctx)) {
+      this.renderFrame();
+    }
+    this.combinedPerfHud.reportStarConquest(this.renderer.info);
+  }
+
+  /** Skip render idle si dual-context over-budget (fill rate 250×550 déjà bas). */
+  private shouldRenderThisFrame(ctx: WebGlFrameContext): boolean {
+    if (this.conquestState.worldNavigating() || this.conquestState.selected()) {
+      return true;
+    }
+    const hints = starConquestFramePerfHints(this.gpuQuality);
+    if (!ctx.dual.dualContextActive || !ctx.overBudget || !hints.skipRenderWhenIdleDual) {
+      return true;
+    }
+    this.renderSkipCounter += 1;
+    return this.renderSkipCounter % 2 === 0;
+  }
 
   private renderFrame(): void {
     if (!this.scene || !this.camera || !this.renderer) return;
+    this.camera.clearViewOffset();
+    this.renderer.setScissorTest(false);
+    const w = this.renderer.domElement.width;
+    const h = this.renderer.domElement.height;
+    if (w > 0 && h > 0) {
+      this.renderer.setViewport(0, 0, w, h);
+      this.renderer.setScissor(0, 0, w, h);
+    }
     this.renderer.render(this.scene, this.camera);
   }
 
-  private pauseAnimation(): void {
-    this.renderFrame();
-    this.animating = false;
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = 0;
-    }
-  }
-
-  private resumeAnimation(): void {
-    if (this.animating) return;
-    this.animating = true;
-    this.lastFrameMs = performance.now();
-    this.animate();
-  }
-
-  private applyRendererSize(width: number, height: number): void {
+  private applyFixedRendererSize(): void {
     if (!this.camera || !this.renderer) return;
-    this.camera.aspect = width / height;
+    const { width, height } = starConquestRenderSize();
+    this.camera.clearViewOffset();
+    this.camera.aspect = width / Math.max(1, height);
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height, false);
-    const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+    const dpr =
+      typeof window !== 'undefined'
+        ? Math.min(window.devicePixelRatio || 1, starConquestDprCap(this.gpuQuality))
+        : 1;
     this.renderer.setPixelRatio(dpr);
     this.relayoutBackground();
   }

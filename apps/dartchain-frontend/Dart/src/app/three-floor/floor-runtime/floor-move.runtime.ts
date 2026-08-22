@@ -6,6 +6,8 @@ import { GeoCoordinateService } from '../../core/map/geo-coordinate.service';
 import { MapConfigService } from '../../core/map/map-config.service';
 import { MapLoadingService } from '../../core/map/map-loading.service';
 import { METRO_SPAWN_ANCHOR, MOVE_JOYSTICK_CONFIG } from '../../core/map/map-configuration';
+import { mapPerfProfile } from '../../core/map/marseille-perf.config';
+import { DualContextGovernorService } from '../../core/utils/dual-context-governor.service';
 import { CHARACTER_ASSETS } from '../../core/services/character-assets.config';
 import { CameraControlService } from '../../core/services/camera-control.service';
 import { CharacterNftService } from '../../core/services/character-nft.service';
@@ -32,6 +34,7 @@ export class FloorMoveRuntime {
   private readonly mapLoading = inject(MapLoadingService);
   private readonly mapConfig = inject(MapConfigService);
   private readonly geo = inject(GeoCoordinateService);
+  private readonly dualContextGovernor = inject(DualContextGovernorService);
   private readonly zone = inject(NgZone);
 
   private readonly footClearanceMeters = CHARACTER_ASSETS.footClearanceMeters;
@@ -59,6 +62,7 @@ export class FloorMoveRuntime {
   };
 
   private readonly velocity = new THREE.Vector3();
+  private mapIdleTick = 0;
   private readonly onKeyDown = (e: KeyboardEvent): void => this.setKey(e, true);
   private readonly onKeyUp = (e: KeyboardEvent): void => this.setKey(e, false);
   private keysBound = false;
@@ -214,7 +218,22 @@ export class FloorMoveRuntime {
       this.runnerState.progress = Math.max(0, -nextZ);
       this.world.update(this.runnerState.progress);
     } else {
-      this.mapLoading.update(state.mesh.position);
+      const avatarMoved = (nextX - prevX) ** 2 + (nextZ - prevZ) ** 2 > 1e-6;
+      const camNudging =
+        this.keys.camL || this.keys.camR || this.keys.camU || this.keys.camD;
+      const stickActive = Math.hypot(this.moveX, this.moveY) > 0.05;
+      this.dualContextGovernor.setFloorAvatarMoving(avatarMoved || camNudging || stickActive);
+      if (avatarMoved || camNudging) {
+        this.mapIdleTick = 0;
+        this.mapLoading.update(state.mesh.position);
+      } else {
+        this.mapIdleTick++;
+        const idleEvery =
+          mapPerfProfile(this.mapConfig.configuration.quality).mapSimIdleTickSkip + 1;
+        if (this.mapIdleTick % idleEvery === 0) {
+          this.mapLoading.update(state.mesh.position);
+        }
+      }
     }
 
     this.character.updateAnimation(

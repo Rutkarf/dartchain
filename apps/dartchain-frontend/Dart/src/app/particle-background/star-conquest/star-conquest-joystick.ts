@@ -1,8 +1,16 @@
 import * as THREE from 'three';
-import { measureGapAboveFloor, screenToWorldOnPlane } from './star-conquest-layout';
+import {
+  measureGapAboveFloor,
+  screenToWorldOnPlane,
+} from './star-conquest-layout';
 import { createSoftDiscTexture } from './star-conquest-visuals';
-import { isScreenPointBlockedByUi } from './star-conquest-occlusion';
+import { isLayoutPointBlockedByUi, isScreenPointBlockedByUi } from './star-conquest-occlusion';
 import { STAR_CONQUEST_OVERLAY } from './star-conquest-scale';
+import {
+  starConquestLayoutHeight,
+  starConquestLayoutWidth,
+  starConquestNdcToLayout,
+} from './star-conquest-viewport.util';
 import {
   exclusionFromRect,
   type JoystickExclusionZone,
@@ -304,8 +312,8 @@ export class StarConquestJoystick {
     floorPeekPx = 64
   ): void {
     this.floorCanvas = null;
-    const vw = Math.max(window.innerWidth, 1);
-    const vh = Math.max(window.innerHeight, 1);
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
 
     if (
       this.anchor &&
@@ -329,7 +337,7 @@ export class StarConquestJoystick {
     let sx = gap.centerX;
     let sy = gap.midY;
 
-    if (isScreenPointBlockedByUi(sx, sy + JOY_Y_OFFSET_PX)) {
+    if (isLayoutPointBlockedByUi(sx, sy + JOY_Y_OFFSET_PX)) {
       const candidates: Array<[number, number]> = [
         [sx, gap.top + gap.height * 0.65],
         [sx, gap.top + gap.height * 0.35],
@@ -338,7 +346,7 @@ export class StarConquestJoystick {
       ];
       for (const [x, y] of candidates) {
         if (y < gap.top || y > gap.bottom) continue;
-        if (!isScreenPointBlockedByUi(x, y + JOY_Y_OFFSET_PX)) {
+        if (!isLayoutPointBlockedByUi(x, y + JOY_Y_OFFSET_PX)) {
           sx = x;
           sy = y;
           break;
@@ -374,7 +382,7 @@ export class StarConquestJoystick {
     this.group.position.copy(world);
     this.group.quaternion.copy(camera.quaternion);
     this.group.scale.setScalar(scale);
-    this.interactive = !isScreenPointBlockedByUi(sx, sy);
+    this.interactive = !isLayoutPointBlockedByUi(sx, sy);
     this.group.visible = this.interactive;
   }
 
@@ -399,8 +407,8 @@ export class StarConquestJoystick {
   }
 
   getExclusionZone(camera: THREE.Camera, padPx = 8): JoystickExclusionZone {
-    const vw = window.innerWidth || 1;
-    const vh = window.innerHeight || 1;
+    const vw = starConquestLayoutWidth();
+    const vh = starConquestLayoutHeight();
     // Un seul rayon = bordure visuelle (plus d’anneaux ×1.55)
     const localR = RING_R * 1.02;
     const samples = [
@@ -584,11 +592,10 @@ export class StarConquestJoystick {
     this.tmp.set(0, 0, 0);
     this.group.localToWorld(this.tmp);
     this.projected.copy(this.tmp).project(camera);
-    const vw = window.innerWidth || 1;
-    const vh = window.innerHeight || 1;
-    this.screenX = (this.projected.x * 0.5 + 0.5) * vw;
-    this.screenY = (-this.projected.y * 0.5 + 0.5) * vh;
-    this.interactive = !isScreenPointBlockedByUi(this.screenX, this.screenY);
+    const layout = starConquestNdcToLayout(this.projected.x, this.projected.y);
+    this.screenX = layout.x;
+    this.screenY = layout.y;
+    this.interactive = !isLayoutPointBlockedByUi(this.screenX, this.screenY);
     this.group.visible = this.interactive;
   }
 

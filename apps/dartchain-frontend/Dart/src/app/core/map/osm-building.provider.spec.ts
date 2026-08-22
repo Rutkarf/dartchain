@@ -46,6 +46,7 @@ describe('OSMBuildingProvider cache', () => {
     const around = await provider.loadBuildingsAround(43.2965, 5.37, 500);
     expect(around).toHaveLength(1);
     expect(around[0].id).toBe('osm-way-42');
+    expect(around[0].heightSource).toBe('levels');
   });
 
   it('filters cached footprints around a GPS center', async () => {

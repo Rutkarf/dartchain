@@ -14,7 +14,7 @@ export interface MapEnvironment {
   enableOsmBuildings?: boolean;
   enableTerrain?: boolean;
   mapDebug?: boolean;
-  mapQuality?: 'low' | 'medium' | 'high';
+  mapQuality?: 'ultra-low' | 'low' | 'medium' | 'high';
   opentopographyApiKey?: string;
 }
 
@@ -43,7 +43,7 @@ export const environment = {
   enableOsmBuildings: true,
   enableTerrain: true,
   mapDebug: false,
-  mapQuality: 'medium',
+  mapQuality: 'ultra-low',
   opentopographyApiKey: '',
 } satisfies ProductEnvironment &
   MapEnvironment & {

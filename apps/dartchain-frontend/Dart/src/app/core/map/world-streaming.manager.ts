@@ -7,7 +7,10 @@ import {
   WORLD_SCALE,
   type MarseilleDistrictId,
 } from './map-configuration';
-import { VIEUX_PORT_CORE_BUILDING_RADIUS } from './geo-reference.config';
+import {
+  streamingBuildingBudget,
+  streamingCoreFadeFactor,
+} from './world-streaming-visual.util';
 import {
   chunkBounds,
   chunkIdFromGrid,
@@ -123,9 +126,9 @@ export class WorldStreamingManager {
     });
     this.wallMaterials = [
       new THREE.MeshStandardMaterial({ color: 0xcbb8a0, roughness: 0.84, metalness: 0.05 }),
+      new THREE.MeshStandardMaterial({ color: 0xd8c3a5, roughness: 0.82, metalness: 0.04 }),
+      new THREE.MeshStandardMaterial({ color: 0xbfa88c, roughness: 0.86, metalness: 0.03 }),
       new THREE.MeshStandardMaterial({ color: 0xe08ab8, roughness: 0.7, metalness: 0.08 }),
-      new THREE.MeshStandardMaterial({ color: 0x7aa6ff, roughness: 0.45, metalness: 0.22 }),
-      new THREE.MeshStandardMaterial({ color: 0x8d7cff, roughness: 0.5, metalness: 0.18 }),
       new THREE.MeshStandardMaterial({ color: 0xd9c4a2, roughness: 0.8, metalness: 0.04 }),
       new THREE.MeshStandardMaterial({
         color: MARSEILLE_DISTRICTS['le-panier'].palette,
@@ -184,11 +187,12 @@ export class WorldStreamingManager {
     const centerX = (bounds.minX + bounds.maxX) * 0.5;
     const centerZ = (bounds.minZ + bounds.maxZ) * 0.5;
 
-    const inCore = Math.hypot(centerX, centerZ) < VIEUX_PORT_CORE_BUILDING_RADIUS;
+    const coreFade = streamingCoreFadeFactor(centerX, centerZ);
+    const inCore = coreFade <= 0;
     const district = this.nearestDistrict(centerX, centerZ);
     let buildingCount = 0;
 
-    if (!inCore) {
+    if (!inCore && coreFade > 0.08) {
       const groundGeo = new THREE.PlaneGeometry(
         WORLD_SCALE.chunkSizeMeters,
         WORLD_SCALE.chunkSizeMeters
@@ -203,9 +207,9 @@ export class WorldStreamingManager {
       if (district === 'notre-dame') {
         buildingCount += this.addNotreDameHill(group, geometries, centerX, centerZ);
       } else if (district === 'la-plaine') {
-        buildingCount += this.addPlainePlaza(group, geometries, centerX, centerZ, seed);
+        buildingCount += this.addPlainePlaza(group, geometries, centerX, centerZ, seed, coreFade);
       } else {
-        buildingCount += this.addSeededBlocks(group, geometries, bounds, seed, district);
+        buildingCount += this.addSeededBlocks(group, geometries, bounds, seed, district, coreFade);
       }
     }
 
@@ -264,14 +268,17 @@ export class WorldStreamingManager {
     geometries: THREE.BufferGeometry[],
     bounds: ReturnType<typeof chunkBounds>,
     seed: number,
-    district: MarseilleDistrictId
+    district: MarseilleDistrictId,
+    coreFade = 1
   ): number {
-    const count =
+    const baseCount =
       district === 'cours-julien' || district === 'joliette'
         ? 8
         : district === 'canebiere' || district === 'le-panier'
           ? 7
           : 6;
+    const count = streamingBuildingBudget(baseCount, coreFade);
+    if (count <= 0) return 0;
     let built = 0;
     for (let i = 0; i < count; i++) {
       const u = this.unit(seed + i * 19);
@@ -352,7 +359,8 @@ export class WorldStreamingManager {
     geometries: THREE.BufferGeometry[],
     x: number,
     z: number,
-    seed: number
+    seed: number,
+    coreFade = 1
   ): number {
     if (!this.groundMaterial) return 0;
     const plazaGeo = new THREE.CircleGeometry(36, 32);
@@ -384,7 +392,8 @@ export class WorldStreamingManager {
         maxZ: z + 58,
       },
       seed,
-      'la-plaine'
+      'la-plaine',
+      coreFade
     );
   }
 
@@ -422,6 +431,10 @@ export class WorldStreamingManager {
   private wallForDistrict(district: MarseilleDistrictId, index: number): THREE.MeshStandardMaterial {
     if (district === 'le-panier') return this.wallMaterials[5] ?? this.wallMaterials[0];
     if (district === 'joliette') return this.wallMaterials[6] ?? this.wallMaterials[0];
+    if (district === 'vieux-port' || district === 'canebiere') {
+      const haussmann = [0, 1, 2, 4][index % 4];
+      return this.wallMaterials[haussmann] ?? this.wallMaterials[0];
+    }
     return this.wallMaterials[index % Math.min(5, this.wallMaterials.length)];
   }
 

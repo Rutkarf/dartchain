@@ -1,20 +1,10 @@
-export const MARSEILLE_ATMOSPHERE_PRESETS = {
-  currentGameplay: {
-    id: 'current-gameplay',
-    fogEnabled: false,
-    fogDensity: 0,
-    nightShift: false,
-  },
-  nightHarbor: {
-    id: 'night-harbor',
-    fogEnabled: true,
-    fogDensity: 0.008,
-    nightShift: true,
-  },
-} as const;
-
-export const ACTIVE_ATMOSPHERE_PRESET_ID = 'currentGameplay' as const;
-
-export function activeAtmospherePreset() {
-  return MARSEILLE_ATMOSPHERE_PRESETS[ACTIVE_ATMOSPHERE_PRESET_ID];
-}
+export {
+  ACTIVE_ATMOSPHERE_PRESET_ID,
+  MARSEILLE_ATMOSPHERE_LIGHTS,
+  MARSEILLE_ATMOSPHERE_PRESETS,
+  activeAtmospherePreset,
+  atmosphereBloomStrength,
+  atmosphereShadowMapSize,
+  atmosphereUsesPostFx,
+  type MarseilleAtmospherePresetId,
+} from '../marseille-atmosphere.config';
