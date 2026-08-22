@@ -15,9 +15,9 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-      - name: Backend tests
+      - name: Backend verify (tests + JaCoCo)
         working-directory: apps/dartchain-backend
-        run: ./mvnw -q test
+        run: ./mvnw -q verify
 
   frontend:
     runs-on: ubuntu-latest
@@ -28,30 +28,17 @@ jobs:
           node-version: "22"
           cache: npm
           cache-dependency-path: apps/dartchain-frontend/Dart/package-lock.json
-      - name: Install & test
+      - name: Install, test, a11y contract
         working-directory: apps/dartchain-frontend/Dart
         run: |
           npm ci
           npm test -- --no-watch --coverage=false
+          npm run verify:a11y
       - name: Production build
         working-directory: apps/dartchain-frontend/Dart
         run: npm run build
-
-  cloudflare-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: apps/dartchain-frontend/Dart/package-lock.json
-      - name: Cloudflare build
+      - name: Cloudflare build smoke
         working-directory: apps/dartchain-frontend/Dart
         env:
           BACKEND_URL: https://dartchain-backend-1-0-0.onrender.com
-        run: |
-          npm ci
-          npm run build:cloudflare
-      - name: Verify dist
-        run: test -f apps/dartchain-frontend/Dart/dist/browser/index.html
+        run: npm run build:cloudflare

@@ -63,14 +63,15 @@ Stack Docker : `cd apps/dartchain-backend && npm run dev:stack`
 ## Validation
 
 ```bash
-# Frontend — tests Vitest
+# Frontend — tests Vitest + contrat a11y
 cd apps/dartchain-frontend/Dart
 npm test -- --no-watch --coverage=false
+npm run verify:a11y
 npm run build
 
-# Backend
+# Backend — tests + gate JaCoCo (verify)
 cd apps/dartchain-backend
-./mvnw test
+./mvnw verify
 ```
 
 ## Scripts npm utiles

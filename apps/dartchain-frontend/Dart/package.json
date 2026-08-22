@@ -16,7 +16,8 @@
     "verify:chain": "ng test --no-watch --coverage=false --include=**/wallet-address.util.spec.ts",
     "verify:admin": "ng test --no-watch --coverage=false --include=**/ops-snapshot.service.spec.ts --include=**/admin-panel.spec.ts",
     "verify:a11y": "ng test --no-watch --coverage=false --include=**/a11y-contract.spec.ts",
-    "verify:release": "npm run verify:release --prefix ../../dartchain-backend && npm run test:coverage"
+    "verify:release": "npm run verify:release --prefix ../../dartchain-backend && npm run test:coverage",
+    "verify:quality": "npm test -- --no-watch --coverage=false && npm run verify:a11y"
   },
   "prettier": {
     "printWidth": 100,
