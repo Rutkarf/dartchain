@@ -157,7 +157,6 @@
               "src/app/r4v3-scene/**/*.ts",
               "src/app/metaverse/three-floor.ts",
               "src/app/star-conquest/components/particle-background/**/*.ts",
-              "src/app/viewport-300x600.ts",
               "src/app/dock/services/dock-*-state.service.ts",
               "src/app/dock/services/dock-navigation.service.ts",
               "src/app/core/utils/detect-webgl.util.ts",

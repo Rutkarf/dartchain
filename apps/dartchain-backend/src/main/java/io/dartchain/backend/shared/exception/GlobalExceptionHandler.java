@@ -2,7 +2,7 @@ package io.dartchain.backend.shared.exception;
 
 import io.dartchain.backend.api.ApiProblemDetails;
 import io.dartchain.backend.api.ApiV1Support;
-import io.dartchain.backend.auth.AuthException;
+import io.dartchain.backend.auth.application.AuthException;
 import io.dartchain.backend.shared.dto.ApiErrorResponse;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
 import io.dartchain.backend.ops.RequestCorrelationFilter;

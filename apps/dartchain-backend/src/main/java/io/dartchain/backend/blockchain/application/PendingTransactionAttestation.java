@@ -1,6 +1,6 @@
 package io.dartchain.backend.blockchain.application;
 
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.blockchain.model.PendingTransaction;
 import io.dartchain.backend.shared.utils.HashUtils;

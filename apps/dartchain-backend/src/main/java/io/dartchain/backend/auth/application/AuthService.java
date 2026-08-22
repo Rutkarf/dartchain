@@ -1,6 +1,8 @@
-package io.dartchain.backend.auth;
+package io.dartchain.backend.auth.application;
 
 import io.dartchain.backend.auth.audit.AuthAuditService;
+import io.dartchain.backend.auth.model.UserAccount;
+import io.dartchain.backend.auth.model.UserRole;
 import io.dartchain.backend.auth.dto.AuthResponse;
 import io.dartchain.backend.auth.dto.LinkWalletRequest;
 import io.dartchain.backend.auth.dto.LoginRequest;

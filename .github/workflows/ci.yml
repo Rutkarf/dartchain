@@ -42,3 +42,12 @@ jobs:
         env:
           BACKEND_URL: https://dartchain-backend-1-0-0.onrender.com
         run: npm run build:cloudflare
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend Docker image
+        run: docker build -t dartchain-backend:ci apps/dartchain-backend
+      - name: Build frontend Docker image
+        run: docker build -t dartchain-frontend:ci apps/dartchain-frontend/Dart

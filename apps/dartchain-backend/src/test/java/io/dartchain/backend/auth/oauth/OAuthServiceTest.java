@@ -29,11 +29,11 @@ class OAuthServiceTest {
 
         UserAccountStore userAccountStore = mock(UserAccountStore.class);
         OAuthIdentityStore oauthIdentityStore = new InMemoryOAuthIdentityStore();
+        OAuthUserProvisioner userProvisioner = new OAuthUserProvisioner(userAccountStore, oauthIdentityStore);
 
         oauthService = new OAuthService(
                 oauthProperties,
-                userAccountStore,
-                oauthIdentityStore,
+                userProvisioner,
                 new InMemoryOAuthStateStore(),
                 new InMemoryOAuthExchangeCodeStore(),
                 new ObjectMapper()

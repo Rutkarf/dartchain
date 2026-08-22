@@ -1,4 +1,4 @@
-package io.dartchain.backend.auth;
+package io.dartchain.backend.auth.persistence;
 
 import io.dartchain.backend.auth.store.SessionStore;
 import org.springframework.beans.factory.annotation.Value;

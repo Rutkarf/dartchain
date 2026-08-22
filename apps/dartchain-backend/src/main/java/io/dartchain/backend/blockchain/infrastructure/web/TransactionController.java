@@ -1,6 +1,6 @@
 package io.dartchain.backend.blockchain.infrastructure.web;
 
-import io.dartchain.backend.auth.AuthService;
+import io.dartchain.backend.auth.application.AuthService;
 import io.dartchain.backend.blockchain.dto.CreateTransactionRequest;
 import io.dartchain.backend.blockchain.dto.TransactionResponse;
 import io.dartchain.backend.blockchain.model.Transaction;

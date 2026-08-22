@@ -1,14 +1,10 @@
 package io.dartchain.backend.auth.oauth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dartchain.backend.auth.AuthException;
-import io.dartchain.backend.auth.AuthNormalizer;
-import io.dartchain.backend.auth.PasswordHasher;
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.application.AuthException;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.auth.oauth.dto.OAuthProviderInfo;
 import io.dartchain.backend.auth.oauth.dto.OAuthProvidersResponse;
-import io.dartchain.backend.auth.oauth.store.OAuthIdentityStore;
-import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.config.ApiRoutes;
 import io.dartchain.backend.config.OAuthProperties;
 import org.springframework.stereotype.Service;
@@ -24,21 +20,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 @Service
 public class OAuthService {
 
-    private static final String OAUTH_PASSWORD_SENTINEL = "$OAUTH$";
     private static final String DEV_MOCK_CODE_PREFIX = "dev-mock:";
-    private static final Pattern USERNAME_SANITIZER = Pattern.compile("[^A-Za-z0-9_]+");
 
     private final OAuthProperties oauthProperties;
-    private final UserAccountStore userAccountStore;
-    private final OAuthIdentityStore oauthIdentityStore;
+    private final OAuthUserProvisioner userProvisioner;
     private final InMemoryOAuthStateStore stateStore;
     private final InMemoryOAuthExchangeCodeStore exchangeCodeStore;
     private final RestClient restClient;
@@ -46,15 +37,13 @@ public class OAuthService {
 
     public OAuthService(
             OAuthProperties oauthProperties,
-            UserAccountStore userAccountStore,
-            OAuthIdentityStore oauthIdentityStore,
+            OAuthUserProvisioner userProvisioner,
             InMemoryOAuthStateStore stateStore,
             InMemoryOAuthExchangeCodeStore exchangeCodeStore,
             ObjectMapper objectMapper
     ) {
         this.oauthProperties = oauthProperties;
-        this.userAccountStore = userAccountStore;
-        this.oauthIdentityStore = oauthIdentityStore;
+        this.userProvisioner = userProvisioner;
         this.stateStore = stateStore;
         this.exchangeCodeStore = exchangeCodeStore;
         this.objectMapper = objectMapper;
@@ -156,7 +145,7 @@ public class OAuthService {
 
             String frontendRedirect = stateStore.consumeRedirectUri(state)
                     .orElse(normalizeFrontendRedirect(null));
-            UserAccount account = resolveOrCreateOAuthUser(
+            UserAccount account = userProvisioner.resolveOrCreate(
                     provider,
                     "dev-mock-" + provider.id(),
                     "oauth." + provider.id() + "@dartchain.local",
@@ -242,7 +231,7 @@ public class OAuthService {
             throw new AuthException(502, "Profil Google incomplet");
         }
 
-        return resolveOrCreateOAuthUser(
+        return userProvisioner.resolveOrCreate(
                 OAuthProvider.GOOGLE,
                 profile.sub(),
                 requireEmail(profile.email(), "Google"),
@@ -283,7 +272,7 @@ public class OAuthService {
             throw new AuthException(502, "Profil Meta incomplet");
         }
 
-        return resolveOrCreateOAuthUser(
+        return userProvisioner.resolveOrCreate(
                 OAuthProvider.META,
                 profile.id(),
                 requireEmail(profile.email(), "Meta"),
@@ -321,7 +310,7 @@ public class OAuthService {
             email = "apple." + claims.sub() + "@oauth.dartchain.local";
         }
 
-        return resolveOrCreateOAuthUser(
+        return userProvisioner.resolveOrCreate(
                 OAuthProvider.APPLE,
                 claims.sub(),
                 email,
@@ -366,7 +355,7 @@ public class OAuthService {
             email = "microsoft." + profile.id() + "@oauth.dartchain.local";
         }
 
-        return resolveOrCreateOAuthUser(
+        return userProvisioner.resolveOrCreate(
                 OAuthProvider.MICROSOFT,
                 profile.id(),
                 email,
@@ -412,7 +401,7 @@ public class OAuthService {
             email = "github." + profile.id() + "@oauth.dartchain.local";
         }
 
-        return resolveOrCreateOAuthUser(
+        return userProvisioner.resolveOrCreate(
                 OAuthProvider.GITHUB,
                 profile.id(),
                 email,
@@ -455,7 +444,7 @@ public class OAuthService {
 
         String email = "x." + profile.data().id() + "@oauth.dartchain.local";
 
-        return resolveOrCreateOAuthUser(
+        return userProvisioner.resolveOrCreate(
                 OAuthProvider.X,
                 profile.data().id(),
                 email,
@@ -504,7 +493,7 @@ public class OAuthService {
             displayName = profile.username();
         }
 
-        return resolveOrCreateOAuthUser(
+        return userProvisioner.resolveOrCreate(
                 OAuthProvider.DISCORD,
                 profile.id(),
                 email,
@@ -557,79 +546,6 @@ public class OAuthService {
         }
 
         return email.trim();
-    }
-
-    private UserAccount resolveOrCreateOAuthUser(
-            OAuthProvider provider,
-            String providerSubject,
-            String email,
-            String displayName
-    ) {
-        Optional<OAuthIdentity> existingIdentity = oauthIdentityStore.findByProviderSubject(provider, providerSubject);
-        if (existingIdentity.isPresent()) {
-            return userAccountStore.findById(existingIdentity.get().userId())
-                    .orElseThrow(() -> new AuthException(404, "Compte OAuth introuvable"));
-        }
-
-        String normalizedEmail = AuthNormalizer.normalizeEmail(email);
-        Optional<UserAccount> byEmail = userAccountStore.findByEmail(normalizedEmail);
-        if (byEmail.isPresent()) {
-            UserAccount linked = byEmail.get();
-            if (!PasswordHasher.isOAuthAccount(linked.getPasswordHash())) {
-                throw new AuthException(409, "Un compte existe déjà avec cet email. Connectez-vous avec votre mot de passe.");
-            }
-            linkIdentity(linked.getId(), provider, providerSubject);
-            return linked;
-        }
-
-        UserAccount account = new UserAccount(
-                UUID.randomUUID().toString(),
-                generateUsername(normalizedEmail, displayName),
-                normalizedEmail,
-                OAUTH_PASSWORD_SENTINEL,
-                "",
-                System.currentTimeMillis()
-        );
-        userAccountStore.create(account);
-        linkIdentity(account.getId(), provider, providerSubject);
-        return account;
-    }
-
-    private void linkIdentity(String userId, OAuthProvider provider, String providerSubject) {
-        oauthIdentityStore.create(new OAuthIdentity(
-                UUID.randomUUID().toString(),
-                userId,
-                provider,
-                providerSubject,
-                System.currentTimeMillis()
-        ));
-    }
-
-    private String generateUsername(String email, String displayName) {
-        String base = USERNAME_SANITIZER.matcher(
-                displayName == null || displayName.isBlank()
-                        ? email.substring(0, email.indexOf('@'))
-                        : displayName
-        ).replaceAll("_").toLowerCase(Locale.ROOT);
-
-        if (base.length() < 3) {
-            base = "user";
-        }
-        if (base.length() > 24) {
-            base = base.substring(0, 24);
-        }
-
-        String candidate = base;
-        int attempt = 0;
-        while (userAccountStore.findByUsername(candidate).isPresent()) {
-            attempt++;
-            candidate = base + attempt;
-            if (candidate.length() > 32) {
-                candidate = base.substring(0, Math.max(3, 32 - String.valueOf(attempt).length())) + attempt;
-            }
-        }
-
-        return candidate;
     }
 
     private void ensureRealProviderEnabled(OAuthProvider provider) {

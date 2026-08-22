@@ -8,7 +8,7 @@ import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import io.dartchain.backend.auth.AuthException;
+import io.dartchain.backend.auth.application.AuthException;
 import io.dartchain.backend.config.OAuthProperties;
 
 import java.security.interfaces.ECPrivateKey;

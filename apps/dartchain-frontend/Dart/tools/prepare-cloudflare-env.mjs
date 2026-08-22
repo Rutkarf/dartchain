@@ -28,33 +28,18 @@ const kpiDebug = ['true', '1', 'yes', 'on'].includes(
   String(process.env.STAR_CONQUEST_KPI_DEBUG ?? 'false').toLowerCase(),
 );
 
-const contents = `import type { MapEnvironment, ProductEnvironment } from './environment';
+const contents = `import { buildEnvironment } from './environment.factory';
 
 /** Build Cloudflare — généré par tools/prepare-cloudflare-env.mjs */
-export const environment = {
+export const environment = buildEnvironment({
   production: true,
   apiUrl: '${backendUrl}/api',
   liveWsUrl: 'wss://${backendHost}/ws/live',
   chatWsUrl: 'wss://${backendHost}/ws/chat',
-  commercial: true,
-  faucetEnabled: true,
   showcaseEnabled: ${showcaseEnabled},
   starConquestOverlayEnabled: ${starConquestOverlay},
   starConquestKpiDebug: ${kpiDebug},
-  mapEnabled: true,
-  mapProvider: 'marseille-osm-three',
-  enableOsmBuildings: true,
-  enableTerrain: true,
-  mapDebug: false,
-  mapQuality: 'ultra-low' as const,
-  opentopographyApiKey: '',
-} satisfies ProductEnvironment &
-  MapEnvironment & {
-    production: boolean;
-    apiUrl: string;
-    liveWsUrl: string;
-    chatWsUrl: string;
-  };
+});
 `;
 
 writeFileSync(outPath, contents, 'utf8');

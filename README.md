@@ -69,7 +69,7 @@ npm test -- --no-watch --coverage=false
 npm run verify:a11y
 npm run build
 
-# Backend — tests + gate JaCoCo (verify)
+# Backend — tests + gate JaCoCo (verify, floor 65%)
 cd apps/dartchain-backend
 ./mvnw verify
 ```

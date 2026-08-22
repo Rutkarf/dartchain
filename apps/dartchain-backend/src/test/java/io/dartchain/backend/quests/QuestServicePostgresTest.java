@@ -41,7 +41,7 @@ class QuestServicePostgresTest {
     }
 
     @Autowired
-    private io.dartchain.backend.auth.AuthService authService;
+    private io.dartchain.backend.auth.application.AuthService authService;
 
     @Autowired
     private QuestService questService;

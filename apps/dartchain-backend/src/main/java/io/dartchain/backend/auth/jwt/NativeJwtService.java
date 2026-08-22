@@ -2,8 +2,8 @@ package io.dartchain.backend.auth.jwt;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dartchain.backend.auth.AuthException;
-import io.dartchain.backend.auth.UserRole;
+import io.dartchain.backend.auth.application.AuthException;
+import io.dartchain.backend.auth.model.UserRole;
 import io.dartchain.backend.config.AuthProperties;
 import org.springframework.stereotype.Service;
 

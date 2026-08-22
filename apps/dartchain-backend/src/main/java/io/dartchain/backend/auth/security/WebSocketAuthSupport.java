@@ -1,7 +1,7 @@
 package io.dartchain.backend.auth.security;
 
-import io.dartchain.backend.auth.AuthService;
-import io.dartchain.backend.auth.AuthTokenResolver;
+import io.dartchain.backend.auth.application.AuthService;
+import io.dartchain.backend.auth.application.AuthTokenResolver;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;

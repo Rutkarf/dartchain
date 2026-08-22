@@ -73,8 +73,14 @@ describe('a11y & UX contract (ex verify-a11y-ux.sh)', () => {
       read(join(appSrc, 'core/config/product-config.service.ts')),
     );
     expectContains(
-      'commercial env prod',
+      'commercial env defaults',
       'commercial: true',
+      'environment.factory.ts',
+      read(join(frontRoot, 'src/environments/environment.factory.ts')),
+    );
+    expectContains(
+      'prod build uses factory',
+      'buildEnvironment',
       'environment.prod.ts',
       read(join(frontRoot, 'src/environments/environment.prod.ts')),
     );

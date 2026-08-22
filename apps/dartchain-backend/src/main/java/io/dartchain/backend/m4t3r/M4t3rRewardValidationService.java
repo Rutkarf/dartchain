@@ -1,6 +1,6 @@
 package io.dartchain.backend.m4t3r;
 
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.m4t3r.config.M4t3rRewardConfig;
 import io.dartchain.backend.m4t3r.dto.M4t3rTrailPickupRequest;
 import io.dartchain.backend.m4t3r.dto.WorldPoint;

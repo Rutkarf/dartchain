@@ -1,7 +1,7 @@
 package io.dartchain.backend.auth.security;
 
-import io.dartchain.backend.auth.AuthTokenResolver;
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.application.AuthTokenResolver;
+import io.dartchain.backend.auth.model.UserAccount;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

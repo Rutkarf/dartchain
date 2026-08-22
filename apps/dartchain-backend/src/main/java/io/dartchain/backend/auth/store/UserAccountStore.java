@@ -1,6 +1,6 @@
 package io.dartchain.backend.auth.store;
 
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.model.UserAccount;
 
 import java.util.Optional;
 

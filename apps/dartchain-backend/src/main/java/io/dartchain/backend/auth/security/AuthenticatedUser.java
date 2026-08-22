@@ -1,7 +1,7 @@
 package io.dartchain.backend.auth.security;
 
-import io.dartchain.backend.auth.UserAccount;
-import io.dartchain.backend.auth.UserRole;
+import io.dartchain.backend.auth.model.UserAccount;
+import io.dartchain.backend.auth.model.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 

@@ -1,10 +1,10 @@
 package io.dartchain.backend.support;
 
-import io.dartchain.backend.auth.AuthService;
-import io.dartchain.backend.auth.AuthTokenResolver;
-import io.dartchain.backend.auth.InMemoryRefreshTokenStore;
-import io.dartchain.backend.auth.InMemorySessionStore;
-import io.dartchain.backend.auth.JsonUserAccountStore;
+import io.dartchain.backend.auth.application.AuthService;
+import io.dartchain.backend.auth.application.AuthTokenResolver;
+import io.dartchain.backend.auth.persistence.InMemoryRefreshTokenStore;
+import io.dartchain.backend.auth.persistence.InMemorySessionStore;
+import io.dartchain.backend.auth.persistence.JsonUserAccountStore;
 import io.dartchain.backend.auth.audit.AuthAuditService;
 import io.dartchain.backend.auth.audit.InMemoryAuthAuditStore;
 import io.dartchain.backend.auth.jwt.NativeJwtService;

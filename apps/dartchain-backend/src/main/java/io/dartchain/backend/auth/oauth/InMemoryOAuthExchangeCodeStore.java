@@ -1,6 +1,6 @@
 package io.dartchain.backend.auth.oauth;
 
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.model.UserAccount;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;

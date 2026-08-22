@@ -1,6 +1,6 @@
 package io.dartchain.backend.showcase.controller;
 
-import io.dartchain.backend.auth.AuthTokenResolver;
+import io.dartchain.backend.auth.application.AuthTokenResolver;
 import io.dartchain.backend.auth.security.BearerTokenAuthenticationFilter;
 import io.dartchain.backend.auth.security.RateLimitCounterStore;
 import io.dartchain.backend.auth.security.RateLimitFilter;

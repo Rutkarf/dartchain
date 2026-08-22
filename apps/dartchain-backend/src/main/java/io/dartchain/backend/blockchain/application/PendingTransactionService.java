@@ -1,6 +1,6 @@
 package io.dartchain.backend.blockchain.application;
 
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.blockchain.dto.AddPendingTransactionResponse;
 import io.dartchain.backend.blockchain.dto.CreatePendingTransactionRequest;
 import io.dartchain.backend.blockchain.dto.MinePendingTransactionResponse;

@@ -1,4 +1,4 @@
-package io.dartchain.backend.auth;
+package io.dartchain.backend.auth.persistence;
 
 import io.dartchain.backend.auth.store.RefreshTokenStore;
 import io.dartchain.backend.config.AuthProperties;

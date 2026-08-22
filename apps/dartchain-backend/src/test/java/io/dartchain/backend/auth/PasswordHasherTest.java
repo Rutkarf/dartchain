@@ -1,5 +1,6 @@
 package io.dartchain.backend.auth;
 
+import io.dartchain.backend.auth.application.PasswordHasher;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,7 +1,7 @@
 package io.dartchain.backend.quests.application;
 
-import io.dartchain.backend.auth.AuthService;
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.application.AuthService;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.quests.dto.QuestProgressRequest;
 import io.dartchain.backend.quests.dto.QuestCatalogResponse;
 import io.dartchain.backend.quests.dto.QuestProgressResponse;

@@ -1,6 +1,9 @@
 package io.dartchain.backend.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dartchain.backend.auth.application.AuthException;
+import io.dartchain.backend.auth.application.AuthService;
+import io.dartchain.backend.auth.persistence.JsonUserAccountStore;
 import io.dartchain.backend.auth.dto.LinkWalletRequest;
 import io.dartchain.backend.auth.dto.LoginRequest;
 import io.dartchain.backend.auth.dto.RegisterRequest;

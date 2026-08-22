@@ -1,7 +1,7 @@
 package io.dartchain.backend.peers.application;
 
-import io.dartchain.backend.auth.AuthService;
-import io.dartchain.backend.auth.AuthTokenResolver;
+import io.dartchain.backend.auth.application.AuthService;
+import io.dartchain.backend.auth.application.AuthTokenResolver;
 import io.dartchain.backend.auth.security.AuthenticatedUser;
 import io.dartchain.backend.auth.security.WebSocketAuthSupport;
 import io.dartchain.backend.config.WebSocketBufferLimits;

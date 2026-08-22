@@ -1,6 +1,6 @@
 package io.dartchain.backend.config;
 
-import io.dartchain.backend.auth.AuthTokenResolver;
+import io.dartchain.backend.auth.application.AuthTokenResolver;
 import io.dartchain.backend.ops.ActuatorAccessFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

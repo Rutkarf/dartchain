@@ -1,7 +1,7 @@
 package io.dartchain.backend.showcase.application;
 
-import io.dartchain.backend.auth.AuthException;
-import io.dartchain.backend.auth.UserRole;
+import io.dartchain.backend.auth.application.AuthException;
+import io.dartchain.backend.auth.model.UserRole;
 import io.dartchain.backend.auth.security.AuthenticatedUser;
 import io.dartchain.backend.showcase.dto.CreateFaqQuestionRequest;
 import io.dartchain.backend.showcase.dto.FaqQuestionResponse;

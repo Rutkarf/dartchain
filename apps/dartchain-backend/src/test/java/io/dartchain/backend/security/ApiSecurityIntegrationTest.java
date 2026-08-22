@@ -3,7 +3,7 @@ package io.dartchain.backend.security;
 import io.dartchain.backend.support.MockMvcIntegrationSupport;
 import io.dartchain.backend.support.MockMvcIntegrationSupport.Session;
 import io.dartchain.backend.support.MockMvcIntegrationSupport.WalletInfo;
-import io.dartchain.backend.auth.AuthService;
+import io.dartchain.backend.auth.application.AuthService;
 import io.dartchain.backend.auth.dto.RegisterRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

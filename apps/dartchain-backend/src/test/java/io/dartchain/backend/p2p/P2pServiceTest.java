@@ -1,7 +1,7 @@
 package io.dartchain.backend.p2p;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.auth.security.AuthenticatedUser;
 import io.dartchain.backend.auth.security.WebSocketAuthSupport;
 import io.dartchain.backend.blockchain.model.Block;

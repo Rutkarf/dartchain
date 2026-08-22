@@ -1,8 +1,8 @@
 package io.dartchain.backend.persistence;
 
-import io.dartchain.backend.auth.AuthException;
-import io.dartchain.backend.auth.AuthNormalizer;
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.application.AuthException;
+import io.dartchain.backend.auth.application.AuthNormalizer;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.persistence.entity.UserEntity;
 import io.dartchain.backend.persistence.repository.UserJpaRepository;

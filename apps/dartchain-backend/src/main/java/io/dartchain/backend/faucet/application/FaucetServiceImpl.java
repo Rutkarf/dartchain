@@ -1,7 +1,7 @@
 package io.dartchain.backend.faucet.application;
 
-import io.dartchain.backend.auth.AuthService;
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.application.AuthService;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.config.FaucetConfig;
 import io.dartchain.backend.faucet.dto.FaucetClaimRequest;
 import io.dartchain.backend.faucet.dto.FaucetClaimResponse;

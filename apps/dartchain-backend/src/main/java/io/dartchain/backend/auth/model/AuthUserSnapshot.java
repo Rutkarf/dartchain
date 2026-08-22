@@ -1,4 +1,4 @@
-package io.dartchain.backend.auth;
+package io.dartchain.backend.auth.model;
 
 import java.util.ArrayList;
 import java.util.List;

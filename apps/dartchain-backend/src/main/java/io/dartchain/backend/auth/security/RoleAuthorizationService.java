@@ -1,9 +1,9 @@
 package io.dartchain.backend.auth.security;
 
-import io.dartchain.backend.auth.AuthException;
-import io.dartchain.backend.auth.AuthTokenResolver;
-import io.dartchain.backend.auth.UserAccount;
-import io.dartchain.backend.auth.UserRole;
+import io.dartchain.backend.auth.application.AuthException;
+import io.dartchain.backend.auth.application.AuthTokenResolver;
+import io.dartchain.backend.auth.model.UserAccount;
+import io.dartchain.backend.auth.model.UserRole;
 import io.dartchain.backend.auth.audit.AuthAuditService;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
 import org.springframework.beans.factory.annotation.Autowired;

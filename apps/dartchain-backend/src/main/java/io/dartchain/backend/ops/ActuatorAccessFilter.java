@@ -1,7 +1,7 @@
 package io.dartchain.backend.ops;
 
-import io.dartchain.backend.auth.AuthTokenResolver;
-import io.dartchain.backend.auth.UserRole;
+import io.dartchain.backend.auth.application.AuthTokenResolver;
+import io.dartchain.backend.auth.model.UserRole;
 import io.dartchain.backend.config.OpsProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,7 +1,7 @@
 package io.dartchain.backend.m4t3r.infrastructure.web;
 
-import io.dartchain.backend.auth.AuthService;
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.application.AuthService;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.m4t3r.config.M4t3rRewardConfig;
 import io.dartchain.backend.m4t3r.dto.M4t3rRewardDto;
 import io.dartchain.backend.m4t3r.dto.M4t3rRewardHistoryResponse;

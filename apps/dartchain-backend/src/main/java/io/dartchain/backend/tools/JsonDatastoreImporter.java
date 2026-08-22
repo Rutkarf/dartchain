@@ -1,8 +1,8 @@
 package io.dartchain.backend.tools;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dartchain.backend.auth.AuthUserSnapshot;
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.model.AuthUserSnapshot;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.blockchain.BlockchainSnapshot;
 import io.dartchain.backend.blockchain.store.BlockchainStateStore;
 import io.dartchain.backend.config.DataImportProperties;

@@ -1,5 +1,6 @@
-package io.dartchain.backend.auth;
+package io.dartchain.backend.auth.application;
 
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.auth.jwt.NativeJwtService;
 import io.dartchain.backend.auth.store.RefreshTokenStore;
 import io.dartchain.backend.auth.store.SessionStore;

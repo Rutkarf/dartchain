@@ -1,8 +1,8 @@
 package io.dartchain.backend.persistence;
 
-import io.dartchain.backend.auth.AuthNormalizer;
-import io.dartchain.backend.auth.UserAccount;
-import io.dartchain.backend.auth.UserRole;
+import io.dartchain.backend.auth.application.AuthNormalizer;
+import io.dartchain.backend.auth.model.UserAccount;
+import io.dartchain.backend.auth.model.UserRole;
 import io.dartchain.backend.persistence.entity.UserEntity;
 
 import java.time.Instant;

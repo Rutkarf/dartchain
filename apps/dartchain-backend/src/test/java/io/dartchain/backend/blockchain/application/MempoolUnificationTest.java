@@ -1,6 +1,6 @@
 package io.dartchain.backend.blockchain.application;
 
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.config.SecurityProperties;
 import io.dartchain.backend.blockchain.dto.BlockValidationResult;

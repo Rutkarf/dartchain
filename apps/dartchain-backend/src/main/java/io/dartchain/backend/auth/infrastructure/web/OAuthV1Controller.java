@@ -1,6 +1,6 @@
 package io.dartchain.backend.auth.infrastructure.web;
 
-import io.dartchain.backend.auth.AuthService;
+import io.dartchain.backend.auth.application.AuthService;
 import io.dartchain.backend.auth.dto.AuthResponse;
 import io.dartchain.backend.auth.oauth.OAuthProvider;
 import io.dartchain.backend.auth.oauth.OAuthService;

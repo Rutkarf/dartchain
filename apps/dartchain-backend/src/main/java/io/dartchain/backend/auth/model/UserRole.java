@@ -1,4 +1,4 @@
-package io.dartchain.backend.auth;
+package io.dartchain.backend.auth.model;
 
 /**
  * Phase AB — rôles applicatifs (GUEST = non authentifié, pas persisté).

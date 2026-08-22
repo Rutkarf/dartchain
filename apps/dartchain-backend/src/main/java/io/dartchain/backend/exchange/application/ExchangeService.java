@@ -1,9 +1,9 @@
 package io.dartchain.backend.exchange.application;
 
-import io.dartchain.backend.auth.UserAccount;
+import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.blockchain.dto.CreatePendingTransactionRequest;
 import io.dartchain.backend.exchange.dto.ExchangePanelResponse;
-import io.dartchain.backend.auth.AuthService;
+import io.dartchain.backend.auth.application.AuthService;
 import io.dartchain.backend.exchange.dto.ExchangeSwapRequest;
 import io.dartchain.backend.exchange.dto.ExchangeSwapResponse;
 import io.dartchain.backend.exchange.store.ExchangeLedgerStore;

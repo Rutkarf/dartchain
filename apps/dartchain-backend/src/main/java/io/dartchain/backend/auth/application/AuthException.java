@@ -1,4 +1,4 @@
-package io.dartchain.backend.auth;
+package io.dartchain.backend.auth.application;
 
 public class AuthException extends RuntimeException {
 
