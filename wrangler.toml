@@ -1,13 +1,10 @@
-# Cloudflare Workers (static assets) — frontend Angular SPA
-# Build CI : npm run build:cloudflare (apps/dartchain-frontend/Dart)
-# Deploy CI : npx wrangler deploy   (voir .github/workflows/cloudflare-deploy.yml)
+# Cloudflare Pages — frontend Angular SPA (dartchain.pages.dev)
+# Prod : build Git natif Pages (voir deploy/cloudflare.env.example).
+# Upload manuel : npx wrangler pages deploy apps/dartchain-frontend/Dart/dist/browser --project-name=dartchain
 #
-# ⚠️  Ne pas remettre pages_build_output_dir : Workers Builds utilise
-#     `wrangler deploy`, incompatible avec la config Pages.
+# Ce fichier sert surtout à `wrangler pages deploy` (CI manual ou local).
+# Ne pas utiliser `wrangler deploy` (Workers) pour ce projet.
 
 name = "dartchain"
 compatibility_date = "2025-07-16"
-
-[assets]
-directory = "./apps/dartchain-frontend/Dart/dist/browser"
-not_found_handling = "single-page-application"
+pages_build_output_dir = "apps/dartchain-frontend/Dart/dist/browser"
