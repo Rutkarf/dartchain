@@ -1,7 +1,7 @@
 package io.dartchain.backend.persistence;
 
 import io.dartchain.backend.faucet.store.FaucetClaimStore;
-import io.dartchain.backend.model.FaucetClaim;
+import io.dartchain.backend.faucet.model.FaucetClaim;
 import io.dartchain.backend.persistence.entity.FaucetClaimEntity;
 import io.dartchain.backend.persistence.repository.FaucetClaimJpaRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

@@ -1,7 +1,7 @@
 package io.dartchain.backend.exchange.application;
 
 import io.dartchain.backend.auth.UserAccount;
-import io.dartchain.backend.dto.CreatePendingTransactionRequest;
+import io.dartchain.backend.blockchain.dto.CreatePendingTransactionRequest;
 import io.dartchain.backend.exchange.dto.ExchangePanelResponse;
 import io.dartchain.backend.auth.AuthService;
 import io.dartchain.backend.exchange.dto.ExchangeSwapRequest;
@@ -12,8 +12,8 @@ import io.dartchain.backend.ops.ApplicationMetricsCollector;
 import io.dartchain.backend.showcase.application.LaunchLabService;
 import io.dartchain.backend.showcase.application.NewsService;
 import io.dartchain.backend.blockchain.application.BlockchainService;
-import io.dartchain.backend.service.CryptoRatesProxyService;
-import io.dartchain.backend.service.PendingTransactionService;
+import io.dartchain.backend.exchange.application.CryptoRatesProxyService;
+import io.dartchain.backend.blockchain.application.PendingTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

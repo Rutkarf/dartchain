@@ -8,11 +8,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
 import {
   DockBlockPhase,
   DockBlockStateService,
-} from '@core/services/dock-block-state.service';
+} from '@dock/services/dock-block-state.service';
 
 @Component({
   selector: 'app-dock-block-summary',

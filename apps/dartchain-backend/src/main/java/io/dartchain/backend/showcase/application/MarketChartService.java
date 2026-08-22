@@ -2,8 +2,8 @@ package io.dartchain.backend.showcase.application;
 
 import io.dartchain.backend.blockchain.BlockchainSnapshot;
 import io.dartchain.backend.blockchain.store.BlockchainStateStore;
-import io.dartchain.backend.model.Block;
-import io.dartchain.backend.model.Transaction;
+import io.dartchain.backend.blockchain.model.Block;
+import io.dartchain.backend.blockchain.model.Transaction;
 import io.dartchain.backend.showcase.dto.ChartPointDto;
 import io.dartchain.backend.showcase.dto.ChartResponse;
 import io.dartchain.backend.showcase.model.PriceSample;

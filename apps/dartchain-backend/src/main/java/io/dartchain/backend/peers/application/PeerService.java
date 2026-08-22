@@ -5,7 +5,7 @@ import io.dartchain.backend.auth.AuthTokenResolver;
 import io.dartchain.backend.auth.security.AuthenticatedUser;
 import io.dartchain.backend.auth.security.WebSocketAuthSupport;
 import io.dartchain.backend.config.WebSocketBufferLimits;
-import io.dartchain.backend.dto.PeerStatsResponse;
+import io.dartchain.backend.peers.dto.PeerStatsResponse;
 import io.dartchain.backend.p2p.P2pService;
 import io.dartchain.backend.p2p.P2pSessionRegistry;
 import io.dartchain.backend.peer.PeerConnection;

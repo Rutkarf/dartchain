@@ -1,6 +1,6 @@
 package io.dartchain.backend.faucet.store;
 
-import io.dartchain.backend.model.FaucetClaim;
+import io.dartchain.backend.faucet.model.FaucetClaim;
 
 import java.util.List;
 import java.util.Optional;

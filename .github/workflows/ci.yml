@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Backend tests
+        working-directory: apps/dartchain-backend
+        run: ./mvnw -q test
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/dartchain-frontend/Dart/package-lock.json
+      - name: Install & test
+        working-directory: apps/dartchain-frontend/Dart
+        run: |
+          npm ci
+          npm test -- --no-watch --coverage=false
+      - name: Production build
+        working-directory: apps/dartchain-frontend/Dart
+        run: npm run build
+
+  cloudflare-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/dartchain-frontend/Dart/package-lock.json
+      - name: Cloudflare build
+        working-directory: apps/dartchain-frontend/Dart
+        env:
+          BACKEND_URL: https://dartchain-backend-1-0-0.onrender.com
+        run: |
+          npm ci
+          npm run build:cloudflare
+      - name: Verify dist
+        run: test -f apps/dartchain-frontend/Dart/dist/browser/index.html

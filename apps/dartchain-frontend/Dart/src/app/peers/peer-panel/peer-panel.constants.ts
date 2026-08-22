@@ -1,4 +1,4 @@
-import { PeerStatus, PeerView } from '../../core/services/blockchain-api.service';
+import { PeerStatus, PeerView } from '@blockchain/services/blockchain-api.service';
 import { PeerFilter, PeerRowView } from './peer-panel.model';
 
 export const PEER_FAVORITES_STORAGE_KEY = 'dart_peer_favorites_v1';

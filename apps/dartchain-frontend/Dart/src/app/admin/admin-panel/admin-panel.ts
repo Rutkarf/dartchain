@@ -10,8 +10,8 @@ import {
 import { CommonModule } from '@angular/common';
 
 import { LocaleService } from '../../core/i18n/locale.service';
-import { OpsSnapshot } from '../../core/models/ops-snapshot.model';
-import { OpsSnapshotService } from '../../core/services/ops-snapshot.service';
+import { OpsSnapshot } from '@admin/models/ops-snapshot.model';
+import { OpsSnapshotService } from '@admin/services/ops-snapshot.service';
 
 @Component({
   selector: 'app-admin-panel',

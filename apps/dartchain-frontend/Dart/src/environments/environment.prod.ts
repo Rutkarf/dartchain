@@ -1,4 +1,4 @@
-/** Généré par scripts/build-cloudflare.sh — ne pas éditer manuellement avant un déploiement CF. */
+/** Build production — Cloudflare utilise environment.cloudflare.ts via ng build --configuration cloudflare. */
 export const environment = {
   production: true,
   apiUrl: 'https://dartchain-backend-1-0-0.onrender.com/api',

@@ -2,11 +2,11 @@ package io.dartchain.backend.blockchain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dartchain.backend.blockchain.store.BlockchainStateStore;
-import io.dartchain.backend.dto.BlockValidationResult;
-import io.dartchain.backend.model.PendingTransaction;
+import io.dartchain.backend.blockchain.dto.BlockValidationResult;
+import io.dartchain.backend.blockchain.model.PendingTransaction;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.blockchain.application.BlockchainValidationService;
-import io.dartchain.backend.service.TransactionPoolService;
+import io.dartchain.backend.blockchain.application.TransactionPoolService;
 import io.dartchain.backend.showcase.application.MarketChartService;
 import io.dartchain.backend.support.BlockchainTestSupport;
 import org.junit.jupiter.api.Test;

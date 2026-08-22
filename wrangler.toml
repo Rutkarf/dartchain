@@ -1,6 +1,6 @@
 # Cloudflare Workers (static assets) — frontend Angular SPA
-# Build CI : bash scripts/cloudflare-build.sh
-# Deploy CI : npx wrangler deploy   (ou bash scripts/cloudflare-deploy.sh)
+# Build CI : npm run build:cloudflare (apps/dartchain-frontend/Dart)
+# Deploy CI : npx wrangler deploy   (voir .github/workflows/cloudflare-deploy.yml)
 #
 # ⚠️  Ne pas remettre pages_build_output_dir : Workers Builds utilise
 #     `wrangler deploy`, incompatible avec la config Pages.

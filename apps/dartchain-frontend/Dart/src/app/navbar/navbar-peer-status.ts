@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
-import { BlockchainApiService } from '../core/services/blockchain-api.service';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
 import { NavbarHintDirective } from './navbar-hint.directive';
 
 interface PeerStats {

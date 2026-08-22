@@ -6,7 +6,7 @@ import {
   output,
 } from '@angular/core';
 
-import { ShowcaseTab, isNewsShowcaseTab, isR4v3ShowcaseTab } from '@core/models/showcase-tab.model';
+import { ShowcaseTab, isNewsShowcaseTab, isR4v3ShowcaseTab } from '@showcase/models/showcase-tab.model';
 import { ShowcaseWindowComponent } from '@showcase/components/showcase-window/showcase-window';
 
 @Component({

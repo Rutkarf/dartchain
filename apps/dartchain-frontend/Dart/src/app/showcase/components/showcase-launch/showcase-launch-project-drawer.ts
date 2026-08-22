@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { LaunchProject, LaunchStatus } from '@core/models/showcase.model';
+import { LaunchProject, LaunchStatus } from '@showcase/models/showcase.model';
 import { isLaunchpadSwapToken } from '@core/constants/exchange-launchpad.constants';
 import { FocusTrapDirective } from '@core/directives/focus-trap.directive';
 

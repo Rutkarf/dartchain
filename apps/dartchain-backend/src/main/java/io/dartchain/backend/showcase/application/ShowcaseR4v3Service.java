@@ -1,7 +1,7 @@
 package io.dartchain.backend.showcase.application;
 
-import io.dartchain.backend.dto.CryptoRatePanelResponse;
-import io.dartchain.backend.service.CryptoRatesProxyService;
+import io.dartchain.backend.exchange.dto.CryptoRatePanelResponse;
+import io.dartchain.backend.exchange.application.CryptoRatesProxyService;
 import io.dartchain.backend.showcase.dto.NewsFeedResponse;
 import io.dartchain.backend.showcase.dto.NewsItemResponse;
 import io.dartchain.backend.showcase.dto.R4v3ShowcaseResponse;

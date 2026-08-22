@@ -90,6 +90,31 @@
     "maximumError": "120kb"
   }
 ]
+            },
+            "cloudflare": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.cloudflare.ts"
+                }
+              ],
+              "optimization": {
+                "fonts": false
+              },
+              "allowedCommonJsDependencies": ["qrcode", "dijkstrajs"],
+              "budgets": [
+  {
+    "type": "initial",
+    "maximumWarning": "2.5mb",
+    "maximumError": "5mb"
+  },
+  {
+    "type": "anyComponentStyle",
+    "maximumWarning": "90kb",
+    "maximumError": "120kb"
+  }
+],
+              "outputHashing": "all"
             }
           },
           "defaultConfiguration": "production"

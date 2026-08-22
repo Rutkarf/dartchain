@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import * as THREE from 'three';
 import { vi } from 'vitest';
 
-import { ThreeSceneService } from '../../services/three-scene.service';
+import { ThreeSceneService } from '@metaverse/services/three-scene.service';
 import { mapPlacementsResponse } from './placement.mapper';
 import { createDevPlacementFixtures } from './placement-fixtures.dev';
 import { PlacementAnchorLayer } from './placement-anchor.layer';

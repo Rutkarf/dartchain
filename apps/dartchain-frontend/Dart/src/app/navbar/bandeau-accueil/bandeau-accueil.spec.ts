@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
-import { BlockchainApiService } from '../../core/services/blockchain-api.service';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
 import { BandeauAccueilComponent } from './bandeau-accueil';
 
 describe('BandeauAccueil', () => {

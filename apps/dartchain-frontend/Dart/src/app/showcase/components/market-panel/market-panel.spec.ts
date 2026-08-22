@@ -3,11 +3,11 @@ import { provideHttpClient } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { of } from 'rxjs';
 
-import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
-import { MarketDataService } from '@core/services/market-data.service';
-import { AuthService } from '@core/services/auth.service';
-import { WalletSessionService } from '@core/services/wallet-session.service';
-import { BlockchainApiService } from '@core/services/blockchain-api.service';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { MarketDataService } from '@showcase/services/market-data.service';
+import { AuthService } from '@auth/services/auth.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
 import { MarketPanelService } from './market-panel.service';
 import { MarketPanelComponent } from './market-panel';
 import { MARKET_ASSETS } from './market-panel.constants';

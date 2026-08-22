@@ -10,12 +10,12 @@ import { CommonModule } from '@angular/common';
 import { AppComponent } from './app';
 import { AuthDrawerComponent } from '@auth/auth-drawer/auth-drawer';
 import { NavbarShellComponent } from './navbar/navbar';
-import { NavbarComponent } from './components/navbar/navbar.component';
+import { NavbarComponent } from '@navbar/components/navbar-host/navbar.component';
 import { BrandCryptoSelectComponent } from './navbar/brand-crypto-select';
 import { ExplorerSearchComponent } from './navbar/explorer-search';
 import { NavbarNetworkStatusComponent } from './navbar/navbar-network-status';
 import { NavbarPeerStatusComponent } from './navbar/navbar-peer-status';
-import { SearchbarComponent } from './searchbar/searchbar';
+import { SearchbarComponent } from '@navbar/components/searchbar/searchbar';
 
 @Component({
   selector: 'app-r4v3-three',

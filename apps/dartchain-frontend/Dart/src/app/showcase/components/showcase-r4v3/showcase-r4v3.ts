@@ -20,26 +20,26 @@ import {
   r4v3FaqCategoryIcon,
   r4v3FaqCategoryLabel,
 } from '@core/constants/r4v3-faq.constants';
-import { R4v3FaqEntry } from '@core/models/r4v3-faq.model';
+import { R4v3FaqEntry } from '@showcase/models/r4v3-faq.model';
 import {
   CommunityFaqQuestion,
   R4v3HubDrawerPayload,
   R4v3HubPillar,
   R4v3SystemStatus,
-} from '@core/models/r4v3-hub.model';
+} from '@showcase/models/r4v3-hub.model';
 import { openR4v3Whitepaper } from '@core/utils/r4v3-whitepaper.util';
-import { AuthService } from '@core/services/auth.service';
-import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
-import { DockWalletStateService } from '@core/services/dock-wallet-state.service';
-import { R4v3CommunityFaqService } from '@core/services/r4v3-community-faq.service';
+import { AuthService } from '@auth/services/auth.service';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { DockWalletStateService } from '@dock/services/dock-wallet-state.service';
+import { R4v3CommunityFaqService } from '@showcase/services/r4v3-community-faq.service';
 import {
   R4v3FaqCategoryFilter,
   R4v3FaqStateService,
-} from '@core/services/r4v3-faq-state.service';
+} from '@showcase/services/r4v3-faq-state.service';
 import { ShellFeedbackService } from '@core/services/shell-feedback.service';
-import { ShowcaseNavigationService } from '@core/services/showcase-navigation.service';
-import { ShowcaseR4v3StateService } from '@core/services/showcase-r4v3-state.service';
-import { ShowcaseHubUiService } from '@core/services/showcase-hub-ui.service';
+import { ShowcaseNavigationService } from '@showcase/services/showcase-navigation.service';
+import { ShowcaseR4v3StateService } from '@showcase/services/showcase-r4v3-state.service';
+import { ShowcaseHubUiService } from '@showcase/services/showcase-hub-ui.service';
 import { ShowcaseR4v3HubDrawerComponent } from './showcase-r4v3-hub-drawer';
 import {
   SHOWCASE_REFRESH_EVENT,

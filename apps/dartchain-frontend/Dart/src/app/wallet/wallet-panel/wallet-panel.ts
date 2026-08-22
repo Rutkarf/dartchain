@@ -24,10 +24,10 @@ import {
   BalanceResponse,
   BlockchainApiService,
   WalletResponse,
-} from '../../core/services/blockchain-api.service';
-import { WalletSessionService } from '../../core/services/wallet-session.service';
-import { AuthService } from '../../core/services/auth.service';
-import { ChainConfigService } from '../../core/services/chain-config.service';
+} from '@blockchain/services/blockchain-api.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
+import { AuthService } from '@auth/services/auth.service';
+import { ChainConfigService } from '@blockchain/services/chain-config.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 import {
   formatR4v3Amount,
@@ -45,7 +45,7 @@ import {
   refreshEventMatchesTab,
 } from '../../core/constants/panel-refresh.constants';
 import { WalletFaucetEmbedComponent } from './wallet-faucet-embed';
-import { DockNavigationService } from '../../core/services/dock-navigation.service';
+import { DockNavigationService } from '@dock/services/dock-navigation.service';
 
 const RECENT_LOOKUPS_STORAGE_KEY = 'dartchain_wallet_recent_lookups_v1';
 const RECENT_LOOKUPS_MAX = 6;

@@ -12,16 +12,16 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { LaunchProject, LaunchStatus } from '@core/models/showcase.model';
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
+import { LaunchProject, LaunchStatus } from '@showcase/models/showcase.model';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
 import {
   EXCHANGE_NATIVE_TOKEN,
   defaultLaunchCounterToken,
   isExchangeNativeToken,
   isLaunchpadSwapToken,
 } from '@core/constants/exchange-launchpad.constants';
-import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
-import { ShowcaseLaunchStateService } from '@core/services/showcase-launch-state.service';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { ShowcaseLaunchStateService } from '@showcase/services/showcase-launch-state.service';
 
 @Component({
   selector: 'app-showcase-launch-summary',

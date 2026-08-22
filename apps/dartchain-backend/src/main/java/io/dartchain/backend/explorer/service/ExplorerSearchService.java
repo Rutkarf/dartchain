@@ -2,8 +2,8 @@ package io.dartchain.backend.explorer.service;
 
 import io.dartchain.backend.explorer.dto.ExplorerSearchResultDto;
 import io.dartchain.backend.explorer.dto.ExplorerSearchResponse;
-import io.dartchain.backend.model.Block;
-import io.dartchain.backend.model.Transaction;
+import io.dartchain.backend.blockchain.model.Block;
+import io.dartchain.backend.blockchain.model.Transaction;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import org.springframework.stereotype.Service;
 

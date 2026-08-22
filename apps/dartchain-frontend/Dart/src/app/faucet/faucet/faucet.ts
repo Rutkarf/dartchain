@@ -10,7 +10,7 @@ import {
   signal,
 } from '@angular/core';
 
-import { FaucetRuntimeService } from '../../core/services/faucet-runtime.service';
+import { FaucetRuntimeService } from '@faucet/services/faucet-runtime.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 import {
   DOCK_REFRESH_EVENT,

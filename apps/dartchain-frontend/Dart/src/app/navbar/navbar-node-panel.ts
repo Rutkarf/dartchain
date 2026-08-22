@@ -13,8 +13,8 @@ import {
 } from '@angular/core';
 
 import { FocusTrapDirective } from '../core/directives/focus-trap.directive';
-import { ChartSummaryStateService } from '../core/services/chart-summary-state.service';
-import { ShellFeedbackService } from '../core/services/shell-feedback.service';
+import { ChartSummaryStateService } from '@showcase/services/chart-summary-state.service';
+import { ShellFeedbackService } from '@core/services/shell-feedback.service';
 import {
   R4V3_PEG_DISPLAY_DELTA,
   R4V3_PEG_DISPLAY_PRICE,

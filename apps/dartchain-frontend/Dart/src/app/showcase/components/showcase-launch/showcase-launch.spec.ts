@@ -3,9 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { AuthService } from '@core/services/auth.service';
-import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
-import { ShowcaseLaunchStateService } from '@core/services/showcase-launch-state.service';
+import { AuthService } from '@auth/services/auth.service';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { ShowcaseLaunchStateService } from '@showcase/services/showcase-launch-state.service';
 import { ShowcaseLaunchComponent } from './showcase-launch';
 
 describe('ShowcaseLaunchComponent (Phase V)', () => {

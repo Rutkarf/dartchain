@@ -1,6 +1,6 @@
 package io.dartchain.backend.utils;
 
-import io.dartchain.backend.service.WalletServiceImpl;
+import io.dartchain.backend.wallet.application.WalletServiceImpl;
 import io.dartchain.backend.shared.utils.EvmCryptoUtils;
 import io.dartchain.backend.shared.utils.CryptoUtils;
 import org.junit.jupiter.api.Test;

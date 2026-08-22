@@ -14,12 +14,12 @@ import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, map, of } from 'rxjs';
 
-import { ChartRange } from '@core/models/showcase.model';
-import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
-import { BlockchainApiService } from '@core/services/blockchain-api.service';
-import { MarketDataService } from '@core/services/market-data.service';
-import { AuthService } from '@core/services/auth.service';
-import { WalletSessionService } from '@core/services/wallet-session.service';
+import { ChartRange } from '@showcase/models/showcase.model';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
+import { MarketDataService } from '@showcase/services/market-data.service';
+import { AuthService } from '@auth/services/auth.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import {
   EXCHANGE_LAUNCHPAD_FALLBACK_TOKENS,
   EXCHANGE_NATIVE_TOKEN,

@@ -29,13 +29,13 @@ import {
   CryptoRatesService,
   CryptoSearchResult,
   RatePanelData,
-} from '@core/services/crypto-rate.service';
+} from '@exchange/services/crypto-rate.service';
 import {
   BRAND_DEFAULT_CRYPTO,
   RATE_PANEL_LEFT_SYMBOLS,
 } from '@core/constants/rate-panel-symbols';
-import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
-import { RatePanelPreferencesService } from '@core/services/rate-panel-preferences.service';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { RatePanelPreferencesService } from '@showcase/services/rate-panel-preferences.service';
 import {
   buildRatePanelTrendSegments,
   ChartTrendSegment,

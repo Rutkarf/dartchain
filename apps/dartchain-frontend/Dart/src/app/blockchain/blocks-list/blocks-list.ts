@@ -13,9 +13,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 
-import { Block } from '../../core/models/block.model';
+import { Block } from '@blockchain/models/block.model';
 import { LocaleService } from '../../core/i18n/locale.service';
-import { ChainDataService } from '../../core/services/chain-data.service';
+import { ChainDataService } from '@blockchain/services/chain-data.service';
 import {
   DOCK_REFRESH_EVENT,
   refreshEventMatchesTab,

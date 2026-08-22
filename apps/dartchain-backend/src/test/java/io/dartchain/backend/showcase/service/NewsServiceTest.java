@@ -1,7 +1,7 @@
 package io.dartchain.backend.showcase.service;
 
 import io.dartchain.backend.blockchain.application.BlockchainService;
-import io.dartchain.backend.service.PendingTransactionService;
+import io.dartchain.backend.blockchain.application.PendingTransactionService;
 import io.dartchain.backend.showcase.dto.NewsFeedResponse;
 import io.dartchain.backend.showcase.news.JsonNewsItemStore;
 import io.dartchain.backend.support.TestObjectMapper;

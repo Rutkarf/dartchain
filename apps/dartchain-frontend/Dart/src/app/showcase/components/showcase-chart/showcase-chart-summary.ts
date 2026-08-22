@@ -7,8 +7,8 @@ import {
   output,
 } from '@angular/core';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
-import { ChartSummaryStateService } from '@core/services/chart-summary-state.service';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
+import { ChartSummaryStateService } from '@showcase/services/chart-summary-state.service';
 import { CollapsedBarActionsComponent } from '../../../components/collapsed-bar-actions/collapsed-bar-actions';
 
 @Component({

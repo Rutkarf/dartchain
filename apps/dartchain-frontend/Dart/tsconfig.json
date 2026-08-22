@@ -27,7 +27,11 @@
       "@blockchain/*": ["./src/app/blockchain/*"],
       "@explorer/*": ["./src/app/explorer/*"],
       "@admin/*": ["./src/app/admin/*"],
-      "@auth/*": ["./src/app/auth/*"]
+      "@auth/*": ["./src/app/auth/*"],
+      "@components/*": ["./src/app/components/*"],
+      "@r4v3-scene/*": ["./src/app/r4v3-scene/*"],
+      "@metaverse/*": ["./src/app/metaverse/*"],
+      "@star-conquest/*": ["./src/app/star-conquest/*"]
     }
   },
   "angularCompilerOptions": {

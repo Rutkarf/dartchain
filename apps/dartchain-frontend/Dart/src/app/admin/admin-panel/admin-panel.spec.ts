@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AdminPanelComponent } from './admin-panel';
 import { LocaleService } from '../../core/i18n/locale.service';
-import { OpsSnapshotService } from '../../core/services/ops-snapshot.service';
+import { OpsSnapshotService } from '@admin/services/ops-snapshot.service';
 
 describe('AdminPanelComponent', () => {
   let fixture: ComponentFixture<AdminPanelComponent>;

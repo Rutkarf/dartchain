@@ -12,8 +12,8 @@ import {
 } from '@angular/core';
 
 import { LocaleService } from '@core/i18n/locale.service';
-import { TransactionsDataService } from '@core/services/transactions-data.service';
-import { TransactionsDockService } from '@core/services/transactions-dock.service';
+import { TransactionsDataService } from '@dock/services/transactions-data.service';
+import { TransactionsDockService } from '@dock/services/transactions-dock.service';
 import {
   DOCK_REFRESH_EVENT,
   refreshEventMatchesTab,

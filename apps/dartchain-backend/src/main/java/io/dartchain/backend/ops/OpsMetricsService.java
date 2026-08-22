@@ -3,13 +3,13 @@ package io.dartchain.backend.ops;
 import io.dartchain.backend.chain.ChainConfigService;
 import io.dartchain.backend.config.OpsProperties;
 import io.dartchain.backend.config.ProductProperties;
-import io.dartchain.backend.dto.OpsAlertResponse;
-import io.dartchain.backend.dto.OpsSnapshotResponse;
+import io.dartchain.backend.ops.dto.OpsAlertResponse;
+import io.dartchain.backend.ops.dto.OpsSnapshotResponse;
 import io.dartchain.backend.live.LiveUpdateSessionRegistry;
 import io.dartchain.backend.p2p.P2pSessionRegistry;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.peers.application.PeerService;
-import io.dartchain.backend.service.TransactionPoolService;
+import io.dartchain.backend.blockchain.application.TransactionPoolService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

@@ -17,9 +17,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 
 import { FocusTrapDirective } from '@core/directives/focus-trap.directive';
-import { BlockchainApiService } from '@core/services/blockchain-api.service';
-import { AuthService } from '@core/services/auth.service';
-import { WalletSessionService } from '@core/services/wallet-session.service';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
+import { AuthService } from '@auth/services/auth.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import { EXCHANGE_NATIVE_TOKEN } from '@core/constants/exchange-launchpad.constants';
 import { MarketAssetRow, MarketRecentTrade } from './market-panel.model';
 

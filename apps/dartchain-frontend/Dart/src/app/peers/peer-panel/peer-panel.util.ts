@@ -1,4 +1,4 @@
-import { PeerStatus, PeerView } from '../../core/services/blockchain-api.service';
+import { PeerStatus, PeerView } from '@blockchain/services/blockchain-api.service';
 import { PeerNetworkStats, PeerRowView } from './peer-panel.model';
 
 function hashString(value: string): number {

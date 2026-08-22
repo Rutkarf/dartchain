@@ -3,10 +3,10 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin, map, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { ChartRange, LaunchProject } from '@core/models/showcase.model';
-import { CryptoRatesService, MarketChartData } from '@core/services/crypto-rate.service';
-import { BlockchainApiService } from '@core/services/blockchain-api.service';
-import { ShowcaseApiService } from '@core/services/showcase-api.service';
+import { ChartRange, LaunchProject } from '@showcase/models/showcase.model';
+import { CryptoRatesService, MarketChartData } from '@exchange/services/crypto-rate.service';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
+import { ShowcaseApiService } from '@showcase/services/showcase-api.service';
 import { EXCHANGE_NATIVE_TOKEN } from '@core/constants/exchange-launchpad.constants';
 import {
   MARKET_ASSETS,

@@ -2,7 +2,7 @@ package io.dartchain.backend.faucet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dartchain.backend.faucet.store.FaucetClaimStore;
-import io.dartchain.backend.model.FaucetClaim;
+import io.dartchain.backend.faucet.model.FaucetClaim;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

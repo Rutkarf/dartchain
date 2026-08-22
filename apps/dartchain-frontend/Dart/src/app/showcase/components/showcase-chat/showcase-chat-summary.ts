@@ -12,9 +12,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
-import { ShowcaseChatStateService } from '@core/services/showcase-chat-state.service';
-import { ShowcaseChatService } from '@core/services/showcase-chat.service';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
+import { ShowcaseChatStateService } from '@showcase/services/showcase-chat-state.service';
+import { ShowcaseChatService } from '@showcase/services/showcase-chat.service';
 
 @Component({
   selector: 'app-showcase-chat-summary',

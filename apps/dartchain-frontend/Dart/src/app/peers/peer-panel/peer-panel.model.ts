@@ -1,4 +1,4 @@
-import { PeerStatus } from '../../core/services/blockchain-api.service';
+import { PeerStatus } from '@blockchain/services/blockchain-api.service';
 
 export type PeerFilter = 'all' | 'connected' | 'favorites';
 

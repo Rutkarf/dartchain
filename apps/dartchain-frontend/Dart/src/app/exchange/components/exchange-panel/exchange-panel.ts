@@ -33,15 +33,15 @@ import {
   tokenUnitLabel,
 } from '@core/constants/exchange-launchpad.constants';
 import { coinIdForSymbol } from '@core/constants/rate-panel-symbols';
-import { BlockchainApiService } from '@core/services/blockchain-api.service';
-import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
-import { CryptoRatesService } from '@core/services/crypto-rate.service';
-import { ShowcaseLaunchStateService } from '@core/services/showcase-launch-state.service';
-import { ShowcaseNavigationService } from '@core/services/showcase-navigation.service';
-import { QuestsProgressService } from '@core/services/quests-progress.service';
-import { WalletSessionService } from '@core/services/wallet-session.service';
-import { AuthService } from '@core/services/auth.service';
-import { R4v3ThreeComponent } from '../../../components/r4v3-three/r4v3-three';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { CryptoRatesService } from '@exchange/services/crypto-rate.service';
+import { ShowcaseLaunchStateService } from '@showcase/services/showcase-launch-state.service';
+import { ShowcaseNavigationService } from '@showcase/services/showcase-navigation.service';
+import { QuestsProgressService } from '@quests/services/quests-progress.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
+import { AuthService } from '@auth/services/auth.service';
+import { R4v3ThreeComponent } from '@r4v3-scene/r4v3-three/r4v3-three';
 
 type SwapAction =
   | 'create-wallet'

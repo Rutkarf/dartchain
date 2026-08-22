@@ -1,4 +1,4 @@
-import { ChartRange } from '@core/models/showcase.model';
+import { ChartRange } from '@showcase/models/showcase.model';
 import { pricesToChartCoordinates } from './chart-display.util';
 import {
   ChartTimeframeId,

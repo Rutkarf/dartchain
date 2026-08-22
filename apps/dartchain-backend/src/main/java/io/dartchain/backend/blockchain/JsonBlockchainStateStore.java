@@ -2,8 +2,8 @@ package io.dartchain.backend.blockchain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dartchain.backend.blockchain.store.BlockchainStateStore;
-import io.dartchain.backend.model.Block;
-import io.dartchain.backend.model.PendingTransaction;
+import io.dartchain.backend.blockchain.model.Block;
+import io.dartchain.backend.blockchain.model.PendingTransaction;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

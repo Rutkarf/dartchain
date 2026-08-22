@@ -10,15 +10,15 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { LaunchProject, LaunchStatus } from '@core/models/showcase.model';
+import { LaunchProject, LaunchStatus } from '@showcase/models/showcase.model';
 import {
   EXCHANGE_NATIVE_TOKEN,
   defaultLaunchCounterToken,
   isExchangeNativeToken,
   isLaunchpadSwapToken,
 } from '@core/constants/exchange-launchpad.constants';
-import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
-import { ShowcaseLaunchStateService } from '@core/services/showcase-launch-state.service';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { ShowcaseLaunchStateService } from '@showcase/services/showcase-launch-state.service';
 import { ShowcaseLaunchProjectDrawerComponent } from './showcase-launch-project-drawer';
 import {
   SHOWCASE_REFRESH_EVENT,

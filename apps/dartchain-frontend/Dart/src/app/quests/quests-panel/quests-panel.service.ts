@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 
-import { QuestsApiService } from '../../core/services/quests-api.service';
-import { WalletSessionService } from '../../core/services/wallet-session.service';
+import { QuestsApiService } from '@quests/services/quests-api.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import {
   DailyQuestDefinition,
   QuestCatalogResponse,

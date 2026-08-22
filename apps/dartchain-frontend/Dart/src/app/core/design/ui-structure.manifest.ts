@@ -45,8 +45,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
     components: [
       {
         selector: 'app-particle-background',
-        template: 'particle-background/particle-background.html',
-        styles: ['particle-background/particle-background.css'],
+        template: 'star-conquest/components/particle-background/particle-background.html',
+        styles: ['star-conquest/components/particle-background/particle-background.css'],
         elements: [
           { id: 'space-overlay', label: 'Overlay radial cyan/magenta', kind: 'panel' },
           { id: 'particle-canvas', label: 'Canvas WebGL particules', kind: 'canvas' },
@@ -56,8 +56,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-three-floor',
-        template: 'three-floor/three-floor.html',
-        styles: ['three-floor/three-floor.css'],
+        template: 'metaverse/three-floor.html',
+        styles: ['metaverse/three-floor.css'],
         elements: [{ id: 'floor-canvas', label: 'Grille 3D perspective cyan/magenta', kind: 'canvas' }],
         interactions: ['Scroll illusion floor', 'Resize', 'Pause visibility'],
         dataFields: [],
@@ -73,8 +73,8 @@ export const UI_STRUCTURE_MANIFEST: readonly UiZoneManifest[] = [
       },
       {
         selector: 'app-r4v3-three',
-        template: 'components/r4v3-three/r4v3-three.html',
-        styles: ['components/r4v3-three/r4v3-three.css'],
+        template: '@r4v3-scene/r4v3-three/r4v3-three.html',
+        styles: ['@r4v3-scene/r4v3-three/r4v3-three.css'],
         elements: [{ id: 'navbar-logo-three', label: 'Gem logo 3D navbar', kind: 'canvas' }],
         interactions: ['logoTapped', 'Orbit', 'Double-tap → r4v3-scene'],
         dataFields: ['modelTargetSize', 'cameraFitFactor', 'presentation'],

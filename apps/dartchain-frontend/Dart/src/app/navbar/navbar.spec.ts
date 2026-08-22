@@ -12,7 +12,7 @@ import { NavbarNetworkStatusComponent } from './navbar-network-status';
 import { NavbarPeerStatusComponent } from './navbar-peer-status';
 import { BrandCryptoSelectComponent } from './brand-crypto-select';
 import { ExplorerSearchComponent } from './explorer-search';
-import { SearchbarComponent } from '../searchbar/searchbar';
+import { SearchbarComponent } from './components/searchbar/searchbar';
 
 @Component({
   selector: 'app-r4v3-three',

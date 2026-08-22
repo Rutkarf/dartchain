@@ -1,5 +1,5 @@
 import { isGuestChatAuthor } from './chat-display.constants';
-import { ChatMessage } from '../models/showcase.model';
+import { ChatMessage } from '@showcase/models/showcase.model';
 
 export type ChatRoleKey = 'self' | 'guest' | 'mod' | 'bot' | 'member';
 

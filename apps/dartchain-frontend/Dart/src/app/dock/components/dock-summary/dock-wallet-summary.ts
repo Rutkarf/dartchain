@@ -9,10 +9,10 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
-import { AuthService } from '@core/services/auth.service';
-import { DockNavigationService } from '@core/services/dock-navigation.service';
-import { DockWalletStateService } from '@core/services/dock-wallet-state.service';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
+import { AuthService } from '@auth/services/auth.service';
+import { DockNavigationService } from '@dock/services/dock-navigation.service';
+import { DockWalletStateService } from '@dock/services/dock-wallet-state.service';
 import { formatR4v3Amount } from '@core/utils/r4v3-amount.util';
 
 @Component({

@@ -4,7 +4,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 
 import { AuthDrawerComponent } from './auth-drawer';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '@auth/services/auth.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 
 describe('AuthDrawer', () => {

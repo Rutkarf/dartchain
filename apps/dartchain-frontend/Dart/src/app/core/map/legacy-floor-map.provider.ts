@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import * as THREE from 'three';
 
-import { RunnerWorldService } from '../services/runner/runner-world.service';
+import { RunnerWorldService } from '@metaverse/services/runner/runner-world.service';
 import type { MapProvider, SurfaceProvider } from './map-provider.interface';
 import {
   createLegacyFloorMeshes,

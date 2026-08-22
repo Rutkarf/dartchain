@@ -1,4 +1,4 @@
-import { R4v3HubPillar } from '../models/r4v3-hub.model';
+import { R4v3HubPillar } from '@showcase/models/r4v3-hub.model';
 
 export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
   {

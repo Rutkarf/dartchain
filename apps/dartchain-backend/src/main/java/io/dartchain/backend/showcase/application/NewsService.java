@@ -1,9 +1,9 @@
 package io.dartchain.backend.showcase.application;
 
-import io.dartchain.backend.dto.PendingTransactionResponse;
-import io.dartchain.backend.model.Block;
+import io.dartchain.backend.blockchain.dto.PendingTransactionResponse;
+import io.dartchain.backend.blockchain.model.Block;
 import io.dartchain.backend.blockchain.application.BlockchainService;
-import io.dartchain.backend.service.PendingTransactionService;
+import io.dartchain.backend.blockchain.application.PendingTransactionService;
 import io.dartchain.backend.showcase.dto.NewsFeedResponse;
 import io.dartchain.backend.showcase.dto.NewsItemResponse;
 import io.dartchain.backend.showcase.model.NewsItem;

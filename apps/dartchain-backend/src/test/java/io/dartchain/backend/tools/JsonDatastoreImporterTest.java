@@ -6,7 +6,7 @@ import io.dartchain.backend.blockchain.store.BlockchainStateStore;
 import io.dartchain.backend.config.DataImportProperties;
 import io.dartchain.backend.exchange.store.ExchangeLedgerStore;
 import io.dartchain.backend.faucet.store.FaucetClaimStore;
-import io.dartchain.backend.model.Block;
+import io.dartchain.backend.blockchain.model.Block;
 import io.dartchain.backend.persistence.repository.UserJpaRepository;
 import io.dartchain.backend.quests.store.QuestProgressStore;
 import io.dartchain.backend.showcase.chat.store.ChatMessageStore;

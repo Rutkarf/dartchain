@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, output } from '@angular/core';
 
-import { ShowcaseTab } from '@core/models/showcase-tab.model';
+import { ShowcaseTab } from '@showcase/models/showcase-tab.model';
 import { ShowcaseNewsSummaryComponent } from '@showcase/components/showcase-news/showcase-news-summary';
 import { ShowcaseNewsComponent } from '@showcase/components/showcase-news/showcase-news';
 import { ShowcaseChatSummaryComponent } from '@showcase/components/showcase-chat/showcase-chat-summary';

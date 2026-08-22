@@ -1,5 +1,5 @@
-import { ChartRange } from '@core/models/showcase.model';
-import { LaunchProject } from '@core/models/showcase.model';
+import { ChartRange } from '@showcase/models/showcase.model';
+import { LaunchProject } from '@showcase/models/showcase.model';
 import { MarketAssetConfig, MarketFilter, MarketSortMode } from './market-panel.constants';
 
 export type MarketMomentum = 'hot' | 'warm' | 'neutral' | 'cool';

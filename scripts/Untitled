@@ -1,9 +1,0 @@
-cd /home/Rbzz/dev/dartchain
-git add apps/dartchain-frontend/Dart
-git status
-git commit -m "$(cat <<'EOF'
-Optimize frontend render path for Cloudflare deploy.
-
-EOF
-)"
-git push -u origin HEAD

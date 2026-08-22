@@ -8,9 +8,9 @@ import {
   inject,
 } from '@angular/core';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
-import { DockFaucetStateService } from '@core/services/dock-faucet-state.service';
-import { FaucetRuntimeService } from '@core/services/faucet-runtime.service';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
+import { DockFaucetStateService } from '@dock/services/dock-faucet-state.service';
+import { FaucetRuntimeService } from '@faucet/services/faucet-runtime.service';
 
 @Component({
   selector: 'app-dock-faucet-summary',

@@ -3,7 +3,7 @@ import {
   R4v3FaqCategoryId,
   R4v3FaqEntry,
   R4v3FaqHighlight,
-} from '../models/r4v3-faq.model';
+} from '@showcase/models/r4v3-faq.model';
 
 export const R4V3_FAQ_CATEGORIES: readonly R4v3FaqCategory[] = [
   { id: 'essentiel', label: 'Essentiel', icon: '◆' },

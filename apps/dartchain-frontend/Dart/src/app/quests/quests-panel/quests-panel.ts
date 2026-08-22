@@ -16,13 +16,13 @@ import { interval } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 import { LocaleService } from '../../core/i18n/locale.service';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '@auth/services/auth.service';
 import {
   DockNavigationService,
   QuestNavigateAction,
-} from '../../core/services/dock-navigation.service';
-import { QuestsDataService } from '../../core/services/quests-data.service';
-import { WalletSessionService } from '../../core/services/wallet-session.service';
+} from '@dock/services/dock-navigation.service';
+import { QuestsDataService } from '@quests/services/quests-data.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import { QuestTaskView } from './quests-panel.model';
 import { QuestsPanelService } from './quests-panel.service';
 import {

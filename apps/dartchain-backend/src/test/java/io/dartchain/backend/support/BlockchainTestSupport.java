@@ -5,7 +5,7 @@ import io.dartchain.backend.blockchain.store.BlockchainStateStore;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.blockchain.application.BlockchainValidationService;
-import io.dartchain.backend.service.TransactionPoolService;
+import io.dartchain.backend.blockchain.application.TransactionPoolService;
 import io.dartchain.backend.showcase.application.MarketChartService;
 
 public final class BlockchainTestSupport {

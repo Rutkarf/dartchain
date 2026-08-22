@@ -2,9 +2,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BrandCryptoSelectionService } from '@core/services/brand-crypto-selection.service';
-import { ShowcaseNavigationService } from '@core/services/showcase-navigation.service';
-import { WalletSessionService } from '@core/services/wallet-session.service';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { ShowcaseNavigationService } from '@showcase/services/showcase-navigation.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import { ExchangePanelComponent } from './exchange-panel';
 
 describe('ExchangePanelComponent', () => {

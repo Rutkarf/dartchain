@@ -3,10 +3,10 @@ import { BehaviorSubject } from 'rxjs';
 import { signal } from '@angular/core';
 
 import { LocaleService } from '../../core/i18n/locale.service';
-import { QuestsDataService } from '../../core/services/quests-data.service';
-import { AuthService } from '../../core/services/auth.service';
-import { DockNavigationService } from '../../core/services/dock-navigation.service';
-import { WalletSessionService } from '../../core/services/wallet-session.service';
+import { QuestsDataService } from '@quests/services/quests-data.service';
+import { AuthService } from '@auth/services/auth.service';
+import { DockNavigationService } from '@dock/services/dock-navigation.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import { QuestsPanelComponent } from './quests-panel';
 import { QuestsPanelService } from './quests-panel.service';
 import { QuestPersistedState } from './quests-panel.model';

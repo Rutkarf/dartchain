@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, Injector } from '@angular/core';
 
-import { NavbarTickerDrawerService } from './navbar-ticker-drawer.service';
+import { NavbarTickerDrawerService } from '@navbar/services/navbar-ticker-drawer.service';
 
 export type NavbarDrawerId = 'status' | 'node' | 'ticker';
 

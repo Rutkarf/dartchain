@@ -10,8 +10,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
-import { MarketDataService } from '@core/services/market-data.service';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
+import { MarketDataService } from '@showcase/services/market-data.service';
 import { MarketAssetRow } from '@showcase/components/market-panel/market-panel.model';
 import {
   DOCK_REFRESH_EVENT,

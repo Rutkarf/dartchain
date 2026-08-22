@@ -8,11 +8,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
 import {
   DockPendingPhase,
   DockPendingStateService,
-} from '@core/services/dock-pending-state.service';
+} from '@dock/services/dock-pending-state.service';
 
 @Component({
   selector: 'app-dock-pending-summary',

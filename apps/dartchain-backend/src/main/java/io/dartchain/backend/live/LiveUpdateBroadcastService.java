@@ -1,11 +1,11 @@
 package io.dartchain.backend.live;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.dartchain.backend.dto.PendingTransactionResponse;
-import io.dartchain.backend.dto.StatsResponse;
-import io.dartchain.backend.model.Block;
+import io.dartchain.backend.blockchain.dto.PendingTransactionResponse;
+import io.dartchain.backend.blockchain.dto.StatsResponse;
+import io.dartchain.backend.blockchain.model.Block;
 import io.dartchain.backend.blockchain.application.BlockchainService;
-import io.dartchain.backend.service.PendingTransactionService;
+import io.dartchain.backend.blockchain.application.PendingTransactionService;
 import io.dartchain.backend.peers.application.PeerService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

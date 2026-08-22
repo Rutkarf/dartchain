@@ -11,10 +11,10 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
-import { DockQuestsStateService } from '@core/services/dock-quests-state.service';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
+import { DockQuestsStateService } from '@dock/services/dock-quests-state.service';
 import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
-import { WalletSessionService } from '@core/services/wallet-session.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import { CURRENT_MISSION } from '@quests/quests-panel/quests-panel.constants';
 
 @Component({

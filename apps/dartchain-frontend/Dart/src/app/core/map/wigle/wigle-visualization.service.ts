@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { GeoCoordinateService } from '../geo-coordinate.service';
 import { MapConfigService } from '../map-config.service';
-import { ThreeSceneService } from '../../services/three-scene.service';
+import { ThreeSceneService } from '@metaverse/services/three-scene.service';
 import { WigleApiService } from './wigle-api.service';
 import { WigleBuildingManager } from './wigle-building.manager';
 import { WIGLEBuildingOverlayManager } from './wigle-building-overlay.manager';

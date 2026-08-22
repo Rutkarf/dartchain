@@ -1,7 +1,7 @@
 import { HttpBackend, HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
-import type { AuthResponse } from '../models/auth.model';
+import type { AuthResponse } from '@auth/models/auth.model';
 import { environment } from '../../../environments/environment';
 import {
   clearAuthSession,

@@ -27,11 +27,11 @@ import {
 import {
   NewsItem,
   NewsSource,
-} from '@core/models/showcase.model';
-import { ShowcaseApiService } from '@core/services/showcase-api.service';
-import { ShowcaseNavigationService } from '@core/services/showcase-navigation.service';
-import { ShowcaseNewsStateService } from '@core/services/showcase-news-state.service';
-import { BlockchainApiService } from '@core/services/blockchain-api.service';
+} from '@showcase/models/showcase.model';
+import { ShowcaseApiService } from '@showcase/services/showcase-api.service';
+import { ShowcaseNavigationService } from '@showcase/services/showcase-navigation.service';
+import { ShowcaseNewsStateService } from '@showcase/services/showcase-news-state.service';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
 import { ShowcaseNewsDrawerComponent } from './showcase-news-drawer';
 import { buildNewsCopyText, copyTextToClipboard } from '@core/utils/clipboard.util';
 import {

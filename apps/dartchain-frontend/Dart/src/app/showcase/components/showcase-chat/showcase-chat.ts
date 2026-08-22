@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ChatMessage } from '@core/models/showcase.model';
+import { ChatMessage } from '@showcase/models/showcase.model';
 import {
   CHAT_THEME_COLOR_GRID,
   CHAT_THEME_HIGHLIGHT_GRID,
@@ -35,10 +35,10 @@ import {
   formatChatMessageTime,
 } from '@core/constants/chat-display.constants';
 import { ChatRoleMeta, chatRoleFor } from '@core/constants/chat-role.constants';
-import { ChatStylePreferencesService } from '@core/services/chat-style-preferences.service';
-import { AuthService } from '@core/services/auth.service';
-import { ShowcaseChatService } from '@core/services/showcase-chat.service';
-import { ShowcaseChatStateService } from '@core/services/showcase-chat-state.service';
+import { ChatStylePreferencesService } from '@showcase/services/chat-style-preferences.service';
+import { AuthService } from '@auth/services/auth.service';
+import { ShowcaseChatService } from '@showcase/services/showcase-chat.service';
+import { ShowcaseChatStateService } from '@showcase/services/showcase-chat-state.service';
 import {
   SHOWCASE_REFRESH_EVENT,
   refreshEventMatchesTab,

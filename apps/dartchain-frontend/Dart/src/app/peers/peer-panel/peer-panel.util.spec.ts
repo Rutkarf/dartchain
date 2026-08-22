@@ -1,4 +1,4 @@
-import { PeerView } from '../../core/services/blockchain-api.service';
+import { PeerView } from '@blockchain/services/blockchain-api.service';
 import {
   buildActivityPoints,
   buildNetworkStats,

@@ -1,4 +1,4 @@
-import { LaunchProject } from '@core/models/showcase.model';
+import { LaunchProject } from '@showcase/models/showcase.model';
 import { MarketRecentTrade } from '@showcase/components/market-panel/market-panel.model';
 
 export type R4v3ChartView = 'auto' | 'flow' | 'pulse' | 'fuel' | 'health';

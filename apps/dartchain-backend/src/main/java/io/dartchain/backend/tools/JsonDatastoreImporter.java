@@ -10,7 +10,7 @@ import io.dartchain.backend.exchange.ExchangeLedgerSnapshot;
 import io.dartchain.backend.exchange.store.ExchangeLedgerStore;
 import io.dartchain.backend.faucet.FaucetClaimSnapshot;
 import io.dartchain.backend.faucet.store.FaucetClaimStore;
-import io.dartchain.backend.model.FaucetClaim;
+import io.dartchain.backend.faucet.model.FaucetClaim;
 import io.dartchain.backend.persistence.UserEntityMapper;
 import io.dartchain.backend.persistence.entity.UserEntity;
 import io.dartchain.backend.persistence.repository.UserJpaRepository;

@@ -1,6 +1,6 @@
 package io.dartchain.backend.explorer.dto;
 
-import io.dartchain.backend.model.Block;
+import io.dartchain.backend.blockchain.model.Block;
 
 import java.util.List;
 

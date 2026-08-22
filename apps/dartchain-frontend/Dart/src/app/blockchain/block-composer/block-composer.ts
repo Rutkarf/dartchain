@@ -19,12 +19,12 @@ import {
 import { firstValueFrom, startWith } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { Block } from '../../core/models/block.model';
-import { BlockchainApiService } from '../../core/services/blockchain-api.service';
-import { AuthService } from '../../core/services/auth.service';
-import { WalletSessionService } from '../../core/services/wallet-session.service';
-import { TransactionsDockService } from '../../core/services/transactions-dock.service';
-import { TransactionsDataService } from '../../core/services/transactions-data.service';
+import { Block } from '@blockchain/models/block.model';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
+import { AuthService } from '@auth/services/auth.service';
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
+import { TransactionsDockService } from '@dock/services/transactions-dock.service';
+import { TransactionsDataService } from '@dock/services/transactions-data.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 
 @Component({

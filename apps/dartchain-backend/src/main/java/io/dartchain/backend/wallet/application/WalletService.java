@@ -1,9 +1,9 @@
 package io.dartchain.backend.wallet.application;
 
-import io.dartchain.backend.dto.WalletPublicView;
-import io.dartchain.backend.dto.WalletVerifyResponse;
-import io.dartchain.backend.model.Wallet;
-import io.dartchain.backend.model.Transaction;
+import io.dartchain.backend.wallet.dto.WalletPublicView;
+import io.dartchain.backend.wallet.dto.WalletVerifyResponse;
+import io.dartchain.backend.wallet.model.Wallet;
+import io.dartchain.backend.blockchain.model.Transaction;
 
 import java.math.BigDecimal;
 

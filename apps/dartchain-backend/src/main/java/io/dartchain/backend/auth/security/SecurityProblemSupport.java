@@ -3,7 +3,7 @@ package io.dartchain.backend.auth.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dartchain.backend.api.ApiProblemDetails;
 import io.dartchain.backend.api.ApiV1Support;
-import io.dartchain.backend.dto.ApiErrorResponse;
+import io.dartchain.backend.shared.dto.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;

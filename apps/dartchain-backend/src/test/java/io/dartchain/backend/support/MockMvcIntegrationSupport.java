@@ -2,11 +2,13 @@ package io.dartchain.backend.support;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dartchain.backend.faucet.store.FaucetPendingBalanceStore;
 import io.dartchain.backend.shared.utils.CryptoUtils;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 import java.security.KeyPair;
 
@@ -86,4 +88,12 @@ public final class MockMvcIntegrationSupport {
         linkWallet(mockMvc, session, wallet);
         return session;
     }
+
+    /** Crédite le solde faucet pending (pièces M4T3R) requis depuis la refonte claim. */
+    public static void seedFaucetPending(FaucetPendingBalanceStore store, String walletAddress, BigDecimal amount) {
+        store.add(walletAddress, amount);
+    }
+
+    /** Montant minimal pour un claim faucet d'intégration (plafond 1 R4V3). */
+    public static final BigDecimal FAUCET_ITEST_PENDING = BigDecimal.ONE;
 }

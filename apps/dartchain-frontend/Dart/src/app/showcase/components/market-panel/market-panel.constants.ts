@@ -1,5 +1,5 @@
-import { ChartRange } from '@core/models/showcase.model';
-import { ExchangeFromToken } from '@core/services/brand-crypto-selection.service';
+import { ChartRange } from '@showcase/models/showcase.model';
+import { ExchangeFromToken } from '@navbar/services/brand-crypto-selection.service';
 
 export type MarketFilter = 'all' | 'r4v3' | 'fav' | 'gainers' | 'losers' | 'tradable';
 

@@ -2,10 +2,10 @@ package io.dartchain.backend.blockchain.infrastructure.web;
 
 import io.dartchain.backend.auth.AuthService;
 import io.dartchain.backend.auth.security.RoleAuthorizationService;
-import io.dartchain.backend.dto.MineRequest;
-import io.dartchain.backend.dto.StatsResponse;
-import io.dartchain.backend.model.Block;
-import io.dartchain.backend.model.Transaction;
+import io.dartchain.backend.blockchain.dto.MineRequest;
+import io.dartchain.backend.blockchain.dto.StatsResponse;
+import io.dartchain.backend.blockchain.model.Block;
+import io.dartchain.backend.blockchain.model.Transaction;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.exchange.application.ExchangeService;
 import io.dartchain.backend.web.RequestClientInfo;

@@ -2,6 +2,7 @@ package io.dartchain.backend.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.dartchain.backend.faucet.store.FaucetPendingBalanceStore;
 import io.dartchain.backend.support.MockMvcIntegrationSupport;
 import io.dartchain.backend.support.MockMvcIntegrationSupport.Session;
 import io.dartchain.backend.support.MockMvcIntegrationSupport.WalletInfo;
@@ -30,11 +31,18 @@ class UserJourneyIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private FaucetPendingBalanceStore pendingBalanceStore;
+
     @Test
     void registerWalletFaucetMineQuestExploreBlock_succeeds() throws Exception {
         Session session = MockMvcIntegrationSupport.register(mockMvc);
         WalletInfo wallet = MockMvcIntegrationSupport.createWallet(mockMvc);
         MockMvcIntegrationSupport.linkWallet(mockMvc, session, wallet);
+        MockMvcIntegrationSupport.seedFaucetPending(
+                pendingBalanceStore,
+                wallet.address(),
+                MockMvcIntegrationSupport.FAUCET_ITEST_PENDING);
 
         mockMvc.perform(post("/api/faucet/claim")
                         .header("Authorization", session.authHeader())

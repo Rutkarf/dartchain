@@ -1,6 +1,6 @@
 package io.dartchain.backend.showcase.dto;
 
-import io.dartchain.backend.dto.CryptoRatePanelResponse;
+import io.dartchain.backend.exchange.dto.CryptoRatePanelResponse;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { BottomDockTab } from '@core/services/dock-navigation.service';
+import { BottomDockTab } from '@dock/services/dock-navigation.service';
 import { ProductConfigService } from '@core/config/product-config.service';
-import { AuthService } from '@core/services/auth.service';
+import { AuthService } from '@auth/services/auth.service';
 import { DockWalletSummaryComponent } from './dock-wallet-summary';
 import { DockFaucetSummaryComponent } from './dock-faucet-summary';
 import { DockTransactionsSummaryComponent } from './dock-transactions-summary';

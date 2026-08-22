@@ -1,8 +1,8 @@
 package io.dartchain.backend.blockchain.infrastructure.web;
 
-import io.dartchain.backend.dto.BlockValidationResult;
-import io.dartchain.backend.dto.CreateBlockRequest;
-import io.dartchain.backend.model.Block;
+import io.dartchain.backend.blockchain.dto.BlockValidationResult;
+import io.dartchain.backend.blockchain.dto.CreateBlockRequest;
+import io.dartchain.backend.blockchain.model.Block;
 import io.dartchain.backend.p2p.P2pService;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.blockchain.application.BlockchainValidationService;

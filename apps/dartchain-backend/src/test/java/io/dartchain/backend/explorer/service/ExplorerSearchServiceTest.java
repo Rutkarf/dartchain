@@ -4,7 +4,7 @@ import io.dartchain.backend.explorer.dto.ExplorerSearchResponse;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.showcase.application.MarketChartService;
 import io.dartchain.backend.blockchain.application.BlockchainValidationService;
-import io.dartchain.backend.service.TransactionPoolService;
+import io.dartchain.backend.blockchain.application.TransactionPoolService;
 import io.dartchain.backend.support.BlockchainTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 import { Injectable, NgZone, inject } from '@angular/core';
 import * as THREE from 'three';
 
-import { ThreeSceneService } from '../../services/three-scene.service';
+import { ThreeSceneService } from '@metaverse/services/three-scene.service';
 import { isPlacementVisible } from './placement-rules';
 import {
   PLACEMENTS_LAYER_CONFIG,

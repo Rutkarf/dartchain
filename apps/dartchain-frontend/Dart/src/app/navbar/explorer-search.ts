@@ -20,12 +20,12 @@ import {
   tap,
 } from 'rxjs';
 
-import { Block } from '../core/models/block.model';
+import { Block } from '@blockchain/models/block.model';
 import {
   ExplorerSearchResult,
   ExplorerSearchResponse,
-} from '../core/models/explorer-search.model';
-import { BlockchainApiService } from '../core/services/blockchain-api.service';
+} from '@explorer/models/explorer-search.model';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
 
 @Component({
   selector: 'app-explorer-search',

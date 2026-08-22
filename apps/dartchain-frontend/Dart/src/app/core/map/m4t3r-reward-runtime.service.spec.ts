@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
 
-import { FaucetRuntimeService } from '../services/faucet-runtime.service';
+import { FaucetRuntimeService } from '@faucet/services/faucet-runtime.service';
 import { M4t3rRewardApiService } from './m4t3r-reward-api.service';
 import { M4t3rRewardRuntimeService } from './m4t3r-reward-runtime.service';
 import type { M4t3rTrailPickupAccepted } from './m4t3r-trail-api.service';

@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 
 import { M4t3rRewardApiService } from './m4t3r-reward-api.service';
 import type { M4t3rTrailPickupAccepted } from './m4t3r-trail-api.service';
-import { FaucetRuntimeService } from '../services/faucet-runtime.service';
+import { FaucetRuntimeService } from '@faucet/services/faucet-runtime.service';
 import type { M4T3RReward, M4T3RRewardHistoryItem } from './m4t3r-reward.types';
 
 export type M4t3rRewardEventType =

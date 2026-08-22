@@ -14,11 +14,11 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { DaoShowcaseCard, daoStatusLabel } from '@core/models/showcase-dao.model';
-import { CommunityFaqQuestion } from '@core/models/r4v3-hub.model';
-import { AuthService } from '@core/services/auth.service';
-import { R4v3CommunityFaqService } from '@core/services/r4v3-community-faq.service';
-import { ShowcaseDaoStateService } from '@core/services/showcase-dao-state.service';
+import { DaoShowcaseCard, daoStatusLabel } from '@showcase/models/showcase-dao.model';
+import { CommunityFaqQuestion } from '@showcase/models/r4v3-hub.model';
+import { AuthService } from '@auth/services/auth.service';
+import { R4v3CommunityFaqService } from '@showcase/services/r4v3-community-faq.service';
+import { ShowcaseDaoStateService } from '@showcase/services/showcase-dao-state.service';
 import { FocusTrapDirective } from '@core/directives/focus-trap.directive';
 
 @Component({

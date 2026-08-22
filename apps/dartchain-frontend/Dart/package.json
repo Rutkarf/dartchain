@@ -6,16 +6,17 @@
     "start": "ng serve --configuration development --project Dart --host localhost --port 4200",
     "build": "ng build",
     "build:docker": "ng build --configuration docker",
-    "build:cloudflare": "bash scripts/build-cloudflare.sh",
-    "build:geojson": "node scripts/build-marseille-geojson.mjs",
+    "build:cloudflare": "node tools/prepare-cloudflare-env.mjs && ng build --configuration cloudflare",
+    "build:geojson": "node tools/build-marseille-geojson.mjs",
+    "build:stats": "ng build --stats-json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:coverage": "ng test --no-watch --coverage",
     "verify:auth": "ng test --no-watch --coverage=false --include=**/auth-session.storage.spec.ts --include=**/auth.interceptor.spec.ts",
     "verify:chain": "ng test --no-watch --coverage=false --include=**/wallet-address.util.spec.ts",
     "verify:admin": "ng test --no-watch --coverage=false --include=**/ops-snapshot.service.spec.ts --include=**/admin-panel.spec.ts",
-    "verify:a11y": "bash scripts/verify-a11y-ux.sh",
-    "verify:release": "bash scripts/release-verify.sh"
+    "verify:a11y": "ng test --no-watch --coverage=false --include=**/a11y-contract.spec.ts",
+    "verify:release": "npm run verify:release --prefix ../../dartchain-backend && npm run test:coverage"
   },
   "prettier": {
     "printWidth": 100,

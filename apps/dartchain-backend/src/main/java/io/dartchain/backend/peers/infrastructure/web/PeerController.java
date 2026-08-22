@@ -1,10 +1,10 @@
 package io.dartchain.backend.peers.infrastructure.web;
 
 import io.dartchain.backend.auth.security.RoleAuthorizationService;
-import io.dartchain.backend.dto.AddPeerRequest;
-import io.dartchain.backend.dto.AddPeerResponse;
-import io.dartchain.backend.dto.PeerStatsResponse;
-import io.dartchain.backend.dto.PeerView;
+import io.dartchain.backend.peers.dto.AddPeerRequest;
+import io.dartchain.backend.peers.dto.AddPeerResponse;
+import io.dartchain.backend.peers.dto.PeerStatsResponse;
+import io.dartchain.backend.peers.dto.PeerView;
 import io.dartchain.backend.peer.PeerConnection;
 import io.dartchain.backend.peer.PeerMetricsRegistry;
 import io.dartchain.backend.peer.PeerMetricsRegistry.PeerMetricsSnapshot;

@@ -10,7 +10,7 @@ DELETION_POLICY: never delete
 
 ### EXCLUSIVE_METAVERSEBB (modifiable / créable)
 
-- `apps/dartchain-frontend/Dart/src/app/three-floor/**`
+- `apps/dartchain-frontend/Dart/src/app/metaverse/**`
 - `apps/dartchain-frontend/Dart/src/app/core/map/marseille-twin/**` (ce dossier)
 - Marseille-only map modules consumed by `MarseilleMapProvider` / three-floor
   (`geo-reference.config.ts`, `marseille-map.provider.ts`, `placements/**`,

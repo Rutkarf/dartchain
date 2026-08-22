@@ -1,8 +1,8 @@
 package io.dartchain.backend.blockchain;
 
 import io.dartchain.backend.blockchain.store.BlockchainStateStore;
-import io.dartchain.backend.model.Block;
-import io.dartchain.backend.model.PendingTransaction;
+import io.dartchain.backend.blockchain.model.Block;
+import io.dartchain.backend.blockchain.model.PendingTransaction;
 
 import java.util.ArrayList;
 import java.util.List;

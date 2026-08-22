@@ -1,9 +1,9 @@
 package io.dartchain.backend.wallet.infrastructure.web;
 
-import io.dartchain.backend.dto.WalletPublicView;
-import io.dartchain.backend.dto.WalletVerifyRequest;
-import io.dartchain.backend.dto.WalletVerifyResponse;
-import io.dartchain.backend.model.Wallet;
+import io.dartchain.backend.wallet.dto.WalletPublicView;
+import io.dartchain.backend.wallet.dto.WalletVerifyRequest;
+import io.dartchain.backend.wallet.dto.WalletVerifyResponse;
+import io.dartchain.backend.wallet.model.Wallet;
 import io.dartchain.backend.wallet.application.WalletService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

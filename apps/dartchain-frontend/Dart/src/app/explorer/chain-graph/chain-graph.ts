@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { Block } from '../../core/models/block.model';
+import { Block } from '@blockchain/models/block.model';
 import {
   buildChainGraphNodes,
   chainGraphDimensions,

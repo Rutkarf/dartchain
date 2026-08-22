@@ -2,11 +2,11 @@ package io.dartchain.backend.faucet.infrastructure.web;
 
 import io.dartchain.backend.auth.AuthService;
 import io.dartchain.backend.auth.UserAccount;
-import io.dartchain.backend.dto.FaucetClaimRequest;
-import io.dartchain.backend.dto.FaucetClaimResponse;
-import io.dartchain.backend.dto.FaucetConfigResponse;
-import io.dartchain.backend.dto.FaucetStateResponse;
-import io.dartchain.backend.model.FaucetClaim;
+import io.dartchain.backend.faucet.dto.FaucetClaimRequest;
+import io.dartchain.backend.faucet.dto.FaucetClaimResponse;
+import io.dartchain.backend.faucet.dto.FaucetConfigResponse;
+import io.dartchain.backend.faucet.dto.FaucetStateResponse;
+import io.dartchain.backend.faucet.model.FaucetClaim;
 import io.dartchain.backend.product.ProductFeatureService;
 import io.dartchain.backend.faucet.application.FaucetService;
 import jakarta.validation.Valid;

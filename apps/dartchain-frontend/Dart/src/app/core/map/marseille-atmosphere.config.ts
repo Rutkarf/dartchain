@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { FLOOR_HORIZON_BLEND } from '../../three-floor/floor-horizon-blend.config';
+import { FLOOR_HORIZON_BLEND } from '@metaverse/floor-horizon-blend.config';
 import type { MapQuality } from './map-configuration';
 import { mapQualityTier } from './map-configuration';
 import { mapPerfProfile } from './marseille-perf.config';

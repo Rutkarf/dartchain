@@ -16,9 +16,9 @@ import {
   BlockchainApiService,
   PendingTransaction,
   LiveUpdateMessage,
-} from '../../core/services/blockchain-api.service';
-import { NavbarTickerStateService } from '../../core/services/navbar-ticker-state.service';
-import { NavbarTickerDrawerService } from '../../core/services/navbar-ticker-drawer.service';
+} from '@blockchain/services/blockchain-api.service';
+import { NavbarTickerStateService } from '@navbar/services/navbar-ticker-state.service';
+import { NavbarTickerDrawerService } from '@navbar/services/navbar-ticker-drawer.service';
 
 @Component({
   selector: 'app-bandeau-accueil',

@@ -10,7 +10,7 @@ import io.dartchain.backend.blockchain.JsonBlockchainStateStore;
 import io.dartchain.backend.quests.dto.QuestProgressRequest;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.blockchain.application.BlockchainValidationService;
-import io.dartchain.backend.service.TransactionPoolService;
+import io.dartchain.backend.blockchain.application.TransactionPoolService;
 import io.dartchain.backend.showcase.application.MarketChartService;
 import io.dartchain.backend.support.AuthServiceTestSupport;
 import io.dartchain.backend.support.BlockchainTestSupport;

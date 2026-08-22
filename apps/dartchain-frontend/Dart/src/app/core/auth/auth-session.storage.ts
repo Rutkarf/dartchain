@@ -1,4 +1,4 @@
-import type { AuthResponse, UserProfile } from '../models/auth.model';
+import type { AuthResponse, UserProfile } from '@auth/models/auth.model';
 
 export const AUTH_TOKEN_KEY = 'dartchain_auth_token';
 export const AUTH_REFRESH_KEY = 'dartchain_auth_refresh';

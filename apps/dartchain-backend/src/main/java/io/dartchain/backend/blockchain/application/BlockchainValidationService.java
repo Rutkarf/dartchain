@@ -1,8 +1,8 @@
 package io.dartchain.backend.blockchain.application;
 
-import io.dartchain.backend.dto.BlockValidationResult;
-import io.dartchain.backend.model.Block;
-import io.dartchain.backend.model.Transaction;
+import io.dartchain.backend.blockchain.dto.BlockValidationResult;
+import io.dartchain.backend.blockchain.model.Block;
+import io.dartchain.backend.blockchain.model.Transaction;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

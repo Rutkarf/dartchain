@@ -12,11 +12,11 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { DaoShowcaseCard, daoStatusLabel } from '@core/models/showcase-dao.model';
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
-import { R4v3CommunityFaqService } from '@core/services/r4v3-community-faq.service';
-import { ShowcaseDaoStateService } from '@core/services/showcase-dao-state.service';
-import { ShowcaseLaunchStateService } from '@core/services/showcase-launch-state.service';
+import { DaoShowcaseCard, daoStatusLabel } from '@showcase/models/showcase-dao.model';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
+import { R4v3CommunityFaqService } from '@showcase/services/r4v3-community-faq.service';
+import { ShowcaseDaoStateService } from '@showcase/services/showcase-dao-state.service';
+import { ShowcaseLaunchStateService } from '@showcase/services/showcase-launch-state.service';
 
 @Component({
   selector: 'app-showcase-dao-summary',

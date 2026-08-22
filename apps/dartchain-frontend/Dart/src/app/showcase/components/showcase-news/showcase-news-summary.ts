@@ -10,10 +10,10 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { COLLAPSED_SUMMARY_BAR_CLASS } from '@core/models/collapsed-summary.model';
-import { ShowcaseNavigationService } from '@core/services/showcase-navigation.service';
-import { ShowcaseHubUiService } from '@core/services/showcase-hub-ui.service';
-import { ShowcaseNewsStateService } from '@core/services/showcase-news-state.service';
+import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
+import { ShowcaseNavigationService } from '@showcase/services/showcase-navigation.service';
+import { ShowcaseHubUiService } from '@showcase/services/showcase-hub-ui.service';
+import { ShowcaseNewsStateService } from '@showcase/services/showcase-news-state.service';
 import { buildNewsCopyText, copyTextToClipboard } from '@core/utils/clipboard.util';
 import {
   formatNewsDisplayTitle,

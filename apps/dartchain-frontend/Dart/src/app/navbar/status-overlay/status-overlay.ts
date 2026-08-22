@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject } from '@angular/core';
 
-import { NetworkTrustService } from '../../core/services/network-trust.service';
-import { ShellFeedbackService } from '../../core/services/shell-feedback.service';
+import { NetworkTrustService } from '@navbar/services/network-trust.service';
+import { ShellFeedbackService } from '@core/services/shell-feedback.service';
 
 export type LatencyTier = 'checking' | 'unknown' | 'excellent' | 'good' | 'slow' | 'poor';
 

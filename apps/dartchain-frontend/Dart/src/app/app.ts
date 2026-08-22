@@ -3,67 +3,67 @@ import { Component, DestroyRef, HostListener, inject, signal } from '@angular/co
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { take } from 'rxjs';
 
-import { Block } from './core/models/block.model';
+import { Block } from '@blockchain/models/block.model';
 import {
   ShowcaseNavigationService,
   ShowcaseNewsAction,
-} from './core/services/showcase-navigation.service';
-import { BlockchainApiService } from './core/services/blockchain-api.service';
+} from '@showcase/services/showcase-navigation.service';
+import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
 
-import { ParticleBackgroundComponent } from './particle-background/particle-background';
-import { StarQuestPanelComponent } from './particle-background/star-conquest/star-quest-panel';
-import { StarQuestScannerComponent } from './particle-background/star-conquest/star-quest-scanner';
+import { ParticleBackgroundComponent } from '@star-conquest/components/particle-background/particle-background';
+import { StarQuestPanelComponent } from '@star-conquest/star-quest-panel';
+import { StarQuestScannerComponent } from '@star-conquest/star-quest-scanner';
 import { BandeauAccueilComponent } from './navbar/bandeau-accueil/bandeau-accueil';
-import { NavbarComponent } from './components/navbar/navbar.component';
+import { NavbarComponent } from '@navbar/components/navbar-host/navbar.component';
 import { SwapComponent } from '@exchange/components/swap/swap.component';
-import { ShowcaseTabShowcaseComponent } from './components/showcase-tab-showcase/showcase-tab-showcase.component';
-import { DockTabsDockTabsComponent } from './components/dock-tabs-dock-tabs/dock-tabs-dock-tabs.component';
-import { GraphComponent } from './components/graph/graph.component';
+import { ShowcaseTabShowcaseComponent } from '@showcase/components/showcase-tab-showcase/showcase-tab-showcase.component';
+import { DockTabsDockTabsComponent } from '@dock/components/dock-tabs-shell/dock-tabs-shell.component';
+import { GraphComponent } from '@exchange/components/graph/graph.component';
 
 import { ShowcaseTab,
   isNewsShowcaseTab,
   newsCategoryForTab,
   normalizeShowcaseTab,
-} from './core/models/showcase-tab.model';
+} from '@showcase/models/showcase-tab.model';
 import {
   BottomDockTab,
   DockNavigationService,
   QuestNavigateAction,
-} from './core/services/dock-navigation.service';
-import { QuestsProgressService } from './core/services/quests-progress.service';
-import { ShellFeedbackService } from './core/services/shell-feedback.service';
+} from '@dock/services/dock-navigation.service';
+import { QuestsProgressService } from '@quests/services/quests-progress.service';
+import { ShellFeedbackService } from '@core/services/shell-feedback.service';
 import { LocaleService } from './core/i18n/locale.service';
 import { OverlayPanel } from '@dock/components/dock-tabs/dock-tabs';
 import { ErrorBannerComponent } from './components/error-banner/error-banner';
 import { R4v3SceneComponent } from './r4v3-scene/r4v3-scene';
 import { BlockDetailDrawerComponent } from '@blockchain/block-detail-drawer/block-detail-drawer';
 import { LaunchFormDrawerComponent } from './showcase/components/launch-form-drawer/launch-form-drawer';
-import { LaunchDrawerService } from './core/services/launch-drawer.service';
-import { ThreeFloor } from './three-floor/three-floor';
+import { LaunchDrawerService } from '@showcase/services/launch-drawer.service';
+import { ThreeFloor } from '@metaverse/three-floor';
 import { CombinedPerfHudComponent } from './core/utils/combined-perf-hud.component';
 import { bindViewportCompactClass } from './core/viewport-compact';
 import { ProductConfigService } from './core/config/product-config.service';
-import { AuthService } from './core/services/auth.service';
-import { ShowcaseNewsStateService } from './core/services/showcase-news-state.service';
-import { ShowcaseHubUiService } from './core/services/showcase-hub-ui.service';
+import { AuthService } from '@auth/services/auth.service';
+import { ShowcaseNewsStateService } from '@showcase/services/showcase-news-state.service';
+import { ShowcaseHubUiService } from '@showcase/services/showcase-hub-ui.service';
 import { AuthDrawerComponent } from '@auth/auth-drawer/auth-drawer';
-import { FaucetRuntimeService } from './core/services/faucet-runtime.service';
-import { ChartSummaryStateService } from './core/services/chart-summary-state.service';
-import { ShowcaseR4v3StateService } from './core/services/showcase-r4v3-state.service';
-import { ShowcaseChatStateService } from './core/services/showcase-chat-state.service';
-import { ShowcaseLaunchStateService } from './core/services/showcase-launch-state.service';
-import { ShowcaseDaoStateService } from './core/services/showcase-dao-state.service';
+import { FaucetRuntimeService } from '@faucet/services/faucet-runtime.service';
+import { ChartSummaryStateService } from '@showcase/services/chart-summary-state.service';
+import { ShowcaseR4v3StateService } from '@showcase/services/showcase-r4v3-state.service';
+import { ShowcaseChatStateService } from '@showcase/services/showcase-chat-state.service';
+import { ShowcaseLaunchStateService } from '@showcase/services/showcase-launch-state.service';
+import { ShowcaseDaoStateService } from '@showcase/services/showcase-dao-state.service';
 import {
   DOCK_REFRESH_EVENT,
   SHOWCASE_REFRESH_EVENT,
 } from './core/constants/panel-refresh.constants';
-import { DockWalletStateService } from './core/services/dock-wallet-state.service';
-import { TransactionsDataService } from './core/services/transactions-data.service';
-import { DockChainStateService } from './core/services/dock-chain-state.service';
-import { ChainDataService } from './core/services/chain-data.service';
-import { MarketDataService } from './core/services/market-data.service';
-import { QuestsDataService } from './core/services/quests-data.service';
-import { PeersDataService } from './core/services/peers-data.service';
+import { DockWalletStateService } from '@dock/services/dock-wallet-state.service';
+import { TransactionsDataService } from '@dock/services/transactions-data.service';
+import { DockChainStateService } from '@dock/services/dock-chain-state.service';
+import { ChainDataService } from '@blockchain/services/chain-data.service';
+import { MarketDataService } from '@showcase/services/market-data.service';
+import { QuestsDataService } from '@quests/services/quests-data.service';
+import { PeersDataService } from '@peers/services/peers-data.service';
 
 @Component({
   selector: 'app-root',

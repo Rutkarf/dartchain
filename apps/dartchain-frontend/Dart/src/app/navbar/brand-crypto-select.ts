@@ -14,10 +14,10 @@ import {
   EXCHANGE_LAUNCHPAD_SWAP_TOKENS,
   isLaunchpadSwapToken,
 } from '../core/constants/exchange-launchpad.constants';
-import { BrandCryptoSelectionService } from '../core/services/brand-crypto-selection.service';
-import { ShowcaseLaunchStateService } from '../core/services/showcase-launch-state.service';
-import { ShowcaseNavigationService } from '../core/services/showcase-navigation.service';
-import { LaunchProject, LaunchStatus } from '../core/models/showcase.model';
+import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
+import { ShowcaseLaunchStateService } from '@showcase/services/showcase-launch-state.service';
+import { ShowcaseNavigationService } from '@showcase/services/showcase-navigation.service';
+import { LaunchProject, LaunchStatus } from '@showcase/models/showcase.model';
 
 const LAUNCH_TOKEN_DISPLAY: Record<string, string> = {
   PXD: 'Pixel DAO',

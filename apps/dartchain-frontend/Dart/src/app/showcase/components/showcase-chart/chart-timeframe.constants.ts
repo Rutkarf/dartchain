@@ -1,4 +1,4 @@
-import { ChartRange } from '@core/models/showcase.model';
+import { ChartRange } from '@showcase/models/showcase.model';
 
 /** Granularité native fournie par CoinGecko (`/coins/{id}/market_chart`). */
 export type CoingeckoGranularity = '5m' | '1h' | '1d';

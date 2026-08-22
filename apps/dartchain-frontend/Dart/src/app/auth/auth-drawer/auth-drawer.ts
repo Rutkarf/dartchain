@@ -12,8 +12,8 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { AuthService } from '../../core/services/auth.service';
-import { AuthMode } from '../../core/models/auth.model';
+import { AuthService } from '@auth/services/auth.service';
+import { AuthMode } from '@auth/models/auth.model';
 import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { AUTH_OAUTH_PROVIDERS } from './auth-drawer.oauth';

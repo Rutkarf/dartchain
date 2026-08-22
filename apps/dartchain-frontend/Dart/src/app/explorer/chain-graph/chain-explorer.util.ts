@@ -1,5 +1,5 @@
-import { Block, BlockTransaction } from '../../core/models/block.model';
-import { ExplorerBlocksResponse } from '../../core/models/explorer-blocks.model';
+import { Block, BlockTransaction } from '@blockchain/models/block.model';
+import { ExplorerBlocksResponse } from '@explorer/models/explorer-blocks.model';
 
 export type { ExplorerBlocksResponse };
 

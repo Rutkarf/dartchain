@@ -1,4 +1,4 @@
-import { QuestNavigateAction } from '../../core/services/dock-navigation.service';
+import { QuestNavigateAction } from '@dock/services/dock-navigation.service';
 
 export interface DailyQuestDefinition {
   id: string;

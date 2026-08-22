@@ -16,9 +16,9 @@ import { catchError, debounceTime, distinctUntilChanged, map, of, switchMap } fr
 
 import { isLaunchpadSwapToken } from '@core/constants/exchange-launchpad.constants';
 import { BRAND_DEFAULT_CRYPTO } from '@core/constants/rate-panel-symbols';
-import { CryptoRatesService } from '@core/services/crypto-rate.service';
-import { RatePanelPreferencesService } from '@core/services/rate-panel-preferences.service';
-import { ShowcaseLaunchStateService } from '@core/services/showcase-launch-state.service';
+import { CryptoRatesService } from '@exchange/services/crypto-rate.service';
+import { RatePanelPreferencesService } from '@showcase/services/rate-panel-preferences.service';
+import { ShowcaseLaunchStateService } from '@showcase/services/showcase-launch-state.service';
 import { chartSearchSourceLabel, ChartSearchResult } from './chart-token-search.model';
 import { readChartWatchlist, upsertChartWatchlist } from './chart-watchlist.util';
 

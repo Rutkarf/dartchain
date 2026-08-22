@@ -14,9 +14,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { NewsItem, NewsSource } from '@core/models/showcase.model';
+import { NewsItem, NewsSource } from '@showcase/models/showcase.model';
 import { FocusTrapDirective } from '@core/directives/focus-trap.directive';
-import { ShowcaseNewsStateService } from '@core/services/showcase-news-state.service';
+import { ShowcaseNewsStateService } from '@showcase/services/showcase-news-state.service';
 import { buildNewsCopyText, copyTextToClipboard } from '@core/utils/clipboard.util';
 import {
   formatNewsDisplayTitle,

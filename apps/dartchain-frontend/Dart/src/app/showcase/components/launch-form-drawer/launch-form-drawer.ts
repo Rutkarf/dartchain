@@ -15,7 +15,7 @@ import {
   Validators,
 } from '@angular/forms';
 
-import { CreateLaunchProjectRequest } from '@core/models/showcase.model';
+import { CreateLaunchProjectRequest } from '@showcase/models/showcase.model';
 import { FocusTrapDirective } from '@core/directives/focus-trap.directive';
 
 const LOGO_MAX_BYTES = 200_000;

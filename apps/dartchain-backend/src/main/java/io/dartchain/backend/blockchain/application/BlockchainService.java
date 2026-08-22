@@ -1,17 +1,17 @@
 package io.dartchain.backend.blockchain.application;
 
 import io.dartchain.backend.blockchain.store.BlockchainStateStore;
-import io.dartchain.backend.dto.BlockValidationResult;
-import io.dartchain.backend.dto.StatsResponse;
+import io.dartchain.backend.blockchain.dto.BlockValidationResult;
+import io.dartchain.backend.blockchain.dto.StatsResponse;
 import io.dartchain.backend.shared.exception.InvalidBlockException;
-import io.dartchain.backend.model.Block;
-import io.dartchain.backend.model.PendingTransaction;
-import io.dartchain.backend.model.Transaction;
+import io.dartchain.backend.blockchain.model.Block;
+import io.dartchain.backend.blockchain.model.PendingTransaction;
+import io.dartchain.backend.blockchain.model.Transaction;
 import io.dartchain.backend.showcase.application.MarketChartService;
 import io.dartchain.backend.ops.ApplicationMetricsCollector;
 import io.dartchain.backend.shared.utils.CryptoUtils;
 import io.dartchain.backend.shared.utils.HashUtils;
-import io.dartchain.backend.service.TransactionPoolService;
+import io.dartchain.backend.blockchain.application.TransactionPoolService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 

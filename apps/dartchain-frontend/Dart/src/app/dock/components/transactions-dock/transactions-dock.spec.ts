@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { TransactionsDockComponent } from './transactions-dock';
-import { TransactionsDockService } from '@core/services/transactions-dock.service';
+import { TransactionsDockService } from '@dock/services/transactions-dock.service';
 
 describe('TransactionsDockComponent', () => {
   let component: TransactionsDockComponent;
