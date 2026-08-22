@@ -5,6 +5,7 @@ Thumbs.db
 # Secrets
 .env
 .env.*
+!.env.example
 *.key
 *.pem
 *.p12
@@ -31,7 +32,6 @@ apps/dartchain-frontend/Dart/.angular/
 
 # Backend (Java)
 apps/dartchain-backend/target/
-apps/dartchain-backend/bin/
 apps/dartchain-backend/*.jar
 apps/dartchain-backend/data/*.json
 !apps/dartchain-backend/data/seed/
@@ -40,6 +40,7 @@ apps/dartchain-backend/data/*.json
 coverage/
 reports/
 .tools/
+backups/
 
 # Reliquat archive GitHub / montages Docker accidentels
 DartChainz-app-main/
