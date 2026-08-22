@@ -11,7 +11,8 @@ describe('cyberpunk-overlay.config (phase B)', () => {
     expect(MARSEILLE_CYBERPUNK_OVERLAY.layerName).toBe('marseille-cyberpunk-overlay');
     expect(shouldAttachCyberpunkOverlay('medium')).toBe(true);
     expect(shouldAttachCyberpunkOverlay('high')).toBe(true);
-    expect(shouldAttachCyberpunkOverlay('low')).toBe(false);
+    expect(shouldAttachCyberpunkOverlay('low')).toBe(true);
+    expect(shouldAttachCyberpunkOverlay('ultra-low')).toBe(true);
   });
 
   it('reste isolé du raycast placements RDC', () => {

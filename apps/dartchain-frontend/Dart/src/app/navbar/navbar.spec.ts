@@ -1,3 +1,4 @@
+import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import {
@@ -5,7 +6,6 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
 
 import { NavbarShellComponent } from './navbar';
 import { NavbarNetworkStatusComponent } from './navbar-network-status';
@@ -31,6 +31,15 @@ class MockR4v3ThreeComponent {
   randomizeFromParentClick(): void {}
 }
 
+@Component({ selector: 'app-navbar-node-panel', standalone: true, template: '' })
+class MockNavbarNodePanelComponent {}
+
+@Component({ selector: 'app-navbar-ticker-drawer', standalone: true, template: '' })
+class MockNavbarTickerDrawerComponent {}
+
+@Component({ selector: '[appNavbarHint]', standalone: true, template: '' })
+class MockNavbarHintDirective {}
+
 describe('Navbar', () => {
   let component: NavbarShellComponent;
   let fixture: ComponentFixture<NavbarShellComponent>;
@@ -51,6 +60,9 @@ describe('Navbar', () => {
             ExplorerSearchComponent,
             SearchbarComponent,
             MockR4v3ThreeComponent,
+            MockNavbarNodePanelComponent,
+            MockNavbarTickerDrawerComponent,
+            MockNavbarHintDirective,
           ],
         },
       })
@@ -62,7 +74,7 @@ describe('Navbar', () => {
   });
 
   afterEach(() => {
-    httpMock.match(() => true).forEach((request) => {
+    httpMock?.match(() => true).forEach((request) => {
       try {
         request.flush(request.request.method === 'GET' ? { ok: true } : {});
       } catch {

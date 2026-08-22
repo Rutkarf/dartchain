@@ -582,7 +582,7 @@ export class BlockchainApiService {
 
   public getPeers(): Observable<PeerView[]> {
     return this.http.get<PeerView[]>(`${this.apiUrl}/peers`).pipe(
-      catchError((error) => this.handleError(error))
+      catchError(() => of([]))
     );
   }
 

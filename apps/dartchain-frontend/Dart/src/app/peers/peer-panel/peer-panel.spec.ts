@@ -28,6 +28,8 @@ describe('PeerPanelComponent', () => {
     destroy: ReturnType<typeof vi.fn>;
     scheduleRefresh: ReturnType<typeof vi.fn>;
     refreshAll: ReturnType<typeof vi.fn>;
+    resumePolling: ReturnType<typeof vi.fn>;
+    pausePolling: ReturnType<typeof vi.fn>;
     rateLimitCountdownLabel: ReturnType<typeof vi.fn>;
     peers: ReturnType<typeof signal>;
     statsTotal: ReturnType<typeof signal>;
@@ -65,6 +67,8 @@ describe('PeerPanelComponent', () => {
       destroy: vi.fn(),
       scheduleRefresh: vi.fn(),
       refreshAll: vi.fn(async () => undefined),
+      resumePolling: vi.fn(),
+      pausePolling: vi.fn(),
       rateLimitCountdownLabel: vi.fn(() => null),
       peers: signal([
         {
@@ -150,7 +154,11 @@ describe('PeerPanelComponent', () => {
         status: 'CONNECTING',
       })
     );
-    fixture.componentInstance['peerInput'].set('wss://peer.example/ws');
+    const input = (fixture.nativeElement as HTMLElement).querySelector(
+      '.peer-panel__connect-input'
+    ) as HTMLInputElement;
+    input.value = 'wss://peer.example/ws';
+    fixture.componentInstance['onPeerInput']('wss://peer.example/ws');
     fixture.detectChanges();
 
     const button = (fixture.nativeElement as HTMLElement).querySelector(

@@ -691,9 +691,11 @@ describe('Star Conquest product scale', () => {
     expect(nextStarConquestScaleTier('company')).toBe('company');
   });
 
-  it('caps GPU density and DPR on low quality', () => {
-    expect(starConquestDepthDensity('low')).toBeLessThan(starConquestDepthDensity('medium'));
-    expect(starConquestDprCap('low')).toBeLessThan(starConquestDprCap('high'));
+  it('uses the ultra-low GPU budget regardless of requested quality', () => {
+    const ultraLowDensity = starConquestDepthDensity('ultra-low');
+    expect(starConquestDepthDensity('low')).toBe(ultraLowDensity);
+    expect(starConquestDepthDensity('medium')).toBe(ultraLowDensity);
+    expect(starConquestDprCap('low')).toBe(starConquestDprCap('high'));
   });
 
   it('is visually viable: sprites, filaments and atmosphere read as a product', () => {

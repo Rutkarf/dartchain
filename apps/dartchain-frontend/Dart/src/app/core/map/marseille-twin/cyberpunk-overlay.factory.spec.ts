@@ -33,8 +33,8 @@ describe('cyberpunk-overlay.factory (ITER-012/025/032/038)', () => {
     expect(built.registry.counts.geometries).toBe(0);
   });
 
-  it('ne crée pas d hologrammes par défaut (flag runtime off)', () => {
-    const built = createCyberpunkOverlayGroup();
+  it('ne crée pas d hologrammes quand le flag runtime est off', () => {
+    const built = createCyberpunkOverlayGroup(false);
     expect(built.group.children.length).toBe(0);
     expect(built.group.userData['pick'].pickable).toBe(false);
     disposeCyberpunkOverlay(built);

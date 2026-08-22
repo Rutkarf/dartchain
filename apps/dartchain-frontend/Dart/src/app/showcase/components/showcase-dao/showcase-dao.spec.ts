@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { signal, computed } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
@@ -7,6 +7,7 @@ import { AuthService } from '@core/services/auth.service';
 import { R4v3CommunityFaqService } from '@core/services/r4v3-community-faq.service';
 import { ShowcaseDaoStateService } from '@core/services/showcase-dao-state.service';
 import { ShowcaseLaunchStateService } from '@core/services/showcase-launch-state.service';
+import type { DaoShowcaseCard } from '@core/models/showcase-dao.model';
 import { ShowcaseDaoComponent } from './showcase-dao';
 
 describe('ShowcaseDaoComponent', () => {
@@ -45,7 +46,10 @@ describe('ShowcaseDaoComponent', () => {
       error: signal(false),
       questions: signal([]),
       load: vi.fn(),
+      askQuestion: vi.fn(() => true),
     };
+
+    const lastSelectedDao = signal<DaoShowcaseCard | null>(null);
 
     const daoState = {
       loading: signal(false),
@@ -69,6 +73,15 @@ describe('ShowcaseDaoComponent', () => {
       activeCards: signal([]),
       load: vi.fn(),
       refresh: vi.fn(),
+      setLastSelectedDao: (card: DaoShowcaseCard) => lastSelectedDao.set(card),
+      collapsedDaoCard: computed(() => lastSelectedDao()),
+      collapsedDaoHeadline: computed(() => {
+        const card = lastSelectedDao();
+        return card ? `${card.symbol} · ${card.name}` : '';
+      }),
+      questionsForDao: vi.fn(() => []),
+      askDaoQuestion: vi.fn(() => true),
+      daoPowerPercent: vi.fn(() => 42),
     };
 
     await TestBed.configureTestingModule({

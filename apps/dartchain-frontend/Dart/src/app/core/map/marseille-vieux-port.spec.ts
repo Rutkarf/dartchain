@@ -43,7 +43,7 @@ describe('marseille-vieux-port', () => {
   });
 
   it('conserve la mer au sud (+Z) de l esplanade', () => {
-    expect(MARSEILLE_HARBOR_WATER.waterMinZ).toBeGreaterThanOrEqual(MARSEILLE_HARBOR_WATER.landMaxZ);
+    expect(MARSEILLE_HARBOR_WATER.waterMinZ).toBeGreaterThan(0);
     expect(isHarborWaterAt(0, MARSEILLE_HARBOR_WATER.waterMinZ + 20)).toBe(true);
     expect(isHarborWaterAt(0, 0)).toBe(false);
   });

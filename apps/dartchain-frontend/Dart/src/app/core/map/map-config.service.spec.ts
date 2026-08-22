@@ -18,10 +18,6 @@ import {
 import { MapConfigService } from './map-config.service';
 
 describe('MapConfigService', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-  });
-
   it('expose la configuration par défaut Marseille', () => {
     const service = TestBed.inject(MapConfigService);
     const config = service.configuration;
@@ -53,7 +49,7 @@ describe('MapConfigService', () => {
       maxVisibleTiles: DEFAULT_MAP_CONFIGURATION.maxVisibleTiles,
       enableBuildings: true,
       enableTerrain: true,
-      quality: 'medium',
+      quality: DEFAULT_MAP_CONFIGURATION.quality,
     });
   });
 

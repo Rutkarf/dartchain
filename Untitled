@@ -1,0 +1,51 @@
+┌─[rutkarf@parrot]─[~/dev/dartchainRefactor]
+└──╼ $cd /home/rutkarf/dev/dartchainRefactor
+
+# Voir les domaines frontend
+find apps/dartchain-frontend/Dart/src/app -maxdepth 1 -type d | sort
+
+# Voir les composants du showcase
+find apps/dartchain-frontend/Dart/src/app/showcase -type d | sort
+
+# Voir les composants du dock
+find apps/dartchain-frontend/Dart/src/app/dock -type d | sort
+apps/dartchain-frontend/Dart/src/app
+apps/dartchain-frontend/Dart/src/app/admin
+apps/dartchain-frontend/Dart/src/app/auth
+apps/dartchain-frontend/Dart/src/app/blockchain
+apps/dartchain-frontend/Dart/src/app/components
+apps/dartchain-frontend/Dart/src/app/core
+apps/dartchain-frontend/Dart/src/app/dock
+apps/dartchain-frontend/Dart/src/app/exchange
+apps/dartchain-frontend/Dart/src/app/explorer
+apps/dartchain-frontend/Dart/src/app/faucet
+apps/dartchain-frontend/Dart/src/app/ladder-climb-scene
+apps/dartchain-frontend/Dart/src/app/navbar
+apps/dartchain-frontend/Dart/src/app/particle-background
+apps/dartchain-frontend/Dart/src/app/peers
+apps/dartchain-frontend/Dart/src/app/quests
+apps/dartchain-frontend/Dart/src/app/r4v3-scene
+apps/dartchain-frontend/Dart/src/app/searchbar
+apps/dartchain-frontend/Dart/src/app/showcase
+apps/dartchain-frontend/Dart/src/app/three-floor
+apps/dartchain-frontend/Dart/src/app/wallet
+apps/dartchain-frontend/Dart/src/app/showcase
+apps/dartchain-frontend/Dart/src/app/showcase/components
+apps/dartchain-frontend/Dart/src/app/showcase/components/launch-form-drawer
+apps/dartchain-frontend/Dart/src/app/showcase/components/market-panel
+apps/dartchain-frontend/Dart/src/app/showcase/components/showcase-chart
+apps/dartchain-frontend/Dart/src/app/showcase/components/showcase-chat
+apps/dartchain-frontend/Dart/src/app/showcase/components/showcase-dao
+apps/dartchain-frontend/Dart/src/app/showcase/components/showcase-launch
+apps/dartchain-frontend/Dart/src/app/showcase/components/showcase-news
+apps/dartchain-frontend/Dart/src/app/showcase/components/showcase-panel
+apps/dartchain-frontend/Dart/src/app/showcase/components/showcase-r4v3
+apps/dartchain-frontend/Dart/src/app/showcase/components/showcase-tabs
+apps/dartchain-frontend/Dart/src/app/showcase/components/showcase-window
+apps/dartchain-frontend/Dart/src/app/dock
+apps/dartchain-frontend/Dart/src/app/dock/components
+apps/dartchain-frontend/Dart/src/app/dock/components/dock-panel
+apps/dartchain-frontend/Dart/src/app/dock/components/dock-summary
+apps/dartchain-frontend/Dart/src/app/dock/components/dock-tabs
+apps/dartchain-frontend/Dart/src/app/dock/components/mini-bar-slide-indicator
+apps/dartchain-frontend/Dart/src/app/dock/components/transactions-dock

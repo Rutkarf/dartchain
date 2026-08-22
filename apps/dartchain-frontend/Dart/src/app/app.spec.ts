@@ -34,6 +34,15 @@ class MockR4v3ThreeComponent {
   randomizeFromParentClick(): void {}
 }
 
+@Component({ selector: 'app-navbar-node-panel', standalone: true, template: '' })
+class MockNavbarNodePanelComponent {}
+
+@Component({ selector: 'app-navbar-ticker-drawer', standalone: true, template: '' })
+class MockNavbarTickerDrawerComponent {}
+
+@Component({ selector: '[appNavbarHint]', standalone: true, template: '' })
+class MockNavbarHintDirective {}
+
 describe('AppComponent', () => {
   let httpMock: HttpTestingController;
 
@@ -52,6 +61,9 @@ describe('AppComponent', () => {
             ExplorerSearchComponent,
             SearchbarComponent,
             MockR4v3ThreeComponent,
+            MockNavbarNodePanelComponent,
+            MockNavbarTickerDrawerComponent,
+            MockNavbarHintDirective,
             AuthDrawerComponent,
           ],
         },

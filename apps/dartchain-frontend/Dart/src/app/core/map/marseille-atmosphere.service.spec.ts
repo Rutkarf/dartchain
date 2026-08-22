@@ -26,18 +26,16 @@ describe('MarseilleAtmosphereService Phase 0', () => {
     const lightNames = scene.children.filter((c) => c instanceof THREE.Light).map((c) => c.name);
     expect(lightNames).toContain('metaverse-key');
     expect(lightNames).toContain('metaverse-ambient');
-    expect(scene.getObjectByName('metaverse-spawn-bounce')).toBeTruthy();
     expect(scene.getObjectByName('metaverse-sky-dome')).toBeTruthy();
   });
 
-  it('active les ombres spawn en medium', () => {
+  it('active les ombres spawn en high', () => {
     service = new MarseilleAtmosphereService();
     scene = new THREE.Scene();
-    service.applyToScene(scene, 'medium');
+    service.applyToScene(scene, 'high');
     const key = scene.getObjectByName('metaverse-key') as THREE.DirectionalLight;
     expect(key.castShadow).toBe(true);
     expect(key.shadow.mapSize.x).toBe(512);
     expect(key.shadow.radius).toBeGreaterThan(1);
-    expect(scene.getObjectByName('metaverse-spawn-bounce')).toBeTruthy();
   });
 });

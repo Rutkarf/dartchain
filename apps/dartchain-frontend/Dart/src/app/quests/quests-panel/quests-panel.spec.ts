@@ -86,6 +86,8 @@ describe('QuestsPanel', () => {
     destroy: vi.fn(),
     scheduleRefresh: vi.fn(),
     refreshAll: vi.fn(async () => undefined),
+    resumePolling: vi.fn(),
+    pausePolling: vi.fn(),
     loading: signal(false),
     error: signal<string | null>(null),
     rateLimitCountdownLabel: vi.fn(() => null),
