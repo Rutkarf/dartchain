@@ -5,6 +5,7 @@ import io.dartchain.backend.auth.application.AuthException;
 import io.dartchain.backend.auth.application.AuthNormalizer;
 import io.dartchain.backend.auth.model.AuthUserSnapshot;
 import io.dartchain.backend.auth.model.UserAccount;
+import io.dartchain.backend.auth.model.UserRole;
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.shared.utils.WalletValidator;
 import jakarta.annotation.PostConstruct;
@@ -114,6 +115,20 @@ public class JsonUserAccountStore implements UserAccountStore {
         account.setPasswordSalt("");
         persist();
         return account;
+    }
+
+    @Override
+    public synchronized UserAccount updateRole(String userId, UserRole role) {
+        UserAccount account = findById(userId)
+                .orElseThrow(() -> new AuthException(404, "Utilisateur introuvable"));
+        account.setRole(role);
+        persist();
+        return account;
+    }
+
+    @Override
+    public synchronized List<UserAccount> findAll() {
+        return List.copyOf(users);
     }
 
     @Override

@@ -58,12 +58,17 @@ import {
   SHOWCASE_REFRESH_EVENT,
 } from './core/constants/panel-refresh.constants';
 import { DockWalletStateService } from '@dock/services/dock-wallet-state.service';
+import { DockQuestsStateService } from '@dock/services/dock-quests-state.service';
+import { DockPeersStateService } from '@dock/services/dock-peers-state.service';
+import { DockPendingStateService } from '@dock/services/dock-pending-state.service';
+import { DockBlockStateService } from '@dock/services/dock-block-state.service';
 import { TransactionsDataService } from '@dock/services/transactions-data.service';
 import { DockChainStateService } from '@dock/services/dock-chain-state.service';
 import { ChainDataService } from '@blockchain/services/chain-data.service';
 import { MarketDataService } from '@showcase/services/market-data.service';
 import { QuestsDataService } from '@quests/services/quests-data.service';
 import { PeersDataService } from '@peers/services/peers-data.service';
+import { ShowcaseChatService } from '@showcase/services/showcase-chat.service';
 
 @Component({
   selector: 'app-root',
@@ -111,12 +116,17 @@ export class AppComponent {
   private readonly launchState = inject(ShowcaseLaunchStateService);
   private readonly daoState = inject(ShowcaseDaoStateService);
   private readonly dockWalletState = inject(DockWalletStateService);
+  private readonly dockQuestsState = inject(DockQuestsStateService);
+  private readonly dockPeersState = inject(DockPeersStateService);
+  private readonly dockPendingState = inject(DockPendingStateService);
+  private readonly dockBlockState = inject(DockBlockStateService);
   private readonly transactionsData = inject(TransactionsDataService);
   private readonly dockChainState = inject(DockChainStateService);
   private readonly chainData = inject(ChainDataService);
   private readonly marketData = inject(MarketDataService);
   private readonly questsData = inject(QuestsDataService);
   private readonly peersData = inject(PeersDataService);
+  private readonly showcaseChat = inject(ShowcaseChatService);
 
   readonly activeShowcaseTab = signal<ShowcaseTab>('tours');
   readonly activeBottomTab = signal<BottomDockTab>('wallet');
@@ -143,6 +153,9 @@ export class AppComponent {
     this.questProgress.recordDailyLogin();
 
     void this.auth.handleOAuthCallbackOnLoad();
+
+    // Précharge showcase + dock dès le boot — évite « Chargement… » au clic d’onglet.
+    this.bootstrapPanelData();
 
     this.nav.newsAction$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -230,10 +243,6 @@ export class AppComponent {
   }
 
   onBottomTabChange(tab: BottomDockTab | 'pending' | 'block'): void {
-    if (tab === 'admin' && !this.auth.isAdmin()) {
-      return;
-    }
-
     if (tab === 'pending' || tab === 'block') {
       this.dockNav.requestTab(tab);
       this.activeBottomTab.set('transactions');
@@ -276,6 +285,30 @@ export class AppComponent {
 
   expandDockFromSummary(): void {
     this.dockCollapsed.set(false);
+  }
+
+  /** Initialise les stores showcase/dock au lancement (tous les onglets). */
+  private bootstrapPanelData(): void {
+    this.newsState.refreshFeed(true);
+    this.r4v3State.load(false);
+    this.daoState.load(false);
+    this.launchState.loadProjects();
+    this.showcaseChat.connect();
+    this.marketData.init();
+    this.chartSummary.refresh();
+
+    this.chainData.init();
+    this.transactionsData.init();
+    this.questsData.init();
+    this.peersData.init();
+
+    this.dockWalletState.refresh();
+    this.dockChainState.refresh(true);
+    void this.dockQuestsState.load();
+    void this.dockPeersState.load();
+    void this.dockPendingState.load();
+    void this.dockBlockState.load();
+    this.faucetRuntime.refreshPanel();
   }
 
   /** Refresh isolé Graph — n’impacte ni showcase ni dock. */

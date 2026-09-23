@@ -9,5 +9,9 @@ export const environment = buildEnvironment({
   liveWsUrl: devWsUrl('/ws/live'),
   chatWsUrl: devWsUrl('/ws/chat'),
   commercial: false,
+  /** Star Conquest désactivé temporairement (code conservé). */
+  starConquestEnabled: false,
   starConquestKpiDebug: true,
+  /** Dev : prototype arène activé (mock local, ledger isolé). */
+  metaverseArenaEnabled: true,
 });

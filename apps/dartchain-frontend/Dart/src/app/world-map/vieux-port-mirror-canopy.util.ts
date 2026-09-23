@@ -10,7 +10,7 @@ export const MIRROR_CANOPY = {
   thickness: 0.09,
   /** Y monde du plan verre (METRO_SPAWN_ANCHOR.mirror.y). */
   deckY: 8.0,
-  /** Cambrure max du verre + marge — titre MetaVerseBB au-dessus. */
+  /** Cambrure max du verre + marge — titre Arène BB au-dessus. */
   titleClearance: 0.52,
   postInsetX: 7.35,
   postInsetZ: 4.55,
@@ -334,7 +334,7 @@ function buildMetaVerseBbTitlePlate(
   return plate;
 }
 
-/** Texture « MetaVerseBB » pour le dessus du miroir. */
+/** Texture titre Ombrière — affiche SCENE_COPY.canopyTitle (Arène BB). */
 export function createMetaVerseBbTitleTexture(): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = 2048;

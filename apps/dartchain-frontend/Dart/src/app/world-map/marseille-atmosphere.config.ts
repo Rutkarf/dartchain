@@ -63,13 +63,31 @@ export const MARSEILLE_ATMOSPHERE_PRESETS = {
     nightShift: false,
     starIntensity: 0.18,
   },
+  /**
+   * Profil arène B+ — fin d’après-midi méditerranéenne (sable / ocre).
+   * Activé uniquement si metaverseArenaEnabled — ne remplace pas le preset nuit par défaut.
+   */
+  mediterraneanArena: {
+    id: 'mediterranean-arena',
+    fogEnabled: true,
+    fogColor: 0xd4c4a8,
+    fogNear: 90,
+    fogFar: 420,
+    toneMappingExposure: 1.08,
+    environmentIntensity: 0.55,
+    nightShift: false,
+    starIntensity: 0.05,
+  },
 } as const;
 
 export type MarseilleAtmospherePresetId = keyof typeof MARSEILLE_ATMOSPHERE_PRESETS;
 
 export const ACTIVE_ATMOSPHERE_PRESET_ID: MarseilleAtmospherePresetId = 'nightHarborGameplay';
 
-export function activeAtmospherePreset() {
+export function activeAtmospherePreset(arenaProfileActive = false) {
+  if (arenaProfileActive) {
+    return MARSEILLE_ATMOSPHERE_PRESETS.mediterraneanArena;
+  }
   return MARSEILLE_ATMOSPHERE_PRESETS[ACTIVE_ATMOSPHERE_PRESET_ID];
 }
 

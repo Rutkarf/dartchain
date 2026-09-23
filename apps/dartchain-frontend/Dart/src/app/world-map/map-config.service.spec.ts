@@ -7,6 +7,8 @@ import {
   MARSEILLE_START_ORIENTATION,
   MARSEILLE_START_POSITION,
   METRO_SPAWN_ANCHOR,
+  MIRROR_SPAWN_SAFE_ZONE,
+  isInsideMirrorSpawnSafeZone,
   VIEUX_PORT_METRO_MIRROR_VIEW,
   WORLD_METERS_PER_UNIT,
   WORLD_SCALE,
@@ -83,5 +85,15 @@ describe('MapConfigService', () => {
     expect(spawnZ).toBeGreaterThan(0);
     expect(spawnZ).toBeLessThan(MARSEILLE_HARBOR_WATER.waterMinZ);
     expect(VIEUX_PORT_METRO_MIRROR_VIEW.id).toBe('VIEUX_PORT_METRO_MIRROR_VIEW');
+  });
+
+  it('définit une zone safe intouchable autour du spawn miroir', () => {
+    const spawnX = METRO_SPAWN_ANCHOR.mirror.x + METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.x;
+    const spawnZ = METRO_SPAWN_ANCHOR.mirror.z + METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.z;
+    expect(isInsideMirrorSpawnSafeZone(spawnX, spawnZ)).toBe(true);
+    expect(isInsideMirrorSpawnSafeZone(0, 5)).toBe(true);
+    expect(isInsideMirrorSpawnSafeZone(0, 5 - MIRROR_SPAWN_SAFE_ZONE.radiusMeters - 1)).toBe(
+      false
+    );
   });
 });

@@ -30,6 +30,8 @@ import { AuthService } from '@auth/services/auth.service';
 import { ChainConfigService } from '@blockchain/services/chain-config.service';
 import { LocaleService } from '../../core/i18n/locale.service';
 import {
+  addR4v3Amounts,
+  compareR4v3Amounts,
   formatR4v3Amount,
   normalizeR4v3Amount,
   R4V3_DECIMALS,
@@ -123,6 +125,8 @@ export class WalletPanelComponent implements OnInit {
   private copiedPrivateKeyTimer: ReturnType<typeof setTimeout> | null = null;
   private messageTimer: ReturnType<typeof setTimeout> | null = null;
   private lastBalanceFetchAddress = '';
+  private optimisticFloor: string | null = null;
+  private optimisticUntilMs = 0;
 
   protected readonly hasWallet = computed(() => {
     const local = this.wallet();
@@ -405,6 +409,15 @@ export class WalletPanelComponent implements OnInit {
         if (address) {
           this.fetchBalance(address, true, false);
         }
+      });
+
+    this.walletSession.optimisticCredit$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((delta) => {
+        const next = addR4v3Amounts(this.balance() ?? '0', delta);
+        this.balance.set(next);
+        this.optimisticFloor = next;
+        this.optimisticUntilMs = Date.now() + 12_000;
       });
   }
 
@@ -775,7 +788,19 @@ export class WalletPanelComponent implements OnInit {
       .subscribe({
         next: (response: BalanceResponse) => {
           const normalized = normalizeR4v3Amount(response.balance);
+          const floor = this.optimisticFloor;
+          const floorActive =
+            fromCurrentWallet &&
+            floor != null &&
+            Date.now() < this.optimisticUntilMs &&
+            compareR4v3Amounts(normalized, floor) < 0;
+          if (floorActive) {
+            this.refreshingBalance.set(false);
+            return;
+          }
           if (fromCurrentWallet) {
+            this.optimisticFloor = null;
+            this.optimisticUntilMs = 0;
             this.balance.set(normalized);
             this.lookedUpBalance.set(null);
             this.lookedUpAddress.set('');

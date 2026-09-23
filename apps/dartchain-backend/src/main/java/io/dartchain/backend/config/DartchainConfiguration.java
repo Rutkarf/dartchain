@@ -14,7 +14,8 @@ import org.springframework.context.annotation.Configuration;
         AuthProperties.class,
         ChainProperties.class,
         OAuthProperties.class,
-        WigleProperties.class
+        WigleProperties.class,
+        io.dartchain.backend.admin.config.AdminSeedProperties.class
 })
 public class DartchainConfiguration {
 }

@@ -53,6 +53,68 @@
   mask-size: 100% 100%;
 }
 
+/* Arène BB : pas de masque fondu ; peek jusqu’sous les onglets (+ bande panel). */
+:host.arena-active {
+  --arena-ui-top-reserve: 300px;
+  --floor-peek-height: calc(100dvh - var(--arena-ui-top-reserve));
+  --arena-chrome-h: 22px;
+  z-index: 1 !important;
+}
+
+:host.arena-active .floor-wrapper {
+  height: var(--floor-peek-height);
+  min-height: 280px;
+  max-height: none;
+  bottom: 0;
+  background: transparent;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* Overrides media — garder le déploiement haute arène */
+@media (max-width: 349px) {
+  :host.arena-active {
+    --arena-ui-top-reserve: 280px;
+  }
+
+  :host.arena-active .floor-wrapper {
+    height: var(--floor-peek-height);
+    min-height: 260px;
+    max-height: none;
+  }
+}
+
+@media (min-width: 350px) and (max-width: 480px) {
+  :host.arena-active {
+    --arena-ui-top-reserve: 300px;
+  }
+
+  :host.arena-active .floor-wrapper {
+    height: var(--floor-peek-height);
+    min-height: 280px;
+    max-height: none;
+  }
+}
+
+@media (min-width: 481px) {
+  :host.arena-active {
+    --arena-ui-top-reserve: 320px;
+  }
+
+  :host.arena-active .floor-wrapper {
+    height: var(--floor-peek-height);
+    min-height: 300px;
+    max-height: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host.arena-active .floor-wrapper {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+}
+
 .floor-canvas {
   width: 100%;
   height: 100%;

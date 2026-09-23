@@ -1,0 +1,8 @@
+# Exemple — ne contient PAS la seed réelle.
+# Générer une seed locale :
+#   python3 -c "..."  ou lire deploy/admin-seed.local.txt (gitignored)
+#
+# Puis exporter le hash :
+#   DARTCHAIN_ADMIN_SEED_SHA256=<sha256 hex lowercase de la phrase normalisée>
+#
+# Phrase normalisée = trim + lower case + espaces simples.

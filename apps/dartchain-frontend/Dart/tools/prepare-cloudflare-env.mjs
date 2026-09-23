@@ -21,6 +21,9 @@ const backendHost = backendUrl.replace(/^https:\/\//, '');
 const showcaseEnabled = !['false', '0', 'no', 'off'].includes(
   String(process.env.SHOWCASE_ENABLED ?? 'true').toLowerCase(),
 );
+const starConquestEnabled = !['false', '0', 'no', 'off'].includes(
+  String(process.env.STAR_CONQUEST_ENABLED ?? 'false').toLowerCase(),
+);
 const starConquestOverlay = !['false', '0', 'no', 'off'].includes(
   String(process.env.STAR_CONQUEST_OVERLAY_ENABLED ?? 'true').toLowerCase(),
 );
@@ -37,6 +40,7 @@ export const environment = buildEnvironment({
   liveWsUrl: 'wss://${backendHost}/ws/live',
   chatWsUrl: 'wss://${backendHost}/ws/chat',
   showcaseEnabled: ${showcaseEnabled},
+  starConquestEnabled: ${starConquestEnabled},
   starConquestOverlayEnabled: ${starConquestOverlay},
   starConquestKpiDebug: ${kpiDebug},
 });

@@ -1,29 +1,26 @@
 <div class="dock-bottom-summary" [attr.data-active-tab]="activeTab">
-  @switch (activeTab) {
-    @case ('wallet') {
-      <app-dock-wallet-summary />
-    }
-    @case ('faucet') {
-      @if (product.faucetEnabled) {
-        <app-dock-faucet-summary />
-      }
-    }
-    @case ('transactions') {
-      <app-dock-transactions-summary />
-    }
-    @case ('chain') {
-      <app-dock-chain-summary />
-    }
-    @case ('quests') {
-      <app-dock-quests-summary />
-    }
-    @case ('peers') {
-      <app-dock-peers-summary />
-    }
-    @case ('admin') {
-      @if (auth.isAdmin()) {
-        <p class="dock-bottom-summary__fallback" role="status">Admin · replié</p>
-      }
-    }
+  <!-- Tous les résumés montés au démarrage pour précharger les données. -->
+  <div [hidden]="activeTab !== 'wallet'">
+    <app-dock-wallet-summary />
+  </div>
+  @if (product.faucetEnabled) {
+    <div [hidden]="activeTab !== 'faucet'">
+      <app-dock-faucet-summary />
+    </div>
   }
+  <div [hidden]="activeTab !== 'transactions'">
+    <app-dock-transactions-summary />
+  </div>
+  <div [hidden]="activeTab !== 'chain'">
+    <app-dock-chain-summary />
+  </div>
+  <div [hidden]="activeTab !== 'quests'">
+    <app-dock-quests-summary />
+  </div>
+  <div [hidden]="activeTab !== 'peers'">
+    <app-dock-peers-summary />
+  </div>
+  <div [hidden]="activeTab !== 'admin'">
+    <p class="dock-bottom-summary__fallback" role="status">Admin · seed lock</p>
+  </div>
 </div>

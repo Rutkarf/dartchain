@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import * as THREE from 'three';
 
 import { FLOOR_HORIZON_BLEND } from '@metaverse/floor-horizon-blend.config';
+import { ProductConfigService } from '@core/config/product-config.service';
 import type { MapQuality } from './map-configuration';
 import { mapPerfProfile } from './marseille-perf.config';
 import { shouldRunSimTick } from './marseille-sim-throttle.util';
@@ -19,6 +20,7 @@ import {
   updateStreamingDistrictHaze,
   type StreamingDistrictHazeResult,
 } from './streaming-district-haze.util';
+import { MARSEILLE_ARENA_PROFILE } from './arena/marseille-arena-profile';
 
 const HAZE_NEAR_OPACITY = 0.14;
 const HAZE_FAR_OPACITY = 0.19;
@@ -29,6 +31,7 @@ const HAZE_FAR_OPACITY = 0.19;
  */
 @Injectable({ providedIn: 'root' })
 export class MarseilleAtmosphereService {
+  private readonly product = inject(ProductConfigService);
   private scene: THREE.Scene | null = null;
   private keyLight: THREE.DirectionalLight | null = null;
   private keyTarget: THREE.Object3D | null = null;
@@ -52,9 +55,12 @@ export class MarseilleAtmosphereService {
     this.scene = scene;
     this.currentQuality = quality;
 
-    const preset = activeAtmospherePreset();
+    const preset = activeAtmospherePreset(this.product.metaverseArenaEnabled);
     const perf = mapPerfProfile(quality);
-    scene.background = new THREE.Color(FLOOR_HORIZON_BLEND.skyColor);
+    const arenaSky = this.product.metaverseArenaEnabled
+      ? MARSEILLE_ARENA_PROFILE.palette.sand
+      : FLOOR_HORIZON_BLEND.skyColor;
+    scene.background = new THREE.Color(arenaSky);
 
     if (preset.fogEnabled) {
       scene.fog = new THREE.FogExp2(
@@ -73,7 +79,25 @@ export class MarseilleAtmosphereService {
 
     this.attachSkyDome(scene, quality);
 
-    const L = MARSEILLE_ATMOSPHERE_LIGHTS;
+    const L = this.product.metaverseArenaEnabled
+      ? {
+          ...MARSEILLE_ATMOSPHERE_LIGHTS,
+          ambient: {
+            color: MARSEILLE_ARENA_PROFILE.light.ambientColor,
+            intensity: MARSEILLE_ARENA_PROFILE.light.ambientIntensity,
+          },
+          hemi: {
+            sky: MARSEILLE_ARENA_PROFILE.light.hemiSky,
+            ground: MARSEILLE_ARENA_PROFILE.light.hemiGround,
+            intensity: MARSEILLE_ARENA_PROFILE.light.hemiIntensity,
+          },
+          key: {
+            color: MARSEILLE_ARENA_PROFILE.light.keyColor,
+            intensity: MARSEILLE_ARENA_PROFILE.light.keyIntensity,
+            position: MARSEILLE_ATMOSPHERE_LIGHTS.key.position,
+          },
+        }
+      : MARSEILLE_ATMOSPHERE_LIGHTS;
 
     const ambient = new THREE.AmbientLight(L.ambient.color, L.ambient.intensity);
     ambient.name = 'metaverse-ambient';
@@ -180,7 +204,7 @@ export class MarseilleAtmosphereService {
       return;
     }
 
-    const preset = activeAtmospherePreset();
+    const preset = activeAtmospherePreset(this.product.metaverseArenaEnabled);
     const hazeTint = preset.fogColor;
 
     const hazeNear = new THREE.Mesh(
@@ -368,7 +392,7 @@ export class MarseilleAtmosphereService {
   }
 
   getToneMappingExposure(): number {
-    return activeAtmospherePreset().toneMappingExposure;
+    return activeAtmospherePreset(this.product.metaverseArenaEnabled).toneMappingExposure;
   }
 
   /** PMREM IBL — réflexions eau Phase 9. */

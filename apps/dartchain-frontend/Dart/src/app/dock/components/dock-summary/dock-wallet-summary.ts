@@ -13,7 +13,7 @@ import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.mode
 import { AuthService } from '@auth/services/auth.service';
 import { DockNavigationService } from '@dock/services/dock-navigation.service';
 import { DockWalletStateService } from '@dock/services/dock-wallet-state.service';
-import { formatR4v3Amount } from '@core/utils/r4v3-amount.util';
+import { formatR4v3AmountCompact } from '@core/utils/r4v3-amount.util';
 
 @Component({
   selector: 'app-dock-wallet-summary',
@@ -51,9 +51,9 @@ export class DockWalletSummaryComponent implements OnInit, OnDestroy {
 
   readonly fullBalanceLabel = computed(() => {
     if (!this.hasWallet()) {
-      return formatR4v3Amount('0');
+      return formatR4v3AmountCompact('0');
     }
-    return formatR4v3Amount(this.state.balance() ?? '0');
+    return formatR4v3AmountCompact(this.state.balance() ?? '0');
   });
 
   /** Conversion CHF (peg pédagogique 1 R4V3 = 1 CHF, même logique que le panel wallet). */

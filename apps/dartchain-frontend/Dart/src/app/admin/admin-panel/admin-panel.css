@@ -177,3 +177,117 @@
   font-size: 0.7575rem;
   opacity: 0.8;
 }
+
+.admin-panel__gate {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-width: 34rem;
+}
+
+.admin-panel__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+}
+
+.admin-panel__seed {
+  width: 100%;
+  min-height: 4.5rem;
+  resize: vertical;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.35);
+  color: inherit;
+  padding: 0.55rem 0.65rem;
+  font: 600 0.78rem/1.35 ui-monospace, Menlo, monospace;
+}
+
+.admin-panel__cta,
+.admin-panel__lock,
+.admin-panel__tab {
+  border: 1px solid rgba(var(--accent-primary-rgb, 0, 180, 255), 0.35);
+  background: rgba(0, 0, 0, 0.28);
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.admin-panel__cta:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.admin-panel__cta--accent {
+  border-color: rgba(255, 45, 154, 0.45);
+  background: rgba(255, 45, 154, 0.12);
+}
+
+.admin-panel__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.admin-panel__tab.is-on {
+  border-color: rgba(158, 240, 255, 0.55);
+  background: rgba(158, 240, 255, 0.12);
+}
+
+.admin-panel__lead {
+  margin: 0 0 0.55rem;
+  font-size: 0.74rem;
+  opacity: 0.8;
+}
+
+.admin-panel__table-wrap {
+  overflow: auto;
+  max-height: 14rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.4rem;
+}
+
+.admin-panel__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.68rem;
+}
+
+.admin-panel__table th,
+.admin-panel__table td {
+  text-align: left;
+  padding: 0.35rem 0.45rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  vertical-align: top;
+}
+
+.admin-panel__status.is-ok {
+  color: #9ef0c4;
+}
+
+.admin-panel__status.is-gap {
+  color: #ffc9a8;
+}
+
+.admin-panel__domains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.admin-panel__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+}
+
+.admin-panel__export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}

@@ -34,6 +34,8 @@ export class CameraControlService {
   private readonly runnerMinPitch = -Math.PI / 3;
   private readonly runnerMaxPitch = Math.PI / 2 - 0.12;
   private closeFraming = false;
+  /** Framing dédié Arène BB (peek bas de page) — additif, n’écrase pas resetOrbit. */
+  private arenaPeekMode = false;
   private orbitDistance: number = RUNNER_CONFIG.camDistance;
   private lookAhead = 0;
   private validationViewActive = false;
@@ -78,12 +80,50 @@ export class CameraControlService {
     return this.closeFraming;
   }
 
+  /** Active un framing combat plein-pied : tête → pieds dans le peek. */
+  setArenaPeekMode(enabled: boolean): void {
+    this.arenaPeekMode = enabled;
+    if (enabled) {
+      this.closeFraming = true;
+      // Recul + pitch doux ; lookAhead ~0 pour garder le STL centré.
+      this.orbitDistance = 8.6;
+      this.cameraAngleY = THREE.MathUtils.clamp(0.18, this.pitchMin(), this.pitchMax());
+      this.lookAhead = 0.05;
+    } else {
+      this.lookAhead = 0;
+    }
+  }
+
+  isArenaPeekMode(): boolean {
+    return this.arenaPeekMode;
+  }
+
   setYaw(angle: number): void {
     this.cameraAngleX = angle;
   }
 
   setPitch(angle: number): void {
     this.cameraAngleY = THREE.MathUtils.clamp(angle, this.pitchMin(), this.pitchMax());
+  }
+
+  /** Kick caméra combat (yaw/pitch rad) — ressenti tir / hit. */
+  applyCombatKick(yawDelta: number, pitchDelta = 0): void {
+    this.cameraAngleX += yawDelta;
+    this.cameraAngleY = THREE.MathUtils.clamp(
+      this.cameraAngleY + pitchDelta,
+      this.pitchMin(),
+      this.pitchMax()
+    );
+  }
+
+  /** Soft-aim : oriente le yaw vers une direction monde (XZ). */
+  softAimYawToward(worldDx: number, worldDz: number, blend = 0.18): void {
+    if (Math.abs(worldDx) + Math.abs(worldDz) < 0.05) return;
+    const targetYaw = Math.atan2(worldDx, worldDz);
+    let delta = targetYaw - this.cameraAngleX;
+    while (delta > Math.PI) delta -= Math.PI * 2;
+    while (delta < -Math.PI) delta += Math.PI * 2;
+    this.cameraAngleX += delta * THREE.MathUtils.clamp(blend, 0, 1);
   }
 
   updateFromJoystick(vector: { x: number; y: number }): void {
@@ -281,10 +321,17 @@ export class CameraControlService {
     const sinX = Math.sin(this.cameraAngleX);
     const cosX = Math.cos(this.cameraAngleX);
     const shoulder = this.closeFraming ? THIRD_PERSON_CAMERA_CONFIG.shoulderOffset : 0;
-    const lookY = this.closeFraming ? THIRD_PERSON_CAMERA_CONFIG.lookAtHeight : 1.8;
-    const camY = this.closeFraming
-      ? charPos.y + THIRD_PERSON_CAMERA_CONFIG.height + sinY * dist * 0.28
-      : charPos.y + sinY * dist + 1.2;
+    // Arène : vise le torse pour tenir tête+pieds dans le peek élargi.
+    const lookY = this.arenaPeekMode
+      ? 1.05
+      : this.closeFraming
+        ? THIRD_PERSON_CAMERA_CONFIG.lookAtHeight
+        : 1.8;
+    const camY = this.arenaPeekMode
+      ? charPos.y + 1.85 + sinY * dist * 0.42
+      : this.closeFraming
+        ? charPos.y + THIRD_PERSON_CAMERA_CONFIG.height + sinY * dist * 0.28
+        : charPos.y + sinY * dist + 1.2;
 
     this.desiredPos.set(
       charPos.x + sinX * cosY * dist + cosX * shoulder,
@@ -301,6 +348,7 @@ export class CameraControlService {
   /**
    * Décale le frustum pour que le perso tienne dans la bande visible sous l’UI,
    * pieds vers le bas de l’écran.
+   * En mode Arène le canvas = déjà le peek → pas de viewOffset (sinon tête coupée).
    */
   private applyPeekFraming(camera: THREE.PerspectiveCamera): void {
     const renderer = this.threeScene.getRenderer();
@@ -310,7 +358,7 @@ export class CameraControlService {
     if (width < 8 || height < 8) {
       return;
     }
-    if (!this.closeFraming) {
+    if (!this.closeFraming || this.arenaPeekMode) {
       camera.clearViewOffset();
       camera.updateProjectionMatrix();
       return;
@@ -342,9 +390,13 @@ export class CameraControlService {
   private readonly colliderScratch: THREE.Object3D[] = [];
 
   private applyFov(camera: THREE.PerspectiveCamera): void {
-    const target = this.closeFraming ? THIRD_PERSON_CAMERA_CONFIG.fov : 62;
+    const target = this.arenaPeekMode
+      ? 52
+      : this.closeFraming
+        ? THIRD_PERSON_CAMERA_CONFIG.fov
+        : 62;
     if (Math.abs(camera.fov - target) < 0.05) return;
-    camera.fov = target;
+    camera.fov = THREE.MathUtils.lerp(camera.fov, target, 0.2);
     camera.updateProjectionMatrix();
   }
 

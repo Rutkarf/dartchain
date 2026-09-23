@@ -21,6 +21,8 @@ export interface FaucetStateResponse {
   lastClaimAt: string | null;
   defaultClaimAmount: string;
   configCooldownSeconds: number;
+  /** Solde faucet pending (off-chain) — lecture seule pour affichage arène (Q1=C). */
+  pendingAmount?: string | null;
 }
 
 export interface FaucetClaimRequest {

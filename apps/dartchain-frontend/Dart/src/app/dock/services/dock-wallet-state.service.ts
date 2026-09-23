@@ -4,7 +4,12 @@ import { firstValueFrom } from 'rxjs';
 import { BlockchainApiService } from '@blockchain/services/blockchain-api.service';
 import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import { formatDockRelativeTime } from '@core/utils/dock-time.util';
-import { formatR4v3Amount, normalizeR4v3Amount } from '@core/utils/r4v3-amount.util';
+import {
+  addR4v3Amounts,
+  compareR4v3Amounts,
+  formatR4v3AmountCompact,
+  normalizeR4v3Amount,
+} from '@core/utils/r4v3-amount.util';
 
 export type DockWalletPhase = 'error' | 'loading' | 'disconnected' | 'ready';
 
@@ -17,6 +22,11 @@ export class DockWalletStateService {
   readonly error = signal(false);
   readonly balance = signal<string | null>(null);
   readonly lastUpdatedAt = signal<number | null>(null);
+
+  private reloadQueued = false;
+  /** Solde plancher tant que la chaîne n’a pas rattrapé le crédit optimiste. */
+  private optimisticFloor: string | null = null;
+  private optimisticUntilMs = 0;
 
   readonly hasWallet = computed(() => {
     const wallet = this.walletSession.wallet();
@@ -56,7 +66,9 @@ export class DockWalletStateService {
     }
 
     const bal = this.balance();
-    return bal !== null ? `${formatR4v3Amount(bal)} R4V3` : 'Solde —';
+    return bal !== null
+      ? `${formatR4v3AmountCompact(bal)} R4V3`
+      : 'Solde —';
   });
 
   readonly progressLabel = computed(() => {
@@ -76,6 +88,23 @@ export class DockWalletStateService {
 
   constructor() {
     this.walletSession.balanceRefresh$.subscribe(() => this.refresh());
+    this.walletSession.optimisticCredit$.subscribe((amount) =>
+      this.applyOptimisticCredit(amount)
+    );
+  }
+
+  /** Crédit immédiat (claim faucet / quête) avant retour getBalance. */
+  applyOptimisticCredit(amount: string | number): void {
+    const delta = normalizeR4v3Amount(amount);
+    if (delta === '0') {
+      return;
+    }
+    const next = addR4v3Amounts(this.balance() ?? '0', delta);
+    this.balance.set(next);
+    this.optimisticFloor = next;
+    this.optimisticUntilMs = Date.now() + 12_000;
+    this.lastUpdatedAt.set(Date.now());
+    this.error.set(false);
   }
 
   async load(): Promise<void> {
@@ -86,6 +115,7 @@ export class DockWalletStateService {
     }
 
     if (this.loading()) {
+      this.reloadQueued = true;
       return;
     }
 
@@ -94,13 +124,28 @@ export class DockWalletStateService {
 
     try {
       const response = await firstValueFrom(this.api.getBalance(address));
-      this.balance.set(normalizeR4v3Amount(response?.balance ?? '0'));
+      const chain = normalizeR4v3Amount(response?.balance ?? '0');
+      const floor = this.optimisticFloor;
+      const floorActive =
+        floor != null && Date.now() < this.optimisticUntilMs;
+      if (floorActive && compareR4v3Amounts(chain, floor) < 0) {
+        // Chaîne pas encore à jour — garde le solde optimiste.
+        return;
+      }
+      this.optimisticFloor = null;
+      this.optimisticUntilMs = 0;
+      this.balance.set(chain);
       this.lastUpdatedAt.set(Date.now());
     } catch {
-      this.balance.set(null);
-      this.error.set(true);
+      if (this.balance() === null) {
+        this.error.set(true);
+      }
     } finally {
       this.loading.set(false);
+      if (this.reloadQueued) {
+        this.reloadQueued = false;
+        void this.load();
+      }
     }
   }
 

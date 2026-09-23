@@ -55,7 +55,27 @@ describe('DockWalletStateService', () => {
 
     expect(service.phase()).toBe('ready');
     expect(service.balance()).toBe('12.5');
-    expect(service.headline()).toContain('12,50000000000000000000000000 R4V3');
+    expect(service.headline()).toContain('12,5 R4V3');
+  });
+
+  it('applique un crédit optimiste puis recharge le solde', async () => {
+    walletSession.setWallet({
+      address: 'dart1opt',
+      publicKey: 'pub',
+      privateKey: 'priv',
+    });
+
+    const pending = service.load();
+    httpMock.expectOne('/api/blockchain/balance/dart1opt').flush({ balance: '1' });
+    await pending;
+
+    walletSession.requestBalanceRefresh('2.5');
+    expect(service.balance()).toBe('3.5');
+
+    // Polls déclenchés par requestBalanceRefresh — chaîne encore à 1 → garder 3.5
+    const polls = httpMock.match('/api/blockchain/balance/dart1opt');
+    polls.forEach((req) => req.flush({ balance: '1' }));
+    expect(service.balance()).toBe('3.5');
   });
 
   it('marks error when balance fetch fails', async () => {

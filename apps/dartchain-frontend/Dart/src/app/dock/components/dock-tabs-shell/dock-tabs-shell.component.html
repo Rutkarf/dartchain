@@ -14,11 +14,21 @@
             type="button"
             class="showcase-tab ds-surface ds-surface--showcase-tab"
             role="tab"
-            [attr.aria-selected]="activeTab === 'wallet'"
-            [class.is-active]="activeTab === 'wallet'"
-            (click)="tabChange.emit('wallet')"
+            [attr.aria-selected]="activeTab === 'admin'"
+            [class.is-active]="activeTab === 'admin'"
+            (click)="tabChange.emit('admin')"
           >
-            <span class="showcase-tab__label">{{ locale.t('dock.wallet') }}</span>
+            <span class="showcase-tab__label">{{ locale.t('dock.admin') }}</span>
+          </button>
+          <button
+            type="button"
+            class="showcase-tab ds-surface ds-surface--showcase-tab"
+            role="tab"
+            [attr.aria-selected]="activeTab === 'chain'"
+            [class.is-active]="activeTab === 'chain'"
+            (click)="tabChange.emit('chain')"
+          >
+            <span class="showcase-tab__label">{{ locale.t('chain.title') }}</span>
           </button>
           @if (product.faucetEnabled) {
             <button
@@ -46,11 +56,11 @@
             type="button"
             class="showcase-tab ds-surface ds-surface--showcase-tab"
             role="tab"
-            [attr.aria-selected]="activeTab === 'chain'"
-            [class.is-active]="activeTab === 'chain'"
-            (click)="tabChange.emit('chain')"
+            [attr.aria-selected]="activeTab === 'peers'"
+            [class.is-active]="activeTab === 'peers'"
+            (click)="tabChange.emit('peers')"
           >
-            <span class="showcase-tab__label">{{ locale.t('chain.title') }}</span>
+            <span class="showcase-tab__label">{{ locale.t('dock.peers') }}</span>
           </button>
           <button
             type="button"
@@ -66,24 +76,12 @@
             type="button"
             class="showcase-tab ds-surface ds-surface--showcase-tab"
             role="tab"
-            [attr.aria-selected]="activeTab === 'peers'"
-            [class.is-active]="activeTab === 'peers'"
-            (click)="tabChange.emit('peers')"
+            [attr.aria-selected]="activeTab === 'wallet'"
+            [class.is-active]="activeTab === 'wallet'"
+            (click)="tabChange.emit('wallet')"
           >
-            <span class="showcase-tab__label">{{ locale.t('dock.peers') }}</span>
+            <span class="showcase-tab__label">{{ locale.t('dock.wallet') }}</span>
           </button>
-          @if (auth.isAdmin()) {
-            <button
-              type="button"
-              class="showcase-tab ds-surface ds-surface--showcase-tab"
-              role="tab"
-              [attr.aria-selected]="activeTab === 'admin'"
-              [class.is-active]="activeTab === 'admin'"
-              (click)="tabChange.emit('admin')"
-            >
-              <span class="showcase-tab__label">{{ locale.t('dock.admin') }}</span>
-            </button>
-          }
         </nav>
       </div>
       <div class="showcase-header-actions">
@@ -145,11 +143,9 @@
             </div>
           }
           @case ('admin') {
-            @if (auth.isAdmin()) {
-              <div class="app-bottom-stack__panel app-bottom-stack__panel--admin">
-                <app-admin-panel />
-              </div>
-            }
+            <div class="app-bottom-stack__panel app-bottom-stack__panel--admin">
+              <app-admin-panel />
+            </div>
           }
         }
       }

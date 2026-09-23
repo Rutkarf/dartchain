@@ -16,6 +16,9 @@ import { DockQuestsStateService } from '@dock/services/dock-quests-state.service
 import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
 import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import { CURRENT_MISSION } from '@quests/quests-panel/quests-panel.constants';
+import { ProductConfigService } from '@core/config/product-config.service';
+import { ArenaMetaService } from '@metaverse/arena/services/arena-meta.service';
+import { ArenaSessionService } from '@metaverse/arena/services/arena-session.service';
 
 @Component({
   selector: 'app-dock-quests-summary',
@@ -31,6 +34,9 @@ export class DockQuestsSummaryComponent implements OnInit, OnDestroy {
   protected readonly state = inject(DockQuestsStateService);
   private readonly quests = inject(QuestsPanelService);
   private readonly walletSession = inject(WalletSessionService);
+  private readonly product = inject(ProductConfigService);
+  private readonly arenaMeta = inject(ArenaMetaService);
+  private readonly arenaSession = inject(ArenaSessionService);
 
   @HostBinding('class')
   readonly hostClasses = `${COLLAPSED_SUMMARY_BAR_CLASS} dock-summary-bar__content is-quests`;
@@ -149,6 +155,16 @@ export class DockQuestsSummaryComponent implements OnInit, OnDestroy {
    * sinon mission / weekly.
    */
   private async claimNextReward(): Promise<boolean> {
+    if (
+      this.product.metaverseArenaEnabled &&
+      this.arenaMeta.questComplete()
+    ) {
+      const amount = this.arenaSession.claimDockQuestReward();
+      if (amount > 0) {
+        return true;
+      }
+    }
+
     const views = this.state.taskViews();
     const current = this.displayedQuest();
     const preferred =

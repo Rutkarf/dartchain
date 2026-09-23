@@ -20,6 +20,9 @@ public final class ApiContractCatalog {
                 "Les routes /api/* legacy restent actives avec en-têtes Deprecation.",
                 List.of(
                         endpoint("GET", ApiRoutes.OPS_SNAPSHOT_V1, true, "Snapshot observabilité native (ADMIN, panel admin)"),
+                        endpoint("GET", ApiRoutes.ADMIN_STATUS_V1, false, "Statut panel admin (seed configurée ?)"),
+                        endpoint("POST", ApiRoutes.ADMIN_UNLOCK_V1, false, "Unlock panel admin via seed 24 mots"),
+                        endpoint("GET", ApiRoutes.ADMIN_EXPORT_V1, true, "Export evidence pack json|txt|csv (header X-Admin-Unlock-Token)"),
                         endpoint("GET", ApiRoutes.CHAIN_CONFIG_V1, false, "Métadonnées chaîne native EVM-compatible"),
                         endpoint("POST", ApiRoutes.WALLETS_GENERATE_EVM_V1, false, "Générer wallet secp256k1 (dev/démo)"),
                         endpoint("GET", ApiRoutes.HEALTH_V1, false, "Santé et flags produit"),

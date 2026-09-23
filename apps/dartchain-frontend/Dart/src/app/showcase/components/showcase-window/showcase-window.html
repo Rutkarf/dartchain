@@ -9,85 +9,98 @@
     role="tabpanel"
     [attr.aria-labelledby]="'showcase-tab-' + activeTab"
   >
-    @switch (activeTab) {
-      @case ('tours') {
-        <div class="showcase-tab-panel ds-surface ds-surface--card">
-          @if (collapsed) {
-            <app-showcase-news-summary />
-          } @else {
-            @defer (on idle) {
-              <app-showcase-news [isExpanded]="true" />
-            } @placeholder {
-              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
-            }
-          }
-        </div>
+    <!--
+      Tous les onglets restent montés ([hidden]) pour s’initialiser au démarrage
+      et éviter « Chargement… » bloqué (on idle ne part jamais avec WebGL actif).
+    -->
+    <div
+      class="showcase-tab-panel ds-surface ds-surface--card"
+      [hidden]="activeTab !== 'tours'"
+    >
+      @if (collapsed) {
+        <app-showcase-news-summary />
+      } @else {
+        @defer (on immediate) {
+          <app-showcase-news [isExpanded]="true" />
+        } @placeholder {
+          <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+        }
       }
-      @case ('r4v3') {
-        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--r4v3">
-          @if (collapsed) {
-            <app-showcase-r4v3-summary />
-          } @else {
-            @defer (on idle) {
-              <app-showcase-r4v3 [isExpanded]="true" />
-            } @placeholder {
-              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
-            }
-          }
-        </div>
+    </div>
+
+    <div
+      class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--r4v3"
+      [hidden]="activeTab !== 'r4v3'"
+    >
+      @if (collapsed) {
+        <app-showcase-r4v3-summary />
+      } @else {
+        @defer (on immediate) {
+          <app-showcase-r4v3 [isExpanded]="true" />
+        } @placeholder {
+          <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+        }
       }
-      @case ('daonews') {
-        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--dao">
-          @if (collapsed) {
-            <app-showcase-dao-summary />
-          } @else {
-            @defer (on idle) {
-              <app-showcase-dao [isExpanded]="true" />
-            } @placeholder {
-              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
-            }
-          }
-        </div>
+    </div>
+
+    <div
+      class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--dao"
+      [hidden]="activeTab !== 'daonews'"
+    >
+      @if (collapsed) {
+        <app-showcase-dao-summary />
+      } @else {
+        @defer (on immediate) {
+          <app-showcase-dao [isExpanded]="true" />
+        } @placeholder {
+          <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+        }
       }
-      @case ('rv23') {
-        <div class="showcase-tab-panel ds-surface ds-surface--card">
-          @if (collapsed) {
-            <app-showcase-chat-summary />
-          } @else {
-            @defer (on idle) {
-              <app-showcase-chat [isExpanded]="true" />
-            } @placeholder {
-              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
-            }
-          }
-        </div>
+    </div>
+
+    <div
+      class="showcase-tab-panel ds-surface ds-surface--card"
+      [hidden]="activeTab !== 'rv23'"
+    >
+      @if (collapsed) {
+        <app-showcase-chat-summary />
+      } @else {
+        @defer (on immediate) {
+          <app-showcase-chat [isExpanded]="true" />
+        } @placeholder {
+          <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+        }
       }
-      @case ('dao') {
-        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--launch">
-          @if (collapsed) {
-            <app-showcase-launch-summary />
-          } @else {
-            @defer (on idle) {
-              <app-showcase-launch [isExpanded]="true" />
-            } @placeholder {
-              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
-            }
-          }
-        </div>
+    </div>
+
+    <div
+      class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--launch"
+      [hidden]="activeTab !== 'dao'"
+    >
+      @if (collapsed) {
+        <app-showcase-launch-summary />
+      } @else {
+        @defer (on immediate) {
+          <app-showcase-launch [isExpanded]="true" />
+        } @placeholder {
+          <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+        }
       }
-      @case ('market') {
-        <div class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--market">
-          @if (collapsed) {
-            <app-dock-market-summary />
-          } @else {
-            @defer (on idle) {
-              <app-market-panel />
-            } @placeholder {
-              <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
-            }
-          }
-        </div>
+    </div>
+
+    <div
+      class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--market"
+      [hidden]="activeTab !== 'market'"
+    >
+      @if (collapsed) {
+        <app-dock-market-summary />
+      } @else {
+        @defer (on immediate) {
+          <app-market-panel />
+        } @placeholder {
+          <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+        }
       }
-    }
+    </div>
   </div>
 </section>

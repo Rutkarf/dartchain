@@ -1,5 +1,7 @@
 import {
+  addR4v3Amounts,
   formatR4v3Amount,
+  formatR4v3AmountCompact,
   normalizeR4v3Amount,
   R4V3_DECIMALS,
 } from './r4v3-amount.util';
@@ -18,5 +20,15 @@ describe('r4v3-amount.util', () => {
 
   it('uses 26 decimals by default', () => {
     expect(formatR4v3Amount('1').split(',')[1].length).toBe(R4V3_DECIMALS);
+  });
+
+  it('adds decimal amounts without float drift', () => {
+    expect(addR4v3Amounts('1.25', '2.5')).toBe('3.75');
+    expect(addR4v3Amounts('0', '0.1')).toBe('0.1');
+  });
+
+  it('formats compact balances for the dock', () => {
+    expect(formatR4v3AmountCompact('12.5000')).toBe('12,5');
+    expect(formatR4v3AmountCompact('0')).toBe('0');
   });
 });

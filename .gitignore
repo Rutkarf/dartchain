@@ -44,3 +44,7 @@ backups/
 
 # Reliquat archive GitHub / montages Docker accidentels
 DartChainz-app-main/
+
+# Admin unlock seed (local)
+deploy/admin-seed.local.txt
+*.admin-seed.local.txt

@@ -91,6 +91,18 @@ export type LocaleKey =
   | 'admin.noEvents'
   | 'admin.loading'
   | 'admin.error'
+  | 'admin.seedTitle'
+  | 'admin.seedHint'
+  | 'admin.seedLabel'
+  | 'admin.seedNotConfigured'
+  | 'admin.unlock'
+  | 'admin.unlocking'
+  | 'admin.lock'
+  | 'admin.sessionUntil'
+  | 'admin.socLead'
+  | 'admin.exportLead'
+  | 'admin.exportAll'
+  | 'admin.opsOptional'
   | 'chain.title'
   | 'chain.view.list'
   | 'chain.view.graph'
@@ -328,8 +340,8 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'dock.quests': 'Quêtes',
     'dock.peers': 'Peers',
     'dock.admin': 'Admin',
-    'admin.title': 'Panel admin',
-    'admin.subtitle': 'Observabilité native — sans Prometheus',
+    'admin.title': 'Panel admin global',
+    'admin.subtitle': 'SOC 1 / SOC 2 Type 1 & 2 — unlock seed',
     'admin.refresh': 'Rafraîchir les métriques',
     'admin.collected': 'Collecté',
     'admin.alerts': 'Alertes',
@@ -341,6 +353,22 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'admin.noEvents': 'Aucun événement récent',
     'admin.loading': 'Chargement des métriques…',
     'admin.error': 'Impossible de charger le snapshot ops.',
+    'admin.seedTitle': 'Admin — seed requise',
+    'admin.seedHint':
+      'Saisissez la seed 24 mots (fichier local deploy/admin-seed.local.txt). Aucune clé wallet.',
+    'admin.seedLabel': 'Seed admin',
+    'admin.seedNotConfigured': 'Hash seed non configuré côté serveur (DARTCHAIN_ADMIN_SEED_SHA256).',
+    'admin.unlock': 'Déverrouiller',
+    'admin.unlocking': 'Vérification…',
+    'admin.lock': 'Verrouiller',
+    'admin.sessionUntil': 'session jusqu’à',
+    'admin.socLead':
+      'Cartographie contrôles techniques. designed = code ; gap-org = process auditeur / période Type 2.',
+    'admin.exportLead':
+      'Evidence pack : utilisateurs (sans mots de passe), audit auth, faucet, blocs, pending, ops, contrôles SOC.',
+    'admin.exportAll': 'Tout (.json + .txt + .csv)',
+    'admin.opsOptional':
+      'Ops snapshot réservé au rôle JWT ADMIN — exports seed restent disponibles.',
     'chain.title': 'Chain',
     'chain.view.list': 'Liste',
     'chain.view.graph': 'Graphe',
@@ -630,8 +658,8 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'dock.quests': 'Quests',
     'dock.peers': 'Peers',
     'dock.admin': 'Admin',
-    'admin.title': 'Admin panel',
-    'admin.subtitle': 'Native observability — no Prometheus',
+    'admin.title': 'Global admin panel',
+    'admin.subtitle': 'SOC 1 / SOC 2 Type 1 & 2 — seed unlock',
     'admin.refresh': 'Refresh metrics',
     'admin.collected': 'Collected',
     'admin.alerts': 'Alerts',
@@ -643,6 +671,22 @@ const MESSAGES: Record<AppLocale, Record<LocaleKey, string>> = {
     'admin.noEvents': 'No recent events',
     'admin.loading': 'Loading metrics…',
     'admin.error': 'Unable to load ops snapshot.',
+    'admin.seedTitle': 'Admin — seed required',
+    'admin.seedHint':
+      'Enter the 24-word admin seed (local file deploy/admin-seed.local.txt). Not a wallet mnemonic.',
+    'admin.seedLabel': 'Admin seed',
+    'admin.seedNotConfigured': 'Seed hash not configured (DARTCHAIN_ADMIN_SEED_SHA256).',
+    'admin.unlock': 'Unlock',
+    'admin.unlocking': 'Checking…',
+    'admin.lock': 'Lock',
+    'admin.sessionUntil': 'session until',
+    'admin.socLead':
+      'Technical control map. designed = code; gap-org = auditor process / Type 2 period.',
+    'admin.exportLead':
+      'Evidence pack: users (no passwords), auth audit, faucet, blocks, pending, ops, SOC controls.',
+    'admin.exportAll': 'All (.json + .txt + .csv)',
+    'admin.opsOptional':
+      'Ops snapshot requires JWT ADMIN role — seed exports remain available.',
     'chain.title': 'Chain',
     'chain.view.list': 'List',
     'chain.view.graph': 'Graph',

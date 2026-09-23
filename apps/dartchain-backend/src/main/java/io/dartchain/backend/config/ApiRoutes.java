@@ -73,6 +73,12 @@ public final class ApiRoutes {
     public static final String CHARACTERS_V1_PREFIX = API_V1_PREFIX + "/characters";
     public static final String CHARACTERS_ME_V1 = CHARACTERS_V1_PREFIX + "/me";
 
+    /** Panel admin global — unlock seed + exports SOC. */
+    public static final String ADMIN_V1_PREFIX = API_V1_PREFIX + "/admin";
+    public static final String ADMIN_UNLOCK_V1 = ADMIN_V1_PREFIX + "/unlock";
+    public static final String ADMIN_EXPORT_V1 = ADMIN_V1_PREFIX + "/export";
+    public static final String ADMIN_STATUS_V1 = ADMIN_V1_PREFIX + "/status";
+
     private ApiRoutes() {
     }
 }

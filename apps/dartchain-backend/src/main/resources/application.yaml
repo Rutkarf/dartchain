@@ -11,6 +11,19 @@ dartchain:
     faucet-enabled: true
     showcase-enabled: true
     legacy-api-aliases-enabled: false
+  metaverse:
+    arena:
+      enabled: true
+      loot-rate: 0.10
+      loot-cap-per-elimination: 25
+      minimum-faucet-balance-to-loot: 1
+      spawn-shield-duration-seconds: 8
+      respawn-delay-seconds: 8
+      kill-cooldown-seconds: 5
+      daily-loot-cap: 200
+      daily-loss-cap: 200
+      new-player-protection-duration-seconds: 60
+      anti-farming-threshold: 8
   chain:
     chain-id: 3377
     network-name: DartChain Native
@@ -21,8 +34,13 @@ dartchain:
     access-token-ttl-seconds: 3600
     refresh-token-ttl-seconds: 604800
     legacy-session-enabled: false
-    bootstrap-admin-username: ${DARTCHAIN_BOOTSTRAP_ADMIN:}
-    password-min-length: 8
+    bootstrap-admin-username: ${DARTCHAIN_BOOTSTRAP_ADMIN:random}
+    bootstrap-admin-password: ${DARTCHAIN_BOOTSTRAP_ADMIN_PASSWORD:random}
+    password-min-length: 6
+  admin:
+    # SHA-256 de la seed 24 mots (jamais la phrase en clair). Voir deploy/admin-seed.local.txt
+    seed-sha256: ${DARTCHAIN_ADMIN_SEED_SHA256:3c7af8f4a99c61e08acb2bb85b972eb022db4ec432c1e338cb6be24abb2c8d9f}
+    unlock-ttl-seconds: ${DARTCHAIN_ADMIN_UNLOCK_TTL:3600}
   oauth:
     dev-mock-enabled: ${OAUTH_DEV_MOCK_ENABLED:false}
     frontend-callback-url: ${OAUTH_FRONTEND_CALLBACK_URL:http://localhost:4200/}

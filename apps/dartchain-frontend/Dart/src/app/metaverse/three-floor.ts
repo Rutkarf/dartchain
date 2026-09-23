@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  HostBinding,
   NgZone,
   OnDestroy,
   ViewChild,
@@ -43,6 +44,10 @@ import { CitySceneComponent } from './city-scene/city-scene.component';
 import { JoystickMoveComponent } from './input/joystick-move/joystick-move.component';
 import { JoystickViewComponent } from './input/joystick-view/joystick-view.component';
 import { PlacementDetailsPanel } from './placement-details-panel/placement-details-panel';
+import { ArenaHudComponent } from './arena/components/arena-hud/arena-hud.component';
+import { ArenaCombatService } from './arena/services/arena-combat.service';
+import { ArenaSessionService } from './arena/services/arena-session.service';
+import { ProductConfigService } from '@core/config/product-config.service';
 
 const FLOOR_HEIGHT_FALLBACK = 420;
 const PERF_DEBUG = isPerfDebugEnabled();
@@ -68,6 +73,7 @@ function getTargetPixelRatio(
     JoystickMoveComponent,
     JoystickViewComponent,
     PlacementDetailsPanel,
+    ArenaHudComponent,
   ],
   templateUrl: './three-floor.html',
   styleUrl: './three-floor.css',
@@ -86,6 +92,15 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private readonly zone = inject(NgZone);
   private readonly animationScheduler = inject(WebGlAnimationSchedulerService);
   private readonly combinedPerfHud = inject(CombinedPerfHudService);
+  private readonly product = inject(ProductConfigService);
+  private readonly arenaCombat = inject(ArenaCombatService);
+  private readonly arenaSession = inject(ArenaSessionService);
+
+  /** Peek plus haut + masque adouci quand l’Arène BB est active. */
+  @HostBinding('class.arena-active')
+  get arenaActiveClass(): boolean {
+    return this.product.metaverseArenaEnabled;
+  }
 
   private scene?: THREE.Scene;
   private camera?: THREE.PerspectiveCamera;
@@ -100,10 +115,12 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private readonly profiler = new PerfProfiler();
 
   ngAfterViewInit(): void {
+    this.applyArenaPeekCssVar();
     this.zone.runOutsideAngular(() => this.initScene());
   }
 
   ngOnDestroy(): void {
+    this.clearArenaPeekCssVar();
     this.unsubControl?.();
     this.characterControl.unbindKeys();
     this.cameraControl.detachOrbit();
@@ -112,6 +129,7 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     this.schedulerUnregister = undefined;
     this.animationScheduler.pauseSubscriber('metaverse-floor');
     this.resizeBinding?.unsubscribe();
+    this.arenaCombat.teardown();
     if (this.renderer) {
       this.renderer.renderLists.dispose();
       this.renderer.dispose();
@@ -123,6 +141,30 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
     this.renderPipeline?.dispose();
     this.renderPipeline = undefined;
     this.atmosphere.dispose();
+  }
+
+  /**
+   * Peek arène : remplit sous navbar + 3 rangées d’onglets + une bande
+   * showcase/dock dépliable (~300px réservés en haut).
+   */
+  private applyArenaPeekCssVar(): void {
+    if (typeof document === 'undefined') return;
+    if (!this.product.metaverseArenaEnabled) return;
+    const peek = 'calc(100dvh - var(--arena-ui-top-reserve, 300px))';
+    document.documentElement.style.setProperty('--arena-ui-top-reserve', '300px');
+    document.documentElement.style.setProperty('--floor-peek-height', peek);
+    document.documentElement.style.setProperty('--floor-canvas-height', peek);
+    document.documentElement.style.setProperty('--arena-chrome-h', '22px');
+    document.documentElement.style.removeProperty('--arena-shell-pad');
+  }
+
+  private clearArenaPeekCssVar(): void {
+    if (typeof document === 'undefined') return;
+    document.documentElement.style.removeProperty('--floor-peek-height');
+    document.documentElement.style.removeProperty('--floor-canvas-height');
+    document.documentElement.style.removeProperty('--arena-chrome-h');
+    document.documentElement.style.removeProperty('--arena-shell-pad');
+    document.documentElement.style.removeProperty('--arena-ui-top-reserve');
   }
 
   private initScene(): void {
@@ -203,6 +245,9 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       this.cameraControl.resetOrbit();
       this.unsubControl = this.threeScene.registerUpdate((dt) => {
         this.characterControl.update(dt);
+        if (this.product.metaverseArenaEnabled) {
+          this.arenaCombat.update(dt);
+        }
       });
 
       this.renderFrame();
@@ -223,6 +268,11 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
         },
       });
       this.animationScheduler.resumeSubscriber('metaverse-floor');
+
+      // Arène BB : session jouable dès que le floor WebGL est prêt (guest OK).
+      if (this.product.metaverseArenaEnabled) {
+        this.arenaSession.ensureAutoPlay();
+      }
 
       if (PERF_DEBUG) {
         console.log('[PERF] Render loop started');
@@ -309,6 +359,13 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private applyHorizonBlendMask(): void {
     const wrapper = this.floorWrapper?.nativeElement;
     if (!wrapper) return;
+    // Arène BB : pas de fondu / coupure — le peek remplit sous les onglets.
+    if (this.product.metaverseArenaEnabled) {
+      wrapper.style.setProperty('-webkit-mask-image', 'none');
+      wrapper.style.setProperty('mask-image', 'none');
+      wrapper.style.backgroundColor = 'transparent';
+      return;
+    }
     const mask = harmonizedHorizonMaskImage();
     wrapper.style.setProperty('-webkit-mask-image', mask);
     wrapper.style.setProperty('mask-image', mask);

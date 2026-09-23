@@ -42,6 +42,10 @@
   border-radius: 0;
 }
 
+.showcase-tab-panel[hidden] {
+  display: none !important;
+}
+
 .showcase-tab-panel--launch {
   padding: 0px;
 }

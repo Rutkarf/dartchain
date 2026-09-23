@@ -1,0 +1,195 @@
+@if (enabled()) {
+  <div
+    class="arena-hud"
+    [class.arena-hud--hit]="hitFlash()"
+    [class.arena-hud--playing]="phase() === 'playing'"
+    [class.arena-hud--lock]="!!lockedTarget()"
+  >
+    <!-- Playfield = zone 3D pleine hauteur -->
+    <div class="arena-hud__playfield">
+      <div
+        class="arena-hud__flash"
+        [style.opacity]="screenFlash()"
+        aria-hidden="true"
+      ></div>
+
+      @if (phase() === 'playing' && ageOk()) {
+        <div
+          class="arena-hud__cross"
+          [class.arena-hud__cross--lock]="!!lockedTarget()"
+          aria-hidden="true"
+        ></div>
+
+        <div class="arena-hud__map" aria-hidden="true">
+          @for (d of minimapDots(); track d.id) {
+            <span
+              class="arena-hud__dot"
+              [class.arena-hud__dot--self]="d.self"
+              [class.arena-hud__dot--power]="d.power"
+              [class.arena-hud__dot--peer]="d.peer"
+              [style.left.%]="d.nx * 100"
+              [style.top.%]="d.nz * 100"
+            ></span>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="arena-hud__fire"
+          aria-label="Tirer {{ weaponName }}"
+          (pointerdown)="fire($event)"
+          (click)="fire($event)"
+        >
+          FIRE
+        </button>
+      }
+
+      @if (questComplete() && phase() === 'playing') {
+        <button type="button" class="arena-hud__quest-claim" (click)="claimQuest()">
+          Claim quête +{{ questReward }}ƒ
+        </button>
+      }
+
+      @if (!ageOk()) {
+        <div class="arena-hud__panel arena-hud__panel--age" role="dialog" aria-label="Age gate">
+          <h2>Arène BB — Kill-to-earn 16+</h2>
+          <p class="arena-hud__lead">
+            Arcade fictionnel. Loot = ledger faucet non claimé uniquement. Wallet jamais touché.
+          </p>
+          <button type="button" class="arena-hud__cta" (click)="acceptAge()">J’ai 16+ · Jouer</button>
+        </div>
+      }
+
+      @if (phase() === 'rules') {
+        <div class="arena-hud__panel" role="dialog" aria-label="Règles Arène BB">
+          <h2>Kill-to-earn</h2>
+          <p class="arena-hud__lead">{{ kteTagline() }}</p>
+          <ul>
+            <li>KO bots / peers → ƒ ledger arène (streak = multi)</li>
+            <li>Multi : WS peers (`{{ transportMode() }}`) + bots solo</li>
+            <li>Tir : FIRE / Espace / F / double-tap</li>
+            <li>{{ questLabel() }}</li>
+            <li>Précision session {{ accuracy() }}%</li>
+            <li>{{ disclaimer }}</li>
+          </ul>
+
+          <div class="arena-hud__row arena-hud__row--tools">
+            <button type="button" class="arena-hud__chip-btn" (click)="toggleMute()">
+              {{ muted() ? 'Son off' : 'Son on' }}
+            </button>
+            <button type="button" class="arena-hud__chip-btn" (click)="togglePause()">
+              {{ paused() ? 'Resume' : 'Pause' }}
+            </button>
+          </div>
+
+          <p class="arena-hud__lead">Mode</p>
+          <div class="arena-hud__row">
+            <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'ffa-bots'" (click)="setMode('ffa-bots')">FFA</button>
+            <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'horde'" (click)="setMode('horde')">Horde</button>
+            <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'duel-bots'" (click)="setMode('duel-bots')">Duel</button>
+            <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'ffa-peers'" (click)="setMode('ffa-peers')">Peers</button>
+          </div>
+
+          <p class="arena-hud__lead">Skin</p>
+          <div class="arena-hud__row">
+            <button type="button" class="arena-hud__chip-btn" [class.is-on]="skin() === 'cyan'" (click)="setSkin('cyan')">Cyan</button>
+            <button type="button" class="arena-hud__chip-btn" [class.is-on]="skin() === 'r4v3'" (click)="setSkin('r4v3')">R4V3</button>
+            <button type="button" class="arena-hud__chip-btn" [class.is-on]="skin() === 'pxd'" (click)="setSkin('pxd')">PXD</button>
+          </div>
+
+          <p class="arena-hud__lead">Room WS</p>
+          <div class="arena-hud__row">
+            <input class="arena-hud__input" [value]="roomDraft()" (input)="onRoomInput($event)" aria-label="Room" />
+            <button type="button" class="arena-hud__chip-btn" (click)="applyRoom()">Set</button>
+          </div>
+          <p class="arena-hud__lead arena-hud__chip--dim">
+            room={{ roomId() }} · {{ transportMode() }} · bots ×{{ targetCount() }} · peers {{ peerCount() }}
+          </p>
+
+          <p class="arena-hud__lead">Top earners</p>
+          <ul class="arena-hud__lb">
+            @for (row of leaderboard(); track row.name) {
+              <li>{{ row.name }} · +{{ row.earned }}ƒ · {{ row.kills }}K</li>
+            }
+          </ul>
+
+          <button type="button" class="arena-hud__cta arena-hud__cta--ghost" (click)="showClaimMock()">
+            Claim on-chain (hors arène)
+          </button>
+          <button type="button" class="arena-hud__cta" (click)="dismissRules()">OK</button>
+        </div>
+      }
+    </div>
+
+    <!-- Barre stats plaquee tout en bas de page -->
+    <div class="arena-hud__chrome">
+      <div class="arena-hud__strip" aria-label="Arène BB Kill-to-earn">
+        <span class="arena-hud__brand">{{ title }}</span>
+        <span class="arena-hud__kte">{{ kteTag }}</span>
+
+        @if (phase() === 'playing' && local(); as player) {
+          <span class="arena-hud__hp" title="Santé">
+            <span class="arena-hud__meter">
+              <span [style.width.%]="healthPct()"></span>
+            </span>
+            {{ healthPct() }}
+          </span>
+          <span class="arena-hud__chip">{{ player.kills }}/{{ player.deaths }}</span>
+          @if (streak() > 0) {
+            <span class="arena-hud__chip arena-hud__chip--streak">×{{ streak() }}</span>
+          }
+          <span class="arena-hud__chip arena-hud__chip--earn" title="Session earned"
+            >+{{ sessionEarned() }}ƒ</span
+          >
+          @if (peerCount() > 0) {
+            <span class="arena-hud__chip arena-hud__chip--peers" title="Peers WS"
+              >P{{ peerCount() }}</span
+            >
+          }
+          @if (lootMult() > 1) {
+            <span class="arena-hud__chip arena-hud__chip--shot">ƒ×{{ lootMult() }}</span>
+          }
+          @if (mode() === 'horde') {
+            <span class="arena-hud__chip">W{{ wave() }}</span>
+          }
+          @if (shotLabel(); as shot) {
+            <span class="arena-hud__chip arena-hud__chip--shot">{{ shot }}</span>
+          }
+        } @else if (phase() === 'eliminated') {
+          <span class="arena-hud__chip">KO</span>
+          <button type="button" class="arena-hud__mini" (click)="respawn()">↑</button>
+        }
+
+        @if (paused()) {
+          <span class="arena-hud__chip arena-hud__chip--pause">PAUSE</span>
+        }
+
+        <button type="button" class="arena-hud__mini" title="Infos" (click)="openRulesBrief()">
+          ?
+        </button>
+      </div>
+
+      @if (killCamActive()) {
+        <p class="arena-hud__toast arena-hud__toast--ko-big" role="status">KILL · EARN</p>
+      }
+      @if (lastLoot(); as loot) {
+        @if (loot.accepted && loot.lootAmount > 0 && phase() === 'playing') {
+          <p class="arena-hud__toast arena-hud__toast--earn" role="status">
+            +{{ loot.lootAmount }} ƒ ledger
+          </p>
+        }
+      }
+      @if (claimToast(); as ct) {
+        <p class="arena-hud__toast arena-hud__toast--earn" role="status">{{ ct }}</p>
+      }
+      @if (phase() === 'eliminated' && notice(); as msg) {
+        <p class="arena-hud__toast arena-hud__toast--ko" role="status">{{ msg }}</p>
+      }
+      @if (notice(); as n) {
+        @if (phase() === 'playing') {
+          <p class="arena-hud__toast arena-hud__toast--earn" role="status">{{ n }}</p>
+        }
+      }
+    </div>
+  </div>
+}

@@ -13,9 +13,9 @@ describe('MetaverseBB scope inventory', () => {
     expect(METAVERSEBB_HOST_SELECTOR).toBe('app-three-floor');
   });
 
-  it('fige les 7 composants exclusifs', () => {
-    expect(METAVERSEBB_EXCLUSIVE_COMPONENT_COUNT).toBe(7);
-    expect(METAVERSEBB_CHILD_SELECTORS).toHaveLength(5);
+  it('fige les 8 composants exclusifs', () => {
+    expect(METAVERSEBB_EXCLUSIVE_COMPONENT_COUNT).toBe(8);
+    expect(METAVERSEBB_CHILD_SELECTORS).toHaveLength(6);
     expect(METAVERSEBB_SHARED_JOYSTICK_SELECTOR).toBe('app-virtual-joystick');
   });
 
@@ -27,11 +27,12 @@ describe('MetaverseBB scope inventory', () => {
       'app-joystick-move',
       'app-joystick-view',
       'app-placement-details-panel',
+      'app-arena-hud',
     ]);
   });
 
   it('confirme que la liste auditée n’a aucun élément unused', () => {
-    expect(METAVERSEBB_LISTED_ELEMENT_COUNT).toBe(41);
+    expect(METAVERSEBB_LISTED_ELEMENT_COUNT).toBe(42);
     expect(METAVERSEBB_LISTED_UNUSED_COUNT).toBe(0);
   });
 });

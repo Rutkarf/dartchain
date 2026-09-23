@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,6 +59,12 @@ public class JpaUserAccountStore implements UserAccountStore {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<UserAccount> findAll() {
+        return userRepository.findAll().stream().map(UserEntityMapper::toAccount).toList();
+    }
+
+    @Override
     @Transactional
     public UserAccount create(UserAccount account) {
         UserEntity saved = userRepository.save(UserEntityMapper.toEntity(account));
@@ -85,6 +92,16 @@ public class JpaUserAccountStore implements UserAccountStore {
 
         entity.setPasswordHash(passwordHash);
         entity.setPasswordSalt("");
+        return UserEntityMapper.toAccount(userRepository.save(entity));
+    }
+
+    @Override
+    @Transactional
+    public UserAccount updateRole(String userId, io.dartchain.backend.auth.model.UserRole role) {
+        UserEntity entity = parseUuid(userId)
+                .flatMap(userRepository::findById)
+                .orElseThrow(() -> new AuthException(404, "Utilisateur introuvable"));
+        entity.setRole(role == null ? "USER" : role.name());
         return UserEntityMapper.toAccount(userRepository.save(entity));
     }
 

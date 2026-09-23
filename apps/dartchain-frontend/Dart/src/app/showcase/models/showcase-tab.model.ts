@@ -10,12 +10,12 @@ export const SHOWCASE_TABS: ReadonlyArray<{
   id: ShowcaseTab;
   label: string;
 }> = [
-  { id: 'tours', label: 'TOUS' },
-  { id: 'r4v3', label: 'R4V3' },
   { id: 'rv23', label: 'CHAT' },
-  { id: 'dao', label: 'LABZ' },
   { id: 'daonews', label: 'D.A.O' },
+  { id: 'dao', label: 'LABZ' },
   { id: 'market', label: 'MARCHÉ' },
+  { id: 'r4v3', label: 'R4V3' },
+  { id: 'tours', label: 'TOUS' },
 ];
 
 /** Anciens identifiants showcase → onglets hub maquette. */

@@ -122,7 +122,8 @@ describe('World streaming and R4V3 cells', () => {
   });
 
   it('remplace les textes de scene et identifie le batiment R4V3', () => {
-    expect(SCENE_COPY.canopyTitle).toBe('MetaVerseBB');
+    expect(SCENE_COPY.canopyTitle).toBe('Arène BB');
+    expect(SCENE_COPY.canopyTitleLegacy).toBe('MetaVerseBB');
     expect(SCENE_COPY.roadMarking).toBe('Hack The Planet x)');
     expect(SCENE_COPY.r4v3).toBe('R4V3');
     expect(SCENE_COPY.m4t3rPickup).toBe('+1');

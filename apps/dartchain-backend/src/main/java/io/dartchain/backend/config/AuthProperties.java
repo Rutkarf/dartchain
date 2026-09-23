@@ -10,6 +10,7 @@ public class AuthProperties {
     private long refreshTokenTtlSeconds = 604800;
     private boolean legacySessionEnabled = true;
     private String bootstrapAdminUsername = "";
+    private String bootstrapAdminPassword = "";
     private int passwordMinLength = 8;
 
     public String getJwtSecret() {
@@ -49,7 +50,15 @@ public class AuthProperties {
     }
 
     public void setBootstrapAdminUsername(String bootstrapAdminUsername) {
-        this.bootstrapAdminUsername = bootstrapAdminUsername;
+        this.bootstrapAdminUsername = bootstrapAdminUsername == null ? "" : bootstrapAdminUsername.trim();
+    }
+
+    public String getBootstrapAdminPassword() {
+        return bootstrapAdminPassword;
+    }
+
+    public void setBootstrapAdminPassword(String bootstrapAdminPassword) {
+        this.bootstrapAdminPassword = bootstrapAdminPassword == null ? "" : bootstrapAdminPassword;
     }
 
     public int getPasswordMinLength() {

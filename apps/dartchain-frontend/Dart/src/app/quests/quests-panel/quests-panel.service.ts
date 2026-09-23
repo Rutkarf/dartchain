@@ -198,6 +198,8 @@ export class QuestsPanelService {
       try {
         const state = await firstValueFrom(this.questsApi.claimTask(taskId));
         this.applyServerState(state);
+        const reward = this.resolveTaskRewardMts(taskId);
+        this.walletSession.requestBalanceRefresh(reward);
         return { ok: true };
       } catch (error) {
         return {
@@ -217,6 +219,7 @@ export class QuestsPanelService {
       try {
         const state = await firstValueFrom(this.questsApi.claimMission());
         this.applyServerState(state);
+        this.walletSession.requestBalanceRefresh(this.getCurrentMission().rewardMts);
         return { ok: true };
       } catch (error) {
         return {
@@ -236,6 +239,7 @@ export class QuestsPanelService {
       try {
         const state = await firstValueFrom(this.questsApi.claimWeekly());
         this.applyServerState(state);
+        this.walletSession.requestBalanceRefresh(this.getWeeklyReward().rewardMts);
         return { ok: true };
       } catch (error) {
         return {
@@ -536,6 +540,10 @@ export class QuestsPanelService {
       progress: afterProgress,
       target,
     };
+  }
+
+  private resolveTaskRewardMts(taskId: string): number {
+    return this.getDailyQuests().find((quest) => quest.id === taskId)?.rewardMts ?? 0;
   }
 
   private resolveApiError(error: unknown, fallback: string): string {

@@ -411,8 +411,9 @@ export class FaucetRuntimeService {
           this.triggerBump();
           this.prependHistoryEntry(response.claimedAt, response.amount, response.txHash);
           void this.questProgress.recordFaucetClaim();
-          // Claim = mempool only ; le solde on-chain monte après mine.
-          this.walletSession.requestBalanceRefresh();
+          // Crédit UI immédiat + mine mempool pour que getBalance suive.
+          this.walletSession.requestBalanceRefresh(response.amount);
+          this.confirmFaucetClaimOnChain(response);
           this.loadNetworkMeta();
           this.loadClaimsHistory();
           window.dispatchEvent(new CustomEvent('dartchain-refresh-dock'));
@@ -421,6 +422,25 @@ export class FaucetRuntimeService {
         error: (error: HttpErrorResponse) => {
           this.handleApiError(error, 'faucet.error.claimFailed');
         },
+      });
+  }
+
+  /** Mine le crédit faucet PENDING pour que le solde on-chain monte. */
+  private confirmFaucetClaimOnChain(_response: FaucetClaimResponse): void {
+    const miner = this.walletAddress()?.trim();
+    if (!miner) {
+      return;
+    }
+    this.blockchain
+      .minePendingTransactions({ minerAddress: miner })
+      .pipe(
+        catchError(() => of(null)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.walletSession.requestBalanceRefresh();
+        window.dispatchEvent(new CustomEvent('dartchain-refresh-dock'));
+        this.refreshWalletBalance();
       });
   }
 

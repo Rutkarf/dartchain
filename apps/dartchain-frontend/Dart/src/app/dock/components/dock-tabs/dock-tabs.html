@@ -9,22 +9,6 @@
       #dockTabButton
       type="button"
       class="dock-tab ds-surface ds-surface--showcase-tab"
-      data-panel="pending"
-      [class.is-active]="activePanel() === 'pending'"
-      [attr.aria-selected]="activePanel() === 'pending' ? 'true' : 'false'"
-      [attr.tabindex]="activePanel() === 'pending' ? '0' : '-1'"
-      role="tab"
-      id="tab-pending"
-      aria-controls="panel-dock"
-      (click)="openPanel('pending')"
-    >
-      <span class="dock-tab-label">Pending</span>
-    </button>
-
-    <button
-      #dockTabButton
-      type="button"
-      class="dock-tab ds-surface ds-surface--showcase-tab"
       data-panel="composer"
       [class.is-active]="activePanel() === 'composer'"
       [attr.aria-selected]="activePanel() === 'composer' ? 'true' : 'false'"
@@ -51,6 +35,22 @@
       (click)="openPanel('chain')"
     >
       <span class="dock-tab-label">Chain</span>
+    </button>
+
+    <button
+      #dockTabButton
+      type="button"
+      class="dock-tab ds-surface ds-surface--showcase-tab"
+      data-panel="pending"
+      [class.is-active]="activePanel() === 'pending'"
+      [attr.aria-selected]="activePanel() === 'pending' ? 'true' : 'false'"
+      [attr.tabindex]="activePanel() === 'pending' ? '0' : '-1'"
+      role="tab"
+      id="tab-pending"
+      aria-controls="panel-dock"
+      (click)="openPanel('pending')"
+    >
+      <span class="dock-tab-label">Pending</span>
     </button>
   </nav>
 </div>

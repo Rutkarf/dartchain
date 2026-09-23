@@ -17,6 +17,16 @@
   min-height: 0;
 }
 
+.dock-bottom-summary > [hidden] {
+  display: none !important;
+}
+
+.dock-bottom-summary > :not([hidden]) {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+}
+
 .dock-bottom-summary__fallback {
   flex: 1 1 auto;
   margin: 0;

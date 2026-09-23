@@ -60,6 +60,27 @@ export const METRO_SPAWN_ANCHOR = {
   spawnOffsetFromMirror: { x: 0, y: 0, z: 5.0 } satisfies WorldAnchor,
 } as const;
 
+/**
+ * Zone intouchable autour du miroir / spawn Vieux-Port.
+ * Tant que le joueur est dedans, les bots ne peuvent pas lui infliger de dégâts.
+ * Alignée sur l’anneau walkable ±14 m (esplanade).
+ */
+export const MIRROR_SPAWN_SAFE_ZONE = {
+  id: 'vieux-port-mirror-safe',
+  centerX:
+    METRO_SPAWN_ANCHOR.mirror.x + METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.x,
+  centerZ:
+    METRO_SPAWN_ANCHOR.mirror.z + METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.z,
+  /** Rayon monde (m) — couvre miroir + esplanade spawn. */
+  radiusMeters: 14,
+} as const;
+
+export function isInsideMirrorSpawnSafeZone(x: number, z: number): boolean {
+  const dx = x - MIRROR_SPAWN_SAFE_ZONE.centerX;
+  const dz = z - MIRROR_SPAWN_SAFE_ZONE.centerZ;
+  return dx * dx + dz * dz <= MIRROR_SPAWN_SAFE_ZONE.radiusMeters ** 2;
+}
+
 /** Vue de validation séparée — n’écrase pas la caméra orbitale tant qu’elle n’est pas activée. */
 export const VIEUX_PORT_METRO_MIRROR_VIEW = {
   id: 'VIEUX_PORT_METRO_MIRROR_VIEW',
@@ -85,7 +106,10 @@ export {
 } from './geo-reference.config';
 
 export const SCENE_COPY = {
-  canopyTitle: 'MetaVerseBB',
+  /** Affichage public du floor — MetaVerseBB devient Arène BB (alias produit). */
+  canopyTitle: 'Arène BB',
+  /** Alias historique conservé pour docs / audits. */
+  canopyTitleLegacy: 'MetaVerseBB',
   roadMarking: 'Hack The Planet x)',
   r4v3: 'R4V3',
   m4t3rPickup: '+1',
