@@ -1,0 +1,219 @@
+@if (open()) {
+  <div
+    class="launch-drawer-backdrop"
+    (click)="closeDrawer()"
+    aria-hidden="false"
+  >
+    <aside
+      class="launch-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="launchFormTitle"
+      [appFocusTrap]="true"
+      (click)="$event.stopPropagation()"
+    >
+      <app-launch-form-drawer-fx class="launch-drawer__fx" />
+
+      <header class="launch-drawer__head">
+        <h2 id="launchFormTitle" class="launch-drawer__title">Lancer un projet</h2>
+        <button
+          type="button"
+          class="launch-drawer__close"
+          aria-label="Fermer le formulaire"
+          [disabled]="submitting()"
+          (click)="closeDrawer()"
+        >
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+        </button>
+      </header>
+
+      <div class="launch-drawer__body">
+        @if (errorMessage()) {
+          <p class="launch-drawer__error" role="alert">{{ errorMessage() }}</p>
+        }
+
+        <form class="launch-drawer__form" [formGroup]="form" (ngSubmit)="submit()">
+          <p class="launch-drawer__section-title launch-drawer__span-all">Identité</p>
+
+          <div class="launch-drawer__logo-cell">
+            @if (logoPreview(); as preview) {
+              <img class="launch-drawer__logo-preview" [src]="preview" alt="Logo du jeton" />
+            } @else {
+              <span class="launch-drawer__logo-preview launch-drawer__logo-preview--empty" aria-hidden="true">?</span>
+            }
+            <div class="launch-drawer__logo-upload">
+              <span class="launch-drawer__label">Logo</span>
+              <label class="launch-drawer__browse">
+                <span class="launch-drawer__browse-icon" aria-hidden="true"></span>
+                <span class="launch-drawer__browse-text">Importer</span>
+                <input
+                  class="launch-drawer__browse-input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  (change)="onLogoChange($event)"
+                />
+              </label>
+            </div>
+            @if (logoPreview()) {
+              <button type="button" class="launch-drawer__link-btn" (click)="clearLogo()" aria-label="Retirer le logo"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
+            }
+            @if (logoError(); as logoErr) {
+              <span class="launch-drawer__field-hint launch-drawer__field-hint--err launch-drawer__span-all">{{ logoErr }}</span>
+            }
+          </div>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Nom *</span>
+            <input type="text" formControlName="name" maxlength="40" autocomplete="off" placeholder="Nova Protocol" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Symbole *</span>
+            <input type="text" formControlName="symbol" maxlength="8" autocomplete="off" placeholder="NVP" />
+          </label>
+
+          <label class="launch-drawer__field launch-drawer__span-2">
+            <span class="launch-drawer__label">Pitch * · {{ descriptionLength() }}/600</span>
+            <textarea
+              formControlName="description"
+              maxlength="600"
+              rows="2"
+              placeholder="Utilité, public cible, promesse…"
+            ></textarea>
+          </label>
+
+          <p class="launch-drawer__section-title launch-drawer__span-all">Chaîne & tokenomics</p>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Blockchain *</span>
+            <select class="launch-drawer__glass-select" formControlName="chain">
+              @for (chain of chainOptions; track chain) {
+                <option [value]="chain">{{ chain }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Offre *</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="totalSupply" min="1" step="1" placeholder="1e9" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('totalSupply', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('totalSupply', -1)"></button>
+              </span>
+            </span>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Décimales *</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="decimals" min="0" max="18" step="1" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('decimals', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('decimals', -1)"></button>
+              </span>
+            </span>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Contrat</span>
+            <input type="text" formControlName="contractAddress" autocomplete="off" placeholder="0x…" />
+          </label>
+
+          <p class="launch-drawer__section-title launch-drawer__span-all">Levée & calendrier</p>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Objectif *</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="targetAmount" min="1" step="100" placeholder="50000" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('targetAmount', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('targetAmount', -1)"></button>
+              </span>
+            </span>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Plafond</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="hardCap" min="0" step="100" placeholder="100000" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('hardCap', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('hardCap', -1)"></button>
+              </span>
+            </span>
+            @if (form.hasError('hardCapBelowTarget')) {
+              <span class="launch-drawer__field-hint launch-drawer__field-hint--err">Plafond ≥ objectif</span>
+            }
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Liquidité %</span>
+            <span class="launch-drawer__number-wrap">
+              <input class="launch-drawer__input-number" type="number" formControlName="liquidityPercent" min="0" max="100" step="1" placeholder="70" />
+              <span class="launch-drawer__stepper" aria-hidden="true">
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--up" tabindex="-1" aria-label="Augmenter" (click)="stepNumber('liquidityPercent', 1)"></button>
+                <button type="button" class="launch-drawer__step-btn launch-drawer__step-btn--down" tabindex="-1" aria-label="Diminuer" (click)="stepNumber('liquidityPercent', -1)"></button>
+              </span>
+            </span>
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Lancement *</span>
+            <input type="datetime-local" formControlName="launchDate" />
+          </label>
+
+          <p class="launch-drawer__section-title launch-drawer__span-all">Présence</p>
+
+          <label class="launch-drawer__field launch-drawer__span-2">
+            <span class="launch-drawer__label">Site web *</span>
+            <input type="url" formControlName="website" placeholder="https://…" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Livre blanc</span>
+            <input type="url" formControlName="whitepaperUrl" placeholder="https://…" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Twitter / X</span>
+            <input type="text" formControlName="twitter" placeholder="@projet" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Telegram</span>
+            <input type="text" formControlName="telegram" placeholder="t.me/…" />
+          </label>
+
+          <label class="launch-drawer__field">
+            <span class="launch-drawer__label">Discord</span>
+            <input type="text" formControlName="discord" placeholder="discord.gg/…" />
+          </label>
+
+          <label class="launch-drawer__terms launch-drawer__span-all">
+            <input type="checkbox" formControlName="acceptTerms" />
+            <span>J’accepte les conditions du laboratoire (testnet).</span>
+          </label>
+
+          <div class="launch-drawer__actions launch-drawer__span-all">
+            <button
+              type="button"
+              class="launch-drawer__btn launch-drawer__btn--ghost"
+              [disabled]="submitting()"
+              (click)="closeDrawer()"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              class="launch-drawer__btn launch-drawer__btn--primary"
+              [disabled]="form.invalid || submitting()"
+            >
+              {{ submitting() ? 'Publication…' : 'Publier le projet' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </aside>
+  </div>
+}

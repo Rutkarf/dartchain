@@ -1,0 +1,22 @@
+{
+  "balances" : {
+    "579850d18479008a6a15e911236fc42511a08564" : {
+      "R4V3" : {
+        "balance" : "0",
+        "chainBalance" : "0",
+        "ledgerAdjustment" : "0",
+        "source" : "SYNC"
+      }
+    }
+  },
+  "events" : [ {
+    "walletAddress" : "579850d18479008a6a15e911236fc42511a08564",
+    "token" : "R4V3",
+    "delta" : "0",
+    "balanceAfter" : "0",
+    "chainBalance" : "0",
+    "ledgerAdjustment" : "0",
+    "eventType" : "SYNC",
+    "createdAt" : "2026-10-07T01:35:41.723106189Z"
+  } ]
+}

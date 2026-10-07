@@ -1,0 +1,17 @@
+/**
+ * Tokens partagés pour les panneaux `.dock-view` (wallet, block-composer, blocks-list).
+ * Les feuilles composant conservent leurs règles locales — import additive Phase K.
+ */
+:root {
+  --dock-view-gap: 0px;
+  --dock-view-pad: 0px;
+  --dock-view-font: var(--fs-chain);
+  --dock-view-font-sm: var(--fs-shell);
+  --dock-view-title-font: var(--fs-title);
+  --dock-view-title-row-h: var(--comp-title-row-h, 16px);
+  --dock-view-row-h: var(--comp-row-h, 16px);
+  --dock-view-col-gap: 0;
+  --dock-view-row-cols: minmax(0, 1fr);
+  --dock-view-border: 1px solid rgba(var(--accent-primary-rgb), 0.08);
+  --dock-view-radius: 4px;
+}

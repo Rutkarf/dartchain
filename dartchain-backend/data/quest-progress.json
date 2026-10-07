@@ -1,0 +1,3715 @@
+{
+  "entries" : [ {
+    "userId" : "08a04ea7-db9b-4276-80be-ab415d56ce92",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "d2e2f7da-6cf4-482e-b26c-47ddfc7a79f8",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "de5c4517-e7bb-4d39-856f-be7b6e4e1e1e",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "8335fbc1-3b0f-4752-a91e-e9172ed09a3d",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "43f1507e-b5e7-4853-ab31-083be7ab8718",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "a23a63e9-481d-4d8a-90ce-65a5a203e685",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "27faef7f-66b1-4308-af9f-e3cea3940ae3",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "c917dd1d-f67a-44da-a9a7-d2127299f684",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "e6d85cf6-f6a2-4093-aaac-0ad9496753c6",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b676a420-03a5-4556-afa4-e9ce31ac9593",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ 0 ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "dd313ed7-773f-4995-b24a-131a1f8e9971",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "8163b466-c3bf-4050-87b1-6091608e4ea7",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "90608f33-8d5b-4e2a-804a-b3b77fb692b6",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "6e96030f-dd1b-48de-9a4c-ba6e134222e0",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "3c00991b-1820-4e30-bc35-dbb3748496fc",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "9bcac7b5-6447-4f2e-a1a5-998c071e35de",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "d9e587e9-8577-4e02-b544-511e2bd6074e",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "fd0a1d76-02b5-4faa-869c-ec63e46b7ee7",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "ed052c3f-d35c-4ea8-9ddc-9bb878dc6c9d",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "7c9365b5-74d5-4323-a976-323f51de4052",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "97feb8e2-1514-49f5-9c78-93ffa1bdd1d9",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "84f85896-894d-410a-a762-150c74957f72",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "ae6955b0-e138-45af-873e-d56f714afd2e",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "8250572b-71a4-4860-986e-1ad58bd5fd57",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "f1da1a6d-887b-4afc-87ba-8bcd301c4704",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "a5795914-a9e8-4395-8131-6ae188407013",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "d6394c1b-2d13-4701-afcd-eed9970063e7",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "80842d20-968c-4875-94ca-fd615b45cda4",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "3a810bb4-f0a5-48b1-9945-69c49f7e0732",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "2303a7df-3cd8-4d56-af83-48d34b76d5e9",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "7f7dfe45-be00-4c89-9506-19a9c5edd34d",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "76f735ce-0521-4442-8465-7ad71720092b",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "1cda3ae4-2613-4d70-8868-5b7cef93acae",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "847169fc-1fea-49a1-beaa-8155b31cbc83",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "faaa540d-ece3-4ae1-bdbf-1e8de1c55bd9",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "97d7005e-13fc-49c9-8d0d-23ca3b4bcbbc",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "bcf52b52-1957-4ec4-8286-403b7819b591",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "524acd24-0c7d-414a-9c10-bcc0685ef31b",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "e1e5eac1-d790-42db-b7f5-ee3f483316dd",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "7ba0a718-3066-49b4-bf32-7a5162e439eb",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "60561965-ea5a-43f0-a916-dbdf25db64bc",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 25,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "959a7344-585c-443c-abc8-c107a951aff3",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 25,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "70f65a79-158c-49c2-9789-5ffa42a7c1c6",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "08bc593d-1561-4be8-ac6c-c028470d11b9",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "4858b1ab-0d2f-440f-a94a-066081eacfc4",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "41cf46d9-8add-4304-b1f9-1b96eca5cb79",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "2b340945-db95-4a1e-952b-467a83e94f8b",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "6bd11c47-9b22-44de-887a-29feacd050ed",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 25,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "8b1b3cbd-28e4-4b59-82d3-767901d2038a",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "e8e6e123-66f1-41a3-95e8-5b7103da27d5",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "8101bfb3-cf85-47d7-adea-a8a7219cff00",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ 0 ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "d649e874-19a9-459b-a574-f4e8f62da0b1",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "f68232e0-ba2e-4e9c-afd1-b262e73261ab",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "851695f6-f017-42e6-9d88-99d9e9baf51a",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "7e40610b-2d3a-42c3-b638-173954f324a5",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "0e765e1a-7fe0-41e1-92b1-66be4c71f5b1",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "474e5247-e8e1-447d-a934-9dc418ba3d0d",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "ce8ff290-a057-4bac-96e1-c4181bf116cc",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "5024d29b-f166-4e72-81ff-75fa20e942fa",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "8734ce3a-bcd8-4b7d-a759-22d88ef02e07",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "be7d3429-600f-4393-bcc4-6649519530a5",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "539feb25-fff9-407a-9036-877e59e2e909",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "c7c172c0-5b64-4859-8ddc-7f89eb2f0c14",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "9b8e01f9-01cd-47f1-a7c8-615d72d9fbf5",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "dc541e4a-7747-4630-b9c0-dfc8eab05295",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "8cf05cb0-2c9f-4e84-ab59-35ef45bf587e",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "explore-blocks" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ 18 ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 25,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "340e1976-a377-4f27-bb1a-97652219c758",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "5154998b-0186-4da5-8eaa-1596f25b2e39",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "3cd413cc-6481-4b85-93d2-cf30ec80d722",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "5dd0fd9e-b6ab-4ff3-a2c0-bc945510e591",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "8b364535-beca-4ea2-b58b-83f38829a1b1",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "73919f06-133b-4a24-9548-816b87e80fb7",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "dd88a288-7520-4973-9549-fd4ae7c166e4",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b3d2bd66-61aa-4f6f-ab51-750bd4c0c623",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b191f950-2668-448c-8dc7-5eb1f6885a8a",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "8a6a98e0-4176-4ed3-98dc-e1c4021a89a4",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "74c5a109-63c3-499a-a529-71d426f42c60",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "6eb667b0-611e-4050-bfea-fe47b6545058",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "7ffbf50e-6b0a-4ad8-afa5-1362ee74c058",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "addc8fa5-a9e1-4fbb-88c7-a754af38feff",
+    "state" : {
+      "dayKey" : "2026-10-04",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : true
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 10,
+      "pendingMts" : 1.00
+    }
+  }, {
+    "userId" : "80a8216c-1725-471d-83e8-beaf405536ba",
+    "state" : {
+      "dayKey" : "2026-10-06",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "083128ef-cbde-4561-80bb-e17fc64f885d",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "8d47963e-ae8b-4de4-9a06-a7ac90437c7c",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "209d78be-0ca8-4133-8b76-59f527d24bcf",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "612f590e-91ef-42a3-a5bb-85c0fba76fb9",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "a7ad5da6-9cd3-4497-a209-b721c62ce091",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "fe7c3c86-b72e-45a2-9842-3c0fdabfae75",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "7c0a961b-a634-4ddb-befb-a95d010c8581",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "a5f68a75-8422-4192-941e-e788657d16fa",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "9a6c64a6-af92-4fd3-aea0-169bd1c044a4",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "d893ac9c-d969-4371-b889-3c4507ba267a",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "0c82fd22-d845-4b99-a80c-061b6165c93b",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b054279e-fce7-4652-afd0-13d9d67cea9d",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "7c09f3b8-98e5-41e8-b339-8670f7574788",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "0e652926-454e-48cb-a6fb-f28db334cf78",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "d2a90472-0709-4c43-9b1a-bf68517b0591",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "9b5724fc-6144-4264-96ba-4f3d83d11972",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "e0a2c715-eaf0-494c-aa1a-8b6766d4d0ce",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "f2449c8e-355d-4941-86bb-85107c17ee06",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "f5e1e5df-0ef6-454e-83ac-6e4d900c624d",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "88cc7fee-819d-4f53-8a19-b0f07ed2dbff",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "83924fe9-b3e5-4792-b718-bb949e796459",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ 0 ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "4346c558-b98f-4615-be29-a4ad98f0e777",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "2f32adfe-44fa-4ae7-897a-fcec75ee9093",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "44da6355-6e60-41ad-88b4-b1cde4bb0d7f",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "26305440-c16d-444c-81e0-dc3f63bb199b",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "27823569-0a56-465f-b479-e87c79d88e06",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "3de30399-2b01-4942-84a6-6da788e0d223",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "37442ee0-41c3-4d60-987f-26ea6f3511f8",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b770900c-59f0-4260-9e20-260c246dd3d7",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "fce8a67d-e512-47e6-9816-ce3f7aa9aca8",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b6d530d3-ceb3-40d7-bdc8-3da328fb38a0",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "5df125c6-0006-4760-a593-c98fe839ac2a",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b59a74ea-a1ef-4d46-9831-a0df0b880b5a",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b06fa3b7-5614-444b-aa93-85710d258e9d",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b0ff15e8-ff2b-473a-ab6d-a1aec090f013",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "5b9e3057-f362-42db-9d0d-00535e3e2a14",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ 27 ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "4a7b108e-25a6-4218-b731-36960bc8078e",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "e1f0a37e-ceb9-4863-a95f-2e8e8f7e6654",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "b88f3dc7-c311-4f0f-b3e1-4b691c530522",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "42ed77f5-43d2-4c17-818b-95ff29331dab",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "44b3a05e-3b3a-459d-9a30-0b2b94ab489f",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "48cd8f0f-59bf-41db-ba2a-b2f180bbeeeb",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "f198b71f-6cea-49eb-a6f2-b77ba087d4bd",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "5691b15a-5862-4800-bd7e-af2e9a191ead",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "58b85fdd-bd2e-4d17-8483-e4dfcc08cc73",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "126f5623-d949-4017-9fb4-526459fdfd6b",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  }, {
+    "userId" : "e22d466c-25ea-4d85-bfd0-dfcbe2dbf24a",
+    "state" : {
+      "dayKey" : "2026-10-07",
+      "weekKey" : "2026-W41",
+      "tasks" : {
+        "daily-login" : {
+          "progress" : 1,
+          "claimed" : false
+        },
+        "faucet-claim" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "explore-blocks" : {
+          "progress" : 0,
+          "claimed" : false
+        },
+        "swap-tokens" : {
+          "progress" : 0,
+          "claimed" : false
+        }
+      },
+      "exploredBlockIndices" : [ ],
+      "missionClaimed" : false,
+      "weeklyClaimed" : false,
+      "totalXp" : 0,
+      "pendingMts" : 0
+    }
+  } ]
+}

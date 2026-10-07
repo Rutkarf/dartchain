@@ -1,0 +1,162 @@
+<div
+ class="showcase-view showcase-view--news"
+ role="region"
+>
+  @if (isExpanded) {
+    <header class="showcase-news__head">
+      <div class="showcase-meta showcase-news__meta-bar">
+        @if (chainBlockLabel(); as blockLabel) {
+          @if (chainLiveClickable()) {
+            <button
+ type="button"
+ class="showcase-news__chain-status showcase-news__chain-status--btn"
+ (click)="openLatestBlock()"
+ [attr.title]="newsState.chainStatusTooltip()"
+ >
+              <span
+                class="showcase-news__chain-led"
+                [class]="newsState.chainLiveToneClass()"
+                aria-hidden="true"
+              ></span>
+              <span class="showcase-news__chain-block">{{ blockLabel }}</span>
+              <span class="showcase-news__chain-sep" aria-hidden="true">·</span>
+              <span class="showcase-news__chain-tone">{{ chainToneLabel() }}</span>
+            </button>
+          } @else {
+            <div
+              class="showcase-news__chain-status"
+              role="status"
+              aria-live="polite"
+              [attr.title]="newsState.chainStatusTooltip()"
+            >
+              <span
+                class="showcase-news__chain-led"
+                [class]="newsState.chainLiveToneClass()"
+                aria-hidden="true"
+              ></span>
+              <span class="showcase-news__chain-block">{{ blockLabel }}</span>
+              <span class="showcase-news__chain-sep" aria-hidden="true">·</span>
+              <span class="showcase-news__chain-tone">{{ chainToneLabel() }}</span>
+            </div>
+          }
+        } @else {
+          <div
+            class="showcase-news__chain-status showcase-news__chain-status--fallback"
+            role="status"
+            aria-live="polite"
+            [attr.title]="newsState.chainStatusTooltip()"
+          >
+            <span
+              class="showcase-news__chain-led"
+              [class]="newsState.chainLiveToneClass()"
+              aria-hidden="true"
+            ></span>
+            <span class="showcase-news__chain-fallback">{{ chainFallbackLabel() }}</span>
+          </div>
+        }
+
+        <label class="showcase-meta__search showcase-news__search-inline">
+          <span class="sr-only">Rechercher dans les actualités</span>
+          <span class="showcase-news__search-icon" aria-hidden="true">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+          </span>
+          <span
+            class="showcase-news__search-hint"
+            [class.is-hidden]="!!searchQuery().trim()"
+            aria-hidden="true"
+          >Rechercher</span>
+          <input
+            #searchInput
+            type="search"
+            class="showcase-meta__search-input"
+            placeholder=""
+            [value]="searchQuery()"
+            (input)="onSearchInput($any($event.target).value)"
+          />
+        </label>
+      </div>
+    </header>
+
+    <div #contentPanel class="showcase-news__content">
+      @if (loading()) {
+        <ul class="showcase-news__list showcase-news__list--skeleton" aria-hidden="true">
+          @for (row of [1, 2, 3, 4, 5, 6, 7]; track row) {
+            <li class="showcase-news__skeleton-item">
+              <span class="showcase-news__skeleton-tag"></span>
+              <span class="showcase-news__skeleton-lines"><span></span></span>
+            </li>
+          }
+        </ul>
+      } @else if (error()) {
+        <div class="showcase-news__status showcase-news__status--error ds-empty" role="alert">
+          <p class="ds-empty__title">Chargement impossible</p>
+          <p class="ds-empty__desc">Impossible de charger les actualités.</p>
+          <button type="button" class="showcase-news__retry cta cta--sm cta--secondary ds-empty__action" (click)="retry()">
+            Réessayer
+          </button>
+        </div>
+      } @else if (filteredItems().length === 0) {
+        <div class="showcase-news__status showcase-news__empty ds-empty" role="status">
+          <p class="ds-empty__title">Aucune actualité</p>
+          <p class="ds-empty__desc">Aucun événement pour ce filtre.</p>
+        </div>
+      } @else {
+        <ul class="showcase-news__list">
+          @for (item of filteredItems(); track item.id; let idx = $index) {
+            <li
+              class="showcase-news__item"
+              [class.showcase-news__item--featured]="isFeatured(item)"
+              [class.showcase-news__item--selected]="selectedItem()?.id === item.id"
+              [class.showcase-news__item--unread]="isUnread(item)"
+              [class.showcase-news__item--keyboard]="isKeyboardFocused(idx)"
+              [class.showcase-news__item--alt]="idx % 2 === 1"
+              [attr.data-category]="categorySlug(item.category)"
+              [attr.data-source]="item.source.toLowerCase()"
+            >
+              <button
+                type="button"
+                class="showcase-news__item-btn"
+                (click)="openItem(item)"
+                [attr.aria-expanded]="selectedItem()?.id === item.id"
+                [attr.title]="itemLineTooltip(item)"
+              >
+                <span
+                  class="showcase-news__tag"
+                  [attr.data-category]="categorySlug(item.category)"
+                >
+                  <span class="showcase-news__tag-badge">{{ categoryAbbrev(item) }}</span>
+                </span>
+                <span class="showcase-news__item-title">{{ itemLineTitle(item) }}</span>
+                @if (itemRelativeTime(item); as relTime) {
+                  <span class="showcase-news__item-time">{{ relTime }}</span>
+                }
+              </button>
+            </li>
+          }
+        </ul>
+
+        @if (hasMore() && !debouncedSearchQuery().trim()) {
+          <div #loadSentinel class="showcase-news__load-sentinel" aria-hidden="true">
+            @if (loadingMore()) {
+              <span class="showcase-news__load-sentinel-label">…</span>
+            }
+          </div>
+        }
+      }
+    </div>
+
+    <app-showcase-news-drawer
+      [item]="detailItem() ?? selectedItem()"
+      [loading]="detailLoading()"
+      [canPrev]="canNavigatePrev()"
+      [canNext]="canNavigateNext()"
+      [itemIndex]="selectedIndex()"
+      [itemTotal]="filteredItems().length"
+      (closeDrawer)="closeItem()"
+      (navigatePrev)="navigatePrev()"
+      (navigateNext)="navigateNext()"
+      (runAction)="runAction($event)"
+      (copySummary)="copySummary($event)"
+    />
+  }
+</div>

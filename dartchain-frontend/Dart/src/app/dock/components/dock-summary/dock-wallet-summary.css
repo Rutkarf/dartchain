@@ -1,0 +1,197 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  container-type: inline-size;
+  box-sizing: border-box;
+}
+
+.wallet-summary-bar {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  padding: 0 1px 0 2px;
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.wallet-summary-bar__balance {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: baseline;
+  gap: 0.22em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-form);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: rgba(237, 231, 217, 0.94);
+  line-height: 1;
+}
+
+.wallet-summary-bar__token {
+  flex: 0 0 auto;
+  color: rgba(var(--tab-accent-rgb, 139, 157, 173), 0.95);
+  letter-spacing: 0.04em;
+}
+
+.wallet-summary-bar__amount {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wallet-summary-bar__eq {
+  flex: 0 0 auto;
+  color: rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.72);
+  font-weight: 600;
+}
+
+.wallet-summary-bar__chf {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(9, 129, 74, 0.92);
+  font-weight: 600;
+}
+
+.wallet-summary-bar__actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 2px;
+  max-height: 100%;
+}
+
+.wallet-summary-bar__icon-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: var(--comp-icon-sm, 12px);
+  height: var(--comp-icon-sm, 12px);
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(var(--tab-accent-rgb, 139, 157, 173), 0.28);
+  border-radius: var(--radius-none);
+  background: rgba(10, 18, 32, 0.35);
+  color: rgba(237, 231, 217, 0.88);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  line-height: 0;
+}
+
+.wallet-summary-bar__icon-btn svg {
+  
+  
+  
+  
+  
+  
+  
+  overflow: visible;
+}
+
+.wallet-summary-bar__icon-btn--swap {
+  color: rgba(9, 129, 74, 0.92);
+  border-color: rgba(9, 129, 74, 0.35);
+}
+
+.wallet-summary-bar__icon-btn:hover:not(:disabled) {
+  color: var(--text-primary, #ede7d9);
+  border-color: var(--state-hover-border);
+  background: var(--state-hover-fill);
+}
+
+.wallet-summary-bar__icon-btn--swap:hover:not(:disabled) {
+  border-color: var(--state-hover-border);
+  background: var(--cta-primary-bg-hover);
+}
+
+.wallet-summary-bar__icon-btn:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.wallet-summary-bar__create {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  max-width: min(5.5rem, 38%);
+  height: var(--comp-hud-h, 16px);
+  margin: 0 0 0 1px;
+  padding: 0 3px;
+  border: 1px solid rgba(var(--tab-accent-rgb, 139, 157, 173), 0.28);
+  border-radius: var(--radius-none);
+  background: rgba(10, 18, 32, 0.35);
+  color: rgba(237, 231, 217, 0.88);
+  font-family: var(--font-display, inherit);
+  font-size: var(--fs-shell);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: 1;
+  touch-action: manipulation;
+}
+
+.wallet-summary-bar__create:hover:not(:disabled) {
+  color: var(--text-primary, #ede7d9);
+  border-color: var(--state-hover-border);
+  background: var(--state-hover-fill);
+}
+
+.wallet-summary-bar__create:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.wallet-summary-bar__create:focus-visible {
+  outline: none;
+  box-shadow: var(--state-focus-ring);
+}
+
+@container (max-width: 200px) {
+  .wallet-summary-bar__create {
+    max-width: 3.2rem;
+    padding: 0 2px;
+    letter-spacing: 0.02em;
+  }
+
+  .wallet-summary-bar__create-full {
+    display: none;
+  }
+
+  .wallet-summary-bar__create-short {
+    display: inline;
+  }
+}
+
+.wallet-summary-bar__create-short {
+  display: none;
+}

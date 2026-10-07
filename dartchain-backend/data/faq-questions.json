@@ -1,0 +1,102 @@
+{
+  "questions" : [ {
+    "id" : "faq-1",
+    "authorId" : "seed-user-1",
+    "authorName" : "NovaTrader",
+    "title" : "Le peg CHF est-il garanti on-chain ?",
+    "body" : "Je vois 1 R4V3 = 1 CHF partout. Est-ce enforce on-chain ou seulement UI ?",
+    "createdAt" : "2026-10-02T20:00:33.295589089Z",
+    "status" : "ACTIVE",
+    "score" : 8,
+    "upvotes" : 9,
+    "downvotes" : 1,
+    "answerCount" : 1,
+    "pendingStaffReview" : false
+  }, {
+    "id" : "faq-2",
+    "authorId" : "seed-user-2",
+    "authorName" : "LaunchDev",
+    "title" : "Différence m4t3r vs R4V3 dans le swap ?",
+    "body" : "Pourquoi l'exchange affiche m4t3r et pas R4V3 directement ?",
+    "createdAt" : "2026-10-03T20:00:33.295589089Z",
+    "status" : "ACTIVE",
+    "score" : 5,
+    "upvotes" : 6,
+    "downvotes" : 1,
+    "answerCount" : 1,
+    "pendingStaffReview" : false
+  }, {
+    "id" : "faq-3",
+    "authorId" : "seed-user-3",
+    "authorName" : "SwissHODL",
+    "title" : "Quelle est la prochaine évolution du protocole R4V3 ?",
+    "body" : "Y a-t-il une roadmap mainnet ou de nouvelles fonctionnalités governance ?",
+    "createdAt" : "2026-10-04T19:00:33.295589089Z",
+    "status" : "ACTIVE",
+    "score" : 2,
+    "upvotes" : 2,
+    "downvotes" : 0,
+    "answerCount" : 0,
+    "pendingStaffReview" : true
+  }, {
+    "id" : "0c82b7eb-dd99-4e08-9849-3bff6b1c4a75",
+    "authorId" : "73919f06-133b-4a24-9548-816b87e80fb7",
+    "authorName" : "iteste8ee26d0",
+    "title" : "Question communautaire test",
+    "body" : "Corps de question suffisamment long pour validation.",
+    "createdAt" : "2026-10-04T20:02:57.235824021Z",
+    "status" : "ACTIVE",
+    "score" : 0,
+    "upvotes" : 0,
+    "downvotes" : 0,
+    "answerCount" : 0,
+    "pendingStaffReview" : true
+  }, {
+    "id" : "1529adcc-25aa-4bd4-80e1-41c843b937f8",
+    "authorId" : "dd88a288-7520-4973-9549-fd4ae7c166e4",
+    "authorName" : "itest0d5d56b5",
+    "title" : "Vote communautaire sur cette question",
+    "body" : "Corps de question suffisamment long pour validation.",
+    "createdAt" : "2026-10-04T20:02:57.315243703Z",
+    "status" : "ACTIVE",
+    "score" : 1,
+    "upvotes" : 1,
+    "downvotes" : 0,
+    "answerCount" : 0,
+    "pendingStaffReview" : true
+  }, {
+    "id" : "9cf70112-7214-4dbf-9371-93316d68d255",
+    "authorId" : "48cd8f0f-59bf-41db-ba2a-b2f180bbeeeb",
+    "authorName" : "itest0769277e",
+    "title" : "Question communautaire test",
+    "body" : "Corps de question suffisamment long pour validation.",
+    "createdAt" : "2026-10-07T01:36:03.501249147Z",
+    "status" : "ACTIVE",
+    "score" : 0,
+    "upvotes" : 0,
+    "downvotes" : 0,
+    "answerCount" : 0,
+    "pendingStaffReview" : true
+  }, {
+    "id" : "858b8522-9616-41d0-b6a5-f01817962373",
+    "authorId" : "f198b71f-6cea-49eb-a6f2-b77ba087d4bd",
+    "authorName" : "itest9eb32fa1",
+    "title" : "Vote communautaire sur cette question",
+    "body" : "Corps de question suffisamment long pour validation.",
+    "createdAt" : "2026-10-07T01:36:03.578946406Z",
+    "status" : "ACTIVE",
+    "score" : 1,
+    "upvotes" : 1,
+    "downvotes" : 0,
+    "answerCount" : 0,
+    "pendingStaffReview" : true
+  } ],
+  "votes" : {
+    "858b8522-9616-41d0-b6a5-f01817962373" : {
+      "f198b71f-6cea-49eb-a6f2-b77ba087d4bd" : "UP"
+    },
+    "1529adcc-25aa-4bd4-80e1-41c843b937f8" : {
+      "dd88a288-7520-4973-9549-fd4ae7c166e4" : "UP"
+    }
+  }
+}

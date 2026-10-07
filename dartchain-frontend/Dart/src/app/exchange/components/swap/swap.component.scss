@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  min-height: var(--mvp-swap-h, var(--market-exchange-height-estimate, 14px));
+}
+
+:host ::ng-deep app-exchange-panel.app-hub-swap-stack {
+  display: block;
+  width: 100%;
+}

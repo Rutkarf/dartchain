@@ -1,0 +1,37 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--ds-modal-radius, var(--radius-md, 8px));
+  background: var(--surface-error-bg);
+  border: 1px solid var(--surface-error-border);
+  color: var(--text-primary, #ede7d9);
+  line-height: 1.4;
+  min-width: 0;
+}
+
+.error-dot {
+  width: var(--comp-hud-h, 16px);
+  height: 8px;
+  margin-top: 3px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--color-negative);
+  flex: 0 0 auto;
+}
+
+.error-text {
+  margin: 0;
+  font-size: var(--fs-fallback);
+  word-break: break-word;
+}
+
+/* === Responsive 250–500px (error-banner) === */
+@media (max-width: 500px) {
+  :host { font-size: var(--fs-fallback); padding: 4px 6px; }
+}

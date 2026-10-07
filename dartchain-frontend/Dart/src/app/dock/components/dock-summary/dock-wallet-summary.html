@@ -1,0 +1,68 @@
+<div
+ class="wallet-summary-bar"
+ role="status"
+ aria-live="polite"
+>
+  <span class="wallet-summary-bar__balance" [attr.title]="balanceAriaLabel()">
+    <span class="wallet-summary-bar__token">R4V3</span>
+    <span class="wallet-summary-bar__amount">{{ fullBalanceLabel() }}</span>
+    <span class="wallet-summary-bar__eq" aria-hidden="true">≈</span>
+    <span class="wallet-summary-bar__chf">{{ formattedChfValue() }} CHF</span>
+  </span>
+
+  <div class="wallet-summary-bar__actions">
+    <button
+      type="button"
+      class="wallet-summary-bar__icon-btn"
+      (click)="onReceive($event)"
+      [disabled]="!hasWallet()"
+      aria-label="Recevoir"
+      title="Recevoir"
+    >
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-down-left"/></svg>
+    </button>
+
+    <button
+      type="button"
+      class="wallet-summary-bar__icon-btn wallet-summary-bar__icon-btn--swap"
+      (click)="onSwap($event)"
+      aria-label="Échange"
+      title="Échange"
+    >
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-left-right"/></svg>
+    </button>
+
+    <button
+      type="button"
+      class="wallet-summary-bar__icon-btn"
+      (click)="onSend($event)"
+      [disabled]="!hasWallet()"
+      aria-label="Envoyer"
+      title="Envoyer"
+    >
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-up-right"/></svg>
+    </button>
+
+    @if (showCreateWallet()) {
+      <button
+        type="button"
+        class="wallet-summary-bar__create"
+        (click)="onCreateWallet($event)"
+        [disabled]="!canCreateWallet()"
+        [attr.aria-label]="
+          canCreateWallet()
+            ? 'Créer un portefeuille'
+            : 'Connectez-vous pour créer un wallet'
+        "
+        [attr.title]="
+          canCreateWallet()
+            ? 'Créer un portefeuille'
+            : 'Connectez-vous pour créer un wallet'
+        "
+      >
+        <span class="wallet-summary-bar__create-full">Créer</span>
+        <span class="wallet-summary-bar__create-short" aria-hidden="true">+</span>
+      </button>
+    }
+  </div>
+</div>

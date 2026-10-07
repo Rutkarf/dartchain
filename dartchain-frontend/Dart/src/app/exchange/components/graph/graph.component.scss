@@ -1,0 +1,68 @@
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  height: var(--market-chart-height, 136px);
+  min-height: var(--market-chart-height, 136px);
+  max-height: var(--market-chart-height, 136px);
+  /* gap géré par .app-main-layout — pas de margin ici */
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  z-index: 6;
+}
+
+/* Replié : aucun padding/margin vertical sur le conteneur global */
+:host(.is-chart-collapsed) {
+  height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px));
+  min-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px));
+  max-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px));
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+:host(.is-chart-collapsed) .app-market-stack--rate,
+:host(.is-chart-collapsed) .app-market-card--rate {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-market-stack--rate {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.app-market-card--rate {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-market-card--rate.is-summary-expandable {
+  cursor: pointer;
+}
+
+:host ::ng-deep app-rate-panel {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+}

@@ -1,0 +1,53 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "paths": {
+      "@core/*": ["./src/app/core/*"],
+      "@showcase/*": ["./src/app/showcase/*"],
+      "@navbar/*": ["./src/app/navbar/*"],
+      "@exchange/*": ["./src/app/exchange/*"],
+      "@dock/*": ["./src/app/dock/*"],
+      "@wallet/*": ["./src/app/wallet/*"],
+      "@faucet/*": ["./src/app/faucet/*"],
+      "@quests/*": ["./src/app/quests/*"],
+      "@peers/*": ["./src/app/peers/*"],
+      "@blockchain/*": ["./src/app/blockchain/*"],
+      "@explorer/*": ["./src/app/explorer/*"],
+      "@admin/*": ["./src/app/admin/*"],
+      "@auth/*": ["./src/app/auth/*"],
+      "@components/*": ["./src/app/components/*"],
+      "@r4v3-scene/*": ["./src/app/r4v3-scene/*"],
+      "@metaverse/*": ["./src/app/metaverse/*"],
+      "@star-conquest/*": ["./src/app/star-conquest/*"],
+      "@world-map/*": ["./src/app/world-map/*"]
+    }
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}

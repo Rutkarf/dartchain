@@ -1,0 +1,6 @@
+.detail-estimated {
+  margin-left: 4px;
+  font-size: var(--fs-price);
+  color: rgba(237, 231, 217, 0.72);
+  font-weight: 600;
+}

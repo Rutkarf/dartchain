@@ -1,0 +1,158 @@
+import { TestBed } from '@angular/core/testing';
+import * as THREE from 'three';
+
+import {
+  METAVERSE_DISTRICTS,
+  MIRROR_SECOND_BUILDING_ID,
+  M4T3R_PICKUP_FX,
+  R4V3_GROUND_FIELD,
+  SCENE_COPY,
+  TRAIL_CONFIG,
+  WORLD_SCALE,
+} from './map-configuration';
+import { clusterId } from './m4t3r-trail.util';
+import { getLodBand, lodDistanceFromPlayer } from './m4t3r-lod.util';
+import { shouldRenderGroundCell } from './m4t3r-ground-exclusion.util';
+import { shouldRenderCellAtLod } from './m4t3r-lod.util';
+import { M4t3rPickupFxService } from './m4t3r-pickup-fx.service';
+import { TokenCellService } from './token-cell.service';
+import { tokenCellId } from './token-cell.types';
+import {
+  chunkIdFromGrid,
+  deterministicChunkSeed,
+  worldToChunkGrid,
+} from './world-chunk.types';
+
+describe('World streaming and R4V3 cells', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+  });
+
+  it('conserve des IDs de chunks et de cellules deterministes', () => {
+    expect(chunkIdFromGrid(2, -3)).toBe('chunk:2:-3');
+    expect(tokenCellId(4, 8)).toBe('r4v3:4:8');
+    expect(deterministicChunkSeed(2, -3)).toBe(deterministicChunkSeed(2, -3));
+    expect(deterministicChunkSeed(2, -3)).not.toBe(deterministicChunkSeed(2, -4));
+    expect(worldToChunkGrid(130, WORLD_SCALE.chunkSizeMeters)).toBe(1);
+  });
+
+  it('etale un tapis de jetons R4V3 fixe autour du joueur', () => {
+    const service = TestBed.inject(TokenCellService);
+    service.dispose();
+    const root = new THREE.Group();
+    service.attach(root);
+    const origin = new THREE.Vector3(0, 0, 0);
+    expect(getLodBand(lodDistanceFromPlayer(origin.x, origin.z, -5.625, -1.875))).toBe('near');
+
+    let manualFull = 0;
+    let manualCheckerboard = 0;
+    const centerX = origin.x;
+    const centerZ = origin.z;
+    const radius = R4V3_GROUND_FIELD.visibleRadius;
+    const size = R4V3_GROUND_FIELD.cellSize;
+    const minX = Math.floor((centerX - radius) / size);
+    const maxX = Math.ceil((centerX + radius) / size);
+    const minZ = Math.floor((centerZ - radius) / size);
+    const maxZ = Math.ceil((centerZ + radius) / size);
+    for (let gz = minZ; gz <= maxZ; gz++) {
+      for (let gx = minX; gx <= maxX; gx++) {
+        const x = (gx + 0.5) * size;
+        const z = (gz + 0.5) * size;
+        if (Math.hypot(x - centerX, z - centerZ) > radius) continue;
+        const dist = lodDistanceFromPlayer(origin.x, origin.z, x, z);
+        const lod = getLodBand(dist);
+        if (!shouldRenderCellAtLod(gx, gz, lod)) continue;
+        manualFull++;
+        if (shouldRenderGroundCell(gx, gz, x, z, lod)) manualCheckerboard++;
+      }
+    }
+    expect(manualFull).toBeGreaterThan(100);
+    expect(manualCheckerboard).toBeGreaterThan(50);
+    expect(manualCheckerboard).toBeLessThan(manualFull * 0.55);
+
+    service.initializeField(origin);
+    const count = service.update(origin);
+    expect(count).toBe(manualCheckerboard);
+    expect(root.getObjectByName('r4v3-token-instances')).toBeTruthy();
+    const stats = service.getDebugStats();
+    expect(stats.lodCounts.near + stats.lodCounts.mid + stats.lodCounts.far).toBe(count);
+    expect(stats.lodCounts.near, JSON.stringify(stats)).toBeGreaterThan(0);
+    expect(stats.lodCounts.mid + stats.lodCounts.far).toBeGreaterThan(0);
+    const again = service.update(origin);
+    expect(again).toBe(count);
+
+    const mesh = root.getObjectByName('r4v3-token-instances-mesh') as THREE.InstancedMesh;
+    const m0 = new THREE.Matrix4();
+    mesh.getMatrixAt(0, m0);
+    const rot0 = new THREE.Euler().setFromRotationMatrix(m0);
+    for (let i = 0; i < 4; i++) {
+      service.tickVisuals(1 / 60);
+    }
+    const m1 = new THREE.Matrix4();
+    mesh.getMatrixAt(0, m1);
+    const rot1 = new THREE.Euler().setFromRotationMatrix(m1);
+    expect(Math.abs(rot1.y - rot0.y)).toBeGreaterThan(0.01);
+    const animStats = service.getDebugStats();
+    expect(animStats.nearAnimationFrequencyHz).toBe(60);
+    expect(animStats.midAnimationFrequencyHz).toBe(24);
+
+    service.dispose();
+  });
+
+  it('refuse une double collecte locale sans attribuer de token', () => {
+    const service = TestBed.inject(TokenCellService);
+    const player = new THREE.Vector3(8, 0, 8);
+    const first = service.requestCollect('player-a', player);
+    expect(first).not.toBeNull();
+    expect(first?.cellId.startsWith('m4t3r-cluster:')).toBe(true);
+    const second = service.requestCollect('player-a', player);
+    expect(second).toBeNull();
+    expect(WORLD_SCALE.tokenMaxVisibleInstances).toBe(8192);
+    expect(WORLD_SCALE.tokenCellSizeMeters).toBe(1.25);
+    expect(WORLD_SCALE.tokenVisibleRadiusMeters).toBe(64);
+    expect(WORLD_SCALE.maxLoadedChunks).toBe(24);
+    expect(R4V3_GROUND_FIELD.visibleRadius).toBe(64);
+    expect(METAVERSE_DISTRICTS['le-panier'].estimated).toBe(true);
+    expect(METAVERSE_DISTRICTS['le-panier'].latitude).toBeCloseTo(43.2988, 4);
+    expect(METAVERSE_DISTRICTS.joliette.estimated).toBe(true);
+    expect(METAVERSE_DISTRICTS.joliette.latitude).toBeCloseTo(43.3018, 4);
+    expect(TRAIL_CONFIG.respawnDelayMs).toBe(30_000);
+    expect(clusterId(32, 32)).toBe('m4t3r-cluster:32:32');
+    expect(tokenCellId(4, 8)).toBe('r4v3:4:8');
+  });
+
+  it('remplace les textes de scene et identifie le batiment R4V3', () => {
+    expect(SCENE_COPY.canopyTitle).toBe('METAVERSEBB');
+    expect(SCENE_COPY.canopyTitleLegacy).toBe('METAVERSEBB');
+    expect(SCENE_COPY.roadMarking).toBe('Hack The Planet x)');
+    expect(SCENE_COPY.r4v3).toBe('R4V3');
+    expect(SCENE_COPY.m4t3rPickup).toBe('+1');
+    expect(MIRROR_SECOND_BUILDING_ID).toBe('mirror-adjacent-building-02');
+  });
+
+  it('fait monter un +1 M4T3R au-dessus de la tete sans crediter de token', () => {
+    const fx = TestBed.inject(M4t3rPickupFxService);
+    const scene = new THREE.Scene();
+    const character = new THREE.Object3D();
+    character.position.set(2, 0, 4);
+    scene.add(character);
+    fx.attach(scene);
+    fx.spawnOne(character, 'm4t3r-render:0:0');
+    fx.spawnOne(character, 'm4t3r-render:1:0');
+    fx.spawnOne(character, 'm4t3r-render:2:0');
+    const plusOnes = scene.children.filter(
+      (child) => child.name.startsWith('m4t3r-pickup-plus-one') && child.visible
+    );
+    expect(plusOnes.length).toBe(3);
+    expect((plusOnes[0]?.position.y ?? 0)).toBeGreaterThan(character.position.y);
+
+    const sprite = plusOnes[0];
+    const startY = sprite?.position.y ?? 0;
+    fx.update(M4T3R_PICKUP_FX.durationMs / 2000);
+    expect(sprite?.position.y ?? 0).toBeGreaterThan(startY);
+
+    fx.update(M4T3R_PICKUP_FX.durationMs / 1000);
+    expect(sprite?.visible).toBe(false);
+    fx.dispose();
+  });
+});

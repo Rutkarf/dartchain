@@ -1,0 +1,39 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+
+import { RatePanelComponent } from '@exchange/components/rate-panel/rate-panel';
+
+/**
+ * Graphique — 4ᵉ enfant de `.app-main-layout` (flex column).
+ * Ordre : swap → showcase → dock → graph → (padding-bottom floor).
+ *
+ * Hauteurs :
+ * - Déplié : `--market-chart-height`
+ * - Replié : `--market-chart-collapsed-h` / `--chart-smart-bar-h` (smart-bar seule)
+ * Gouttière : `--stack-section-gap` (identique swap/showcase/dock)
+ */
+@Component({
+  selector: 'app-graph',
+  standalone: true,
+  imports: [RatePanelComponent],
+  templateUrl: './graph.component.html',
+  styleUrl: './graph.component.scss',
+  host: {
+    class: 'app-graph-section',
+    '[class.is-chart-collapsed]': 'chartCollapsed',
+  },
+})
+export class GraphComponent {
+  @Input() chartCollapsed = true;
+  @Input() collapseAriaLabel = 'Replier le graphique';
+
+  @Output() readonly collapseToggle = new EventEmitter<void>();
+  @Output() readonly summaryExpand = new EventEmitter<void>();
+
+  onCardClick(event?: Event): void {
+    if (!this.chartCollapsed) {
+      return;
+    }
+    event?.stopPropagation();
+    this.summaryExpand.emit();
+  }
+}

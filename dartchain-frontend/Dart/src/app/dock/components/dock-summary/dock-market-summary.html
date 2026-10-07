@@ -1,0 +1,60 @@
+<div
+ class="market-summary-bar"
+ role="status"
+ aria-live="polite"
+>
+  <div class="market-summary-line" aria-live="polite">
+    @if (carouselRow(); as row) {
+      <div
+        class="market-summary-line__slide"
+        [class.market-summary-line__slide--enter]="carouselAnimating()"
+        [attr.title]="rowTitle(row)"
+      >
+        <span class="market-summary-line__symbol">{{ row.config.displaySymbol }}</span>
+
+        <span class="market-summary-line__name">{{ row.config.name }}</span>
+
+        <span class="market-summary-line__sep" aria-hidden="true">·</span>
+
+        <span
+          class="market-summary-line__price"
+          [class.is-unavailable]="row.priceUnavailable"
+        >
+          {{ row.price }}
+        </span>
+
+        <span
+          class="market-summary-line__change"
+          [class.is-up]="row.positive"
+          [class.is-down]="!row.positive"
+        >
+          {{ formatChange(row) }}
+        </span>
+
+        <span class="market-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="market-summary-line__stat" [attr.title]="'Vol ' + row.metrics.volumeLabel">
+          V {{ compactMetric(row.metrics.volumeLabel) }}
+        </span>
+
+        <span class="market-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="market-summary-line__stat" [attr.title]="'Liq ' + row.metrics.liquidityLabel">
+          L {{ compactMetric(row.metrics.liquidityLabel) }}
+        </span>
+
+        <span class="market-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="market-summary-line__cap" [attr.title]="'Cap ' + row.metrics.marketCapLabel">
+          Cap {{ compactMetric(row.metrics.marketCapLabel) }}
+        </span>
+      </div>
+    } @else if (loading()) {
+      <span class="market-summary-line__fallback">Synchronisation…</span>
+    } @else if (error()) {
+      <span class="market-summary-line__fallback">Cours indisponibles</span>
+    } @else {
+      <span class="market-summary-line__fallback">Aucun token</span>
+    }
+  </div>
+</div>

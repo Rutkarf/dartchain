@@ -1,0 +1,49 @@
+@if (view(); as panel) {
+  <aside
+    class="star-quest-panel"
+    [class.star-quest-panel--compact]="panel.compact"
+    role="dialog"
+    aria-labelledby="star-quest-panel-title"
+    [attr.data-family]="panel.quest.family"
+    [attr.data-claim]="panel.claimKind"
+    [attr.data-live]="panel.live ? 'true' : null"
+    [style.left.px]="panel.x"
+    [style.top.px]="panel.y"
+    [style.--sc-family-rgb]="panel.familyRgb"
+    [style.--sc-family-hex]="panel.familyHex"
+  >
+    <button
+      type="button"
+      class="star-quest-panel__close"
+      aria-label="Fermer la quest"
+      (click)="dismiss(); $event.stopPropagation()"
+      (pointerdown)="$event.stopPropagation()"
+    >
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+    </button>
+
+    <h2 id="star-quest-panel-title" class="star-quest-panel__title">{{ panel.quest.title }}</h2>
+
+    <p class="star-quest-panel__info" aria-live="polite">
+      {{ panel.familyLabel }} · {{ panel.rewardValue }}
+      @if (panel.live) {
+        · Live
+      }
+      — {{ panel.quest.description }}
+    </p>
+
+    <button
+ type="button"
+ class="star-quest-panel__claim"
+ [disabled]="!panel.ctaEnabled"
+ (click)="onCta(); $event.stopPropagation()"
+ (pointerdown)="$event.stopPropagation()"
+ >
+      {{ panel.ctaLabel }}
+    </button>
+
+    @if (claimErrorMessage(); as error) {
+      <p class="star-quest-panel__error" role="alert">{{ error }}</p>
+    }
+  </aside>
+}

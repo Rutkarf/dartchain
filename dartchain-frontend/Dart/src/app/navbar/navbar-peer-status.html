@@ -1,0 +1,15 @@
+<div class="navbar-peer" role="status">
+  <span class="navbar-peer-metrics"><!--
+    --><span class="navbar-peer-count">{{ peersLabel() }}</span><!--
+    --><button
+      type="button"
+      class="navbar-peer-refresh"
+      (click)="refresh()"
+      [disabled]="loading()"
+      aria-label="Rafraîchir les peers"
+      appNavbarHint="Actualiser le nombre de peers connectés au réseau"
+    >
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-refresh"/></svg>
+    </button>
+  </span>
+</div>

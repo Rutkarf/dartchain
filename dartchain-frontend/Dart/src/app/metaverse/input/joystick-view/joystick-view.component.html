@@ -1,0 +1,18 @@
+<div class="joy-zone" data-testid="joystick-view">
+  <div class="joy-stick-slot">
+    <app-virtual-joystick
+      [ariaLabel]="'Orienter la caméra'"
+      (vectorChange)="onVector($event)"
+    />
+  </div>
+  <svg class="joy-arc" viewBox="0 0 78 28" aria-hidden="true">
+    <defs>
+      <path id="joy-arc-view" d="M 10 6 A 30 14 0 0 0 68 6" />
+    </defs>
+    <text>
+      <textPath href="#joy-arc-view" startOffset="50%" text-anchor="middle">
+        VIEW
+      </textPath>
+    </text>
+  </svg>
+</div>

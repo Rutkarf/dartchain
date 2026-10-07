@@ -1,0 +1,85 @@
+<div
+ class="showcase-dao-hub showcase-view showcase-view--news"
+ [class.is-drawer-open]="!!selectedCard()"
+ role="region"
+>
+  @if (isExpanded) {
+    <div class="showcase-news__content showcase-dao__content">
+      @if (loading()) {
+        <ul class="showcase-news__list showcase-news__list--skeleton" aria-hidden="true">
+          @for (row of [1, 2, 3, 4, 5]; track row) {
+            <li class="showcase-news__skeleton-item showcase-dao__skeleton-item">
+              <span class="showcase-news__skeleton-tag"></span>
+              <span class="showcase-news__skeleton-lines">
+                <span></span>
+                <span></span>
+              </span>
+            </li>
+          }
+        </ul>
+      } @else if (error()) {
+        <div class="showcase-news__status showcase-news__status--error">
+          <p>Impossible de charger les DAO.</p>
+          <button type="button" class="showcase-news__retry" (click)="refresh()">Réessayer</button>
+        </div>
+      } @else if (filteredCards().length === 0) {
+        <div class="showcase-news__status">
+          <p>Aucune DAO disponible.</p>
+        </div>
+      } @else {
+        <ul class="showcase-news__list showcase-dao__list">
+          @for (card of filteredCards(); track card.id) {
+            <li class="showcase-news__item showcase-dao__item">
+              <button
+ type="button"
+ class="showcase-dao__card"
+ [attr.data-dao-symbol]="card.symbol"
+ [attr.data-symbol]="card.symbol"
+ [class.showcase-dao__card--active]="card.status === 'active'"
+ (click)="openDao(card)"
+ >
+                <span class="showcase-dao__col showcase-dao__col--ticker">
+                  <span class="showcase-dao__ticker">{{ card.symbol }}</span>
+                </span>
+
+                <span class="showcase-dao__col showcase-dao__col--identity">
+                  <span class="showcase-dao__title">
+                    <span class="showcase-dao__name">{{ card.name }}</span>
+                    <span class="showcase-dao__sep" aria-hidden="true">·</span>
+                    <span class="showcase-dao__symbol">{{ card.symbol }}</span>
+                  </span>
+                  <span class="showcase-dao__stats">
+                    {{ card.proposalsCount }}P {{ card.votesCount }}V {{ card.membersActive }}M
+                  </span>
+                </span>
+
+                <span class="showcase-dao__col showcase-dao__col--summary">
+                  <span class="showcase-dao__summary">{{ card.summary }}</span>
+                </span>
+
+                <span class="showcase-dao__col showcase-dao__col--action">
+                  <span class="showcase-dao__chip">
+                    <span class="showcase-dao__status" [ngClass]="statusClass(card)">
+                      {{ statusShortLabel(card) }}
+                    </span>
+                    <span class="showcase-dao__enter" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"/></svg></span>
+                  </span>
+                </span>
+
+                <span class="showcase-dao__xp" aria-hidden="true">
+                  <span class="showcase-dao__xp-fill" [style.width.%]="xpPercent(card)"></span>
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <app-showcase-dao-drawer
+      [card]="selectedCard()"
+      (closeDrawer)="closeDao()"
+      (refreshed)="refresh()"
+    />
+  }
+</div>

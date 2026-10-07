@@ -1,0 +1,1271 @@
+/* Viewport exclusif 250 × 550 — layout figé type appel iOS / Android. */
+
+:host {
+  display: contents;
+}
+
+:host:has(.age-call),
+:host:has(.age-call__flyer) {
+  display: block;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100svh;
+  z-index: 40000;
+  pointer-events: none;
+}
+
+:host:has(.age-call) {
+  pointer-events: auto;
+}
+
+.age-call__codec-audio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.age-call {
+  /* Plein écran. Le fond va au bord, les boutons restent dans la safe-area. */
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 1;
+  display: grid;
+  /* Header un peu plus bas → bandeau top légèrement plus haut. */
+  grid-template-rows: 98px minmax(0, 1fr) 132px;
+  align-items: stretch;
+  justify-items: center;
+  color: #ede7d9;
+  font-family:
+    'Roboto', sans-serif;
+  overflow: hidden;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+.age-call__wallpaper,
+.age-call__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.age-call__wallpaper {
+  background:
+    radial-gradient(140% 90% at 50% -10%, rgba(139, 157, 173, 0.55), transparent 52%),
+    radial-gradient(90% 60% at 80% 90%, rgba(35, 87, 137, 0.35), transparent 55%),
+    linear-gradient(168deg, #235789 0%, #0a1220 42%, #0a1220 100%);
+}
+
+.age-call__shade {
+  /* Pas de backdrop-filter : trop cher avec WebGL (cause du rame au décrocher). */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: rgba(10, 18, 32, 0.42);
+}
+
+.age-call__top,
+.age-call__actions {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 250px;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.age-call__top {
+  grid-row: 1;
+}
+
+.age-call__actions {
+  grid-row: 3;
+}
+
+.age-call__top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 24px 16px 6px;
+  text-align: center;
+  /* Largeur pixel-figée : pas de 100% qui reflow quand le WebGL compose. */
+  width: 250px;
+  max-width: 250px;
+  min-width: 250px;
+  height: 98px;
+  box-sizing: border-box;
+  flex: 0 0 98px;
+  /* layout/style seulement — paint strict tronquait le « @ » en bas. */
+  contain: layout style;
+  isolation: isolate;
+  overflow: visible;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+/* Nom d’appelant type FaceTime / appel système. */
+.age-call__carrier {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.02em;
+  width: 218px;
+  max-width: 218px;
+  flex: 0 0 auto;
+  /* Pas de paint containment : le glyphe « @ » dépasse le line-box sinon. */
+  contain: layout style;
+  overflow: visible;
+  font-family:
+    'Roboto', sans-serif;
+  font-size: var(--fs-form);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: #ede7d9;
+  text-shadow:
+    0 1px 0 rgba(237, 231, 217, 0.12),
+    0 8px 22px rgba(10, 18, 32, 0.45),
+    0 0 28px rgba(35, 87, 137, 0.35);
+}
+
+.age-call__carrier-at {
+  display: inline-block;
+  font-weight: 700;
+  font-size: var(--fs-form);
+  line-height: 1.25;
+  letter-spacing: 0;
+  padding-bottom: 0.06em;
+  overflow: visible;
+  color: rgba(139, 157, 173, 0.92);
+  text-shadow: 0 0 12px rgba(35, 87, 137, 0.45);
+}
+
+.age-call__carrier-name {
+  display: inline-block;
+  font-weight: 400;
+  font-size: var(--fs-form);
+  line-height: 1.25;
+  overflow: visible;
+  background: linear-gradient(
+    180deg,
+    #ede7d9 0%,
+    #ede7d9 42%,
+    #ede7d9 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Ligne « Appel entrant » vivante — pastille + points animés. */
+.age-call__status {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  /* Largeur px figée — immunisée au 1er frame WebGL. */
+  width: 156px;
+  min-width: 156px;
+  max-width: 156px;
+  height: 22px;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  flex: 0 0 22px;
+  contain: layout style;
+  background: rgba(10, 18, 32, 0.42);
+  box-shadow:
+    inset 0 0 0 1px rgba(237, 231, 217, 0.1),
+    0 4px 14px rgba(10, 18, 32, 0.28);
+  /* blur GPU peut “gonfler” au 1er frame WebGL — glass sans blur live. */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  font-family:
+    'Roboto', sans-serif;
+  font-size: var(--fs-form);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  color: rgba(237, 231, 217, 0.92);
+}
+
+.age-call__status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: #09814a;
+  box-shadow: 0 0 0 0 rgba(9, 129, 74, 0.55);
+}
+
+.age-call__status--live .age-call__status-dot {
+  animation:  age-call-status-dot 1.35s ease-in-out infinite;
+}
+
+.age-call__status-label {
+  white-space: nowrap;
+}
+
+.age-call__status-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: 14px;
+  margin-left: 2px;
+}
+
+.age-call__status-dots i {
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(9, 129, 74, 0.85);
+  opacity: 0.25;
+}
+
+.age-call__status--live .age-call__status-dots i:nth-child(1) {
+  animation:  age-call-ellip 1.2s ease-in-out infinite;
+}
+.age-call__status--live .age-call__status-dots i:nth-child(2) {
+  animation:  age-call-ellip 1.2s ease-in-out 0.18s infinite;
+}
+.age-call__status--live .age-call__status-dots i:nth-child(3) {
+  animation:  age-call-ellip 1.2s ease-in-out 0.36s infinite;
+}
+
+@keyframes age-call-status-dot {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(9, 129, 74, 0.5);
+    background: #09814a;
+  }
+  50% {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 6px rgba(9, 129, 74, 0);
+    background: #09814a;
+  }
+}
+
+@keyframes age-call-ellip {
+  0%,
+  100% {
+    opacity: 0.22;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
+}
+
+.age-call__identity {
+  /* Rangée milieu seulement — ne jamais recouvrir les boutons (z/hitbox). */
+  position: absolute;
+  top: 98px;
+  right: 0;
+  bottom: 132px;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  min-height: 0;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.age-call__avatar-wrap {
+  /* Halo + logo : même boîte, flex center — le scale aura reste centré. */
+  --age-call-token-size: min(220px, 88vw);
+  position: relative;
+  width: var(--age-call-token-size);
+  height: var(--age-call-token-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  flex: none;
+  overflow: visible;
+  pointer-events: auto;
+  background: transparent;
+}
+
+/*
+ * Aura soft circulaire : déjà en place dès l’appel.
+ * Ne pas la rattacher à token-ready (sinon appear 0→1 = flash disparition/réapparition).
+ */
+.age-call__avatar-wrap::before,
+.age-call__avatar-wrap::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  transform-origin: center center;
+}
+
+.age-call__avatar-wrap::before {
+  width: 78%;
+  height: 78%;
+  background: radial-gradient(
+    circle,
+    rgba(9, 129, 74, 0.58) 0%,
+    rgba(9, 129, 74, 0.32) 42%,
+    transparent 68%
+  );
+  filter: blur(6px);
+  animation: age-call-aura-breathe 2.8s ease-in-out infinite;
+}
+
+.age-call__avatar-wrap::after {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    transparent 26%,
+    rgba(139, 157, 173, 0.42) 46%,
+    rgba(9, 129, 74, 0.22) 60%,
+    transparent 74%
+  );
+  filter: blur(8px);
+  animation: age-call-aura-breathe-outer 2.8s ease-in-out infinite;
+}
+
+.age-call__avatar {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  display: block;
+  /* visible : overflow:hidden découpait un cadre rectangulaire autour du STL. */
+  overflow: visible;
+  color: #ede7d9;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+  filter: none;
+  touch-action: none;
+  cursor: grab;
+  transform: none;
+  backface-visibility: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Respiration : dézoom min ≈ collé au contour du token, puis gros. */
+@keyframes age-call-aura-breathe {
+  0%,
+  100% {
+    opacity: 0.78;
+    transform: translate(-50%, -50%) scale(0.68);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.14);
+  }
+}
+
+@keyframes age-call-aura-breathe-outer {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+}
+
+/*
+ * Canvas créé en JS : sans _ngcontent, les règles encapsulées ne matchent pas.
+ * On cible via :host + sélecteur descendant + styles inline de secours (TS).
+ */
+:host .age-call__avatar canvas,
+.age-call__avatar canvas {
+  position: absolute !important;
+  inset: 0 !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  box-sizing: border-box !important;
+  opacity: 0;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  /* Pas de drop-shadow : empilés, ils dessinaient un cadre autour du canvas. */
+  filter: none !important;
+  pointer-events: auto;
+  transform: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.age-call--token-ready .age-call__avatar canvas {
+  opacity: 1;
+  /* Glow = halo CSS (::before/::after) uniquement — zéro contour canvas. */
+  filter: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.age-call__avatar:active {
+  cursor: grabbing;
+}
+
+.age-call__avatar--token {
+  padding: 0;
+}
+
+.age-call__actions {
+  position: relative;
+  z-index: 5;
+  /* 2 colonnes : tops des disques / âges / libellés sur les mêmes axes. */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  align-content: end;
+  justify-items: stretch;
+  width: 100%;
+  max-width: 250px;
+  height: 100%;
+  padding: 0 28px 48px;
+  box-sizing: border-box;
+  column-gap: 0;
+}
+
+.age-call__btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #ede7d9;
+  position: relative;
+  width: 80px;
+  /* 3 rangées figées = alignement horizontal parfait rouge ↔ vert. */
+  display: grid;
+  grid-template-rows: 40px 1.2em 1.2em;
+  align-items: center;
+  justify-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 6;
+}
+
+.age-call__btn--decline {
+  justify-self: start;
+}
+
+.age-call__btn--answer {
+  justify-self: end;
+  cursor: pointer !important;
+}
+
+.age-call__btn--answer::before {
+  content: '';
+  position: absolute;
+  /* Zone tactile autour du disque + labels, sans décaler le layout. */
+  inset: -14px -12px -8px;
+  border-radius: 20px;
+  z-index: 0;
+}
+
+/* Décrocher : feedback téléphone (hover / touch) — empile sans retirer breath/ring/scan. */
+.age-call__btn--answer:hover:not(:disabled),
+.age-call__btn--answer.is-hover:not(:disabled),
+.age-call__btn--answer:focus-visible:not(:disabled) {
+  .age-call__fx {
+    transform: scale(1.08);
+    transition: transform 0.18s cubic-bezier(0.33, 0.08, 0.2, 1);
+  }
+
+  .age-call__btn-icon {
+    background: radial-gradient(circle at 35% 28%, #0aad5f, #09814a 72%);
+    box-shadow:
+      0 8px 18px rgba(10, 18, 32, 0.4),
+      0 0 0 3px rgba(9, 129, 74, 0.28),
+      0 0 22px rgba(9, 129, 74, 0.45);
+  }
+
+  .age-call__fx-ring {
+    border-color: rgba(9, 129, 74, 0.75);
+    box-shadow: 0 0 12px rgba(9, 129, 74, 0.35);
+  }
+
+  .age-call__btn-caption {
+    color: #ede7d9;
+    text-shadow: 0 0 10px rgba(9, 129, 74, 0.55);
+  }
+}
+
+.age-call__btn--answer:active:not(:disabled),
+.age-call__btn--answer.is-pressed:not(:disabled) {
+  .age-call__fx {
+    transform: scale(0.94);
+    transition: transform 0.08s cubic-bezier(0.33, 0.08, 0.2, 1);
+  }
+
+  .age-call__btn-icon {
+    background: radial-gradient(circle at 40% 35%, #087a46, #065c35 78%);
+    box-shadow:
+      0 3px 8px rgba(10, 18, 32, 0.45),
+      inset 0 2px 6px rgba(10, 18, 32, 0.35);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .age-call__btn--answer .age-call__fx {
+    transition: transform 0.18s cubic-bezier(0.33, 0.08, 0.2, 1);
+  }
+
+  .age-call__btn--answer .age-call__btn-icon {
+    transition:
+      background 0.18s cubic-bezier(0.33, 0.08, 0.2, 1),
+      box-shadow 0.18s cubic-bezier(0.33, 0.08, 0.2, 1);
+  }
+}
+
+.age-call__btn-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 14px rgba(10, 18, 32, 0.35);
+  flex: 0 0 40px;
+}
+
+.age-call__phone-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.age-call__phone-icon--decline {
+  transform: rotate(135deg);
+}
+
+.age-call__btn--decline .age-call__btn-icon {
+  background: radial-gradient(circle at 35% 30%, #7b0d1e, #7b0d1e 72%);
+  color: #ede7d9;
+  animation:  age-call-decline 1.7s ease-in-out infinite;
+}
+
+.age-call__btn--answer .age-call__btn-icon {
+  background: radial-gradient(circle at 35% 30%, #09814a, #09814a 72%);
+  color: #ede7d9;
+  position: relative;
+  z-index: 3;
+}
+
+/* Mêmes effets que Feed The R4V3, calés sur le disque vert. */
+.age-call__fx {
+  position: relative;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  overflow: visible;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: 
+    age-call-feed-breathe 1.8s ease-in-out infinite,
+    age-call-feed-micro 1.35s steps(1, end) infinite,
+    age-call-feed-burst 5.2s steps(1, end) infinite;
+}
+
+.age-call__fx-ring,
+.age-call__fx-scan,
+.age-call__fx-ghost {
+  position: absolute;
+  pointer-events: none;
+}
+
+.age-call__fx-ring {
+  inset: -6px;
+  z-index: 1;
+  border: 1px solid rgba(35, 87, 137, 0.6);
+  border-radius: 50%;
+  animation:  age-call-feed-ring 2.4s ease-out infinite;
+}
+
+.age-call__fx-scan {
+  left: 6%;
+  right: 6%;
+  top: 28%;
+  height: 4px;
+  z-index: 4;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 157, 173, 0.85),
+    rgba(237, 231, 217, 0.75),
+    transparent
+  );
+  opacity: 0;
+  animation:  age-call-feed-scan 5.2s infinite;
+}
+
+.age-call__fx-ghost {
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  opacity: 0;
+  border-radius: 50%;
+}
+
+.age-call__fx-ghost--cyan {
+  color: #8b9dad;
+  animation:  age-call-feed-cyan 5.2s infinite;
+}
+
+.age-call__fx-ghost--mag {
+  color: #8b9dad;
+  animation:  age-call-feed-mag 5.2s infinite;
+}
+
+.age-call__btn--answer .age-call__btn-caption {
+  animation:  age-call-feed-slice 5.2s infinite;
+  text-shadow: 0 0 8px rgba(35, 87, 137, 0.45);
+}
+
+.age-call__btn-meta,
+.age-call__btn-caption,
+.age-call__btn-age,
+.age-call__btn-icon,
+.age-call__phone-icon {
+  pointer-events: none;
+}
+
+.age-call__btn-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  height: 100%;
+  line-height: 1.2;
+}
+
+.age-call__btn-age {
+  font-size: var(--fs-form);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  color: rgba(237, 231, 217, 0.95);
+  white-space: nowrap;
+}
+
+.age-call__btn-caption {
+  font-size: var(--fs-form);
+  font-weight: 500;
+  line-height: 1.2;
+  color: rgba(237, 231, 217, 0.9);
+  white-space: nowrap;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes age-call-decline {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(123, 13, 30, 0.5);
+  }
+  55% {
+    box-shadow: 0 0 0 12px rgba(123, 13, 30, 0);
+  }
+}
+
+@keyframes age-call-feed-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(139, 157, 173, 0.35),
+      0 0 14px rgba(35, 87, 137, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(139, 157, 173, 0.7),
+      0 0 22px rgba(35, 87, 137, 0.55);
+  }
+}
+
+@keyframes age-call-feed-micro {
+  0%,
+  78%,
+  90%,
+  100% {
+    transform: none;
+  }
+  80%,
+  83% {
+    transform: translateX(1.5px);
+  }
+  85%,
+  87% {
+    transform: translateX(-2px);
+  }
+}
+
+@keyframes age-call-feed-burst {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    filter: none;
+    transform: none;
+  }
+  8%,
+  11% {
+    filter: contrast(1.35) saturate(1.6);
+    transform: translateX(-3px) skewX(-8deg);
+  }
+  45%,
+  47% {
+    filter: contrast(1.5) hue-rotate(-18deg);
+    transform: translateX(4px) skewX(10deg);
+  }
+  70%,
+  73% {
+    filter: contrast(1.4) saturate(1.8);
+    transform: translate(-2px, 1px) skewX(-6deg);
+  }
+}
+
+@keyframes age-call-feed-cyan {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
+  8%,
+  10% {
+    opacity: 0.9;
+    transform: translate(-5px, 1px);
+    clip-path: inset(12% 0 40% 0);
+  }
+  45%,
+  48% {
+    opacity: 0.9;
+    transform: translate(-6px, -1px);
+    clip-path: inset(0 16% 0 0);
+  }
+  71%,
+  73% {
+    opacity: 0.8;
+    transform: translate(-4px, 2px);
+    clip-path: inset(48% 0 8% 0);
+  }
+}
+
+@keyframes age-call-feed-mag {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
+  8%,
+  10% {
+    opacity: 0.85;
+    transform: translate(6px, -1px);
+    clip-path: inset(36% 0 16% 0);
+  }
+  45%,
+  48% {
+    opacity: 0.85;
+    transform: translate(7px, 1px);
+    clip-path: inset(0 0 0 18%);
+  }
+  71%,
+  73% {
+    opacity: 0.75;
+    transform: translate(5px, -2px);
+    clip-path: inset(8% 0 46% 0);
+  }
+}
+
+@keyframes age-call-feed-scan {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  8%,
+  11% {
+    opacity: 0.95;
+    transform: translateY(8px);
+  }
+  45%,
+  48% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+  70%,
+  73% {
+    opacity: 0.85;
+    transform: translateY(3px);
+  }
+}
+
+@keyframes age-call-feed-ring {
+  0%,
+  18% {
+    opacity: 0.75;
+    transform: scale(1);
+    border-color: rgba(139, 157, 173, 0.7);
+  }
+  32% {
+    opacity: 0.35;
+    border-color: rgba(35, 87, 137, 0.45);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.28);
+    border-color: rgba(35, 87, 137, 0);
+  }
+}
+
+@keyframes age-call-feed-slice {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    transform: none;
+    letter-spacing: 0.02em;
+    color: rgba(237, 231, 217, 0.9);
+    opacity: 1;
+  }
+  8% {
+    transform: translateX(2px);
+    letter-spacing: 0.08em;
+  }
+  10% {
+    transform: translateX(-2px);
+  }
+  46% {
+    transform: translate(2px, 0);
+  }
+  72% {
+    transform: translateX(-1px);
+  }
+}
+
+/* Décrocher : press + fade réaliste du vert (pas un cut opacity 120ms). */
+.age-call--answering {
+  pointer-events: none;
+}
+
+.age-call--answering .age-call__top {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.42s cubic-bezier(0.33, 0.08, 0.2, 1),
+    transform 0.42s cubic-bezier(0.33, 0.08, 0.2, 1);
+  pointer-events: none;
+}
+
+.age-call--answering .age-call__actions {
+  opacity: 1;
+  transform: none;
+  pointer-events: none;
+}
+
+.age-call--answering .age-call__btn--answer {
+  animation: age-call-answer-dismiss 0.62s cubic-bezier(0.33, 0.08, 0.2, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+.age-call--answering .age-call__btn--answer .age-call__fx {
+  animation: none;
+}
+
+.age-call--answering .age-call__btn--answer .age-call__fx-ring,
+.age-call--answering .age-call__btn--answer .age-call__fx-scan,
+.age-call--answering .age-call__btn--answer .age-call__fx-ghost,
+.age-call--answering .age-call__btn--answer .age-call__btn-caption {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+.age-call--answering .age-call__btn--answer .age-call__btn-icon {
+  animation: age-call-answer-icon 0.62s cubic-bezier(0.33, 0.08, 0.2, 1) forwards;
+  box-shadow:
+    0 0 0 0 rgba(9, 129, 74, 0.55),
+    0 8px 22px rgba(9, 129, 74, 0.35);
+}
+
+.age-call--answering .age-call__btn--answer .age-call__btn-meta,
+.age-call--answering .age-call__btn--answer .age-call__btn-caption {
+  animation: age-call-answer-label 0.4s cubic-bezier(0.33, 0.08, 0.2, 1) forwards;
+}
+
+.age-call--answering .age-call__btn--decline {
+  animation: age-call-decline-dismiss 0.48s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.age-call--answering .age-call__btn--decline .age-call__btn-icon {
+  animation: none;
+}
+
+@keyframes age-call-answer-dismiss {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    filter: brightness(1);
+  }
+  14% {
+    transform: scale(0.9) translateY(2px);
+    opacity: 1;
+    filter: brightness(1.12);
+  }
+  32% {
+    transform: scale(1.06) translateY(0);
+    opacity: 1;
+    filter: brightness(1.28);
+  }
+  62% {
+    transform: scale(1.28) translateY(6px);
+    opacity: 0.55;
+    filter: brightness(1.35);
+  }
+  100% {
+    transform: scale(1.48) translateY(14px);
+    opacity: 0;
+    filter: brightness(1.45);
+  }
+}
+
+@keyframes age-call-answer-icon {
+  0% {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 0 rgba(9, 129, 74, 0.5),
+      0 6px 14px rgba(10, 18, 32, 0.35);
+  }
+  18% {
+    transform: scale(0.92);
+  }
+  40% {
+    transform: scale(1.08);
+    box-shadow:
+      0 0 0 10px rgba(9, 129, 74, 0),
+      0 0 28px rgba(9, 129, 74, 0.55);
+  }
+  100% {
+    transform: scale(1.55);
+    box-shadow:
+      0 0 0 22px rgba(9, 129, 74, 0),
+      0 0 36px rgba(9, 129, 74, 0);
+  }
+}
+
+@keyframes age-call-answer-label {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes age-call-decline-dismiss {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.92) translateY(10px);
+    opacity: 0;
+  }
+}
+
+/* Transition décrocher : dive zoom tranche → crossfade intro. */
+.age-call--zooming {
+  overflow: visible;
+  pointer-events: none;
+}
+
+.age-call--zooming .age-call__top {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 0.42s cubic-bezier(0.33, 0.08, 0.2, 1), transform 0.42s cubic-bezier(0.33, 0.08, 0.2, 1);
+  pointer-events: none;
+}
+
+/* Les boutons sont pilotés par --answering ; ne pas les cut en 120ms. */
+.age-call--zooming:not(.age-call--answering) .age-call__actions {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 0.42s cubic-bezier(0.33, 0.08, 0.2, 1), transform 0.42s cubic-bezier(0.33, 0.08, 0.2, 1);
+  pointer-events: none;
+}
+
+.age-call--zooming.age-call--answering .age-call__actions {
+  opacity: 1;
+  transform: none;
+  transition: none;
+  pointer-events: none;
+}
+
+/* Wallpaper opaque pendant le dive — pas de fantôme intro en dessous. */
+.age-call--zooming .age-call__shade {
+  opacity: 0.28;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
+}
+
+.age-call--zooming .age-call__wallpaper {
+  opacity: 1;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
+}
+
+/* Token full-bleed viewport : pas de carré qui coupe L/R. */
+.age-call--zooming .age-call__identity {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.age-call--zooming .age-call__avatar-wrap {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  /* Pas de transition de taille : le saut CSS est annulé par la compensation caméra. */
+  transition: none;
+}
+
+.age-call--zooming .age-call__avatar-wrap::before,
+.age-call--zooming .age-call__avatar-wrap::after {
+  opacity: 0;
+  /* Halo s’efface vite sans laisser croire à un zoom pop. */
+  transition: opacity 120ms linear;
+  animation: none;
+}
+
+.age-call--zooming .age-call__avatar {
+  /* Plein cadre parent (pas 100vw — évite débord ±scrollbar / coupe fantôme). */
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  cursor: default;
+}
+
+.age-call--zooming .age-call__avatar canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.age-call--zooming.age-call--token-ready .age-call__avatar canvas {
+  filter: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.age-call--handoff {
+  pointer-events: none;
+}
+
+.age-call--handoff .age-call__top,
+.age-call--handoff .age-call__actions {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.97);
+  transition: opacity var(--motion-state) var(--motion-ease-state), transform var(--motion-state) var(--motion-ease-state);
+  pointer-events: none;
+}
+
+/*
+ * Crossfade GL→GL : wallpaper hors jeu d’abord (sinon le token disparaît
+ * dans un aplats puis l’intro apparaît = saut), puis fondu du canvas appel.
+ */
+.age-call--handoff .age-call__identity {
+  opacity: 0;
+  /* Sync CALL_DISSOLVE_MS — fondu pendant que l’intro voyage déjà. */
+  transition: opacity 180ms cubic-bezier(0.33, 0.08, 0.2, 1);
+  pointer-events: none;
+}
+
+.age-call--handoff .age-call__shade {
+  opacity: 0;
+  transition: opacity 160ms linear;
+}
+
+.age-call--handoff .age-call__wallpaper {
+  /* Instantané : l’intro peinte est déjà sous le canvas d’appel. */
+  opacity: 0 !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Pas de fade avatar séparé : le canvas reste visible jusqu’au fondu identity. */
+.age-call--handoff .age-call__avatar {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+/* Au-dessus de l’intro le temps du vol ; wallpaper s’ouvre sur l’intro peinte. */
+:host:has(.age-call--handoff),
+:host:has(.age-call--zooming),
+:host:has(.age-call__flyer) {
+  z-index: 25000;
+  background: transparent;
+}
+
+/* Voyageur logo.stl : vol piloté en rAF (bezier) — pas de transition CSS brutale. */
+.age-call__flyer {
+  position: fixed;
+  z-index: 50000;
+  border-radius: 0;
+  overflow: visible;
+  pointer-events: none;
+  will-change: left, top, width, height;
+  transition:  none;
+  filter: drop-shadow(0 6px 16px rgba(10, 18, 32, 0.38));
+  background: transparent;
+  box-shadow: none;
+}
+
+.age-call__flyer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .age-call__btn--decline .age-call__btn-icon,
+  .age-call__btn--answer .age-call__fx,
+  .age-call__btn--answer .age-call__fx-ring,
+  .age-call__btn--answer .age-call__fx-scan,
+  .age-call__btn--answer .age-call__fx-ghost,
+  .age-call__btn--answer .age-call__btn-caption,
+  .age-call__status--live .age-call__status-dot,
+  .age-call__status--live .age-call__status-dots i,
+  .age-call__avatar-wrap::before,
+  .age-call__avatar-wrap::after {
+    animation: none !important;
+  }
+
+  .age-call__avatar-wrap::before,
+  .age-call__avatar-wrap::after {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(0.82);
+  }
+
+  .age-call__status--live .age-call__status-dots i {
+    opacity: 0.7;
+  }
+
+  .age-call--zooming .age-call__avatar-wrap,
+  .age-call--zooming .age-call__avatar,
+  .age-call--handoff .age-call__wallpaper,
+  .age-call--answering .age-call__btn--answer,
+  .age-call--answering .age-call__btn--answer .age-call__btn-icon,
+  .age-call--answering .age-call__btn--decline,
+  .age-call__flyer {
+    animation: none;
+    transition-duration: 0.01ms;
+  }
+
+  .age-call--answering .age-call__btn--answer,
+  .age-call--answering .age-call__btn--decline {
+    opacity: 0;
+  }
+
+  .age-call--handoff .age-call__wallpaper {
+    opacity: 0;
+  }
+}

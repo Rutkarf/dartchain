@@ -1,0 +1,213 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: visible;
+  container-type: inline-size;
+  --launch-cyan-rgb: var(--ds-neon-cyan-rgb, var(--accent-cyan-rgb, 139, 157, 173));
+}
+
+.launch-summary-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  padding: 0 2px 0 2px;
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.launch-summary-line {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.launch-summary-line__slide {
+  display: grid;
+  grid-template-columns:
+    max-content
+    max-content
+    minmax(0, 1fr)
+    max-content
+    max-content
+    max-content;
+  align-items: center;
+  column-gap: 4px;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding-right: 2px;
+  box-sizing: border-box;
+}
+
+.launch-summary-line__slide--enter {
+  animation: launch-summary-line-rise var(--motion-enter) var(--motion-ease-enter) both;
+}
+
+.launch-summary-line__badge {
+  justify-self: start;
+  min-width: 0;
+  max-width: var(--comp-form-h, 32px);
+  padding: 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid rgba(237, 231, 217, 0.1);
+  border-radius: var(--radius-none);
+  font-size: var(--fs-module);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(139, 157, 173, 0.72);
+  line-height: 1.35;
+  box-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.04);
+}
+
+.launch-summary-line__badge--live {
+  color: #09814a;
+  border-color: rgba(9, 129, 74, 0.45);
+  background: linear-gradient(
+    180deg,
+    rgba(9, 129, 74, 0.16) 0%,
+    rgba(9, 129, 74, 0.06) 100%
+  );
+}
+
+.launch-summary-line__badge--soon {
+  color: rgba(139, 157, 173, 0.68);
+  background: rgba(237, 231, 217, 0.03);
+  border-color: rgba(237, 231, 217, 0.1);
+}
+
+.launch-summary-line__badge--ended {
+  color: rgba(139, 157, 173, 0.65);
+}
+
+.launch-summary-line__symbol {
+  min-width: 0;
+  color: rgba(var(--launch-cyan-rgb), 0.92);
+  font-family: var(--ds-font-mono, 'Inter', sans-serif);
+  font-size: var(--fs-module);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.launch-summary-line__name {
+  min-width: 0;
+  overflow: visible;
+  white-space: nowrap;
+  font-size: var(--fs-module);
+  font-weight: 800;
+  color: rgba(237, 231, 217, 0.94);
+}
+
+.launch-summary-line__cap {
+  min-width: max-content;
+  overflow: visible;
+  white-space: nowrap;
+  font-family: var(--ds-font-mono, 'Inter', sans-serif);
+  font-size: var(--fs-module);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: rgba(237, 231, 217, 0.78);
+  text-align: right;
+}
+
+.launch-summary-line__swap {
+  margin: 0;
+  padding: 0 4px;
+  min-width: 0;
+  height: 8px;
+  border: none;
+  border-radius: var(--radius-none);
+  color: rgba(237, 231, 217, 0.9);
+  font-size: var(--fs-module);
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.launch-summary-line__swap.ds-surface.ds-surface--showcase-tab:not(:disabled) {
+  color: rgba(237, 231, 217, 0.92) !important;
+}
+
+.launch-summary-line__swap--muted,
+.launch-summary-line__swap:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.launch-summary-line__wp {
+  display: inline-grid;
+  place-items: center;
+  width: var(--comp-tag-h, 8px);
+  height: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(var(--launch-cyan-rgb), 0.88);
+  cursor: pointer;
+}
+
+.launch-summary-line__wp svg {
+  
+  
+  
+  
+  
+  
+  
+  overflow: visible;
+}
+
+.launch-summary-line__wp:hover:not(:disabled) {
+  color: rgba(237, 231, 217, 0.95);
+}
+
+.launch-summary-line__wp--disabled,
+.launch-summary-line__wp:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.launch-summary-line__fallback {
+  font-size: var(--fs-module);
+  font-weight: 700;
+  color: rgba(237, 231, 217, 0.62);
+  white-space: nowrap;
+}
+
+@keyframes launch-summary-line-rise {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launch-summary-line__slide,
+  .launch-summary-line__slide--enter {
+    animation:  none !important;
+  }
+}

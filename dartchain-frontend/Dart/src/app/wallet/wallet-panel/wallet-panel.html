@@ -1,0 +1,585 @@
+<section
+ class="wallet-display ds-surface ds-surface--showcase-body"
+ [class.is-wallet-active]="hasWallet()"
+ [class.needs-wallet-creation]="needsWalletCreation()"
+ [class.is-action-panel-open]="showSendPanel() || showReceivePanel()"
+>
+  @if (shouldShowStatusLine()) {
+    <div
+      class="wallet-display__status-line"
+      [class.wallet-display__status-line--error]="centerTone() === 'error'"
+      [class.wallet-display__status-line--success]="centerTone() === 'success'"
+      [class.wallet-display__status-line--info]="centerTone() === 'info'"
+      aria-live="polite"
+      role="status"
+    >
+      <span class="wallet-display__status-line-text">{{ centerMessage() }}</span>
+      <button
+        type="button"
+        class="wallet-display__status-line-close"
+        (click)="dismissStatusLine($event)"
+        aria-label="Fermer la notification"
+        title="Fermer"
+      ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
+    </div>
+  }
+
+  <div
+ #bodyScrollRef
+ class="wallet-display__body"
+ [class.is-wallet-active]="hasWallet()"
+ [attr.tabindex]="hasWallet() ? 0 : null"
+ role="region"
+ >
+    <section class="wallet-display__holdings wallet-display__holdings--split">
+      <div class="wallet-display__balance-col">
+        <article class="wallet-display__balance-cyber">
+          <header class="wallet-display__balance-cyber-head">
+            @if (hasWallet() || displayWalletAddress()) {
+              <button
+                type="button"
+                class="wallet-display__balance-cyber-address"
+                [title]="friendlyWalletAddress()"
+                (click)="copyWalletAddress()"
+              >
+                <span
+                  class="wallet-display__balance-cyber-address-led"
+                  [class.is-active]="hasWallet()"
+                  aria-hidden="true"
+                ></span>
+                <span class="wallet-display__balance-cyber-address-text">{{
+                  friendlyWalletAddress()
+                }}</span>
+                <span
+                  class="wallet-display__balance-cyber-address-icon"
+                  [class.is-copied]="copiedAddress()"
+                  aria-hidden="true"
+                >
+                  @if (copiedAddress()) { <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg> } @else { <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-copy"/></svg> }
+                </span>
+              </button>
+            } @else {
+              <span
+                class="wallet-display__balance-cyber-account"
+                [class.wallet-display__balance-cyber-account--guest]="!auth.isAuthenticated()"
+              >
+                {{ accountDisplayName() || '—' }}
+              </span>
+            }
+          </header>
+
+          <div class="wallet-display__balance-glass">
+            <span class="wallet-display__balance-brand">{{ nativeToken() }}</span>
+            <div class="wallet-display__balance-amount" aria-hidden="true">
+              <div class="wallet-display__balance-line wallet-display__balance-line--whole">
+                <span class="wallet-display__balance-whole">{{ balanceWholePart() }}</span>
+                <span class="wallet-display__balance-sep">,</span>
+              </div>
+              <div class="wallet-display__balance-line wallet-display__balance-line--frac">
+                <span class="wallet-display__balance-frac">{{ balanceFractionPart() }}</span>
+              </div>
+            </div>
+            <div class="wallet-display__balance-chf">
+              <span class="wallet-display__balance-chf-label">CHF</span>
+              <span class="wallet-display__balance-chf-value">{{ formattedChfValue() }}</span>
+            </div>
+          </div>
+
+          @if (otherHoldings().length > 0) {
+            <div
+ class="wallet-display__tokens"
+ [class.is-expanded]="holdingsExpanded()"
+ >
+              <button
+                type="button"
+                class="wallet-display__tokens-toggle"
+                (click)="toggleHoldingsExpanded()"
+                [attr.aria-expanded]="holdingsExpanded()"
+                [attr.title]="locale.t('wallet.holdings.toggle')"
+              >
+                <span class="wallet-display__tokens-chips" aria-hidden="true">
+                  @for (holding of previewHoldings(); track holding.token) {
+                    <span class="wallet-display__token-chip">{{ holding.token }}</span>
+                  }
+                  @if (extraHoldingsCount() > 0) {
+                    <span class="wallet-display__token-more">+{{ extraHoldingsCount() }}</span>
+                  }
+                </span>
+                <span class="wallet-display__tokens-meta">
+                  <span class="wallet-display__tokens-count">
+                    {{ otherHoldings().length }}
+                    {{ locale.t('wallet.holdings.others') }}
+                  </span>
+                  <span class="wallet-display__tokens-caret" aria-hidden="true">
+                    {{ holdingsExpanded() ? '▴' : '▾' }}
+                  </span>
+                </span>
+              </button>
+
+              @if (holdingsExpanded()) {
+                <ul class="wallet-display__tokens-list">
+                  @for (holding of otherHoldingsRows(); track holding.token) {
+                    <li class="wallet-display__tokens-item">
+                      <button
+                        type="button"
+                        class="wallet-display__tokens-row"
+                        (click)="openSwapForToken(holding.token)"
+                        [attr.title]="locale.t('wallet.holdings.swapHint')"
+                      >
+                        <span class="wallet-display__tokens-symbol">{{ holding.token }}</span>
+                        <span class="wallet-display__tokens-amount">{{
+                          holding.formattedBalance
+                        }}</span>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </article>
+
+        <div class="wallet-display__create-slot">
+          @if (needsWalletCreation()) {
+            <button
+ type="button"
+ class="wallet-display__create-cta"
+ [class.wallet-display__create-cta--loading]="creatingWallet()"
+ (click)="createWallet()"
+ [disabled]="creatingWallet()"
+ [attr.title]="
+ canCreateWallet()
+ ? locale.t('wallet.create')
+ : 'Inscris-toi ou connecte-toi pour créer un wallet'
+ "
+ >
+              @if (creatingWallet()) {
+                <span class="wallet-display__create-cta-spinner" aria-hidden="true"></span>
+              }
+              <span class="wallet-display__create-cta-label">
+                {{ creatingWallet() ? locale.t('wallet.creating') : locale.t('wallet.create') }}
+              </span>
+            </button>
+          } @else if (hasWallet()) {
+            <section
+ class="wallet-display__keys wallet-display__keys--under-balance"
+ >
+              <article class="wallet-display__key-strip">
+                <span class="wallet-display__key-strip-label">
+                  {{ locale.t('wallet.keys.public') }}
+                </span>
+                <div class="wallet-display__key-strip-body">
+                  <code class="wallet-display__key-strip-value">{{ maskedPublicKey() }}</code>
+                  <div class="wallet-display__key-strip-actions">
+                    <button
+ type="button"
+ class="wallet-display__key-icon-btn"
+ [class.is-active]="publicKeyVisible()"
+ (click)="onTogglePublicKeyVisibility($event)"
+ [title]="
+ publicKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
+ "
+  [attr.aria-label]="
+                        publicKeyVisible() ? locale.t('wallet.keys.hide') : locale.t('wallet.keys.show')
+                      ">
+                      @if (publicKeyVisible()) {
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye-off"/></svg>
+                      } @else {
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg>
+                      }
+                    </button>
+                    <button
+ type="button"
+ class="wallet-display__key-icon-btn wallet-display__key-icon-btn--copy"
+ [class.is-copied]="copiedPublicKey()"
+ (click)="copyPublicKey($event)"
+ [title]="locale.t('wallet.keys.copy')"
+ [attr.aria-label]="locale.t('wallet.keys.copy')"
+ >
+                      @if (copiedPublicKey()) {
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>
+                      } @else {
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-copy"/></svg>
+                      }
+                    </button>
+                  </div>
+                </div>
+              </article>
+
+              <article class="wallet-display__key-strip">
+                <span class="wallet-display__key-strip-label">
+                  {{ locale.t('wallet.keys.private') }}
+                </span>
+                <div class="wallet-display__key-strip-body">
+                  <code class="wallet-display__key-strip-value">{{ maskedPrivateKey() }}</code>
+                  <div class="wallet-display__key-strip-actions">
+                    <button
+ type="button"
+ class="wallet-display__key-icon-btn"
+ [class.is-active]="privateKeyVisible()"
+ (click)="onTogglePrivateKeyVisibility($event)"
+ [title]="
+ privateKeyVisible()
+ ? locale.t('wallet.keys.hide')
+ : locale.t('wallet.keys.showPrivate')
+ "
+ >
+                      @if (privateKeyVisible()) {
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye-off"/></svg>
+                      } @else {
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg>
+                      }
+                    </button>
+                    <button
+ type="button"
+ class="wallet-display__key-icon-btn wallet-display__key-icon-btn--copy"
+ [class.is-copied]="copiedPrivateKey()"
+ (click)="copyPrivateKey($event)"
+ [title]="locale.t('wallet.keys.copy')"
+ [attr.aria-label]="locale.t('wallet.keys.copy')"
+ >
+                      @if (copiedPrivateKey()) {
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>
+                      } @else {
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-copy"/></svg>
+                      }
+                    </button>
+                  </div>
+                </div>
+              </article>
+            </section>
+          }
+        </div>
+      </div>
+
+      <div class="wallet-display__faucet-col">
+        <app-wallet-faucet-embed />
+
+        <section
+ class="wallet-display__explorer wallet-display__explorer--under-faucet"
+ >
+          <form class="wallet-display__explorer-row" [formGroup]="balanceForm">
+            <span class="wallet-display__explorer-label">{{ locale.t('wallet.explorer.address') }}</span>
+            <input
+              type="text"
+              class="wallet-display__explorer-input"
+              formControlName="address"
+              placeholder="usernameR4V3…"
+              autocomplete="off"
+            />
+            <button
+ type="button"
+ class="wallet-display__icon-btn wallet-display__icon-btn--copy wallet-display__icon-btn--explorer"
+ (click)="copyLookupAddress()"
+ [title]="locale.t('wallet.keys.copy')"
+ [class.is-copied]="copiedLookupAddress()"
+  [attr.aria-label]="locale.t('wallet.keys.copy')">
+              @if (copiedLookupAddress()) {
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>
+              } @else {
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-copy"/></svg>
+              }
+            </button>
+            <button
+ type="button"
+ class="wallet-display__icon-btn wallet-display__icon-btn--lookup wallet-display__icon-btn--explorer"
+ [disabled]="refreshingBalance()"
+ (click)="fetchBalanceFromForm()"
+ [attr.title]="locale.t('wallet.explorer.lookup')"
+ >
+              @if (refreshingBalance()) {
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-refresh"/></svg>
+              } @else {
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+              }
+            </button>
+          </form>
+
+          @if (explorerAddressInvalid()) {
+            <p class="wallet-display__field-error">{{ locale.t('wallet.validation.recipient') }}</p>
+          }
+
+          @if (formattedLookedUpBalance(); as exploredBalance) {
+            <div class="wallet-display__explorer-result">
+              <p class="wallet-display__explorer-result-addr">
+                {{ shorten(friendlyLookedUpAddress()) }}
+              </p>
+              <div class="wallet-display__explorer-result-row">
+                <span class="wallet-display__explorer-result-balance">
+                  {{ exploredBalance }} {{ nativeToken() }}/m4t3r
+                </span>
+                @if (formattedLookedUpFiat(); as exploredFiat) {
+                  <span class="wallet-display__explorer-result-fiat">{{ exploredFiat }}</span>
+                }
+              </div>
+            </div>
+          }
+        </section>
+
+        <section
+ class="wallet-display__recent"
+ >
+          <header class="wallet-display__recent-head">
+            <span class="wallet-display__recent-accent" aria-hidden="true"></span>
+            <h3 class="wallet-display__recent-title">{{ locale.t('wallet.recent.title') }}</h3>
+          </header>
+          @if (recentLookupRows().length === 0) {
+            <div class="wallet-display__recent-empty">
+              <p class="wallet-display__recent-empty-title">{{ locale.t('wallet.recent.empty') }}</p>
+              <p class="wallet-display__recent-empty-hint">{{ locale.t('wallet.recent.hint') }}</p>
+            </div>
+          } @else {
+            <ul class="wallet-display__recent-list">
+              @for (entry of recentLookupRows(); track entry.address) {
+                <li class="wallet-display__recent-item">
+                  <button
+                    type="button"
+                    class="wallet-display__recent-btn"
+                    (click)="consultRecentLookup(entry)"
+                    [title]="entry.display"
+                  >
+                    <span class="wallet-display__recent-addr">{{ entry.shortDisplay }}</span>
+                    <span class="wallet-display__recent-metrics">
+                      <span class="wallet-display__recent-bal">
+                        {{ entry.formattedBalance }} {{ nativeToken() }}/m4t3r
+                      </span>
+                      <span class="wallet-display__recent-fiat">{{ entry.formattedFiat }}</span>
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <footer class="wallet-display__actions">
+    <div class="wallet-display__actions-row">
+      <button
+        type="button"
+        class="wallet-display__action-btn"
+        (click)="receiveAction()"
+        [disabled]="!hasWallet()"
+        [class.is-active]="showReceivePanel()"
+      >
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-down-left"/></svg>
+        {{ locale.t('wallet.receive') }}
+      </button>
+      <button
+        type="button"
+        class="wallet-display__action-btn wallet-display__action-btn--swap"
+        (click)="swapAction()"
+      >
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-left-right"/></svg>
+        {{ locale.t('wallet.swap') }}
+      </button>
+      <button
+        type="button"
+        class="wallet-display__action-btn"
+        (click)="sendAction()"
+        [disabled]="!hasWallet() || sending()"
+        [class.is-active]="showSendPanel()"
+      >
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-up-right"/></svg>
+        {{ locale.t('wallet.send') }}
+      </button>
+    </div>
+  </footer>
+
+  @if (showSendPanel()) {
+    <section
+ #sendPanelRef
+ class="wallet-display__panel wallet-display__panel--overlay wallet-display__panel--send"
+ tabindex="0"
+ >
+      <button
+        type="button"
+        class="wallet-display__panel-close wallet-display__panel-close--float"
+        (click)="closeActionPanels()"
+        [attr.aria-label]="locale.t('wallet.send.confirmCancel')"
+        [title]="locale.t('wallet.send.confirmCancel')"
+      ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
+
+      <form class="wallet-display__send-form" [formGroup]="sendForm" (ngSubmit)="requestSendConfirm()">
+        <label class="wallet-display__field wallet-display__send-row">
+          <span class="wallet-display__field-label">{{ locale.t('wallet.send.recipient') }}</span>
+          <input
+            class="wallet-display__field-control"
+            type="text"
+            formControlName="recipient"
+            placeholder="usernameR4V3…"
+            autocomplete="off"
+          />
+        </label>
+        @if (recipientInvalid()) {
+          <p class="wallet-display__field-error">{{ locale.t('wallet.validation.recipient') }}</p>
+        }
+
+        <label class="wallet-display__field wallet-display__send-row wallet-display__send-row--amount">
+          <span class="wallet-display__field-label">{{ locale.t('wallet.send.amount') }}</span>
+          <div class="wallet-display__field-control wallet-display__amount-field">
+            <div class="wallet-display__amount-input-wrap">
+              <input
+                type="number"
+                step="0.0001"
+                min="0.0001"
+                formControlName="amount"
+                inputmode="decimal"
+              />
+              <span class="wallet-display__amount-unit" aria-hidden="true">{{ nativeToken() }}</span>
+            </div>
+            <div class="wallet-display__amount-steppers">
+              <button
+                type="button"
+                class="wallet-display__amount-step"
+                (click)="nudgeSendAmount(0.0001)"
+                aria-label="+0.0001"
+                title="+0.0001"
+              >
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-up"/></svg>
+              </button>
+              <button
+                type="button"
+                class="wallet-display__amount-step"
+                (click)="nudgeSendAmount(-0.0001)"
+                aria-label="-0.0001"
+                title="-0.0001"
+              >
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-down"/></svg>
+              </button>
+            </div>
+          </div>
+        </label>
+        @if (amountInvalid()) {
+          <p class="wallet-display__field-error">{{ locale.t('wallet.validation.amount') }}</p>
+        }
+
+        <label class="wallet-display__field wallet-display__send-row">
+          <span class="wallet-display__field-label">{{ locale.t('wallet.send.memo') }}</span>
+          <input
+            class="wallet-display__field-control"
+            type="text"
+            formControlName="memo"
+            placeholder="Référence"
+            autocomplete="off"
+          />
+        </label>
+
+        <button type="submit" class="wallet-display__panel-submit" [disabled]="sending()">
+          {{ sending() ? locale.t('wallet.send.sending') : locale.t('wallet.send.confirm') }}
+        </button>
+      </form>
+
+      @if (showSendConfirm()) {
+        <div
+ class="wallet-display__send-confirm"
+ role="dialog"
+ aria-modal="true"
+ >
+          <div class="wallet-display__send-confirm-card">
+            <h4 class="wallet-display__send-confirm-title">{{ locale.t('wallet.send.confirmTitle') }}</h4>
+            <p class="wallet-display__send-confirm-hint">{{ locale.t('wallet.send.confirmHint') }}</p>
+            <dl class="wallet-display__send-confirm-summary">
+              <div>
+                <dt>{{ locale.t('wallet.send.recipient') }}</dt>
+                <dd>{{ sendConfirmRecipient() }}</dd>
+              </div>
+              <div>
+                <dt>{{ locale.t('wallet.send.amount') }}</dt>
+                <dd>{{ sendConfirmAmount() }}</dd>
+              </div>
+              @if (sendConfirmMemo()) {
+                <div>
+                  <dt>{{ locale.t('wallet.send.memo') }}</dt>
+                  <dd>{{ sendConfirmMemo() }}</dd>
+                </div>
+              }
+            </dl>
+            <div class="wallet-display__send-confirm-actions">
+              <button
+                type="button"
+                class="wallet-display__send-confirm-btn wallet-display__send-confirm-btn--ghost"
+                (click)="cancelSendConfirm()"
+                [disabled]="sending()"
+              >
+                {{ locale.t('wallet.send.confirmCancel') }}
+              </button>
+              <button
+                type="button"
+                class="wallet-display__send-confirm-btn wallet-display__send-confirm-btn--primary"
+                (click)="confirmSend()"
+                [disabled]="sending()"
+              >
+                {{ sending() ? locale.t('wallet.send.sending') : locale.t('wallet.send.confirmYes') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </section>
+  }
+
+  @if (showReceivePanel()) {
+    <section
+ #receivePanelRef
+ class="wallet-display__panel wallet-display__panel--overlay wallet-display__panel--receive"
+ tabindex="0"
+ >
+      <button
+        type="button"
+        class="wallet-display__panel-close wallet-display__panel-close--float"
+        (click)="closeActionPanels()"
+        [attr.aria-label]="locale.t('wallet.send.confirmCancel')"
+        [title]="locale.t('wallet.send.confirmCancel')"
+      ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
+
+      <div class="wallet-display__receive">
+        <div class="wallet-display__field wallet-display__receive-row">
+          <span class="wallet-display__field-label wallet-display__receive-label">
+            {{ locale.t('wallet.receive.addressLabel') }}
+          </span>
+          <button
+            type="button"
+            class="wallet-display__field-control wallet-display__receive-address"
+            (click)="copyWalletAddress()"
+            [disabled]="!hasWallet()"
+            [title]="hasWallet() ? friendlyWalletAddress() : locale.t('wallet.noWallet')"
+          >
+            {{ hasWallet() ? shorten(friendlyWalletAddress()) : locale.t('wallet.noWallet') }}
+          </button>
+        </div>
+
+        <div class="wallet-display__qr-wrap">
+          <div
+ class="wallet-display__qr"
+ role="img"
+ >
+            @if (qrDataUrl()) {
+              <img
+                [src]="qrDataUrl()!"
+                [alt]="
+                  hasWallet()
+                    ? 'QR code pour recevoir des fonds sur ' + friendlyWalletAddress()
+                    : 'QR code de démonstration'
+                "
+              />
+            } @else {
+              <span class="wallet-display__qr-placeholder">QR</span>
+            }
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="wallet-display__panel-submit"
+          (click)="copyWalletAddress()"
+          [disabled]="!hasWallet()"
+        >
+          {{ locale.t('wallet.receive.copy') }}
+        </button>
+      </div>
+    </section>
+  }
+</section>

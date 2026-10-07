@@ -1,0 +1,194 @@
+@if (loadingPanel()) {
+  <div
+    class="exchange-panel__rail exchange-panel__rail--skeleton"
+    [class.exchange-panel__rail--collapsed]="exchangeCollapsed()"
+    aria-hidden="true"
+    aria-label="Convertir vos jetons du laboratoire"
+  >
+    <span class="exchange-panel__skeleton-row"></span>
+  </div>
+} @else {
+  <div
+ class="exchange-panel__rail"
+ [class.exchange-panel__rail--collapsed]="exchangeCollapsed()"
+ [class.exchange-panel__rail--picking]="tokenMenuOpen()"
+ [formGroup]="amountForm"
+ role="group"
+ >
+    <span
+      class="exchange-panel__sr-only"
+      [id]="exchangeCollapsed() ? 'exchange-collapsed-hint' : 'exchange-convert-hint'"
+      aria-live="polite"
+    >
+      {{ pairSubtitle() }} · Solde {{ formatBalance(fromBalance()) }} {{ amountUnitDisplay(fromToken()) }}
+      @if (rateLine()) {
+        · {{ rateLine() }}
+      }
+      @if (parsedAmount() > 0) {
+        · Estimation ≈ {{ formattedEstimatedTo() }} {{ toToken() }}
+      }
+      @if (unitUsdPriceTo() != null) {
+        · {{ prixSubline() }}
+      }
+    </span>
+
+    <div class="exchange-panel__row">
+    <div class="exchange-panel__pair-route">
+      <span class="exchange-panel__pair-from">
+        <span class="exchange-panel__pair-logo" aria-hidden="true">
+          <app-r4v3-three
+            class="exchange-panel__pair-logo-three"
+            presentation="navbar"
+            [modelTargetSize]="10"
+            [cameraFitFactor]="1.22"
+            [frameBiasY]="-0.04"
+            [enableOrbit]="true"
+          />
+        </span>
+        <span class="exchange-panel__pair-symbol">{{ nativeTokenLabel }}</span>
+      </span>
+
+      <span class="exchange-panel__pair-arrow" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-right"/></svg></span>
+
+      <div class="exchange-panel__pair-to-select">
+        <button
+ type="button"
+ class="exchange-panel__token-trigger"
+ [class.exchange-panel__token-trigger--open]="tokenMenuOpen()"
+ (click)="toggleTokenMenu($event)"
+ [attr.aria-expanded]="tokenMenuOpen()"
+ aria-haspopup="listbox"
+ >
+          @if (tokenLogoUrl(toToken()); as toLogo) {
+            <img
+              class="exchange-panel__pair-icon exchange-panel__pair-icon--img"
+              [src]="toLogo"
+              alt=""
+              (error)="onTokenLogoError(toToken())"
+            />
+          } @else {
+            <span class="exchange-panel__pair-icon" aria-hidden="true">{{
+              tokenIconText(toToken())
+            }}</span>
+          }
+          <span class="exchange-panel__token-trigger-label">{{ toToken() }}</span>
+          <span class="exchange-panel__token-trigger-chevron" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="exchange-panel__amount-zone"
+      [class.exchange-panel__amount-zone--valid]="amountInputState() === 'valid'"
+      [class.exchange-panel__amount-zone--warn]="amountInputState() === 'insufficient'"
+      [class.exchange-panel__amount-zone--flash]="validFlash()"
+    >
+      <div class="exchange-panel__amount-wrap">
+        <label class="exchange-panel__sr-only" [for]="amountInputId()">
+          Montant à convertir en {{ toToken() }} ({{ amountUnitDisplay(fromToken()) }})
+        </label>
+        <input
+          [id]="amountInputId()"
+          class="exchange-panel__amount-input exchange-panel__amount-input--solo"
+          type="text"
+          inputmode="decimal"
+          formControlName="amount"
+          [placeholder]="amountPlaceholder"
+          [attr.aria-describedby]="exchangeCollapsed() ? 'exchange-collapsed-hint' : 'exchange-convert-hint'"
+          (input)="onAmountInput()"
+          (keydown.enter)="onAmountEnter($event)"
+        />
+        @if (!nativeFrom()) {
+          <span class="exchange-panel__amount-unit" aria-hidden="true">{{
+            amountUnitDisplay(fromToken())
+          }}</span>
+        }
+      </div>
+
+      @if (showQuickAmounts()) {
+        <button
+ type="button"
+ class="exchange-panel__max-btn"
+ (click)="setMaxAmount()"
+ >
+          Max
+        </button>
+      }
+    </div>
+
+    <button
+      type="button"
+      class="exchange-panel__cta"
+      [class.exchange-panel__cta--ready]="swapAction() === 'swap'"
+      [class.exchange-panel__cta--funnel]="isFunnelCta()"
+      [class.exchange-panel__cta--funnel-intro]="funnelIntroPulse()"
+      [class.exchange-panel__cta--warn]="swapAction() === 'insufficient' && fromBalance() > 0"
+      [class.exchange-panel__cta--loading]="swapAction() === 'swapping'"
+      (click)="onSwapClick()"
+      [disabled]="swapButtonDisabled()"
+      [attr.aria-label]="swapButtonLabel()"
+      [attr.aria-busy]="swapAction() === 'swapping'"
+    >
+      @if (swapAction() === 'swapping') {
+        <span class="exchange-panel__cta-spinner" aria-hidden="true"></span>
+      }
+      <span class="exchange-panel__cta-label">{{ swapCtaVisibleLabel() }}</span>
+    </button>
+    </div>
+
+    <div class="exchange-panel__meta" aria-live="polite">
+      @if (tokenMenuOpen()) {
+        <div class="exchange-panel__meta-tokens" role="listbox">
+          @for (token of launchpadSwapTokens(); track token) {
+            <button
+              type="button"
+              role="option"
+              class="exchange-panel__meta-chip"
+              [class.exchange-panel__meta-chip--active]="toToken() === token"
+              [attr.aria-selected]="toToken() === token"
+              (click)="selectLaunchFromMenu(token)"
+            >
+              {{ token }}
+            </button>
+          }
+        </div>
+      } @else if (metaStatusText()) {
+        <span
+          class="exchange-panel__meta-status"
+          [class.exchange-panel__meta-status--error]="metaStatusKind() === 'error'"
+          [class.exchange-panel__meta-status--success]="metaStatusKind() === 'success'"
+        >
+          {{ metaStatusText() }}
+        </span>
+        @if (showSuccessToast()) {
+          <button type="button" class="exchange-panel__toast-dismiss" (click)="dismissSuccessToast()"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
+        }
+      } @else {
+        @if (showBalanceInline()) {
+          <span class="exchange-panel__balance">{{ compactBalanceLabel() }}</span>
+        }
+        @if (showInlineEstimate()) {
+          <span
+            class="exchange-panel__estimate"
+            [class.exchange-panel__estimate--pulse]="estimatePulse()"
+          >
+            {{ compactEstimateLabel() }}
+          </span>
+        } @else if (compactRateLabel()) {
+          <span class="exchange-panel__rate">{{ compactRateLabel() }}</span>
+        } @else if (compactMetaHint()) {
+          <span class="exchange-panel__meta-hint">{{ compactMetaHint() }}</span>
+        }
+        @if (quoteLockTimestampLabel()) {
+          <span class="exchange-panel__quote-lock">
+            <svg class="exchange-panel__lock-icon icon" aria-hidden="true" focusable="false"><use href="#icon-lock"/></svg>
+            {{ quoteLockLabel }}
+            <time class="exchange-panel__quote-time" [attr.datetime]="quoteLockIso()">
+              {{ quoteLockTimestampLabel() }}
+            </time>
+          </span>
+        }
+      }
+    </div>
+  </div>
+}

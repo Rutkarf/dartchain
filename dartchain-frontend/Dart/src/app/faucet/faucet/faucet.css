@@ -1,0 +1,1077 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  line-height: normal;
+}
+
+.faucet-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 2px 2px 2px;
+  border-radius: var(--ds-surface-radius, var(--radius-none, 0));
+  background-color: var(--ds-surface-tint);
+  background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
+  backdrop-filter: var(--ds-surface-backdrop);
+  -webkit-backdrop-filter: var(--ds-surface-backdrop);
+  box-shadow: inset 0 1px 0 rgba(var(--ds-surface-metal-highlight-rgb, 139, 157, 173), 0.04);
+  overflow: hidden;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.faucet-panel__toast {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  max-width: calc(100% - 8px);
+  padding: 0px 4px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-chain);
+  line-height: 1.2;
+  text-align: center;
+  border: 1px solid var(--state-success-border);
+  background: var(--state-success-bg);
+  color: var(--state-success-fg);
+  pointer-events: none;
+}
+
+.faucet-panel__toast.is-info {
+  border-color: rgba(139, 157, 173, 0.45);
+  background: rgba(10, 18, 32, 0.94);
+  color: #ede7d9;
+}
+
+.faucet-panel__toast.is-error {
+  border-color: var(--state-error-border);
+  background: var(--state-error-bg);
+  color: var(--state-error-fg);
+}
+
+.faucet-panel__head {
+  grid-row: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  min-width: 0;
+}
+
+.faucet-panel__body {
+  grid-row: 2;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.faucet-panel__meta-inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 0;
+  padding: 0 0px 0px;
+  min-width: 0;
+  font-size: var(--fs-chain);
+  line-height: 1.2;
+  color: rgba(237, 231, 217, 0.88);
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.faucet-panel__meta-inline strong {
+  color: #ede7d9;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.faucet-panel__meta-sep {
+  color: rgba(237, 231, 217, 0.45);
+}
+
+.faucet-panel__meta-inline .faucet-panel__block-link {
+  display: inline;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: var(--fs-chain);
+  line-height: inherit;
+  color: #ede7d9;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.faucet-panel__meta-inline .faucet-panel__block-link:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.faucet-panel__value-token {
+  color: rgba(237, 231, 217, 0.92);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.faucet-panel__title-wrap {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px;
+  padding: 0 0px;
+  min-width: 0;
+}
+
+.faucet-panel__title-wrap h2 {
+  margin: 0;
+  font-size: var(--fs-chain);
+  letter-spacing: 0.08em;
+  color: #ede7d9;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.faucet-panel__title-sub {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--fs-chain);
+  color: rgba(237, 231, 217, 0.8);
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.faucet-panel__refresh {
+  flex: 0 0 auto;
+  width: 16px;
+  height: var(--comp-hud-h, 16px);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 157, 173, 0.32);
+  background: rgba(139, 157, 173, 0.08);
+  color: rgba(237, 231, 217, 0.95);
+  font-size: var(--fs-chain);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.faucet-panel__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(34px, 0.38fr) 48px;
+  gap: 0px;
+  align-items: stretch;
+  min-height: 0;
+  margin-bottom: 0px;
+}
+
+.faucet-panel__top .faucet-panel__tile--amount {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: var(--comp-form-h, 32px);
+  max-height: var(--comp-form-h, 32px);
+  padding: 0px 0px;
+}
+
+.faucet-panel__value-wrap {
+  margin: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-left: 10%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.faucet-panel__value-fit {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  transform-origin: right center;
+  will-change: transform;
+  text-align: right;
+}
+
+.faucet-panel__value {
+  margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 2px;
+  width: max-content;
+  max-width: none;
+  font-family: 'Inter', sans-serif;
+  color: #8b9dad;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  letter-spacing: 0;
+  line-height: 1;
+  font-weight: 700;
+  font-size: var(--fs-chain);
+  transition: color var(--motion-state) var(--motion-ease-state);
+}
+
+.faucet-panel__value.is-capped {
+  color: var(--state-error-fg);
+  text-shadow: none;
+}
+
+.faucet-panel__cap-hint {
+  margin: 0;
+  font-size: var(--fs-chain);
+  line-height: 1;
+  color: rgba(123, 13, 30, 0.85);
+  text-align: center;
+}
+
+.faucet-panel__value-whole {
+  display: inline-block;
+  color: #8b9dad;
+}
+
+.faucet-panel__value-sep {
+  display: inline-block;
+  color: rgba(237, 231, 217, 0.75);
+}
+
+.faucet-panel__value-decimal {
+  display: inline-block;
+}
+
+.faucet-panel__value-unit {
+  display: inline-block;
+  font-size: var(--fs-chain);
+  color: rgba(237, 231, 217, 0.88);
+  letter-spacing: 0.04em;
+}
+
+.faucet-panel__value.is-bumping {
+  color: #8b9dad;
+  text-shadow: none;
+}
+
+.faucet-panel__label {
+  margin: 0;
+  font-size: var(--fs-chain);
+  letter-spacing: 0.09em;
+  color: rgba(237, 231, 217, 0.78);
+  white-space: nowrap;
+}
+
+.faucet-panel__tile {
+  border: 1px solid rgba(139, 157, 173, 0.24);
+  border-radius: var(--radius-md);
+  background: rgba(10, 18, 32, 0.78);
+  padding: 0px 2px;
+  min-height: 0;
+  min-width: 0;
+}
+
+.faucet-panel__tile--cooldown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
+  padding: 0px;
+  max-height: var(--comp-form-h, 32px);
+}
+
+.faucet-panel__cooldown-ring {
+  --cooldown-progress: 0;
+  width: var(--comp-hud-h, 16px);
+  height: var(--comp-form-h, 32px);
+  border-radius: var(--radius-circle);
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: conic-gradient(
+    from -90deg,
+    rgba(139, 157, 173, 0.72) calc((1 - var(--cooldown-progress)) * 360deg),
+    rgba(139, 157, 173, 0.1) 0
+  );
+  box-shadow:
+    inset 0 0 14px rgba(139, 157, 173, 0.16),
+    0 0 10px rgba(139, 157, 173, 0.12);
+}
+
+.faucet-panel__cooldown-ring::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: var(--radius-circle);
+  border: 1px solid rgba(139, 157, 173, 0.35);
+  background: rgba(10, 18, 32, 0.92);
+}
+
+.faucet-panel__cooldown-value {
+  position: relative;
+  z-index: 1;
+  font-size: var(--fs-chain);
+  color: #ede7d9;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.faucet-panel__sub {
+  margin: 0;
+  font-size: var(--fs-chain);
+  color: rgba(237, 231, 217, 0.74);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.faucet-panel__claim-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.faucet-panel__claim-slot.is-success {
+  justify-content: center;
+}
+
+.faucet-panel__claim {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 24px;
+  height: 100%;
+  margin: 0;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 157, 173, 0.62);
+  background: linear-gradient(180deg, rgba(139, 157, 173, 0.14), rgba(9, 129, 74, 0.08));
+  color: #ede7d9;
+  font-size: var(--fs-chain);
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow:
+    0 0 10px rgba(139, 157, 173, 0.18),
+    inset 0 1px 0 rgba(237, 231, 217, 0.26);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 0px;
+  text-transform: uppercase;
+  transition: opacity var(--motion-state) var(--motion-ease-state), color var(--motion-state) var(--motion-ease-state), border-color var(--motion-state) var(--motion-ease-state);
+}
+
+.faucet-panel__claim.is-inactive,
+.faucet-panel__claim.is-cooling {
+  opacity: var(--state-disabled-opacity);
+  color: var(--text-primary, #ede7d9);
+  cursor: not-allowed;
+}
+
+.faucet-panel__claim:disabled.is-cooling {
+  cursor: not-allowed;
+}
+
+.faucet-panel__claim.is-success {
+  border-color: var(--state-success-border);
+  background: var(--state-success-bg);
+  color: var(--state-success-fg);
+  cursor: default;
+}
+
+.faucet-panel__claim-success-info {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2px;
+  min-height: var(--comp-hud-h, 16px);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--state-success-border);
+  background: var(--state-success-bg);
+  color: var(--state-success-fg);
+  font-family: 'Inter', sans-serif;
+  font-size: var(--fs-chain);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow:
+    0 0 8px rgba(9, 129, 74, 0.14),
+    inset 0 1px 0 rgba(9, 129, 74, 0.12);
+}
+
+.faucet-panel__tx-line {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: var(--comp-hud-h, 16px);
+  padding: 0 0px;
+}
+
+.faucet-panel__tx-line .faucet-panel__tx {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.faucet-panel__tx-line .faucet-panel__tx--explorer {
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.faucet-panel__feedback {
+  margin: 0;
+  padding: 0px 2px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-chain);
+  line-height: 1.2;
+  max-height: 2.4em;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.faucet-panel__feedback--error {
+  border: 1px solid var(--state-error-border);
+  background: var(--state-error-bg);
+  color: var(--state-error-fg);
+}
+
+.faucet-panel__feedback--success {
+  border: 1px solid var(--state-success-border);
+  background: var(--state-success-bg);
+  color: var(--state-success-fg);
+}
+
+.faucet-panel__banner {
+  margin: 0;
+  padding: 0px 2px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-chain);
+  line-height: 1.2;
+  text-align: center;
+}
+
+.faucet-panel__banner--disabled,
+.faucet-panel__banner--offline {
+  border: 1px solid var(--state-error-border);
+  background: var(--state-error-bg);
+  color: var(--state-error-fg);
+}
+
+.faucet-panel__banner--warn {
+  border: 1px solid rgba(123, 13, 30, 0.42);
+  background: rgba(10, 18, 32, 0.72);
+  color: #ede7d9;
+}
+
+.faucet-panel__retry {
+  margin-left: 4px;
+  border: none;
+  background: transparent;
+  color: var(--state-error-fg);
+  font-size: var(--fs-chain);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.faucet-panel__sub--eligible {
+  color: rgba(237, 231, 217, 0.82);
+  font-size: var(--fs-chain);
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
+}
+
+.faucet-panel__balance {
+  display: block;
+  margin-top: 0px;
+  font-size: var(--fs-chain);
+  color: rgba(19138, 149, 165, 0.92);
+}
+
+.faucet-panel__tx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 0px;
+}
+
+.faucet-panel__tx--explorer {
+  color: rgba(9, 129, 74, 0.95);
+}
+
+.faucet-panel__tx {
+  display: block;
+  margin-top: 0px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: var(--fs-chain);
+  color: rgba(237, 231, 217, 0.88);
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  cursor: pointer;
+  word-break: break-all;
+}
+
+.faucet-panel__history {
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 1px solid rgba(139, 157, 173, 0.2);
+  border-radius: var(--radius-md);
+  background: rgba(10, 18, 32, 0.72);
+  padding: 0px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  overflow: hidden;
+}
+
+.faucet-panel__history-export {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0px;
+  margin: 0;
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(139, 157, 173, 0.92);
+  font-size: var(--fs-chain);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.faucet-panel__history-export svg {
+  
+  
+  flex: 0 0 auto;
+}
+
+.faucet-panel__history-export:hover {
+  color: var(--text-primary, #ede7d9);
+  background: var(--state-hover-bg);
+}
+
+.faucet-panel__rows {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-right: 2px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-scrollbar-thumb) var(--ds-scrollbar-track);
+}
+
+.faucet-panel__row {
+  display: grid;
+  grid-template-columns: 34px 44px 40px minmax(0, 1fr) 40px 28px;
+  gap: 0px;
+  align-items: center;
+  min-width: 0;
+  min-height: var(--comp-hud-h, 16px);
+  font-size: var(--fs-chain);
+  line-height: 1.05;
+  color: rgba(237, 231, 217, 0.8);
+}
+
+.faucet-panel__row--head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: var(--fs-chain);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(237, 231, 217, 0.62);
+  border-bottom: 1px solid rgba(139, 157, 173, 0.12);
+  padding-bottom: 0px;
+  margin-bottom: 0;
+  background: rgba(10, 18, 32, 0.96);
+}
+
+.faucet-panel__row span,
+.faucet-panel__row button {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.faucet-panel__row--head .faucet-panel__history-export {
+  min-width: max-content;
+  overflow: visible;
+  text-overflow: clip;
+  justify-self: end;
+}
+
+.faucet-panel__row-amount {
+  overflow: visible;
+  text-overflow: clip;
+  font-variant-numeric: tabular-nums;
+}
+
+.faucet-panel__row-status {
+  color: var(--state-success-fg);
+  text-align: right;
+  font-weight: 700;
+}
+
+.faucet-panel__row-explorer-spacer {
+  display: block;
+  width: var(--comp-tag-h, 8px);
+  height: 0px;
+  justify-self: end;
+}
+
+.faucet-panel__row-explorer {
+  border: none;
+  background: transparent;
+  color: rgba(139, 157, 173, 0.9);
+  font-size: var(--fs-chain);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  justify-self: end;
+}
+
+.faucet-panel__empty {
+  font-size: var(--fs-chain);
+  color: rgba(237, 231, 217, 0.75);
+  text-align: center;
+  padding: 2px 0;
+}
+
+.faucet-panel__load-more {
+  align-self: center;
+  margin-top: 0px;
+  border: none;
+  background: transparent;
+  color: rgba(139, 157, 173, 0.88);
+  font-size: var(--fs-chain);
+  cursor: pointer;
+  padding: 0;
+}
+
+.faucet-panel__meta {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 2px;
+  align-items: center;
+  border-top: 1px solid rgba(139, 157, 173, 0.28);
+  padding: 0px 0px 2px;
+  min-height: var(--comp-hud-h, 16px);
+  line-height: 1.1;
+  background: rgba(10, 18, 32, 0.92);
+  position: relative;
+  z-index: 3;
+}
+
+.faucet-panel__meta-item {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  line-height: 1.15;
+}
+
+.faucet-panel__meta-item span {
+  display: block;
+  font-size: var(--fs-chain);
+  line-height: 1.2;
+  color: rgba(237, 231, 217, 0.85);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.faucet-panel__meta-item strong {
+  display: block;
+  font-size: var(--fs-chain);
+  line-height: 1.2;
+  color: #ede7d9;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.faucet-panel__block-link {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: var(--fs-chain);
+  line-height: 1.2;
+  color: #ede7d9;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faucet-panel__block-link:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.faucet-panel__block-link:not(:disabled):hover {
+  color: var(--text-primary, #ede7d9);
+}
+
+.faucet-panel__meta-detail {
+  display: block;
+  font-size: var(--fs-chain);
+  line-height: 1.1;
+  color: rgba(237, 231, 217, 0.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.faucet-panel__dot {
+  width: var(--comp-led-size, 4px);
+  height: 4px;
+  border-radius: var(--radius-circle);
+  flex-shrink: 0;
+  background: var(--state-error);
+  box-shadow: none;
+}
+
+.faucet-panel__dot.is-ready {
+  background: var(--state-success);
+  box-shadow: none;
+  animation: faucet-led-pulse 1.4s ease-in-out infinite;
+}
+
+.faucet-panel__dot.is-cooldown {
+  background: var(--state-error);
+  box-shadow: none;
+}
+
+.faucet-panel__dot.is-offline {
+  background: var(--state-error);
+  box-shadow: none;
+}
+
+.faucet-panel__dot.is-disabled {
+  background: rgba(139, 157, 173, 0.55);
+  box-shadow: none;
+}
+
+@keyframes faucet-led-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.72;
+    transform: scale(0.88);
+  }
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel {
+  border: none;
+  border-radius: var(--radius-none);
+  box-shadow: none;
+  padding: 0px 2px 2px;
+  gap: 0px;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__title-wrap {
+  display: none;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__top {
+  grid-template-columns: minmax(0, 1.85fr) minmax(28px, 0.32fr) 40px;
+  gap: 0px;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__top .faucet-panel__tile--amount {
+  min-height: var(--comp-btn-form-h, 32px);
+  max-height: var(--comp-form-h, 32px);
+  padding: 0px;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__value {
+  font-size: var(--fs-chain);
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__tile--cooldown {
+  max-height: var(--comp-form-h, 32px);
+  padding: 0px;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__cooldown-ring {
+  width: 22px;
+  height: var(--comp-hud-h, 16px);
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__cooldown-value {
+  font-size: var(--fs-chain);
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__label {
+  display: none;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__claim {
+  min-height: var(--comp-btn-form-h, 32px);
+  height: 100%;
+  font-size: var(--fs-chain);
+  letter-spacing: 0.02em;
+  padding: 0;
+  margin: 0;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__claim-success-info {
+  font-size: var(--fs-chain);
+  padding: 0 2px;
+  min-height: 8px;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__tx-line {
+  min-height: var(--comp-hud-h, 16px);
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__tx-line .faucet-panel__tx,
+:host-context(.app-bottom-stack__panel) .faucet-panel__tx-line .faucet-panel__tx--explorer {
+  font-size: var(--fs-chain);
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__body {
+  min-height: 0;
+  max-height: none;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__history {
+  min-height: 0;
+  padding: 0px 2px 0px;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__row {
+  min-height: 8px;
+  font-size: var(--fs-chain);
+  grid-template-columns: 30px 38px 34px minmax(0, 1fr) 34px 26px;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__row--head {
+  font-size: var(--fs-chain);
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__history-export {
+  font-size: var(--fs-chain);
+  gap: 0px;
+}
+
+:host-context(.app-bottom-stack__panel) .faucet-panel__meta-inline {
+  font-size: var(--fs-chain);
+  gap: 2px;
+  padding: 0 0px;
+}
+
+@media (max-width: 349px) {
+  .faucet-panel {
+    padding: 0px 2px 2px;
+    gap: 0px;
+  }
+
+  .faucet-panel__row {
+    font-size: var(--fs-chain);
+    gap: 0px;
+  }
+}
+
+/* ── Dock polish V4 (Wallet charter — moderated glass) ── */
+.faucet-panel {
+  --dock-cyan: #8b9dad;
+  --dock-cyan-rgb: 139, 157, 173;
+  --dock-green: var(--state-success);
+  --dock-green-rgb: 9, 129, 74;
+  --dock-glass-bg: linear-gradient(
+    165deg,
+    rgba(237, 231, 217, 0.06) 0%,
+    rgba(var(--dock-cyan-rgb), 0.06) 42%,
+    rgba(10, 18, 32, 0.28) 100%
+  );
+  --dock-glass-border: rgba(var(--dock-cyan-rgb), 0.28);
+  --dock-glass-blur: blur(10px) saturate(135%);
+  --dock-glass-shadow:
+    inset 0 1px 0 rgba(237, 231, 217, 0.12),
+    inset 0 -1px 0 rgba(10, 18, 32, 0.35),
+    0 4px 14px rgba(10, 18, 32, 0.35);
+
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--radius-none);
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.2);
+  background-color: #0a1220;
+  background-image:
+    linear-gradient(180deg, rgba(237, 231, 217, 0.03) 0%, transparent 28%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 7px,
+      rgba(237, 231, 217, 0.012) 7px 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 7px,
+      rgba(237, 231, 217, 0.01) 7px 8px
+    );
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 rgba(237, 231, 217, 0.04),
+    inset 0 0 0 1px rgba(10, 18, 32, 0.35);
+}
+
+.faucet-panel__tile,
+.faucet-panel__history,
+.faucet-panel__claim-slot {
+  border-radius: var(--radius-none) !important;
+  border: 1px solid var(--dock-glass-border) !important;
+  background: var(--dock-glass-bg) !important;
+  backdrop-filter: var(--dock-glass-blur);
+  -webkit-backdrop-filter: var(--dock-glass-blur);
+  box-shadow: var(--dock-glass-shadow) !important;
+}
+
+.faucet-panel__tile--amount {
+  clip-path: polygon(
+    0 3px,
+    3px 0,
+    calc(100% - 3px) 0,
+    100% 3px,
+    100% calc(100% - 3px),
+    calc(100% - 3px) 100%,
+    3px 100%,
+    0 calc(100% - 3px)
+  );
+}
+
+.faucet-panel__claim {
+  border-radius: var(--radius-none) !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.55) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dock-cyan-rgb), 0.95) 0%,
+    rgba(var(--dock-cyan-rgb), 0.62) 55%,
+    rgba(35, 87, 137, 0.95) 100%
+  ) !important;
+  color: #0a1220 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  box-shadow:
+    inset 0 1px 0 rgba(237, 231, 217, 0.35),
+    inset 0 -1px 0 rgba(10, 18, 32, 0.35),
+    0 0 12px rgba(var(--dock-cyan-rgb), 0.28) !important;
+}
+
+.faucet-panel__claim:hover:not(:disabled) {
+  background: var(--cta-accent-bg-hover) !important;
+  border-color: var(--state-hover-border) !important;
+  box-shadow: var(--cta-accent-shadow-hover) !important;
+  transform: none;
+}
+
+.faucet-panel__claim.is-inactive,
+.faucet-panel__claim.is-cooling,
+.faucet-panel__claim:disabled {
+  opacity: var(--state-disabled-opacity) !important;
+  cursor: not-allowed !important;
+  box-shadow: var(--shadow-flat) !important;
+}
+
+.faucet-panel__claim.is-success {
+  border-color: var(--state-success-border) !important;
+  background: var(--state-success-bg) !important;
+  color: var(--state-success-fg) !important;
+}
+
+.faucet-panel__retry,
+.faucet-panel__history-export,
+.faucet-panel__tx,
+.faucet-panel__block-link,
+.faucet-panel__load-more {
+  border-radius: var(--radius-none) !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.32) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(237, 231, 217, 0.08) 0%,
+    rgba(10, 18, 32, 0.35) 100%
+  ) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(237, 231, 217, 0.12),
+    inset 0 -1px 0 rgba(10, 18, 32, 0.4) !important;
+  color: rgba(var(--dock-cyan-rgb), 0.92) !important;
+}
+
+.faucet-panel__row {
+  border-radius: var(--radius-none) !important;
+  border-color: rgba(var(--dock-cyan-rgb), 0.14) !important;
+  background: rgba(10, 18, 32, 0.28) !important;
+}
+
+.faucet-panel__row--head {
+  background: rgba(var(--dock-cyan-rgb), 0.08) !important;
+}
+
+.faucet-panel__value-whole {
+  color: #ede7d9 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(var(--dock-cyan-rgb), 0.35);
+}
+
+.faucet-panel__value-sep {
+  color: rgba(var(--dock-cyan-rgb), 0.9) !important;
+}
+
+.faucet-panel__toast {
+  border-radius: var(--radius-none) !important;
+}

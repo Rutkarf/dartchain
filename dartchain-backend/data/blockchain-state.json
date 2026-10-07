@@ -1,0 +1,718 @@
+{
+  "blocks" : [ {
+    "index" : 0,
+    "timestamp" : 0,
+    "data" : "Genesis Block",
+    "transactions" : [ ],
+    "previousHash" : "0",
+    "hash" : "a91f441ca0f9814c840f485ee3e35d06f55d4e567ca327582db9114070662252",
+    "nonce" : 0,
+    "difficulty" : 4
+  }, {
+    "index" : 1,
+    "timestamp" : 1791144039049,
+    "data" : "System credit to 324cd4b4672212153333a288cfb684b43f433b58",
+    "transactions" : [ {
+      "id" : "62430136-9a69-4338-9c7c-c2b6d951a555",
+      "hash" : "6c94160f7f1334cb5ef51d349b69053411ae6fdd049f9cef309d09f15d91b199",
+      "sender" : "SYSTEM",
+      "recipient" : "324cd4b4672212153333a288cfb684b43f433b58",
+      "amount" : 1.00,
+      "timestamp" : 1791144039048,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "a91f441ca0f9814c840f485ee3e35d06f55d4e567ca327582db9114070662252",
+    "hash" : "0000cee3eba220494879e96ffccc057e00f1982d2b3e267120a559e63a1b8b7a",
+    "nonce" : 9896,
+    "difficulty" : 4
+  }, {
+    "index" : 2,
+    "timestamp" : 1791144039149,
+    "data" : "Mined block with 2 transaction(s)",
+    "transactions" : [ {
+      "id" : "e66a517b-dfd2-4b99-acc6-bd4bf708e739",
+      "hash" : "8204f6b5bd4586541d5818906e5f621ac8a6740c25e93ab080c7a4711069b834",
+      "sender" : "324cd4b4672212153333a288cfb684b43f433b58",
+      "recipient" : "c924b77840c1502dc5f1b98a53a1624862cab60f",
+      "amount" : 0.25,
+      "timestamp" : 1791144039128,
+      "signature" : "AUTHv1:43f1507e-b5e7-4853-ab31-083be7ab8718:bd8ae01d58e47f652f6d932cb7ea84ddf319166b4149dbcc0728203ed989390a",
+      "systemReward" : false,
+      "payload" : "",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "6a59c0a9-8985-4990-9bda-6f6b0968335c",
+      "hash" : "b7d756e4652cdb7d8a366688b8ceacb13c6a41732b902a1ebcab41dafab58a1f",
+      "sender" : "SYSTEM",
+      "recipient" : "324cd4b4672212153333a288cfb684b43f433b58",
+      "amount" : 10.0,
+      "timestamp" : 1791144039149,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "MINING_REWARD",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000cee3eba220494879e96ffccc057e00f1982d2b3e267120a559e63a1b8b7a",
+    "hash" : "0000c94a33e11fad7df0b17dcc47a7fc5a54302449b13d7e238082154dfd201d",
+    "nonce" : 163141,
+    "difficulty" : 4
+  }, {
+    "index" : 3,
+    "timestamp" : 1791144039932,
+    "data" : "System credit to 22dba83551feb4a58f671d953d412c83815552fa",
+    "transactions" : [ {
+      "id" : "a125f4a7-31a7-45e7-af51-346941da2c5a",
+      "hash" : "60ece7166ecf28a5204d03c7be6c3e5c519831a6924426f2bd077e377dec1fda",
+      "sender" : "SYSTEM",
+      "recipient" : "22dba83551feb4a58f671d953d412c83815552fa",
+      "amount" : 1.00,
+      "timestamp" : 1791144039932,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000c94a33e11fad7df0b17dcc47a7fc5a54302449b13d7e238082154dfd201d",
+    "hash" : "0000843fcbf9cf3c3ae9dff7aa189940e4944db88c9dfb57bbed32055a0f1321",
+    "nonce" : 11356,
+    "difficulty" : 4
+  }, {
+    "index" : 4,
+    "timestamp" : 1791144043878,
+    "data" : "System credit to bac3cd2c80708aef2b3fb81d95021cd8cbda0333",
+    "transactions" : [ {
+      "id" : "994d6c44-cfa1-4296-8adb-09f33a137b4c",
+      "hash" : "bfdb9a8c0889077fd96f5818ef4c465ba2861bf6952f170e245b233a8cb02fa9",
+      "sender" : "SYSTEM",
+      "recipient" : "bac3cd2c80708aef2b3fb81d95021cd8cbda0333",
+      "amount" : 1.00,
+      "timestamp" : 1791144043878,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000843fcbf9cf3c3ae9dff7aa189940e4944db88c9dfb57bbed32055a0f1321",
+    "hash" : "000020975483972e2964a87a7766c0279b52f763ad169c89f8c0255b390761c9",
+    "nonce" : 117330,
+    "difficulty" : 4
+  }, {
+    "index" : 5,
+    "timestamp" : 1791144105654,
+    "data" : "secured-block",
+    "transactions" : [ ],
+    "previousHash" : "000020975483972e2964a87a7766c0279b52f763ad169c89f8c0255b390761c9",
+    "hash" : "0000dfb53266dfa8f461683188b9cad9b3b8c819c9b87f0daf7131cc5d8a3f91",
+    "nonce" : 136448,
+    "difficulty" : 4
+  }, {
+    "index" : 6,
+    "timestamp" : 1791144106055,
+    "data" : "System credit to 8ad5c925e9d087fd837b3a7f7c0ed48c68339d6d",
+    "transactions" : [ {
+      "id" : "96ebb2d2-f6bf-43a2-9df0-351135b70e31",
+      "hash" : "54ccbf5c635b090d813b187821a2c610af305043cd160416897403021b8353aa",
+      "sender" : "SYSTEM",
+      "recipient" : "8ad5c925e9d087fd837b3a7f7c0ed48c68339d6d",
+      "amount" : 1.00,
+      "timestamp" : 1791144106055,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000dfb53266dfa8f461683188b9cad9b3b8c819c9b87f0daf7131cc5d8a3f91",
+    "hash" : "0000ab17614f0e7130650a5f203d841debeafadecd6b36885c85ba08cfeed2d1",
+    "nonce" : 109982,
+    "difficulty" : 4
+  }, {
+    "index" : 7,
+    "timestamp" : 1791144106338,
+    "data" : "Mined block with 2 transaction(s)",
+    "transactions" : [ {
+      "id" : "082754b0-2eac-4d5e-a24f-0e11ffb9224d",
+      "hash" : "0fb638ee8233557efe52d944bbd1b8aacc7824179862855844e6cd7eb7d15ecf",
+      "sender" : "22dba83551feb4a58f671d953d412c83815552fa",
+      "recipient" : "02b8c3d3faae61d4f74bde6eb9d5a67f52120f67",
+      "amount" : 0.5,
+      "timestamp" : 1791144039967,
+      "signature" : "AUTHv1:a23a63e9-481d-4d8a-90ce-65a5a203e685:c7034a2d427ffded1c365053633b7928dac4274ad6661470a294073847017d53",
+      "systemReward" : false,
+      "payload" : "phase-l-test",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "31133446-c62b-49f6-9123-23049e819ad8",
+      "hash" : "0853d5a1fc298c78d1fc1944824c705fa7c9559b949dd3119bb80e9e80d96a28",
+      "sender" : "SYSTEM",
+      "recipient" : "8ad5c925e9d087fd837b3a7f7c0ed48c68339d6d",
+      "amount" : 10.0,
+      "timestamp" : 1791144106338,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "MINING_REWARD",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000ab17614f0e7130650a5f203d841debeafadecd6b36885c85ba08cfeed2d1",
+    "hash" : "0000792635486c462846e7397bc38c7c2d7a5ea092a2f0f9a0c61d0607440b60",
+    "nonce" : 9665,
+    "difficulty" : 4
+  }, {
+    "index" : 8,
+    "timestamp" : 1791144106519,
+    "data" : "System credit to 936ddac25fecb2ee1e7d7f4cc059c4570dd10760",
+    "transactions" : [ {
+      "id" : "79854f31-e1b7-4fd6-88dc-418096e83bdd",
+      "hash" : "00f225e546ad6758c00f57fbf663b0266e7f6d2fb21dfe5f18e6ead598484cbd",
+      "sender" : "SYSTEM",
+      "recipient" : "936ddac25fecb2ee1e7d7f4cc059c4570dd10760",
+      "amount" : 1.00,
+      "timestamp" : 1791144106519,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000792635486c462846e7397bc38c7c2d7a5ea092a2f0f9a0c61d0607440b60",
+    "hash" : "00009db21475123fa084c3b9ae90eab5d32e4f27f51ddb37b2134df6c2001e00",
+    "nonce" : 15539,
+    "difficulty" : 4
+  }, {
+    "index" : 9,
+    "timestamp" : 1791144106588,
+    "data" : "Mined block with 2 transaction(s)",
+    "transactions" : [ {
+      "id" : "b922b02e-e235-44ef-aa53-17c979d5a68b",
+      "hash" : "1f3cf785fc429117636bcf50307e60d875c76be2733494154566e0929d5e5c87",
+      "sender" : "936ddac25fecb2ee1e7d7f4cc059c4570dd10760",
+      "recipient" : "71be5e1608f85cf5ebeb2fd2cc7a2d7f933b26c9",
+      "amount" : 0.25,
+      "timestamp" : 1791144106573,
+      "signature" : "AUTHv1:e1e5eac1-d790-42db-b7f5-ee3f483316dd:cb4b0b20208c83247a092fbf02f152b4ac9e0d9f82fa898e7c784229cd204be6",
+      "systemReward" : false,
+      "payload" : "",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "7dc379b8-8426-4063-b0f9-1d4ad461f497",
+      "hash" : "d9d9eef8507f0ebf5ea1ab66d1a191df9f19a89e272b2e533d26b8bf70571f81",
+      "sender" : "SYSTEM",
+      "recipient" : "936ddac25fecb2ee1e7d7f4cc059c4570dd10760",
+      "amount" : 10.0,
+      "timestamp" : 1791144106588,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "MINING_REWARD",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "00009db21475123fa084c3b9ae90eab5d32e4f27f51ddb37b2134df6c2001e00",
+    "hash" : "00000a256853c1e48cc630452c7341332b135bed07b3188dcc1a1eac542a3730",
+    "nonce" : 102891,
+    "difficulty" : 4
+  }, {
+    "index" : 10,
+    "timestamp" : 1791144107065,
+    "data" : "System credit to 4658e599614610eaec03a987daa4fceaa8817b6f",
+    "transactions" : [ {
+      "id" : "0b70b5fd-c13d-40df-af86-480b3024bba8",
+      "hash" : "fd193b4cf63794f3b120e10ba72e568f777f5a08d95fa9e32901b529512366a3",
+      "sender" : "SYSTEM",
+      "recipient" : "4658e599614610eaec03a987daa4fceaa8817b6f",
+      "amount" : 1.00,
+      "timestamp" : 1791144107065,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "00000a256853c1e48cc630452c7341332b135bed07b3188dcc1a1eac542a3730",
+    "hash" : "000097bff8762f2f9b055bb9ceee2194ecb5e729e38859606a93566045b33228",
+    "nonce" : 101631,
+    "difficulty" : 4
+  }, {
+    "index" : 11,
+    "timestamp" : 1791144107478,
+    "data" : "System credit to 251c13096d0c4c85870ac28ec4813fc15e3bc021",
+    "transactions" : [ {
+      "id" : "1aa31025-ca5b-47d3-8928-b0226e39c393",
+      "hash" : "033f70c1d6ca57aa5ed1faf8c67ec8c1ca711cc40ea759517e57393c067a8022",
+      "sender" : "SYSTEM",
+      "recipient" : "251c13096d0c4c85870ac28ec4813fc15e3bc021",
+      "amount" : 1.00,
+      "timestamp" : 1791144107478,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "000097bff8762f2f9b055bb9ceee2194ecb5e729e38859606a93566045b33228",
+    "hash" : "0000ecc1b1d9efe05f2bd6f2462ca4f8084147af76e304e65f3ac515ad0a5bfc",
+    "nonce" : 74038,
+    "difficulty" : 4
+  }, {
+    "index" : 12,
+    "timestamp" : 1791144107743,
+    "data" : "System credit to 6fc35b42705186edcb84d99d0117baabe436c0b1",
+    "transactions" : [ {
+      "id" : "1c3bbbec-ef9d-48c2-8bca-8ae9ef52fe9d",
+      "hash" : "d0d773a7a77db265c6ba16646920ef4b30316683cf4dd58abcf5b6b1c39c9b84",
+      "sender" : "SYSTEM",
+      "recipient" : "6fc35b42705186edcb84d99d0117baabe436c0b1",
+      "amount" : 1.00,
+      "timestamp" : 1791144107743,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000ecc1b1d9efe05f2bd6f2462ca4f8084147af76e304e65f3ac515ad0a5bfc",
+    "hash" : "0000b3c09847df3b9e7a12a5ad09de6b2b286ba46474c2d78d2f986fe10e87db",
+    "nonce" : 223555,
+    "difficulty" : 4
+  }, {
+    "index" : 13,
+    "timestamp" : 1791144108425,
+    "data" : "System credit to 34baf502acf2f237047e0b4f783b6f16a24f6fe1",
+    "transactions" : [ {
+      "id" : "b5730973-e9fb-4861-8487-693043e64b59",
+      "hash" : "04707427167b89cd201d5569e2e3f1577841190255141eeb5ec5c1bbd5726e12",
+      "sender" : "SYSTEM",
+      "recipient" : "34baf502acf2f237047e0b4f783b6f16a24f6fe1",
+      "amount" : 1.00,
+      "timestamp" : 1791144108425,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000b3c09847df3b9e7a12a5ad09de6b2b286ba46474c2d78d2f986fe10e87db",
+    "hash" : "0000bd84978c0088bb489ca39d07c10ebba0e79fc5410c709169c69d448acf6e",
+    "nonce" : 175744,
+    "difficulty" : 4
+  }, {
+    "index" : 14,
+    "timestamp" : 1791144111929,
+    "data" : "System credit to 1efff1bf4572e04d189b4241cc751594c0bb3d1c",
+    "transactions" : [ {
+      "id" : "e9d93c6a-8556-4483-8870-effab4b96c2d",
+      "hash" : "e9a61eb5a8c164205788389ae844fe0725cefe658c2bcfe19921b31ca2806171",
+      "sender" : "SYSTEM",
+      "recipient" : "1efff1bf4572e04d189b4241cc751594c0bb3d1c",
+      "amount" : 1.00,
+      "timestamp" : 1791144111929,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000bd84978c0088bb489ca39d07c10ebba0e79fc5410c709169c69d448acf6e",
+    "hash" : "00007e64d61d14fc4d9926fa815d46a823165329ce5bd5239de20dfa389e81fc",
+    "nonce" : 56281,
+    "difficulty" : 4
+  }, {
+    "index" : 15,
+    "timestamp" : 1791144112418,
+    "data" : "System credit to f8f06b6e24d07c03f547f335566385d62806dc3f",
+    "transactions" : [ {
+      "id" : "c1f956af-967e-4e69-bc67-629efd8570cc",
+      "hash" : "b4ad38879c41f174c4c9e9c1060edbdbfa533268c35a169a4a3662bac3e179bc",
+      "sender" : "SYSTEM",
+      "recipient" : "f8f06b6e24d07c03f547f335566385d62806dc3f",
+      "amount" : 1.00,
+      "timestamp" : 1791144112418,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "00007e64d61d14fc4d9926fa815d46a823165329ce5bd5239de20dfa389e81fc",
+    "hash" : "0000708f1bf308e42e2ebd81e8f30f154ba601c845b4ce329e4c639249cb03dc",
+    "nonce" : 32855,
+    "difficulty" : 4
+  }, {
+    "index" : 16,
+    "timestamp" : 1791144174988,
+    "data" : "System credit to f684197acb038810d32a08a72e4d8afe1076f519",
+    "transactions" : [ {
+      "id" : "d4487371-6493-4e94-a5d3-1b811e6007d4",
+      "hash" : "dfcdfc677604cf8715484dc35fa4829ea28d1d4328083caee7c615e65d9a8891",
+      "sender" : "SYSTEM",
+      "recipient" : "f684197acb038810d32a08a72e4d8afe1076f519",
+      "amount" : 1.00,
+      "timestamp" : 1791144174988,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000708f1bf308e42e2ebd81e8f30f154ba601c845b4ce329e4c639249cb03dc",
+    "hash" : "0000d4c511cb2200588b93b8094e8963215a6076d2ddc46660a24e4c600128a5",
+    "nonce" : 193594,
+    "difficulty" : 4
+  }, {
+    "index" : 17,
+    "timestamp" : 1791144176610,
+    "data" : "System credit to ef6c2c08c45bf01db935e2ce1b801d5e71013653",
+    "transactions" : [ {
+      "id" : "8f4bcd23-a52f-4e42-8c4b-fb4480c7f883",
+      "hash" : "f4644202a983dbbe7d8412142e920db3e223ef965210d6e066f1dbf2309a117c",
+      "sender" : "SYSTEM",
+      "recipient" : "ef6c2c08c45bf01db935e2ce1b801d5e71013653",
+      "amount" : 1.00,
+      "timestamp" : 1791144176610,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000d4c511cb2200588b93b8094e8963215a6076d2ddc46660a24e4c600128a5",
+    "hash" : "0000bb9f0e231ae58a4462a5d1a0489438a4e3cd5813ea54976f6e034e82099a",
+    "nonce" : 22381,
+    "difficulty" : 4
+  }, {
+    "index" : 18,
+    "timestamp" : 1791144176662,
+    "data" : "Mined block with 7 transaction(s)",
+    "transactions" : [ {
+      "id" : "3051c22b-0275-4e7c-beb7-e3b003750011",
+      "hash" : "64e9e07bab66588c6cd595fb50a9fc4590af0df526a8bef0cbc7afe7c329cbd8",
+      "sender" : "4658e599614610eaec03a987daa4fceaa8817b6f",
+      "recipient" : "12e11bba137c5d28c46b41c335cc64fb8d5b4466",
+      "amount" : 0.5,
+      "timestamp" : 1791144107323,
+      "signature" : "AUTHv1:7ba0a718-3066-49b4-bf32-7a5162e439eb:77764cb10b9ec0ffe7270bcd69b64abcee649dbed887738b16d897b59cf4ed19",
+      "systemReward" : false,
+      "payload" : "phase-l-test",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "92066fde-9fb4-419c-b39b-c33e2b0d529f",
+      "hash" : "59e67c90545e20508afa4c3f29119006a9149b48028dd950fede5b88ae8ebb13",
+      "sender" : "SYSTEM",
+      "recipient" : "251c13096d0c4c85870ac28ec4813fc15e3bc021",
+      "amount" : 1E-26,
+      "timestamp" : 1791144107634,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "FAUCET_CLAIM",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "3ddbd1a9-8308-44c9-a61d-9720b90f55ee",
+      "hash" : "03e3c9c643cb73fe621d7c6aad30cfb32872c309fd2fd166429e8fa4893c5275",
+      "sender" : "SYSTEM",
+      "recipient" : "6fc35b42705186edcb84d99d0117baabe436c0b1",
+      "amount" : 1E-26,
+      "timestamp" : 1791144108183,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "FAUCET_CLAIM",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "2a9cf207-c2e5-49e2-b6f7-b6c2462c9541",
+      "hash" : "299323315a1b4c5856824acd46e17f9b222c9ebe89f4f6f4982076a40515d29f",
+      "sender" : "6fc35b42705186edcb84d99d0117baabe436c0b1",
+      "recipient" : "f4d567052c6339df7bc57b40fb9c97c06d64a9f4",
+      "amount" : 0.1,
+      "timestamp" : 1700000123456,
+      "signature" : "MEUCIFog/4QazUuz/qYAtvfKT3UCtLIy6LzJ9AbyLcsy4I4ZAiEA4Y/ea2XjxVdSLETSqoHIklBV5lCM0gV3xvOWQKruRIw=",
+      "systemReward" : false,
+      "payload" : "6fc35b42705186edcb84d99d0117baabe436c0b1|f4d567052c6339df7bc57b40fb9c97c06d64a9f4|0.1|1700000123456|phase-m-signed",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "7a3a031c-8fdf-4c56-82ab-b9f069655aa0",
+      "hash" : "e667021915a6029026ef38beaedac8fd65b69f84b66566bc7dcf7553c035fe79",
+      "sender" : "SYSTEM",
+      "recipient" : "f8f06b6e24d07c03f547f335566385d62806dc3f",
+      "amount" : 1E-26,
+      "timestamp" : 1791144112485,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "FAUCET_CLAIM",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "c1ff4b66-71d8-4f57-9086-69b9e71c94e1",
+      "hash" : "3a26453cc2ec41775edf38716d3b99910339f629c13de5c3e167045b45b78786",
+      "sender" : "SYSTEM",
+      "recipient" : "ef6c2c08c45bf01db935e2ce1b801d5e71013653",
+      "amount" : 1E-26,
+      "timestamp" : 1791144176658,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "FAUCET_CLAIM",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "43f6bb5f-71a4-4560-9289-c6ef7e1d9e0e",
+      "hash" : "bb7a18cae70b4b030f1c7d925c0d8390338dc2d81ca5df5b9bf932638c7e9b7f",
+      "sender" : "SYSTEM",
+      "recipient" : "ef6c2c08c45bf01db935e2ce1b801d5e71013653",
+      "amount" : 10.0,
+      "timestamp" : 1791144176662,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "MINING_REWARD",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000bb9f0e231ae58a4462a5d1a0489438a4e3cd5813ea54976f6e034e82099a",
+    "hash" : "0000be43d7588ae03eabebf8a39ca976a6d2327563ad1a04e37029bf388341dc",
+    "nonce" : 4311,
+    "difficulty" : 4
+  }, {
+    "index" : 19,
+    "timestamp" : 1791144245395,
+    "data" : "System credit to 29a88adc3c7b4020fb56cdfcf836577046ee8a8a",
+    "transactions" : [ {
+      "id" : "22c04c63-89f6-4bd6-aba0-8c6b1bbb098a",
+      "hash" : "8783d1a852906cf65902f8c559e298f152a99fd748927eb090534bb34a99678a",
+      "sender" : "SYSTEM",
+      "recipient" : "29a88adc3c7b4020fb56cdfcf836577046ee8a8a",
+      "amount" : 1.00,
+      "timestamp" : 1791144245394,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000be43d7588ae03eabebf8a39ca976a6d2327563ad1a04e37029bf388341dc",
+    "hash" : "0000f63781944c018242e801c1d877765f35a8849fd038659e8e116992b1317a",
+    "nonce" : 162423,
+    "difficulty" : 4
+  }, {
+    "index" : 20,
+    "timestamp" : 1791144245978,
+    "data" : "Mined block with 2 transaction(s)",
+    "transactions" : [ {
+      "id" : "73389137-9354-48dd-874f-4c61437905ae",
+      "hash" : "3f0ccbd2795645c8c895919edb3d8544049e135d2f82384f11b8ce3f8aec6474",
+      "sender" : "29a88adc3c7b4020fb56cdfcf836577046ee8a8a",
+      "recipient" : "2ed9b1986b5be85287dbdf64e4d8676b6b145416",
+      "amount" : 0.25,
+      "timestamp" : 1791144245958,
+      "signature" : "AUTHv1:74c5a109-63c3-499a-a529-71d426f42c60:c94a6a5b1eea3ed5a8436e69e8ee07c20647f6c5a9ecdbb3189ca86bce478e72",
+      "systemReward" : false,
+      "payload" : "",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "6abf2f55-63b6-43b5-924a-2078639455de",
+      "hash" : "532d31885d37417a1a669d52ca96eb82e7aa3f3debc1ecb4b6a7dbbfc72532d5",
+      "sender" : "SYSTEM",
+      "recipient" : "29a88adc3c7b4020fb56cdfcf836577046ee8a8a",
+      "amount" : 10.0,
+      "timestamp" : 1791144245978,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "MINING_REWARD",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000f63781944c018242e801c1d877765f35a8849fd038659e8e116992b1317a",
+    "hash" : "0000786be97d751364d33ec512f0387ba01fb50a6de2129917b37e3c417a7a36",
+    "nonce" : 41770,
+    "difficulty" : 4
+  }, {
+    "index" : 21,
+    "timestamp" : 1791144246431,
+    "data" : "System credit to b1d50702311fd5887785fcecb0964fe47934eef1",
+    "transactions" : [ {
+      "id" : "4ff62c07-cbf8-4acc-b25f-7ad224c8b017",
+      "hash" : "b5d900111b9573602ee901f740a1bf242dc65964cd1d8b9d7490d6e5bf2073dd",
+      "sender" : "SYSTEM",
+      "recipient" : "b1d50702311fd5887785fcecb0964fe47934eef1",
+      "amount" : 1.00,
+      "timestamp" : 1791144246430,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000786be97d751364d33ec512f0387ba01fb50a6de2129917b37e3c417a7a36",
+    "hash" : "000013bc990f004b5bb70da12e1a489ca7f23635916cfea1fe3785c5f70c1d49",
+    "nonce" : 23476,
+    "difficulty" : 4
+  }, {
+    "index" : 22,
+    "timestamp" : 1791144249092,
+    "data" : "System credit to 60c9591bb3cbeda37534fcf441c893f6e3710a69",
+    "transactions" : [ {
+      "id" : "65230648-c52e-438b-b0db-65f375223437",
+      "hash" : "ea62bd6af0957df20b4b975a15f976f821df2a526f81f1f42d12f847e94f8545",
+      "sender" : "SYSTEM",
+      "recipient" : "60c9591bb3cbeda37534fcf441c893f6e3710a69",
+      "amount" : 1.00,
+      "timestamp" : 1791144249092,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "000013bc990f004b5bb70da12e1a489ca7f23635916cfea1fe3785c5f70c1d49",
+    "hash" : "000010398d7b9712a38b18a480080c2c7c99a611bff18beb0c53ef6699235482",
+    "nonce" : 68457,
+    "difficulty" : 4
+  }, {
+    "index" : 23,
+    "timestamp" : 1791144250435,
+    "data" : "System credit to 38afa7319ee788993e8e95a92787182c5758164c",
+    "transactions" : [ {
+      "id" : "bd97b8df-3996-479f-b02e-40a7c96a4bd0",
+      "hash" : "0f9b2908a7153474013166cbd14ce8f9730db2f491a1da548db5624e765e77fa",
+      "sender" : "SYSTEM",
+      "recipient" : "38afa7319ee788993e8e95a92787182c5758164c",
+      "amount" : 1.00,
+      "timestamp" : 1791144250435,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "QUEST_TASK:daily-login",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "000010398d7b9712a38b18a480080c2c7c99a611bff18beb0c53ef6699235482",
+    "hash" : "0000e7c3346ef58cc6db0f50e83047a4696c55bd1606cf69bbd1ef5d815774ed",
+    "nonce" : 35571,
+    "difficulty" : 4
+  }, {
+    "index" : 24,
+    "timestamp" : 1791144250671,
+    "data" : "Mined block with 2 transaction(s)",
+    "transactions" : [ {
+      "id" : "437c6c43-5b18-4926-bbd9-1924016710df",
+      "hash" : "4cc60a551abaa062e54b591c02c87b402c790f22a8e5403cedf120dd42b7b008",
+      "sender" : "b1d50702311fd5887785fcecb0964fe47934eef1",
+      "recipient" : "9a6485b772f6a02468bc55a49f29f6d19c5acbd5",
+      "amount" : 0.5,
+      "timestamp" : 1791144246494,
+      "signature" : "AUTHv1:6eb667b0-611e-4050-bfea-fe47b6545058:58b9c2f00613211b46db6ab940877d15f7bdf0e728130e31811101c383c5e308",
+      "systemReward" : false,
+      "payload" : "phase-l-test",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "9b9dd8f8-e504-4a00-8cc7-cc79459e5a30",
+      "hash" : "a54600dd84981173cedbf071499835e94e344bfce45766f6398118b83bd218eb",
+      "sender" : "SYSTEM",
+      "recipient" : "38afa7319ee788993e8e95a92787182c5758164c",
+      "amount" : 10.0,
+      "timestamp" : 1791144250671,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "MINING_REWARD",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000e7c3346ef58cc6db0f50e83047a4696c55bd1606cf69bbd1ef5d815774ed",
+    "hash" : "00003cc72c43194cdffd805ec81acae3f6d238d41fdf3b38b3940ccedd23226f",
+    "nonce" : 114076,
+    "difficulty" : 4
+  }, {
+    "index" : 25,
+    "timestamp" : 1791336941505,
+    "data" : "secured-block",
+    "transactions" : [ ],
+    "previousHash" : "00003cc72c43194cdffd805ec81acae3f6d238d41fdf3b38b3940ccedd23226f",
+    "hash" : "0000e9901e26e334732213ee0cf9a75a6b80920f622865cb816930a8866e2886",
+    "nonce" : 27315,
+    "difficulty" : 4
+  }, {
+    "index" : 26,
+    "timestamp" : 1791336941904,
+    "data" : "Mined block with 2 transaction(s)",
+    "transactions" : [ {
+      "id" : "7dcebc66-e3a1-4a38-b012-ce53a070f408",
+      "hash" : "a5e1d5e250150dd3389d7847b7aa160e7ddcc876808dbca3c0027fa9232feed2",
+      "sender" : "a3489d4bfdd095bec97c908d2e5850399c5bd8f1",
+      "recipient" : "d93897b530afc866a1f06258f4de6b605ef4f7ac",
+      "amount" : 0.25,
+      "timestamp" : 1791336941888,
+      "signature" : "AUTHv1:9a6c64a6-af92-4fd3-aea0-169bd1c044a4:01c1740f41881fd1e4828be679a692f975232bb53544aad81576a0977144e495",
+      "systemReward" : false,
+      "payload" : "",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "41b4d019-c680-4324-9e96-2963f8d3a871",
+      "hash" : "48ff8db5df489c10585ef277851045cab837c887a8b6f8507b37d2f0495b8caa",
+      "sender" : "SYSTEM",
+      "recipient" : "a3489d4bfdd095bec97c908d2e5850399c5bd8f1",
+      "amount" : 10.0,
+      "timestamp" : 1791336941903,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "MINING_REWARD",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000e9901e26e334732213ee0cf9a75a6b80920f622865cb816930a8866e2886",
+    "hash" : "0000422368fca74a7c8a3347473869d926469d3b9d91e7323ef9cd99152428f1",
+    "nonce" : 97589,
+    "difficulty" : 4
+  }, {
+    "index" : 27,
+    "timestamp" : 1791336961821,
+    "data" : "Mined block with 6 transaction(s)",
+    "transactions" : [ {
+      "id" : "1b10c9be-d958-4d6e-9a31-cde8eacc4100",
+      "hash" : "f109e79b934682d83cdf246a642d3314ab54cdd90ed12d0d1043b6f67b7f53e2",
+      "sender" : "321bec553c8064d7d3cde3b2a6b8e44d75101d5b",
+      "recipient" : "b20e9ea106e31e6afae22cd9a38513d6b113ceb7",
+      "amount" : 0.5,
+      "timestamp" : 1791336942376,
+      "signature" : "AUTHv1:d893ac9c-d969-4371-b889-3c4507ba267a:cf494b551ac384922206514e2895723974f737a8a18fee1ed2a4a6b3818f78bc",
+      "systemReward" : false,
+      "payload" : "phase-l-test",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "38163765-87dc-4b95-914f-5522020acb4c",
+      "hash" : "a5ac7f2a1346aeaa8c2de9e19cb8bfe571d1387eeeeb335615a6b65a379b2175",
+      "sender" : "SYSTEM",
+      "recipient" : "57f817cc4812bb0b7d24581ce5e55ed2d2fb679d",
+      "amount" : 1E-26,
+      "timestamp" : 1791336942493,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "FAUCET_CLAIM",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "c6d14cb6-abcb-426c-881e-f46b69772332",
+      "hash" : "01ec4cd7518aac4e4b84a94939e90f751ec2cf7c6ce8cdcae11566cb2ba98c37",
+      "sender" : "SYSTEM",
+      "recipient" : "9b856b3dd232136710e06f9718ba464db78da34d",
+      "amount" : 1E-26,
+      "timestamp" : 1791336942624,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "FAUCET_CLAIM",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "8d052e13-b680-4778-b549-cc9500fead71",
+      "hash" : "d932f5375bbef98b50c7e07e535663f10bfb8957e846d409e068509e6f2ac7ef",
+      "sender" : "SYSTEM",
+      "recipient" : "ab7ef10dc2b4902b612817c6fb480c4b315b3b2e",
+      "amount" : 1E-26,
+      "timestamp" : 1791336945330,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "FAUCET_CLAIM",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "9aa4e090-a347-4c02-a176-1c62e79e8728",
+      "hash" : "d8c12de32bcfa013160d9aa93272ca796d0f96b53a3130b0068b9c39526978db",
+      "sender" : "SYSTEM",
+      "recipient" : "95a02906d0462c3e8f8a1efada7e13e4bb77d2c7",
+      "amount" : 1E-26,
+      "timestamp" : 1791336961814,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "FAUCET_CLAIM",
+      "status" : "CONFIRMED"
+    }, {
+      "id" : "b986fb17-6619-4022-9eab-f495b9c552a9",
+      "hash" : "95574c034b18dc6f3c56e6fad7c4376b6277e5a3a854ba4ae8da3cfe460fa3ed",
+      "sender" : "SYSTEM",
+      "recipient" : "95a02906d0462c3e8f8a1efada7e13e4bb77d2c7",
+      "amount" : 10.0,
+      "timestamp" : 1791336961821,
+      "signature" : "SYSTEM",
+      "systemReward" : true,
+      "payload" : "MINING_REWARD",
+      "status" : "CONFIRMED"
+    } ],
+    "previousHash" : "0000422368fca74a7c8a3347473869d926469d3b9d91e7323ef9cd99152428f1",
+    "hash" : "0000ca921503c4bda3b442fedfc1fa0aaa89092f6263c65b52172e28043311b3",
+    "nonce" : 103968,
+    "difficulty" : 4
+  } ],
+  "pendingPool" : [ ]
+}

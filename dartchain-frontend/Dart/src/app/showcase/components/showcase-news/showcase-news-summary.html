@@ -1,0 +1,111 @@
+<div
+ class="news-summary-bar"
+ role="button"
+ tabindex="0"
+ aria-live="polite"
+ (click)="onBarClick($event)"
+ (keydown.enter)="onBarKeydown($event)"
+ (keydown.space)="onBarKeydown($event)"
+>
+  <!-- Chip hors du 1fr : même 22×7 que la liste dépliée, P2P / NET / INFO identiques -->
+  <span class="news-summary-bar__cat" [attr.data-category]="categorySlug()">
+    <span
+      class="news-summary-bar__pastille"
+      aria-hidden="true"
+      [attr.data-category]="categorySlug()"
+    ></span>
+    <span
+      class="showcase-news__tag"
+      [attr.data-category]="categorySlug()"
+    >
+      <span
+        class="showcase-news__tag-badge"
+        [attr.title]="newsState.categoryLabel(activeItem()?.category ?? 'INFO')"
+      >
+        {{ categoryBadge() }}
+      </span>
+    </span>
+  </span>
+
+  <div class="news-summary-bar__headline-wrap">
+    @if (loading()) {
+      <span class="news-summary-bar__headline news-summary-bar__headline--muted">Chargement…</span>
+    } @else {
+      <span
+        class="news-summary-bar__headline-stack"
+        [class.is-transitioning]="isTransitioning()"
+        [attr.data-rotation]="activeHeadlineIndex()"
+      >
+        @if (isTransitioning() && previousHeadlineTitle()) {
+          <span
+            class="news-summary-bar__headline news-summary-bar__headline--out"
+            [attr.title]="previousHeadlineTitle()"
+          >
+            {{ previousHeadlineTitle() }}
+          </span>
+        }
+        <span
+          class="news-summary-bar__headline"
+          [class.news-summary-bar__headline--muted]="!activeItem() && !newsState.collapsedPrimaryItem()"
+          [class.news-summary-bar__headline--in]="isTransitioning()"
+          [attr.title]="headlineTitle()"
+          [style.fontSize]="'var(--fs-module)'"
+          [style.fontWeight]="600"
+          [style.lineHeight]="1.1"
+        >
+          {{ headlineTitle() }}
+        </span>
+      </span>
+    }
+  </div>
+
+  @if (headlineAge()) {
+    <span class="news-summary-bar__age-stack" [class.is-transitioning]="isTransitioning()">
+      @if (isTransitioning() && previousHeadlineAge()) {
+        <span
+          class="news-summary-bar__age news-summary-bar__age--out"
+          [style.fontSize]="'var(--fs-module)'"
+          [style.fontWeight]="600"
+        >{{ previousHeadlineAge() }}</span>
+      }
+      <span
+        class="news-summary-bar__age"
+        [class.news-summary-bar__age--in]="isTransitioning()"
+        [style.fontSize]="'var(--fs-module)'"
+        [style.fontWeight]="600"
+      >{{ headlineAge() }}</span>
+    </span>
+  }
+
+  <div class="news-summary-bar__actions" aria-label="Navigation entre actualités">
+    <button
+      type="button"
+      class="news-summary-bar__action-btn"
+      [disabled]="!canNavigatePrev()"
+      aria-label="Actualité précédente"
+      (click)="navigatePrev($event)"
+    ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-left"/></svg></button>
+    <button
+      type="button"
+      class="news-summary-bar__action-btn"
+      [disabled]="!canNavigateNext()"
+      aria-label="Actualité suivante"
+      (click)="navigateNext($event)"
+    ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"/></svg></button>
+    <button
+ type="button"
+ class="news-summary-bar__action-btn news-summary-bar__action-btn--copy"
+ [class.is-copied]="copied()"
+ [class.is-failed]="copyFailed()"
+ [attr.aria-live]="copied() || copyFailed() ? 'polite' : null"
+ [attr.title]="copyButtonLabel()"
+ (click)="copyCurrent($event)"
+ >
+      @if (copied()) {
+        <span class="news-summary-bar__copy-ok" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span>
+      } @else {
+        <svg class="news-summary-bar__copy-icon icon" aria-hidden="true" focusable="false"><use href="#icon-copy"/></svg>
+      }
+    </button>
+  </div>
+</div>

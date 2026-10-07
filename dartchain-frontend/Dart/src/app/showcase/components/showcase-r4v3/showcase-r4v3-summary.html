@@ -1,0 +1,54 @@
+<div
+ class="r4v3-summary-bar"
+ role="button"
+ tabindex="0"
+ aria-live="polite"
+ (click)="onBarClick($event)"
+ (keydown.enter)="onBarKeydown($event)"
+ (keydown.space)="onBarKeydown($event)"
+>
+  <span class="r4v3-summary-bar__peg">
+    <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--token">1 R4V3</span>
+    <span class="r4v3-summary-bar__peg-eq" aria-hidden="true">=</span>
+    <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--fiat">1 CHF</span>
+  </span>
+
+  <span
+    class="r4v3-summary-bar__pillar"
+    [attr.title]="pillarLabel() + ' · ' + pillarDetail()"
+    aria-live="polite"
+  >
+    <span class="r4v3-summary-bar__pillar-stack" [class.is-transitioning]="isPillarTransitioning()">
+      @if (isPillarTransitioning() && previousPillarLabel()) {
+        <span class="r4v3-summary-bar__pillar-line r4v3-summary-bar__pillar-line--out">
+          <span class="r4v3-summary-bar__pillar-label">{{ previousPillarLabel() }}</span>
+          @if (previousPillarDetail()) {
+            <span class="r4v3-summary-bar__pillar-sep" aria-hidden="true">·</span>
+            <span class="r4v3-summary-bar__pillar-detail">{{ previousPillarDetail() }}</span>
+          }
+        </span>
+      }
+
+      <span class="r4v3-summary-bar__pillar-line" [class.r4v3-summary-bar__pillar-line--in]="isPillarTransitioning()">
+        <span class="r4v3-summary-bar__pillar-label">{{ pillarLabel() }}</span>
+        @if (pillarDetail()) {
+          <span class="r4v3-summary-bar__pillar-sep" aria-hidden="true">·</span>
+          <span class="r4v3-summary-bar__pillar-detail">{{ pillarDetail() }}</span>
+        }
+      </span>
+    </span>
+  </span>
+
+  <button
+    type="button"
+    class="r4v3-summary-bar__wp-btn"
+    (click)="onWhitepaper($event)"
+    [attr.aria-label]="whitepaperAriaLabel()"
+    [attr.aria-busy]="whitepaperLoading()"
+    [attr.title]="whitepaperLoading() ? 'Téléchargement…' : 'Télécharger le white paper R4V3'"
+  >
+    <span class="r4v3-summary-bar__wp-btn-icon" aria-hidden="true">
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-file-down"/></svg>
+    </span>
+  </button>
+</div>

@@ -1,0 +1,120 @@
+@if (tour.active()) {
+  <div
+    class="onboarding-tour"
+    [class.onboarding-tour--paused]="tour.paused()"
+    [class.onboarding-tour--park]="tour.step()?.id === 'park'"
+    [class.onboarding-tour--reduced]="tour.reducedMotion()"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'onboarding-tour-title'"
+    [attr.aria-describedby]="'onboarding-tour-body'"
+  >
+    <div class="onboarding-tour__veil-layer" aria-hidden="true">
+      <svg
+        class="onboarding-tour__veil"
+        [attr.viewBox]="veilShape().viewBox"
+        preserveAspectRatio="none"
+      >
+        <path
+          class="onboarding-tour__veil-shape"
+          fill-rule="evenodd"
+          [attr.d]="veilShape().d"
+        />
+      </svg>
+      <div
+        class="onboarding-tour__veil-catch"
+        [style.clip-path]="veilClip()"
+      ></div>
+    </div>
+
+    @if (hole(); as spot) {
+      <div
+        class="onboarding-tour__spotlight"
+        aria-hidden="true"
+        [style.top.px]="spot.top"
+        [style.left.px]="spot.left"
+        [style.width.px]="spot.width"
+        [style.height.px]="spot.height"
+      ></div>
+    }
+
+    @if (showTourToken()) {
+      <div
+        class="onboarding-tour__token"
+        [class.onboarding-tour__token--from-handoff]="!!tour.entryPose()"
+        aria-hidden="true"
+        [style.top.px]="tokenPose().top"
+        [style.left.px]="tokenPose().left"
+        [style.width.px]="tokenPose().size"
+        [style.height.px]="tokenPose().size"
+      >
+        <app-tour-logo-traveler
+          [reducedMotion]="tour.reducedMotion()"
+          [spinning]="tour.step()?.id !== 'park'"
+        />
+      </div>
+    }
+
+    @let bubble = bubbleLayout();
+    <div
+ class="onboarding-tour__bubble"
+ [class.onboarding-tour__bubble--below]="bubble.placement === 'below'"
+ [class.onboarding-tour__bubble--above]="bubble.placement === 'above'"
+ [class.onboarding-tour__bubble--left]="bubble.placement === 'left'"
+ [class.onboarding-tour__bubble--right]="bubble.placement === 'right'"
+ [style.top.px]="bubble.top"
+ [style.left.px]="bubble.left"
+ [style.width.px]="bubble.width"
+ [style.--tail-offset.px]="bubble.tailOffset"
+ role="group"
+ >
+      <span class="onboarding-tour__bubble-tail" aria-hidden="true"></span>
+
+      <div class="onboarding-tour__top">
+        <span class="onboarding-tour__kicker">{{ ui().kicker }}</span>
+        <button
+          type="button"
+          class="onboarding-tour__skip"
+          (click)="skip($event)"
+        >
+          {{ ui().skip }}
+        </button>
+      </div>
+
+      @if (stepView(); as step) {
+        <h2 class="onboarding-tour__title" id="onboarding-tour-title">
+          {{ step.title }}
+        </h2>
+        <p class="onboarding-tour__body" id="onboarding-tour-body">
+          {{ step.body }}
+        </p>
+      }
+
+      @if (tour.paused()) {
+        <p class="onboarding-tour__hint">{{ ui().pausedHint }}</p>
+      }
+
+      <div class="onboarding-tour__footer">
+        <div class="onboarding-tour__actions">
+          <button
+            type="button"
+            class="onboarding-tour__btn onboarding-tour__btn--ghost"
+            [disabled]="tour.paused() || tour.isFirstStep()"
+            (click)="back($event)"
+          >
+            {{ ui().back }}
+          </button>
+          <button
+            type="button"
+            class="onboarding-tour__btn onboarding-tour__btn--primary"
+            [disabled]="tour.paused()"
+            (click)="next($event)"
+          >
+            {{ tour.isLastStep() ? ui().ok : ui().next }}
+          </button>
+        </div>
+        <span class="onboarding-tour__progress">{{ tour.progressLabel() }}</span>
+      </div>
+    </div>
+  </div>
+}

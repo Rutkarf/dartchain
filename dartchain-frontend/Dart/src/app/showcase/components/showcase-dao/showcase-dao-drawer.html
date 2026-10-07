@@ -1,0 +1,268 @@
+@if (card(); as item) {
+  <div class="dao-drawer-backdrop" (click)="dismiss()">
+    <aside
+      #drawerPanel
+      class="dao-drawer news-insight-panel ds-surface ds-surface--card"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      [appFocusTrap]="!subDrawer()"
+      [attr.aria-labelledby]="'daoDrawerTitle-' + item.id"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="dao-drawer__head">
+        <div class="dao-drawer__brand">
+          @if (item.logoUrl) {
+            <img class="dao-drawer__logo" [src]="item.logoUrl" [alt]="item.name" width="12" height="12" />
+          } @else {
+            <span class="dao-drawer__logo dao-drawer__logo--placeholder" aria-hidden="true">{{ initials(item) }}</span>
+          }
+          <div class="dao-drawer__titles">
+            <h3 class="dao-drawer__title" [id]="'daoDrawerTitle-' + item.id">
+              {{ item.name }}
+              <span class="dao-drawer__symbol">{{ item.symbol }}</span>
+            </h3>
+            <div class="dao-drawer__meta">
+              <span
+                class="dao-drawer__chip"
+                [class.dao-drawer__chip--active]="item.status === 'active'"
+                [class.dao-drawer__chip--creating]="item.status === 'creating'"
+                [class.dao-drawer__chip--closed]="item.status === 'closed'"
+              >
+                {{ statusLabel(item) }}
+              </span>
+              @if (item.chain) {
+                <span class="dao-drawer__chip dao-drawer__chip--muted">{{ item.chain }}</span>
+              }
+              <span class="dao-drawer__chip dao-drawer__chip--muted">{{ roleLabel() }}</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="dao-drawer__close" aria-label="Fermer" (click)="dismiss()">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+        </button>
+      </header>
+
+      <div class="dao-drawer__body">
+        <section class="dao-drawer__telemetry">
+          <div class="dao-drawer__metric">
+            <span class="dao-drawer__metric-k">Prop</span>
+            <span class="dao-drawer__metric-v">{{ item.proposalsCount }}</span>
+          </div>
+          <div class="dao-drawer__metric">
+            <span class="dao-drawer__metric-k">Votes</span>
+            <span class="dao-drawer__metric-v">{{ item.votesCount }}</span>
+          </div>
+          <div class="dao-drawer__metric">
+            <span class="dao-drawer__metric-k">Memb</span>
+            <span class="dao-drawer__metric-v">{{ item.membersActive }}</span>
+          </div>
+          <div class="dao-drawer__metric">
+            <span class="dao-drawer__metric-k">Live</span>
+            <span class="dao-drawer__metric-v">
+              <span class="dao-drawer__live-dot" aria-hidden="true"></span>
+              {{ openProposals() }}
+            </span>
+          </div>
+        </section>
+
+        <section class="dao-drawer__pwr">
+          <span class="dao-drawer__pwr-label">Pwr {{ xpPercent(item) }}%</span>
+          <span class="dao-drawer__pwr-bar" aria-hidden="true">
+            <span class="dao-drawer__pwr-fill" [style.width.%]="xpPercent(item)"></span>
+          </span>
+        </section>
+
+        <div class="dao-drawer__split">
+          <section class="dao-drawer__intel">
+            <div class="dao-drawer__block">
+              <span class="dao-drawer__block-k">Brief</span>
+              <p class="dao-drawer__block-v">{{ item.summary }}</p>
+            </div>
+            <div class="dao-drawer__block">
+              <span class="dao-drawer__block-k">Mission</span>
+              <p class="dao-drawer__block-v">{{ item.objective }}</p>
+            </div>
+          </section>
+
+          <section class="dao-drawer__gov">
+            <div class="dao-drawer__gov-head">
+              <span class="dao-drawer__sec-label">Ouvertes</span>
+              <span class="dao-drawer__gov-count">{{ openProposals() }}</span>
+            </div>
+            @if (previewQuestions().length === 0) {
+              <p class="dao-drawer__empty">Aucune décision ouverte</p>
+            } @else {
+              <ul class="dao-drawer__questions">
+                @for (question of previewQuestions(); track question.id) {
+                  <li class="dao-drawer__question">
+                    <p class="dao-drawer__question-title">{{ question.title }}</p>
+                    <div class="dao-drawer__question-meta">
+                      <button
+ type="button"
+ class="dao-drawer__vote-btn"
+ [class.dao-drawer__vote-btn--active]="question.userVote === 'UP'"
+ (click)="voteQuestion(question, 'UP')"
+ >
+                        ▲ {{ question.upvotes }}
+                      </button>
+                      <button
+ type="button"
+ class="dao-drawer__vote-btn"
+ [class.dao-drawer__vote-btn--active]="question.userVote === 'DOWN'"
+ (click)="voteQuestion(question, 'DOWN')"
+ >
+                        ▼ {{ question.downvotes }}
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ul>
+              @if (hiddenQuestionCount() > 0) {
+                <p class="dao-drawer__more">+{{ hiddenQuestionCount() }} dans Détail</p>
+              }
+            }
+          </section>
+        </div>
+
+        <footer class="dao-drawer__foot">
+          <button type="button" class="dao-drawer__foot-btn" (click)="openSub('proposal')">
+            Proposition
+          </button>
+          <button type="button" class="dao-drawer__foot-btn dao-drawer__foot-btn--accent" (click)="openSub('detail')">
+            Détail
+          </button>
+        </footer>
+      </div>
+    </aside>
+  </div>
+
+  @if (subDrawer(); as mode) {
+    <div class="dao-sub-backdrop" (click)="closeSub()">
+      <aside
+        #subDrawerPanel
+        class="dao-sub-drawer ds-surface ds-surface--card"
+        role="dialog"
+        aria-modal="true"
+        tabindex="-1"
+        [appFocusTrap]="true"
+        [attr.aria-labelledby]="mode === 'proposal' ? 'daoSubProposalTitle' : 'daoSubDetailTitle'"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="dao-sub-drawer__head">
+          <div class="dao-sub-drawer__head-copy">
+            <p class="dao-sub-drawer__eyebrow">D.A.O · {{ item.symbol }}</p>
+            <h3
+              class="dao-sub-drawer__title"
+              [id]="mode === 'proposal' ? 'daoSubProposalTitle' : 'daoSubDetailTitle'"
+            >
+              {{ mode === 'proposal' ? 'Nouvelle proposition' : 'Détail gouvernance' }}
+            </h3>
+          </div>
+          <button type="button" class="dao-sub-drawer__close" aria-label="Fermer" (click)="closeSub()">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+          </button>
+        </header>
+
+        @if (mode === 'proposal') {
+          <div class="dao-sub-drawer__body dao-sub-drawer__body--form">
+            @if (!canAsk()) {
+              <p class="dao-sub-drawer__hint">Connectez-vous pour publier une proposition.</p>
+              <button type="button" class="dao-sub-drawer__login" (click)="promptLogin()">Connexion</button>
+            } @else {
+              <form class="dao-sub-drawer__form" (ngSubmit)="submitQuestion()">
+                <label class="dao-sub-drawer__field">
+                  <span class="dao-sub-drawer__label">Proposition *</span>
+                  <input
+                    type="text"
+                    name="daoAskTitle"
+                    [ngModel]="askTitle()"
+                    (ngModelChange)="askTitle.set($event)"
+                    placeholder="Titre de la décision…"
+                    required
+                    minlength="8"
+                    maxlength="120"
+                  />
+                </label>
+                <label class="dao-sub-drawer__field dao-sub-drawer__field--grow">
+                  <span class="dao-sub-drawer__label">Détail *</span>
+                  <textarea
+                    name="daoAskBody"
+                    rows="5"
+                    [ngModel]="askBody()"
+                    (ngModelChange)="askBody.set($event)"
+                    placeholder="Contexte, objectifs, impact…"
+                    required
+                    minlength="12"
+                    maxlength="800"
+                  ></textarea>
+                </label>
+                @if (submitMessage(); as msg) {
+                  <p class="dao-sub-drawer__feedback" [class.is-ok]="formSuccess()">{{ msg }}</p>
+                }
+                <button type="submit" class="dao-sub-drawer__submit" [disabled]="formSuccess()">
+                  {{ formSuccess() ? 'Publié' : 'Publier' }}
+                </button>
+              </form>
+            }
+          </div>
+        } @else {
+          <div class="dao-sub-drawer__body dao-sub-drawer__body--detail">
+            <section class="dao-sub-drawer__block">
+              <h4 class="dao-sub-drawer__block-title">Brief</h4>
+              <p class="dao-sub-drawer__prose">{{ item.summary }}</p>
+            </section>
+            <section class="dao-sub-drawer__block">
+              <h4 class="dao-sub-drawer__block-title">Mission</h4>
+              <p class="dao-sub-drawer__prose">{{ item.objective }}</p>
+            </section>
+            <section class="dao-sub-drawer__block">
+              <h4 class="dao-sub-drawer__block-title">Intel</h4>
+              <p class="dao-sub-drawer__prose">{{ intelText(item) }}</p>
+            </section>
+            <section class="dao-sub-drawer__block dao-sub-drawer__block--props">
+              <div class="dao-sub-drawer__block-head">
+                <h4 class="dao-sub-drawer__block-title">Propositions</h4>
+                <span class="dao-sub-drawer__count">{{ questions().length }}</span>
+              </div>
+              @if (questions().length === 0) {
+                <p class="dao-sub-drawer__hint">Aucune proposition pour l’instant.</p>
+              } @else {
+                <ul class="dao-sub-drawer__questions">
+                  @for (question of questions(); track question.id) {
+                    <li class="dao-sub-drawer__question">
+                      <div class="dao-sub-drawer__question-head">
+                        <strong>{{ question.title }}</strong>
+                        <span class="dao-sub-drawer__question-meta">
+                          <button
+                            type="button"
+                            class="dao-drawer__vote-btn"
+                            [class.dao-drawer__vote-btn--active]="question.userVote === 'UP'"
+                            (click)="voteQuestion(question, 'UP')"
+                          >
+                            ▲ {{ question.upvotes }}
+                          </button>
+                          <button
+                            type="button"
+                            class="dao-drawer__vote-btn"
+                            [class.dao-drawer__vote-btn--active]="question.userVote === 'DOWN'"
+                            (click)="voteQuestion(question, 'DOWN')"
+                          >
+                            ▼ {{ question.downvotes }}
+                          </button>
+                        </span>
+                      </div>
+                      @if (question.body) {
+                        <p class="dao-sub-drawer__prose">{{ question.body }}</p>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            </section>
+          </div>
+        }
+      </aside>
+    </div>
+  }
+}

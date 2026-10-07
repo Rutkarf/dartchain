@@ -1,0 +1,30 @@
+dartchain:
+  persistence:
+    mode: postgres
+  oauth:
+    # Dev local sans CLIENT_ID : mock qui crée quand même le compte en Postgres.
+    # Dès qu’un OAUTH_*_CLIENT_ID/SECRET est fourni, le vrai fournisseur prend le dessus.
+    dev-mock-enabled: ${OAUTH_DEV_MOCK_ENABLED:true}
+    backend-base-url: ${OAUTH_BACKEND_BASE_URL:http://localhost:8080}
+    frontend-callback-url: ${OAUTH_FRONTEND_CALLBACK_URL:http://localhost:4200/}
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:dartchain}}
+    username: ${DATABASE_USERNAME:dartchain}
+    password: ${DATABASE_PASSWORD:dartchain}
+    hikari:
+      maximum-pool-size: ${DATABASE_POOL_SIZE:10}
+      minimum-idle: 2
+      connection-timeout: 30000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration

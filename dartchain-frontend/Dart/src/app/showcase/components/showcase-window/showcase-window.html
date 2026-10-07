@@ -1,0 +1,118 @@
+<section
+ class="showcase-window"
+ [attr.data-active-tab]="activeTab"
+>
+  <div
+    class="showcase-window__body"
+    [id]="'showcase-panel-' + activeTab"
+    role="tabpanel"
+    [attr.aria-labelledby]="'showcase-tab-' + activeTab"
+  >
+    <!-- Un seul panneau visible : l’onglet actif. Le rail reste inactif, sans pile à droite. -->
+    <app-depth-rail
+      class="showcase-window__rail"
+      preset="shell"
+      mode="navigate"
+      [loop]="false"
+      [enabled]="false"
+      [activeIndex]="tabIndex()"
+      itemSelector=".showcase-tab-panel"
+    >
+      <div
+        class="showcase-tab-panel ds-surface ds-surface--card"
+        data-shell-label="CHAT"
+        [hidden]="activeTab !== 'rv23'"
+      >
+        @if (collapsed) {
+          <app-showcase-chat-summary />
+        } @else {
+          @defer (on immediate) {
+            <app-showcase-chat [isExpanded]="true" />
+          } @placeholder {
+            <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+          }
+        }
+      </div>
+
+      <div
+        class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--dao"
+        data-shell-label="D.A.O"
+        [hidden]="activeTab !== 'daonews'"
+      >
+        @if (collapsed) {
+          <app-showcase-dao-summary />
+        } @else {
+          @defer (on immediate) {
+            <app-showcase-dao [isExpanded]="true" />
+          } @placeholder {
+            <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+          }
+        }
+      </div>
+
+      <div
+        class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--launch"
+        data-shell-label="LABZ"
+        [hidden]="activeTab !== 'dao'"
+      >
+        @if (collapsed) {
+          <app-showcase-launch-summary />
+        } @else {
+          @defer (on immediate) {
+            <app-showcase-launch [isExpanded]="true" />
+          } @placeholder {
+            <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+          }
+        }
+      </div>
+
+      <div
+        class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--market"
+        data-shell-label="MARCHÉ"
+        [hidden]="activeTab !== 'market'"
+      >
+        @if (collapsed) {
+          <app-dock-market-summary />
+        } @else {
+          @defer (on immediate) {
+            <app-market-panel />
+          } @placeholder {
+            <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+          }
+        }
+      </div>
+
+      <div
+        class="showcase-tab-panel ds-surface ds-surface--card showcase-tab-panel--r4v3"
+        data-shell-label="R4V3"
+        [hidden]="activeTab !== 'r4v3'"
+      >
+        @if (collapsed) {
+          <app-showcase-r4v3-summary />
+        } @else {
+          @defer (on immediate) {
+            <app-showcase-r4v3 [isExpanded]="true" />
+          } @placeholder {
+            <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+          }
+        }
+      </div>
+
+      <div
+        class="showcase-tab-panel ds-surface ds-surface--card"
+        data-shell-label="NEWS"
+        [hidden]="activeTab !== 'tours'"
+      >
+        @if (collapsed) {
+          <app-showcase-news-summary />
+        } @else {
+          @defer (on immediate) {
+            <app-showcase-news [isExpanded]="true" />
+          } @placeholder {
+            <p class="showcase-window__defer" aria-busy="true">Chargement…</p>
+          }
+        }
+      </div>
+    </app-depth-rail>
+  </div>
+</section>

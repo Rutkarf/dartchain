@@ -1,0 +1,156 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  --dock-tab-cyan: var(--tab-push-cyan, var(--ds-neon-cyan, #8b9dad));
+  --dock-tab-cyan-rgb: var(--tab-push-cyan-rgb, var(--ds-neon-cyan-rgb, 139, 157, 173));
+  --dock-hub-tab-h: var(--dock-hub-tab-h, var(--showcase-hub-tab-h, 15px));
+  --dock-hub-tab-w: var(--dock-hub-tab-w, clamp(2rem, 10vw, 2.75rem));
+}
+
+:host-context(.dock-header-tabs) {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  height: 100%;
+}
+
+:host-context(.dock-header-tabs) .dock-tabstrip {
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+}
+
+:host-context(.dock-header-tabs) .dock-tabs {
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: var(--tab-push-gap, 1px);
+  width: fit-content;
+  max-width: 100%;
+  height: 100%;
+  padding: 1px;
+  margin: 0;
+}
+
+.dock-tabstrip {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: 100%;
+  min-width: 0;
+  height: var(--dock-hub-tab-h);
+  min-height: var(--dock-hub-tab-h);
+  max-height: var(--dock-hub-tab-h);
+  overflow: visible;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.dock-tabstrip .dock-tabs {
+  pointer-events: auto;
+}
+
+.dock-tabs {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: var(--tab-push-gap, 1px);
+  width: fit-content;
+  max-width: 100%;
+  height: var(--dock-hub-tab-h);
+  min-height: var(--dock-hub-tab-h);
+  max-height: var(--dock-hub-tab-h);
+  padding: 1px;
+  margin: 0;
+  overflow: visible;
+  box-sizing: border-box;
+  border: none;
+}
+
+.dock-tab {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: max-content;
+  max-width: none;
+  min-height: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0 2px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: var(--tab-push-radius, 0);
+  color: var(--tab-push-label-idle, rgba(139, 157, 173, 0.52));
+  font-family: inherit;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: unset;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  touch-action: manipulation;
+}
+
+.dock-tab:focus {
+  outline: none;
+}
+
+.dock-tab:focus-visible {
+  outline: 1px solid rgba(var(--dock-tab-cyan-rgb), 0.9);
+  outline-offset: 1px;
+}
+
+.dock-tab-label {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: visible;
+  min-width: min-content;
+  color: inherit;
+  font-family: 'Roboto', sans-serif;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  font-style: normal;
+  transform: skewX(-11deg);
+  transform-origin: center center;
+}
+
+.dock-tab.is-active .dock-tab-label {
+  font-weight: 800;
+}
+
+@media (max-width: 500px) {
+  .dock-tab,
+  .dock-tab-label {
+    font-size: var(--fs-label);
+  }
+}
+
+@media (max-width: 349px) {
+  .dock-tab {
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+    padding: 0 1px;
+  }
+}
+
+@media (max-width: 299px) {
+  .dock-tab {
+    touch-action: manipulation;
+  }
+}

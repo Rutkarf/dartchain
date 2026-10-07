@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: data-import
+
+dartchain:
+  data-import:
+    enabled: true
+    exit-after-import: true

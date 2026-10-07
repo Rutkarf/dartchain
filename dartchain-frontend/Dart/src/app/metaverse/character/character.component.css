@@ -1,0 +1,26 @@
+:host {
+  display: contents;
+}
+
+.character-host {
+  display: none;
+}
+
+.climb-prompt {
+  position: fixed;
+  left: 50%;
+  bottom: max(96px, calc(12% + env(safe-area-inset-bottom, 0px)));
+  transform: translateX(-50%);
+  z-index: 1100;
+  pointer-events: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-sm);
+  font-family: 'Roboto', sans-serif;
+  font-size: var(--fs-label);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #0a1220;
+  background: rgba(9, 129, 74, 0.88);
+  border: 1px solid rgba(9, 129, 74, 0.65);
+  box-shadow: 0 2px 12px rgba(10, 18, 32, 0.25);
+}

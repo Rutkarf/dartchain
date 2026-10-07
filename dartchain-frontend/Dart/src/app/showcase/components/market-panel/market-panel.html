@@ -1,0 +1,74 @@
+<section
+ class="market-panel ds-surface ds-surface--showcase-body"
+ [class.is-drawer-open]="!!drawerRow()"
+ tabindex="0"
+>
+  <aside class="market-panel__rail">
+    @for (option of categoryRail; track option.id) {
+      <button
+        type="button"
+        class="market-panel__rail-btn"
+        [class.is-active]="isFilterActive(option.id)"
+        (click)="setFilter(option.id)"
+      >
+        <span class="market-panel__rail-label">{{ option.label }}</span>
+      </button>
+    }
+  </aside>
+
+  <div class="market-panel__main">
+    <header class="market-panel__toolbar">
+      <span class="market-panel__count" aria-live="polite">{{ resultCountLabel() }}</span>
+      <label class="market-panel__search">
+        <input
+          type="search"
+          class="market-panel__search-input"
+          placeholder="Rechercher un produit"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchInput($event)"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Rechercher un produit"
+        />
+        <span class="market-panel__search-icon" aria-hidden="true">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+        </span>
+      </label>
+    </header>
+
+    @if (statusBanner(); as banner) {
+      <div
+        class="market-panel__banner"
+        [class.market-panel__banner--error]="banner.tone === 'error'"
+        [class.market-panel__banner--warn]="banner.tone === 'warn'"
+        [class.market-panel__banner--info]="banner.tone === 'info'"
+        role="status"
+      >
+        <span>{{ banner.message }}</span>
+        <button type="button" class="market-panel__banner-dismiss" (click)="dismissStatusBanner()" aria-label="Fermer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
+      </div>
+    }
+
+    <div class="market-panel__stage">
+      @if (loadingRows() && carouselLanes().every((lane) => lane.items.length === 0)) {
+        <p class="market-panel__empty">Chargement catalogue…</p>
+      } @else {
+        <app-market-carousel-3d
+          [lanes]="carouselLanes()"
+          [activeCategoryId]="filter()"
+          [emptyMessage]="emptyStateMessage()"
+          (categoryChange)="onCarouselCategoryChange($event)"
+          (itemSelect)="openTokenDrawer($event)"
+          (itemFocus)="onCarouselItemFocus($event)"
+        />
+      }
+    </div>
+  </div>
+
+  <app-market-token-drawer
+    [row]="drawerRow()"
+    (closed)="closeTokenDrawer()"
+    (swapped)="onDrawerSwapped($event)"
+    (favoriteToggle)="onDrawerFavoriteToggle()"
+  />
+</section>

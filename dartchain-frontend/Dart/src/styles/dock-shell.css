@@ -1,0 +1,302 @@
+/**
+ * Dock — surface + hauteur réelle du stack (global : hors encapsulation App).
+ */
+.app-bottom-stack {
+  position: relative;
+  z-index: 6 !important;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  /* Hauteur ici (global) — pas sur le host Angular opaque */
+  height: var(--bottom-stack-active-height);
+  min-height: var(--bottom-stack-active-height);
+  max-height: var(--bottom-stack-active-height);
+  margin: 0 !important;
+  padding: 0;
+  gap: 0;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
+}
+
+.app-bottom-stack.is-dock-collapsed {
+  --bottom-stack-active-height: var(--bottom-stack-height-collapsed);
+  height: var(--bottom-stack-height-collapsed);
+  min-height: var(--bottom-stack-height-collapsed);
+  max-height: var(--bottom-stack-height-collapsed);
+  margin-top: 0;
+  margin-bottom: 0 !important;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Grande fenêtre : onglets et panneau du dock grandissent. Pas le téléphone. */
+@media (min-width: 481px) and (min-height: 640px) {
+  .app-bottom-stack {
+    --dock-wide-tab: clamp(24px, 3vh, 32px);
+    --dock-wide-panel: clamp(180px, 26vh, 240px);
+    --showcase-hub-tab-h: var(--dock-wide-tab);
+    --dock-hub-tab-h: var(--dock-wide-tab);
+    --dock-smart-bar-h: var(--dock-wide-tab);
+    --bottom-stack-panel-height: var(--dock-wide-panel);
+    --dock-panel-height: var(--dock-wide-panel);
+    --bottom-stack-height-expanded: calc(var(--dock-wide-tab) + var(--dock-wide-panel));
+    --bottom-stack-height-collapsed: calc(var(--dock-wide-tab) * 2);
+    --bottom-stack-active-height: var(--bottom-stack-height-expanded);
+  }
+
+  .app-bottom-stack.is-dock-collapsed {
+    --bottom-stack-active-height: var(--bottom-stack-height-collapsed);
+    height: var(--bottom-stack-height-collapsed);
+    min-height: var(--bottom-stack-height-collapsed);
+    max-height: var(--bottom-stack-height-collapsed);
+  }
+}
+
+/* Téléphone portrait haut : dock suit les panneaux lisibles. */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 700px) {
+  .app-bottom-stack {
+    --dock-tall-tab: 22px;
+    --dock-tall-panel: clamp(150px, 22vh, 190px);
+    --showcase-hub-tab-h: var(--dock-tall-tab);
+    --dock-hub-tab-h: var(--dock-tall-tab);
+    --dock-smart-bar-h: var(--dock-tall-tab);
+    --bottom-stack-panel-height: var(--dock-tall-panel);
+    --dock-panel-height: var(--dock-tall-panel);
+    --bottom-stack-height-expanded: calc(var(--dock-tall-tab) + var(--dock-tall-panel));
+    --bottom-stack-height-collapsed: calc(var(--dock-tall-tab) * 2);
+    --bottom-stack-active-height: var(--bottom-stack-height-expanded);
+  }
+
+  .app-bottom-stack.is-dock-collapsed {
+    --bottom-stack-active-height: var(--bottom-stack-height-collapsed);
+    height: var(--bottom-stack-height-collapsed);
+    min-height: var(--bottom-stack-height-collapsed);
+    max-height: var(--bottom-stack-height-collapsed);
+  }
+
+  .app-bottom-stack .showcase-header-tabs .showcase-tab__label,
+  .app-bottom-stack .dock-summary-bar,
+  .app-bottom-stack .dock-summary-status,
+  .app-bottom-stack .dock-summary-progress__text,
+  .app-bottom-stack .collapsed-summary-bar {
+    font-size: 10px !important;
+  }
+}
+
+.app-bottom-stack.is-dock-collapsed .showcase-block__shell,
+.app-bottom-stack.is-dock-collapsed .bottom-stack__shell {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-bottom-stack .showcase-block__shell.bottom-stack__shell.ds-surface.ds-surface--card {
+  border: none;
+  box-shadow: var(--ds-surface-shadow);
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-bottom-stack .showcase-header.app-bottom-stack__header,
+.app-bottom-stack .app-bottom-stack__content,
+.app-bottom-stack .app-bottom-stack__band,
+.app-bottom-stack .showcase-header-tabs,
+.app-bottom-stack .showcase-header-actions,
+.app-bottom-stack .app-bottom-stack__panel {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.app-bottom-stack .app-bottom-stack__content,
+.app-bottom-stack .app-bottom-stack__band {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: var(--bottom-stack-panel-height, 154px);
+  max-height: var(--bottom-stack-panel-height, 154px);
+  overflow: hidden;
+  margin-block: 0;
+  padding-block: 0;
+  box-sizing: border-box;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
+}
+
+/* Remplit la bande — sinon trou semi-transparent sous le wallet (= faux gap dock→graph) */
+.app-bottom-stack .app-bottom-stack__panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.app-bottom-stack .app-bottom-stack__panel > * {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__content,
+.app-bottom-stack.is-dock-collapsed .app-bottom-stack__band {
+  height: var(--dock-smart-bar-h, 16px);
+  max-height: var(--dock-smart-bar-h, 16px);
+  min-height: var(--dock-smart-bar-h, 16px);
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-bottom-stack .showcase-header-tabs {
+  flex: 1 1 0% !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  overflow: hidden !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tabs,
+.app-bottom-stack .showcase-header-tabs .app-bottom-stack__tabs {
+  display: flex !important;
+  flex-flow: row nowrap !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  gap: var(--tab-push-gap, 2px) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 2px !important;
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+  container-type: inline-size;
+  container-name: dock-tabs;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tabs::-webkit-scrollbar,
+.app-bottom-stack .showcase-header-tabs .app-bottom-stack__tabs::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab,
+.app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 0 0px !important;
+  font-size: var(--fs-shell)!important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  overflow: hidden !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab--mempool {
+  flex: 1.75 1 0 !important;
+  min-width: 0 !important;
+  padding-inline: 4px !important;
+  letter-spacing: 0.02em !important;
+  overflow: hidden !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab--mempool .showcase-tab__label {
+  letter-spacing: 0.02em !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface.ds-surface--showcase-tab {
+  overflow: hidden !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab__label {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+  font-family: 'Roboto', sans-serif;
+  font-size: var(--fs-label)!important;
+  font-weight: 600 !important;
+  font-style: normal !important;
+  line-height: 1.1 !important;
+  letter-spacing: 0.04em !important;
+  transform: skewX(-11deg) !important;
+  transform-origin: center center !important;
+}
+
+.app-bottom-stack .showcase-header-tabs .showcase-tab.is-active,
+.app-bottom-stack .showcase-header-tabs .showcase-tab.is-active .showcase-tab__label {
+  font-weight: 800 !important;
+  font-style: normal !important;
+}
+
+.app-bottom-stack .showcase-header.app-bottom-stack__header {
+  display: flex !important;
+  flex-flow: row nowrap !important;
+  align-items: center !important;
+  flex: 0 0 var(--showcase-hub-tab-h, 16px);
+  height: var(--showcase-hub-tab-h, 16px);
+  max-height: var(--showcase-hub-tab-h, 16px);
+  overflow: hidden !important;
+}
+
+.app-bottom-stack .showcase-header-actions {
+  flex: 0 0 var(--panel-action-menu-w, 26px) !important;
+  flex-shrink: 0 !important;
+  width: var(--panel-action-menu-w, 26px) !important;
+  min-width: var(--panel-action-menu-w, 26px) !important;
+  max-width: var(--panel-action-menu-w, 26px) !important;
+  margin-left: auto !important;
+  pointer-events: auto !important;
+  z-index: 8 !important;
+}
+
+@media (max-width: 349px),
+       (orientation: portrait) and (max-width: 480px) {
+  .app-bottom-stack .showcase-header-tabs .showcase-tab__label {
+    text-overflow: ellipsis !important;
+  }
+}
+
+.app-bottom-stack .app-bottom-stack__panel .quests-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .market-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .peer-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .chain-dock.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .transactions-dock.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .faucet-panel.ds-surface {
+  --ds-surface-carbon-opacity: 0;
+  --ds-surface-sheen-opacity: 0.3;
+  background-color: rgba(var(--ds-surface-base-deep-rgb, 6, 7, 10), 0.62);
+  background-image: var(--ds-surface-metallic), var(--ds-surface-bg), var(--ds-surface-veil);
+}
+
+/* Grande fenêtre : lettres du dock lisibles. Le téléphone ne passe pas ici. */
+@media (min-width: 481px) and (min-height: 640px) {
+  .app-bottom-stack .showcase-header-tabs .showcase-tab__label,
+  .app-bottom-stack .dock-summary-bar,
+  .app-bottom-stack .dock-summary-status,
+  .app-bottom-stack .dock-summary-progress__text,
+  .app-bottom-stack .collapsed-summary-bar {
+    font-size: clamp(12px, 1.5vh, 14px) !important;
+  }
+}

@@ -1,0 +1,251 @@
+@if (row(); as item) {
+  <div class="market-token-backdrop" (click)="dismiss()">
+    <aside
+      #drawerPanel
+      class="market-token-drawer market-token-drawer--product news-insight-panel ds-surface ds-surface--card"
+      [class.market-token-drawer--native]="item.config.native"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      [appFocusTrap]="true"
+      [attr.aria-labelledby]="'marketTokenDrawerTitle-' + item.config.exchangeToken"
+      [style.--token-accent]="item.config.accent"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="market-token-drawer__head">
+        <span class="market-token-drawer__breadcrumb">
+          @if (item.config.native) {
+            <span class="market-token-drawer__breadcrumb-k">Vendeur</span>
+            <span class="market-token-drawer__breadcrumb-v">{{ sellerName(item) }}</span>
+          } @else {
+            {{ offerRayonLabel(item) }}
+          }
+        </span>
+        <button type="button" class="market-token-drawer__close" aria-label="Fermer" (click)="dismiss()">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+        </button>
+      </header>
+
+      <div class="market-token-drawer__body">
+        <h3
+          class="market-token-drawer__sr-title"
+          [id]="'marketTokenDrawerTitle-' + item.config.exchangeToken"
+        >
+          {{ item.config.displaySymbol }} {{ tokenSubtitle(item) }}
+        </h3>
+
+        @if (item.config.native) {
+          <div class="market-token-drawer__sheet">
+            <div class="market-token-drawer__col">
+              <p class="market-token-drawer__line">
+                <span class="market-token-drawer__line-k">Rayon</span>
+                <span class="market-token-drawer__line-v">: Actif financier Digital</span>
+              </p>
+              <p class="market-token-drawer__line">
+                <span class="market-token-drawer__line-k">Token</span>
+                <span class="market-token-drawer__line-v">: R4V3 Coin</span>
+              </p>
+              <p class="market-token-drawer__line market-token-drawer__line--desc">
+                <span class="market-token-drawer__line-k">Description</span>
+                <span class="market-token-drawer__line-v">
+                  : Token Natif Dartchain, indexé 1R4V3 : 1CHF
+                </span>
+              </p>
+            </div>
+
+            <div class="market-token-drawer__aside">
+              <div class="market-token-drawer__logo-stack">
+                <div class="market-token-drawer__media" aria-hidden="true">
+                  <app-r4v3-three
+                    #productLogo
+                    class="market-token-drawer__media-three"
+                    presentation="navbar"
+                    [modelTargetSize]="30"
+                    [cameraFitFactor]="1.12"
+                    [frameBiasY]="-0.04"
+                    [enableOrbit]="false"
+                  />
+                </div>
+                <span class="market-token-drawer__chip market-token-drawer__chip--under">
+                  UTILITY 1 R4V3 : 1 CHF
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="market-token-drawer__buy" role="group" aria-label="Quantité">
+            <div class="market-token-drawer__stepper">
+              <button
+                type="button"
+                class="market-token-drawer__stepper-btn"
+                (click)="bumpQty(-1)"
+                [disabled]="buyQty() <= 1"
+                aria-label="Diminuer"
+              ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-minus"/></svg></button>
+              <input
+                class="market-token-drawer__buy-input"
+                type="number"
+                min="1"
+                max="99999"
+                inputmode="numeric"
+                [value]="buyQty()"
+                (input)="onQtyInput($event)"
+                aria-label="Nombre de R4V3 à acheter"
+              />
+              <button
+                type="button"
+                class="market-token-drawer__stepper-btn market-token-drawer__stepper-btn--plus"
+                (click)="bumpQty(1)"
+                aria-label="Augmenter"
+              ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-plus"/></svg></button>
+            </div>
+            @for (preset of qtyPresets; track preset) {
+              <button
+                type="button"
+                class="market-token-drawer__buy-preset"
+                (click)="addQty(preset)"
+              >
+                {{ preset }}
+              </button>
+            }
+            <span class="market-token-drawer__buy-total">{{ chfTotalLabel() }}</span>
+          </div>
+        } @else {
+          <section class="market-token-drawer__hero">
+            <div class="market-token-drawer__media" aria-hidden="true">
+              @if (item.metrics.logoUrl) {
+                <img
+                  class="market-token-drawer__media-img"
+                  [src]="item.metrics.logoUrl"
+                  [alt]=""
+                />
+              } @else {
+                <span class="market-token-drawer__media-fallback" [style.color]="item.config.accent">
+                  {{ initials(item) }}
+                </span>
+              }
+              <span class="market-token-drawer__badge">{{ item.config.offerTag }}</span>
+            </div>
+
+            <div class="market-token-drawer__hero-copy">
+              <div class="market-token-drawer__title">
+                <span class="market-token-drawer__symbol">{{ item.config.displaySymbol }}</span>
+                <span class="market-token-drawer__name">{{ tokenSubtitle(item) }}</span>
+              </div>
+
+              <div class="market-token-drawer__price-row">
+                <span class="market-token-drawer__price">
+                  {{ heroPriceAmount(item) }}
+                  @if (heroPriceCurrency(item); as currency) {
+                    <small>{{ currency }}</small>
+                  }
+                </span>
+                <span class="market-token-drawer__chip">{{ item.config.offerTag }}</span>
+              </div>
+
+              <p class="market-token-drawer__stock">
+                <span class="market-token-drawer__stock-dot" aria-hidden="true"></span>
+                {{ item.config.stockLabel }}
+              </p>
+            </div>
+          </section>
+
+          <p class="market-token-drawer__desc">{{ productPitch(item) }}</p>
+
+          <dl class="market-token-drawer__meta">
+            <div class="market-token-drawer__meta-row">
+              <dt>Vendeur</dt>
+              <dd>{{ trustSrcLabel(item) }}</dd>
+            </div>
+            <div class="market-token-drawer__meta-row">
+              <dt>Rayon</dt>
+              <dd>{{ offerRayonLabel(item) }} · {{ item.metrics.tokenAgeLabel || '—' }}</dd>
+            </div>
+          </dl>
+
+          <div class="market-token-drawer__qty">
+            <span class="market-token-drawer__qty-k">Qté</span>
+            <div class="market-token-drawer__qty-ctrl">
+              <button type="button" class="market-token-drawer__qty-btn" (click)="bumpQty(-1)" aria-label="Diminuer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-minus"/></svg></button>
+              <span class="market-token-drawer__qty-val">{{ buyQty() }}</span>
+              <button type="button" class="market-token-drawer__qty-btn" (click)="bumpQty(1)" aria-label="Augmenter"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-plus"/></svg></button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <footer class="market-token-drawer__foot">
+        <div class="market-token-drawer__cta-row">
+          <button
+            type="button"
+            class="market-token-drawer__cta market-token-drawer__cta--fav"
+            [class.is-on]="item.favorite"
+            [class.is-pulse]="favPulse()"
+            [attr.aria-pressed]="item.favorite"
+            (click)="onFavoriteClick($event, item)"
+          >
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-star"/></svg>
+            Favoris
+          </button>
+          <button
+            type="button"
+            class="market-token-drawer__cta market-token-drawer__cta--cart"
+            [class.is-pulse]="cartPulse()"
+            [disabled]="cartBusy()"
+            (click)="onCartClick($event, item)"
+          >
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-cart"/></svg>
+            Panier
+          </button>
+          <button
+            type="button"
+            class="market-token-drawer__cta market-token-drawer__cta--primary"
+            [class.is-pulse]="buyPulse()"
+            [disabled]="cartBusy()"
+            (click)="onBuyClick($event, item)"
+          >
+            <span class="market-token-drawer__cta-r4v3" aria-hidden="true">
+              <app-r4v3-three
+                #buyLogo
+                presentation="navbar"
+                [modelTargetSize]="9"
+                [cameraFitFactor]="1.2"
+                [frameBiasY]="-0.04"
+                [enableOrbit]="false"
+              />
+            </span>
+            Acheter
+          </button>
+        </div>
+      </footer>
+
+      @if (buyConfirm(); as confirm) {
+        <div class="market-token-drawer__confirm" role="alertdialog" aria-modal="true" aria-labelledby="marketBuyConfirmTitle">
+          <div class="market-token-drawer__confirm-card">
+            <p id="marketBuyConfirmTitle" class="market-token-drawer__confirm-title">Confirmer l'achat</p>
+            <p class="market-token-drawer__confirm-body">
+              Transférer
+              <strong>{{ confirm.totalLabel }}</strong>
+              contre
+              <strong>{{ confirm.qty }} {{ confirm.symbol }}</strong>
+              ?
+            </p>
+            <div class="market-token-drawer__confirm-actions">
+              <button type="button" class="market-token-drawer__confirm-btn market-token-drawer__confirm-btn--ghost" (click)="cancelBuyConfirm()">
+                Annuler
+              </button>
+              <button
+                type="button"
+                class="market-token-drawer__confirm-btn market-token-drawer__confirm-btn--go"
+                [disabled]="cartBusy()"
+                (click)="confirmBuy()"
+              >
+                {{ cartBusy() ? 'Paiement…' : 'Confirmer' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </aside>
+  </div>
+}

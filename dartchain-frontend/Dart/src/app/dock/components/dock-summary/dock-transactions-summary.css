@@ -1,0 +1,165 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: visible;
+  container-type: inline-size;
+  box-sizing: border-box;
+}
+
+.mempool-summary-bar {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  padding: 0 1px 0 2px;
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.mempool-summary-bar__hash {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: baseline;
+  gap: 0.28em;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-shell);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: rgba(237, 231, 217, 0.94);
+}
+
+.mempool-summary-bar__hash.is-empty {
+  color: rgba(139, 157, 173, 0.62);
+  font-weight: 600;
+}
+
+.mempool-summary-bar__count {
+  flex: 0 0 auto;
+  color: rgba(var(--tab-accent-rgb, 139, 157, 173), 0.9);
+  letter-spacing: 0.02em;
+}
+
+.mempool-summary-bar__hash-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.mempool-summary-bar__meta {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  padding-left: 3px;
+  border-left: 1px solid rgba(var(--tab-accent-rgb, 139, 157, 173), 0.12);
+  white-space: nowrap;
+}
+
+.mempool-summary-bar__tip-tx {
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-shell);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(9, 129, 74, 0.88);
+}
+
+.mempool-summary-bar__time {
+  font-size: var(--fs-shell);
+  font-weight: 500;
+  color: var(--text-secondary, #8b9dad);
+}
+
+.mempool-summary-bar__actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+  padding-left: 3px;
+  border-left: 1px solid rgba(var(--tab-accent-rgb, 139, 157, 173), 0.12);
+}
+
+.mempool-summary-bar__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: var(--comp-hud-h, 16px);
+  margin: 0;
+  padding: 0 4px;
+  border-radius: var(--radius-none);
+  font-family: var(--font-display, inherit);
+  font-size: var(--fs-shell);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: 1;
+  touch-action: manipulation;
+}
+
+.mempool-summary-bar__btn--tx {
+  border: 1px solid rgba(var(--tab-accent-rgb, 139, 157, 173), 0.4);
+  background: linear-gradient(
+    180deg,
+    rgba(var(--tab-accent-rgb, 139, 157, 173), 0.28) 0%,
+    rgba(var(--tab-accent-rgb, 139, 157, 173), 0.1) 100%
+  );
+  color: rgba(237, 231, 217, 0.96);
+}
+
+.mempool-summary-bar__btn--tx:hover {
+  color: var(--text-primary, #ede7d9);
+  border-color: var(--state-hover-border);
+  background: var(--state-hover-fill);
+}
+
+.mempool-summary-bar__btn--mine {
+  border: 1px solid rgba(9, 129, 74, 0.45);
+  background: linear-gradient(
+    180deg,
+    rgba(9, 129, 74, 0.32) 0%,
+    rgba(9, 129, 74, 0.12) 100%
+  );
+  color: rgba(237, 231, 217, 0.96);
+}
+
+.mempool-summary-bar__btn--mine:hover:not(:disabled) {
+  color: var(--text-primary, #ede7d9);
+  border-color: var(--state-hover-border);
+  background: var(--state-hover-fill);
+}
+
+.mempool-summary-bar__btn--mine:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.mempool-summary-bar__btn:focus-visible {
+  outline: none;
+  box-shadow: var(--state-focus-ring);
+}
+
+@container (max-width: 160px) {
+  .mempool-summary-bar__btn {
+    padding: 0 3px;
+    letter-spacing: 0.03em;
+  }
+}

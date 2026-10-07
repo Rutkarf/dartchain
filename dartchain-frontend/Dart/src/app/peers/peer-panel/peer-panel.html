@@ -1,0 +1,173 @@
+<section class="peer-panel ds-surface ds-surface--showcase-body" [attr.aria-label]="locale.t('peers.title')" tabindex="0">
+  @if (successMessage()) {
+    <div class="peer-panel__toast peer-panel__toast--success" role="status">
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorBanner()) {
+    <div class="peer-panel__error" role="alert">
+      <span>{{ errorBanner() }}</span>
+      <button
+        type="button"
+        class="peer-panel__error-dismiss"
+        (click)="dismissError()"
+        [attr.aria-label]="locale.t('peers.refresh')"
+      ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
+    </div>
+  }
+
+  <header class="peer-panel__strip" [attr.aria-label]="locale.t('peers.title')">
+    <div class="peer-panel__kpis">
+      <span class="peer-panel__kpi" [title]="locale.t('peers.networkPeers')">
+        <span class="peer-panel__kpi-label">{{ locale.t('peers.networkPeers') }}</span>
+        <span class="peer-panel__kpi-value peer-panel__kpi-value--cyan">{{ networkStats().networkPeers }}</span>
+      </span>
+      <span class="peer-panel__kpi" [title]="locale.t('peers.avgLatency')">
+        <span class="peer-panel__kpi-label">{{ locale.t('peers.avgLatency') }}</span>
+        <span class="peer-panel__kpi-value peer-panel__kpi-value--green">
+          {{ networkStats().avgLatencyMs === null ? '—' : networkStats().avgLatencyMs + ' ms' }}
+        </span>
+      </span>
+      <span class="peer-panel__kpi" [title]="locale.t('peers.networkLoad')">
+        <span class="peer-panel__kpi-label">{{ locale.t('peers.networkLoad') }}</span>
+        <span class="peer-panel__kpi-value peer-panel__kpi-value--cyan">{{ networkStats().networkLoadPercent }}%</span>
+      </span>
+    </div>
+  </header>
+
+  <label class="peer-panel__search">
+    <span class="peer-panel__search-icon" aria-hidden="true">
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+    </span>
+    <input
+      class="peer-panel__search-input"
+      type="search"
+      [placeholder]="locale.t('peers.search')"
+      [ngModel]="searchQuery()"
+      [ngModelOptions]="{ standalone: true }"
+      (ngModelChange)="onSearchInput($event)"
+      autocomplete="off"
+      spellcheck="false"
+      [attr.aria-label]="locale.t('peers.search')"
+    />
+    <button
+      type="button"
+      class="peer-panel__search-fav"
+      [class.is-active]="favoritesOnly()"
+      (click)="toggleFavoritesFilter()"
+      [attr.aria-pressed]="favoritesOnly()"
+      [attr.aria-label]="locale.t('peers.filterFavorites')"
+    >
+      FAV
+    </button>
+  </label>
+
+  <div class="peer-panel__connect">
+    <input
+      #peerInputRef
+      id="peer-input"
+      type="text"
+      inputmode="url"
+      class="peer-panel__connect-input"
+      [placeholder]="locale.t('peers.connectPlaceholder')"
+      [ngModel]="peerInput()"
+      [ngModelOptions]="{ standalone: true }"
+      (ngModelChange)="onPeerInput($event)"
+      (keydown.enter)="onConnectSubmit($event)"
+      [disabled]="submitting()"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      [attr.aria-label]="locale.t('peers.connectPeer')"
+    />
+    <button
+      type="button"
+      class="peer-panel__connect-btn"
+      [disabled]="submitting()"
+      [attr.aria-busy]="submitting()"
+      (click)="onConnectSubmit($event)"
+    >
+      {{ connectButtonLabel() }}
+    </button>
+  </div>
+
+  <ul class="peer-panel__list" role="list" [attr.aria-label]="locale.t('peers.title')">
+    @if (loading() && peerCount() === 0) {
+      @for (row of [1, 2, 3, 4]; track row) {
+        <li class="peer-panel__row peer-panel__row--skeleton" aria-hidden="true"></li>
+      }
+    } @else if (filteredRows().length === 0) {
+      <li class="peer-panel__empty" role="listitem">
+        {{ peerCount() === 0 ? locale.t('peers.empty') : locale.t('peers.emptyFilter') }}
+      </li>
+    } @else {
+      @for (row of filteredRows(); track trackPeer($index, row)) {
+        <li
+          class="peer-panel__row"
+          role="listitem"
+          [class.is-favorite]="row.isFavorite"
+          [class.is-error]="row.status === 'ERROR'"
+          [attr.aria-label]="row.nodeName + ' ' + statusLabel(row.status)"
+        >
+          <button
+            type="button"
+            class="peer-panel__fav-btn"
+            [class.is-active]="row.isFavorite"
+            (click)="toggleFavorite(row.url, $event)"
+            [attr.aria-label]="favoriteLabel(row.isFavorite)"
+          >
+            ★
+          </button>
+
+          <button
+            type="button"
+            class="peer-panel__row-main"
+            (click)="openPeerDetail(row)"
+            [attr.aria-label]="locale.t('peers.openDetail')"
+          >
+            <span class="peer-panel__node-name" [title]="row.url">{{ row.nodeName }}</span>
+            <span class="peer-panel__node-endpoint" [title]="row.url">{{ row.endpoint }}</span>
+          </button>
+
+          <span class="peer-panel__status" [ngClass]="statusClass(row.status)">
+            {{ statusLabel(row.status) }}
+          </span>
+
+          <div class="peer-panel__row-actions">
+            <button
+              type="button"
+              class="peer-panel__action peer-panel__action--copy"
+              (click)="copyPeerUrl(row.url, $event)"
+              [attr.aria-label]="locale.t('peers.copy')"
+              [title]="locale.t('peers.copy')"
+            >
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-copy"/></svg>
+            </button>
+            <button
+              type="button"
+              class="peer-panel__action peer-panel__action--disconnect"
+              (click)="disconnectPeer(row.url, $event)"
+              [disabled]="submitting()"
+              [attr.aria-label]="locale.t('peers.disconnect')"
+              [title]="locale.t('peers.disconnect')"
+            >
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+              <span>{{ locale.t('peers.disconnect') }}</span>
+            </button>
+          </div>
+        </li>
+      }
+    }
+  </ul>
+
+  <footer class="peer-panel__foot" aria-live="polite">
+    {{ listSummary() }}
+  </footer>
+</section>
+
+<app-peer-detail-drawer
+  [open]="detailOpen()"
+  [peer]="selectedPeer()"
+  (close)="closePeerDetail()"
+/>

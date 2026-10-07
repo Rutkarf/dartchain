@@ -1,0 +1,200 @@
+/**
+ * Pile : swap → showcase → dock → graph.
+ * Un seul gap flex = même espace partout (dont dock→graph = showcase→dock).
+ */
+.app-shell[data-testid='app-shell'],
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.app-main-layout {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  flex: 0 0 auto;
+  width: 100%;
+  height: fit-content;
+  min-height: 0;
+  overflow: visible;
+  align-self: flex-start;
+  /* UNE gouttière pour toutes les sections */
+  gap: var(--stack-section-gap, 4px);
+  row-gap: var(--stack-section-gap, 4px);
+  position: relative;
+  z-index: 2;
+  padding-bottom: calc(var(--floor-peek-height, 220px) + var(--graph-floor-gap, 6px));
+  box-sizing: border-box;
+}
+
+.app-main-layout > app-swap,
+.app-main-layout > app-showcase-tab-showcase,
+.app-main-layout > app-dock-tabs-dock-tabs,
+.app-main-layout > app-graph,
+.app-main-layout > .app-swap-section,
+.app-main-layout > .app-showcase-tab-showcase-section,
+.app-main-layout > .app-dock-tabs-section,
+.app-main-layout > .app-graph-section {
+  position: relative;
+  flex: 0 0 auto !important;
+  width: 100%;
+  margin: 0 !important;
+  inset: auto !important;
+}
+
+.app-main-layout > app-dock-tabs-dock-tabs,
+.app-main-layout > .app-dock-tabs-section,
+.app-main-layout > app-graph,
+.app-main-layout > .app-graph-section {
+  z-index: 6;
+}
+
+.app-main-layout > app-graph,
+.app-main-layout > .app-graph-section,
+app-graph.app-graph-section {
+  height: var(--market-chart-height, 136px) !important;
+  min-height: var(--market-chart-height, 136px) !important;
+  max-height: var(--market-chart-height, 136px) !important;
+  overflow: hidden;
+}
+
+/* Graph replié = smart-bar seule — aucun padding/margin vertical */
+.app-main-layout.is-chart-collapsed > app-graph,
+.app-main-layout > app-graph.is-chart-collapsed,
+app-graph.app-graph-section.is-chart-collapsed {
+  height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px)) !important;
+  min-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px)) !important;
+  max-height: var(--market-chart-collapsed-h, var(--chart-smart-bar-h, 11px)) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-main-layout .app-bottom-stack {
+  margin-bottom: 0 !important;
+}
+
+/* Grande fenêtre : navbar, échange, showcase, graphique et dock suivent la hauteur.
+   Le téléphone (≤480 ou moins de 640 de haut) ne passe pas ici. */
+@media (min-width: 481px) and (min-height: 640px) {
+  .app-shell {
+    --wide-tab: clamp(24px, 3vh, 32px);
+    /* Panneau un peu plus haut : plus de lignes visibles, moins de scroll. */
+    --wide-panel: clamp(180px, 26vh, 240px);
+    --wide-chart: clamp(72px, 11vh, 110px);
+    --wide-swap: clamp(40px, 5.5vh, 56px);
+    --wide-font: clamp(12px, 1.45vh, 13px);
+    --wide-font-body: clamp(12px, 1.55vh, 14px);
+
+    --fs-label: var(--wide-font);
+    --fs-shell: var(--wide-font);
+    --fs-chart: var(--wide-font);
+    --fs-price: var(--wide-font);
+    --fs-title: var(--wide-font);
+    --fs-chain: var(--wide-font);
+    --fs-chat-chrome: var(--wide-font);
+    --fs-module: var(--wide-font-body);
+    --fs-chat-msg: var(--wide-font-body);
+    --fs-form: var(--wide-font-body);
+    --fs-body: var(--wide-font-body);
+
+    --showcase-hub-tab-h: var(--wide-tab);
+    --showcase-hub-header-h: var(--wide-tab);
+    --dock-hub-tab-h: var(--wide-tab);
+    --dock-smart-bar-h: var(--wide-tab);
+    --chart-smart-bar-h: var(--wide-tab);
+    --showcase-smart-bar-h: var(--wide-tab);
+    --market-chart-collapsed-h: var(--wide-tab);
+
+    --bottom-stack-panel-height: var(--wide-panel);
+    --mvp-bottom-panel-h: var(--wide-panel);
+    --mvp-showcase-body-h: var(--wide-panel);
+    --showcase-band-height: var(--wide-panel);
+    --dock-panel-height: var(--wide-panel);
+    --bottom-stack-height-expanded: calc(var(--wide-tab) + var(--wide-panel));
+    --bottom-stack-height-collapsed: calc(var(--wide-tab) * 2);
+    --bottom-stack-active-height: var(--bottom-stack-height-expanded);
+    --hub-showcase-block-height: var(--bottom-stack-height-expanded);
+    --hub-showcase-block-height-collapsed: var(--bottom-stack-height-collapsed);
+
+    --mvp-chart-h: var(--wide-chart);
+    --market-chart-height: var(--wide-chart);
+    --market-chart-height-expanded: var(--wide-chart);
+
+    --mvp-swap-h: var(--wide-swap);
+    --market-exchange-height: var(--wide-swap);
+    --market-exchange-strip-h: var(--wide-swap);
+    --market-exchange-height-estimate: var(--wide-swap);
+  }
+
+  app-navbar {
+    --nv-logo-h: var(--wide-tab);
+    --nv-ticker-row-h: var(--wide-tab);
+    --nv-action-btn: var(--wide-tab);
+    --nv-shell-min-h: calc(var(--wide-tab) * 2);
+  }
+}
+
+/* Téléphone portrait haut (480×800, 390×844…) : texte + panneaux lisibles.
+   Canon 250×550 / petits SE restent sur le lock micro. */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 700px) {
+  .app-shell {
+    --phone-tall-tab: 22px;
+    --phone-tall-panel: clamp(150px, 22vh, 190px);
+    --phone-tall-chart: clamp(64px, 10vh, 88px);
+    --phone-tall-swap: 36px;
+    --phone-tall-font: 10px;
+    --phone-tall-font-body: 11px;
+
+    --fs-label: var(--phone-tall-font);
+    --fs-shell: var(--phone-tall-font);
+    --fs-chart: var(--phone-tall-font);
+    --fs-price: var(--phone-tall-font);
+    --fs-title: var(--phone-tall-font);
+    --fs-chain: var(--phone-tall-font);
+    --fs-chat-chrome: var(--phone-tall-font);
+    --fs-module: var(--phone-tall-font-body);
+    --fs-chat-msg: var(--phone-tall-font-body);
+    --fs-form: var(--phone-tall-font-body);
+    --fs-body: var(--phone-tall-font-body);
+
+    --showcase-hub-tab-h: var(--phone-tall-tab);
+    --showcase-hub-header-h: var(--phone-tall-tab);
+    --dock-hub-tab-h: var(--phone-tall-tab);
+    --dock-smart-bar-h: var(--phone-tall-tab);
+    --chart-smart-bar-h: var(--phone-tall-tab);
+    --showcase-smart-bar-h: var(--phone-tall-tab);
+    --market-chart-collapsed-h: var(--phone-tall-tab);
+
+    --mvp-showcase-body-h: var(--phone-tall-panel);
+    --mvp-bottom-panel-h: var(--phone-tall-panel);
+    --showcase-band-height: var(--phone-tall-panel);
+    --dock-panel-height: var(--phone-tall-panel);
+    --bottom-stack-panel-height: var(--phone-tall-panel);
+    --bottom-stack-height-expanded: calc(var(--phone-tall-tab) + var(--phone-tall-panel));
+    --bottom-stack-height-collapsed: calc(var(--phone-tall-tab) * 2);
+    --bottom-stack-active-height: var(--bottom-stack-height-expanded);
+    --hub-showcase-block-height: var(--bottom-stack-height-expanded);
+    --hub-showcase-block-height-collapsed: var(--bottom-stack-height-collapsed);
+
+    --mvp-chart-h: var(--phone-tall-chart);
+    --market-chart-height: var(--phone-tall-chart);
+    --market-chart-height-expanded: var(--phone-tall-chart);
+
+    --mvp-swap-h: var(--phone-tall-swap);
+    --market-exchange-height: var(--phone-tall-swap);
+    --market-exchange-strip-h: var(--phone-tall-swap);
+    --market-exchange-height-estimate: var(--phone-tall-swap);
+  }
+
+  app-navbar {
+    --nv-logo-h: var(--phone-tall-tab);
+    --nv-ticker-row-h: var(--phone-tall-tab);
+    --nv-action-btn: var(--phone-tall-tab);
+    --nv-shell-min-h: calc(var(--phone-tall-tab) * 2);
+  }
+}

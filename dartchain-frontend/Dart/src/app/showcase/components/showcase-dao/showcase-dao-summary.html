@@ -1,0 +1,40 @@
+<div
+ class="dao-summary-bar"
+ role="status"
+ aria-live="polite"
+>
+  <div class="dao-summary-line" aria-live="polite">
+    @if (carouselCard(); as card) {
+      <div
+        class="dao-summary-line__slide"
+        [class.dao-summary-line__slide--enter]="carouselAnimating()"
+        [attr.title]="cardLineTitle(card)"
+      >
+        <span
+          class="dao-summary-line__status"
+          [class.dao-summary-line__status--active]="card.status === 'active'"
+          [class.dao-summary-line__status--creating]="card.status === 'creating'"
+          [class.dao-summary-line__status--closed]="card.status === 'closed'"
+        >
+          {{ statusShortLabel(card) }}
+        </span>
+
+        <span class="dao-summary-line__symbol">{{ card.symbol }}</span>
+
+        <span class="dao-summary-line__name">{{ card.name }}</span>
+
+        <span class="dao-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="dao-summary-line__stats">{{ cardStats(card) }}</span>
+
+        <span class="dao-summary-line__sep" aria-hidden="true">·</span>
+
+        <span class="dao-summary-line__summary">{{ card.summary }}</span>
+      </div>
+    } @else if (loading()) {
+      <span class="dao-summary-line__fallback">Synchronisation…</span>
+    } @else {
+      <span class="dao-summary-line__fallback">Aucune DAO active</span>
+    }
+  </div>
+</div>

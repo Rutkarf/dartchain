@@ -1,0 +1,50 @@
+#!/usr/bin/env node
+/**
+ * Prépare environment.cloudflare.ts depuis BACKEND_URL (CI Cloudflare / deploy local).
+ */
+import { writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const outPath = join(root, 'src/environments/environment.cloudflare.ts');
+
+let backendUrl = (process.env.BACKEND_URL || 'https://dartchain-backend.onrender.com').trim();
+if (backendUrl.includes('YOUR-BACKEND')) {
+  console.error('FAIL: BACKEND_URL invalide');
+  process.exit(1);
+}
+backendUrl = backendUrl.replace(/\/$/, '').replace(/^https?:\/\//, '');
+backendUrl = `https://${backendUrl}`;
+const backendHost = backendUrl.replace(/^https:\/\//, '');
+
+const showcaseEnabled = !['false', '0', 'no', 'off'].includes(
+  String(process.env.SHOWCASE_ENABLED ?? 'true').toLowerCase(),
+);
+const starConquestEnabled = !['false', '0', 'no', 'off'].includes(
+  String(process.env.STAR_CONQUEST_ENABLED ?? 'false').toLowerCase(),
+);
+const starConquestOverlay = !['false', '0', 'no', 'off'].includes(
+  String(process.env.STAR_CONQUEST_OVERLAY_ENABLED ?? 'true').toLowerCase(),
+);
+const kpiDebug = ['true', '1', 'yes', 'on'].includes(
+  String(process.env.STAR_CONQUEST_KPI_DEBUG ?? 'false').toLowerCase(),
+);
+
+const contents = `import { buildEnvironment } from './environment.factory';
+
+/** Build Cloudflare — généré par tools/prepare-cloudflare-env.mjs */
+export const environment = buildEnvironment({
+  production: true,
+  apiUrl: '${backendUrl}/api',
+  liveWsUrl: 'wss://${backendHost}/ws/live',
+  chatWsUrl: 'wss://${backendHost}/ws/chat',
+  showcaseEnabled: ${showcaseEnabled},
+  starConquestEnabled: ${starConquestEnabled},
+  starConquestOverlayEnabled: ${starConquestOverlay},
+  starConquestKpiDebug: ${kpiDebug},
+});
+`;
+
+writeFileSync(outPath, contents, 'utf8');
+console.info('[prepare-cloudflare-env] Écrit', outPath, '— backend', backendUrl);

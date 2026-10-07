@@ -1,0 +1,144 @@
+<header class="navbar-wrap">
+  <div class="navbar-top-shell">
+    <nav
+ class="navbar-top ds-surface ds-surface--strip"
+ [class.navbar-top--auth-open]="auth.drawerOpen()"
+ >
+      <div class="navbar-brand-stack">
+        <div class="navbar-brand-head" #brandHead>
+          <div class="navbar-brand-track" #brandTrack>
+            <div class="navbar-brand-row" #brandRow>
+              <div
+                class="logo-shell"
+                role="button"
+                tabindex="0"
+                aria-label="Logo R4V3 — cinq clics rapides pour rejouer le tutoriel"
+                appNavbarHint="Cinq clics rapides : rejouer le tutoriel"
+                [class.logo-clicked]="logoClicked"
+                (keydown.enter)="onLogoPulse()"
+                (keydown.space)="$event.preventDefault(); onLogoPulse()"
+              >
+                <div class="logo-frame">
+                  <app-r4v3-three
+                    #logoThree
+                    class="navbar-logo-three"
+                    presentation="navbar"
+                    [modelTargetSize]="42"
+                    [cameraFitFactor]="1.148"
+                    [frameBiasX]="0"
+                    [frameBiasY]="-0.12"
+                    [enableOrbit]="true"
+                    (logoTapped)="onLogoPulse()"
+                  />
+                </div>
+              </div>
+
+              <div class="navbar-brand-chips" aria-label="Token et statut réseau">
+                <app-brand-crypto-select class="navbar-brand-select" />
+
+                <app-navbar-network-status
+                  #networkStatus
+                  class="navbar-brand-row__network"
+                />
+
+                <app-navbar-node-panel class="navbar-brand-row__node" />
+              </div>
+            </div>
+
+            <div class="navbar-ticker-slot">
+              <div class="navbar-ticker" aria-live="polite">
+                <ng-content />
+              </div>
+              <app-navbar-ticker-drawer />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="navbar-end" role="group">
+        @switch (authStripMode()) {
+          @case ('logout') {
+            <div class="navbar-auth-strip navbar-auth-strip--session" role="group">
+              <button
+ type="button"
+ class="navbar-auth-user__name"
+ [title]="locale.t('auth.twoFactorOpen')"
+ (click)="onTwoFactor()"
+ >
+                {{ authDisplayName() }}
+              </button>
+              <button
+                type="button"
+                class="navbar-auth-btn navbar-auth-btn--logout"
+                (click)="onLogout()"
+                [attr.aria-label]="'Se déconnecter · ' + authDisplayName()"
+              >
+                <svg class="icon icon--md" aria-hidden="true" focusable="false"><use href="#icon-log-out"/></svg>
+              </button>
+            </div>
+          }
+          @case ('guest') {
+            <div
+              class="navbar-auth-strip"
+              [class.navbar-auth-strip--drawer-open]="auth.drawerOpen()"
+              role="group"
+              [attr.aria-label]="locale.t('auth.tabListLabel')"
+            >
+              <button
+                type="button"
+                class="navbar-auth-btn navbar-auth-btn--register"
+                data-tour="register"
+                [class.is-active]="authRegisterActive()"
+                [attr.aria-pressed]="authRegisterActive()"
+                (click)="onRegister()"
+                [attr.aria-label]="locale.t('auth.tabRegister')"
+                [attr.title]="locale.t('auth.tabRegister')"
+              >
+                <svg class="icon icon--md" aria-hidden="true" focusable="false"><use href="#icon-user-plus"/></svg>
+              </button>
+              <span class="navbar-auth-sep" aria-hidden="true"></span>
+              <button
+                type="button"
+                class="navbar-auth-btn navbar-auth-btn--login"
+                data-tour="login"
+                [class.is-active]="authLoginActive()"
+                [attr.aria-pressed]="authLoginActive()"
+                (click)="onLogin()"
+                [attr.aria-label]="locale.t('auth.tabLogin')"
+                [attr.title]="locale.t('auth.tabLogin')"
+              >
+                <svg class="icon icon--md" aria-hidden="true" focusable="false"><use href="#icon-log-in"/></svg>
+              </button>
+            </div>
+          }
+        }
+
+        @if (showAdminEntry()) {
+          <button
+            type="button"
+            class="navbar-auth-btn navbar-auth-btn--admin"
+            (click)="onOpenAdmin()"
+            aria-label="Panneau d’administration"
+            title="Administration"
+            appNavbarHint="Ouvrir le panneau d’administration"
+          >
+            <svg class="icon icon--md" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg>
+          </button>
+        }
+      </div>
+
+      <div class="navbar-aux" role="group" aria-label="Outils et pairs">
+        <app-navbar-peer-status class="navbar-aux__peers" />
+        <div class="navbar-aux__searchbar">
+          <app-searchbar (openPending)="explorePending.emit()" />
+        </div>
+        <div class="navbar-aux__search">
+          <app-explorer-search
+            (selectBlock)="exploreBlock.emit($event)"
+            (openPending)="explorePending.emit()"
+          />
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>

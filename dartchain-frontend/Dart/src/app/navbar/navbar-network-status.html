@@ -1,0 +1,36 @@
+<div #anchorRoot class="network-trust-anchor">
+  <button
+ type="button"
+ class="network-trust-chip"
+ data-tour="network-status"
+ [class.is-live]="trust.trustState() === 'live'"
+ [class.is-slow]="trust.trustState() === 'slow'"
+ [class.is-offline]="trust.trustState() === 'offline'"
+ [class.is-checking]="trust.trustState() === 'checking'"
+ [class.is-stream-live]="trust.streamLive()"
+ [class.is-session-guest]="!auth.isAuthenticated()"
+ [class.is-session-auth]="auth.isAuthenticated()"
+ [class.is-panel-open]="panelOpen()"
+ [attr.aria-expanded]="panelOpen()"
+ aria-haspopup="dialog"
+ (click)="openDetails($event)"
+ >
+    <span class="network-trust-chip__led-wrap nv-drawer-led-anchor" aria-hidden="true">
+      <span class="network-trust-chip__led"></span>
+    </span>
+    <span class="network-trust-chip__label">{{ trust.chipLabel() }}</span>
+    <span class="network-trust-chip__detail">{{ trust.latencyLabel() }}</span>
+  </button>
+
+  @if (panelOpen()) {
+    <aside
+      class="nv-anchor-drawer nv-anchor-drawer--live"
+      role="dialog"
+      aria-label="État réseau détaillé"
+      [appFocusTrap]="true"
+      (click)="onDrawerClick($event)"
+    >
+      <app-status-overlay />
+    </aside>
+  }
+</div>

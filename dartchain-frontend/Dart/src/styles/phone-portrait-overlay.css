@@ -1,0 +1,89 @@
+/*
+ * Portrait téléphone (html.vp-compact) — tiroirs modaux plein cadre.
+ * Les menus ancrés sous la navbar restent des menus : ils scrollent
+ * dans la hauteur visible, ils ne deviennent pas l’écran.
+ * --vv-height est posé par syncVisualViewportMetrics (défaut 100svh).
+ */
+:root {
+  --vv-height: 100svh;
+  --vv-offset-top: 0px;
+}
+
+html.vp-compact :is(
+  .drawer-backdrop,
+  .launch-drawer-backdrop,
+  .news-insight-backdrop,
+  .market-token-backdrop,
+  .r4v3-hub-drawer__backdrop,
+  .dao-drawer-backdrop,
+  .launch-project-backdrop,
+  .market-cart-backdrop
+) {
+  position: fixed;
+  inset: auto;
+  top: var(--vv-offset-top, 0px);
+  left: 0;
+  right: 0;
+  height: var(--vv-height, 100svh);
+  z-index: var(--z-drawer, 100);
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding:
+    var(--ds-safe-top, 0px)
+    var(--ds-safe-right, 0px)
+    var(--ds-safe-bottom, 0px)
+    var(--ds-safe-left, 0px);
+  box-sizing: border-box;
+}
+
+html.vp-compact :is(
+  .drawer-backdrop > .drawer,
+  .launch-drawer,
+  .showcase-news-drawer,
+  .market-token-drawer,
+  .r4v3-hub-drawer,
+  .dao-drawer,
+  .launch-project-drawer,
+  .market-cart-drawer
+) {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  border-radius: 0;
+}
+
+html.vp-compact :is(
+  .drawer-body,
+  .launch-drawer__body,
+  .news-insight-panel__body,
+  .market-token-drawer__body,
+  .r4v3-hub-drawer__body,
+  .dao-drawer__body,
+  .launch-project-drawer__body,
+  .market-cart-drawer__body
+) {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Menus navbar : restent sous la puce, coupés par le clavier ils scrollent. */
+html.vp-compact :is(.nv-anchor-drawer, app-navbar-ticker-drawer) {
+  max-height: calc(var(--vv-height, 100svh) - var(--ds-safe-bottom, 0px) - 40px);
+  overflow-y: auto;
+}
+
+/* Clavier : le shell tient dans la hauteur visible, le floor cède. */
+html.kb-open app-root {
+  position: fixed;
+  top: var(--vv-offset-top, 0px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: var(--vv-height, 100svh) !important;
+  max-height: var(--vv-height, 100svh) !important;
+  --floor-peek-height: 0px;
+  --floor-canvas-height: 0px;
+}

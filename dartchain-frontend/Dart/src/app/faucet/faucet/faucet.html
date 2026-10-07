@@ -1,0 +1,201 @@
+<section
+ class="faucet-panel ds-surface ds-surface--showcase-body"
+>
+  @if (runtime.toastMessage()) {
+    <div
+      class="faucet-panel__toast"
+      [class.is-success]="runtime.toastKind() === 'success'"
+      [class.is-info]="runtime.toastKind() === 'info'"
+      [class.is-error]="runtime.toastKind() === 'error'"
+      role="status"
+    >
+      {{ runtime.toastMessage() }}
+    </div>
+  }
+
+  <header class="faucet-panel__head">
+    <div class="faucet-panel__title-wrap">
+      <h2>{{ locale.t('faucet.title') }}</h2>
+    </div>
+
+    @if (runtime.offlineMode()) {
+      <p class="faucet-panel__banner faucet-panel__banner--offline" role="status">
+        {{ t('faucet.offline') }}
+        <button type="button" class="faucet-panel__retry" (click)="retryConnection()">
+          {{ t('faucet.retry') }}
+        </button>
+      </p>
+    }
+
+    @if (runtime.isReady() && !runtime.walletValid()) {
+      <p class="faucet-panel__banner faucet-panel__banner--warn" role="alert">
+        {{ t('faucet.error.walletInvalid') }}
+      </p>
+    }
+
+    <div class="faucet-panel__top">
+      <article class="faucet-panel__tile faucet-panel__tile--amount">
+        <div #valueWrap class="faucet-panel__value-wrap">
+          <div
+            class="faucet-panel__value-fit"
+            [style.transform]="'scale(' + valueFitScale() + ')'"
+          >
+            <span
+ #valueText
+ class="faucet-panel__value"
+ [class.is-bumping]="runtime.bump()"
+ [class.is-capped]="runtime.atMaxClaim()"
+ >
+              <span class="faucet-panel__value-whole">{{ runtime.wholePartDisplay() }}</span>
+              <span class="faucet-panel__value-sep">,</span>
+              <span class="faucet-panel__value-decimal">{{ runtime.decimalDigits() }}</span>
+              <span class="faucet-panel__value-unit">m4t3r</span>
+            </span>
+          </div>
+        </div>
+        @if (runtime.atMaxClaim()) {
+          <p class="faucet-panel__cap-hint">
+            {{ t('faucet.atMaxClaim', { max: '1', token: runtime.nativeTokenLabel() }) }}
+          </p>
+        }
+      </article>
+
+      <div
+        class="faucet-panel__claim-slot"
+        [class.is-success]="runtime.claimSuccessActive()"
+      >
+        <button
+          type="button"
+          class="faucet-panel__claim"
+          [disabled]="runtime.claimDisabled()"
+          [class.is-inactive]="!runtime.eligible() && !runtime.loading() && runtime.isReady()"
+          [class.is-cooling]="!runtime.eligible() && !runtime.loading() && runtime.isReady() && runtime.cooldownSeconds() > 0"
+          [class.is-success]="runtime.claimSuccessActive()"
+          (click)="claim()"
+        >
+          @if (runtime.claimSuccessActive()) {
+            {{ t('faucet.claimSuccess') }}
+          } @else {
+            {{ runtime.claimButtonLabel() }}
+          }
+        </button>
+        @if (runtime.claimSuccessActive() && runtime.formattedClaimedAmountLine()) {
+          <span class="faucet-panel__claim-success-info" role="status" aria-live="polite">
+            {{ runtime.formattedClaimedAmountLine() }}
+          </span>
+        }
+      </div>
+
+      <article class="faucet-panel__tile faucet-panel__tile--cooldown">
+        <p class="faucet-panel__label">{{ locale.t('faucet.cooldown') }}</p>
+        <div
+          class="faucet-panel__cooldown-ring"
+          [style.--cooldown-progress]="runtime.cooldownProgress()"
+        >
+          <span class="faucet-panel__cooldown-value">{{ runtime.cooldownLabel() }}</span>
+        </div>
+      </article>
+    </div>
+
+    @if (runtime.txHash()) {
+      <div class="faucet-panel__tx-line" role="status" aria-live="polite">
+        <button
+ type="button"
+ class="faucet-panel__tx"
+ (click)="copyTxHash()"
+ [title]="runtime.txHash()"
+ >
+          Tx: {{ runtime.txHash() }}
+        </button>
+        <button
+ type="button"
+ class="faucet-panel__tx faucet-panel__tx--explorer"
+ (click)="openTxInExplorer()"
+ >
+          {{ locale.t('faucet.txExplorer') }}
+        </button>
+      </div>
+    }
+
+    <p class="faucet-panel__meta-inline">
+      <span
+        class="faucet-panel__dot"
+        [class.is-ready]="runtime.ledTone() === 'ready'"
+        [class.is-cooldown]="runtime.ledTone() === 'cooldown'"
+        [class.is-offline]="runtime.ledTone() === 'offline'"
+        [class.is-disabled]="runtime.ledTone() === 'disabled'"
+        [attr.aria-label]="runtime.networkOnline() ? locale.t('faucet.networkOnline') : locale.t('faucet.networkOffline')"
+      ></span>
+      <span>{{ locale.t('faucet.network') }} : <strong>{{ runtime.networkLabel() }}</strong></span>
+      <span class="faucet-panel__meta-sep" aria-hidden="true">·</span>
+      <span>{{ locale.t('faucet.peers') }} : <strong>{{ runtime.peersLabel() }}</strong></span>
+      <span class="faucet-panel__meta-sep" aria-hidden="true">·</span>
+      <span>
+        {{ locale.t('faucet.block') }}
+        <button
+          type="button"
+          class="faucet-panel__block-link"
+          [disabled]="runtime.blockHeight() == null || runtime.blockHeight()! <= 0"
+          (click)="openBlockInExplorer()"
+          [attr.title]="t('faucet.blockHint')"
+        >
+          {{ runtime.blockHeightLabel() }}
+        </button>
+      </span>
+    </p>
+
+    @if (runtime.errorMessage()) {
+      <p class="faucet-panel__feedback faucet-panel__feedback--error" role="alert">
+        {{ runtime.errorMessage() }}
+      </p>
+    }
+  </header>
+
+  <div class="faucet-panel__body">
+    <section class="faucet-panel__history">
+      <div class="faucet-panel__rows">
+        @if (runtime.history().length === 0) {
+          <div class="faucet-panel__empty">{{ locale.t('faucet.historyEmpty') }}</div>
+        } @else {
+          <div class="faucet-panel__row faucet-panel__row--head">
+            <span>Action</span>
+            <span>Date</span>
+            <span>Heure</span>
+            <span>Montant</span>
+            <span>Statut</span>
+            <button
+ type="button"
+ class="faucet-panel__history-export"
+ (click)="exportHistoryJson()"
+ [title]="locale.t('faucet.exportHistory')"
+ >
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-file-down"/></svg>
+              <span>.Json</span>
+            </button>
+          </div>
+          @for (row of runtime.history(); track row.date + row.time + row.action + (row.txHash ?? '')) {
+            <div class="faucet-panel__row">
+              <span class="faucet-panel__row-action">{{ row.action }}</span>
+              <span class="faucet-panel__row-date">{{ row.date }}</span>
+              <span class="faucet-panel__row-time">{{ row.time }}</span>
+              <span class="faucet-panel__row-amount">{{ row.amount }}</span>
+              <span class="faucet-panel__row-status">{{ row.status }}</span>
+              @if (row.txHash) {
+                <button
+                  type="button"
+                  class="faucet-panel__row-explorer"
+                  (click)="openTxInExplorer(row.txHash)"
+                  [attr.aria-label]="locale.t('faucet.txExplorer')"
+                >
+                  ↗
+                </button>
+              } @else {
+                <span class="faucet-panel__row-explorer-spacer" aria-hidden="true"></span>
+              }
+            </div>
+          }
+        }
+      </div>
+    </section>
+  </div>
+</section>

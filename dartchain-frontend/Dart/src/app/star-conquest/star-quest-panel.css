@@ -1,0 +1,155 @@
+:host {
+  display: contents;
+  pointer-events: none;
+}
+
+/* Panneau compact ~½ — laisse cliquer les autres quêtes autour */
+.star-quest-panel {
+  --sc-family-rgb: 139, 157, 173;
+  --sc-family-hex: #8b9dad;
+
+  position: fixed;
+  z-index: 140;
+  pointer-events: none;
+  box-sizing: border-box;
+  width: min(var(--sc-overlay-panel-w, 74px), calc(100vw - 12px));
+  max-width: 120px;
+  max-height: min(88px, calc(100vh - var(--sc-overlay-floor-chrome, 86px) - 12px));
+  padding: 4px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(var(--sc-family-rgb), 0.36);
+  background:
+    linear-gradient(180deg, rgba(10, 18, 32, 0.9) 0%, rgba(10, 18, 32, 0.94) 100%);
+  box-shadow: 0 6px 14px rgba(10, 18, 32, 0.5);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  color: rgba(237, 231, 217, 0.94);
+  animation:  star-quest-panel-in 140ms ease-out;
+}
+
+.star-quest-panel--compact {
+  width: min(var(--sc-overlay-panel-compact-w, 70px), calc(100vw - 12px));
+}
+
+.star-quest-panel__close,
+.star-quest-panel__claim {
+  pointer-events: auto;
+}
+
+.star-quest-panel__close {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: var(--comp-hit-min, 24px);
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(237, 231, 217, 0.1);
+  border-radius: var(--radius-sm);
+  background: rgba(237, 231, 217, 0.04);
+  color: rgba(237, 231, 217, 0.9);
+  font-size: var(--fs-chain);
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.star-quest-panel__close:hover,
+.star-quest-panel__close:focus-visible {
+  color: rgba(237, 231, 217, 0.98);
+  background: rgba(var(--sc-family-rgb), 0.14);
+  outline: none;
+}
+
+.star-quest-panel__title {
+  margin: 0;
+  padding-right: 16px;
+  font-family: var(--ds-font-ui, var(--font-display, 'Orbitron', sans-serif));
+  font-size: var(--fs-chain);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: rgba(237, 231, 217, 0.96);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.star-quest-panel__info {
+  margin: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  font-size: var(--fs-chain);
+  line-height: 1.25;
+  color: rgba(139, 157, 173, 0.9);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.star-quest-panel__claim {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--comp-btn-form-h, 32px);
+  margin: 0;
+  padding: 4px 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(var(--sc-family-rgb), 0.45);
+  background: rgba(var(--sc-family-rgb), 0.18);
+  color: rgba(237, 231, 217, 0.96);
+  font-size: var(--fs-chain);
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.star-quest-panel__claim:hover:not(:disabled),
+.star-quest-panel__claim:focus-visible:not(:disabled) {
+  background: rgba(var(--sc-family-rgb), 0.28);
+  outline: none;
+}
+
+.star-quest-panel__claim:disabled {
+  cursor: default;
+  opacity: 0.55;
+  border-color: rgba(237, 231, 217, 0.08);
+  background: rgba(237, 231, 217, 0.04);
+}
+
+.star-quest-panel__error {
+  margin: 0;
+  font-size: var(--fs-chain);
+  line-height: 1.2;
+  color: rgba(123, 13, 30, 0.95);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes star-quest-panel-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-quest-panel {
+    animation:  none;
+  }
+}

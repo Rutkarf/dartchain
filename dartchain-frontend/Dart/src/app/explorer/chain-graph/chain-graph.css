@@ -1,0 +1,100 @@
+:host {
+  display: flex;
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
+}
+
+.chain-graph {
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  background: #0a1220;
+  margin: 0;
+  padding: 0;
+}
+
+.chain-graph__scroll {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chain-graph__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.chain-graph__link {
+  stroke: rgba(139, 157, 173, 0.55);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.chain-graph__node {
+  cursor: pointer;
+  outline: none;
+}
+
+.chain-graph__node-hit {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+
+.chain-graph__node-circle {
+  fill: rgba(10, 18, 32, 1);
+  stroke: rgba(139, 157, 173, 0.9);
+  stroke-width: 0.9;
+  pointer-events: none;
+}
+
+.chain-graph__node.is-tip .chain-graph__node-circle {
+  fill: rgb(139, 157, 173);
+  stroke: rgba(237, 231, 217, 0.98);
+}
+
+.chain-graph__node-index {
+  pointer-events: none;
+  fill: rgba(21138, 149, 165, 0.95);
+  font-size: var(--fs-fallback);
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.chain-graph__node.is-tip .chain-graph__node-index {
+  fill: #0a1220;
+}
+
+.chain-graph__node:focus-visible .chain-graph__node-circle,
+.chain-graph__node:hover .chain-graph__node-circle {
+  stroke: rgba(139, 157, 173, 0.98);
+  fill: rgba(139, 157, 173, 0.55);
+}
+
+.chain-graph__node:focus-visible .chain-graph__node-index,
+.chain-graph__node:hover .chain-graph__node-index {
+  fill: #0a1220;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chain-graph__scroll {
+    scroll-behavior: auto;
+  }
+}

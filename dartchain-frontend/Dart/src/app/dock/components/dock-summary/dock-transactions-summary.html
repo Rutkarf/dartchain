@@ -1,0 +1,50 @@
+<div
+ class="mempool-summary-bar"
+ role="status"
+ aria-live="polite"
+>
+  <span
+    class="mempool-summary-bar__hash"
+    [class.is-empty]="!pendingHash()"
+    [attr.title]="pendingHash() || 'File vide'"
+  >
+    @if (pendingCount() > 1) {
+      <span class="mempool-summary-bar__count" aria-hidden="true">{{ pendingCount() }}×</span>
+    }
+    <span class="mempool-summary-bar__hash-text">{{ hashDisplay() }}</span>
+  </span>
+
+  <div class="mempool-summary-bar__meta">
+    @if (tipTxLabel()) {
+      <span
+ class="mempool-summary-bar__tip-tx"
+ [attr.title]="tipTxLabel() + ' dans le dernier bloc'"
+ >
+        {{ tipTxLabel() }}
+      </span>
+    }
+    @if (updatedAgeLabel()) {
+      <span class="mempool-summary-bar__time">{{ updatedAgeLabel() }}</span>
+    }
+  </div>
+
+  <div class="mempool-summary-bar__actions">
+    <button
+ type="button"
+ class="mempool-summary-bar__btn mempool-summary-bar__btn--tx"
+ (click)="onOpenTx($event)"
+ title="Tx"
+ >
+      Tx
+    </button>
+    <button
+ type="button"
+ class="mempool-summary-bar__btn mempool-summary-bar__btn--mine"
+ (click)="onMine($event)"
+ [disabled]="!canMine()"
+ [attr.title]="canMine() ? 'Miner' : 'Rien à miner'"
+ >
+      {{ mining() ? '…' : 'Miner' }}
+    </button>
+  </div>
+</div>

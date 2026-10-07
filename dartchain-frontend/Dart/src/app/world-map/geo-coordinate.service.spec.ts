@@ -1,0 +1,91 @@
+import { TestBed } from '@angular/core/testing';
+import * as THREE from 'three';
+
+import { METAVERSE_START_POSITION } from './map-configuration';
+import { GeoCoordinateService } from './geo-coordinate.service';
+import { LocalOriginService } from './local-origin.service';
+import { MapConfigService } from './map-config.service';
+
+describe('GeoCoordinateService', () => {
+  let geo: GeoCoordinateService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    geo = TestBed.inject(GeoCoordinateService);
+  });
+
+  it('place l origine Ombrière au centre du monde local', () => {
+    const world = geo.geoToWorld(
+      METAVERSE_START_POSITION.latitude,
+      METAVERSE_START_POSITION.longitude,
+      0
+    );
+
+    expect(world.x).toBeCloseTo(0, 4);
+    expect(world.z).toBeCloseTo(0, 4);
+    expect(world.y).toBeCloseTo(0, 4);
+  });
+
+  it('convertit inversement sans perte significative sur le Vieux-Port', () => {
+    const original = {
+      latitude: 43.2945995,
+      longitude: 5.3741227,
+      altitude: 12,
+    };
+    const world = geo.geoToWorld(original.latitude, original.longitude, original.altitude);
+    const back = geo.worldToGeo(world);
+
+    expect(back.latitude).toBeCloseTo(original.latitude, 5);
+    expect(back.longitude).toBeCloseTo(original.longitude, 5);
+    expect(back.altitude).toBeCloseTo(original.altitude, 3);
+  });
+
+  it('conserve l altitude sur plusieurs positions autour du Vieux-Port', () => {
+    const samples = [
+      { latitude: 43.295, longitude: 5.368, altitude: 8 },
+      { latitude: 43.298, longitude: 5.372, altitude: 25 },
+      { latitude: 43.294, longitude: 5.365, altitude: 0 },
+    ];
+
+    for (const sample of samples) {
+      const world = geo.geoToWorld(sample.latitude, sample.longitude, sample.altitude);
+      const back = geo.worldToGeo(world);
+      expect(back.altitude).toBeCloseTo(sample.altitude, 3);
+    }
+  });
+
+  it('oriente le nord géographique vers −Z', () => {
+    const origin = geo.geoToWorld(43.2945995, 5.3741227, 0);
+    const north = geo.geoToWorld(43.2955995, 5.3741227, 0);
+
+    expect(north.z).toBeLessThan(origin.z);
+    expect(north.x).toBeCloseTo(origin.x, 3);
+  });
+
+  it('oriente l est géographique vers +X', () => {
+    const origin = geo.geoToWorld(43.2945995, 5.3741227, 0);
+    const east = geo.geoToWorld(43.2945995, 5.3751227, 0);
+
+    expect(east.x).toBeGreaterThan(origin.x);
+    expect(east.z).toBeCloseTo(origin.z, 3);
+  });
+
+  it('expose metaverse-local-v1 via getReferenceConfig', () => {
+    expect(geo.getReferenceConfig().coordinateSystemVersion).toBe('metaverse-local-v1');
+  });
+
+  it('expose l origine via LocalOriginService', () => {
+    const origin = TestBed.inject(LocalOriginService);
+    expect(origin.latitude).toBe(METAVERSE_START_POSITION.latitude);
+    expect(origin.longitude).toBe(METAVERSE_START_POSITION.longitude);
+    expect(origin.worldScale).toBe(1);
+  });
+
+  it('retourne des Vector3 indépendants à chaque appel', () => {
+    const a = geo.geoToWorld(43.2945995, 5.3741227, 0);
+    const b = geo.geoToWorld(43.295, 5.3745, 5);
+    a.x = 999;
+    expect(b).toBeInstanceOf(THREE.Vector3);
+    expect(b.x).not.toBe(999);
+  });
+});

@@ -1,0 +1,42 @@
+<div class="dock-summary-bar" role="status" aria-live="polite">
+  <div class="dock-summary-main">
+    <span class="dock-summary-main__rail" aria-hidden="true"></span>
+    <span
+ class="dock-summary-status"
+ [ngClass]="statusClass(phase())"
+ >
+      {{ statusLabel() }}
+    </span>
+    @if (count() > 0) {
+      <span class="dock-summary-badge">{{ count() }}</span>
+    }
+  </div>
+
+  <div class="dock-summary-progress">
+    <p class="dock-summary-progress__text">
+      @if (headline()) {
+        <span>{{ headline() }}</span>
+      } @else {
+        <span class="dock-summary-progress__text--muted">{{ progressLabel() || 'File vide' }}</span>
+      }
+    </p>
+  </div>
+
+  <div class="dock-summary-meta">
+    @if (updatedAgeLabel()) {
+      <span class="dock-summary-meta__time">{{ updatedAgeLabel() }}</span>
+    }
+  </div>
+
+  <div class="dock-summary-actions">
+    @if (count() > 0) {
+      <button
+ type="button"
+ class="dock-summary-actions__btn dock-summary-actions__primary"
+ (click)="onExpand($event)"
+ >
+        Voir
+      </button>
+    }
+  </div>
+</div>

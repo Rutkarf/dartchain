@@ -1,0 +1,515 @@
+/**
+ * Thème DartChainz — palette fintech + DA
+ * Navy #0a1220 · Baltic #235789 · Jaune doré · Blanc cassé · Gris info #8b9dad · Rouge · Vert
+ * (ex-violet nuit #0d0630 retiré — commit pré-remap / Baltic d’origine)
+ */
+:root {
+  /* Typographie — 3 polices charte : Orbitron / Roboto / Inter */
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Roboto', sans-serif;
+  --font-ui: 'Roboto', sans-serif;
+  --font-mono: 'Inter', sans-serif;
+  --font-data: 'Inter', sans-serif;
+  --font-fallback: 'Roboto', sans-serif;
+
+  /* —— Palette marque —— */
+  --brand-info-grey: #8b9dad;
+  --brand-info-grey-rgb: 139, 157, 173;
+  --brand-porcelain: #ede7d9;
+  --brand-porcelain-rgb: 237, 231, 217;
+  --brand-baltic-blue: #235789;
+  --brand-baltic-blue-rgb: 35, 87, 137;
+  --brand-ultra-purple: #0a1220;
+  --brand-ultra-purple-rgb: 10, 18, 32;
+  --brand-black: #0a1220;
+  --brand-black-rgb: 10, 18, 32;
+
+  /* ÉLÉVATION — même rampe que design-system-tokens.css (chargé après, il gagne). */
+  --bg-0: #0a1220;
+  --bg-1: rgba(237, 231, 217, 0.04);
+  --bg-2: rgba(237, 231, 217, 0.08);
+  --bg-hover-1: var(--bg-2);
+  --bg-hover-2: rgba(237, 231, 217, 0.12);
+  --bg-1-fill: linear-gradient(var(--bg-1), var(--bg-1)), var(--bg-0);
+  --bg-2-fill: linear-gradient(var(--bg-2), var(--bg-2)), var(--bg-0);
+  --bg-hover-1-fill: linear-gradient(var(--bg-hover-1), var(--bg-hover-1)), var(--bg-0);
+  --bg-hover-2-fill: linear-gradient(var(--bg-hover-2), var(--bg-hover-2)), var(--bg-0);
+  --shadow-flat: 0 0 0 transparent;
+
+  /* États interactifs — même contrat que design-system-tokens.css
+     Source : docs/directionArtistique/etats interactifs.txt */
+  --state-hover-bg: var(--bg-hover-2);
+  --state-hover-fill: var(--bg-hover-2-fill);
+  --state-hover-border: var(--stroke-active);
+  --state-active-fill: var(--state-hover-fill);
+  --state-active-border: var(--state-hover-border);
+  --state-focus-ring: var(--shadow-focus);
+  --state-focus-border: var(--stroke-active);
+  --state-disabled-opacity: 0.48;
+  --state-loading-opacity: 0.72;
+  --state-error: #7b0d1e;
+  --state-error-rgb: 123, 13, 30;
+  --state-error-fg: var(--state-error);
+  --state-error-bg: rgba(var(--state-error-rgb), 0.1);
+  --state-error-border: rgba(var(--state-error-rgb), 0.28);
+  --state-success: #09814a;
+  --state-success-rgb: 9, 129, 74;
+  --state-success-fg: var(--state-success);
+  --state-success-bg: rgba(var(--state-success-rgb), 0.1);
+  --state-success-border: rgba(var(--state-success-rgb), 0.28);
+
+  /* Motion — recopié ; design-system-tokens.css (chargé après) gagne.
+     Source : docs/directionArtistique/motion et transitions.txt */
+  --motion-state: 120ms;
+  --motion-enter: 160ms;
+  --motion-ease-state: ease;
+  --motion-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* —— Palette site (navy → Baltic → porcelaine) — rampe fintech d’origine —— */
+  --palette-1: var(--brand-black);
+  --palette-1-rgb: var(--brand-black-rgb);
+  --palette-2: #0a1018;
+  --palette-2-rgb: 10, 16, 24;
+  --palette-3: #121f2e;
+  --palette-3-rgb: 18, 31, 46;
+  --palette-4: #1a3048;
+  --palette-4-rgb: 26, 48, 72;
+  --palette-5: var(--brand-baltic-blue);
+  --palette-5-rgb: var(--brand-baltic-blue-rgb);
+  --palette-6: #3d6f9e;
+  --palette-6-rgb: 61, 111, 158;
+  --palette-7: #6a95b8;
+  --palette-7-rgb: 106, 149, 184;
+  --palette-8: #a8c4d8;
+  --palette-8-rgb: 168, 196, 216;
+  --palette-9: var(--brand-porcelain);
+  --palette-9-rgb: var(--brand-porcelain-rgb);
+
+  /* —— Palette boutons —— */
+  --btn-palette-1: #0a1220;
+  --btn-palette-1-rgb: 10, 18, 32;
+  --btn-palette-2: #0d1824;
+  --btn-palette-2-rgb: 13, 24, 36;
+  --btn-palette-3: #152535;
+  --btn-palette-3-rgb: 21, 37, 53;
+  --btn-palette-4: #1c3550;
+  --btn-palette-4-rgb: 28, 53, 80;
+  --btn-palette-5: #235789;
+  --btn-palette-5-rgb: 35, 87, 137;
+  --btn-palette-6: #2d6a94;
+  --btn-palette-6-rgb: 45, 106, 148;
+  --btn-palette-7: #4a87ad;
+  --btn-palette-7-rgb: 74, 135, 173;
+  --btn-palette-8: #6ba3c4;
+  --btn-palette-8-rgb: 107, 163, 196;
+  --btn-palette-9: #8fc0dc;
+  --btn-palette-9-rgb: 143, 192, 220;
+
+  /* —— Accents (alias legacy « electric-* ») —— */
+  --electric-cyan: var(--brand-baltic-blue);
+  --electric-cyan-rgb: var(--brand-baltic-blue-rgb);
+  --electric-violet: #235789;
+  --electric-violet-rgb: 35, 87, 137;
+  --electric-magenta: var(--brand-info-grey);
+  --electric-magenta-rgb: var(--brand-info-grey-rgb);
+  --electric-pink: #8b9dad;
+  --electric-pink-rgb: 139, 157, 173;
+  --electric-teal: var(--brand-ultra-purple);
+  --electric-teal-rgb: var(--brand-ultra-purple-rgb);
+
+  --accent-primary: var(--brand-baltic-blue);
+  --accent-primary-rgb: var(--brand-baltic-blue-rgb);
+  --accent-secondary: var(--brand-info-grey);
+  --accent-secondary-rgb: var(--brand-info-grey-rgb);
+  --accent-warm: var(--brand-ultra-purple);
+  --accent-warm-rgb: var(--brand-ultra-purple-rgb);
+  --accent-mid: #8b9dad;
+  --accent-mid-rgb: 139, 157, 173;
+
+  --ui-accent: var(--accent-primary);
+  --ui-accent-rgb: var(--accent-primary-rgb);
+  --ui-accent-2: var(--accent-secondary);
+  --ui-accent-2-rgb: var(--accent-secondary-rgb);
+  --ui-border: rgba(var(--brand-porcelain-rgb), 0.1);
+  --ui-border-hover: rgba(var(--brand-baltic-blue-rgb), 0.35);
+  --ui-border-active: rgba(var(--brand-baltic-blue-rgb), 0.55);
+  --ui-glow: var(--shadow-flat);
+  --ui-glow-strong: var(--shadow-flat);
+  --ui-glow-accent:
+    0 0 12px rgba(var(--brand-baltic-blue-rgb), 0.35),
+    0 0 24px rgba(var(--brand-baltic-blue-rgb), 0.15);
+  --ui-glow-accent-strong:
+    0 0 16px rgba(var(--brand-baltic-blue-rgb), 0.48),
+    0 0 32px rgba(var(--brand-info-grey-rgb), 0.18);
+  --ui-glow-magenta:
+    0 0 14px rgba(var(--brand-info-grey-rgb), 0.4),
+    0 0 28px rgba(var(--brand-info-grey-rgb), 0.16);
+  --ui-chip-bg: rgba(var(--brand-porcelain-rgb), 0.04);
+  --ui-chip-bg-hover: linear-gradient(
+    135deg,
+    rgba(var(--brand-baltic-blue-rgb), 0.14) 0%,
+    rgba(var(--brand-info-grey-rgb), 0.08) 100%
+  );
+  --ui-chip-bg-active: linear-gradient(
+    135deg,
+    rgba(var(--brand-baltic-blue-rgb), 0.22) 0%,
+    rgba(var(--brand-info-grey-rgb), 0.12) 100%
+  );
+
+  --gradient-accent-v: linear-gradient(180deg, var(--brand-baltic-blue), var(--brand-info-grey));
+  --gradient-accent-h: linear-gradient(90deg, var(--brand-baltic-blue), var(--brand-info-grey));
+  --gradient-accent-soft: linear-gradient(90deg, var(--brand-baltic-blue), var(--brand-ultra-purple));
+  --gradient-panel: linear-gradient(135deg, var(--palette-2), var(--palette-4), var(--palette-3));
+
+  --gradient-btn: linear-gradient(180deg, var(--btn-palette-4), var(--btn-palette-5));
+  --gradient-btn-warm: linear-gradient(180deg, var(--btn-palette-5), var(--brand-info-grey));
+  --gradient-claim: linear-gradient(90deg, var(--brand-baltic-blue), var(--brand-ultra-purple));
+  --gradient-cta-blue: var(--gradient-btn);
+  --gradient-brand-text: linear-gradient(
+    180deg,
+    var(--text-primary) 0%,
+    var(--brand-baltic-blue) 55%,
+    var(--brand-ultra-purple) 100%
+  );
+
+  --glass-fill: linear-gradient(
+    165deg,
+    rgba(var(--brand-info-grey-rgb), 0.05) 0%,
+    rgba(var(--palette-3-rgb), 0.42) 42%,
+    rgba(var(--brand-baltic-blue-rgb), 0.06) 100%
+  );
+  --glass-border: linear-gradient(
+    135deg,
+    rgba(var(--brand-baltic-blue-rgb), 0.45),
+    rgba(var(--brand-info-grey-rgb), 0.2),
+    rgba(var(--brand-ultra-purple-rgb), 0.18)
+  );
+  --glass-shadow:
+    inset 0 1px 0 rgba(var(--brand-porcelain-rgb), 0.08),
+    0 2px 12px rgba(10, 18, 32, 0.45),
+    0 0 1px rgba(var(--brand-baltic-blue-rgb), 0.2);
+  --glass-blur: blur(8px);
+  --glass-dropdown-fill: linear-gradient(
+    180deg,
+    rgba(var(--surface-dropdown-top-rgb), 0.5),
+    rgba(var(--surface-dropdown-mid-rgb), 0.45),
+    rgba(var(--surface-dropdown-bottom-rgb), 0.48)
+  );
+
+  --tab-accent: var(--ui-accent);
+  --tab-accent-rgb: var(--ui-accent-rgb);
+  --tab-accent-2: var(--ui-accent-2);
+  --tab-accent-2-rgb: var(--ui-accent-2-rgb);
+
+  --glass-tab-tint-idle: rgba(var(--palette-3-rgb), 0.55);
+  --glass-tab-tint-hover: rgba(var(--palette-4-rgb), 0.72);
+  --glass-tab-tint-active: rgba(var(--tab-accent-rgb), 0.2);
+  --glass-tab-border-color: rgba(var(--brand-porcelain-rgb), 0.1);
+  --glass-tab-border-hover-color: rgba(var(--brand-porcelain-rgb), 0.16);
+  --glass-tab-border-active-color: rgba(var(--tab-accent-rgb), 0.55);
+  --glass-tab-glow: var(--ui-glow-accent);
+
+  --glass-tab-bg: var(--glass-tab-tint-idle);
+  --glass-tab-bg-hover: var(--glass-tab-tint-hover);
+  --glass-tab-border: var(--glass-tab-border-color);
+  --glass-tab-border-hover: var(--glass-tab-border-hover-color);
+  --glass-tab-border-active: var(--glass-tab-border-active-color);
+
+  --tab-rail-scale: 1.5;
+  --tab-rail-width: calc(20px * var(--tab-rail-scale));
+  --tab-rail-gap: 0px;
+  --tab-rail-radius: calc(4px * var(--tab-rail-scale));
+  --tab-rail-label-size: clamp(7px, 3vw, 10px);
+  --tab-rail-slot-min: calc(29.25px * var(--tab-rail-scale));
+
+  --cta-transition:  var(--motion-state) var(--motion-ease-state);
+  --cta-disabled-opacity: var(--state-disabled-opacity);
+  /* DA radius : une seule source = --comp-btn-form-radius (8px). */
+  --cta-radius-sm: var(--comp-btn-form-radius);
+  --cta-radius-md: var(--comp-btn-form-radius);
+  --cta-radius-lg: var(--comp-btn-form-radius);
+  --cta-height-sm: 32px;
+  --cta-height-md: 32px;
+  --cta-height-lg: 32px;
+  --cta-padding-sm: 0 12px;
+  --cta-padding-md: 0 12px;
+  --cta-padding-lg: 0 12px;
+  --cta-font-sm: var(--fs-body);
+  --cta-font-md: var(--fs-body);
+  --cta-font-lg: var(--fs-body);
+  --cta-focus-ring:
+    0 0 0 2px rgba(var(--bg-base-rgb), 0.95),
+    0 0 0 3px rgba(var(--brand-baltic-blue-rgb), 0.5),
+    var(--ui-glow-accent);
+
+  --cta-primary-text: #0a1220;
+  --cta-primary-fill: #d5a021;
+  --cta-primary-fill-hover: #d5a021;
+  --cta-primary-border: rgba(213, 160, 33, 0.65);
+  --cta-primary-bg: var(--cta-primary-fill);
+  --cta-primary-bg-hover: var(--cta-primary-fill-hover);
+  --cta-primary-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.18);
+  --cta-primary-shadow-hover: inset 0 1px 0 rgba(237, 231, 217, 0.22);
+  --cta-primary-text-glow: 0 0 10px rgba(var(--brand-baltic-blue-rgb), 0.45);
+
+  --cta-accent-text: var(--brand-porcelain);
+  --cta-accent-fill: linear-gradient(
+    118deg,
+    rgba(var(--btn-palette-3-rgb), 0.98) 0%,
+    rgba(var(--brand-info-grey-rgb), 0.75) 55%,
+    rgba(var(--brand-info-grey-rgb), 0.9) 100%
+  );
+  --cta-accent-fill-hover: linear-gradient(
+    118deg,
+    rgba(var(--btn-palette-4-rgb), 1) 0%,
+    rgba(var(--brand-info-grey-rgb), 0.88) 45%,
+    rgba(var(--electric-pink-rgb), 0.95) 100%
+  );
+  --cta-accent-border: rgba(var(--brand-info-grey-rgb), 0.85);
+  --cta-accent-bg: var(--cta-accent-fill);
+  --cta-accent-bg-hover: var(--cta-accent-fill-hover);
+  --cta-accent-shadow:
+    inset 0 1px 0 rgba(var(--brand-porcelain-rgb), 0.18),
+    0 0 0 1px rgba(var(--brand-info-grey-rgb), 0.35),
+    0 0 14px rgba(var(--brand-info-grey-rgb), 0.35);
+  --cta-accent-shadow-hover:
+    inset 0 1px 0 rgba(var(--brand-porcelain-rgb), 0.22),
+    0 0 0 1px rgba(var(--brand-info-grey-rgb), 0.55),
+    var(--ui-glow-magenta);
+  --cta-accent-text-glow: 0 0 10px rgba(var(--brand-info-grey-rgb), 0.5);
+
+  --cta-secondary-text: var(--brand-porcelain);
+  --cta-secondary-fill: #235789;
+  --cta-secondary-fill-hover: #235789;
+  --cta-secondary-border: rgba(var(--brand-porcelain-rgb), 0.1);
+  --cta-secondary-bg: var(--cta-secondary-fill);
+  --cta-secondary-bg-hover: var(--cta-secondary-fill-hover);
+  --cta-secondary-shadow:
+    inset 0 1px 0 rgba(var(--brand-porcelain-rgb), 0.08),
+    0 0 10px rgba(var(--brand-baltic-blue-rgb), 0.15);
+  --cta-secondary-shadow-hover:
+    inset 0 1px 0 rgba(var(--brand-porcelain-rgb), 0.12),
+    var(--ui-glow-accent);
+
+  --cta-tertiary-text: var(--brand-info-grey);
+  --cta-tertiary-fill: transparent;
+  --cta-tertiary-fill-hover: rgba(var(--brand-porcelain-rgb), 0.04);
+  --cta-tertiary-border: transparent;
+  --cta-tertiary-bg: var(--cta-tertiary-fill);
+  --cta-tertiary-bg-hover: var(--cta-tertiary-fill-hover);
+  --cta-tertiary-shadow: 0 0 8px rgba(var(--brand-ultra-purple-rgb), 0.12);
+  --cta-tertiary-shadow-hover: var(--ui-glow-accent);
+
+  --cta-ghost-text: var(--text-muted-strong);
+  --cta-ghost-bg: rgba(var(--btn-palette-2-rgb), 0.5);
+  --cta-ghost-bg-hover: rgba(var(--brand-baltic-blue-rgb), 0.15);
+  --cta-ghost-border-color: rgba(var(--brand-baltic-blue-rgb), 0.4);
+  --cta-ghost-border-hover: rgba(var(--brand-baltic-blue-rgb), 0.65);
+  --cta-ghost-shadow: 0 0 6px rgba(var(--brand-baltic-blue-rgb), 0.08);
+  --cta-ghost-shadow-hover: var(--ui-glow-accent);
+
+  --cta-danger-text: var(--brand-porcelain);
+  --cta-danger-fill: #7b0d1e;
+  --cta-danger-fill-hover: #7b0d1e;
+  --cta-danger-border: rgba(123, 13, 30, 0.85);
+  --cta-danger-bg: var(--cta-danger-fill);
+  --cta-danger-bg-hover: var(--cta-danger-fill-hover);
+  --cta-danger-shadow:
+    inset 0 1px 0 rgba(var(--brand-porcelain-rgb), 0.1),
+    0 1px 2px rgba(10, 18, 32, 0.35);
+  --cta-danger-shadow-hover:
+    inset 0 1px 0 rgba(var(--brand-porcelain-rgb), 0.14),
+    0 2px 4px rgba(10, 18, 32, 0.4);
+
+  --glass-btn-fill: var(--cta-secondary-fill);
+  --glass-btn-fill-hover: var(--cta-secondary-fill-hover);
+  --glass-border-btn: var(--cta-secondary-border);
+  --glass-shadow-btn: var(--cta-secondary-shadow);
+  --bg-action-btn: var(--cta-tertiary-bg);
+  --bg-action-btn-hover: var(--cta-tertiary-bg-hover);
+  --bg-swap-arrow: var(--cta-primary-bg);
+
+  --glass-field-bg: rgba(var(--palette-4-rgb), 0.55);
+  --glass-field-bg-hover: rgba(var(--palette-5-rgb), 0.65);
+
+  --bg-exchange-fill: var(--glass-fill);
+  --bg-rate-fill: var(--glass-fill);
+  --bg-showcase-fill: var(--glass-fill);
+  --bg-tab-idle: var(--glass-tab-bg);
+  --bg-tab-active: var(--glass-tab-bg-hover);
+  --bg-dock-panel-fill: var(--glass-fill);
+  --bg-navbar-fill: transparent;
+  --bg-navbar-border: rgba(var(--brand-porcelain-rgb), 0.08);
+  /* Navbar : hauteur ×2 (contenu inclus) */
+  --navbar-scale: 2;
+  --navbar-logo-visual-scale: 0.63;
+  --navbar-content-lift: 1px;
+  --bandeau-slot-h: auto;
+  --faucet-band-height: auto;
+  --navbar-utility-h: auto;
+  --navbar-stack-h: auto;
+  --market-after-ticker-gap: calc(clamp(4px, 1.2vw, 7px) * 3);
+  --market-logo-clearance: 0px;
+
+  --navbar-top-bleed: 0px;
+  --navbar-logo-size: calc(72px * var(--navbar-scale) * var(--navbar-logo-visual-scale));
+  /* Hauteur layout réelle du gem (sans marge transparente sous le canvas) */
+  --navbar-logo-layout-h: calc(var(--navbar-logo-size) * 0.68);
+  /* Colonne logo = empreinte visuelle du gem (pas toute la zone canvas) */
+  --navbar-logo-offset: var(--navbar-logo-layout-h);
+  --navbar-logo-shell-h: var(--navbar-logo-layout-h);
+  --navbar-bar-h: max(var(--navbar-row-h), var(--navbar-logo-shell-h));
+  --navbar-logo-canvas-scale: 1;
+  --navbar-logo-inset-top: 0px;
+  /* Canvas collé en haut du slot logo (pas de bande vide au-dessus du gem) */
+  --navbar-logo-canvas-shift-y: 1px;
+  --navbar-logo-column-pull: 0px;
+  --navbar-logo-top-pull: 0px;
+  --navbar-logo-dead-space: 0px;
+  --brand-crypto-gap: 0px;
+  --navbar-logo-slot-w: var(--navbar-logo-layout-h);
+  --navbar-led-size: calc(2.5px * var(--navbar-scale));
+  --navbar-led-size-network: calc(3px * var(--navbar-scale));
+  --navbar-mini-btn-icon-size: calc(6px * var(--navbar-scale));
+  --navbar-mini-btn-size: calc(var(--navbar-mini-btn-icon-size) + 4px);
+  /* Hauteur unique : search, auth, R4V3, métriques (même ligne) */
+  --navbar-chrome-h: var(--navbar-mini-btn-size);
+  --navbar-utility-row-h: var(--navbar-chrome-h);
+  --navbar-row-h: var(--navbar-chrome-h);
+  --navbar-control-h: var(--navbar-chrome-h);
+  --navbar-search-h: var(--navbar-chrome-h);
+  --navbar-metrics-h: var(--navbar-chrome-h);
+  --navbar-auth-icon-size: calc(var(--navbar-chrome-h) - 4px);
+  --navbar-auth-btn-size: var(--navbar-chrome-h);
+  --navbar-auth-strip-w: calc(var(--navbar-auth-btn-size) * 2);
+  --navbar-icon-btn-size: calc(24px * var(--navbar-scale));
+  --navbar-status-font-size: var(--fs-shell);
+  --navbar-brand-title-size: calc(0.46rem * var(--navbar-scale));
+  --navbar-crypto-font-size: var(--fs-price);
+  --navbar-crypto-select-w: 2.75rem;
+
+  --bg-base: #0a1220;
+  --bg-base-rgb: 10, 18, 32;
+  --bg-deep: #0a1220;
+  --bg-deep-rgb: 10, 18, 32;
+  --bg-elevated: #0a1220;
+  --bg-elevated-rgb: 10, 18, 32;
+  --bg-body-top: #0a1220;
+  --bg-body-bottom: #0a1220;
+
+  --background-top: #0a1220;
+  --background-middle: #0a1220;
+  --background-bottom: #0a1220;
+  --background-light-halo: transparent;
+  --background-blue-halo: transparent;
+  --background-depth-halo: transparent;
+  --surface-card-top: rgba(var(--palette-4-rgb), 0.45);
+  --surface-card-bottom: rgba(var(--palette-2-rgb), 0.65);
+  --surface-panel-rgb: 10, 18, 32;
+  --surface-panel-deep-rgb: 10, 18, 32;
+  --surface-input: rgba(var(--brand-porcelain-rgb), 0.06);
+  --surface-input-rgb: 237, 231, 217;
+  --surface-input-hover: rgba(var(--brand-porcelain-rgb), 0.1);
+  --surface-input-hover-rgb: 237, 231, 217;
+  --surface-dropdown-top-rgb: 35, 87, 137;
+  --surface-dropdown-mid-rgb: 35, 87, 137;
+  --surface-dropdown-bottom-rgb: 10, 18, 32;
+
+  --text-primary: var(--brand-porcelain);
+  --text-primary-rgb: var(--brand-porcelain-rgb);
+  --text-secondary: var(--brand-info-grey);
+  --text-secondary-rgb: var(--brand-info-grey-rgb);
+  --text-bright: #ede7d9;
+  --text-bright-rgb: 237, 231, 217;
+  --text-soft: #ede7d9;
+  --text-on-accent: var(--brand-black);
+  --text-on-accent-rgb: var(--brand-black-rgb);
+  --text-muted: rgba(var(--brand-porcelain-rgb), 0.45);
+  --text-muted-rgb: var(--brand-porcelain-rgb);
+  --text-dim: rgba(var(--brand-porcelain-rgb), 0.45);
+  --text-dim-rgb: var(--brand-porcelain-rgb);
+  --text-muted-strong: #ede7d9;
+  --text-muted-strong-rgb: 237, 231, 217;
+  --text-faint: rgba(var(--brand-porcelain-rgb), 0.72);
+  --text-ghost: rgba(var(--brand-porcelain-rgb), 0.45);
+  --text-hint: var(--text-dim);
+  --text-placeholder: rgba(var(--brand-porcelain-rgb), 0.45);
+  --text-disabled: rgba(var(--brand-porcelain-rgb), 0.32);
+  --text-accent-soft: #ede7d9;
+  --text-accent-glow: #235789;
+  --text-link: var(--brand-info-grey);
+
+  --color-positive: #09814a;
+  --color-positive-rgb: 9, 129, 74;
+  --color-positive-bright: #09814a;
+  --color-negative: #7b0d1e;
+  --color-negative-rgb: 123, 13, 30;
+  --color-negative-soft: rgba(123, 13, 30, 0.45);
+
+  /* Graphiques — hausse / baisse (rate panel, showcase) */
+  --chart-trend-up: #09814a;
+  --chart-trend-up-rgb: 9, 129, 74;
+  --chart-trend-down: #7b0d1e;
+  --chart-trend-down-rgb: 123, 13, 30;
+  --color-warning: #d5a021;
+  --color-warning-rgb: 213, 160, 33;
+  --electric-green: var(--brand-ultra-purple);
+  --electric-green-rgb: var(--brand-ultra-purple-rgb);
+  --status-online: var(--brand-ultra-purple);
+  --status-online-rgb: var(--brand-ultra-purple-rgb);
+  --status-online-glow: rgba(var(--brand-ultra-purple-rgb), 0.55);
+
+  /* LED navbar (peer + réseau) — vert néon, indépendant du thème global */
+  --navbar-led-online: #09814a;
+  --navbar-led-online-rgb: 9, 129, 74;
+  --navbar-led-online-glow: rgba(9, 129, 74, 0.55);
+  --status-offline: #8b9dad;
+  --status-offline-rgb: 139, 157, 173;
+
+  --border-subtle: rgba(var(--brand-porcelain-rgb), 0.12);
+  --border-faint: var(--stroke-subtle);
+  --border-soft: var(--stroke-default);
+  --border-accent: var(--stroke-active);
+  --border-accent-hover: var(--stroke-active);
+  --overlay-highlight: rgba(var(--brand-porcelain-rgb), 0.05);
+  --overlay-highlight-strong: rgba(var(--brand-porcelain-rgb), 0.08);
+  --surface-inset-top: rgba(var(--brand-porcelain-rgb), 0.06);
+  --surface-inset-top-strong: rgba(var(--brand-porcelain-rgb), 0.09);
+  --surface-raised: rgba(var(--brand-porcelain-rgb), 0.04);
+  --surface-sunken: rgba(10, 18, 32, 0.4);
+  --surface-sunken-hover: rgba(10, 18, 32, 0.5);
+  --surface-scrollbar-track: var(--ds-scrollbar-track, rgba(var(--brand-black-rgb), 0.72));
+  --surface-scrollbar-thumb: var(--ds-scrollbar-thumb, rgba(var(--accent-primary-rgb), 0.28));
+  --surface-scrollbar-thumb-hover: var(--ds-scrollbar-thumb-hover, rgba(var(--accent-primary-rgb), 0.46));
+  --surface-scrim: rgba(var(--bg-base-rgb), 0.72);
+  --surface-scrim-heavy: rgba(10, 18, 32, 0.78);
+  --gradient-surface-header: linear-gradient(180deg, rgba(var(--brand-porcelain-rgb), 0.05), transparent);
+  --gradient-surface-shine: linear-gradient(180deg, rgba(var(--brand-porcelain-rgb), 0.06), transparent);
+  --shadow-ink-rgb: 10, 18, 32;
+  --glow-primary: rgba(var(--brand-baltic-blue-rgb), 0.2);
+  --glow-warm: rgba(var(--brand-info-grey-rgb), 0.16);
+
+  --surface-success-bg: var(--state-success-bg);
+  --surface-success-border: var(--state-success-border);
+  --surface-success-glow: rgba(var(--state-success-rgb), 0.15);
+  --surface-warning-bg: rgba(var(--color-warning-rgb), 0.12);
+  --surface-warning-border: rgba(var(--color-warning-rgb), 0.3);
+  --surface-error-bg: var(--state-error-bg);
+  --surface-error-border: var(--state-error-border);
+  --surface-error-scrim: rgba(10, 18, 32, 0.1);
+  --surface-info-bg: rgba(var(--brand-baltic-blue-rgb), 0.12);
+  --surface-info-border: rgba(var(--brand-baltic-blue-rgb), 0.3);
+  --surface-focus-ring: rgba(var(--brand-baltic-blue-rgb), 0.35);
+  --surface-inset-pressed: var(--overlay-highlight);
+  --surface-shine-strong: rgba(var(--brand-porcelain-rgb), 0.08);
+  --shadow-elevated: rgba(10, 18, 32, 0.5);
+
+  --drawer-bg: rgba(var(--bg-deep-rgb), 0.92);
+  --drawer-bg-2: rgba(var(--bg-base-rgb), 0.96);
+  --drawer-text: var(--text-primary);
+  --drawer-muted: var(--text-secondary);
+  --drawer-muted-rgb: var(--text-secondary-rgb);
+
+  --dock-tab-cyan: var(--accent-primary);
+  --showcase-tab-cyan: var(--accent-primary);
+}

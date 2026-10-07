@@ -1,0 +1,816 @@
+@import './styles/google-fonts.css';
+@import './theme.css';
+@import './styles/design-system-tokens.css';
+@import './styles/icon.css';
+@import './styles/ds-scrollbar.css';
+@import './styles/ds-surface.css';
+@import './styles/showcase-tabs-global.css';
+@import './styles/showcase-meta-shared.css';
+@import './styles/collapsed-summary-bar.css';
+@import './styles/news-category-chip.css';
+@import './styles/dock-shell.css';
+@import './styles/panel-headers.css';
+@import './styles/shell-stack.css';
+@import './cta-buttons.css';
+@import './styles/dock-view-tokens.css';
+@import './styles/tab-push-button-v4.css';
+@import './styles/ds-pass3-polish.css';
+@import './styles/phone-portrait-overlay.css';
+@import './styles/wide-shell-fit.css';
+@import './styles/phone-tall-fit.css';
+
+/* —— Viewport one-page @ 250×550 —— */
+html,
+body {
+  background-color: #0a1220;
+  background-image: none;
+}
+
+html,
+body,
+app-root {
+  display: block;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  /* Gouttière canon compact = 2px. Au-dessus de 349 px, app.css restaure le % historique. */
+  --app-side-gutter: var(--ds-shell-gutter, 2px);
+  --app-side-gutter-exchange: var(--ds-shell-gutter, 2px);
+  --app-side-gutter-band: var(--ds-shell-gutter, 2px);
+}
+
+html.intro-active,
+html.intro-active body,
+html.age-gate-active,
+html.age-gate-active body {
+  overflow: hidden;
+  background: #0a1220 !important;
+}
+
+/* Refus d’âge : écran noir total jusqu’à about:blank — zéro flash du hub. */
+html.age-gate-kick,
+html.age-gate-kick body {
+  background: #0a1220 !important;
+  overflow: hidden !important;
+}
+
+html.age-gate-kick app-root,
+html.age-gate-kick .app-shell,
+html.age-gate-kick #age-call-boot {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#age-call-kick {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: var(--z-agegate, 10060) !important;
+  background: #0a1220 !important;
+  pointer-events: auto !important;
+}
+
+/* Pendant l’appel d’âge, l’intro ne doit ni se voir ni capter les clics. */
+html.age-gate-active:not(.intro-active) .intro {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Pont appel → INSERT : l’intro apparaît sous le flyer pendant le vol. */
+html.intro-handoff,
+html.intro-handoff body {
+  /* Filet anti-flash noir si une couche est un frame en retard. */
+  background-color: #0a1220 !important;
+}
+
+html.intro-handoff .intro,
+html.intro-active.intro-handoff .intro {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+html.intro-handoff .intro__atmosphere {
+  opacity: 1 !important;
+}
+
+/*
+ * Hub / blockchain invisibles pendant l’appel puis l’intro,
+ * jusqu’au reveal (token qui recule) ou fin d’intro.
+ * Star Conquest reste visible pendant intro-feed-sc (soulignage token).
+ */
+html.age-gate-active .app-shell > :not(app-age-call-gate):not(app-intro-overlay):not(app-particle-background),
+html.intro-active:not(.intro-reveal) .app-shell > :not(app-age-call-gate):not(app-intro-overlay):not(app-particle-background) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* Pendant l’intro Feed : SC en bandeau sous le token (cliquable). */
+html.intro-active:not(.intro-feed-sc) app-particle-background {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+html.intro-feed-sc app-particle-background {
+  visibility: visible !important;
+  opacity: var(--intro-sc-opacity, 0) !important;
+  /* Host cliquable UNIQUEMENT dans le bandeau (clip-path coupe aussi le hit-test). */
+  pointer-events: auto !important;
+  z-index: 19000 !important;
+  transition: opacity 0.85s cubic-bezier(0.33, 0.08, 0.2, 1) !important;
+  /*
+   * clip-path = hitbox parked. Feather bas large pour éviter une arête nette
+   * sous le token. Pas de translate rise : ça créait une droite qui montait
+   * et masquait SC.
+   */
+  clip-path: inset(
+    var(--sc-playable-top, 40%) 0 var(--sc-playable-bottom, 40%) 0
+  ) !important;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent max(0px, calc(var(--sc-playable-top, 40%) - 72px)),
+    rgba(0, 0, 0, 0.22) max(0px, calc(var(--sc-playable-top, 40%) - 36px)),
+    rgba(0, 0, 0, 0.7) calc(var(--sc-playable-top, 40%) - 4px),
+    #000 calc(var(--sc-playable-top, 40%) + 10px),
+    #000 calc(100% - var(--sc-playable-bottom, 40%) - 56px),
+    rgba(0, 0, 0, 0.65) calc(100% - var(--sc-playable-bottom, 40%) - 28px),
+    rgba(0, 0, 0, 0.28) calc(100% - var(--sc-playable-bottom, 40%) - 4px),
+    transparent calc(100% - var(--sc-playable-bottom, 40%) + 48px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent max(0px, calc(var(--sc-playable-top, 40%) - 72px)),
+    rgba(0, 0, 0, 0.22) max(0px, calc(var(--sc-playable-top, 40%) - 36px)),
+    rgba(0, 0, 0, 0.7) calc(var(--sc-playable-top, 40%) - 4px),
+    #000 calc(var(--sc-playable-top, 40%) + 10px),
+    #000 calc(100% - var(--sc-playable-bottom, 40%) - 56px),
+    rgba(0, 0, 0, 0.65) calc(100% - var(--sc-playable-bottom, 40%) - 28px),
+    rgba(0, 0, 0, 0.28) calc(100% - var(--sc-playable-bottom, 40%) - 4px),
+    transparent calc(100% - var(--sc-playable-bottom, 40%) + 48px),
+    transparent 100%
+  );
+}
+
+/*
+ * Montée token : plus de clip-path / plan horizontal qui monte.
+ * SC reste en place, soft-mask ouvert vers le ciel, fondu opacity.
+ */
+html.intro-feed-sc.intro-feed-sc-lift app-particle-background {
+  clip-path: none !important;
+  pointer-events: none !important;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.35) max(0px, calc(var(--sc-playable-top, 40%) - 48px)),
+    #000 calc(var(--sc-playable-top, 40%) + 8px),
+    #000 calc(100% - var(--sc-playable-bottom, 40%) + 24px),
+    rgba(0, 0, 0, 0.4) calc(100% - var(--sc-playable-bottom, 40%) + 72px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.35) max(0px, calc(var(--sc-playable-top, 40%) - 48px)),
+    #000 calc(var(--sc-playable-top, 40%) + 8px),
+    #000 calc(100% - var(--sc-playable-bottom, 40%) + 24px),
+    rgba(0, 0, 0, 0.4) calc(100% - var(--sc-playable-bottom, 40%) + 72px),
+    transparent 100%
+  );
+}
+
+html.intro-feed-sc app-particle-background canvas {
+  pointer-events: auto !important;
+}
+
+html.intro-feed-sc.intro-feed-sc-lift app-particle-background canvas {
+  pointer-events: none !important;
+}
+
+/* Trou fond : ancré (pas de rise) — feather bas doux, pas d’arête qui monte. */
+html.intro-feed-sc .intro__atmosphere,
+html.intro-feed-sc .intro__grid,
+html.intro-feed-sc .intro__grain,
+html.intro-feed-sc .intro__gl {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 max(0px, calc(var(--intro-sc-mask-top, 40%) - 110px)),
+    rgba(0, 0, 0, 0.4) max(0px, calc(var(--intro-sc-mask-top, 40%) - 52px)),
+    rgba(0, 0, 0, 0.06) max(0px, calc(var(--intro-sc-mask-top, 40%) - 12px)),
+    transparent var(--intro-sc-mask-top, 40%),
+    transparent var(--intro-sc-mask-bottom, 55%),
+    rgba(0, 0, 0, 0.06) calc(var(--intro-sc-mask-bottom, 55%) + 16px),
+    rgba(0, 0, 0, 0.35) calc(var(--intro-sc-mask-bottom, 55%) + 56px),
+    #000 calc(var(--intro-sc-mask-bottom, 55%) + 110px),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 max(0px, calc(var(--intro-sc-mask-top, 40%) - 110px)),
+    rgba(0, 0, 0, 0.4) max(0px, calc(var(--intro-sc-mask-top, 40%) - 52px)),
+    rgba(0, 0, 0, 0.06) max(0px, calc(var(--intro-sc-mask-top, 40%) - 12px)),
+    transparent var(--intro-sc-mask-top, 40%),
+    transparent var(--intro-sc-mask-bottom, 55%),
+    rgba(0, 0, 0, 0.06) calc(var(--intro-sc-mask-bottom, 55%) + 16px),
+    rgba(0, 0, 0, 0.35) calc(var(--intro-sc-mask-bottom, 55%) + 56px),
+    #000 calc(var(--intro-sc-mask-bottom, 55%) + 110px),
+    #000 100%
+  );
+}
+
+/* Pendant la montée : trou atmosphère s’ouvre vers le ciel, bas figé (pas de lame). */
+html.intro-feed-sc.intro-feed-sc-lift .intro__atmosphere,
+html.intro-feed-sc.intro-feed-sc-lift .intro__grid,
+html.intro-feed-sc.intro-feed-sc-lift .intro__grain,
+html.intro-feed-sc.intro-feed-sc-lift .intro__gl {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 max(0px, calc(var(--intro-sc-mask-top, 40%) - 160px)),
+    rgba(0, 0, 0, 0.25) max(0px, calc(var(--intro-sc-mask-top, 40%) - 80px)),
+    transparent max(0px, calc(var(--intro-sc-mask-top, 40%) - 20px)),
+    transparent calc(var(--intro-sc-mask-bottom, 55%) + 40px),
+    rgba(0, 0, 0, 0.2) calc(var(--intro-sc-mask-bottom, 55%) + 90px),
+    #000 calc(var(--intro-sc-mask-bottom, 55%) + 150px),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 max(0px, calc(var(--intro-sc-mask-top, 40%) - 160px)),
+    rgba(0, 0, 0, 0.25) max(0px, calc(var(--intro-sc-mask-top, 40%) - 80px)),
+    transparent max(0px, calc(var(--intro-sc-mask-top, 40%) - 20px)),
+    transparent calc(var(--intro-sc-mask-bottom, 55%) + 40px),
+    rgba(0, 0, 0, 0.2) calc(var(--intro-sc-mask-bottom, 55%) + 90px),
+    #000 calc(var(--intro-sc-mask-bottom, 55%) + 150px),
+    #000 100%
+  );
+}
+
+/* Pendant la descente logo.stl haut → Live : pas de 2ᵉ logo navbar concurrent. */
+html.intro-token-entering .logo-shell {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Pendant le vol logo appel → fente, l’intro reste visible sous le flyer. */
+html.intro-active app-age-call-gate {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Dock stack : onglets horizontaux visibles au-dessus du panneau repliable */
+.app-dock-stack .dock-header-tabs app-dock-tabs,
+.app-dock-stack .app-dock-tabstrip app-dock-tabs {
+  display: block !important;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: visible !important;
+}
+
+.app-dock-stack .app-dock-block {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+.app-dock-stack .dock-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+}
+
+.app-dock-stack .dock-header-tabs,
+.app-dock-stack .dock-tabstrip,
+.app-dock-stack .app-dock-tabstrip {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: flex-end !important;
+  width: 100% !important;
+  height: var(--dock-hub-tab-h, 18px) !important;
+  min-height: var(--dock-hub-tab-h, 18px) !important;
+  max-height: var(--dock-hub-tab-h, 18px) !important;
+  overflow: visible !important;
+  visibility: visible !important;
+  z-index: 10 !important;
+}
+
+.app-dock-stack .dock-tabs {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: flex-end !important;
+  justify-content: flex-end !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  height: var(--dock-hub-tab-h, 18px) !important;
+  min-height: var(--dock-hub-tab-h, 18px) !important;
+  max-height: var(--dock-hub-tab-h, 18px) !important;
+  gap: var(--tab-push-gap, 1px) !important;
+  padding: 1px !important;
+  overflow: visible !important;
+  visibility: visible !important;
+}
+
+.app-dock-stack .dock-tab {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: max-content !important;
+  max-width: none !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  visibility: visible !important;
+}
+
+.app-dock-stack .dock-tab-label {
+  writing-mode: horizontal-tb !important;
+  transform: none !important;
+  white-space: nowrap !important;
+}
+
+.app-dock-stack .app-dock-band {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+app-dock-panel .dock-tabs-panel {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+}
+
+/* Contenus dock : même calage que Pending / Block (pas d’ombre externe dans la gouttière) */
+app-dock-panel .dock-panel-layer > app-wallet-panel,
+app-dock-panel .dock-panel-layer > app-pending-transactions,
+app-dock-panel .dock-panel-layer > app-block-composer,
+app-dock-panel .dock-panel-layer > app-blocks-list,
+app-dock-panel .dock-panel-layer > app-peer-panel {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+app-dock-panel .wallet-compact,
+app-dock-panel .pending-panel,
+app-dock-panel .composer-card,
+app-dock-panel .blocks-panel,
+app-dock-panel .peer-panel {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+app-dock-panel .dock-panel-layer:has(app-pending-transactions),
+app-dock-panel .dock-panel-layer:has(app-block-composer),
+app-dock-panel .dock-panel-layer:has(app-wallet-panel),
+app-dock-panel .dock-panel-layer:has(app-blocks-list),
+app-dock-panel .dock-panel-layer:has(app-peer-panel) {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+app-dock-panel .dock-panel-layer > app-pending-transactions,
+app-dock-panel .dock-panel-layer > app-block-composer,
+app-dock-panel .dock-panel-layer > app-wallet-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+}
+
+app-dock-panel .peer-shell {
+  padding: 3px;
+}
+
+app-dock-panel .composer-card,
+app-dock-panel .pending-panel,
+app-dock-panel .wallet-compact {
+  padding: 0;
+}
+
+app-dock-panel .overlay-card {
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  box-shadow: inset 0 1px 0 var(--surface-inset-top);
+}
+
+/* —— Typographie globale —— */
+html,
+body,
+button,
+input,
+textarea,
+select,
+optgroup {
+  font-family: var(--font-body);
+}
+
+:where(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .brand-title,
+  .bandeau-accueil__content span,
+  .showcase-tab,
+  .showcase-window__title,
+  .faucet-inline__claim-text,
+  .faucet-inline__value,
+  .wallet-compact__title,
+  .showcase-news__title,
+  .showcase-news__filter,
+  .showcase-news__refresh,
+  .showcase-chat__title,
+  .showcase-chat__menu-select,
+  .launch-drawer__glass-select,
+  .showcase-chat__menu-btn,
+  .showcase-chat__dropdown-trigger,
+  .showcase-news__tag,
+  .showcase-news__item-title,
+  .showcase-chart__range-btn,
+  .showcase-chart__type-btn,
+  .showcase-chart__tool-btn,
+  .showcase-chart__retry,
+  .rate-card__symbol,
+  .launch-drawer__eyebrow,
+  .launch-drawer h3,
+  .drawer-eyebrow,
+  .drawer h3,
+  .composer-title,
+  .pending-title,
+  .pending-state-title,
+  .exchange-panel__label-row,
+  .icon-btn span,
+  .navbar-auth-btn,
+  .composer-primary,
+  .composer-secondary,
+  .cta
+) {
+  font-family: var(--font-display);
+}
+
+:where(
+  .wallet-compact__mono,
+  .pending-hash,
+  .block-hash,
+  .detail-code,
+  .detail-inline-code
+) {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+
+/* Panneaux — coque vitrée commune */
+:where(
+  .composer-card,
+  .pending-panel,
+  .peer-shell,
+  .wallet-compact,
+  .status-shell,
+  .launch-drawer,
+  .drawer
+) {
+  border: 1px solid transparent;
+  background: var(--glass-fill) padding-box, var(--glass-border) border-box;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Faucet : hauteur au contenu, sans coque vitrée, collé ticker / marché */
+app-faucet {
+  display: block;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  margin-block: 0;
+  padding-block: 0;
+  line-height: 0;
+}
+
+.navbar-ticker-faucet-stack {
+  gap: 0;
+  row-gap: 0;
+  margin-block: 0;
+  padding-block: 0;
+}
+
+.navbar-ticker-faucet-stack .navbar-bandeau-slot,
+.navbar-ticker-faucet-stack .navbar-faucet-slot {
+  margin-block: 0;
+  padding-block: 0;
+}
+
+.faucet-inline {
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  margin-block: 0;
+  padding-block: 0;
+  background: none;
+  border: none;
+  outline: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.faucet-inline,
+.faucet-inline__core {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.faucet-inline__core {
+  margin-block: 0;
+  padding-block: 0;
+}
+
+.navbar-bandeau-slot,
+.navbar-faucet-slot {
+  margin: 0;
+  padding: 0;
+  margin-block: 0;
+  padding-block: 0;
+}
+
+.navbar-bandeau-slot app-bandeau-accueil,
+.navbar-faucet-slot app-faucet {
+  display: block;
+  margin: 0;
+  padding: 0;
+  margin-block: 0;
+  padding-block: 0;
+}
+
+/* Le layout principal est désormais piloté uniquement par `src/app/app.css`.
+   On évite ici toute redéfinition globale de `.app-shell` pour ne pas écraser
+   les hauteurs/rows compactes (250×500 MVP). */
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  background: var(--bg-base);
+  overflow: hidden;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body :where(input, textarea, select) {
+  color: var(--text-primary);
+  -webkit-text-fill-color: var(--text-primary);
+  /* Empêche le rendu « light » navigateur (fond crème/jaune) sur UI dark. */
+  color-scheme: dark;
+  caret-color: var(--text-primary);
+}
+
+body :where(input, textarea)::placeholder {
+  color: var(--text-placeholder) !important;
+  -webkit-text-fill-color: var(--text-placeholder) !important;
+}
+
+/*
+ * Autofill navigateur (Chrome/Edge/Safari) : fond jaune opaque par défaut,
+ * illisible avec le texte porcelain. On force la charte dark via inset shadow
+ * (background-color est ignoré sur :-webkit-autofill).
+ */
+body :where(input, textarea, select):-webkit-autofill,
+body :where(input, textarea, select):-webkit-autofill:hover,
+body :where(input, textarea, select):-webkit-autofill:focus,
+body :where(input, textarea, select):-webkit-autofill:active,
+body :where(input, textarea, select):autofill {
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary);
+  border-color: var(--ds-input-border, rgba(237, 231, 217, 0.08));
+  box-shadow: 0 0 0 1000px var(--bg-0, #0a1220) inset !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-0, #0a1220) inset !important;
+  transition:  background-color 99999s ease-in-out 0s;
+}
+
+body :where(button, input, textarea, select):disabled {
+  color: var(--text-disabled) !important;
+  -webkit-text-fill-color: var(--text-disabled) !important;
+}
+
+body {
+  min-height: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+/* Canon ≤349 et téléphone portrait ≤480 — zero-scroll, hauteur verrouillée */
+@media (max-width: 349px),
+       (orientation: portrait) and (max-width: 480px) {
+  html,
+  body,
+  app-root {
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+.exchange-panel__swap--inactive:not(:disabled) {
+  opacity: 0.78;
+  filter: brightness(0.92) saturate(0.92);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/*
+ * Dock — reset panneaux legacy (bordures cyan). Surface = ds-surface (dock-shell.css).
+ */
+.app-bottom-stack .showcase-block__shell.ds-surface.ds-surface--card {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+.app-bottom-stack .showcase-block__shell .app-bottom-stack__panel {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.app-bottom-stack .app-bottom-stack__panel app-faucet {
+  line-height: normal;
+  height: 100%;
+  min-height: 0;
+}
+
+.app-bottom-stack .app-bottom-stack__panel .wallet-display:not(.ds-surface),
+.app-bottom-stack .app-bottom-stack__panel .faucet-panel:not(.ds-surface) {
+  border: none !important;
+  border-radius: var(--radius-none) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-bottom-stack .app-bottom-stack__panel .quests-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .market-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .peer-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .chain-dock.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .transactions-dock.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .faucet-panel.ds-surface,
+.app-bottom-stack .app-bottom-stack__panel .wallet-display.ds-surface {
+  border: none !important;
+  border-radius: var(--radius-none) !important;
+  box-shadow: none !important;
+}
+
+/* Showcase + dock: shells and tabs stay square */
+.app-hub-showcase-block,
+.app-hub-showcase-block .showcase-block__shell,
+.app-hub-showcase-block .showcase-block__shell.ds-surface.ds-surface--card,
+.app-showcase-band,
+.app-showcase-band__window,
+.showcase-window,
+.showcase-window__body,
+.showcase-tab-panel,
+.showcase-tab-panel.ds-surface.ds-surface--card,
+.app-dock-stack,
+.app-dock-band,
+.app-dock-band app-dock-panel,
+.app-bottom-stack,
+.app-bottom-stack .showcase-block__shell,
+.app-bottom-stack .showcase-block__shell.ds-surface.ds-surface--card,
+.showcase-tabs,
+.app-bottom-stack__tabs,
+.showcase-tab,
+.showcase-tab.ds-surface.ds-surface--showcase-tab,
+.app-bottom-stack .showcase-tab,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab {
+  border-radius: var(--radius-none) !important;
+}
+
+/* TOUS collapsed: same text sizing as dock collapsed, stronger override */
+app-showcase-news-summary .news-summary-bar,
+app-showcase-news-summary .news-summary-bar__headline-wrap {
+  overflow: hidden !important;
+}
+
+app-showcase-news-summary .news-summary-bar__cat {
+  flex: 0 0 auto !important;
+}
+
+app-showcase-news-summary .news-summary-bar__headline {
+  font-size: var(--fs-module)!important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+}
+
+app-showcase-news-summary .news-summary-bar__age {
+  font-size: var(--fs-module)!important;
+  font-weight: 600 !important;
+}
+
+.app-bottom-stack .dock-view,
+.app-bottom-stack .pending-view {
+  background: transparent;
+}
+
+/* Panneau dock : occupe la 2e ligne du stack */
+.app-dock-stack .dock-tabs-panel,
+.app-dock-stack .dock-tabs-panel__body,
+.app-dock-stack .dock-panel-layer {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+}
+
+/* Onboarding tour — cible nette (pas de bordure / glow) */
+.onboarding-tour-target-focus {
+  position: relative;
+  z-index: 9100;
+}
+
+/* Grossissement ludique sur la zone nette active */
+.onboarding-tour-target-lure {
+  transform-origin: center center;
+  animation: onboarding-tour-lure 1.15s ease-in-out infinite;
+  will-change: transform;
+  filter: brightness(1.06);
+}
+
+@keyframes onboarding-tour-lure {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Legacy pulse (compat) — sans bordure */
+.onboarding-tour-target-pulse {
+  position: relative;
+  z-index: 1;
+  animation: onboarding-tour-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes onboarding-tour-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-tour-target-pulse,
+  .onboarding-tour-target-lure {
+    animation:  none;
+  }
+}

@@ -1,0 +1,480 @@
+@if (payload(); as content) {
+  <div class="r4v3-hub-drawer__backdrop" (click)="dismiss()" aria-hidden="true">
+    <aside
+      #drawerPanel
+      class="r4v3-hub-drawer news-insight-panel ds-surface ds-surface--card ds-surface--drawer"
+      [class]="drawerShellClass(content.kind)"
+      [class.r4v3-hub-drawer--wiki-faq]="content.kind === 'faq' && showBackToWiki()"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      [appFocusTrap]="true"
+      [attr.aria-labelledby]="'r4v3HubDrawerTitle'"
+      (click)="$event.stopPropagation()"
+    >
+      <header
+        class="r4v3-hub-drawer__head"
+        [class.r4v3-hub-drawer__head--wiki]="content.kind === 'official-wiki'"
+        [class.r4v3-hub-drawer__head--wiki-faq]="content.kind === 'faq' && showBackToWiki()"
+      >
+        @if (content.kind === 'official-wiki') {
+          <h3 class="sr-only" id="r4v3HubDrawerTitle">{{ drawerTitle() }}</h3>
+
+          <div class="r4v3-hub-drawer__wiki-top">
+            <button
+              type="button"
+              class="r4v3-hub-drawer__filter r4v3-hub-drawer__filter--toutes"
+              [class.r4v3-hub-drawer__filter--active]="isWikiCategoryActive('all')"
+              (click)="selectWikiCategory('all')"
+            >
+              Toutes
+            </button>
+
+            <label class="r4v3-hub-drawer__search r4v3-hub-drawer__search--wiki">
+              <input
+                type="search"
+                placeholder="Rechercher…"
+                aria-label="Recherche wiki"
+                [value]="wikiSearchQuery()"
+                (input)="onWikiSearchInput($any($event.target).value)"
+              />
+              <svg class="r4v3-hub-drawer__search-loupe icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+            </label>
+
+            <button
+              type="button"
+              class="r4v3-hub-drawer__icon-btn r4v3-hub-drawer__icon-btn--close r4v3-hub-drawer__icon-btn--wiki-close"
+              aria-label="Fermer"
+              (click)="dismiss()"
+            >
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+            </button>
+          </div>
+
+          <div class="r4v3-hub-drawer__filters r4v3-hub-drawer__filters--categories" role="toolbar">
+            @for (category of wikiCategories; track category.id) {
+              <button
+                type="button"
+                class="r4v3-hub-drawer__filter"
+                [attr.data-cat]="category.id"
+                [class.r4v3-hub-drawer__filter--active]="isWikiCategoryActive(category.id)"
+                [attr.title]="category.label"
+                (click)="selectWikiCategory(category.id)"
+              >
+                <span class="r4v3-hub-drawer__filter-icon" aria-hidden="true">{{ category.icon }}</span>
+                <span class="r4v3-hub-drawer__filter-label">{{ category.label }}</span>
+              </button>
+            }
+          </div>
+        } @else if (content.kind === 'faq' && showBackToWiki()) {
+          <h3 class="sr-only" id="r4v3HubDrawerTitle">{{ drawerTitle() }}</h3>
+          <div class="r4v3-hub-drawer__wiki-faq-top">
+            <button
+              type="button"
+              class="r4v3-hub-drawer__wiki-col-btn"
+              (click)="backToWiki.emit()"
+            >
+              Wiki
+            </button>
+            <span class="r4v3-hub-drawer__wiki-faq-mark" aria-hidden="true">{{ drawerIcon() }}</span>
+            @if (positionLabel()) {
+              <span class="r4v3-hub-drawer__wiki-faq-pos">{{ positionLabel() }}</span>
+            }
+            <p class="r4v3-hub-drawer__wiki-faq-title" [attr.title]="drawerTitle()">
+              {{ drawerTitle() }}
+            </p>
+            <button
+              type="button"
+              class="r4v3-hub-drawer__icon-btn r4v3-hub-drawer__icon-btn--close r4v3-hub-drawer__icon-btn--wiki-close"
+              aria-label="Fermer"
+              (click)="dismiss()"
+            >
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+            </button>
+          </div>
+        } @else {
+          @if (showBackToWiki()) {
+            <button
+              type="button"
+              class="r4v3-hub-drawer__back"
+              (click)="backToWiki.emit()"
+            >
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-left"/></svg> Wiki
+            </button>
+          }
+
+          <div class="r4v3-hub-drawer__head-row">
+            <div class="r4v3-hub-drawer__identity">
+              <span
+                class="r4v3-hub-drawer__mark"
+                [attr.title]="drawerEyebrow()"
+                aria-hidden="true"
+              >{{ drawerIcon() }}</span>
+            </div>
+
+            <h3
+              class="r4v3-hub-drawer__title"
+              id="r4v3HubDrawerTitle"
+              [attr.title]="drawerTitle()"
+            >
+              {{ drawerTitle() }}
+            </h3>
+
+            <div class="r4v3-hub-drawer__head-actions">
+              @if (showNavigation()) {
+                <div class="r4v3-hub-drawer__nav">
+                  @if (positionLabel()) {
+                    <span class="r4v3-hub-drawer__nav-pos">{{ positionLabel() }}</span>
+                  }
+                  <button
+                    type="button"
+                    class="r4v3-hub-drawer__icon-btn ds-surface ds-surface--showcase-tab"
+                    [disabled]="!canPrev()"
+                    aria-label="Élément précédent"
+                    (click)="navigatePrev.emit()"
+                  ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-left"/></svg></button>
+                  <button
+                    type="button"
+                    class="r4v3-hub-drawer__icon-btn ds-surface ds-surface--showcase-tab"
+                    [disabled]="!canNext()"
+                    aria-label="Élément suivant"
+                    (click)="navigateNext.emit()"
+                  ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"/></svg></button>
+                </div>
+              }
+              <button
+                type="button"
+                class="r4v3-hub-drawer__icon-btn r4v3-hub-drawer__icon-btn--close ds-surface ds-surface--showcase-tab"
+                aria-label="Fermer"
+                (click)="dismiss()"
+              >
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+              </button>
+            </div>
+          </div>
+        }
+      </header>
+
+      <div class="r4v3-hub-drawer__body">
+        @switch (content.kind) {
+          @case ('pillar') {
+            <article class="r4v3-hub-drawer__article r4v3-hub-drawer__article--pillar">
+              <section class="r4v3-hub-drawer__card r4v3-hub-drawer__card--lead r4v3-hub-drawer__card--pillar-lead">
+                <span class="r4v3-hub-drawer__card-label">En bref</span>
+                <p class="r4v3-hub-drawer__prose r4v3-hub-drawer__prose--lead">{{ content.pillar.drawerSummary }}</p>
+              </section>
+              <div class="r4v3-hub-drawer__pillar-sections" role="list">
+                @for (section of content.pillar.sections; track section.title) {
+                  <section class="r4v3-hub-drawer__card r4v3-hub-drawer__card--pillar-section" role="listitem">
+                    <span class="r4v3-hub-drawer__card-label">{{ section.title }}</span>
+                    <p class="r4v3-hub-drawer__prose">{{ section.body }}</p>
+                  </section>
+                }
+              </div>
+            </article>
+          }
+          @case ('faq') {
+            <article
+              class="r4v3-hub-drawer__article"
+              [class.r4v3-hub-drawer__article--wiki-faq]="showBackToWiki()"
+            >
+              @if (!showBackToWiki() && (content.entry.popular || content.entry.isNew)) {
+                <div class="r4v3-hub-drawer__badges">
+                  @if (content.entry.popular) {
+                    <span class="r4v3-hub-drawer__badge">Populaire</span>
+                  }
+                  @if (content.entry.isNew) {
+                    <span class="r4v3-hub-drawer__badge r4v3-hub-drawer__badge--new">Nouveau</span>
+                  }
+                </div>
+              }
+              <section
+                class="r4v3-hub-drawer__card r4v3-hub-drawer__card--lead"
+                [class.r4v3-hub-drawer__card--wiki-center]="showBackToWiki()"
+              >
+                <span class="r4v3-hub-drawer__card-label">Résumé</span>
+                <p class="r4v3-hub-drawer__prose">{{ content.entry.summary }}</p>
+              </section>
+              <section
+                class="r4v3-hub-drawer__card"
+                [class.r4v3-hub-drawer__card--wiki-center]="showBackToWiki()"
+              >
+                <span class="r4v3-hub-drawer__card-label">Réponse complète</span>
+                <p class="r4v3-hub-drawer__prose r4v3-hub-drawer__prose--detail">{{ content.entry.body }}</p>
+              </section>
+            </article>
+          }
+          @case ('community') {
+            <article class="r4v3-hub-drawer__article">
+              @if (communityQuestionLive(); as question) {
+                <div class="r4v3-hub-drawer__stats">
+                  <div class="r4v3-hub-drawer__stat">
+                    <span class="r4v3-hub-drawer__stat-label">Auteur</span>
+                    <span class="r4v3-hub-drawer__stat-value">{{ question.authorName }}</span>
+                  </div>
+                  <div class="r4v3-hub-drawer__stat">
+                    <span class="r4v3-hub-drawer__stat-label">Votes</span>
+                    <span class="r4v3-hub-drawer__stat-value">{{ question.upvotes }}</span>
+                  </div>
+                  <div class="r4v3-hub-drawer__stat">
+                    <span class="r4v3-hub-drawer__stat-label">Score</span>
+                    <span class="r4v3-hub-drawer__stat-value">{{ question.score }}</span>
+                  </div>
+                  <div class="r4v3-hub-drawer__stat">
+                    <span class="r4v3-hub-drawer__stat-label">Publié</span>
+                    <span class="r4v3-hub-drawer__stat-value">{{ question.relativeTime }}</span>
+                  </div>
+                </div>
+
+                <div class="r4v3-hub-drawer__votes">
+                  <button
+                    type="button"
+                    class="r4v3-hub-drawer__vote-btn"
+                    [class.r4v3-hub-drawer__vote-btn--active]="question.userVote === 'UP'"
+                    (click)="voteCommunityQuestion('UP')"
+                  >
+                    ▲ {{ question.upvotes }}
+                  </button>
+                  <button
+                    type="button"
+                    class="r4v3-hub-drawer__vote-btn"
+                    [class.r4v3-hub-drawer__vote-btn--active]="question.userVote === 'DOWN'"
+                    (click)="voteCommunityQuestion('DOWN')"
+                  >
+                    ▼ {{ question.downvotes }}
+                  </button>
+                </div>
+
+                <section class="r4v3-hub-drawer__card r4v3-hub-drawer__card--lead">
+                  <span class="r4v3-hub-drawer__card-label">Question</span>
+                  <p class="r4v3-hub-drawer__prose r4v3-hub-drawer__prose--lead">{{ question.title }}</p>
+                </section>
+                <section class="r4v3-hub-drawer__card">
+                  <span class="r4v3-hub-drawer__card-label">Détails</span>
+                  <p class="r4v3-hub-drawer__prose">{{ question.body }}</p>
+                </section>
+                @if (question.answers.length > 0) {
+                  @for (answer of question.answers; track answer.id) {
+                    <section class="r4v3-hub-drawer__card">
+                      <span class="r4v3-hub-drawer__card-label">
+                        {{ answer.authorName }}
+                        @if (answer.isStaff) { · Staff }
+                        @if (answer.isValidated) { · Validée }
+                      </span>
+                      <p class="r4v3-hub-drawer__prose">{{ answer.body }}</p>
+                    </section>
+                  }
+                } @else {
+                  <p class="r4v3-hub-drawer__empty">Aucune réponse pour le moment.</p>
+                }
+              }
+            </article>
+          }
+          @case ('official-wiki') {
+            <div class="r4v3-hub-drawer__wiki">
+              <ul class="r4v3-hub-drawer__wiki-rail">
+                @if (filteredWikiEntries().length === 0) {
+                  <li class="r4v3-hub-drawer__empty">Aucun article ne correspond à votre recherche.</li>
+                } @else {
+                  @for (entry of filteredWikiEntries(); track entry.id; let i = $index) {
+                    <li>
+                      <button
+                        type="button"
+                        class="r4v3-hub-drawer__wiki-entry"
+                        [attr.data-cat]="entry.categoryId"
+                        [attr.title]="entry.summary"
+                        (click)="openWikiEntry(entry)"
+                      >
+                        <span class="r4v3-hub-drawer__wiki-entry-idx" aria-hidden="true">{{
+                          i + 1 | number: '2.0-0'
+                        }}</span>
+                        <span class="r4v3-hub-drawer__wiki-entry-glyph" aria-hidden="true">{{
+                          wikiCategoryIcon(entry.categoryId)
+                        }}</span>
+                        <span class="r4v3-hub-drawer__wiki-entry-q">{{ entry.title }}</span>
+                        <span class="r4v3-hub-drawer__wiki-entry-pulse" aria-hidden="true"></span>
+                      </button>
+                    </li>
+                  }
+                }
+              </ul>
+            </div>
+          }
+          @case ('community-form') {
+            <div class="r4v3-hub-drawer__form-wrap">
+              <div class="r4v3-hub-drawer__dex-banner">
+                <span class="r4v3-hub-drawer__dex-badge">Gouvernance d’échange</span>
+                <p>
+                  Votre question entre dans le classement communautaire. Les votes déterminent les sujets épinglés.
+                </p>
+              </div>
+
+              @if (formSuccess()) {
+                <div class="r4v3-hub-drawer__success" role="status">
+                  <span class="r4v3-hub-drawer__success-icon" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span>
+                  <div>
+                    <strong>Question envoyée</strong>
+                    <p>Elle apparaîtra dans le ticker et pourra être votée par la communauté.</p>
+                  </div>
+                </div>
+              } @else if (isAuthenticated()) {
+                <form class="r4v3-hub-drawer__form" (submit)="submitCommunityForm($event)">
+                  <label class="r4v3-hub-drawer__field r4v3-hub-drawer__field--question">
+                    <span class="r4v3-hub-drawer__field-label r4v3-hub-drawer__field-label--col">
+                      Question
+                    </span>
+                    <span class="r4v3-hub-drawer__field-control">
+                      <span class="r4v3-hub-drawer__field-hint">{{ titleLength() }}/200</span>
+                      <input
+                        type="text"
+                        class="r4v3-hub-drawer__input"
+                        placeholder="Ex. Quelle est la prochaine évolution du protocole R4V3 ?"
+                        maxlength="200"
+                        [ngModel]="askTitle()"
+                        (ngModelChange)="askTitle.set($event)"
+                        name="communityAskTitle"
+                        required
+                        minlength="8"
+                      />
+                    </span>
+                  </label>
+                  <label class="r4v3-hub-drawer__field">
+                    <span class="r4v3-hub-drawer__field-label">Description détaillée (optionnel)</span>
+                    <textarea
+                      class="r4v3-hub-drawer__textarea"
+                      rows="5"
+                      placeholder="Contexte, contraintes, ce que vous avez déjà consulté…"
+                      [ngModel]="askBody()"
+                      (ngModelChange)="askBody.set($event)"
+                      name="communityAskBody"
+                    ></textarea>
+                  </label>
+                  <div class="r4v3-hub-drawer__field">
+                    <span class="r4v3-hub-drawer__field-label">Catégorie (optionnel)</span>
+                    <div
+                      class="r4v3-hub-drawer__token-select"
+                      [class.r4v3-hub-drawer__token-select--open]="categoryMenuOpen()"
+                    >
+                      <button
+                        type="button"
+                        class="r4v3-hub-drawer__token-trigger"
+                        [attr.aria-expanded]="categoryMenuOpen()"
+                        aria-haspopup="listbox"
+                        (click)="toggleCategoryMenu($event)"
+                      >
+                        <span class="r4v3-hub-drawer__token-value">{{ askCategoryLabel() }}</span>
+                        <span class="r4v3-hub-drawer__token-chevron" aria-hidden="true"></span>
+                      </button>
+                      @if (categoryMenuOpen()) {
+                        <ul
+                          class="r4v3-hub-drawer__token-menu"
+                          role="listbox"
+                          (click)="$event.stopPropagation()"
+                        >
+                          @for (option of wikiCategoryOptions; track option.id) {
+                            <li
+                              role="option"
+                              class="r4v3-hub-drawer__token-option"
+                              [class.r4v3-hub-drawer__token-option--active]="askCategory() === option.id"
+                              [attr.aria-selected]="askCategory() === option.id"
+                              (click)="selectAskCategory(option.id)"
+                            >
+                              <span class="r4v3-hub-drawer__token-option-symbol">{{
+                                wikiCategoryIcon(option.id)
+                              }}</span>
+                              <span class="r4v3-hub-drawer__token-option-name">{{ option.label }}</span>
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </div>
+                  </div>
+                </form>
+              } @else {
+                <div class="r4v3-hub-drawer__login-card">
+                  <p>Connectez-vous pour proposer une question à la communauté.</p>
+                  <button
+                    type="button"
+                    class="r4v3-hub-drawer__login-btn ds-surface ds-surface--showcase-tab"
+                    (click)="promptLoginForQuestion()"
+                  >
+                    Se connecter
+                  </button>
+                </div>
+              }
+
+              @if (communitySubmitMessage() && !formSuccess()) {
+                <p class="r4v3-hub-drawer__feedback" role="status">{{ communitySubmitMessage() }}</p>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      @if (showFooterActions()) {
+        <footer
+          class="r4v3-hub-drawer__foot"
+          [class.r4v3-hub-drawer__foot--wiki-faq]="content.kind === 'faq' && showBackToWiki()"
+        >
+          @if (content.kind === 'faq' && showBackToWiki()) {
+            <button
+              type="button"
+              class="r4v3-hub-drawer__foot-nav"
+              [disabled]="!canPrev()"
+              aria-label="Question précédente"
+              (click)="navigatePrev.emit()"
+            ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-left"/></svg></button>
+            <button
+              type="button"
+              class="r4v3-hub-drawer__action r4v3-hub-drawer__action--copy-center ds-surface ds-surface--showcase-tab"
+              [class.r4v3-hub-drawer__action--copied]="copied()"
+              [class.r4v3-hub-drawer__action--failed]="copyFailed()"
+              (click)="onCopy($event)"
+            >
+              {{ copyButtonLabel() }}
+            </button>
+            <button
+              type="button"
+              class="r4v3-hub-drawer__foot-nav"
+              [disabled]="!canNext()"
+              aria-label="Question suivante"
+              (click)="navigateNext.emit()"
+            ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"/></svg></button>
+          } @else {
+            @if (actionLabel(); as label) {
+              <button
+                type="button"
+                class="r4v3-hub-drawer__action r4v3-hub-drawer__action--primary ds-surface ds-surface--showcase-tab"
+                (click)="onPrimaryAction()"
+              >
+                {{ label }}
+              </button>
+            }
+            <button
+              type="button"
+              class="r4v3-hub-drawer__action ds-surface ds-surface--showcase-tab"
+              [class.r4v3-hub-drawer__action--copied]="copied()"
+              [class.r4v3-hub-drawer__action--failed]="copyFailed()"
+              (click)="onCopy($event)"
+            >
+              {{ copyButtonLabel() }}
+            </button>
+          }
+        </footer>
+      }
+
+      @if (content.kind === 'community-form' && isAuthenticated() && !formSuccess()) {
+        <footer class="r4v3-hub-drawer__foot r4v3-hub-drawer__foot--sticky">
+          <button
+            type="button"
+            class="r4v3-hub-drawer__submit ds-surface ds-surface--showcase-tab"
+            [disabled]="!canSubmitForm()"
+            (click)="submitCommunityForm($event)"
+          >
+            Envoyer à la communauté
+          </button>
+        </footer>
+      }
+    </aside>
+  </div>
+}

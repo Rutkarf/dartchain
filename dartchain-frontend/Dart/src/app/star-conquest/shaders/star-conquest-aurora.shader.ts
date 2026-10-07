@@ -1,0 +1,78 @@
+import * as THREE from 'three';
+
+export const STAR_CONQUEST_AURORA_VERTEX = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+export const STAR_CONQUEST_AURORA_FRAGMENT = /* glsl */ `
+uniform float uTime;
+uniform vec3 uColorA;
+uniform vec3 uColorB;
+uniform float uIntensity;
+uniform float uContain;
+varying vec2 vUv;
+
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  float a = hash(i);
+  float b = hash(i + vec2(1.0, 0.0));
+  float c = hash(i + vec2(0.0, 1.0));
+  float d = hash(i + vec2(1.0, 1.0));
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 5; i++) {
+    v += a * noise(p);
+    p *= 2.07;
+    a *= 0.52;
+  }
+  return v;
+}
+
+void main() {
+  vec2 uv = vUv;
+  vec2 p = (uv - 0.5) * vec2(1.85, 1.0);
+  float n = fbm(p * 3.1 + vec2(uTime * 0.028, -uTime * 0.018));
+  float ridges = smoothstep(0.58, 0.84, n) * (0.32 + 0.68 * n);
+  float veins = pow(max(0.0, n - 0.5), 1.85);
+  float mixAmt = clamp(ridges * 0.72 + veins * 0.85, 0.0, 1.0);
+  vec3 col = mix(uColorB, uColorA, mixAmt);
+  float glass = pow(max(0.0, n - 0.62), 2.2);
+  col += vec3(0.55, 0.78, 1.0) * glass * 0.35;
+  float radial = length((uv - 0.5) * vec2(1.0, 1.35));
+  float bowl = smoothstep(uContain, uContain - 0.28, radial);
+  float vignette = pow(max(0.0, 1.0 - radial * 1.35), 1.35);
+  float alpha = mixAmt * vignette * bowl * uIntensity * 0.22;
+  gl_FragColor = vec4(col, alpha);
+}
+`;
+
+export function createStarConquestAuroraMaterial(): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 },
+      uColorA: { value: new THREE.Color(0.32, 0.9, 0.93) },
+      uColorB: { value: new THREE.Color(0.65, 0.35, 0.98) },
+      uIntensity: { value: 0.54 },
+      uContain: { value: 0.48 },
+    },
+    vertexShader: STAR_CONQUEST_AURORA_VERTEX,
+    fragmentShader: STAR_CONQUEST_AURORA_FRAGMENT,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+}

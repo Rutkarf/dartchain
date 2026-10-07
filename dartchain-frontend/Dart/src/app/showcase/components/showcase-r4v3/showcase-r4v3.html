@@ -1,0 +1,110 @@
+<div class="showcase-view showcase-view--r4v3" role="region">
+  @if (isExpanded) {
+    <app-showcase-r4v3-fx class="showcase-r4v3__fx" />
+
+    <button
+ type="button"
+ class="showcase-r4v3__rail-btn showcase-r4v3__rail-btn--left"
+ [class.showcase-r4v3__rail-btn--active]="isWikiDrawerOpen()"
+ (click)="toggleOfficialWiki()"
+ aria-haspopup="dialog"
+ [attr.aria-expanded]="isWikiDrawerOpen()"
+ [attr.title]="isWikiDrawerOpen() ? 'Fermer le wiki' : 'Ouvrir le wiki R4V3'"
+ >
+      <span class="showcase-r4v3__rail-btn-icon" aria-hidden="true">
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-book"/></svg>
+      </span>
+      <span class="showcase-r4v3__rail-btn-label">Wiki</span>
+    </button>
+
+    <div class="showcase-r4v3__main">
+      <div class="showcase-r4v3__peg-banner">
+        <div class="showcase-r4v3__peg-banner-main">
+          <span class="showcase-r4v3__peg showcase-r4v3__peg--hero">
+            <span class="showcase-r4v3__peg-part showcase-r4v3__peg-part--token">1 R4V3</span>
+            <span class="showcase-r4v3__peg-eq" aria-hidden="true">&nbsp;=&nbsp;</span>
+            <span class="showcase-r4v3__peg-part showcase-r4v3__peg-part--fiat">1 CHF</span>
+          </span>
+        </div>
+      </div>
+
+      @if (whitepaperFeedback()) {
+        <p class="showcase-r4v3__doc-feedback" role="status">{{ whitepaperFeedback() }}</p>
+      }
+
+      <div #contentPanel class="showcase-r4v3__content">
+        <div class="showcase-r4v3__dashboard">
+          <section class="showcase-r4v3__hero">
+            <div class="showcase-r4v3__pillar-grid">
+              @for (column of pillarColumns; track column[0].id; let colIndex = $index) {
+                <div class="showcase-r4v3__pillar-column">
+                  @for (pillar of column; track pillar.id) {
+                    <button
+ type="button"
+ class="showcase-r4v3__pillar"
+ [class]="pillarAccentClass(pillar)"
+ [attr.data-pillar-id]="pillar.id"
+ (click)="openPillar(pillar)"
+ >
+                      <span class="showcase-r4v3__pillar-glow" aria-hidden="true"></span>
+                      <span class="showcase-r4v3__pillar-icon" aria-hidden="true">{{ pillar.icon }}</span>
+                      <span class="showcase-r4v3__pillar-copy">
+                        <strong class="showcase-r4v3__pillar-label">{{ pillar.label }}</strong>
+                        <span class="showcase-r4v3__pillar-detail">{{ pillar.detail }}</span>
+                      </span>
+                      <span class="showcase-r4v3__pillar-chevron" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"/></svg></span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+
+          <nav class="showcase-r4v3__section-nav">
+            <button
+ type="button"
+ class="showcase-r4v3__section-link showcase-r4v3__section-link--community"
+ (click)="openCommunityFormDrawer()"
+ aria-haspopup="dialog"
+ >
+              <span class="showcase-r4v3__section-link-label">FAQ communautaire</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <app-showcase-r4v3-hub-drawer
+        [payload]="drawerPayload()"
+        [showBackToWiki]="drawerOpenedFromWiki() && drawerPayload()?.kind === 'faq'"
+        [canPrev]="canNavigatePrev()"
+        [canNext]="canNavigateNext()"
+        [itemIndex]="drawerNavIndex()"
+        [itemTotal]="drawerNavTotal()"
+        (closeDrawer)="closeDrawer()"
+        (backToWiki)="backToOfficialWiki()"
+        (navigatePrev)="navigatePrev()"
+        (navigateNext)="navigateNext()"
+        (runAction)="runDrawerAction($event)"
+        (selectOfficialEntry)="openEntry($event, true)"
+        (communityQuestionSubmitted)="onCommunityQuestionSubmitted()"
+      />
+    </div>
+
+    <button
+ type="button"
+ class="showcase-r4v3__rail-btn showcase-r4v3__rail-btn--right showcase-r4v3__wp-btn"
+ (click)="openWhitepaper($event)"
+ [attr.aria-busy]="whitepaperLoading()"
+ [attr.title]="
+ whitepaperLoading() ? 'Téléchargement…' : 'Télécharger le white paper R4V3'
+ "
+ >
+      <span class="showcase-r4v3__rail-btn-label showcase-r4v3__wp-btn-label">
+        {{ whitepaperLoading() ? 'Ouverture…' : 'Livre blanc' }}
+      </span>
+      <span class="showcase-r4v3__rail-btn-icon showcase-r4v3__wp-btn-icon" aria-hidden="true">
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-download"/></svg>
+      </span>
+    </button>
+  }
+</div>

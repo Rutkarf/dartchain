@@ -1,0 +1,135 @@
+@if (project(); as item) {
+  <div class="launch-project-backdrop" (click)="dismiss()">
+    <aside
+      #drawerPanel
+      class="launch-project-drawer news-insight-panel ds-surface ds-surface--card"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      [appFocusTrap]="true"
+      [attr.aria-labelledby]="'launchDrawerTitle-' + item.id"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="launch-project-drawer__head">
+        <div class="launch-project-drawer__head-row">
+          @if (item.logoUrl) {
+            <img class="launch-project-drawer__logo" [src]="item.logoUrl" [alt]="item.name" width="12" height="12" />
+          } @else {
+            <span class="launch-project-drawer__logo launch-project-drawer__logo--placeholder" aria-hidden="true">
+              {{ initials(item) }}
+            </span>
+          }
+          <h3 class="launch-project-drawer__title" [id]="'launchDrawerTitle-' + item.id">
+            {{ item.name }}
+            <span class="launch-project-drawer__symbol">{{ item.symbol }}</span>
+          </h3>
+          <span
+            class="launch-project-drawer__status"
+            [class.launch-project-drawer__status--live]="item.status === 'LIVE'"
+            [class.launch-project-drawer__status--soon]="item.status === 'SOON'"
+            [class.launch-project-drawer__status--ended]="item.status === 'ENDED'"
+          >
+            {{ statusLabel(item.status) }}
+          </span>
+          @if (item.chain) {
+            <span class="launch-project-drawer__chain">{{ item.chain }}</span>
+          }
+          <span class="launch-project-drawer__lab">Lab</span>
+          <button type="button" class="launch-project-drawer__close" aria-label="Fermer le projet" (click)="dismiss()">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="launch-project-drawer__body">
+        <section class="launch-project-drawer__telemetry">
+          <div class="launch-project-drawer__metric">
+            <span class="launch-project-drawer__metric-k">Raised</span>
+            <span class="launch-project-drawer__metric-v">{{ raisedOnly() }}</span>
+          </div>
+          <div class="launch-project-drawer__metric">
+            <span class="launch-project-drawer__metric-k">Target</span>
+            <span class="launch-project-drawer__metric-v">{{ targetOnly() }}</span>
+          </div>
+          <div class="launch-project-drawer__metric">
+            <span class="launch-project-drawer__metric-k">Prog</span>
+            <span class="launch-project-drawer__metric-v">
+              {{ progress() !== null ? progress() + '%' : '—' }}
+            </span>
+          </div>
+          <div class="launch-project-drawer__metric">
+            <span class="launch-project-drawer__metric-k">Swap</span>
+            <span class="launch-project-drawer__metric-v" [class.is-ready]="swapReady()" [class.is-lock]="!swapReady()">
+              {{ swapReady() ? 'Ready' : 'Lock' }}
+            </span>
+          </div>
+        </section>
+
+        <section class="launch-project-drawer__progress">
+          <span class="launch-project-drawer__progress-label">
+            Raise {{ progress() !== null ? progress() + '%' : 'n/a' }}
+          </span>
+          <span class="launch-project-drawer__progress-track" aria-hidden="true">
+            <span class="launch-project-drawer__progress-fill" [style.width.%]="progress() ?? 0"></span>
+          </span>
+        </section>
+
+        <section class="launch-project-drawer__intel">
+          <div class="launch-project-drawer__kv">
+            <span class="launch-project-drawer__kv-k">Brief</span>
+            <span class="launch-project-drawer__kv-v">
+              {{ item.description || ('Projet Laboratoire ' + item.symbol + ' — détails à venir.') }}
+            </span>
+          </div>
+          <div class="launch-project-drawer__kv">
+            <span class="launch-project-drawer__kv-k">Date</span>
+            <span class="launch-project-drawer__kv-v">{{ item.launchDate || '—' }}</span>
+          </div>
+          <div class="launch-project-drawer__kv">
+            <span class="launch-project-drawer__kv-k">Chain</span>
+            <span class="launch-project-drawer__kv-v">{{ item.chain || 'DartChain' }}</span>
+          </div>
+          <div class="launch-project-drawer__kv">
+            <span class="launch-project-drawer__kv-k">Cap</span>
+            <span class="launch-project-drawer__kv-v">{{ marketCapLabel(item) }}</span>
+          </div>
+        </section>
+
+        <section class="launch-project-drawer__links">
+          <span class="launch-project-drawer__sec-label">Liens</span>
+          <div class="launch-project-drawer__link-row">
+            @if (hasWhitepaper()) {
+              <button type="button" class="launch-project-drawer__link-btn" (click)="openWhitepaper(item)">
+                Whitepaper
+              </button>
+            }
+            @if (hasWebsite()) {
+              <button type="button" class="launch-project-drawer__link-btn" (click)="openWebsite(item)">
+                Site
+              </button>
+            }
+            @if (!hasWhitepaper() && !hasWebsite()) {
+              <span class="launch-project-drawer__link-empty">Aucun lien publié</span>
+            }
+          </div>
+        </section>
+
+        <footer class="launch-project-drawer__foot">
+          @if (canSwap(item)) {
+            <button type="button" class="launch-project-drawer__swap" (click)="triggerSwap(item)">
+              Swap {{ item.symbol }}
+            </button>
+          } @else {
+            <p class="launch-project-drawer__foot-hint">
+              @if (item.status === 'ENDED') {
+                Projet clôturé — swap indisponible.
+              } @else {
+                Swap bientôt disponible pour {{ item.symbol }}.
+              }
+            </p>
+          }
+        </footer>
+      </div>
+    </aside>
+  </div>
+}

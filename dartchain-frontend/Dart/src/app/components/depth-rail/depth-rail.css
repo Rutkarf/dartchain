@@ -1,0 +1,274 @@
+app-depth-rail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.depth-rail {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  perspective: var(--depth-perspective, 860px);
+  overflow: clip;
+  touch-action: none;
+  user-select: none;
+}
+
+.depth-rail--compact {
+  --depth-perspective: 1400px;
+}
+
+.depth-rail--band {
+  --depth-perspective: 1200px;
+}
+
+.depth-rail--shell {
+  --depth-perspective: 980px;
+}
+
+.depth-rail--band .depth-rail__scene {
+  transform-origin: 50% 42%;
+}
+
+.depth-rail--shell .depth-rail__scene {
+  transform-origin: 50% 50%;
+}
+
+.depth-rail--dragging {
+  cursor: grabbing;
+}
+
+.depth-rail__scene {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+  pointer-events: none;
+}
+
+.depth-rail:not(.is-disabled) .depth-rail__scene {
+  pointer-events: auto;
+}
+
+.depth-rail.is-disabled {
+  display: flex;
+  perspective: none;
+  overflow: visible;
+  touch-action: manipulation;
+}
+
+.depth-rail.is-disabled .depth-rail__scene {
+  position: relative;
+  inset: auto;
+  display: flex;
+  flex: 1 1 auto;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  transform: none !important;
+  pointer-events: auto;
+}
+
+.depth-rail__scene,
+.depth-rail__scene ul,
+.depth-rail__scene .market-panel__list {
+  transform-style: preserve-3d;
+}
+
+.depth-rail:not(.is-disabled) .is-depth-item {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: var(--depth-w, auto) !important;
+  height: var(--depth-h, auto) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0;
+  box-sizing: border-box;
+  flex: none !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  opacity: var(--depth-opacity, 1);
+  transform: translate(-50%, -50%) translate3d(var(--depth-x, 0px), var(--depth-y, 0px), var(--depth-z, 0px)) rotateX(var(--depth-tilt, 0deg)) rotateY(var(--depth-yaw, 0deg)) scale(var(--depth-scale, 1)) !important;
+  transform-origin: center center;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+/* Le flou du shell aplatit le preserve-3d des cartes. */
+.app-hub-showcase-block .showcase-block__shell.ds-surface {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.depth-rail--compact:not(.is-disabled) .showcase-tab {
+  font-size: var(--fs-shell)!important;
+  letter-spacing: 0.06em;
+  color: rgba(237, 231, 217, 0.88);
+}
+
+.depth-rail--compact .showcase-tab.is-active {
+  color: #ede7d9;
+}
+
+.depth-rail--band .is-depth-item {
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: rgba(10, 18, 32, 0.98);
+  border: 1px solid rgba(139, 157, 173, 0.22);
+  box-shadow: none;
+}
+
+.depth-rail--band .showcase-news__item-title,
+.depth-rail--band .showcase-news__item-time,
+.depth-rail--band .showcase-dao__ticker,
+.depth-rail--band .showcase-dao__name,
+.depth-rail--band .showcase-dao__symbol,
+.depth-rail--band .showcase-dao__stats,
+.depth-rail--band .showcase-dao__summary,
+.depth-rail--band .showcase-launch__name,
+.depth-rail--band .showcase-launch__symbol,
+.depth-rail--band .showcase-launch__raised,
+.depth-rail--band .market-panel__row-symbol,
+.depth-rail--band .market-panel__row-price,
+.depth-rail--band .market-panel__row-change,
+.depth-rail--band .market-panel__row-stat {
+  font-size: var(--fs-module)!important;
+  line-height: 1.15;
+}
+
+.depth-rail--band .showcase-news__tag-badge,
+.depth-rail--band .showcase-launch__badge {
+  height: auto !important;
+  min-height: 0;
+  padding: 1px 4px;
+  font-size: var(--fs-module)!important;
+}
+
+.depth-rail--shell:not(.is-disabled) {
+  touch-action: none;
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel[data-depth-rank='0'] {
+  touch-action: pan-y;
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel {
+  overflow: hidden !important;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel:not([data-depth-rank='0']) {
+  background:
+    linear-gradient(105deg, rgba(10, 18, 32, 0.35) 0%, rgba(139, 157, 173, 0.16) 62%, rgba(139, 157, 173, 0.42) 100%),
+    var(--ds-card-standard-bg, #0a1220);
+  box-shadow:
+    inset -4px 0 0 rgba(139, 157, 173, 0.92);
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel[data-depth-rank='0'] > :not(.showcase-shell-tab) {
+  box-sizing: border-box;
+  padding-top: 24px;
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel[data-depth-rank='0'] :is(
+  .showcase-news__item-title,
+  .showcase-news__item-time,
+  .showcase-news__search-hint,
+  .showcase-news__empty,
+  .showcase-news__meta,
+  .showcase-dao__ticker,
+  .showcase-dao__name,
+  .showcase-dao__symbol,
+  .showcase-dao__summary,
+  .showcase-launch__name,
+  .showcase-launch__symbol,
+  .showcase-launch__raised,
+  .market-panel__row-symbol,
+  .market-panel__row-price,
+  .market-panel__row-change
+) {
+  font-size: var(--fs-module)!important;
+  line-height: 1.25 !important;
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel[data-depth-rank='0'] .showcase-news__tag-badge,
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel[data-depth-rank='0'] .showcase-launch__badge {
+  height: auto !important;
+  min-height: var(--comp-hud-h, 16px);
+  font-size: var(--fs-module)!important;
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel:not([data-depth-rank='0']) > * {
+  pointer-events: none !important;
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel > :not(.showcase-shell-tab) {
+  opacity: var(--shell-content, 1);
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel:not([data-depth-rank='0']) {
+  cursor: pointer;
+}
+
+.depth-rail--shell:not(.is-disabled) .showcase-tab-panel[data-depth-rank='0'] {
+  cursor: default;
+}
+
+.depth-rail.is-disabled .is-depth-item {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important;
+  height: auto !important;
+  flex: 1 1 0;
+  min-width: 0;
+  opacity: 1;
+  transform: none !important;
+  border-radius: var(--radius-none);
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  will-change: auto;
+}
+
+.depth-rail--shell.is-disabled .depth-rail__scene {
+  flex-flow: column nowrap;
+}
+
+.depth-rail--shell.is-disabled .is-depth-item {
+  width: 100% !important;
+  height: 100% !important;
+  flex: 1 1 auto;
+}
+
+.depth-rail:not(.is-disabled) .showcase-tab .showcase-tab__label {
+  transform: none !important;
+}
+
+.depth-rail--band .showcase-news__list,
+.depth-rail--band .showcase-dao__list,
+.depth-rail--band .showcase-launch__list,
+.depth-rail--band .market-panel__list {
+  position: absolute;
+  inset: 0;
+  display: block;
+  height: 100%;
+  margin: 0;
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .depth-rail .is-depth-item {
+    will-change: auto;
+  }
+}

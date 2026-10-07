@@ -1,0 +1,134 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: visible;
+  container-type: inline-size;
+  box-sizing: border-box;
+}
+
+.quests-summary-bar {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  padding: 0 1px 0 2px;
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.quests-summary-bar__mission {
+  flex: 0 0 auto;
+  max-width: 42%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display, inherit);
+  font-size: var(--fs-chain);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(var(--tab-accent-rgb, 255, 184, 77), 0.95);
+}
+
+.quests-summary-bar__quest {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-chain);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: rgba(237, 231, 217, 0.94);
+}
+
+.quests-summary-bar__quest.is-empty {
+  color: rgba(139, 157, 173, 0.62);
+  font-weight: 600;
+}
+
+.quests-summary-bar__actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding-left: 3px;
+  border-left: 1px solid rgba(var(--tab-accent-rgb, 255, 184, 77), 0.12);
+}
+
+.quests-summary-bar__claim {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: var(--comp-hud-h, 16px);
+  margin: 0;
+  padding: 0 5px;
+  border: 1px solid rgba(123, 13, 30, 0.35);
+  border-radius: var(--radius-none);
+  background: linear-gradient(
+    180deg,
+    rgba(123, 13, 30, 0.18) 0%,
+    rgba(123, 13, 30, 0.06) 100%
+  );
+  color: rgba(237, 231, 217, 0.72);
+  font-family: var(--font-display, inherit);
+  font-size: var(--fs-chain);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: 1;
+  touch-action: manipulation;
+}
+
+.quests-summary-bar__claim.is-ready {
+  border-color: rgba(9, 129, 74, 0.5);
+  background: linear-gradient(
+    180deg,
+    rgba(9, 129, 74, 0.34) 0%,
+    rgba(9, 129, 74, 0.12) 100%
+  );
+  color: rgba(237, 231, 217, 0.96);
+}
+
+.quests-summary-bar__claim.is-ready:hover:not(:disabled) {
+  color: var(--text-primary, #ede7d9);
+  border-color: var(--state-hover-border);
+  background: var(--cta-accent-bg-hover);
+  box-shadow: var(--cta-accent-shadow-hover);
+}
+
+.quests-summary-bar__claim:disabled {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.quests-summary-bar__claim:focus-visible {
+  outline: none;
+  box-shadow: var(--state-focus-ring);
+}
+
+@container (max-width: 160px) {
+  .quests-summary-bar__claim {
+    padding: 0 3px;
+    letter-spacing: 0.03em;
+  }
+
+  .quests-summary-bar__mission {
+    max-width: 36%;
+  }
+}

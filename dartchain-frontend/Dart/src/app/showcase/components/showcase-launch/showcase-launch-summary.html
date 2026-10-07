@@ -1,0 +1,61 @@
+<div
+ class="launch-summary-bar"
+ role="status"
+ aria-live="polite"
+>
+  <div class="launch-summary-line" aria-live="polite">
+    @if (carouselProject(); as project) {
+      <div
+        class="launch-summary-line__slide"
+        [class.launch-summary-line__slide--enter]="carouselAnimating()"
+      >
+        <span
+          class="launch-summary-line__badge"
+          [class.launch-summary-line__badge--live]="project.status === 'LIVE'"
+          [class.launch-summary-line__badge--soon]="isSoon(project.status)"
+          [class.launch-summary-line__badge--ended]="isEnded(project.status)"
+        >
+          {{ statusLabel(project.status) }}
+        </span>
+
+        <span class="launch-summary-line__symbol" [title]="project.symbol">
+          {{ project.symbol }}
+        </span>
+
+        <span class="launch-summary-line__name" [title]="projectDisplayName(project)">
+          {{ projectDisplayName(project) }}
+        </span>
+
+        <span class="launch-summary-line__cap" [title]="marketCapLabel(project)">
+          {{ marketCapLabel(project) }}
+        </span>
+
+        <button
+ type="button"
+ class="launch-summary-line__swap ds-surface ds-surface--showcase-tab"
+ [class.launch-summary-line__swap--muted]="!canSwapProject(project)"
+ [disabled]="!canSwapProject(project)"
+ (click)="swapProject(project, $event)"
+ >
+          Swap
+        </button>
+
+        <button
+          type="button"
+          class="launch-summary-line__wp"
+          [class.launch-summary-line__wp--disabled]="!hasWhitepaper(project)"
+          [disabled]="!hasWhitepaper(project)"
+          [attr.aria-label]="whitepaperAriaLabel(project)"
+          [attr.title]="whitepaperAriaLabel(project)"
+          (click)="openWhitepaper(project, $event)"
+        >
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-file-down"/></svg>
+        </button>
+      </div>
+    } @else if (loading()) {
+      <span class="launch-summary-line__fallback">Synchronisation…</span>
+    } @else {
+      <span class="launch-summary-line__fallback">Aucun projet actif</span>
+    }
+  </div>
+</div>

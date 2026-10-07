@@ -1,0 +1,19 @@
+<div class="joy-zone" data-testid="joystick-move">
+  <div class="joy-stick-slot">
+    <app-virtual-joystick
+      [ariaLabel]="'Déplacer le personnage'"
+      [walkRunRings]="true"
+      (vectorChange)="onVector($event)"
+    />
+  </div>
+  <svg class="joy-arc" viewBox="0 0 78 28" aria-hidden="true">
+    <defs>
+      <path id="joy-arc-move" d="M 10 6 A 30 14 0 0 0 68 6" />
+    </defs>
+    <text>
+      <textPath href="#joy-arc-move" startOffset="50%" text-anchor="middle">
+        MOVE
+      </textPath>
+    </text>
+  </svg>
+</div>

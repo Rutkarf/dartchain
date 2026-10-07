@@ -1,0 +1,51 @@
+<div class="chain-graph" role="img" [attr.aria-label]="'Graphe de ' + layoutNodes().length + ' blocs'">
+  <div class="chain-graph__scroll">
+    <svg
+      class="chain-graph__svg"
+      [attr.viewBox]="'0 0 ' + graphWidth() + ' ' + graphHeight()"
+      [style.min-width.%]="minWidthPercent()"
+      width="100%"
+      preserveAspectRatio="xMinYMid meet"
+      aria-hidden="false"
+    >
+      @for (segment of linkSegments(); track $index) {
+        <line
+          class="chain-graph__link"
+          [attr.x1]="segment.x1"
+          [attr.y1]="segment.y1"
+          [attr.x2]="segment.x2"
+          [attr.y2]="segment.y2"
+        />
+      }
+
+      @for (node of layoutNodes(); track node.block.index) {
+        <g
+ class="chain-graph__node"
+ [class.is-tip]="node.isTip"
+ role="button"
+ tabindex="0"
+ [attr.title]="shortHash(node.block.hash) + ' · #' + node.block.index"
+ (click)="openBlock(node.block)"
+ (keydown.enter)="openBlock(node.block)"
+ (keydown.space)="$event.preventDefault(); openBlock(node.block)"
+ >
+          <circle
+            class="chain-graph__node-hit"
+            [attr.cx]="node.x"
+            [attr.cy]="node.y"
+            [attr.r]="hitRadius"
+          />
+          <circle
+            class="chain-graph__node-circle"
+            [attr.cx]="node.x"
+            [attr.cy]="node.y"
+            [attr.r]="nodeRadius"
+          />
+          <text class="chain-graph__node-index" [attr.x]="node.x" [attr.y]="node.y">
+            {{ node.block.index }}
+          </text>
+        </g>
+      }
+    </svg>
+  </div>
+</div>

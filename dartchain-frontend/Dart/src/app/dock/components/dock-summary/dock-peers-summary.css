@@ -1,0 +1,111 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: visible;
+  container-type: inline-size;
+  box-sizing: border-box;
+}
+
+.peers-summary-bar {
+  --peer-sum-cyan-rgb: var(--ds-neon-cyan-rgb, var(--tab-accent-rgb, 139, 157, 173));
+  --peer-sum-mono: var(--font-data, 'Inter', sans-serif);
+
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  padding: 0 2px;
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.peers-summary-bar__item {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: baseline;
+  gap: 0.28em;
+  min-width: 0;
+  max-width: none;
+  white-space: nowrap;
+}
+
+.peers-summary-bar__item--peer {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.peers-summary-bar__sep {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 0.55em;
+  margin: 0 5px;
+  background: rgba(var(--peer-sum-cyan-rgb), 0.28);
+}
+
+.peers-summary-bar__label {
+  flex: 0 0 auto;
+  font-family: var(--peer-sum-mono);
+  font-size: var(--fs-label);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(139, 157, 173, 0.65);
+}
+
+.peers-summary-bar__value {
+  flex: 0 0 auto;
+  font-family: var(--peer-sum-mono);
+  font-size: var(--fs-price);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: rgba(237, 231, 217, 0.94);
+}
+
+.peers-summary-bar__value--latency {
+  color: rgba(9, 129, 74, 0.95);
+}
+
+.peers-summary-bar__value--load {
+  color: rgba(var(--peer-sum-cyan-rgb), 0.95);
+}
+
+.peers-summary-bar__value--name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.peers-summary-bar__value--people {
+  flex: 0 0 auto;
+  font-weight: 900;
+  color: rgba(var(--peer-sum-cyan-rgb), 0.95);
+}
+
+.peers-summary-bar__value--muted,
+.peers-summary-bar__item--peer.is-empty .peers-summary-bar__value {
+  color: rgba(139, 157, 173, 0.58);
+  font-weight: 600;
+}
+
+@container (max-width: 180px) {
+  .peers-summary-bar__label {
+    display: none;
+  }
+
+  .peers-summary-bar__sep {
+    margin: 0 3px;
+  }
+}

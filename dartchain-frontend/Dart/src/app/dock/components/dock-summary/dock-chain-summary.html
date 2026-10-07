@@ -1,0 +1,60 @@
+<div
+ class="chain-summary-bar"
+ role="status"
+ aria-live="polite"
+>
+  <div class="chain-summary-bar__status">
+    <span
+ class="dock-summary-status"
+ [ngClass]="statusClass(phase())"
+ >
+      {{ statusLabel() }}
+    </span>
+    @if (blockCount() > 0) {
+      <span class="dock-summary-badge">
+        {{ blockCount() }}
+      </span>
+    }
+  </div>
+
+  <span
+    class="chain-summary-bar__tip"
+    [class.is-empty]="!tipHash()"
+    [attr.title]="tipTitle()"
+  >
+    @if (tipHash()) {
+      <span class="chain-summary-bar__tip-label">TIP</span>
+      <span class="chain-summary-bar__tip-index">#{{ tipIndex() }}</span>
+      <span class="chain-summary-bar__tip-hash">{{ tipHash() }}</span>
+    } @else {
+      <span class="chain-summary-bar__tip-hash">{{ emptyLabel() }}</span>
+    }
+  </span>
+
+  <div class="chain-summary-bar__meta">
+    @if (updatedAgeLabel()) {
+      <span class="chain-summary-bar__time">{{ updatedAgeLabel() }}</span>
+    }
+  </div>
+
+  <div class="chain-summary-bar__actions">
+    <button
+ type="button"
+ class="chain-summary-bar__btn chain-summary-bar__btn--tip"
+ (click)="onOpenTip($event)"
+ [disabled]="!latestBlock()"
+ title="Sommet"
+ >
+      Tip
+    </button>
+    <button
+ type="button"
+ class="chain-summary-bar__btn chain-summary-bar__btn--copy"
+ (click)="onCopyHash($event)"
+ [disabled]="!tipHash()"
+ [attr.title]="copied() ? 'Copié' : 'Copy'"
+ >
+      {{ copied() ? 'OK' : 'Copy' }}
+    </button>
+  </div>
+</div>

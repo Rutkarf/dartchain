@@ -1,0 +1,10 @@
+<div
+  class="depth-rail__scene"
+  #scene
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerUp($event)"
+>
+  <ng-content />
+</div>

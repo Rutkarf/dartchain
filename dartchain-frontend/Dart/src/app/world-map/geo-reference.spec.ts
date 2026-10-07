@@ -1,0 +1,92 @@
+import { TestBed } from '@angular/core/testing';
+import * as THREE from 'three';
+
+import { GeoCoordinateService } from './geo-coordinate.service';
+import {
+  GEO_REFERENCE_CONFIG,
+  METAVERSE_GEO_ORIGIN,
+  METAVERSE_LANDMARK_BUILDINGS,
+  METAVERSE_VALIDATION_ANCHORS,
+  metersToWorld,
+  worldToMeters,
+} from './geo-reference.config';
+import { footprintCentroid } from './geo-building.util';
+import { METAVERSE_START_POSITION, METRO_SPAWN_ANCHOR } from './map-configuration';
+
+describe('geo-reference', () => {
+  let geo: GeoCoordinateService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    geo = TestBed.inject(GeoCoordinateService);
+  });
+
+  it('utilise l Ombrière comme origine géographique', () => {
+    expect(GEO_REFERENCE_CONFIG.originLatitude).toBe(METAVERSE_GEO_ORIGIN.latitude);
+    expect(GEO_REFERENCE_CONFIG.originLongitude).toBe(METAVERSE_GEO_ORIGIN.longitude);
+    expect(GEO_REFERENCE_CONFIG.metersPerWorldUnit).toBe(1);
+    expect(GEO_REFERENCE_CONFIG.coordinateSystemVersion).toBe('metaverse-local-v1');
+    expect(GEO_REFERENCE_CONFIG.axisMapping.north).toBe('-z');
+    expect(GEO_REFERENCE_CONFIG.axisMapping.east).toBe('x');
+  });
+
+  it('place le miroir à l origine monde', () => {
+    const mirror = geo.geoToWorld(
+      METAVERSE_GEO_ORIGIN.latitude,
+      METAVERSE_GEO_ORIGIN.longitude,
+      0
+    );
+    expect(mirror.x).toBeCloseTo(METRO_SPAWN_ANCHOR.mirror.x, 3);
+    expect(mirror.z).toBeCloseTo(METRO_SPAWN_ANCHOR.mirror.z, 3);
+  });
+
+  it('convertit aller-retour lat/lon ↔ monde', () => {
+    const sample = { latitude: 43.2950145, longitude: 5.3748504, altitude: 8 };
+    const world = geo.geoToWorld(sample.latitude, sample.longitude, sample.altitude);
+    const back = geo.worldToGeo(world);
+    expect(back.latitude).toBeCloseTo(sample.latitude, 5);
+    expect(back.longitude).toBeCloseTo(sample.longitude, 5);
+    expect(back.altitude).toBeCloseTo(sample.altitude, 3);
+  });
+
+  it('conserve mètres/monde à 1:1', () => {
+    expect(metersToWorld(12)).toBe(12);
+    expect(worldToMeters(12)).toBe(12);
+    expect(geo.metersToWorldUnits(7.5)).toBeCloseTo(7.5, 4);
+  });
+
+  it('oriente le nord vers −Z', () => {
+    const origin = geo.geoToWorld(METAVERSE_GEO_ORIGIN.latitude, METAVERSE_GEO_ORIGIN.longitude, 0);
+    const north = geo.geoToWorld(METAVERSE_GEO_ORIGIN.latitude + 0.001, METAVERSE_GEO_ORIGIN.longitude, 0);
+    expect(north.z).toBeLessThan(origin.z);
+  });
+
+  it('aligne METAVERSE_START_POSITION sur l origine', () => {
+    expect(METAVERSE_START_POSITION.latitude).toBe(METAVERSE_GEO_ORIGIN.latitude);
+    expect(METAVERSE_START_POSITION.longitude).toBe(METAVERSE_GEO_ORIGIN.longitude);
+  });
+
+  it('place les landmarks proches de positions OSM attendues (< 15 m)', () => {
+    const expected: Record<string, THREE.Vector3> = {
+      'mirror-adjacent-building-01': new THREE.Vector3(57.75, 0, -6.58),
+      'mirror-adjacent-building-02': new THREE.Vector3(51.99, 0, -25.36),
+      'harbor-west-building': new THREE.Vector3(-27.58, 0, 85.98),
+      'harbor-east-building': new THREE.Vector3(113.7, 0, -10.96),
+    };
+
+    for (const def of METAVERSE_LANDMARK_BUILDINGS) {
+      const center = footprintCentroid(def.footprint, geo);
+      const exp = expected[def.id];
+      expect(exp).toBeDefined();
+      const err = Math.hypot(center.x - exp!.x, center.z - exp!.z);
+      expect(err).toBeLessThan(2);
+    }
+  });
+
+  it('expose des ancres de validation avec tolérances', () => {
+    expect(METAVERSE_VALIDATION_ANCHORS.length).toBeGreaterThan(3);
+    const mirrorAnchor = METAVERSE_VALIDATION_ANCHORS.find((a) => a.id === 'ombriere-mirror');
+    expect(mirrorAnchor?.expectedWorldPosition.x).toBe(0);
+    expect(mirrorAnchor?.expectedWorldPosition.z).toBe(0);
+  });
+});

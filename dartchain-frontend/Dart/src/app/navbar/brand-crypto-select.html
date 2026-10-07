@@ -1,0 +1,66 @@
+<div class="token-select brand-crypto-select" [class.token-select--open]="menuOpen">
+  <button
+ type="button"
+ class="token-field token-select__trigger"
+ (click)="toggleMenu($event)"
+ [attr.aria-expanded]="menuOpen"
+ aria-haspopup="listbox"
+ >
+      <span class="token-select__value">{{ selection.selected() }}</span>
+    <span class="token-select__chevron" aria-hidden="true"></span>
+  </button>
+
+  @if (menuOpen) {
+  <ul
+ class="token-select__menu"
+ role="listbox"
+ (click)="$event.stopPropagation()"
+ >
+    <li class="token-select__section" role="presentation">Natif</li>
+    <li
+      role="option"
+      [attr.aria-selected]="nativeToken === selection.selected()"
+      class="token-select__option"
+      [class.token-select__option--active]="nativeToken === selection.selected()"
+      (click)="selectSymbol(nativeToken)"
+    >
+      <span class="token-select__option-symbol">{{ nativeToken }}</span>
+      <span class="token-select__option-name">Jeton natif</span>
+    </li>
+
+    <li class="token-select__section token-select__section--launch" role="presentation">
+      Laboratoire
+      @if (hasLaunchProjects()) {
+        <span class="token-select__section-count">{{ platformLaunchProjects().length }}</span>
+      }
+    </li>
+
+    @if (launchState.loading()) {
+      <li class="token-select__empty" role="presentation">Chargement des lancements…</li>
+    } @else if (launchState.error() && !hasLaunchProjects()) {
+      <li class="token-select__empty" role="presentation">Lancements indisponibles</li>
+    } @else if (!hasLaunchProjects()) {
+      <li class="token-select__empty" role="presentation">Aucun jeton lancé pour le moment</li>
+    } @else {
+      @for (project of platformLaunchProjects(); track project.id) {
+      <li
+        role="option"
+        [attr.aria-selected]="project.symbol === selection.selected()"
+        class="token-select__option token-select__option--launch"
+        [class.token-select__option--active]="project.symbol === selection.selected()"
+        (click)="selectLaunchProject(project, $event)"
+      >
+        <span class="token-select__option-symbol">{{ project.symbol }}</span>
+        <span class="token-select__option-name">{{ project.name }}</span>
+        <span
+          class="token-select__option-tag"
+          [class.token-select__option-tag--live]="project.status === 'LIVE'"
+        >
+          {{ launchStatusLabel(project.status) }}
+        </span>
+      </li>
+      }
+    }
+  </ul>
+  }
+</div>

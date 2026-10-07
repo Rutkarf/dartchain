@@ -1,0 +1,75 @@
+{
+  "claims" : [ {
+    "id" : "a0118cc2-d1eb-4e62-895a-25887f82f0c8",
+    "walletAddress" : "251c13096d0c4c85870ac28ec4813fc15e3bc021",
+    "amount" : "0.00000000000000000000000001",
+    "claimedAt" : 1791144107633,
+    "nextEligibleAt" : 1791144117633,
+    "txHash" : "59e67c90545e20508afa4c3f29119006a9149b48028dd950fede5b88ae8ebb13",
+    "clientId" : null,
+    "m4t3rCount" : "1"
+  }, {
+    "id" : "74bf5096-286f-4bfc-9e67-26fbad3f1efa",
+    "walletAddress" : "6fc35b42705186edcb84d99d0117baabe436c0b1",
+    "amount" : "0.00000000000000000000000001",
+    "claimedAt" : 1791144108183,
+    "nextEligibleAt" : 1791144118183,
+    "txHash" : "03e3c9c643cb73fe621d7c6aad30cfb32872c309fd2fd166429e8fa4893c5275",
+    "clientId" : null,
+    "m4t3rCount" : "1"
+  }, {
+    "id" : "cac90143-9f88-4392-bb8e-5b6a09e7b9df",
+    "walletAddress" : "f8f06b6e24d07c03f547f335566385d62806dc3f",
+    "amount" : "0.00000000000000000000000001",
+    "claimedAt" : 1791144112485,
+    "nextEligibleAt" : 1791144122485,
+    "txHash" : "e667021915a6029026ef38beaedac8fd65b69f84b66566bc7dcf7553c035fe79",
+    "clientId" : null,
+    "m4t3rCount" : "1"
+  }, {
+    "id" : "c1e7bcdb-d72a-4663-8d31-c1a1167d5d76",
+    "walletAddress" : "ef6c2c08c45bf01db935e2ce1b801d5e71013653",
+    "amount" : "0.00000000000000000000000001",
+    "claimedAt" : 1791144176658,
+    "nextEligibleAt" : 1791144186658,
+    "txHash" : "3a26453cc2ec41775edf38716d3b99910339f629c13de5c3e167045b45b78786",
+    "clientId" : null,
+    "m4t3rCount" : "1"
+  }, {
+    "id" : "8d2c3f13-6da8-4d83-970b-422e9264474c",
+    "walletAddress" : "57f817cc4812bb0b7d24581ce5e55ed2d2fb679d",
+    "amount" : "0.00000000000000000000000001",
+    "claimedAt" : 1791336942493,
+    "nextEligibleAt" : 1791336952493,
+    "txHash" : "a5ac7f2a1346aeaa8c2de9e19cb8bfe571d1387eeeeb335615a6b65a379b2175",
+    "clientId" : null,
+    "m4t3rCount" : "1"
+  }, {
+    "id" : "eb4c2dff-8072-4f6c-a14a-bf802f9b8d79",
+    "walletAddress" : "9b856b3dd232136710e06f9718ba464db78da34d",
+    "amount" : "0.00000000000000000000000001",
+    "claimedAt" : 1791336942624,
+    "nextEligibleAt" : 1791336952624,
+    "txHash" : "01ec4cd7518aac4e4b84a94939e90f751ec2cf7c6ce8cdcae11566cb2ba98c37",
+    "clientId" : null,
+    "m4t3rCount" : "1"
+  }, {
+    "id" : "c15f02e2-5df0-4e6f-a941-bde11ada6892",
+    "walletAddress" : "ab7ef10dc2b4902b612817c6fb480c4b315b3b2e",
+    "amount" : "0.00000000000000000000000001",
+    "claimedAt" : 1791336945330,
+    "nextEligibleAt" : 1791336955330,
+    "txHash" : "d932f5375bbef98b50c7e07e535663f10bfb8957e846d409e068509e6f2ac7ef",
+    "clientId" : null,
+    "m4t3rCount" : "1"
+  }, {
+    "id" : "f15bb598-5477-49b3-9071-b899701396a8",
+    "walletAddress" : "95a02906d0462c3e8f8a1efada7e13e4bb77d2c7",
+    "amount" : "0.00000000000000000000000001",
+    "claimedAt" : 1791336961814,
+    "nextEligibleAt" : 1791336971814,
+    "txHash" : "d8c12de32bcfa013160d9aa93272ca796d0f96b53a3130b0068b9c39526978db",
+    "clientId" : null,
+    "m4t3rCount" : "1"
+  } ]
+}

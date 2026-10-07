@@ -1,0 +1,43 @@
+/**
+ * Icône chrome — DA iconographie.
+ * Outline round, couleur du texte, boîte carrée.
+ * Le sprite (.icon-sprite, dans app.html) dessine en viewBox 24,
+ * stroke 2 = --icon-stroke (1 px optique à 12 px).
+ * La classe se pose sur le <svg> qui fait <use>. Pas pour les logos
+ * filled, ni pour les tracés de chart / rate / chain-graph / joystick.
+ */
+
+.icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+svg.icon {
+  display: block;
+  flex-shrink: 0;
+  width: var(--comp-icon-sm);
+  height: var(--comp-icon-sm);
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--icon-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+svg.icon.icon--md {
+  width: var(--comp-icon-md);
+  height: var(--comp-icon-md);
+}
+
+svg.icon.icon--lg {
+  width: var(--comp-icon-lg);
+  height: var(--comp-icon-lg);
+}
+
+svg.icon.icon--xl {
+  width: var(--comp-icon-xl);
+  height: var(--comp-icon-xl);
+}

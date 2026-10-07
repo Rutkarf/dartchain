@@ -1,0 +1,63 @@
+<div
+  class="chart-token-search"
+  [class.chart-token-search--compact]="compact()"
+  [class.chart-token-search--icon-only]="iconOnly()"
+  [class.chart-token-search--open]="searchFocused() || searchMenuOpen()"
+>
+  <form class="chart-token-search__form" (submit)="onSearchSubmit($event)">
+    <input
+      #searchInput
+      class="chart-token-search__input"
+      type="search"
+      [value]="searchQuery()"
+      placeholder="Token…"
+      autocomplete="off"
+      spellcheck="false"
+      aria-label="Rechercher un token (R4V3, Laboratoire, CoinGecko…)"
+      (input)="onSearchInput($any($event.target).value)"
+      (focus)="onSearchFocus()"
+      (blur)="onSearchBlur()"
+    />
+    @if (searchLoading()) {
+      <span class="chart-token-search__spinner" aria-hidden="true"></span>
+    }
+    <span class="chart-token-search__icon" aria-hidden="true">
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+    </span>
+  </form>
+
+  @if (searchMenuOpen() && searchQuery().trim().length >= 2) {
+    <div
+ class="chart-token-search__panel"
+ role="listbox"
+ >
+      @if (searchError(); as errorMessage) {
+        <p class="chart-token-search__empty">{{ errorMessage }}</p>
+      } @else if (searchLoading()) {
+        <p class="chart-token-search__empty">Recherche…</p>
+      } @else if (searchResults().length === 0) {
+        <p class="chart-token-search__empty">Aucun token trouvé.</p>
+      } @else {
+        @for (item of searchResults(); track item.id + item.symbol) {
+          <button
+            type="button"
+            class="chart-token-search__item"
+            role="option"
+            (mousedown)="$event.preventDefault()"
+            (click)="pickResult(item)"
+          >
+            @if (item.thumb) {
+              <img class="chart-token-search__logo" [src]="item.thumb" alt="" />
+            } @else {
+              <span class="chart-token-search__logo chart-token-search__logo--fallback">{{ item.symbol.slice(0, 1) }}</span>
+            }
+            <span class="chart-token-search__copy">
+              <span class="chart-token-search__name">{{ item.name }}</span>
+              <span class="chart-token-search__meta">{{ item.symbol }} · {{ sourceLabel(item.source, item.network) }}</span>
+            </span>
+          </button>
+        }
+      }
+    </div>
+  }
+</div>

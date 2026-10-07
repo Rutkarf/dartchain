@@ -1,0 +1,79 @@
+<div
+ class="chart-summary-bar"
+ role="status"
+ aria-live="polite"
+>
+  <div class="chart-summary-bar__identity">
+    <span class="chart-summary-bar__symbol">{{ symbolLabel() }}</span>
+    <span class="chart-summary-bar__range">{{ rangeBadge() }}</span>
+  </div>
+
+  <div class="chart-summary-bar__quote">
+    @if (loading()) {
+      <span class="chart-summary-bar__price chart-summary-bar__price--muted">…</span>
+    } @else if (error()) {
+      <span class="chart-summary-bar__price chart-summary-bar__price--muted">Indispo.</span>
+    } @else {
+      <span class="chart-summary-bar__price">{{ price() }}</span>
+      <span
+        class="chart-summary-bar__delta"
+        [class.is-up]="positive()"
+        [class.is-down]="!positive()"
+      >
+        {{ delta() }}
+      </span>
+    }
+  </div>
+
+  <div class="chart-summary-bar__spark-wrap" aria-hidden="true">
+    @if (loading()) {
+      <div class="chart-summary-bar__spark-skeleton"></div>
+    } @else {
+      <svg class="chart-summary-bar__spark" viewBox="0 0 100 20" preserveAspectRatio="none">
+        @for (seg of sparklineSegments(); track $index) {
+          <path
+            class="chart-summary-bar__spark-area"
+            [class.is-up]="seg.up"
+            [class.is-down]="!seg.up"
+            [attr.d]="seg.areaD"
+          ></path>
+          <path
+            class="chart-summary-bar__spark-seg"
+            [class.is-up]="seg.up"
+            [class.is-down]="!seg.up"
+            [attr.d]="seg.d"
+          ></path>
+        }
+        @if (sparklineHead(); as head) {
+          <circle
+            class="chart-summary-bar__spark-head"
+            [class.is-up]="head.up"
+            [class.is-down]="!head.up"
+            [attr.cx]="head.x"
+            [attr.cy]="head.y"
+            r="1.35"
+          ></circle>
+        }
+      </svg>
+    }
+  </div>
+
+  <div class="chart-summary-bar__metrics">
+    @if (volume() !== '—') {
+      <span class="chart-summary-bar__metric">Vol {{ volume() }}</span>
+    }
+    @if (highLowLabel()) {
+      <span class="chart-summary-bar__metric chart-summary-bar__metric--hl">{{ highLowLabel() }}</span>
+    }
+  </div>
+
+  <app-collapsed-bar-actions
+    class="chart-summary-bar__actions"
+    [collapsed]="true"
+    [collapseAriaLabel]="collapseAriaLabel()"
+    refreshAriaLabel="Actualiser le graphique"
+    [refreshBusy]="loading()"
+    (refresh)="onRefresh($event)"
+    (collapseToggle)="collapseToggle.emit()"
+  />
+</div>

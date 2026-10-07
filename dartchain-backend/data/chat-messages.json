@@ -1,0 +1,20 @@
+{
+  "messages" : [ {
+    "id" : "4838a8d8-12e1-4ac8-bd4e-1122e221807b",
+    "roomId" : "global",
+    "author" : "Anonymous",
+    "text" : "hello-anon",
+    "sentAt" : "2026-10-07T01:36:03.408672148Z",
+    "clientId" : null,
+    "fontKey" : "arial",
+    "fontSize" : "11",
+    "bold" : false,
+    "italic" : false,
+    "underline" : false,
+    "strikethrough" : false,
+    "fontColor" : "#f4f0ff",
+    "highlightColor" : "transparent",
+    "textAlign" : "left",
+    "styleKey" : "neon"
+  } ]
+}

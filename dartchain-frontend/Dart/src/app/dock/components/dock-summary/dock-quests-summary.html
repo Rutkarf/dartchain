@@ -1,0 +1,30 @@
+<div
+ class="quests-summary-bar"
+ role="status"
+ aria-live="polite"
+>
+  <span class="quests-summary-bar__mission" title="Gardien du réseau">
+    Gardien du réseau
+  </span>
+
+  <span
+    class="quests-summary-bar__quest"
+    [class.is-empty]="!displayedQuestTitle()"
+    [attr.title]="displayedQuestTitle()"
+  >
+    {{ displayedQuestTitle() }}
+  </span>
+
+  <div class="quests-summary-bar__actions">
+    <button
+ type="button"
+ class="quests-summary-bar__claim"
+ [disabled]="claimDisabled()"
+ [class.is-ready]="canClaim()"
+ (click)="onClaimQuest($event)"
+ title="Claim Quest"
+ >
+      CLAIM QUEST
+    </button>
+  </div>
+</div>

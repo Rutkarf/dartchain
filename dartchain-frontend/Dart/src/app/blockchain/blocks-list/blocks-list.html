@@ -1,0 +1,162 @@
+<div class="chain-dock ds-surface ds-surface--showcase-body">
+  <header class="chain-dock__head">
+    <div class="chain-dock__head-left" aria-live="polite">
+      @if (chainValid() === true) {
+        <span class="chain-dock__badge chain-dock__badge--valid">{{ locale.t('chain.valid') }}</span>
+      } @else if (chainValid() === false) {
+        <span class="chain-dock__badge chain-dock__badge--invalid">{{ locale.t('chain.invalid') }}</span>
+      } @else if (loading()) {
+        <span class="chain-dock__badge chain-dock__badge--sync">{{ locale.t('chain.syncing') }}</span>
+      }
+    </div>
+
+    <div class="chain-dock__head-center" aria-live="polite">
+      @if (latestBlock(); as head) {
+        <button
+ type="button"
+ class="chain-dock__block-pill"
+ (click)="openBlock(head)"
+ >
+          BLOCK #{{ head.index }}
+        </button>
+      } @else {
+        <span class="chain-dock__block-pill chain-dock__block-pill--static">BLOCK —</span>
+      }
+      <span class="chain-dock__sync-label">{{ syncSubLabel() }}</span>
+    </div>
+
+    <div class="chain-dock__head-right">
+      <div class="chain-dock__view-toggle" role="group">
+        <button
+          type="button"
+          class="chain-dock__view-btn"
+          [class.is-active]="viewMode() === 'list'"
+          [attr.aria-pressed]="viewMode() === 'list'"
+          (click)="setViewMode('list')"
+        >
+          {{ locale.t('chain.view.list') }}
+        </button>
+        <button
+          type="button"
+          class="chain-dock__view-btn"
+          [class.is-active]="viewMode() === 'graph'"
+          [attr.aria-pressed]="viewMode() === 'graph'"
+          (click)="setViewMode('graph')"
+        >
+          {{ locale.t('chain.view.graph') }}
+        </button>
+      </div>
+
+      <button
+ type="button"
+ class="chain-dock__export"
+ (click)="exportFilteredBlocks()"
+ [title]="locale.t('chain.export')"
+ >
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-file-down"/></svg>
+        <span>.Json</span>
+      </button>
+    </div>
+  </header>
+
+  @if (feedback()) {
+    <p class="chain-dock__toast" [class.chain-dock__toast--error]="feedbackKind() === 'error'" role="status">
+      {{ feedback() }}
+    </p>
+  }
+
+  @if (error()) {
+    <div class="chain-dock__alert chain-dock__alert--error" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" class="chain-dock__alert-btn" (click)="refresh()">{{ locale.t('chain.retry') }}</button>
+    </div>
+  } @else if (loading() && !hasBlocks()) {
+    <ul class="chain-dock__list chain-dock__list--skeleton" aria-hidden="true">
+      @for (row of [1, 2, 3, 4, 5]; track row) {
+        <li class="chain-dock__skeleton"></li>
+      }
+    </ul>
+  } @else if (hasBlocks()) {
+    <div class="chain-dock__main">
+      <div class="chain-dock__body">
+        @if (hasFilteredBlocks()) {
+          @if (viewMode() === 'graph') {
+            <app-chain-graph
+              [blocks]="filteredBlocks()"
+              [tipIndex]="tipBlockIndex()"
+              [maxNodes]="graphMaxNodes()"
+              (selectBlock)="openBlock($event)"
+            />
+          } @else {
+            <ul class="chain-dock__list">
+              @for (block of filteredBlocks(); track block.index) {
+                <li
+                  class="chain-dock__item"
+                  [class.is-head]="latestBlock() && block.index === latestBlock()!.index"
+                >
+                  <button
+ type="button"
+ class="chain-dock__item-btn"
+ (click)="openBlock(block)"
+ [attr.aria-current]="latestBlock() && block.index === latestBlock()!.index ? 'true' : null"
+ >
+                    <span class="chain-dock__spine" aria-hidden="true">
+                      <span class="chain-dock__spine-rail"></span>
+                      <span class="chain-dock__spine-node"></span>
+                    </span>
+
+                    <span class="chain-dock__index-wrap">
+                      <span class="chain-dock__cell chain-dock__cell--index">#{{ block.index }}</span>
+                      @if (latestBlock() && block.index === latestBlock()!.index) {
+                        <span class="chain-dock__head-tag">HEAD</span>
+                      }
+                    </span>
+
+                    <span
+                      class="chain-dock__cell chain-dock__cell--hash"
+                      [title]="block.hash || 'Hash indisponible'"
+                    >
+                      {{ shortHash(block.hash) }}
+                    </span>
+
+                    <span class="chain-dock__meta">
+                      <span class="chain-dock__tx">
+                        <span class="chain-dock__tx-chip">{{ blockTxCount(block) }} TX</span>
+                        <span class="chain-dock__tx-ticks" aria-hidden="true">
+                          @for (filled of txLoadTicks(block); track $index) {
+                            <span
+                              class="chain-dock__tx-tick"
+                              [class.is-on]="filled"
+                            ></span>
+                          }
+                        </span>
+                      </span>
+                      <span class="chain-dock__cell chain-dock__cell--time">
+                        @if (block.timestamp) {
+                          {{ block.timestamp | date:'dd/MM HH:mm' }}
+                        } @else {
+                          —
+                        }
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        } @else {
+          <div class="chain-dock__empty">
+            <p>{{ locale.t('chain.noMatch') }}</p>
+            <button type="button" class="chain-dock__alert-btn" (click)="clearFilters()">
+              {{ locale.t('chain.filter.reset') }}
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="chain-dock__empty">
+      <p>{{ locale.t('chain.empty') }}</p>
+    </div>
+  }
+</div>

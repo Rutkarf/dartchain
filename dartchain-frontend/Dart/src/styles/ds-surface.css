@@ -1,0 +1,291 @@
+/**
+ * ds-surface — glassmorphisme fintech subtil (R4V3 Pass 1).
+ * Trois niveaux : standard / elevated / active.
+ * Couches carbone/sheen conservées mais quasi invisibles (tokens).
+ */
+
+.ds-surface {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--ds-surface-tint);
+  background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
+  backdrop-filter: var(--ds-surface-backdrop);
+  -webkit-backdrop-filter: var(--ds-surface-backdrop);
+  border: 1px solid var(--ds-surface-border);
+  box-shadow: var(--ds-surface-shadow);
+  color: var(--ds-text-primary);
+  box-sizing: border-box;
+}
+
+/* Tissage / grain — conservé, opacité pilotée par tokens (très basse) */
+.ds-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+  opacity: 0;
+  background-image: none;
+  mix-blend-mode: normal;
+}
+
+.ds-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+  opacity: var(--ds-surface-sheen-opacity);
+  background-image: var(--ds-surface-metallic-sheen);
+  background-size: auto;
+  mix-blend-mode: soft-light;
+}
+
+.ds-surface > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* —— Card levels —— */
+.ds-surface--standard,
+.ds-surface--card {
+  background-color: var(--ds-card-standard-bg);
+  border-color: var(--ds-card-standard-border);
+  border-radius: var(--ds-card-radius);
+  overflow: hidden;
+}
+
+.ds-surface--elevated {
+  background-color: var(--bg-0);
+  background-image: linear-gradient(var(--bg-2), var(--bg-2));
+  border-color: var(--ds-card-elevated-border);
+  border-radius: var(--ds-card-radius);
+  box-shadow: var(--ds-surface-shadow);
+}
+
+.ds-surface--active {
+  background-color: var(--bg-0);
+  background-image: linear-gradient(var(--bg-hover-2), var(--bg-hover-2));
+  border-color: var(--ds-card-active-border);
+  border-radius: var(--ds-card-radius);
+  box-shadow: var(--ds-glow-active), var(--ds-surface-shadow);
+}
+
+/* Lisibilité : ombre légère de contraste, pas de glow néon */
+.ds-surface--strip,
+.ds-surface--strip .navbar-brand-row,
+.ds-surface--strip .navbar-node-panel__box,
+.ds-surface--strip .navbar-auth-btn {
+  text-shadow: 0 1px 2px rgba(10, 18, 32, 0.55);
+}
+
+.ds-surface--card .exchange-panel__eyebrow,
+.ds-surface--card .exchange-panel__row-label,
+.ds-surface--card .exchange-panel__value-primary,
+.ds-surface--card .exchange-panel__pair-main,
+.ds-surface--card .showcase-chart__hub-title,
+.ds-surface--card .showcase-chart__hub-period,
+.ds-surface--card .showcase-chart__hub-stat-label,
+.ds-surface--card .showcase-chart__hub-stat-value,
+.ds-surface--card .showcase-chart__y-axis-title,
+.ds-surface--card .showcase-chart__y-axis-tick,
+.ds-surface--card .showcase-tab,
+.ds-surface--card .showcase-tab__label,
+.ds-surface--card .dock-tab,
+.ds-surface--card .dock-tab-label,
+.app-bottom-stack .showcase-tab__label {
+  text-shadow: 0 1px 2px rgba(10, 18, 32, 0.5);
+}
+
+.ds-surface--strip {
+  border-radius: var(--radius-none);
+  border-top: 1px solid var(--ds-surface-border-top);
+  border-bottom: 1px solid var(--ds-surface-border-bottom);
+  border-left: none;
+  border-right: none;
+  box-shadow: var(--ds-surface-shadow-strip);
+}
+
+.ds-surface--card {
+  border-radius: var(--ds-surface-radius);
+  border: 1px solid var(--ds-surface-border);
+  overflow: hidden;
+}
+
+.ds-surface--showcase-header {
+  border-radius: var(--radius-none);
+  border-bottom: 1px solid var(--ds-surface-border-bottom);
+}
+
+.ds-surface--showcase-body {
+  border-radius: var(--radius-none);
+  border-top: none;
+}
+
+.ds-surface--dock {
+  border-radius: var(--ds-surface-radius) var(--ds-surface-radius) 0 0;
+  border-bottom: none;
+}
+
+.ds-surface--showcase-tab {
+  border-radius: var(--radius-none);
+  overflow: hidden;
+  border: 1px solid var(--ds-surface-border);
+}
+
+.showcase-tab.ds-surface.ds-surface--showcase-tab:has(.showcase-tab__unread-toast) {
+  overflow: visible;
+  z-index: 2;
+}
+
+/* Push-button V4 visuals live in tab-push-button-v4.css (idle/hover/pressed/active). */
+.showcase-tab.ds-surface.ds-surface--showcase-tab,
+.dock-tab.ds-surface.ds-surface--showcase-tab,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab {
+  border: none;
+}
+
+.dock-tab.ds-surface.ds-surface--showcase-tab,
+.app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab {
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.ds-surface--showcase-tab .showcase-tab__label,
+.ds-surface--showcase-tab .showcase-tab__badge,
+.ds-surface--showcase-tab .dock-tab-label {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(10, 18, 32, 0.45);
+}
+
+.ds-surface--showcase-tab .showcase-tab__unread-toast {
+  position: absolute;
+  z-index: 3;
+  text-shadow: none;
+}
+
+.ds-surface--panel {
+  border-radius: var(--ds-surface-radius);
+  border: 1px solid var(--ds-surface-border);
+}
+
+.ds-surface--drawer {
+  overflow: hidden;
+}
+
+.ds-surface--drawer .showcase-news-drawer__title,
+.ds-surface--drawer .showcase-news-drawer__category,
+.ds-surface--drawer .showcase-news-drawer__nav-btn,
+.ds-surface--drawer .showcase-news-drawer__action {
+  text-shadow: 0 1px 2px rgba(10, 18, 32, 0.45);
+}
+
+/* Metric / label hierarchy helpers (Pass 1 primitives) */
+.ds-label {
+  color: var(--ds-text-secondary, #8b9dad);
+  font-size: var(--fs-chat-msg);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.ds-value {
+  color: var(--ds-text-value, var(--ds-text-primary));
+  font-size: var(--fs-form);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-caption {
+  color: var(--ds-text-secondary, #8b9dad);
+  font-size: var(--fs-module);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.ds-recommend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-1) var(--ds-space-2);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-recommend-bg);
+  border: 1px solid var(--ds-recommend-border);
+  color: var(--ds-recommend-fg);
+  font-size: var(--fs-module);
+  line-height: 1.3;
+}
+
+.ds-skeleton {
+  display: block;
+  border-radius: var(--ds-radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--ds-skeleton-base) 0%,
+    var(--ds-skeleton-shine) 50%,
+    var(--ds-skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  animation: ds-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes ds-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-skeleton {
+    animation:  none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ds-surface,
+  .ds-surface--strip,
+  .ds-surface--card,
+  .ds-surface--standard,
+  .ds-surface--elevated,
+  .ds-surface--active,
+  .ds-surface--showcase-header,
+  .ds-surface--showcase-body,
+  .ds-surface--dock,
+  .ds-surface--panel {
+    background-color: var(--ds-surface-bg-solid);
+    background-image: var(--ds-surface-metallic);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .ds-surface,
+  .ds-surface--strip,
+  .ds-surface--card,
+  .ds-surface--standard,
+  .ds-surface--elevated,
+  .ds-surface--active,
+  .ds-surface--showcase-header,
+  .ds-surface--showcase-body,
+  .ds-surface--dock,
+  .ds-surface--panel {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: var(--ds-surface-bg-solid);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-surface::before {
+    opacity: calc(var(--ds-surface-carbon-opacity) * 0.75);
+  }
+}

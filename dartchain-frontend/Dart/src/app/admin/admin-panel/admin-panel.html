@@ -1,0 +1,224 @@
+<section class="admin-panel">
+  @if (!unlocked()) {
+    <div class="admin-panel__gate" role="dialog" aria-labelledby="admin-seed-title">
+      <h2 id="admin-seed-title" class="admin-panel__title">{{ locale.t('admin.seedTitle') }}</h2>
+      <p class="admin-panel__subtitle">{{ locale.t('admin.seedHint') }}</p>
+      @if (!seedConfigured()) {
+        <p class="admin-panel__toast admin-panel__toast--error" role="alert">
+          {{ locale.t('admin.seedNotConfigured') }}
+        </p>
+      }
+      <label class="admin-panel__label" for="admin-seed-input">{{ locale.t('admin.seedLabel') }}</label>
+      <textarea
+        id="admin-seed-input"
+        class="admin-panel__seed"
+        rows="3"
+        [value]="seedDraft()"
+        (input)="onSeedInput($event)"
+        autocomplete="off"
+        spellcheck="false"
+        [attr.aria-invalid]="unlockError() ? 'true' : null"
+      ></textarea>
+      @if (unlockError()) {
+        <p class="admin-panel__toast admin-panel__toast--error" role="alert">{{ unlockError() }}</p>
+      }
+      <button
+        type="button"
+        class="admin-panel__cta"
+        (click)="submitUnlock()"
+        [disabled]="unlocking() || !seedDraft().trim()"
+      >
+        {{ unlocking() ? locale.t('admin.unlocking') : locale.t('admin.unlock') }}
+      </button>
+    </div>
+  } @else {
+    <header class="admin-panel__head">
+      <div>
+        <h2 class="admin-panel__title">{{ locale.t('admin.title') }}</h2>
+        <p class="admin-panel__subtitle">
+          {{ locale.t('admin.subtitle') }} · {{ locale.t('admin.sessionUntil') }}
+          {{ expiresAtLabel() }}
+        </p>
+      </div>
+      <button type="button" class="admin-panel__lock" (click)="lock()">
+        {{ locale.t('admin.lock') }}
+      </button>
+    </header>
+
+    <nav class="admin-panel__tabs">
+      <button
+        type="button"
+        class="admin-panel__tab"
+        [class.is-on]="section() === 'soc'"
+        (click)="setSection('soc')"
+      >
+        SOC
+      </button>
+      <button
+        type="button"
+        class="admin-panel__tab"
+        [class.is-on]="section() === 'export'"
+        (click)="setSection('export')"
+      >
+        Export
+      </button>
+      <button
+        type="button"
+        class="admin-panel__tab"
+        [class.is-on]="section() === 'ops'"
+        (click)="setSection('ops')"
+      >
+        Ops
+      </button>
+    </nav>
+
+    @if (section() === 'soc') {
+      <section class="admin-panel__soc">
+        <p class="admin-panel__lead">{{ locale.t('admin.socLead') }}</p>
+        <div class="admin-panel__table-wrap">
+          <table class="admin-panel__table">
+            <thead>
+              <tr>
+                <th>Cadre</th>
+                <th>Type</th>
+                <th>Critère</th>
+                <th>Contrôle</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of socRows; track row.criterion) {
+                <tr>
+                  <td>{{ row.framework }}</td>
+                  <td>{{ row.type }}</td>
+                  <td>{{ row.criterion }}</td>
+                  <td>{{ row.control }}</td>
+                  <td>
+                    <span
+                      class="admin-panel__status"
+                      [class.is-ok]="row.status === 'designed'"
+                      [class.is-gap]="row.status === 'gap-org'"
+                    >
+                      {{ row.status }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @if (section() === 'export') {
+      <section class="admin-panel__export">
+        <p class="admin-panel__lead">{{ locale.t('admin.exportLead') }}</p>
+        <div class="admin-panel__domains">
+          @for (domain of domains; track domain) {
+            <label class="admin-panel__check">
+              <input
+                type="checkbox"
+                [checked]="domainChecked(domain)"
+                (change)="toggleDomain(domain, $any($event.target).checked)"
+              />
+              {{ domain }}
+            </label>
+          }
+        </div>
+        <div class="admin-panel__export-actions">
+          <button type="button" class="admin-panel__cta" [disabled]="exportBusy()" (click)="exportOne('json')">
+            .json
+          </button>
+          <button type="button" class="admin-panel__cta" [disabled]="exportBusy()" (click)="exportOne('txt')">
+            .txt
+          </button>
+          <button type="button" class="admin-panel__cta" [disabled]="exportBusy()" (click)="exportOne('csv')">
+            .csv (Excel)
+          </button>
+          <button
+            type="button"
+            class="admin-panel__cta admin-panel__cta--accent"
+            [disabled]="exportBusy()"
+            (click)="exportAll()"
+          >
+            {{ locale.t('admin.exportAll') }}
+          </button>
+        </div>
+        @if (exportNotice()) {
+          <p class="admin-panel__ok" role="status">{{ exportNotice() }}</p>
+        }
+      </section>
+    }
+
+    @if (section() === 'ops') {
+      @if (errorMessage()) {
+        <div class="admin-panel__toast admin-panel__toast--error" role="alert">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (snapshot(); as data) {
+        <section class="admin-panel__meta">
+          <span class="admin-panel__badge">Phase {{ data.phase }}</span>
+          <span class="admin-panel__meta-item">
+            {{ locale.t('admin.collected') }}: {{ formatTimestamp(data.collectedAt) }}
+          </span>
+        </section>
+
+        @if (data.alerts.length > 0) {
+          <section class="admin-panel__alerts">
+            <h3 class="admin-panel__section-title">{{ locale.t('admin.alerts') }}</h3>
+            <ul class="admin-panel__alert-list">
+              @for (alert of data.alerts; track alert.code) {
+                <li class="admin-panel__alert">
+                  <strong>{{ alert.code }}</strong>
+                  <span>{{ alert.message }}</span>
+                </li>
+              }
+            </ul>
+          </section>
+        } @else {
+          <p class="admin-panel__ok">{{ locale.t('admin.noAlerts') }}</p>
+        }
+
+        <section class="admin-panel__stats">
+          <h3 class="admin-panel__section-title">{{ locale.t('admin.gauges') }}</h3>
+          <div class="admin-panel__grid">
+            @for (entry of gaugeEntries(); track entry.key) {
+              <article class="admin-panel__stat">
+                <p class="admin-panel__stat-label">{{ formatKey(entry.key) }}</p>
+                <p class="admin-panel__stat-value">{{ entry.value }}</p>
+              </article>
+            }
+          </div>
+        </section>
+
+        <section class="admin-panel__stats">
+          <h3 class="admin-panel__section-title">{{ locale.t('admin.latency') }}</h3>
+          <div class="admin-panel__grid">
+            @for (entry of latencyEntries(); track entry.key) {
+              <article class="admin-panel__stat">
+                <p class="admin-panel__stat-label">{{ formatKey(entry.key) }}</p>
+                <p class="admin-panel__stat-value">{{ entry.value }}</p>
+              </article>
+            }
+          </div>
+        </section>
+
+        <section class="admin-panel__stats">
+          <h3 class="admin-panel__section-title">{{ locale.t('admin.counters') }}</h3>
+          <div class="admin-panel__grid admin-panel__grid--compact">
+            @for (entry of counterEntries(); track entry.key) {
+              <article class="admin-panel__stat admin-panel__stat--compact">
+                <p class="admin-panel__stat-label">{{ formatKey(entry.key) }}</p>
+                <p class="admin-panel__stat-value">{{ entry.value }}</p>
+              </article>
+            }
+          </div>
+        </section>
+      } @else if (loading()) {
+        <p class="admin-panel__loading">{{ locale.t('admin.loading') }}</p>
+      }
+    }
+  }
+</section>

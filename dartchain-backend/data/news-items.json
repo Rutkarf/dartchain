@@ -1,0 +1,93 @@
+{
+  "items" : [ {
+    "id" : "editorial-1",
+    "category" : "Réseau",
+    "title" : "Bienvenue sur Dart Explorer",
+    "summary" : "Explore la chaîne R4V3 en temps réel.",
+    "body" : "Dart Explorer agrège les blocs, transactions pending et activité réseau. Utilise les onglets du dock pour miner, consulter la chaîne et gérer tes peers.",
+    "publishedAt" : "2026-10-04T19:58:33.002804387Z",
+    "source" : "EDITORIAL",
+    "actionType" : "NONE",
+    "actionTarget" : null
+  }, {
+    "id" : "editorial-2",
+    "category" : "R4V3",
+    "title" : "Volume R4V3 en hausse sur 24h",
+    "summary" : "Activité accrue sur la paire R4V3 / CHF.",
+    "body" : "Le panneau taux et le swap permettent de suivre l'évolution du token natif R4V3 et de simuler des échanges depuis le bandeau marché.",
+    "publishedAt" : "2026-10-04T19:46:33.002804387Z",
+    "source" : "EDITORIAL",
+    "actionType" : "NONE",
+    "actionTarget" : null
+  }, {
+    "id" : "editorial-3",
+    "category" : "Peers",
+    "title" : "Synchronisation multi-nœuds",
+    "summary" : "Connecte des peers pour propager la chaîne.",
+    "body" : "Ouvre le panneau Peers dans le dock pour ajouter des nœuds et synchroniser ta copie locale de la blockchain avec le réseau.",
+    "publishedAt" : "2026-10-04T19:00:33.002804387Z",
+    "source" : "EDITORIAL",
+    "actionType" : "OPEN_PEERS",
+    "actionTarget" : null
+  }, {
+    "id" : "editorial-4",
+    "category" : "Écosystème",
+    "title" : "Faucet actif — claim R4V3 testnet",
+    "summary" : "Récupère des jetons pour tester les transactions.",
+    "body" : "Le faucet distribue des R4V3 de test pour alimenter ton wallet et expérimenter les envois, le minage et les swaps sans risque.",
+    "publishedAt" : "2026-10-04T17:00:33.002804387Z",
+    "source" : "EDITORIAL",
+    "actionType" : "OPEN_FAUCET",
+    "actionTarget" : null
+  }, {
+    "id" : "editorial-5",
+    "category" : "Réseau",
+    "title" : "Proof-of-work difficulté 4",
+    "summary" : "Chaque bloc respecte la règle des zéros en tête.",
+    "body" : "La difficulté actuelle impose que le hash des blocs commence par quatre zéros. Mine les transactions pending pour valider la chaîne.",
+    "publishedAt" : "2026-10-04T15:00:33.002804387Z",
+    "source" : "EDITORIAL",
+    "actionType" : "OPEN_PENDING",
+    "actionTarget" : null
+  }, {
+    "id" : "editorial-6",
+    "category" : "R4V3",
+    "title" : "Exchange panel R4V3 ↔ launch tokens",
+    "summary" : "Simule des swaps depuis le panneau gauche.",
+    "body" : "Le panneau d'échange en haut de l'écran permet de convertir entre R4V3 et d'autres actifs avec estimation en temps réel.",
+    "publishedAt" : "2026-10-04T12:00:33.002804387Z",
+    "source" : "EDITORIAL",
+    "actionType" : "OPEN_SWAP",
+    "actionTarget" : null
+  }, {
+    "id" : "editorial-7",
+    "category" : "Écosystème",
+    "title" : "LaunchLab — déployer un token testnet",
+    "summary" : "Crée un actif custom sur la chaîne R4V3.",
+    "body" : "LaunchLab permet de configurer un token, le déployer en testnet et le retrouver dans l'onglet dédié du showcase.",
+    "publishedAt" : "2026-10-04T08:00:33.002804387Z",
+    "source" : "EDITORIAL",
+    "actionType" : "NONE",
+    "actionTarget" : null
+  }, {
+    "id" : "editorial-8",
+    "category" : "Réseau",
+    "title" : "Explorer les blocs minés",
+    "summary" : "Consulte l'historique depuis le dock.",
+    "body" : "Chaque bloc miné apparaît dans le dock Blocks. Clique une news réseau pour ouvrir le détail du bloc associé.",
+    "publishedAt" : "2026-10-04T02:00:33.002804387Z",
+    "source" : "EDITORIAL",
+    "actionType" : "NONE",
+    "actionTarget" : null
+  }, {
+    "id" : "editorial-9",
+    "category" : "Peers",
+    "title" : "Statut réseau en direct",
+    "summary" : "Le bandeau NEWS reflète l'activité chaîne.",
+    "body" : "Les événements réseau, blocs minés et peers apparaissent automatiquement dans le fil NEWS avec horodatage relatif.",
+    "publishedAt" : "2026-10-03T20:00:33.002804387Z",
+    "source" : "EDITORIAL",
+    "actionType" : "NONE",
+    "actionTarget" : null
+  } ]
+}

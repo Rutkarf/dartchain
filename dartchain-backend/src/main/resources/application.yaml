@@ -1,0 +1,208 @@
+server:
+  port: ${PORT:8080}
+
+dartchain:
+  persistence:
+    mode: ${DARTCHAIN_PERSISTENCE_MODE:memory}
+  product:
+    commercial: false
+    allow-legacy-private-key: false
+    allow-server-wallet-create: false
+    faucet-enabled: true
+    showcase-enabled: true
+    legacy-api-aliases-enabled: false
+  metaverse:
+    arena:
+      enabled: true
+      loot-rate: 0.10
+      loot-cap-per-elimination: 25
+      minimum-faucet-balance-to-loot: 1
+      spawn-shield-duration-seconds: 8
+      respawn-delay-seconds: 8
+      kill-cooldown-seconds: 5
+      daily-loot-cap: 200
+      daily-loss-cap: 200
+      new-player-protection-duration-seconds: 60
+      anti-farming-threshold: 8
+  chain:
+    chain-id: 3377
+    network-name: DartChain Native
+    native-token: R4V3
+    allow-server-evm-wallet-create: true
+  auth:
+    jwt-secret: ${DARTCHAIN_JWT_SECRET:dev-only-change-in-prod}
+    access-token-ttl-seconds: 3600
+    refresh-token-ttl-seconds: 604800
+    legacy-session-enabled: false
+    bootstrap-admin-username: ${DARTCHAIN_BOOTSTRAP_ADMIN:random}
+    bootstrap-admin-password: ${DARTCHAIN_BOOTSTRAP_ADMIN_PASSWORD:random}
+    password-min-length: 6
+    email-verification-required: ${DARTCHAIN_EMAIL_VERIFICATION:true}
+  mail:
+    host: ${DARTCHAIN_MAIL_HOST:}
+    port: ${DARTCHAIN_MAIL_PORT:587}
+    username: ${DARTCHAIN_MAIL_USERNAME:}
+    password: ${DARTCHAIN_MAIL_PASSWORD:}
+    from: ${DARTCHAIN_MAIL_FROM:noreply@dartchain.review}
+    starttls: ${DARTCHAIN_MAIL_STARTTLS:true}
+  admin:
+    # SHA-256 de la seed 24 mots (jamais la phrase en clair). Voir deploy/admin-seed.local.txt
+    seed-sha256: ${DARTCHAIN_ADMIN_SEED_SHA256:3c7af8f4a99c61e08acb2bb85b972eb022db4ec432c1e338cb6be24abb2c8d9f}
+    unlock-ttl-seconds: ${DARTCHAIN_ADMIN_UNLOCK_TTL:3600}
+  oauth:
+    dev-mock-enabled: ${OAUTH_DEV_MOCK_ENABLED:false}
+    frontend-callback-url: ${OAUTH_FRONTEND_CALLBACK_URL:http://localhost:4200/}
+    backend-base-url: ${OAUTH_BACKEND_BASE_URL:http://localhost:8080}
+    google:
+      enabled: ${OAUTH_GOOGLE_ENABLED:false}
+      client-id: ${OAUTH_GOOGLE_CLIENT_ID:}
+      client-secret: ${OAUTH_GOOGLE_CLIENT_SECRET:}
+    meta:
+      enabled: ${OAUTH_META_ENABLED:false}
+      client-id: ${OAUTH_META_CLIENT_ID:}
+      client-secret: ${OAUTH_META_CLIENT_SECRET:}
+    apple:
+      enabled: ${OAUTH_APPLE_ENABLED:false}
+      client-id: ${OAUTH_APPLE_CLIENT_ID:}
+      team-id: ${OAUTH_APPLE_TEAM_ID:}
+      key-id: ${OAUTH_APPLE_KEY_ID:}
+      private-key: ${OAUTH_APPLE_PRIVATE_KEY:}
+    microsoft:
+      enabled: ${OAUTH_MICROSOFT_ENABLED:false}
+      client-id: ${OAUTH_MICROSOFT_CLIENT_ID:}
+      client-secret: ${OAUTH_MICROSOFT_CLIENT_SECRET:}
+    github:
+      enabled: ${OAUTH_GITHUB_ENABLED:false}
+      client-id: ${OAUTH_GITHUB_CLIENT_ID:}
+      client-secret: ${OAUTH_GITHUB_CLIENT_SECRET:}
+    x:
+      enabled: ${OAUTH_X_ENABLED:false}
+      client-id: ${OAUTH_X_CLIENT_ID:}
+      client-secret: ${OAUTH_X_CLIENT_SECRET:}
+    discord:
+      enabled: ${OAUTH_DISCORD_ENABLED:false}
+      client-id: ${OAUTH_DISCORD_CLIENT_ID:}
+      client-secret: ${OAUTH_DISCORD_CLIENT_SECRET:}
+  rate-limit:
+    max-requests: 60
+    window-ms: 60000
+  security:
+    strict-pending-signatures: true
+  ops:
+    restrict-actuator: false
+    actuator-token: ${DARTCHAIN_ACTUATOR_TOKEN:}
+    mempool-alert-threshold: ${DARTCHAIN_MEMPOOL_ALERT_THRESHOLD:50}
+    http-error-alert-threshold: ${DARTCHAIN_HTTP_ERROR_ALERT_THRESHOLD:10}
+    slow-request-threshold-ms: ${DARTCHAIN_SLOW_REQUEST_THRESHOLD_MS:2000}
+    rbac-denied-alert-threshold: ${DARTCHAIN_RBAC_DENIED_ALERT_THRESHOLD:20}
+  cors:
+    allowed-origin-patterns:
+      - http://localhost:*
+      - http://127.0.0.1:*
+      - https://localhost:*
+      - https://127.0.0.1:*
+      - https://dartchain.pages.dev
+      - https://*.dartchain.pages.dev
+      - https://*.pages.dev
+      - https://*.workers.dev
+      - https://*.*.workers.dev
+      - https://dartzvz01-tagname.onrender.com
+      - https://*.onrender.com
+  data-import:
+    enabled: false
+    exit-after-import: true
+  wigle:
+    mock-enabled: true
+    api-name: ${WIGLE_API_NAME:}
+    api-token: ${WIGLE_API_TOKEN:}
+    cache-ttl-ms: 300000
+    coordinate-precision-degrees: 0.0004
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+      access:
+        default: unrestricted
+    access:
+      default: read_only
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
+      access: unrestricted
+    info:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: "@project.version@"
+    phase: AF
+  dartchain:
+    persistence-mode: ${dartchain.persistence.mode:memory}
+    postgres-only-profiles: prod,staging
+
+spring:
+  application:
+    name: dartchain-backend
+
+blockchain:
+  state:
+    path: ${BLOCKCHAIN_STATE_PATH:data/blockchain-state.json}
+
+exchange:
+  ledger:
+    path: ${EXCHANGE_LEDGER_PATH:data/exchange-ledger.json}
+
+wallet:
+  balances:
+    path: ${WALLET_BALANCES_PATH:data/wallet-balances.json}
+
+launch:
+  projects:
+    path: ${LAUNCH_PROJECTS_PATH:data/launch-projects.json}
+
+chat:
+  messages:
+    path: ${CHAT_MESSAGES_PATH:data/chat-messages.json}
+
+news:
+  items:
+    path: ${NEWS_ITEMS_PATH:data/news-items.json}
+
+faq:
+  questions:
+    path: ${FAQ_QUESTIONS_PATH:data/faq-questions.json}
+
+quests:
+  progress:
+    path: ${QUESTS_PROGRESS_PATH:data/quest-progress.json}
+
+faucet:
+  claims:
+    path: ${FAUCET_CLAIMS_PATH:data/faucet-claims.json}
+
+m4t3r:
+  reward:
+    settlement-mode: ${M4T3R_REWARD_SETTLEMENT_MODE:OFFCHAIN}
+    testnet-enabled: ${M4T3R_REWARD_TESTNET_ENABLED:false}
+    mainnet-enabled: ${M4T3R_REWARD_MAINNET_ENABLED:false}
+    amount-per-token: ${M4T3R_REWARD_AMOUNT:0.00000000000000000000000001}
+    signing-key-id: ${M4T3R_REWARD_KEY_ID:dev-reward-key-1}
+    signing-key: ${M4T3R_REWARD_SIGNING_KEY:change-me-m4t3r-reward-dev-only}
+    max-speed-mps: ${M4T3R_REWARD_MAX_SPEED:32.0}
+    world-id: metaverse
+  rewards:
+    path: ${M4T3R_REWARDS_PATH:data/m4t3r-rewards.json}
+
+auth:
+  users:
+    path: ${AUTH_USERS_PATH:data/auth-users.json}
+  session:
+    ttl-seconds: ${AUTH_SESSION_TTL_SECONDS:604800}

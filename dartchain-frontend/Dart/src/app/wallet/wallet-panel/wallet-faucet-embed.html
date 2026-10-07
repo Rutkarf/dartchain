@@ -1,0 +1,105 @@
+<div class="wallet-faucet">
+  @if (runtime.toastMessage()) {
+    <div
+      class="wallet-faucet__toast"
+      [class.is-success]="runtime.toastKind() === 'success'"
+      [class.is-error]="runtime.toastKind() === 'error'"
+      [class.is-info]="runtime.toastKind() === 'info'"
+      role="status"
+      aria-live="polite"
+    >
+      {{ runtime.toastMessage() }}
+    </div>
+  }
+
+  <div class="wallet-faucet__top">
+    <article class="wallet-faucet__tile wallet-faucet__tile--amount">
+      <div #valueWrap class="wallet-faucet__value-wrap">
+        <div
+          class="wallet-faucet__value-fit"
+          [style.transform]="'scale(' + valueFitScale() + ')'"
+        >
+          <span
+ #valueText
+ class="wallet-faucet__value"
+ [class.is-bumping]="runtime.bump()"
+ [class.is-capped]="runtime.atMaxClaim()"
+ [attr.title]="runtime.displayLine()"
+ >
+            <span class="wallet-faucet__value-token">{{ runtime.nativeTokenLabel() }}</span>
+            <span class="wallet-faucet__value-whole">{{ runtime.wholePartDisplay() }}</span>
+            <span class="wallet-faucet__value-sep">,</span>
+            <span class="wallet-faucet__value-decimal">{{ runtime.decimalDigits() }}</span>
+            <span class="wallet-faucet__value-unit">m4t3r</span>
+          </span>
+        </div>
+      </div>
+    </article>
+
+    <button
+      type="button"
+      class="wallet-faucet__claim"
+      [disabled]="runtime.claimDisabled()"
+      [class.is-inactive]="!runtime.eligible() && !runtime.loading() && runtime.isReady()"
+      [class.is-cooling]="!runtime.eligible() && !runtime.loading() && runtime.isReady() && runtime.cooldownSeconds() > 0"
+      [class.is-success]="runtime.claimSuccessActive()"
+      [class.is-ready]="runtime.eligible() && !runtime.loading()"
+      [attr.aria-label]="
+        runtime.claimSuccessActive()
+          ? t('faucet.claimSuccess')
+          : runtime.claimButtonLabel()
+      "
+      [attr.title]="
+        runtime.claimSuccessActive()
+          ? t('faucet.claimSuccess')
+          : runtime.claimButtonLabel()
+      "
+      (click)="claim()"
+    >
+      <span class="wallet-faucet__claim-glyph" aria-hidden="true">
+        @if (runtime.claimSuccessActive()) {
+          <svg class="wallet-faucet__claim-svg icon" viewBox="0 0 24 24" focusable="false">
+            <circle cx="12" cy="12" r="9.2" class="wallet-faucet__claim-ring" />
+            <path
+              class="wallet-faucet__claim-check"
+              d="M7.8 12.2 10.7 15.1 16.4 9"
+              fill="none"
+            />
+          </svg>
+        } @else {
+          <svg class="wallet-faucet__claim-svg icon" viewBox="0 0 24 24" focusable="false">
+            <path
+              class="wallet-faucet__claim-arrow"
+              d="M12 4.2v9.2"
+              fill="none"
+            />
+            <path
+              class="wallet-faucet__claim-arrowhead"
+              d="M7.6 10.4 12 15.2l4.4-4.8"
+              fill="none"
+            />
+            <path
+              class="wallet-faucet__claim-tray"
+              d="M5.4 17.6h13.2"
+              fill="none"
+            />
+            <circle class="wallet-faucet__claim-spark wallet-faucet__claim-spark--a" cx="17.6" cy="6.2" r="1.1" />
+            <circle class="wallet-faucet__claim-spark wallet-faucet__claim-spark--b" cx="6.4" cy="7.4" r="0.85" />
+          </svg>
+        }
+      </span>
+    </button>
+
+    <article
+ class="wallet-faucet__tile wallet-faucet__tile--cooldown"
+ [attr.title]="runtime.cooldownLabel()"
+ >
+      <div
+        class="wallet-faucet__cooldown-ring"
+        [style.--cooldown-progress]="runtime.cooldownProgress()"
+      >
+        <span class="wallet-faucet__cooldown-value">{{ runtime.cooldownLabel() }}</span>
+      </div>
+    </article>
+  </div>
+</div>

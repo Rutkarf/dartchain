@@ -1,0 +1,220 @@
+:host {
+  display: block !important;
+  overflow: visible !important;
+  pointer-events: none !important;
+  position: fixed !important;
+  left: var(--app-side-gutter, 2px) !important;
+  right: var(--app-side-gutter, 2px) !important;
+  bottom: var(--ds-safe-bottom, 0px) !important;
+  width: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  z-index: var(--z-floor, 1) !important;
+  isolation: isolate;
+}
+
+/*
+ * Bande metaverse en pied de page : hauteur = peek réservé sous l’UI.
+ * Le perso tient de plein pied dans cette bande, même panneaux dépliés.
+ */
+.floor-wrapper {
+  position: fixed;
+  left: var(--app-side-gutter, 2px);
+  right: var(--app-side-gutter, 2px);
+  bottom: var(--ds-safe-bottom, 0px);
+  width: auto;
+  height: var(--floor-peek-height, 220px);
+  min-height: 200px;
+  max-height: min(42vh, 240px);
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  background: #0a1220;
+  /* Fallback : le masque runtime (floor-horizon-blend.config) remplace ces stops. */
+  -webkit-mask-image: linear-gradient(
+    to top,
+    #0a1220 0%,
+    #0a1220 50%,
+    rgba(10, 18, 32, 0.88) 64%,
+    rgba(10, 18, 32, 0.52) 76%,
+    rgba(10, 18, 32, 0.18) 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to top,
+    #0a1220 0%,
+    #0a1220 50%,
+    rgba(10, 18, 32, 0.88) 64%,
+    rgba(10, 18, 32, 0.52) 76%,
+    rgba(10, 18, 32, 0.18) 88%,
+    transparent 100%
+  );
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* MetaVerseBB : pas de masque fondu ; peek jusqu’sous les onglets (+ bande panel). */
+:host.arena-active {
+  --arena-ui-top-reserve: 300px;
+  --floor-peek-height: calc(100dvh - var(--arena-ui-top-reserve));
+  --arena-chrome-h: var(--comp-form-h, 32px);
+  z-index: 1 !important;
+}
+
+:host.arena-active .floor-wrapper {
+  height: var(--floor-peek-height);
+  min-height: 280px;
+  max-height: none;
+  bottom: var(--ds-safe-bottom, 0px);
+  background: transparent;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* Overrides media — garder le déploiement haute arène */
+@media (max-width: 349px) {
+  :host.arena-active {
+    --arena-ui-top-reserve: 280px;
+  }
+
+  :host.arena-active .floor-wrapper {
+    height: var(--floor-peek-height);
+    min-height: 0;
+    max-height: var(--floor-peek-height);
+  }
+}
+
+@media (orientation: portrait) and (min-width: 350px) and (max-width: 480px) {
+  :host.arena-active {
+    --arena-ui-top-reserve: 300px;
+  }
+
+  :host.arena-active .floor-wrapper {
+    height: var(--floor-peek-height);
+    min-height: 0;
+    max-height: var(--floor-peek-height);
+  }
+}
+
+@media (orientation: landscape) and (min-width: 350px) and (max-width: 480px) {
+  :host.arena-active {
+    --arena-ui-top-reserve: 300px;
+  }
+
+  :host.arena-active .floor-wrapper {
+    height: var(--floor-peek-height);
+    min-height: 280px;
+    max-height: none;
+  }
+}
+
+/* Portrait téléphone : la bande est celle du shell, l’arène ne la rallonge pas. */
+@media (max-width: 349px),
+       (orientation: portrait) and (max-width: 480px) {
+  :host.arena-active {
+    --floor-peek-height: inherit;
+    --floor-canvas-height: inherit;
+  }
+}
+
+@media (min-width: 481px) {
+  :host.arena-active {
+    --arena-ui-top-reserve: 320px;
+  }
+
+  :host.arena-active .floor-wrapper {
+    height: var(--floor-peek-height);
+    min-height: 300px;
+    max-height: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host.arena-active .floor-wrapper {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+}
+
+.floor-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 1;
+  background: transparent;
+  pointer-events: auto !important;
+  touch-action: none;
+}
+
+/* ——— Intro veil — assombrissement bord seulement ; titre = Ombrière 3D uniquement ——— */
+.metaverse-intro-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+  will-change: opacity;
+  /* Centre totalement ouvert : pas de teinte / texte HUD sur METAVERSEBB. */
+  background: radial-gradient(
+    ellipse 55% 48% at 50% 42%,
+    transparent 0%,
+    transparent 42%,
+    rgba(10, 18, 32, 0.45) 78%,
+    rgba(10, 18, 32, 0.62) 100%
+  );
+}
+
+.metaverse-intro-veil__vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 70px 28px rgba(10, 18, 32, 0.4);
+  pointer-events: none;
+}
+
+
+@media (max-width: 349px),
+       (orientation: portrait) and (max-width: 480px) {
+  .floor-wrapper {
+    height: var(--floor-peek-height, 220px);
+    min-height: 0;
+    max-height: var(--floor-peek-height, 220px);
+  }
+}
+
+@media (orientation: landscape) and (min-width: 350px) and (max-width: 480px) {
+  .floor-wrapper {
+    height: var(--floor-peek-height, 220px);
+    min-height: 200px;
+    max-height: min(38vh, 240px);
+  }
+}
+
+@media (min-width: 481px) {
+  .floor-wrapper {
+    height: var(--floor-peek-height, 220px);
+    min-height: 200px;
+    max-height: min(36vh, 240px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floor-wrapper {
+    -webkit-mask-image: linear-gradient(
+      to top,
+      #0a1220 0%,
+      #0a1220 58%,
+      rgba(10, 18, 32, 0.7) 80%,
+      rgba(10, 18, 32, 0.22) 92%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to top,
+      #0a1220 0%,
+      #0a1220 58%,
+      rgba(10, 18, 32, 0.7) 80%,
+      rgba(10, 18, 32, 0.22) 92%,
+      transparent 100%
+    );
+  }
+}

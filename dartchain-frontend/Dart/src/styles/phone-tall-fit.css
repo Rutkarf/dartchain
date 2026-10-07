@@ -1,0 +1,398 @@
+/*
+ * Téléphone portrait HAUT (ex. 480×800, 390×844) :
+ * encore en vp-compact, mais les lettres micro + panneaux 80 px
+ * rendent tout illisible. On ouvre texte + cases.
+ * Canon 250×550 / 320×568 : ce media ne match pas.
+ */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 700px) {
+  /* ── Onglets showcase + dock lisibles ── */
+  .app-hub-showcase-block .showcase-header-tabs .showcase-tab .showcase-tab__label,
+  .app-bottom-stack .showcase-header-tabs .showcase-tab__label {
+    font-size: 10px !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1.1 !important;
+  }
+
+  .app-bottom-stack .dock-summary-bar,
+  .app-bottom-stack .dock-summary-status,
+  .app-bottom-stack .collapsed-summary-bar {
+    font-size: 10px !important;
+  }
+
+  /* ── Actus ── */
+  app-showcase-news {
+    --news-visible-rows: 4 !important;
+    --news-tag-w: 48px !important;
+    --news-time-w: 36px !important;
+  }
+
+  .showcase-news__tag-badge {
+    height: auto !important;
+    min-height: 14px;
+    line-height: 1.15 !important;
+    padding: 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .showcase-news__item-btn,
+  .showcase-news__item-title {
+    line-height: 1.15 !important;
+  }
+
+  /* ── D.A.O : 4 lignes visibles, ticker entier ── */
+  app-showcase-dao {
+    --dao-visible-rows: 4 !important;
+    --dao-row-min: 36px !important;
+    --dao-ticker-w: 44px !important;
+    --dao-chip-h: 16px !important;
+    --dao-xp-h: 2px !important;
+    --dao-row-pad-y: 2px !important;
+    --dao-col-gap: 4px !important;
+    --dao-line: 1.15 !important;
+  }
+
+  .showcase-dao__item.showcase-news__item,
+  .showcase-dao__skeleton-item {
+    flex: 0 0 var(--dao-row-h) !important;
+    height: var(--dao-row-h) !important;
+    min-height: var(--dao-row-h) !important;
+    max-height: var(--dao-row-h) !important;
+  }
+
+  .showcase-dao__col--identity {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
+    overflow: hidden !important;
+  }
+
+  .showcase-dao__name,
+  .showcase-dao__symbol,
+  .showcase-dao__ticker,
+  .showcase-dao__stats {
+    line-height: 1.15 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .showcase-dao__summary {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-break: normal !important;
+  }
+
+  .showcase-dao__chip {
+    height: var(--dao-chip-h) !important;
+    min-height: var(--dao-chip-h) !important;
+    max-height: var(--dao-chip-h) !important;
+  }
+
+  /* ── LABO : lignes qui remplissent, plus de chevauchement ── */
+  app-showcase-launch {
+    --launch-visible-rows: 4 !important;
+    --launch-title-row-h: 22px !important;
+    --launch-row-h: 28px !important;
+  }
+
+  .showcase-launch__item,
+  .showcase-launch .showcase-news__item {
+    flex: 0 0 calc(100cqh / var(--launch-visible-rows)) !important;
+    height: calc(100cqh / var(--launch-visible-rows)) !important;
+    min-height: calc(100cqh / var(--launch-visible-rows)) !important;
+    max-height: calc(100cqh / var(--launch-visible-rows)) !important;
+    overflow: hidden !important;
+  }
+
+  /* ── Marché : rail assez large pour SERVICES ── */
+  .market-panel {
+    --market-rail-w: 72px !important;
+    --market-toolbar-h: 24px !important;
+  }
+
+  .market-panel__rail-label {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    overflow-wrap: normal !important;
+    word-break: keep-all !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1.15 !important;
+    font-size: 10px !important;
+  }
+
+  /* ── R4V3 : piliers lisibles + Livre blanc entier ── */
+  .showcase-r4v3__pillar {
+    padding: 4px 3px !important;
+    gap: 2px !important;
+    overflow: hidden !important;
+  }
+
+  .showcase-r4v3__pillar-label {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+  }
+
+  .showcase-r4v3__pillar-detail {
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden !important;
+  }
+
+  .showcase-r4v3__wp-btn {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    overflow: hidden !important;
+    justify-content: flex-start !important;
+    gap: 2px !important;
+    padding: 2px 1px !important;
+  }
+
+  .showcase-r4v3__wp-btn-label {
+    flex: 0 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    letter-spacing: 0 !important;
+    line-height: 1.05 !important;
+    font-size: 9px !important;
+  }
+
+  .showcase-r4v3__wp-btn-icon {
+    margin-top: 2px !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* ── Chaîne : rangées assez hautes pour lire ≥4 blocs ── */
+  .chain-dock__head {
+    min-height: 22px !important;
+    max-height: none !important;
+  }
+
+  .chain-dock__list {
+    gap: 3px !important;
+  }
+
+  .chain-dock__toolbar {
+    min-height: 22px !important;
+    max-height: none !important;
+  }
+
+  .chain-dock__item-btn {
+    min-height: 26px !important;
+    height: 26px !important;
+    max-height: 26px !important;
+    line-height: 1.15 !important;
+  }
+
+  .chain-dock__block-pill,
+  .chain-dock__sync-label,
+  .chain-dock__badge {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+  }
+
+  /* ── File ── */
+  app-pending-transactions {
+    --pending-row-h: 28px !important;
+  }
+
+  .pending-view__list--compact,
+  .pending-view__list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    overflow-y: auto !important;
+  }
+
+  .pending-view__item {
+    flex: 1 1 0 !important;
+    min-height: 26px !important;
+  }
+
+  .pending-view__item-row,
+  .pending-view__item-row--compact {
+    grid-template-columns: 40px minmax(56px, 1fr) minmax(0, 1.4fr) 52px 44px !important;
+    height: 100% !important;
+    min-height: 26px !important;
+    line-height: 1.15 !important;
+    column-gap: 4px !important;
+    align-items: center !important;
+  }
+
+  .pending-view__item-row--compact > .pending-view__mine {
+    height: auto !important;
+    min-height: 16px !important;
+  }
+
+  /* ── Pairs : connect + liste lisibles ── */
+  app-peer-panel {
+    --peer-row-height: 28px !important;
+  }
+
+  .peer-panel {
+    gap: 4px !important;
+    padding: 4px !important;
+    overflow: hidden !important;
+  }
+
+  .peer-panel__strip,
+  .peer-panel__search,
+  .peer-panel__connect,
+  .peer-panel__connect-input {
+    min-height: 22px !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .peer-panel__connect-input,
+  .peer-panel__search-input,
+  .peer-panel__kpi-label,
+  .peer-panel__kpi-value,
+  .peer-panel__node-name {
+    font-size: 10px !important;
+    line-height: 1.15 !important;
+  }
+
+  .peer-panel__list {
+    overflow-y: auto !important;
+    min-height: 0 !important;
+  }
+
+  .peer-panel__row {
+    flex: 0 0 auto !important;
+    min-height: 28px !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: hidden !important;
+  }
+
+  /* ── Quêtes : 4 lignes distinctes ── */
+  .quests-panel__guardian,
+  .quests-panel__countdown {
+    max-height: none !important;
+    min-height: 22px !important;
+    overflow: hidden !important;
+    line-height: 1.15 !important;
+  }
+
+  .quests-panel__countdown {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 2px 4px !important;
+  }
+
+  .quests-panel__list {
+    grid-auto-rows: minmax(0, 1fr) !important;
+    overflow: hidden !important;
+    align-content: stretch !important;
+    gap: 2px !important;
+  }
+
+  .quests-panel__row {
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    align-items: center !important;
+  }
+
+  /* ── Portefeuille : solde visible + CTA contenu ── */
+  .app-bottom-stack__panel .wallet-display__holdings--split,
+  .wallet-display__holdings--split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 4px !important;
+  }
+
+  .app-bottom-stack__panel .wallet-display.needs-wallet-creation .wallet-display__balance-col,
+  .wallet-display.needs-wallet-creation .wallet-display__balance-col {
+    display: grid !important;
+    grid-template-rows: minmax(36px, 1fr) auto !important;
+    gap: 4px !important;
+    overflow: hidden !important;
+  }
+
+  .app-bottom-stack__panel .wallet-display__balance-cyber,
+  .app-bottom-stack__panel .wallet-display__balance-glass,
+  .wallet-display__balance-cyber,
+  .wallet-display__balance-glass {
+    min-height: 36px !important;
+    overflow: hidden !important;
+  }
+
+  .app-bottom-stack__panel .wallet-display__create-cta,
+  .wallet-display__create-cta {
+    min-height: 28px !important;
+    max-height: 32px !important;
+    font-size: 10px !important;
+    padding: 2px 4px !important;
+  }
+
+  .app-bottom-stack__panel .wallet-display__balance-whole,
+  .app-bottom-stack__panel .wallet-display__balance-frac,
+  .app-bottom-stack__panel .wallet-display__balance-brand {
+    font-size: 11px !important;
+    line-height: 1.15 !important;
+  }
+
+  .wallet-faucet__top {
+    grid-template-columns: minmax(0, 1fr) 24px minmax(40px, 56px) !important;
+    min-height: 24px;
+    align-items: center;
+  }
+
+  .wallet-faucet__claim {
+    width: 24px !important;
+    min-width: 24px !important;
+    max-width: 24px !important;
+    min-height: 24px !important;
+  }
+
+  .wallet-faucet__cooldown-ring {
+    width: 100% !important;
+    height: 24px !important;
+  }
+
+  /* ── Graphique : axe bas ── */
+  .showcase-chart__axis,
+  .showcase-chart__axis--hub {
+    height: auto !important;
+    min-height: 18px !important;
+    max-height: none !important;
+    overflow: visible;
+  }
+
+  .showcase-chart__axis-tick {
+    top: auto !important;
+    bottom: 0;
+    transform: translate(-50%, 0) !important;
+  }
+
+  /* ── Star Conquest : pas de coupe dure trop haute ── */
+  app-particle-background.app-background,
+  app-particle-background {
+    /* Le bas du clip suit le floor ; on évite une bande morte visible. */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 calc(100% - 12px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      #000 0%,
+      #000 calc(100% - 12px),
+      transparent 100%
+    );
+  }
+}
