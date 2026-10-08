@@ -1,9 +1,18 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
 
 import {
+  MIRROR_SPAWN_SAFE_ZONE,
+  SPAWN_CIRCLE_GROUND_COLOR,
+} from './map-configuration';
+import {
   buildVieuxPortMirrorCanopy,
   createCamberedCanopyGeometry,
+  createMetaVerseBbTitleTexture,
+  METAVERSE_BB_TITLE_FONT,
   MIRROR_CANOPY,
 } from './vieux-port-mirror-canopy.util';
 
@@ -33,27 +42,42 @@ describe('Vieux-Port mirror canopy', () => {
 
   it('assembles glass, steel posts and plaza as a named group', () => {
     const built = buildVieuxPortMirrorCanopy('high', { x: 0, y: 8.0, z: 0 });
-    expect(built.group.name).toBe('marseille-mirror-canopy-group');
+    expect(built.group.name).toBe('metaverse-mirror-canopy-group');
     const names: string[] = [];
     built.group.traverse((obj) => {
       if (obj.name) names.push(obj.name);
     });
-    expect(names).toContain('marseille-mirror-canopy');
-    expect(names).toContain('marseille-mirror-canopy-top');
-    expect(names).toContain('marseille-mirror-glass-title');
-    expect(names).toContain('marseille-mirror-plaza');
-    expect(names).not.toContain('marseille-mirror-caustic');
-    expect(names).not.toContain('marseille-mirror-aura');
-    expect(names).toContain('marseille-mirror-under-light');
-    expect(names.some((n) => n.startsWith('marseille-mirror-post-'))).toBe(true);
+    expect(names).toContain('metaverse-mirror-canopy');
+    expect(names).toContain('metaverse-mirror-canopy-top');
+    expect(names).toContain('metaverse-mirror-glass-title');
+    expect(names).toContain('metaverse-mirror-plaza');
+    expect(names).not.toContain('metaverse-mirror-caustic');
+    expect(names).not.toContain('metaverse-mirror-aura');
+    expect(names).toContain('metaverse-mirror-under-light');
+    expect(names.some((n) => n.startsWith('metaverse-mirror-post-'))).toBe(true);
     expect(built.geometries.length).toBeGreaterThan(8);
     expect(built.materials.length).toBeGreaterThan(6);
 
-    const glass = built.group.getObjectByName('marseille-mirror-canopy') as THREE.Mesh;
+    const plaza = built.group.getObjectByName('metaverse-mirror-plaza') as THREE.Mesh;
+    const plazaMat = plaza.material as THREE.MeshLambertMaterial;
+    expect(plazaMat.color.getHex()).toBe(SPAWN_CIRCLE_GROUND_COLOR);
+    expect(plazaMat.map).toBeNull();
+    expect((plaza.geometry as THREE.CircleGeometry).parameters.radius).toBe(
+      MIRROR_SPAWN_SAFE_ZONE.radiusMeters
+    );
+
+    const glass = built.group.getObjectByName('metaverse-mirror-canopy') as THREE.Mesh;
     expect(glass).toBeTruthy();
     const mat = glass.material as THREE.MeshPhysicalMaterial;
     expect(mat.transmission).toBeGreaterThan(0.4);
     expect(mat.ior).toBeGreaterThan(1.4);
+
+    const top = built.group.getObjectByName('metaverse-mirror-canopy-top') as THREE.Mesh;
+    const topMat = top.material as THREE.MeshPhysicalMaterial;
+    expect(topMat.metalness).toBeGreaterThan(0.7);
+    expect(topMat.roughness).toBeLessThan(0.08);
+    expect(topMat.emissiveIntensity).toBeGreaterThan(0.3);
+    expect(topMat.color.getHex()).toBeGreaterThan(0xede7d9);
 
     for (const g of built.geometries) g.dispose();
     for (const m of built.materials) m.dispose();
@@ -63,7 +87,7 @@ describe('Vieux-Port mirror canopy', () => {
   it('skips physical transmission on low and medium quality', () => {
     for (const quality of ['low', 'medium'] as const) {
       const built = buildVieuxPortMirrorCanopy(quality, { x: 0, y: 8.0, z: 0 });
-      const glass = built.group.getObjectByName('marseille-mirror-canopy') as THREE.Mesh;
+      const glass = built.group.getObjectByName('metaverse-mirror-canopy') as THREE.Mesh;
       const mat = glass.material as THREE.MeshStandardMaterial;
       expect(mat.type).toBe('MeshStandardMaterial');
       expect(mat.metalness).toBeGreaterThan(0.5);
@@ -71,5 +95,22 @@ describe('Vieux-Port mirror canopy', () => {
       for (const m of built.materials) m.dispose();
       for (const t of built.textures) t.dispose();
     }
+  });
+
+  it('paints the MetaVerseBB title at most once (Orbitron only, no morph)', async () => {
+    expect(METAVERSE_BB_TITLE_FONT).toBe('700 188px Orbitron');
+    expect(METAVERSE_BB_TITLE_FONT).not.toMatch(/Arial|Orbit,|900/);
+
+    let painted = 0;
+    const tex = createMetaVerseBbTitleTexture(() => {
+      painted += 1;
+    });
+    await Promise.resolve();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(painted).toBeLessThanOrEqual(1);
+    if (tex.userData['metaverseBbTitlePainted']) {
+      expect(painted).toBe(1);
+    }
+    tex.dispose();
   });
 });

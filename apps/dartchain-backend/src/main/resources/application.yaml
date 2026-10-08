@@ -37,6 +37,14 @@ dartchain:
     bootstrap-admin-username: ${DARTCHAIN_BOOTSTRAP_ADMIN:random}
     bootstrap-admin-password: ${DARTCHAIN_BOOTSTRAP_ADMIN_PASSWORD:random}
     password-min-length: 6
+    email-verification-required: ${DARTCHAIN_EMAIL_VERIFICATION:true}
+  mail:
+    host: ${DARTCHAIN_MAIL_HOST:}
+    port: ${DARTCHAIN_MAIL_PORT:587}
+    username: ${DARTCHAIN_MAIL_USERNAME:}
+    password: ${DARTCHAIN_MAIL_PASSWORD:}
+    from: ${DARTCHAIN_MAIL_FROM:noreply@dartchain.review}
+    starttls: ${DARTCHAIN_MAIL_STARTTLS:true}
   admin:
     # SHA-256 de la seed 24 mots (jamais la phrase en clair). Voir deploy/admin-seed.local.txt
     seed-sha256: ${DARTCHAIN_ADMIN_SEED_SHA256:3c7af8f4a99c61e08acb2bb85b972eb022db4ec432c1e338cb6be24abb2c8d9f}
@@ -96,6 +104,8 @@ dartchain:
       - https://dartchain.pages.dev
       - https://*.dartchain.pages.dev
       - https://*.pages.dev
+      - https://*.workers.dev
+      - https://*.*.workers.dev
       - https://dartzvz01-tagname.onrender.com
       - https://*.onrender.com
   data-import:
@@ -132,7 +142,7 @@ management:
 info:
   app:
     name: ${spring.application.name}
-    version: 0.17.0-SNAPSHOT
+    version: "@project.version@"
     phase: AF
   dartchain:
     persistence-mode: ${dartchain.persistence.mode:memory}
@@ -149,6 +159,10 @@ blockchain:
 exchange:
   ledger:
     path: ${EXCHANGE_LEDGER_PATH:data/exchange-ledger.json}
+
+wallet:
+  balances:
+    path: ${WALLET_BALANCES_PATH:data/wallet-balances.json}
 
 launch:
   projects:
@@ -182,8 +196,8 @@ m4t3r:
     amount-per-token: ${M4T3R_REWARD_AMOUNT:0.00000000000000000000000001}
     signing-key-id: ${M4T3R_REWARD_KEY_ID:dev-reward-key-1}
     signing-key: ${M4T3R_REWARD_SIGNING_KEY:change-me-m4t3r-reward-dev-only}
-    max-speed-mps: ${M4T3R_REWARD_MAX_SPEED:5.0}
-    world-id: marseille
+    max-speed-mps: ${M4T3R_REWARD_MAX_SPEED:32.0}
+    world-id: metaverse
   rewards:
     path: ${M4T3R_REWARDS_PATH:data/m4t3r-rewards.json}
 

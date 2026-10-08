@@ -1,0 +1,73 @@
+@if (cart.open()) {
+  <div class="market-cart-backdrop" (click)="cart.closeDrawer()">
+    <aside
+      class="market-cart-drawer news-insight-panel ds-surface ds-surface--card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="marketCartTitle"
+      tabindex="-1"
+      [appFocusTrap]="true"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="market-cart-drawer__head">
+        <h3 id="marketCartTitle" class="market-cart-drawer__title">Panier</h3>
+        <span class="market-cart-drawer__count">{{ cart.itemCount() }}</span>
+        <button type="button" class="market-cart-drawer__close" aria-label="Fermer le panier" (click)="cart.closeDrawer()">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+        </button>
+      </header>
+
+      <div class="market-cart-drawer__body">
+        @if (cart.items().length === 0) {
+          <p class="market-cart-drawer__empty">Votre panier est vide.</p>
+        } @else {
+          @for (item of cart.items(); track item.exchangeToken) {
+            <div class="market-cart-drawer__row">
+              <div class="market-cart-drawer__meta">
+                <span class="market-cart-drawer__symbol">
+                  @if (item.favorite) {
+                    <span class="market-cart-drawer__fav-mark" aria-hidden="true">★</span>
+                  }
+                  {{ item.displaySymbol }}
+                </span>
+                <span class="market-cart-drawer__name">{{ item.name }}</span>
+              </div>
+              <div class="market-cart-drawer__qty">
+                <button type="button" (click)="bump(item.exchangeToken, -1, item.quantity)" aria-label="Diminuer"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-minus"/></svg></button>
+                <span>{{ item.quantity }}</span>
+                <button type="button" (click)="bump(item.exchangeToken, 1, item.quantity)" aria-label="Augmenter"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-plus"/></svg></button>
+              </div>
+              <span class="market-cart-drawer__line-total">
+                {{ (item.quantity * item.unitPriceR4v3) | number: '1.0-4' }} R4V3
+              </span>
+              <button
+                type="button"
+                class="market-cart-drawer__remove"
+                aria-label="Retirer"
+                (click)="cart.remove(item.exchangeToken)"
+              ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
+            </div>
+          }
+        }
+      </div>
+
+      <footer class="market-cart-drawer__foot">
+        <div class="market-cart-drawer__total">
+          <span>Total</span>
+          <strong>{{ cart.totalR4v3() | number: '1.0-4' }} R4V3</strong>
+        </div>
+        @if (cart.lastMessage(); as msg) {
+          <p class="market-cart-drawer__msg" role="status">{{ msg }}</p>
+        }
+        <button
+ type="button"
+ class="market-cart-drawer__pay"
+ [disabled]="cart.items().length === 0 || cart.busy()"
+ (click)="pay()"
+ >
+          {{ cart.busy() ? 'Paiement…' : 'Payer en R4V3' }}
+        </button>
+      </footer>
+    </aside>
+  </div>
+}

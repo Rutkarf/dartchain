@@ -13,9 +13,7 @@
         class="peer-panel__error-dismiss"
         (click)="dismissError()"
         [attr.aria-label]="locale.t('peers.refresh')"
-      >
-        ×
-      </button>
+      ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
     </div>
   }
 
@@ -39,7 +37,9 @@
   </header>
 
   <label class="peer-panel__search">
-    <span class="peer-panel__search-icon" aria-hidden="true">⌕</span>
+    <span class="peer-panel__search-icon" aria-hidden="true">
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+    </span>
     <input
       class="peer-panel__search-input"
       type="search"
@@ -142,7 +142,7 @@
               [attr.aria-label]="locale.t('peers.copy')"
               [title]="locale.t('peers.copy')"
             >
-              ⎘
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-copy"/></svg>
             </button>
             <button
               type="button"
@@ -152,7 +152,8 @@
               [attr.aria-label]="locale.t('peers.disconnect')"
               [title]="locale.t('peers.disconnect')"
             >
-              ✕
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
+              <span>{{ locale.t('peers.disconnect') }}</span>
             </button>
           </div>
         </li>

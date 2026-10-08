@@ -3,7 +3,7 @@ package io.dartchain.backend.admin.application;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dartchain.backend.auth.audit.AuthAuditEntry;
-import io.dartchain.backend.auth.audit.InMemoryAuthAuditStore;
+import io.dartchain.backend.auth.audit.AuthAuditStore;
 import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.blockchain.application.BlockchainService;
@@ -41,7 +41,7 @@ public class AdminExportService {
     );
 
     private final UserAccountStore userAccountStore;
-    private final InMemoryAuthAuditStore authAuditStore;
+    private final AuthAuditStore authAuditStore;
     private final FaucetClaimStore faucetClaimStore;
     private final BlockchainService blockchainService;
     private final OpsMetricsService opsMetricsService;
@@ -50,7 +50,7 @@ public class AdminExportService {
 
     public AdminExportService(
             UserAccountStore userAccountStore,
-            InMemoryAuthAuditStore authAuditStore,
+            AuthAuditStore authAuditStore,
             FaucetClaimStore faucetClaimStore,
             BlockchainService blockchainService,
             OpsMetricsService opsMetricsService,

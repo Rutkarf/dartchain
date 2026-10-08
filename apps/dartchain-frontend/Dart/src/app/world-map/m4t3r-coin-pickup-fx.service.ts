@@ -8,7 +8,7 @@ import {
   R4V3_GROUND_FIELD,
 } from './map-configuration';
 
-const PICKUP_COLORS = [0x40e0ff, 0xff3ecf, 0x7a5cff, 0xffe600, 0x51ffb8] as const;
+const PICKUP_COLORS = [0x8a95a5, 0x7b0d1e, 0x8a95a5, 0xd5a021, 0x09814a] as const;
 
 interface CoinPickupSlot {
   coin: THREE.Mesh;
@@ -72,8 +72,8 @@ export class M4t3rCoinPickupFxService {
     this.sharedGeometry = createPickupCoinGeometry();
     for (let i = 0; i < M4T3R_COIN_PICKUP_FX.poolSize; i++) {
       const material = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        emissive: 0x40e0ff,
+        color: 0xede7d9,
+        emissive: 0x8a95a5,
         emissiveIntensity: 0.55,
         metalness: 0.42,
         roughness: 0.22,
@@ -88,7 +88,7 @@ export class M4t3rCoinPickupFxService {
       coin.renderOrder = 20;
 
       const sparkleMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
+        color: 0xede7d9,
         transparent: true,
         opacity: 0,
         depthWrite: false,
@@ -102,7 +102,7 @@ export class M4t3rCoinPickupFxService {
       sparkle.renderOrder = 19;
 
       const burstMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
+        color: 0xede7d9,
         transparent: true,
         opacity: 0,
         depthWrite: false,
@@ -144,7 +144,7 @@ export class M4t3rCoinPickupFxService {
     this.spawnCounter += 1;
 
     const color = hashRenderKeyColor(renderKey);
-    slot.material.color.setHex(0xffffff);
+    slot.material.color.setHex(0xede7d9);
     slot.material.emissive.setHex(color);
     slot.material.emissiveIntensity =
       M4T3R_COIN_PICKUP_FX.emissiveBase + M4T3R_COIN_PICKUP_FX.emissivePulse;

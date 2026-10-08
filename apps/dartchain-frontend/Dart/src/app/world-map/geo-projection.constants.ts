@@ -1,5 +1,5 @@
 /**
- * Constantes de projection locale équirectangulaire (zone urbaine Marseille).
+ * Constantes de projection locale équirectangulaire (zone urbaine Metaverse).
  *
  * Repère Three.js :
  * - X : est (longitude croissante)

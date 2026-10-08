@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { activeAtmospherePreset } from './marseille-atmosphere.config';
+import { activeAtmospherePreset } from './metaverse-atmosphere.config';
 
 export type HorizonAtmosphereVariant = 'night' | 'twilight' | 'day';
 
@@ -37,7 +37,7 @@ const VARIANT_MASK_TWEAK: Record<
 };
 
 /**
- * Stops masque CSS alignés sur le fog gameplay — transition douce vers Star Conquest.
+ * Stops masque CSS alignés sur le fog gameplay — transition douce vers Conquête stellaire.
  */
 export function harmonizedHorizonMaskStops(variant?: HorizonAtmosphereVariant): HorizonMaskStop[] {
   const preset = activeAtmospherePreset();
@@ -53,10 +53,10 @@ export function harmonizedHorizonMaskStops(variant?: HorizonAtmosphereVariant): 
 
   return [
     { offset: 0, alpha: 1 },
-    { offset: 0.5, alpha: 1 },
-    { offset: fadeStart, alpha: 0.9 },
-    { offset: mid, alpha: 0.48 },
-    { offset: late, alpha: 0.14 + tweak.topAlpha },
+    { offset: 0.4, alpha: 1 },
+    { offset: fadeStart, alpha: 0.92 },
+    { offset: mid, alpha: 0.52 },
+    { offset: late, alpha: 0.18 + tweak.topAlpha },
     { offset: 1, alpha: 0 },
   ];
 }

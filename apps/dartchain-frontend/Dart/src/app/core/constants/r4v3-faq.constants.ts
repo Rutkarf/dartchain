@@ -35,7 +35,7 @@ export const R4V3_FAQ_HIGHLIGHTS: readonly R4v3FaqHighlight[] = [
   {
     id: 'transparent',
     label: 'Transparent',
-    detail: 'White paper et mécanismes documentés',
+    detail: 'Livre blanc et mécanismes documentés',
     icon: '◉',
   },
 ] as const;
@@ -46,9 +46,9 @@ export const R4V3_FAQ_ENTRIES: readonly R4v3FaqEntry[] = [
     categoryId: 'essentiel',
     title: "Qu'est-ce que le R4V3 ?",
     summary: 'Le token natif et stable de DartChain, conçu comme monnaie de référence de l’écosystème.',
-    body: `Le R4V3 est le token natif de DartChain. Il sert de monnaie de référence dans l’application : affichage des prix, swaps LaunchLab, faucet testnet et interactions réseau.
+    body: `Le R4V3 est le token natif de DartChain. Il sert de monnaie de référence dans l’application : affichage des prix, swaps Laboratoire, faucet testnet et interactions réseau.
 
-Contrairement aux tokens LaunchLab (PXD, NVFI, etc.), le R4V3 n’est pas un memecoin spéculatif : c’est un utility coin pensé pour être compris rapidement et utilisé au quotidien dans l’écosystème.`,
+Contrairement aux tokens Laboratoire (PXD, NVFI, etc.), le R4V3 n’est pas un memecoin spéculatif : c’est un utility coin pensé pour être compris rapidement et utilisé au quotidien dans l’écosystème.`,
     popular: true,
     tags: ['natif', 'utility', 'dartchain'],
   },
@@ -59,7 +59,7 @@ Contrairement aux tokens LaunchLab (PXD, NVFI, etc.), le R4V3 n’est pas un mem
     summary: 'Parité pédagogique à 1 CHF pour simplifier la lecture des montants dans l’interface.',
     body: `Dans DartChain, le R4V3 est présenté avec une parité de référence de **1 R4V3 = 1 franc suisse** (CHF).
 
-Ce n’est pas une promesse financière régulée : c’est un ancrage d’affichage qui permet de lire les montants sans conversion mentale compliquée. Sur testnet, cette parité facilite les démonstrations, les swaps LaunchLab et la comparaison des valeurs entre tokens.
+Ce n’est pas une promesse financière régulée : c’est un ancrage d’affichage qui permet de lire les montants sans conversion mentale compliquée. Sur testnet, cette parité facilite les démonstrations, les swaps Laboratoire et la comparaison des valeurs entre tokens.
 
 Le graphique et le hub R4V3 affichent cette référence pour que tout utilisateur comprenne immédiatement l’ordre de grandeur d’un montant.`,
     popular: true,
@@ -71,12 +71,12 @@ Le graphique et le hub R4V3 affichent cette référence pour que tout utilisateu
     id: 'role-dartchain',
     categoryId: 'essentiel',
     title: 'À quoi sert le R4V3 dans DartChain ?',
-    summary: 'Payer les frais, swapper, alimenter le faucet et servir de quote pour LaunchLab.',
+    summary: 'Payer les frais, swapper, alimenter le faucet et servir de quote pour Laboratoire.',
     body: `Le R4V3 remplit plusieurs rôles complémentaires :
 
 • **Monnaie native** — unité de compte par défaut dans l’interface
-• **Quote LaunchLab** — les tokens lancés sont cotés vs R4V3
-• **Swap** — échange R4V3 ↔ tokens LaunchLab via le panneau Exchange
+• **Quote Laboratoire** — les tokens lancés sont cotés vs R4V3
+• **Swap** — échange R4V3 ↔ tokens Laboratoire via le panneau Exchange
 • **Faucet testnet** — obtention de R4V3 pour tester sans friction
 • **Référence graphique** — base de lecture des paires et des tendances
 
@@ -91,7 +91,7 @@ En résumé : le R4V3 est le point d’entrée économique de l’écosystème D
     summary: 'Via le faucet testnet ou en recevant des tokens après un swap.',
     body: `Sur l’environnement testnet DartChain, le moyen le plus simple d’obtenir des R4V3 est le **faucet** intégré à l’application.
 
-Vous pouvez aussi en recevoir après un swap depuis un token LaunchLab, ou via les flux de démonstration prévus dans l’écosystème.
+Vous pouvez aussi en recevoir après un swap depuis un token Laboratoire, ou via les flux de démonstration prévus dans l’écosystème.
 
 Connectez-vous ou créez un wallet testnet, ouvrez le faucet et demandez un crédit. Les montants affichés en **m4t3r** dans l’exchange panel correspondent à la micro-unité du R4V3.`,
     actionType: 'OPEN_FAUCET',
@@ -102,10 +102,10 @@ Connectez-vous ou créez un wallet testnet, ouvrez le faucet et demandez un cré
     id: 'use-r4v3',
     categoryId: 'utilisation',
     title: 'Comment utiliser le R4V3 ?',
-    summary: 'Swapper, consulter le graphique, explorer les paires LaunchLab.',
+    summary: 'Swapper, consulter le graphique, explorer les paires Laboratoire.',
     body: `Une fois crédité, vous pouvez :
 
-1. **Consulter** le graphique R4V3 et les paires LaunchLab
+1. **Consulter** le graphique R4V3 et les paires Laboratoire
 2. **Swapper** via le panneau Exchange (R4V3 → token ou inverse)
 3. **Sélectionner** R4V3 dans la navbar pour synchroniser graphique et swap
 4. **Suivre** l’activité réseau dans les autres onglets du showcase
@@ -122,22 +122,22 @@ L’interface est conçue pour que la sélection du R4V3 dans la navbar ouvre di
     summary: 'La plus petite unité affichée du R4V3 dans l’exchange panel.',
     body: `Le **m4t3r** est le libellé UI de la micro-unité R4V3 dans le panneau Exchange — aligné sur le faucet et les soldes testnet.
 
-Afficher les montants en m4t3r permet de saisir de très petites quantités sans notation scientifique, tout en gardant le R4V3 comme symbole principal ailleurs dans l’application (navbar, graphique, paires LaunchLab).`,
+Afficher les montants en m4t3r permet de saisir de très petites quantités sans notation scientifique, tout en gardant le R4V3 comme symbole principal ailleurs dans l’application (navbar, graphique, paires Laboratoire).`,
     tags: ['m4t3r', 'unité', 'exchange'],
   },
   {
     id: 'swap-launchlab',
     categoryId: 'utilisation',
-    title: 'Comment échanger R4V3 contre un token LaunchLab ?',
+    title: 'Comment échanger R4V3 contre un token Laboratoire ?',
     summary: 'Sélectionnez une paire R4V3 → PXD (ou autre) dans le panneau Exchange.',
-    body: `Le swap est **unidirectionnel par défaut** : R4V3 est la source, le token LaunchLab la destination.
+    body: `Le swap est **unidirectionnel par défaut** : R4V3 est la source, le token Laboratoire la destination.
 
 1. Ouvrez le panneau Exchange sous le graphique
-2. Choisissez le token LaunchLab (PXD, NVFI, LAB3, ORB…)
+2. Choisissez le token Laboratoire (PXD, NVFI, LAB3, ORB…)
 3. Saisissez un montant en m4t3r
 4. Confirmez le swap
 
-Vous pouvez aussi sélectionner un token LaunchLab depuis la navbar : le graphique et le swap se synchronisent automatiquement.`,
+Vous pouvez aussi sélectionner un token Laboratoire depuis la navbar : le graphique et le swap se synchronisent automatiquement.`,
     actionType: 'OPEN_SWAP',
     actionLabel: 'Aller au swap',
     tags: ['launchlab', 'exchange', 'pxd'],
@@ -151,7 +151,7 @@ Vous pouvez aussi sélectionner un token LaunchLab depuis la navbar : le graphiq
 
 Le mécanisme repose sur :
 • un **ancrage d’affichage** (1 R4V3 = 1 franc suisse)
-• des **quotes LaunchLab** exprimées vs R4V3
+• des **quotes Laboratoire** exprimées vs R4V3
 • un **white paper** décrivant le modèle visé
 
 Ce n’est pas un stablecoin régulé mainnet : c’est un utility token testnet conçu pour être prévisible dans l’UX.`,
@@ -161,14 +161,14 @@ Ce n’est pas un stablecoin régulé mainnet : c’est un utility token testnet
     id: 'peg-explained',
     categoryId: 'stabilite',
     title: 'Comment fonctionne le peg ?',
-    summary: 'Référence fixe à 1 CHF pour l’affichage, distincte des tokens LaunchLab volatils.',
+    summary: 'Référence fixe à 1 CHF pour l’affichage, distincte des tokens Laboratoire volatils.',
     body: `Le **peg** (ancrage) du R4V3 signifie que l’application présente le token comme valant **1 franc suisse** en référence.
 
-Les tokens LaunchLab, eux, fluctuent relativement au R4V3 selon l’activité testnet et les scénarios de démo. Cette séparation permet de comprendre :
+Les tokens Laboratoire, eux, fluctuent relativement au R4V3 selon l’activité testnet et les scénarios de démo. Cette séparation permet de comprendre :
 • le R4V3 = unité stable de lecture
-• les tokens LaunchLab = actifs d’expérimentation
+• les tokens Laboratoire = actifs d’expérimentation
 
-Le graphique R4V3 reflète cette stabilité ; les graphiques LaunchLab montrent la dynamique relative.`,
+Le graphique R4V3 reflète cette stabilité ; les graphiques Laboratoire montrent la dynamique relative.`,
     popular: true,
     tags: ['peg', 'chf', 'launchlab'],
   },
@@ -179,7 +179,7 @@ Le graphique R4V3 reflète cette stabilité ; les graphiques LaunchLab montrent 
     summary: 'Transparence documentaire et environnement testnet — pas de garantie financière.',
     body: `DartChain testnet est un environnement de démonstration. Les garanties portent sur la **transparence** et la **pédagogie**, pas sur une couverture financière :
 
-• White paper accessible depuis le hub R4V3
+• Livre blanc accessible depuis le hub R4V3
 • Mécanismes décrits dans cette FAQ
 • Code et API ouverts pour inspection
 • Pas de promesse de rendement ou de parité régulée
@@ -193,10 +193,10 @@ Pour toute utilisation au-delà du testnet, consultez la documentation officiell
     id: 'advantages',
     categoryId: 'ecosysteme',
     title: 'Quels sont les avantages pour les utilisateurs ?',
-    summary: 'Simplicité, prévisibilité des montants, accès LaunchLab et onboarding rapide.',
+    summary: 'Simplicité, prévisibilité des montants, accès Laboratoire et onboarding rapide.',
     body: `• **Lisibilité** — 1 R4V3 = 1 CHF, pas de surprise sur l’ordre de grandeur
 • **Onboarding** — faucet + FAQ intégrée pour démarrer sans doc externe
-• **Interopérabilité** — swap direct avec les tokens LaunchLab
+• **Interopérabilité** — swap direct avec les tokens Laboratoire
 • **Cohérence UI** — navbar, graphique et exchange synchronisés
 • **Évolutivité** — hub d’information mis à jour avec l’écosystème
 
@@ -222,11 +222,11 @@ Les transactions sont traçables on-chain dans l’explorateur intégré. Pour u
     id: 'roadmap',
     categoryId: 'evolution',
     title: 'Quelles sont les prochaines évolutions ?',
-    summary: 'FAQ évolutive, enrichissement LaunchLab et documentation officielle continue.',
+    summary: 'FAQ évolutive, enrichissement Laboratoire et documentation officielle continue.',
     body: `Le hub R4V3 est conçu pour évoluer avec l’écosystème :
 
 • Nouvelles questions ajoutées au fil des retours utilisateurs
-• Intégration renforcée avec LaunchLab et le graphique
+• Intégration renforcée avec Laboratoire et le graphique
 • Documentation officielle (white paper) mise à jour
 • Possibilité future d’administration des FAQ via API
 

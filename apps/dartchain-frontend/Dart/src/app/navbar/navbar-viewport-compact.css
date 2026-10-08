@@ -1,25 +1,27 @@
 /**
- * Navbar — Phase 2 viewport compact (250–349 px, cible 250×500).
+ * Navbar — viewport compact (canon 250–349, et portrait téléphone ≤ 480).
  * Largeur externe pilotée par .app-navbar-zone (--navbar-inline-pad).
  */
 
-@media (min-width: 250px) and (max-width: 349px) {
+@media (min-width: 250px) and (max-width: 349px),
+       (orientation: portrait) and (max-width: 480px) {
   :host {
-    --nv-margin-top: max(1px, env(safe-area-inset-top, 0px));
-    /* Pas de gouttière wrap : l’alignement horizontal est sur .app-navbar-zone */
+    --nv-margin-top: var(--ds-navbar-top-inset, max(0px, env(safe-area-inset-top, 0px)));
+    /* Gouttière unique 2px portée par .app-navbar-zone — pas de second inset. */
     --nv-wrap-pad-x: 0px;
-    --nv-wrap-pad-left: 1px;
+    --nv-wrap-pad-left: 0px;
     --nv-wrap-pad-right: 0px;
-    --nv-pad-x: 3px;
+    --nv-pad-x: 0px;
     --nv-pad-top: 0px;
     --nv-pad-y: 0px;
     --nv-inner-gap: 0px;
-    --nv-ticker-row-h: 0.6875rem;
-    --nv-action-row-h: 0.6875rem;
-    --nv-action-btn: 20px;
-    --nv-shell-radius: 10px;
+    --nv-ticker-row-h: var(--comp-ticker-row-h, 16px);
+    --nv-action-row-h: var(--comp-ticker-row-h, 16px);
+    --nv-action-btn: var(--comp-btn-hud-h, 16px);
+    --nv-shell-radius: var(--ds-navbar-shell-radius, var(--radius-none, 0));
     --nv-logo: 22px;
-    --nv-logo-h: 18px;
+    --nv-logo-h: var(--comp-logo-row-h, 16px);
+    --nv-logo-slot: calc(var(--nv-logo-h) * 1.5);
     --nv-brand-chip-h: calc(var(--nv-logo-h) - 0px);
     --nv-logo-shift-y: 1px;
     --nv-logo-scale: 1.28;
@@ -91,20 +93,15 @@
   .navbar-ticker ::ng-deep .bandeau-accueil__chip,
   .navbar-subtitle ::ng-deep .bandeau-accueil__chip {
     box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      inset 0 0 0 1px rgba(237, 231, 217, 0.04),
       inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--nv-cyan-rgb), 0.5));
-  }
-
-  .navbar-auth-btn svg {
-    width: 14px;
-    height: 10px;
   }
 
   .navbar-auth-user__name {
     max-width: min(30vw, 5.5rem);
     height: var(--nv-logo-h, 18px);
     padding: 0 0.22rem 0 0.26rem;
-    font-size: 0.375rem;
+    font-size: var(--fs-shell);
     letter-spacing: 0.01em;
   }
 }
@@ -117,7 +114,7 @@ html.vp-compact app-navbar .navbar-wrap {
 
 html.vp-compact app-navbar .navbar-top {
   column-gap: 4px;
-  padding: var(--nv-pad-top, 0px) var(--nv-pad-x, 2px) var(--nv-pad-y, 0px);
+  padding: var(--nv-pad-top, 0px) var(--nv-pad-x, 0px) var(--nv-pad-y, 0px);
   min-height: var(--nv-shell-min-h);
   max-height: var(--ds-zone-navbar, 32px);
   grid-template-columns: minmax(0, 1fr) auto;
@@ -144,4 +141,61 @@ html.vp-compact app-navbar .navbar-brand-chips {
 
 html.vp-compact app-navbar .navbar-brand-head {
   margin-inline-start: 0;
+}
+
+/*
+ * Portrait téléphone haut (≥600px, ex. 436×653) : le compact force encore
+ * max-height 32px / rows 16px. On aligne sur les tokens phone-tall (22px).
+ */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 600px) {
+  :host {
+    --nv-ticker-row-h: 22px;
+    --nv-action-row-h: 22px;
+    --nv-action-btn: 22px;
+    --nv-logo: 22px;
+    --nv-logo-h: 22px;
+    /* Slot ≈ row : plus de débord haut (était 1.5× → top −5.5px clipé). */
+    --nv-logo-slot: 24px;
+    --nv-brand-chip-h: 22px;
+    --nv-shell-min-h: 44px;
+    --nv-logo-scale: 1;
+    --nv-logo-shift-y: 0px;
+  }
+
+  .navbar-top {
+    max-height: none;
+    min-height: var(--nv-shell-min-h);
+  }
+
+  .logo-shell {
+    margin: 1px 0 0 2px;
+  }
+
+  .navbar-auth-btn {
+    width: var(--nv-logo-h);
+    height: var(--nv-logo-h);
+    min-width: var(--nv-logo-h);
+    min-height: var(--nv-logo-h);
+    max-height: var(--nv-logo-h);
+  }
+
+  .navbar-auth-user__name {
+    height: var(--nv-logo-h);
+    font-size: var(--fs-shell, 10px);
+  }
+
+  html.vp-compact app-navbar .navbar-top {
+    max-height: none;
+    min-height: 44px;
+  }
+
+  html.vp-compact app-navbar .navbar-brand-row {
+    height: 22px;
+    max-height: 22px;
+  }
+
+  html.vp-compact app-navbar .navbar-brand-chips {
+    height: 22px;
+    max-height: 22px;
+  }
 }

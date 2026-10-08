@@ -8,7 +8,9 @@
         <div class="showcase-header-tabs">
           <app-showcase-tabs
             [activeTab]="activeTab"
+            [collapsed]="showcaseCollapsed"
             (tabChange)="tabChange.emit($event)"
+            (tabDoubleClick)="tabDoubleClick.emit($event)"
           />
         </div>
         <div class="showcase-header-actions">
@@ -34,6 +36,7 @@
           [activeTab]="activeTab"
           [collapsed]="showcaseCollapsed"
           (selectBlock)="selectBlock.emit($event)"
+          (tabChange)="tabChange.emit($event)"
         />
       </div>
     </div>

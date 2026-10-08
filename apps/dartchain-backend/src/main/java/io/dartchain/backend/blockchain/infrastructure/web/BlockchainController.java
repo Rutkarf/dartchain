@@ -32,6 +32,7 @@ public class BlockchainController {
     public Map<String, Object> getBalance(@PathVariable String address) {
         BigDecimal chainBalance = blockchainService.getBalance(address);
         BigDecimal effectiveBalance = exchangeService.getEffectiveNativeBalance(address);
+        exchangeService.syncPersistedBalances(address);
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("address", address);

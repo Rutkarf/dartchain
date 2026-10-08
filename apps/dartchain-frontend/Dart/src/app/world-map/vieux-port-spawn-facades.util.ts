@@ -65,18 +65,18 @@ function buildArcadeBuilding(
   group.userData = { source: spec.source, confidence: spec.confidence };
 
   const stoneMaterial = new THREE.MeshStandardMaterial({
-    color: 0xd4c4a8,
+    color: 0xede7d9,
     roughness: 0.82,
     metalness: 0.06,
   });
   const upperMaterial = new THREE.MeshStandardMaterial({
-    color: 0xe8dcc8,
+    color: 0xede7d9,
     roughness: 0.75,
     metalness: 0.04,
   });
   const archMaterial = new THREE.MeshStandardMaterial({
-    color: 0xf5efe3,
-    emissive: 0x2a2218,
+    color: 0xede7d9,
+    emissive: 0x0d0630,
     emissiveIntensity: 0.15,
     roughness: 0.55,
     metalness: 0.08,
@@ -152,7 +152,7 @@ function addNeonTrim(
   registerMaterial: (m: THREE.Material) => void
 ): void {
   const neonMat = new THREE.MeshBasicMaterial({
-    color: 0x40e0ff,
+    color: 0x8a95a5,
     transparent: true,
     opacity: 0.85,
   });
@@ -187,11 +187,11 @@ function buildShopRowBuilding(
   group.userData = { source: spec.source, confidence: spec.confidence };
 
   const bodyMaterial = new THREE.MeshStandardMaterial({
-    color: 0xc9b59a,
+    color: 0x8a95a5,
     roughness: 0.78,
     metalness: 0.05,
   });
-  const shopColors = [0xb8a888, 0xc4b49a, 0xa89878, 0xd0c0a4, 0xbcac8c];
+  const shopColors = [0x8a95a5, 0x8a95a5, 0x8a95a5, 0xede7d9, 0x8a95a5];
   registerMaterial(bodyMaterial);
 
   const w = spec.widthMeters;
@@ -223,7 +223,7 @@ function buildShopRowBuilding(
     group.add(win);
 
     const awningMat = new THREE.MeshStandardMaterial({
-      color: 0x4a4038,
+      color: 0x18314f,
       roughness: 0.7,
       metalness: 0.08,
       side: THREE.DoubleSide,

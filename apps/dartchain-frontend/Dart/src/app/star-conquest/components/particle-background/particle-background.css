@@ -1,4 +1,4 @@
-/* Niveau 3 — ciel neuronal Star Conquest (derrière floor z=1 et UI z≥2) */
+/* Niveau 3 — ciel neuronal SC ; clip host (hub). Feed = feather via styles.css. */
 :host {
   position: fixed !important;
   inset: 0 !important;
@@ -12,13 +12,23 @@
   height: 100vh !important;
   height: 100dvh !important;
   max-height: none !important;
-  z-index: 0 !important;
+  z-index: 2 !important;
   pointer-events: none !important;
   display: block !important;
-  overflow: visible !important;
+  overflow: hidden !important;
   margin: 0 !important;
   padding: 0 !important;
   background: transparent !important;
+  clip-path: inset(
+    var(--sc-playable-top, 0px) 0 var(--sc-playable-bottom, 0px) 0
+  );
+}
+
+:host-context(html.intro-feed-sc) {
+  /* Pas de double arête : le clip/mask Feed est piloté par styles.css */
+  clip-path: none !important;
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 :host canvas {

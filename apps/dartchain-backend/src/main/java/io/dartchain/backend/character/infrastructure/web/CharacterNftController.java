@@ -1,5 +1,9 @@
 package io.dartchain.backend.character.infrastructure.web;
 
+import io.dartchain.backend.auth.application.AuthException;
+import io.dartchain.backend.auth.model.UserAccount;
+import io.dartchain.backend.auth.model.UserRole;
+import io.dartchain.backend.auth.security.RoleAuthorizationService;
 import io.dartchain.backend.character.application.CharacterNftService;
 import io.dartchain.backend.character.dto.CharacterNftResponse;
 import io.dartchain.backend.config.ApiRoutes;
@@ -10,45 +14,40 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * API Character NFT — lecture seule pour l’instant (STL path + id).
+ * Personnage applicatif. Ce n'est pas un contrat.
  */
 @RestController
 @RequestMapping(ApiRoutes.CHARACTERS_V1_PREFIX)
 public class CharacterNftController {
 
     private final CharacterNftService characterNftService;
+    private final RoleAuthorizationService roleAuthorizationService;
 
-    public CharacterNftController(CharacterNftService characterNftService) {
+    public CharacterNftController(
+            CharacterNftService characterNftService,
+            RoleAuthorizationService roleAuthorizationService
+    ) {
         this.characterNftService = characterNftService;
+        this.roleAuthorizationService = roleAuthorizationService;
     }
 
-    /**
-     * Personnage du user authentifié (Authorization optionnel → guest).
-     * Le frontend peut ignorer la réponse et utiliser le STL local par défaut.
-     */
     @GetMapping("/me")
     public CharacterNftResponse me(
-            @RequestHeader(value = "X-User-Id", required = false) String userIdHeader,
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
-        String userId = resolveUserId(userIdHeader, authorization);
-        return characterNftService.getOrCreateForUser(userId);
+        UserAccount account = roleAuthorizationService.requireAuthenticated(authorization);
+        return characterNftService.getOrCreateForUser(account.getId());
     }
 
     @GetMapping("/{userId}")
-    public CharacterNftResponse byUser(@PathVariable String userId) {
+    public CharacterNftResponse byUser(
+            @PathVariable String userId,
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        UserAccount account = roleAuthorizationService.requireAuthenticated(authorization);
+        if (account.getRole() != UserRole.ADMIN && !account.getId().equals(userId)) {
+            throw new AuthException(403, "Personnage réservé à son compte");
+        }
         return characterNftService.getOrCreateForUser(userId);
-    }
-
-    private static String resolveUserId(String userIdHeader, String authorization) {
-        if (userIdHeader != null && !userIdHeader.isBlank()) {
-            return userIdHeader.trim();
-        }
-        // Placeholder : sans parsing JWT ici — guest si pas de header.
-        // Auth complète branchée plus tard via AuthService.me().
-        if (authorization != null && authorization.startsWith("Bearer ")) {
-            return "authed-user";
-        }
-        return "guest";
     }
 }

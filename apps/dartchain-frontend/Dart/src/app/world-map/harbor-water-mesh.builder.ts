@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { MARSEILLE_HARBOR_WATER } from './map-configuration';
+import { METAVERSE_HARBOR_WATER } from './map-configuration';
 import { HARBOR_WATER_DEEP_VISUAL, HARBOR_WATER_SHADER_CONFIG } from './harbor-water.config';
 import type { HarborWaterShaderMaterial } from './harbor-water.shader';
 
@@ -91,7 +91,7 @@ function applyShoreDepthAttribute(
 
 /** Polygones eau Vieux-Port — fallback layout (remplaçable OSM Phase 2). */
 export function defaultHarborWaterPolygons(
-  harbor: typeof MARSEILLE_HARBOR_WATER = MARSEILLE_HARBOR_WATER
+  harbor: typeof METAVERSE_HARBOR_WATER = METAVERSE_HARBOR_WATER
 ): HarborWaterPolygonDef[] {
   const channelHalf = 102;
   return [
@@ -144,7 +144,7 @@ export function buildHarborWaterSurfaceMesh(
   geometry.computeVertexNormals();
 
   const surface = new THREE.Mesh(geometry, material);
-  surface.name = `marseille-water-surface-${def.id}`;
+  surface.name = `metaverse-water-surface-${def.id}`;
   surface.position.y = waterY;
   surface.renderOrder = 10;
   surface.frustumCulled = false;
@@ -155,7 +155,7 @@ export function buildHarborWaterSurfaceMesh(
   deepGeometry.rotateX(-Math.PI / 2);
 
   const deepBed = new THREE.Mesh(deepGeometry, deepMaterial);
-  deepBed.name = `marseille-water-deep-${def.id}`;
+  deepBed.name = `metaverse-water-deep-${def.id}`;
   deepBed.position.y = deepY;
   deepBed.renderOrder = 5;
   deepBed.frustumCulled = false;

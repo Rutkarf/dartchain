@@ -11,7 +11,7 @@ export const EXCHANGE_AMOUNT_VALUE_PLACEHOLDER =
 /** Placeholder complet montant + unité m4t3r (sr-only / hints). */
 export const EXCHANGE_AMOUNT_PLACEHOLDER = `${EXCHANGE_AMOUNT_VALUE_PLACEHOLDER} ${EXCHANGE_NATIVE_UNIT_LABEL}`;
 
-/** 5 tokens LaunchLab échangeables contre R4V3 / m4t3r. */
+/** 5 tokens Laboratoire échangeables contre R4V3 / m4t3r. */
 export const EXCHANGE_LAUNCHPAD_SWAP_TOKENS = [
   'PXD',
   'NVFI',

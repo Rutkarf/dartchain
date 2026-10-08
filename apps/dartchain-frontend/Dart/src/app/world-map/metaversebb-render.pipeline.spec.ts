@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { mapQualityTier } from './map-configuration';
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 import {
   shouldUseRenderPipeline,
   shouldUseTaa,
@@ -10,7 +10,7 @@ import {
 import {
   atmosphereBloomStrength,
   atmosphereBloomThreshold,
-} from './marseille-atmosphere.config';
+} from './metaverse-atmosphere.config';
 import { colorGradeMixForQuality } from './metaversebb-color-grade.shader';
 import {
   districtColorGradeMix,

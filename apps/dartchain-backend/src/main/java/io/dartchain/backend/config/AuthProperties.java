@@ -12,6 +12,7 @@ public class AuthProperties {
     private String bootstrapAdminUsername = "";
     private String bootstrapAdminPassword = "";
     private int passwordMinLength = 8;
+    private boolean emailVerificationRequired = false;
 
     public String getJwtSecret() {
         return jwtSecret;
@@ -67,5 +68,13 @@ public class AuthProperties {
 
     public void setPasswordMinLength(int passwordMinLength) {
         this.passwordMinLength = passwordMinLength;
+    }
+
+    public boolean isEmailVerificationRequired() {
+        return emailVerificationRequired;
+    }
+
+    public void setEmailVerificationRequired(boolean emailVerificationRequired) {
+        this.emailVerificationRequired = emailVerificationRequired;
     }
 }

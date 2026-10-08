@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createFxLineMaterial, STROKE } from '../core/constants/stroke-bevel';
 import {
   blendFamilyRgb,
   familyTheme,
@@ -84,8 +85,11 @@ const STATUS_BRIGHT: Record<StarQuestStatus, number> = {
 };
 
 const LINKED_BOOST = 1.22;
-/** Voisinage Obsidian : hors 1-hop le graphe s’éteint. */
+/** Sélection : hors voisinage le graphe s’éteint. */
 const DIM_FACTOR = 0.08;
+/** Survol : le reste du ciel reste lisible (pas d’extinction SC). */
+const HOVER_REST_DIM = 0.78;
+const HOVER_FAMILY_BOOST = 1.28;
 const MAX_ENERGY_PACKETS = 24;
 /** Brins par arête — un filament clair (liaison fiable entre particules). */
 const LINE_STRANDS = 1;
@@ -195,6 +199,8 @@ export class StarConquestGraph {
   private readonly packetPositions: Float32Array;
   private readonly packetColors: Float32Array;
   private focusId: string | null = null;
+  /** Survol souris/tactile — illumine la constellation sans mode solo sélection. */
+  private hoverId: string | null = null;
   private pulsePhase = 0;
   private energyPhase = 0;
   private driftTime = 0;
@@ -315,7 +321,7 @@ export class StarConquestGraph {
     const coreMat = new THREE.PointsMaterial({
       size: sizes.core,
       map: this.coreTexture,
-      color: 0xffffff,
+      color: 0xede7d9,
       transparent: true,
       opacity: 1,
       vertexColors: true,
@@ -332,7 +338,7 @@ export class StarConquestGraph {
     const haloMat = new THREE.PointsMaterial({
       size: sizes.halo,
       map: this.discTexture,
-      color: 0xffffff,
+      color: 0xede7d9,
       transparent: true,
       opacity: 0.3,
       vertexColors: true,
@@ -350,7 +356,7 @@ export class StarConquestGraph {
     const bloomMat = new THREE.PointsMaterial({
       size: sizes.bloom,
       map: this.bloomTexture,
-      color: 0xffffff,
+      color: 0xede7d9,
       transparent: true,
       opacity: 0.18,
       vertexColors: true,
@@ -368,7 +374,7 @@ export class StarConquestGraph {
     const ghostMat = new THREE.PointsMaterial({
       size: sizes.ghost,
       map: this.discTexture,
-      color: 0xa8fff8,
+      color: 0xede7d9,
       transparent: true,
       opacity: 0.14,
       vertexColors: true,
@@ -420,13 +426,7 @@ export class StarConquestGraph {
       'position',
       new THREE.BufferAttribute(this.constellationPositions, 3)
     );
-    const guideMat = new THREE.LineBasicMaterial({
-      color: 0x88d4f0,
-      transparent: true,
-      opacity: 0.16,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const guideMat = createFxLineMaterial(STROKE.dense);
     this.constellationGuides = new THREE.LineSegments(guideGeom, guideMat);
     this.constellationGuides.name = 'star-conquest-zodiac-guides';
     this.constellationGuides.raycast = () => {};
@@ -500,7 +500,7 @@ export class StarConquestGraph {
     const packetMat = new THREE.PointsMaterial({
       size: 6.8 * STAR_CONQUEST_SCALE.visual,
       map: this.coreTexture,
-      color: 0xffffff,
+      color: 0xede7d9,
       transparent: true,
       opacity: 0.95,
       vertexColors: true,
@@ -543,7 +543,7 @@ export class StarConquestGraph {
     return 'ultra-low';
   }
 
-  /** Bascule l’univers spatial Star Conquest (100 % autonome, sans metaverse floor). */
+  /** Bascule l’univers spatial Conquête stellaire (100 % autonome, sans metaverse floor). */
   setUniverse(theme: StarConquestUniverseTheme): void {
     this.universeTheme = theme;
     this.background.setGpuQuality(this.gpuQuality);
@@ -872,11 +872,27 @@ export class StarConquestGraph {
 
   setFocus(questId: string | null): void {
     this.focusId = questId;
+    if (questId) this.hoverId = null;
     this.applyFocusVisuals();
   }
 
   getFocusId(): string | null {
     return this.focusId;
+  }
+
+  /**
+   * Survol souris / tactile : illumine la constellation sous le pointeur
+   * sans éteindre le reste de Star Conquest (contrairement à setFocus).
+   */
+  setHover(questId: string | null): void {
+    if (this.focusId) return;
+    if (this.hoverId === questId) return;
+    this.hoverId = questId;
+    this.applyFocusVisuals();
+  }
+
+  getHoverId(): string | null {
+    return this.hoverId;
   }
 
   /** Pulse fort après sélection scanner. */
@@ -1467,7 +1483,12 @@ export class StarConquestGraph {
 
     pos.needsUpdate = true;
     this.writeGhostPositions(pos);
-    this.writeConstellationGuides();
+    const litFamily = this.focusId
+      ? (this.quests[this.idToIndex.get(this.focusId) ?? -1]?.family ?? null)
+      : this.hoverId
+        ? (this.quests[this.idToIndex.get(this.hoverId) ?? -1]?.family ?? null)
+        : null;
+    this.writeConstellationGuides(litFamily);
 
     const vw = starConquestLayoutWidth();
     const vh = starConquestLayoutHeight();
@@ -1490,6 +1511,27 @@ export class StarConquestGraph {
       this.ghostPoints.visible = true;
       this.writeLineGeometry(this.linkedSet(this.focusId), this.energyPhase);
       this.updateEnergyPackets(this.focusId, this.energyPhase);
+    } else if (this.hoverId) {
+      // Survol : constellation allumée, ciel entier toujours visible.
+      const theme = this.universeTheme;
+      const rest = STAR_CONQUEST_REST_GLOW;
+      const mq = starConquestMobileQuality(this.gpuQuality);
+      const breathe = Math.sin(this.driftTime * 0.28) * rest.breatheAmp;
+      this.applyQuestPointSizes(0.86);
+      const coreMat = this.questPoints.material as THREE.PointsMaterial;
+      const haloMat = this.haloPoints.material as THREE.PointsMaterial;
+      const bloomMat = this.bloomPoints.material as THREE.PointsMaterial;
+      const ghostMat = this.ghostPoints.material as THREE.PointsMaterial;
+      coreMat.opacity = Math.min(1, theme.coreOpacity * rest.coreMul * mq.restMul + breathe + 0.08);
+      haloMat.opacity = Math.min(
+        0.35,
+        theme.haloOpacity * rest.haloMul * mq.restMul + breathe * 0.5 + 0.06,
+      );
+      bloomMat.opacity = (0.1 + theme.haloOpacity * 0.1) * rest.bloomMul * mq.restMul;
+      ghostMat.opacity = 0.04 * rest.ghostMul;
+      this.ghostPoints.visible = ghostMat.opacity > 0.02;
+      this.writeLineGeometry(this.familySet(this.hoverId), this.energyPhase, true);
+      this.updateIdleEnergyPackets(this.energyPhase, deltaMs);
     } else {
       const theme = this.universeTheme;
       const rest = STAR_CONQUEST_REST_GLOW;
@@ -1618,12 +1660,28 @@ export class StarConquestGraph {
     this.bloomTexture.dispose();
   }
 
-  /** Guides zodiacaux : suivent les nœuds (70 % live + 30 % ancre) — silhouette respirante. */
-  private writeConstellationGuides(): void {
+  /**
+   * Guides zodiacaux : suivent les nœuds (70 % live + 30 % ancre).
+   * Si `familyOnly` est défini (survol), n’illumine que cette constellation.
+   */
+  private writeConstellationGuides(familyOnly: string | null = null): void {
     if (this.constellationPairs.length === 0) return;
     const posAttr = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
     this.constellationPairs.forEach(([i, j], edgeIdx) => {
       const o = edgeIdx * 6;
+      const inFamily =
+        !familyOnly ||
+        (this.quests[i].family === familyOnly && this.quests[j].family === familyOnly);
+      if (!inFamily) {
+        // Collapse hors constellation survolée (évite d’éclairer tout le zodiac).
+        this.constellationPositions[o] = 0;
+        this.constellationPositions[o + 1] = 0;
+        this.constellationPositions[o + 2] = 0;
+        this.constellationPositions[o + 3] = 0;
+        this.constellationPositions[o + 4] = 0;
+        this.constellationPositions[o + 5] = 0;
+        return;
+      }
       const i3 = i * 3;
       const j3 = j * 3;
       const ax = posAttr.getX(i) * 0.7 + this.homePositions[i3] * 0.3;
@@ -1674,12 +1732,29 @@ export class StarConquestGraph {
     return linked;
   }
 
+  /** Tous les nœuds de la même constellation (famille) que la quest. */
+  private familySet(questId: string): Set<number> {
+    const set = new Set<number>();
+    const idx = this.idToIndex.get(questId);
+    if (idx === undefined) return set;
+    const family = this.quests[idx].family;
+    for (let i = 0; i < this.quests.length; i++) {
+      if (this.quests[i].family === family) set.add(i);
+    }
+    return set;
+  }
+
   private applyFocusVisuals(): void {
     const colors = this.questPoints.geometry.getAttribute('color') as THREE.BufferAttribute;
     const haloCol = this.haloPoints.geometry.getAttribute('color') as THREE.BufferAttribute;
-    const linked = this.focusId ? this.linkedSet(this.focusId) : null;
-    const focusIdx = this.focusId ? (this.idToIndex.get(this.focusId) ?? -1) : -1;
-    const focusFamily = focusIdx >= 0 ? this.quests[focusIdx].family : null;
+    const selectId = this.focusId;
+    const hoverId = selectId ? null : this.hoverId;
+    const selectIdx = selectId ? (this.idToIndex.get(selectId) ?? -1) : -1;
+    const hoverIdx = hoverId ? (this.idToIndex.get(hoverId) ?? -1) : -1;
+    const linked = selectId ? this.linkedSet(selectId) : null;
+    const family = hoverId ? this.familySet(hoverId) : null;
+    const selectFamily = selectIdx >= 0 ? this.quests[selectIdx].family : null;
+    const hoverFamily = hoverIdx >= 0 ? this.quests[hoverIdx].family : null;
 
     for (let i = 0; i < this.quests.length; i++) {
       const i3 = i * 3;
@@ -1690,9 +1765,9 @@ export class StarConquestGraph {
       let hg = this.haloColors[i3 + 1];
       let hb = this.haloColors[i3 + 2];
 
-      if (linked && focusIdx >= 0 && focusFamily) {
-        if (i === focusIdx) {
-          const theme = familyTheme(focusFamily);
+      if (linked && selectIdx >= 0 && selectFamily) {
+        if (i === selectIdx) {
+          const theme = familyTheme(selectFamily);
           const sel = starQuestVisualTone('selected');
           r = Math.min(1, (0.82 + theme.rgb[0] * 0.35) * sel.vertex);
           g = Math.min(1, (0.86 + theme.rgb[1] * 0.28) * sel.vertex);
@@ -1715,6 +1790,35 @@ export class StarConquestGraph {
           hr *= DIM_FACTOR;
           hg *= DIM_FACTOR;
           hb *= DIM_FACTOR;
+        }
+      } else if (family && hoverIdx >= 0 && hoverFamily) {
+        // Survol : constellation (famille) allumée, reste du ciel encore visible.
+        const z = this.questPoints.geometry.getAttribute('position').getZ(i);
+        const depthFade = Math.max(0.42, Math.min(1.05, 0.72 + z * 0.012));
+        if (i === hoverIdx) {
+          const theme = familyTheme(hoverFamily);
+          const hoverTone = starQuestVisualTone('hover');
+          r = Math.min(1, (0.78 + theme.rgb[0] * 0.4) * hoverTone.vertex * depthFade);
+          g = Math.min(1, (0.82 + theme.rgb[1] * 0.32) * hoverTone.vertex * depthFade);
+          b = Math.min(1, (0.88 + theme.rgb[2] * 0.26) * hoverTone.vertex * depthFade);
+          hr = Math.min(1, theme.rgb[0] * 1.35 * hoverTone.halo * depthFade);
+          hg = Math.min(1, theme.rgb[1] * 1.35 * hoverTone.halo * depthFade);
+          hb = Math.min(1, theme.rgb[2] * 1.35 * hoverTone.halo * depthFade);
+        } else if (family.has(i)) {
+          const linkedTone = starQuestVisualTone('linked');
+          r = Math.min(1, r * HOVER_FAMILY_BOOST * linkedTone.vertex * depthFade);
+          g = Math.min(1, g * HOVER_FAMILY_BOOST * linkedTone.vertex * depthFade);
+          b = Math.min(1, b * HOVER_FAMILY_BOOST * linkedTone.vertex * depthFade);
+          hr = Math.min(1, hr * HOVER_FAMILY_BOOST * linkedTone.halo * depthFade);
+          hg = Math.min(1, hg * HOVER_FAMILY_BOOST * linkedTone.halo * depthFade);
+          hb = Math.min(1, hb * HOVER_FAMILY_BOOST * linkedTone.halo * depthFade);
+        } else {
+          r *= HOVER_REST_DIM * depthFade;
+          g *= HOVER_REST_DIM * depthFade;
+          b *= HOVER_REST_DIM * depthFade;
+          hr *= HOVER_REST_DIM * depthFade;
+          hg *= HOVER_REST_DIM * depthFade;
+          hb *= HOVER_REST_DIM * depthFade;
         }
       } else {
         const tone = starQuestVisualTone(
@@ -1741,20 +1845,31 @@ export class StarConquestGraph {
     colors.needsUpdate = true;
     haloCol.needsUpdate = true;
 
-    this.writeLineGeometry(linked, this.energyPhase);
+    // Sélection = voisinage 1-hop ; survol = constellation famille (soft).
+    const lineLinked = linked ?? family;
+    this.writeLineGeometry(lineLinked, this.energyPhase, !!hoverId && !selectId);
     const rest = STAR_CONQUEST_REST_GLOW;
-    this.lineCoreMat.uniforms['uOpacity'].value =
-      focusIdx >= 0 ? 0.88 : 0.12 * rest.filamentRestMul;
-    this.filamentMat.uniforms['uOpacity'].value =
-      focusIdx >= 0 ? 0.55 : 0.04 * rest.filamentRestMul;
+    if (selectIdx >= 0) {
+      this.lineCoreMat.uniforms['uOpacity'].value = 0.88;
+      this.filamentMat.uniforms['uOpacity'].value = 0.55;
+    } else if (hoverIdx >= 0) {
+      this.lineCoreMat.uniforms['uOpacity'].value = 0.42 * rest.filamentRestMul;
+      this.filamentMat.uniforms['uOpacity'].value = 0.22 * rest.filamentRestMul;
+    } else {
+      this.lineCoreMat.uniforms['uOpacity'].value = 0.12 * rest.filamentRestMul;
+      this.filamentMat.uniforms['uOpacity'].value = 0.04 * rest.filamentRestMul;
+    }
     const guideMat = this.constellationGuides.material as THREE.LineBasicMaterial;
     const showGuides =
       this.universeTheme.showConstellations && this.universeTheme.constellationOpacity > 0;
-    this.constellationGuides.visible = showGuides && focusIdx >= 0;
+    this.constellationGuides.visible = showGuides && (selectIdx >= 0 || hoverIdx >= 0);
     guideMat.opacity =
-      focusIdx >= 0
+      selectIdx >= 0
         ? this.universeTheme.constellationOpacity * 0.7
-        : 0;
+        : hoverIdx >= 0
+          ? this.universeTheme.constellationOpacity * 0.55
+          : 0;
+    this.writeConstellationGuides(hoverFamily ?? selectFamily);
   }
 
   private hideEnergyPackets(): void {
@@ -1882,13 +1997,18 @@ export class StarConquestGraph {
       packet > 0 ? STAR_CONQUEST_REST_GLOW.packetMul : 0;
   }
 
-  private writeLineGeometry(linked: Set<number> | null, energy: number): void {
+  private writeLineGeometry(
+    linked: Set<number> | null,
+    energy: number,
+    softHover = false,
+  ): void {
     if (this.universeTheme.peerLayout === 'swarm-orbit') {
-      this.writeSwarmMandalaLines(linked, energy);
+      this.writeSwarmMandalaLines(linked, energy, softHover);
       return;
     }
 
     const posAttr = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const restDim = softHover ? HOVER_REST_DIM * 0.55 : 0.08;
 
     this.edgePairs.forEach(([i, j], edgeIdx) => {
       const ax = posAttr.getX(i);
@@ -1912,9 +2032,9 @@ export class StarConquestGraph {
       const dim = linked !== null && !focused;
       const zAvg = (az + bz) * 0.5;
       const depthFade = 0.8 + Math.max(-0.2, Math.min(0.22, zAvg * 0.008));
-      // Hiérarchie : focus > même famille > passif ; dim Obsidian hors voisinage
-      let intensity = focused ? 0.98 : same ? 0.68 : 0.5;
-      if (dim) intensity = 0.08;
+      // Hiérarchie : focus/survol > même famille > passif ; survol = soft dim
+      let intensity = focused ? (softHover ? 0.9 : 0.98) : same ? 0.68 : 0.5;
+      if (dim) intensity = restDim;
       const flow =
         0.85 +
         0.15 * (0.5 + 0.5 * Math.sin(energy * (focused ? 3.0 : 0.9) + edgeIdx));
@@ -1970,9 +2090,14 @@ export class StarConquestGraph {
     this.syncFilamentRibbon();
   }
 
-  private writeSwarmMandalaLines(linked: Set<number> | null, energy: number): void {
+  private writeSwarmMandalaLines(
+    linked: Set<number> | null,
+    energy: number,
+    softHover = false,
+  ): void {
     const posAttr = this.questPoints.geometry.getAttribute('position') as THREE.BufferAttribute;
     let edgeIdx = 0;
+    const dimMul = softHover ? HOVER_REST_DIM : 0.14;
 
     const writeSegment = (
       ax: number,
@@ -2011,7 +2136,7 @@ export class StarConquestGraph {
       const focused = linked !== null && linked.has(i) && linked.has(j);
       const dim = linked !== null && !focused;
       let intensity = focused ? 0.92 : hubIntensity;
-      if (dim) intensity *= 0.14;
+      if (dim) intensity *= dimMul;
       writeSegment(
         posAttr.getX(i),
         posAttr.getY(i),

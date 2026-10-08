@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-import type { BuildingLodLevel } from './marseille-twin/building-lod.model';
+import type { BuildingLodLevel } from './metaverse-twin/building-lod.model';
 
 const BATCH_NAME_PREFIX = 'ground-osm-batched-';
 const MERGE_NAME_PREFIXES = ['ground-osm-poly-', 'ground-osm-curb-'] as const;

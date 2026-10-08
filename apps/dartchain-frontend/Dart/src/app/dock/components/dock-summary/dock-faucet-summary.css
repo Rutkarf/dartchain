@@ -14,31 +14,82 @@
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 4px;
+  justify-content: center;
+  gap: 6px;
   width: 100%;
   min-width: 0;
   height: 100%;
   max-height: 100%;
-  padding: 0 1px 0 2px;
+  /* Plus à gauche + marge droite pour le bump scale. */
+  padding: 0 8px 0 2%;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
   line-height: 1;
 }
 
 .faucet-summary-bar__balance {
   flex: 1 1 auto;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: visible;
+  /* Marge avant CLAIM : le scale bump ne tronque plus à droite. */
+  padding-right: 6px;
+  margin-right: 2px;
+}
+
+.faucet-summary-bar__amount {
+  display: inline-flex;
+  align-items: baseline;
+  flex: 0 0 auto;
+  max-width: 100%;
   white-space: nowrap;
-  text-align: left;
-  font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: calc(clamp(0.28rem, 1.7vw, 0.375rem) + 1px);
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-chain);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.01em;
-  color: rgba(244, 251, 255, 0.94);
+  letter-spacing: -0.01em;
+  color: rgba(237, 231, 217, 0.94);
+  transform-origin: right center;
+  transition: color var(--motion-state) var(--motion-ease-state);
+}
+
+.faucet-summary-bar__whole {
+  color: rgba(237, 231, 217, 0.98);
+}
+
+.faucet-summary-bar__sep {
+  color: rgba(237, 231, 217, 0.8);
+  margin: 0 0.22em;
+}
+
+.faucet-summary-bar__decimals {
+  color: #ede7d9;
+  letter-spacing: 0;
+}
+
+.faucet-summary-bar__balance.is-bumping .faucet-summary-bar__amount {
+  color: #ede7d9;
+  text-shadow: 0 0 8px rgba(9, 129, 74, 0.65);
+  animation: faucet-summary-bump var(--motion-enter) var(--motion-ease-enter);
+}
+
+.faucet-summary-bar__balance.is-bumping .faucet-summary-bar__decimals {
+  color: #09814a;
+}
+
+@keyframes faucet-summary-bump {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.045);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .faucet-summary-bar__claim {
@@ -46,19 +97,19 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  height: 11px;
+  height: var(--comp-hud-h, 16px);
   margin: 0;
   padding: 0 5px;
-  border: 1px solid rgba(61, 214, 140, 0.45);
-  border-radius: 0;
+  border: 1px solid rgba(9, 129, 74, 0.45);
+  border-radius: var(--radius-none);
   background: linear-gradient(
     180deg,
-    rgba(61, 214, 140, 0.32) 0%,
-    rgba(61, 214, 140, 0.12) 100%
+    rgba(9, 129, 74, 0.32) 0%,
+    rgba(9, 129, 74, 0.12) 100%
   );
-  color: rgba(244, 251, 255, 0.96);
+  color: rgba(237, 231, 217, 0.96);
   font-family: var(--font-display, inherit);
-  font-size: clamp(0.26rem, 1.5vw, 0.34rem);
+  font-size: var(--fs-chain);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -71,31 +122,37 @@
 }
 
 .faucet-summary-bar__claim:hover:not(:disabled) {
-  color: #fff;
-  border-color: rgba(61, 214, 140, 0.7);
-  background: linear-gradient(
-    180deg,
-    rgba(61, 214, 140, 0.42) 0%,
-    rgba(61, 214, 140, 0.18) 100%
-  );
+  color: var(--text-primary, #ede7d9);
+  border-color: var(--state-hover-border);
+  background: var(--cta-accent-bg-hover);
+  box-shadow: var(--cta-accent-shadow-hover);
 }
 
 .faucet-summary-bar__claim:disabled,
 .faucet-summary-bar__claim.is-cooling:disabled {
-  opacity: 0.38;
-  cursor: default;
-  pointer-events: none;
-  border-color: rgba(245, 215, 110, 0.28);
-  background: rgba(245, 215, 110, 0.1);
-  color: rgba(245, 215, 110, 0.75);
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
 }
 
 .faucet-summary-bar__claim:focus-visible {
-  outline: 1px solid rgba(61, 214, 140, 0.55);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: var(--state-focus-ring);
 }
 
-@container (max-width: 140px) {
+@container (max-width: 160px) {
+  .faucet-summary-bar {
+    padding-right: 6px;
+    gap: 4px;
+  }
+
+  .faucet-summary-bar__balance {
+    padding-right: 4px;
+  }
+
+  .faucet-summary-bar__amount {
+    font-size: var(--fs-chain);
+  }
+
   .faucet-summary-bar__claim {
     padding: 0 3px;
     letter-spacing: 0.04em;

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, output } from '@angular/core';
 
-import { ShowcaseTab } from '@showcase/models/showcase-tab.model';
+import { SHOWCASE_TABS, ShowcaseTab } from '@showcase/models/showcase-tab.model';
+import { DepthRailComponent } from '@components/depth-rail/depth-rail';
 import { ShowcaseNewsSummaryComponent } from '@showcase/components/showcase-news/showcase-news-summary';
 import { ShowcaseNewsComponent } from '@showcase/components/showcase-news/showcase-news';
 import { ShowcaseChatSummaryComponent } from '@showcase/components/showcase-chat/showcase-chat-summary';
@@ -30,6 +31,7 @@ import { MarketPanelComponent } from '@showcase/components/market-panel/market-p
     ShowcaseR4v3SummaryComponent,
     DockMarketSummaryComponent,
     MarketPanelComponent,
+    DepthRailComponent,
   ],
   templateUrl: './showcase-window.html',
   styleUrls: ['./showcase-window.css'],
@@ -40,6 +42,19 @@ export class ShowcaseWindowComponent {
   @Input() collapsed = false;
 
   readonly selectBlock = output<number>();
+  readonly tabChange = output<ShowcaseTab>();
+
+  tabIndex(): number {
+    const index = SHOWCASE_TABS.findIndex((tab) => tab.id === this.activeTab);
+    return index < 0 ? 0 : index;
+  }
+
+  onRailIndex(index: number): void {
+    const tab = SHOWCASE_TABS[index];
+    if (tab && tab.id !== this.activeTab) {
+      this.tabChange.emit(tab.id);
+    }
+  }
 
   windowAriaLabel(): string {
     switch (this.activeTab) {
@@ -52,7 +67,7 @@ export class ShowcaseWindowComponent {
       case 'rv23':
         return 'Chat showcase';
       case 'dao':
-        return 'LaunchLab showcase';
+        return 'Vitrine du laboratoire';
       case 'market':
         return 'Marché — tokens et liquidité';
       default:

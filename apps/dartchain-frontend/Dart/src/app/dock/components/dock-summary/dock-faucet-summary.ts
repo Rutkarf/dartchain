@@ -36,11 +36,15 @@ export class DockFaucetSummaryComponent implements OnInit, OnDestroy {
   readonly collapsedClass = true;
 
   readonly headline = this.state.headline;
+  readonly wholePart = this.state.wholePart;
+  readonly decimalDigitsSpaced = this.state.decimalDigitsSpaced;
+  readonly fullBalance = this.runtime.displayLine;
+  readonly bumping = this.runtime.bump;
   readonly claimDisabled = this.runtime.claimDisabled;
   readonly isCooling = computed(
     () => !this.runtime.eligible() && this.runtime.cooldownSeconds() > 0
   );
-  readonly barAriaLabel = computed(() => `Faucet ${this.headline()}`);
+  readonly barAriaLabel = computed(() => `Faucet ${this.headline()} m4t3r`);
 
   ngOnInit(): void {
     window.addEventListener('dartchain-refresh-dock', this.onGlobalRefresh);

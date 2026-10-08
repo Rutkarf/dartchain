@@ -1,4 +1,4 @@
-<div class="showcase-view showcase-view--chat" role="region" aria-label="Chat du salon global">
+<div class="showcase-view showcase-view--chat" role="region">
   @if (isExpanded) {
     <header class="showcase-chat__head">
       <div class="showcase-meta showcase-chat__meta-bar">
@@ -11,19 +11,17 @@
         </div>
 
         <div
-          class="showcase-chat__ribbon showcase-chat__ribbon--inline"
-          role="toolbar"
-          aria-label="Chat — mise en forme"
-        >
+ class="showcase-chat__ribbon showcase-chat__ribbon--inline"
+ role="toolbar"
+ >
           <div class="showcase-chat__ribbon-group showcase-chat__ribbon-group--font">
             <div class="showcase-chat__font-field">
               <select
-                class="showcase-chat__menu-select showcase-chat__menu-select--font"
-                [value]="prefs.fontKey()"
-                (change)="onFontChange($event)"
-                aria-label="Police"
-                title="Police"
-              >
+ class="showcase-chat__menu-select showcase-chat__menu-select--font"
+ [value]="prefs.fontKey()"
+ (change)="onFontChange($event)"
+ title="Police"
+ >
                 @for (opt of fontOptions; track opt.key) {
                   <option [value]="opt.key">{{ opt.label }}</option>
                 }
@@ -33,7 +31,7 @@
           </div>
 
           <div class="showcase-chat__ribbon-group showcase-chat__ribbon-group--chars">
-            <div class="showcase-chat__toggle-group" role="group" aria-label="Style de caractère">
+            <div class="showcase-chat__toggle-group" role="group">
               <button
                 type="button"
                 class="showcase-chat__tool-btn showcase-chat__icon-btn"
@@ -108,17 +106,15 @@
               </button>
               @if (isMenuOpen('colors')) {
                 <div
-                  class="showcase-chat__palette showcase-chat__palette--combined"
-                  role="dialog"
-                  aria-label="Couleurs"
-                  (click)="stopMenuClick($event)"
-                >
+ class="showcase-chat__palette showcase-chat__palette--combined"
+ role="dialog"
+ (click)="stopMenuClick($event)"
+ >
                   <p class="showcase-chat__palette-title">Couleur de police</p>
                   <div
-                    class="showcase-chat__palette-grid"
-                    role="listbox"
-                    aria-label="Couleurs de police"
-                  >
+ class="showcase-chat__palette-grid"
+ role="listbox"
+  aria-label="Couleurs de police">
                     @for (color of fontColorGrid; track color) {
                       <button
                         type="button"
@@ -143,7 +139,7 @@
                   <p class="showcase-chat__palette-title showcase-chat__palette-title--section">
                     Surlignage
                   </p>
-                  <div class="showcase-chat__palette-grid" role="listbox" aria-label="Surlignage">
+                  <div class="showcase-chat__palette-grid" role="listbox">
                     @for (color of highlightGrid; track color) {
                       <button
                         type="button"
@@ -199,26 +195,20 @@
                 aria-label="Rechercher dans le chat"
                 title="Rechercher"
               >
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="m20 20-3.5-3.5" />
-                </svg>
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
               </button>
             }
           </div>
 
           <button
             type="button"
-            class="showcase-meta__search-toggle showcase-chat__clear-btn"
+            class="showcase-chat__clear-btn"
             (click)="clearChat($event)"
             aria-label="Vider le chat"
             title="Vider le chat"
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M4 7h16" />
-              <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-              <path d="M7 7l1 12a1 1 0 0 0 1 .9h6a1 1 0 0 0 1-.9l1-12" />
-            </svg>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-trash"/></svg>
+            <span>Vider</span>
           </button>
         </div>
       </div>
@@ -232,9 +222,7 @@
           class="showcase-chat__error-dismiss"
           aria-label="Fermer l'alerte"
           (click)="dismissSendError()"
-        >
-          ×
-        </button>
+        ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
       </div>
     }
 
@@ -278,32 +266,29 @@
       }
       <div [ngClass]="composerBubbleClass()">
         <div
-          class="showcase-chat__identity"
-          role="group"
-          aria-label="Publier en tant que"
-        >
+ class="showcase-chat__identity"
+ role="group"
+ >
           <button
-            type="button"
-            class="showcase-chat__identity-btn"
-            [class.is-active]="!postAsAnonymous()"
-            [attr.title]="postIdentityTitle()"
-            [attr.aria-pressed]="!postAsAnonymous()"
-            [attr.aria-label]="postIdentityTitle()"
-            (click)="setPostMode(false, $event)"
-          >
+ type="button"
+ class="showcase-chat__identity-btn"
+ [class.is-active]="!postAsAnonymous()"
+ [attr.title]="postIdentityTitle()"
+ [attr.aria-pressed]="!postAsAnonymous()"
+ (click)="setPostMode(false, $event)"
+ >
             {{ postIdentityLabel() }}
           </button>
           <button
-            type="button"
-            class="showcase-chat__identity-btn showcase-chat__identity-btn--anon"
-            [class.is-active]="postAsAnonymous()"
-            [class.is-locked]="!auth.isAuthenticated()"
-            [attr.title]="postAnonymousTitle()"
-            [attr.aria-pressed]="postAsAnonymous()"
-            [attr.aria-label]="postAnonymousTitle()"
-            (click)="setPostMode(true, $event)"
-          >
-            <span class="showcase-chat__identity-anon-label">Anon</span>
+ type="button"
+ class="showcase-chat__identity-btn showcase-chat__identity-btn--anon"
+ [class.is-active]="postAsAnonymous()"
+ [class.is-locked]="!auth.isAuthenticated()"
+ [attr.title]="postAnonymousTitle()"
+ [attr.aria-pressed]="postAsAnonymous()"
+ (click)="setPostMode(true, $event)"
+ >
+            <span class="showcase-chat__identity-anon-label">Anonyme</span>
             <svg class="showcase-chat__anon-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path
                 fill="currentColor"
@@ -328,12 +313,11 @@
           />
         </div>
         <button
-          type="submit"
-          class="showcase-chat__send ds-surface ds-surface--showcase-tab"
-          [disabled]="!auth.isAuthenticated() || messageControl.invalid"
-          [attr.title]="sendButtonLabel()"
-          [attr.aria-label]="sendButtonLabel()"
-        >
+ type="submit"
+ class="showcase-chat__send ds-surface ds-surface--showcase-tab"
+ [disabled]="!auth.isAuthenticated() || messageControl.invalid"
+ [attr.title]="sendButtonLabel()"
+ >
           Envoyer
         </button>
       </div>

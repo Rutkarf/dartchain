@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import * as THREE from 'three';
 
 import {
-  MARSEILLE_DISTRICTS,
+  METAVERSE_DISTRICTS,
   MIRROR_SECOND_BUILDING_ID,
   M4T3R_PICKUP_FX,
   R4V3_GROUND_FIELD,
@@ -112,18 +112,18 @@ describe('World streaming and R4V3 cells', () => {
     expect(WORLD_SCALE.tokenVisibleRadiusMeters).toBe(64);
     expect(WORLD_SCALE.maxLoadedChunks).toBe(24);
     expect(R4V3_GROUND_FIELD.visibleRadius).toBe(64);
-    expect(MARSEILLE_DISTRICTS['le-panier'].estimated).toBe(true);
-    expect(MARSEILLE_DISTRICTS['le-panier'].latitude).toBeCloseTo(43.2988, 4);
-    expect(MARSEILLE_DISTRICTS.joliette.estimated).toBe(true);
-    expect(MARSEILLE_DISTRICTS.joliette.latitude).toBeCloseTo(43.3018, 4);
+    expect(METAVERSE_DISTRICTS['le-panier'].estimated).toBe(true);
+    expect(METAVERSE_DISTRICTS['le-panier'].latitude).toBeCloseTo(43.2988, 4);
+    expect(METAVERSE_DISTRICTS.joliette.estimated).toBe(true);
+    expect(METAVERSE_DISTRICTS.joliette.latitude).toBeCloseTo(43.3018, 4);
     expect(TRAIL_CONFIG.respawnDelayMs).toBe(30_000);
     expect(clusterId(32, 32)).toBe('m4t3r-cluster:32:32');
     expect(tokenCellId(4, 8)).toBe('r4v3:4:8');
   });
 
   it('remplace les textes de scene et identifie le batiment R4V3', () => {
-    expect(SCENE_COPY.canopyTitle).toBe('Arène BB');
-    expect(SCENE_COPY.canopyTitleLegacy).toBe('MetaVerseBB');
+    expect(SCENE_COPY.canopyTitle).toBe('METAVERSEBB');
+    expect(SCENE_COPY.canopyTitleLegacy).toBe('METAVERSEBB');
     expect(SCENE_COPY.roadMarking).toBe('Hack The Planet x)');
     expect(SCENE_COPY.r4v3).toBe('R4V3');
     expect(SCENE_COPY.m4t3rPickup).toBe('+1');

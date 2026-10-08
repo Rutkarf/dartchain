@@ -1,8 +1,7 @@
 <div
-  class="wallet-summary-bar"
-  role="status"
-  aria-live="polite"
-  [attr.aria-label]="balanceAriaLabel()"
+ class="wallet-summary-bar"
+ role="status"
+ aria-live="polite"
 >
   <span class="wallet-summary-bar__balance" [attr.title]="balanceAriaLabel()">
     <span class="wallet-summary-bar__token">R4V3</span>
@@ -20,23 +19,17 @@
       aria-label="Recevoir"
       title="Recevoir"
     >
-      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-        <path d="M4 4.5 11.5 12" />
-        <path d="M7.5 12H12v-4.5" />
-      </svg>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-down-left"/></svg>
     </button>
 
     <button
       type="button"
       class="wallet-summary-bar__icon-btn wallet-summary-bar__icon-btn--swap"
       (click)="onSwap($event)"
-      aria-label="Swap"
-      title="Swap"
+      aria-label="Échange"
+      title="Échange"
     >
-      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-        <path d="M3 5h9M9 2l3 3-3 3" />
-        <path d="M13 11H4M7 8l-3 3 3 3" />
-      </svg>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-left-right"/></svg>
     </button>
 
     <button
@@ -47,10 +40,7 @@
       aria-label="Envoyer"
       title="Envoyer"
     >
-      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-        <path d="M4 11.5 11.5 4" />
-        <path d="M7.5 4H12v4.5" />
-      </svg>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-up-right"/></svg>
     </button>
 
     @if (showCreateWallet()) {
@@ -59,14 +49,19 @@
         class="wallet-summary-bar__create"
         (click)="onCreateWallet($event)"
         [disabled]="!canCreateWallet()"
-        aria-label="Créer un wallet"
+        [attr.aria-label]="
+          canCreateWallet()
+            ? 'Créer un portefeuille'
+            : 'Connectez-vous pour créer un wallet'
+        "
         [attr.title]="
           canCreateWallet()
-            ? 'Créer un wallet'
+            ? 'Créer un portefeuille'
             : 'Connectez-vous pour créer un wallet'
         "
       >
-        Créer un wallet
+        <span class="wallet-summary-bar__create-full">Créer</span>
+        <span class="wallet-summary-bar__create-short" aria-hidden="true">+</span>
       </button>
     }
   </div>

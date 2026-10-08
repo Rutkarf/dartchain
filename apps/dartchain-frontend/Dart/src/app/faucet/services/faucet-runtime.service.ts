@@ -7,7 +7,7 @@ import {
   formatDisplayAmount,
   isWalletValidForFaucet,
   maxClaimSmallestUnits,
-  parseAmountToSmallestUnits,
+  m4t3rUnitCount,
   smallestUnitsToAmount,
 } from '@faucet/faucet/faucet.util';
 import { LocaleKey } from '@core/i18n/locale.messages';
@@ -23,8 +23,7 @@ import {
 } from '@faucet/services/faucet.service';
 import { QuestsProgressService } from '@quests/services/quests-progress.service';
 import { WalletSessionService } from '@wallet/services/wallet-session.service';
-import { formatR4v3Amount } from '@core/utils/r4v3-amount.util';
-
+import { DockNavigationService } from '@dock/services/dock-navigation.service';
 export interface FaucetHistoryRow {
   action: string;
   date: string;
@@ -48,12 +47,14 @@ export class FaucetRuntimeService {
   private readonly product = inject(ProductConfigService);
   private readonly locale = inject(LocaleService);
   private readonly zone = inject(NgZone);
+  private readonly dockNav = inject(DockNavigationService);
 
   private readonly clientId = 'angular-faucet-ui';
   private static readonly COOLDOWN_TICK_MS = 100;
+  /** Friandise : +1 m4t3r (plus petite unité) chaque seconde passée sur le site. */
   private static readonly VISUAL_TICK_MS = 1000;
-  private static readonly DECIMALS = 26;
   private static readonly VISUAL_INCREMENT = 1n;
+  private static readonly DECIMALS = 26;
   /** +1 plus petite unité m4t3r par pièce trail validée serveur. */
   static readonly M4T3R_FAUCET_UNITS_PER_TOKEN = 1n;
   private static readonly META_REFRESH_MS = 15_000;
@@ -84,8 +85,18 @@ export class FaucetRuntimeService {
   readonly cooldownSeconds = signal(0);
   readonly wholePart = signal(0n);
   readonly decimalPart = signal(0n);
+  /** Compteur affiché, en unités m4t3r, aligné sur le pending claimable. */
+  private readonly pendingUnits = signal(0n);
+  /** Nombre exact débité au dernier claim de cette session. */
+  private readonly claimedUnitLabel = signal('');
 
-  readonly walletAddress = computed(() => this.walletSession.address());
+  readonly walletAddress = computed(() => {
+    const local = this.walletSession.address()?.trim() ?? '';
+    if (local) {
+      return local;
+    }
+    return this.auth.user()?.walletAddress?.trim() ?? '';
+  });
   readonly walletValid = computed(() => {
     const address = this.walletAddress();
     if (!address) {
@@ -119,11 +130,17 @@ export class FaucetRuntimeService {
     () => this.faucetConfig()?.nativeToken?.trim() || 'R4V3'
   );
   readonly wholePartDisplay = computed(() => this.wholePart().toString());
+  /** 26 décimales paddées — ex. 000…001 qui s’incrémente chaque seconde. */
   readonly decimalDigits = computed(() =>
     this.decimalPart().toString().padStart(FaucetRuntimeService.DECIMALS, '0')
   );
+  /** Nombre entier de m4t3r (smartbar + embeds) — suit toujours le dual feed tick/pickup. */
+  readonly m4t3rCountDisplay = computed(() => {
+    const raw = this.pendingUnits().toString();
+    return raw.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+  });
   readonly displayLine = computed(
-    () => `${this.nativeTokenLabel()} ${this.wholePartDisplay()},${this.decimalDigits()} m4t3r`
+    () => `${this.wholePartDisplay()},${this.decimalDigits()} m4t3r`,
   );
   readonly ledTone = computed((): FaucetLedTone => {
     if (this.faucetDisabled()) {
@@ -199,6 +216,11 @@ export class FaucetRuntimeService {
     if (!this.walletValid()) {
       return true;
     }
+    if (this.eligible()) {
+      if (this.pendingUnits() <= 0n) {
+        return true;
+      }
+    }
     return !this.eligible();
   });
   readonly claimSuccessActive = computed(() => {
@@ -209,13 +231,10 @@ export class FaucetRuntimeService {
 
     return !this.eligible();
   });
-  readonly formattedWalletBalanceLine = computed(() => {
-    const balance = this.walletBalance();
-    if (!balance) {
-      return '';
-    }
-
-    return `${this.nativeTokenLabel()} ${formatR4v3Amount(balance)} m4t3r`;
+  /** Montant réellement débité au claim, en nombre de m4t3r. */
+  readonly formattedClaimedAmountLine = computed(() => {
+    const count = this.claimedUnitLabel().trim();
+    return count ? `${count} m4t3r` : '';
   });
 
   private started = false;
@@ -228,11 +247,14 @@ export class FaucetRuntimeService {
   private retryAttempt = 0;
   private retryTimerId: number | null = null;
   private toastTimerId: number | null = null;
+  /** Crédit local pas encore relu dans pendingAmount. */
+  private localCreditAhead = false;
 
   constructor() {
     effect(() => {
       this.auth.isAuthenticated();
       this.walletSession.address();
+      this.auth.user()?.walletAddress;
       if (!this.started) {
         return;
       }
@@ -311,9 +333,26 @@ export class FaucetRuntimeService {
     this.addSmallestUnits(added);
   }
 
+  /** Aligne le compteur sur le pending serveur (pièces réellement claimables). */
+  setClaimableFromAmount(amount: string, unitCount?: string | null): void {
+    this.zone.run(() => {
+      const explicit = this.parseUnitCount(unitCount);
+      const units = explicit ?? m4t3rUnitCount(amount) ?? 0n;
+      const capped = units > this.maxClaimUnits ? this.maxClaimUnits : units;
+      const local = this.pendingUnits();
+      // Ne jamais descendre sous le tick friandise / crédits locaux déjà affichés.
+      if (capped < local) {
+        return;
+      }
+      this.localCreditAhead = false;
+      this.setFromSmallestUnits(capped);
+      this.triggerBump();
+    });
+  }
+
   /** Crédite depuis un montant m4t3r décimal (ex. « 0.000…001 »). Ne diminue jamais le total. */
   creditM4t3rAmount(amount: string): void {
-    const units = parseAmountToSmallestUnits(amount);
+    const units = m4t3rUnitCount(amount);
     if (units === null || units <= 0n) {
       return;
     }
@@ -330,6 +369,7 @@ export class FaucetRuntimeService {
       if (next <= current) {
         return;
       }
+      this.localCreditAhead = true;
       this.setFromSmallestUnits(next > this.maxClaimUnits ? this.maxClaimUnits : next);
       this.triggerBump();
     });
@@ -351,11 +391,17 @@ export class FaucetRuntimeService {
         const message = this.t('faucet.error.loginRequired');
         this.errorMessage.set(message);
         this.showToast(message, 'error');
-        this.auth.openDrawer('login');
+        this.auth.openDrawer('register');
       } else if (!this.walletAddress()) {
         const message = this.t('faucet.error.walletRequired');
         this.errorMessage.set(message);
         this.showToast(message, 'error');
+        this.dockNav.requestTab('wallet');
+        queueMicrotask(() => {
+          document
+            .querySelector('.wallet-display__create-cta, .wallet-summary-bar__create')
+            ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        });
       }
       return;
     }
@@ -399,6 +445,7 @@ export class FaucetRuntimeService {
           this.successMessage.set(this.t('faucet.claimSuccess'));
           this.txHash.set(response.txHash);
           this.claimAmount.set(response.amount);
+          this.rememberClaimedCount(response.amount, response.m4t3rCount);
           this.nextEligibleAtIso.set(response.nextEligibleAt);
           this.eligible.set(false);
           this.cooldownTotalSeconds = Math.max(
@@ -411,36 +458,18 @@ export class FaucetRuntimeService {
           this.triggerBump();
           this.prependHistoryEntry(response.claimedAt, response.amount, response.txHash);
           void this.questProgress.recordFaucetClaim();
-          // Crédit UI immédiat + mine mempool pour que getBalance suive.
-          this.walletSession.requestBalanceRefresh(response.amount);
-          this.confirmFaucetClaimOnChain(response);
+          // Crédit en mempool (File) — solde chaîne inchangé tant qu’on ne mine pas.
           this.loadNetworkMeta();
           this.loadClaimsHistory();
           window.dispatchEvent(new CustomEvent('dartchain-refresh-dock'));
-          this.showToast(this.t('faucet.claimSuccess'), 'success');
+          this.showToast(
+            this.formattedClaimedAmountLine() || this.t('faucet.claimSuccess'),
+            'success'
+          );
         },
         error: (error: HttpErrorResponse) => {
           this.handleApiError(error, 'faucet.error.claimFailed');
         },
-      });
-  }
-
-  /** Mine le crédit faucet PENDING pour que le solde on-chain monte. */
-  private confirmFaucetClaimOnChain(_response: FaucetClaimResponse): void {
-    const miner = this.walletAddress()?.trim();
-    if (!miner) {
-      return;
-    }
-    this.blockchain
-      .minePendingTransactions({ minerAddress: miner })
-      .pipe(
-        catchError(() => of(null)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.walletSession.requestBalanceRefresh();
-        window.dispatchEvent(new CustomEvent('dartchain-refresh-dock'));
-        this.refreshWalletBalance();
       });
   }
 
@@ -507,7 +536,7 @@ export class FaucetRuntimeService {
           this.maxClaimUnits = maxClaimSmallestUnits(config.maxClaimAmount ?? '1');
         },
         error: (error: HttpErrorResponse) => {
-          if (this.handleFeatureDisabled(error)) {
+          if (this.handleFeatureDisabled(error, false)) {
             return;
           }
           this.markOffline(() => this.loadConfig());
@@ -548,6 +577,10 @@ export class FaucetRuntimeService {
       this.eligible.set(false);
       this.cooldownSeconds.set(0);
       this.cooldownUntilEpochMs = 0;
+      this.txHash.set('');
+      this.claimedUnitLabel.set('');
+      this.claimAmount.set('—');
+      this.resetDisplayToZero();
       return;
     }
 
@@ -579,14 +612,18 @@ export class FaucetRuntimeService {
           if (state.lastClaimAmount) {
             this.claimAmount.set(state.lastClaimAmount);
           }
+          if (!this.claimSuccessActive() && state.lastClaimM4t3r) {
+            this.claimedUnitLabel.set(state.lastClaimM4t3r);
+          }
+          this.syncDisplayToPending(state.pendingAmount, state.pendingM4t3r);
           this.refreshWalletBalance();
         },
         error: (error: HttpErrorResponse) => {
-          if (this.handleFeatureDisabled(error)) {
+          if (this.handleFeatureDisabled(error, false)) {
             return;
           }
           this.markOffline(() => this.loadState());
-          this.errorMessage.set(error?.error?.message || this.t('faucet.error.loadFailed'));
+          this.errorMessage.set(this.readApiMessage(error, this.t('faucet.error.loadFailed')));
         },
       });
   }
@@ -666,54 +703,99 @@ export class FaucetRuntimeService {
     }
     if (this.visualTimerId !== null) {
       window.clearInterval(this.visualTimerId);
-      this.visualTimerId = null;
     }
 
-    let visualAccMs = 0;
     this.tickTimerId = window.setInterval(() => {
       this.syncCooldownFromTimestamp();
-      visualAccMs += FaucetRuntimeService.COOLDOWN_TICK_MS;
-      if (visualAccMs >= FaucetRuntimeService.VISUAL_TICK_MS) {
-        visualAccMs = 0;
-        this.incrementDisplayValue();
-      }
     }, FaucetRuntimeService.COOLDOWN_TICK_MS);
+
+    this.visualTimerId = window.setInterval(() => {
+      this.incrementDisplayValue();
+    }, FaucetRuntimeService.VISUAL_TICK_MS);
+  }
+
+  /** +1 m4t3r / s — la friandise « chaque seconde sur le site ». */
+  private incrementDisplayValue(): void {
+    this.zone.run(() => {
+      const current = this.currentSmallestUnits();
+      if (current >= this.maxClaimUnits) {
+        this.setFromSmallestUnits(this.maxClaimUnits);
+        return;
+      }
+      const next = current + FaucetRuntimeService.VISUAL_INCREMENT;
+      this.localCreditAhead = true;
+      this.setFromSmallestUnits(next > this.maxClaimUnits ? this.maxClaimUnits : next);
+      this.triggerBump();
+    });
+  }
+
+  /** Après claim : le compteur repart de zéro et se remplit à nouveau. */
+  private restartVisualCounterAfterClaim(): void {
+    this.localCreditAhead = false;
+    this.wholePart.set(0n);
+    this.decimalPart.set(0n);
+    this.pendingUnits.set(0n);
+    this.atMaxClaim.set(false);
   }
 
   private resolveClaimAmount(): string {
-    const units = this.currentSmallestUnits();
+    const units = this.pendingUnits();
     const capped = units > this.maxClaimUnits ? this.maxClaimUnits : units;
     return smallestUnitsToAmount(capped);
   }
 
   private currentSmallestUnits(): bigint {
-    const scale = 10n ** BigInt(FaucetRuntimeService.DECIMALS);
-    return this.wholePart() * scale + this.decimalPart();
+    return this.pendingUnits();
   }
 
   private setFromSmallestUnits(units: bigint): void {
     const formatted = formatDisplayAmount(units);
     this.wholePart.set(formatted.whole);
     this.decimalPart.set(formatted.decimal);
+    this.pendingUnits.set(units);
     this.atMaxClaim.set(units >= this.maxClaimUnits);
   }
 
-  private incrementDisplayValue(): void {
-    const current = this.currentSmallestUnits();
-    if (current >= this.maxClaimUnits) {
-      this.setFromSmallestUnits(this.maxClaimUnits);
+  /**
+   * Aligne sur le pending serveur sans casser la friandise visuelle :
+   * on prend le max (serveur vs compteur local qui tick chaque seconde).
+   */
+  private syncDisplayToPending(amount: string | null | undefined, unitCount?: string | null): void {
+    const units = this.parseUnitCount(unitCount) ?? m4t3rUnitCount(amount ?? '0') ?? 0n;
+    const capped = units > this.maxClaimUnits ? this.maxClaimUnits : units;
+    const local = this.pendingUnits();
+    if (capped < local) {
+      // Garde le tick local / ramassage plus récent.
       return;
     }
-
-    const next = current + FaucetRuntimeService.VISUAL_INCREMENT;
-    this.setFromSmallestUnits(next > this.maxClaimUnits ? this.maxClaimUnits : next);
-    this.triggerBump();
+    this.localCreditAhead = false;
+    this.setFromSmallestUnits(capped);
   }
 
-  private restartVisualCounterAfterClaim(): void {
-    this.wholePart.set(0n);
-    this.decimalPart.set(0n);
-    this.atMaxClaim.set(false);
+  /** Après claim : le reste claimable est mémorisé, l’affichage montre le débit exact. */
+  private applyClaimedAmount(amount: string, unitCount?: string | null): void {
+    const claimed = this.parseUnitCount(unitCount) ?? m4t3rUnitCount(amount) ?? 0n;
+    const remaining = this.pendingUnits() - claimed;
+    this.localCreditAhead = false;
+    this.setFromSmallestUnits(remaining > 0n ? remaining : 0n);
+  }
+
+  private rememberClaimedCount(amount: string, unitCount?: string | null): void {
+    const explicit = this.parseUnitCount(unitCount);
+    const count = explicit ?? m4t3rUnitCount(amount);
+    this.claimedUnitLabel.set(count == null ? '' : count.toString());
+  }
+
+  private parseUnitCount(value?: string | null): bigint | null {
+    const trimmed = value?.trim() ?? '';
+    if (!/^\d+$/.test(trimmed)) {
+      return null;
+    }
+    try {
+      return BigInt(trimmed);
+    } catch {
+      return null;
+    }
   }
 
   private triggerBump(): void {
@@ -784,7 +866,8 @@ export class FaucetRuntimeService {
           );
         },
         error: (error: HttpErrorResponse) => {
-          if (this.handleFeatureDisabled(error)) {
+          if (this.handleFeatureDisabled(error, false)) {
+            this.history.set([]);
             return;
           }
           if (error.status >= 400 && error.status < 500) {
@@ -798,6 +881,7 @@ export class FaucetRuntimeService {
 
   private toHistoryRow(claim: {
     amount: string | number;
+    m4t3rCount?: string | null;
     claimedAt: number;
     txHash?: string | null;
   }): FaucetHistoryRow {
@@ -812,18 +896,15 @@ export class FaucetRuntimeService {
       .toString()
       .padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
 
-    const amountValue =
-      typeof claim.amount === 'number' ? claim.amount : Number.parseFloat(`${claim.amount}`);
-    const amountLabel = Number.isFinite(amountValue)
-      ? `+ ${amountValue.toFixed(FaucetRuntimeService.DECIMALS)} m4t3r`
-      : `+ ${claim.amount} m4t3r`;
+    const amountLabel = this.formatClaimedM4t3r(claim.amount, claim.m4t3rCount);
 
     return {
       action: 'CLAIM',
       date: dateLabel,
       time: timeLabel,
       amount: amountLabel,
-      status: claim.txHash ? 'SUCCESS' : 'PENDING',
+      // Hash présent = tx en File ; confirmation chaîne seulement après mine.
+      status: 'PENDING',
       txHash: claim.txHash ?? undefined,
     };
   }
@@ -839,10 +920,7 @@ export class FaucetRuntimeService {
       .toString()
       .padStart(2, '0')}:${safeDate.getSeconds().toString().padStart(2, '0')}`;
 
-    const normalizedAmount = Number.parseFloat(amount);
-    const amountLabel = Number.isFinite(normalizedAmount)
-      ? `+ ${normalizedAmount.toFixed(FaucetRuntimeService.DECIMALS)} m4t3r`
-      : `+ ${amount} m4t3r`;
+    const amountLabel = this.formatClaimedM4t3r(amount);
 
     this.history.update((rows) => [
       {
@@ -850,17 +928,35 @@ export class FaucetRuntimeService {
         date: dateLabel,
         time: timeLabel,
         amount: amountLabel,
-        status: 'SUCCESS',
+        status: 'PENDING',
         txHash,
       },
       ...rows,
     ]);
   }
 
+  private formatClaimedM4t3r(amount: string | number, unitCount?: string | null): string {
+    const explicit = this.parseUnitCount(unitCount);
+    const count = explicit ?? m4t3rUnitCount(amount);
+    return count == null ? `+ ${amount} m4t3r` : `+ ${count.toString()} m4t3r`;
+  }
+
   private resetDisplayToZero(): void {
     this.wholePart.set(0n);
     this.decimalPart.set(0n);
+    this.pendingUnits.set(0n);
     this.atMaxClaim.set(false);
+  }
+
+  private readApiMessage(error: HttpErrorResponse, fallback: string): string {
+    const body = error.error as { message?: unknown; detail?: unknown } | null;
+    if (typeof body?.message === 'string' && body.message.trim()) {
+      return body.message;
+    }
+    if (typeof body?.detail === 'string' && body.detail.trim()) {
+      return body.detail;
+    }
+    return fallback;
   }
 
   private showToast(message: string, kind: 'success' | 'info' | 'error'): void {
@@ -883,23 +979,22 @@ export class FaucetRuntimeService {
       return;
     }
 
-    this.errorMessage.set(error?.error?.message || this.t(fallbackKey));
+    this.errorMessage.set(this.readApiMessage(error, this.t(fallbackKey)));
     if (error.status === 0) {
       this.markOffline();
     }
   }
 
-  private handleFeatureDisabled(error: HttpErrorResponse): boolean {
+  private handleFeatureDisabled(error: HttpErrorResponse, notify = true): boolean {
     // Ne jamais désactiver le faucet côté UI : un 403 vient plutôt d’un auth/ACL
     // ponctuel, pas d’un flag produit. On remonte une erreur actionnable.
     if (error.status === 403) {
       this.faucetDisabled.set(false);
-      const message =
-        typeof error.error?.message === 'string' && error.error.message.trim()
-          ? error.error.message
-          : this.t('faucet.error.loginRequired');
-      this.errorMessage.set(message);
-      this.showToast(message, 'error');
+      if (notify) {
+        const message = this.readApiMessage(error, this.t('faucet.error.loginRequired'));
+        this.errorMessage.set(message);
+        this.showToast(message, 'error');
+      }
       return true;
     }
     return false;

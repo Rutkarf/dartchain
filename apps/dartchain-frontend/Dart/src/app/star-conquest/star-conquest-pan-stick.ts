@@ -25,7 +25,7 @@ import {
       <div
         class="sc-pan-stick"
         role="application"
-        aria-label="Déplacer l’univers Star Conquest"
+        aria-label="Déplacer l’univers Conquête stellaire"
         (pointerdown)="onDown($event)"
         (pointermove)="onMove($event)"
         (pointerup)="onUp($event)"
@@ -62,15 +62,15 @@ import {
       .sc-pan-stick__base,
       .sc-pan-stick__knob {
         position: absolute;
-        border-radius: 50%;
+        border-radius: var(--radius-circle);
       }
       .sc-pan-stick__base {
         inset: 0;
-        border: 1px solid rgba(160, 210, 230, 0.35);
+        border: 1px solid rgba(237, 231, 217, 0.35);
         background: radial-gradient(
           circle at 35% 30%,
-          rgba(255, 255, 255, 0.18),
-          rgba(8, 10, 16, 0.72) 70%
+          rgba(237, 231, 217, 0.18),
+          rgba(10, 18, 32, 0.72) 70%
         );
       }
       .sc-pan-stick__knob {
@@ -79,8 +79,8 @@ import {
         width: 16px;
         height: 16px;
         margin: -8px 0 0 -8px;
-        background: rgba(210, 236, 255, 0.92);
-        box-shadow: 0 0 8px rgba(80, 200, 255, 0.45);
+        background: rgba(237, 231, 217, 0.92);
+        box-shadow: 0 0 8px rgba(139, 157, 173, 0.45);
       }
     `,
   ],

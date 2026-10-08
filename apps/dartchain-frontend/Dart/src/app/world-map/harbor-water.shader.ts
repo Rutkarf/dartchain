@@ -130,7 +130,7 @@ export function createHarborWaterShaderMaterial(
       uShallowColor: { value: cfg.shallowColor.clone() },
       uDeepColor: { value: cfg.deepColor.clone() },
       uFoamColor: { value: cfg.foamColor.clone() },
-      uHorizonTint: { value: new THREE.Color(0xa8e8ff) },
+      uHorizonTint: { value: new THREE.Color(0xede7d9) },
       uFoamThreshold: { value: cfg.foamShoreThreshold },
       uFoamStrength: { value: cfg.foamStrength },
       uFresnelStrength: { value: cfg.fresnelStrength },

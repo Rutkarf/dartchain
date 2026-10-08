@@ -5,6 +5,7 @@ import io.dartchain.backend.exchange.dto.ExchangePanelResponse;
 import io.dartchain.backend.exchange.dto.ExchangeSwapRequest;
 import io.dartchain.backend.exchange.dto.ExchangeSwapResponse;
 import io.dartchain.backend.exchange.application.ExchangeService;
+import io.dartchain.backend.wallet.dto.WalletPortfolioResponse;
 import io.dartchain.backend.web.RequestClientInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,14 @@ public class ExchangeController {
             @RequestParam(required = false) String toToken
     ) {
         return exchangeService.getPanel(walletAddress, fromToken, toToken);
+    }
+
+    /** Soldes R4V3 + tokens swap persistés (snapshot wallet_balances). */
+    @GetMapping("/portfolio")
+    public WalletPortfolioResponse getPortfolio(
+            @RequestParam String walletAddress
+    ) {
+        return exchangeService.getPortfolio(walletAddress);
     }
 
     @PostMapping("/swap")

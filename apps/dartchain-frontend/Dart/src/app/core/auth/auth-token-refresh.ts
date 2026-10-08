@@ -54,6 +54,9 @@ async function performRefresh(httpBackend: HttpBackend): Promise<string | null> 
     );
 
     const accessToken = response.accessToken ?? response.token;
+    if (!accessToken) {
+      return null;
+    }
     updateStoredAccessToken(accessToken, response.expiresIn);
 
     if (response.refreshToken) {

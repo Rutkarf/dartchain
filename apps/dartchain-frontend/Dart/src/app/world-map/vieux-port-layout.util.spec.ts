@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { MARSEILLE_HARBOR_WATER } from './map-configuration';
+import { METAVERSE_HARBOR_WATER } from './map-configuration';
 import {
   isHarborLandAt,
   isHarborWalkableRegionAt,
@@ -31,7 +31,7 @@ describe('Vieux-Port layout', () => {
   });
 
   it('aligne le bras sud avec waterMinZ', () => {
-    expect(isHarborWaterAt(0, MARSEILLE_HARBOR_WATER.waterMinZ + 5)).toBe(true);
-    expect(isHarborWaterAt(0, MARSEILLE_HARBOR_WATER.waterMinZ - 2)).toBe(false);
+    expect(isHarborWaterAt(0, METAVERSE_HARBOR_WATER.waterMinZ + 5)).toBe(true);
+    expect(isHarborWaterAt(0, METAVERSE_HARBOR_WATER.waterMinZ - 2)).toBe(false);
   });
 });

@@ -7,6 +7,15 @@ import {
 export const SC_LAYOUT_W = STAR_CONQUEST_DESIGN_VIEWPORT.w;
 export const SC_LAYOUT_H = STAR_CONQUEST_DESIGN_VIEWPORT.h;
 
+export function starConquestLayoutYToDomPx(layoutY: number): number {
+  const { scaleY } = starConquestDomToLayoutScale();
+  return layoutY / Math.max(scaleY, 1e-6);
+}
+
+export function starConquestLayoutHeightToDomPx(layoutH: number): number {
+  return starConquestLayoutYToDomPx(layoutH);
+}
+
 export function starConquestRenderSize(): { width: number; height: number } {
   return { width: SC_LAYOUT_W, height: SC_LAYOUT_H };
 }

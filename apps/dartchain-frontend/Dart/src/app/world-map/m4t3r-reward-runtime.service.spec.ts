@@ -12,14 +12,15 @@ describe('M4t3rRewardRuntimeService', () => {
   let service: M4t3rRewardRuntimeService;
   let faucetCreditCount: ReturnType<typeof vi.fn>;
   let faucetCreditAmount: ReturnType<typeof vi.fn>;
+  let faucetSetClaimable: ReturnType<typeof vi.fn>;
 
   const sampleReward: M4T3RReward = {
     rewardId: 'reward-1',
     collectionId: 'user:token:0',
-    tokenId: 'm4t3r:marseille:chunk:0:0:10:20:cycle-1',
+    tokenId: 'm4t3r:metaverse:chunk:0:0:10:20:cycle-1',
     amount: '0.00000000000000000000000001',
     playerSpeed: '1.420',
-    maxAllowedSpeed: '5.000',
+    maxAllowedSpeed: '32.000',
     status: 'CREDITED_OFFCHAIN',
     proofHash: '0xabcdef1234567890',
     serverSignature: '0xsig',
@@ -32,9 +33,9 @@ describe('M4t3rRewardRuntimeService', () => {
     collectedCells: ['m4t3r-cluster:1:1'],
     amount: 1,
     respawnAt: Date.now() + 30_000,
-    balanceAfter: '42',
+    balanceAfter: '0.00000000000000000000000001',
     playerSpeed: '1.420',
-    maxAllowedSpeed: '5.000',
+    maxAllowedSpeed: '32.000',
     settlementMode: 'OFFCHAIN',
     rewards: [],
   };
@@ -42,6 +43,7 @@ describe('M4t3rRewardRuntimeService', () => {
   beforeEach(() => {
     faucetCreditCount = vi.fn();
     faucetCreditAmount = vi.fn();
+    faucetSetClaimable = vi.fn();
     TestBed.configureTestingModule({
       providers: [
         M4t3rRewardRuntimeService,
@@ -65,6 +67,7 @@ describe('M4t3rRewardRuntimeService', () => {
           useValue: {
             creditM4t3rCollectCount: faucetCreditCount,
             creditM4t3rAmount: faucetCreditAmount,
+            setClaimableFromAmount: faucetSetClaimable,
           },
         },
       ],
@@ -72,15 +75,28 @@ describe('M4t3rRewardRuntimeService', () => {
     service = TestBed.inject(M4t3rRewardRuntimeService);
   });
 
-  it('increments faucet on server-validated trail even without signed rewards', () => {
+  it('crédite additivement le faucet même avec balanceAfter serveur (pas de sync absolu)', () => {
     service.onTrailAccepted(trailAccepted);
     expect(faucetCreditCount).toHaveBeenCalledWith(1);
+    expect(faucetSetClaimable).not.toHaveBeenCalled();
     expect(service.lastReward()).toBeNull();
   });
 
-  it('updates reward metadata when signed rewards are present', () => {
+  it('crédite localement si balanceAfter est 0 (invité / pas de compte)', () => {
+    service.onTrailAccepted({
+      ...trailAccepted,
+      balanceAfter: '0',
+      amount: 3,
+      rewards: [],
+    });
+    expect(faucetSetClaimable).not.toHaveBeenCalled();
+    expect(faucetCreditCount).toHaveBeenCalledWith(3);
+  });
+
+  it('crédite par montant reward signé (additif) et met à jour les métadonnées', () => {
     service.onTrailAccepted({ ...trailAccepted, rewards: [sampleReward] });
-    expect(faucetCreditAmount).toHaveBeenCalledWith('0.00000000000000000000000001');
+    expect(faucetCreditAmount).toHaveBeenCalledWith(sampleReward.amount);
+    expect(faucetSetClaimable).not.toHaveBeenCalled();
     expect(faucetCreditCount).not.toHaveBeenCalled();
     expect(service.lastReward()?.rewardId).toBe('reward-1');
     expect(service.lastEvent()).toBe('M4T3R_REWARD_CREDITED');
@@ -88,6 +104,6 @@ describe('M4t3rRewardRuntimeService', () => {
 
   it('masks proof and token zone for display', () => {
     expect(service.maskProof('0xabcdef1234567890')).toContain('…');
-    expect(service.maskTokenZone(sampleReward.tokenId)).toBe('m4t3r:marseille:chunk:0:0');
+    expect(service.maskTokenZone(sampleReward.tokenId)).toBe('m4t3r:metaverse:chunk:0:0');
   });
 });

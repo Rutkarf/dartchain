@@ -18,7 +18,7 @@ class MockR4v3ThreeComponent {
   randomizeFromParentClick(): void {}
 }
 
-describe('Faucet', () => {
+describe('Robinet', () => {
   let component: FaucetComponent;
   let fixture: ComponentFixture<FaucetComponent>;
 

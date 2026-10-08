@@ -1,6 +1,5 @@
 <section
-  class="faucet-panel ds-surface ds-surface--showcase-body"
-  aria-label="Faucet panel"
+ class="faucet-panel ds-surface ds-surface--showcase-body"
 >
   @if (runtime.toastMessage()) {
     <div
@@ -42,13 +41,11 @@
             [style.transform]="'scale(' + valueFitScale() + ')'"
           >
             <span
-              #valueText
-              class="faucet-panel__value"
-              [class.is-bumping]="runtime.bump()"
-              [class.is-capped]="runtime.atMaxClaim()"
-              [attr.aria-label]="runtime.displayLine()"
-            >
-              <span class="faucet-panel__value-token">{{ runtime.nativeTokenLabel() }}</span>
+ #valueText
+ class="faucet-panel__value"
+ [class.is-bumping]="runtime.bump()"
+ [class.is-capped]="runtime.atMaxClaim()"
+ >
               <span class="faucet-panel__value-whole">{{ runtime.wholePartDisplay() }}</span>
               <span class="faucet-panel__value-sep">,</span>
               <span class="faucet-panel__value-decimal">{{ runtime.decimalDigits() }}</span>
@@ -82,9 +79,9 @@
             {{ runtime.claimButtonLabel() }}
           }
         </button>
-        @if (runtime.claimSuccessActive() && runtime.formattedWalletBalanceLine()) {
+        @if (runtime.claimSuccessActive() && runtime.formattedClaimedAmountLine()) {
           <span class="faucet-panel__claim-success-info" role="status" aria-live="polite">
-            {{ runtime.formattedWalletBalanceLine() }}
+            {{ runtime.formattedClaimedAmountLine() }}
           </span>
         }
       </div>
@@ -103,26 +100,24 @@
     @if (runtime.txHash()) {
       <div class="faucet-panel__tx-line" role="status" aria-live="polite">
         <button
-          type="button"
-          class="faucet-panel__tx"
-          (click)="copyTxHash()"
-          [attr.aria-label]="locale.t('faucet.txCopy')"
-          [title]="runtime.txHash()"
-        >
+ type="button"
+ class="faucet-panel__tx"
+ (click)="copyTxHash()"
+ [title]="runtime.txHash()"
+ >
           Tx: {{ runtime.txHash() }}
         </button>
         <button
-          type="button"
-          class="faucet-panel__tx faucet-panel__tx--explorer"
-          (click)="openTxInExplorer()"
-          [attr.aria-label]="locale.t('faucet.txExplorer')"
-        >
+ type="button"
+ class="faucet-panel__tx faucet-panel__tx--explorer"
+ (click)="openTxInExplorer()"
+ >
           {{ locale.t('faucet.txExplorer') }}
         </button>
       </div>
     }
 
-    <p class="faucet-panel__meta-inline" [attr.aria-label]="locale.t('faucet.network')">
+    <p class="faucet-panel__meta-inline">
       <span
         class="faucet-panel__dot"
         [class.is-ready]="runtime.ledTone() === 'ready'"
@@ -157,7 +152,7 @@
   </header>
 
   <div class="faucet-panel__body">
-    <section class="faucet-panel__history" [attr.aria-label]="locale.t('faucet.history')">
+    <section class="faucet-panel__history">
       <div class="faucet-panel__rows">
         @if (runtime.history().length === 0) {
           <div class="faucet-panel__empty">{{ locale.t('faucet.historyEmpty') }}</div>
@@ -169,36 +164,12 @@
             <span>Montant</span>
             <span>Statut</span>
             <button
-              type="button"
-              class="faucet-panel__history-export"
-              (click)="exportHistoryJson()"
-              [attr.aria-label]="locale.t('faucet.exportHistory')"
-              [title]="locale.t('faucet.exportHistory')"
-            >
-              <svg viewBox="0 0 16 16" focusable="false" aria-hidden="true">
-                <path
-                  d="M3.2 1.6h6.1L12.8 5v9.4H3.2z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.2"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M9.2 1.6V5h3.6"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.2"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M8 7.2v4.2M6.2 9.8 8 11.6l1.8-1.8"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+ type="button"
+ class="faucet-panel__history-export"
+ (click)="exportHistoryJson()"
+ [title]="locale.t('faucet.exportHistory')"
+ >
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-file-down"/></svg>
               <span>.Json</span>
             </button>
           </div>

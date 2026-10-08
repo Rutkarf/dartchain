@@ -4,6 +4,7 @@ export interface UserProfile {
   email: string;
   createdAt: number;
   role?: string;
+  totpEnabled?: boolean;
   walletAddress?: string | null;
   walletPublicKey?: string | null;
 }
@@ -14,12 +15,31 @@ export interface LinkWalletRequest {
 }
 
 export interface AuthResponse {
-  token: string;
-  accessToken?: string;
-  refreshToken?: string;
+  token: string | null;
+  accessToken?: string | null;
+  refreshToken?: string | null;
   expiresIn?: number;
-  tokenType?: string;
+  tokenType?: string | null;
   user: UserProfile;
+  status?: 'AUTHENTICATED' | 'EMAIL_VERIFICATION' | 'TWO_FACTOR';
+  verificationId?: string | null;
+  challengeToken?: string | null;
+}
+
+export type AuthChallengeStatus = 'EMAIL_VERIFICATION' | 'TWO_FACTOR' | 'TOTP_SETUP' | 'TOTP_DISABLE';
+
+export interface AuthChallenge {
+  status: AuthChallengeStatus;
+  verificationId?: string | null;
+  challengeToken?: string | null;
+  email?: string | null;
+  secret?: string | null;
+  otpauthUrl?: string | null;
+}
+
+export interface TotpSetupResponse {
+  secret: string;
+  otpauthUrl: string;
 }
 
 export interface RegisterRequest {
@@ -39,6 +59,8 @@ export interface OAuthProviderInfo {
   id: string;
   label: string;
   enabled: boolean;
+  /** true = login local sans fournisseur réel (dev mock). */
+  mock?: boolean;
 }
 
 export interface OAuthProvidersResponse {

@@ -1,13 +1,12 @@
 @if (open() && peer()) {
   <div class="drawer-backdrop" (click)="closeDrawer()" aria-hidden="true">
     <aside
-      class="drawer"
-      role="dialog"
-      aria-modal="true"
-      [attr.aria-label]="locale.t('peers.detailTitle')"
-      [appFocusTrap]="true"
-      (click)="$event.stopPropagation()"
-    >
+ class="drawer"
+ role="dialog"
+ aria-modal="true"
+ [appFocusTrap]="true"
+ (click)="$event.stopPropagation()"
+ >
       <div class="drawer-head">
         <div class="drawer-head-copy">
           <p class="drawer-eyebrow">{{ locale.t('peers.detailTitle') }}</p>
@@ -20,9 +19,7 @@
           class="drawer-close"
           [attr.aria-label]="locale.t('peers.detailClose')"
           (click)="closeDrawer()"
-        >
-          ✕
-        </button>
+        ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
       </div>
 
       <div class="drawer-body">

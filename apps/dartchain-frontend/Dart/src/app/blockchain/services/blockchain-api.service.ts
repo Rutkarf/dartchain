@@ -196,6 +196,22 @@ export interface ExchangeSwapResponse {
   message: string;
 }
 
+export interface WalletHoldingDto {
+  token: string;
+  balance: string;
+  chainBalance: string;
+  ledgerAdjustment: string;
+  nativeToken: boolean;
+}
+
+export interface WalletPortfolioResponse {
+  walletAddress: string;
+  nativeToken: string;
+  holdings: WalletHoldingDto[];
+  otherTokenCount: number;
+  syncedAtEpochMs: number;
+}
+
 export interface CreateTransactionRequest {
   senderAddress: string;
   senderPublicKey: string;
@@ -278,7 +294,7 @@ export class BlockchainApiService {
     return this.http.get<HealthResponse>(`${this.apiUrl}/health`).pipe(
       catchError(() =>
         of({
-          ok: true,
+          ok: false,
           service: 'blockchain-api',
         })
       )
@@ -347,9 +363,16 @@ export class BlockchainApiService {
   }
 
   public getBlockByHash(hash: string): Observable<Block> {
-    return this.http
-      .get<Block>(`${this.apiUrl}/blocks/${encodeURIComponent(hash)}`)
-      .pipe(catchError((error) => this.handleError(error)));
+    return this.getBlocks().pipe(
+      map((blocks) => {
+        const found = blocks.find((block) => block.hash === hash);
+        if (!found) {
+          throw new Error(`Bloc introuvable : ${hash}`);
+        }
+        return found;
+      }),
+      catchError((error) => this.handleError(error))
+    );
   }
 
   public getLatestBlock(): Observable<Block> {
@@ -370,18 +393,13 @@ export class BlockchainApiService {
       .pipe(catchError(() => of(false)));
   }
 
-  public mineBlock(data: string): Observable<MineBlockResponse> {
-    const payload: MineBlockRequest = { data };
-
-    return this.http.post<Block>(`${this.apiUrl}/blocks`, payload).pipe(
-      map((block) => ({ block })),
-      catchError(() =>
-        this.http.post<Block>(`${this.apiUrl}/blockchain/blocks`, payload).pipe(
-          map((block) => ({ block }))
-        )
-      ),
-      catchError((error) => this.handleError(error))
-    );
+  public mineBlock(minerAddress: string): Observable<MineBlockResponse> {
+    return this.http
+      .post<Block>(`${this.apiUrl}/blockchain/mine`, { minerAddress })
+      .pipe(
+        map((block) => ({ block })),
+        catchError((error) => this.handleError(error))
+      );
   }
 
   // =========================================================
@@ -675,6 +693,15 @@ export class BlockchainApiService {
       );
   }
 
+  public getWalletPortfolio(walletAddress: string): Observable<WalletPortfolioResponse> {
+    const params = new HttpParams().set('walletAddress', walletAddress);
+    return this.http
+      .get<WalletPortfolioResponse>(`${this.apiUrl}/exchange-panel/portfolio`, { params })
+      .pipe(
+        catchError((error) => this.handleError(error))
+      );
+  }
+
   // =========================================================
   // COMPAT HELPERS
   // =========================================================
@@ -692,9 +719,7 @@ export class BlockchainApiService {
   }
 
   public getLegacyStats(): Observable<BlockchainStats> {
-    return this.http.get<BlockchainStats>(`${this.apiUrl}/stats`).pipe(
-      catchError((error) => this.handleError(error))
-    );
+    return this.getModernStats();
   }
 
   public getModernStats(): Observable<BlockchainStats> {
@@ -712,7 +737,25 @@ export class BlockchainApiService {
   }
 
   public getModernPendingTransactions(): Observable<Transaction[]> {
-    return this.http.get<Transaction[]>(`${this.apiUrl}/transactions/pending`).pipe(
+    return this.http.get<PendingTransaction[]>(`${this.apiUrl}/pending-transactions`).pipe(
+      map((rows) =>
+        rows.map((row) => ({
+          id: row.id,
+          hash: row.hash,
+          sender: row.sender ?? row.fromAddress ?? '',
+          recipient: row.recipient ?? row.toAddress ?? '',
+          amount: row.amount ?? 0,
+          timestamp: row.timestamp ?? row.createdAt ?? 0,
+          signature: row.signature ?? '',
+          systemReward: row.systemReward,
+          payload: row.payload ?? row.data,
+          fromAddress: row.fromAddress ?? row.sender,
+          toAddress: row.toAddress ?? row.recipient,
+          status: row.status,
+          data: row.data ?? row.payload,
+          createdAt: row.createdAt ?? row.timestamp,
+        }))
+      ),
       catchError((error) => this.handleError(error))
     );
   }
@@ -851,10 +894,11 @@ export class BlockchainApiService {
 
   private handleError(error: unknown): Observable<never> {
     if (error instanceof HttpErrorResponse) {
+      const body = error.error as { message?: unknown; detail?: unknown } | null;
       const message =
-        typeof error.error?.message === 'string'
-          ? error.error.message
-          : `HTTP ${error.status} - ${error.statusText || 'Unknown error'}`;
+        (typeof body?.message === 'string' && body.message.trim()) ||
+        (typeof body?.detail === 'string' && body.detail.trim()) ||
+        `HTTP ${error.status} - ${error.statusText || 'Unknown error'}`;
 
       return throwError(() => new Error(message));
     }

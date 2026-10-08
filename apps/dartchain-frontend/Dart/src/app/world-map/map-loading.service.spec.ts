@@ -5,7 +5,7 @@ import { vi } from 'vitest';
 import { MapConfigService } from './map-config.service';
 import { MapLoadingService } from './map-loading.service';
 import { LegacyFloorMapProvider } from './legacy-floor-map.provider';
-import { MarseilleMapProvider } from './marseille-map.provider';
+import { MetaverseMapProvider } from './metaverse-map.provider';
 import { PlacementAnchorLayer } from './placements/placement-anchor.layer';
 import type { MapProvider } from './map-provider.interface';
 
@@ -26,7 +26,7 @@ function createMockProvider(id: MapProvider['id']): MapProvider {
 describe('MapLoadingService', () => {
   let service: MapLoadingService;
   let legacy: MapProvider;
-  let marseille: MapProvider;
+  let metaverse: MapProvider;
   let config: MapConfigService;
   let placementLayer: {
     attach: ReturnType<typeof vi.fn>;
@@ -39,7 +39,7 @@ describe('MapLoadingService', () => {
 
   beforeEach(() => {
     legacy = createMockProvider('legacy-floor');
-    marseille = createMockProvider('marseille-osm-three');
+    metaverse = createMockProvider('metaverse-osm-three');
     placementLayer = {
       attach: vi.fn().mockResolvedValue(undefined),
       update: vi.fn(),
@@ -54,8 +54,8 @@ describe('MapLoadingService', () => {
           useValue: legacy,
         },
         {
-          provide: MarseilleMapProvider,
-          useValue: marseille,
+          provide: MetaverseMapProvider,
+          useValue: metaverse,
         },
         {
           provide: PlacementAnchorLayer,
@@ -74,7 +74,7 @@ describe('MapLoadingService', () => {
     await service.initialize(scene, camera);
 
     expect(legacy.initialize).toHaveBeenCalledWith(scene, camera);
-    expect(marseille.initialize).not.toHaveBeenCalled();
+    expect(metaverse.initialize).not.toHaveBeenCalled();
     expect(service.getState()).toEqual({
       activeProviderId: 'legacy-floor',
       fallbackActive: false,
@@ -83,13 +83,13 @@ describe('MapLoadingService', () => {
     expect(placementLayer.attach).not.toHaveBeenCalled();
   });
 
-  it('tente marseille puis bascule sur legacy en cas d échec', async () => {
-    vi.spyOn(config, 'effectiveProvider').mockReturnValue('marseille-osm-three');
-    vi.mocked(marseille.initialize).mockRejectedValueOnce(new Error('OSM indisponible'));
+  it('tente metaverse puis bascule sur legacy en cas d échec', async () => {
+    vi.spyOn(config, 'effectiveProvider').mockReturnValue('metaverse-osm-three');
+    vi.mocked(metaverse.initialize).mockRejectedValueOnce(new Error('OSM indisponible'));
 
     await service.initialize(scene, camera);
 
-    expect(marseille.initialize).toHaveBeenCalledWith(scene, camera);
+    expect(metaverse.initialize).toHaveBeenCalledWith(scene, camera);
     expect(legacy.initialize).toHaveBeenCalledWith(scene, camera);
     expect(service.getState()).toEqual({
       activeProviderId: 'legacy-floor',
@@ -99,15 +99,15 @@ describe('MapLoadingService', () => {
     expect(placementLayer.attach).not.toHaveBeenCalled();
   });
 
-  it('active marseille sans fallback si init réussit', async () => {
-    vi.spyOn(config, 'effectiveProvider').mockReturnValue('marseille-osm-three');
+  it('active metaverse sans fallback si init réussit', async () => {
+    vi.spyOn(config, 'effectiveProvider').mockReturnValue('metaverse-osm-three');
 
     await service.initialize(scene, camera);
 
-    expect(marseille.initialize).toHaveBeenCalledWith(scene, camera);
+    expect(metaverse.initialize).toHaveBeenCalledWith(scene, camera);
     expect(legacy.initialize).not.toHaveBeenCalled();
     expect(service.getState().fallbackActive).toBe(false);
-    expect(service.getState().activeProviderId).toBe('marseille-osm-three');
+    expect(service.getState().activeProviderId).toBe('metaverse-osm-three');
     expect(placementLayer.attach).toHaveBeenCalledWith(scene);
   });
 

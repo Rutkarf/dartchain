@@ -63,6 +63,9 @@ export function persistAuthSession(response: AuthResponse): void {
   }
 
   const accessToken = response.accessToken ?? response.token;
+  if (!accessToken) {
+    return;
+  }
   localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
   localStorage.setItem(AUTH_USER_KEY, JSON.stringify(response.user));
 

@@ -16,7 +16,7 @@ Préfixe des chemins : `apps/dartchain-frontend/Dart/src/app/`
 |---|---|---|---|---|
 | app-three-floor | Component | `metaverse/three-floor.ts` | YES | Host WebGL, renderer, rAF |
 | app-character | Component | `metaverse/character/character.component.ts` | YES | Bootstrap avatar CharacterAnon |
-| app-city-scene | Component | `metaverse/city-scene/city-scene.component.ts` | YES | Charge Marseille / legacy |
+| app-city-scene | Component | `metaverse/city-scene/city-scene.component.ts` | YES | Charge Metaverse / legacy |
 | app-joystick-move | Component | `metaverse/input/joystick-move/joystick-move.component.ts` | YES | Stick MOVE bas-gauche |
 | app-joystick-view | Component | `metaverse/input/joystick-view/joystick-view.component.ts` | YES | Stick VIEW bas-droite |
 | app-virtual-joystick | Component | `metaverse/input/joystick-shared/virtual-joystick.component.ts` | YES | Stick partagé MOVE/VIEW |
@@ -30,13 +30,13 @@ Préfixe des chemins : `apps/dartchain-frontend/Dart/src/app/`
 | RunnerStateService | Service | `core/services/runner/runner-state.service.ts` | YES | Progress runner |
 | MapLoadingService | Service | `core/map/map-loading.service.ts` | YES | Provider + fallback legacy |
 | MapConfigService | Service | `core/map/map-config.service.ts` | YES | Config carte depuis environment |
-| MarseilleMapProvider | Service | `core/map/marseille-map.provider.ts` | YES | Ville OSM Vieux-Port |
+| MetaverseMapProvider | Service | `core/map/metaverse-map.provider.ts` | YES | Ville OSM Vieux-Port |
 | LegacyFloorMapProvider | Service | `core/map/legacy-floor-map.provider.ts` | YES | Floor fallback |
 | OSMBuildingProvider | Service | `core/map/osm-building.provider.ts` | YES | Extrusions bâtiments OSM |
 | GeoCoordinateService | Service | `core/map/geo-coordinate.service.ts` | YES | WGS84 → monde Three |
-| LocalOriginService | Service | `core/map/local-origin.service.ts` | YES | Origine locale Marseille |
+| LocalOriginService | Service | `core/map/local-origin.service.ts` | YES | Origine locale Metaverse |
 | WorldStreamingManager | Service | `core/map/world-streaming.manager.ts` | YES | Streaming chunks |
-| MarseilleGeoDebugService | Service | `core/map/marseille-geo-debug.service.ts` | YES | Overlay F11 geo |
+| MetaverseGeoDebugService | Service | `core/map/metaverse-geo-debug.service.ts` | YES | Overlay F11 geo |
 | PlacementFacade | Service | `core/map/placements/placement.facade.ts` | YES | Sélection / inquiry placements |
 | PlacementAnchorLayer | Service | `core/map/placements/placement-anchor.layer.ts` | YES | Hit-volumes RDC Three.js |
 | PlacementApiRepository | Service | `core/map/placements/placement-api.repository.ts` | YES | HTTP placements |
@@ -78,31 +78,31 @@ Critère « other features » : import hors `metaverse/**`, `core/map/**`, `meta
 | RunnerStateService | YES | NO | NO | Seulement character-control |
 | MapLoadingService | YES | NO | NO | city-scene + character-control |
 | MapConfigService | YES | NO | NO | Exclusive ; le *fichier* `map-configuration.ts` est SHARED |
-| MarseilleMapProvider | YES | NO | NO | Via MapLoadingService |
+| MetaverseMapProvider | YES | NO | NO | Via MapLoadingService |
 | LegacyFloorMapProvider | YES | NO | NO | Fallback |
-| OSMBuildingProvider | YES | NO | NO | Marseille + GeoMapping |
+| OSMBuildingProvider | YES | NO | NO | Metaverse + GeoMapping |
 | GeoCoordinateService | YES | NO | NO | Pipeline WGS84 |
 | LocalOriginService | YES | NO | NO | Facade mince sur MapConfig |
-| WorldStreamingManager | YES | NO | NO | MarseilleMapProvider |
-| MarseilleGeoDebugService | YES | NO | NO | F11, attaché par Marseille provider |
+| WorldStreamingManager | YES | NO | NO | MetaverseMapProvider |
+| MetaverseGeoDebugService | YES | NO | NO | F11, attaché par Metaverse provider |
 | PlacementFacade | YES | NO | NO | Panel + anchor layer |
 | PlacementAnchorLayer | YES | NO | NO | MapLoadingService |
 | PlacementApiRepository | YES | NO | NO | Via PlacementFacade |
-| WigleVisualizationService | YES | NO | NO | MapLoading + Marseille |
-| WigleBuildingRegistryService | YES | NO | NO | Marseille + visualization |
+| WigleVisualizationService | YES | NO | NO | MapLoading + Metaverse |
+| WigleBuildingRegistryService | YES | NO | NO | Metaverse + visualization |
 | WigleApiService | YES | NO | NO | Visualization (+ barrel unused) |
 | WigleGeoService | YES | NO | NO | Visualization |
 | GeoMappingService | YES | NO | NO | Visualization |
-| TokenCellService | YES | NO | NO | Control + Marseille |
-| FootprintTrailManager | YES | NO | NO | Control + Marseille |
-| M4t3rPickupFxService | YES | NO | NO | Control + Marseille |
-| M4t3rCoinPickupFxService | YES | NO | NO | Control + Marseille |
+| TokenCellService | YES | NO | NO | Control + Metaverse |
+| FootprintTrailManager | YES | NO | NO | Control + Metaverse |
+| M4t3rPickupFxService | YES | NO | NO | Control + Metaverse |
+| M4t3rCoinPickupFxService | YES | NO | NO | Control + Metaverse |
 | M4t3rPickupFxOrchestratorService | YES | NO | NO | CharacterControl |
-| M4t3rCollectTrailVisualService | YES | NO | NO | Control + Marseille |
+| M4t3rCollectTrailVisualService | YES | NO | NO | Control + Metaverse |
 | M4t3rRewardRuntimeService | YES | NO | NO | CharacterControl + debug overlay |
 | M4t3rRewardApiService | YES | NO | NO | Via reward runtime |
 | M4t3rTrailApiService | YES | NO | NO | CharacterControl |
-| M4t3rDebugOverlay | YES | NO | NO | MarseilleMapProvider (F9) |
+| M4t3rDebugOverlay | YES | NO | NO | MetaverseMapProvider (F9) |
 
 ## 3. Functional roles
 
@@ -151,7 +151,7 @@ Notes: Stub utile, pas bloquant.
 
 Element: RunnerWorldService / RunnerStateService  
 Role: Monde procédural + progress pour collisions / fallback legacy.  
-Criticality: CRITICAL (legacy) / USEFUL (Marseille)  
+Criticality: CRITICAL (legacy) / USEFUL (Metaverse)  
 Category: CHARACTER
 
 Element: app-joystick-move / app-joystick-view / app-virtual-joystick  
@@ -167,17 +167,17 @@ Criticality: CRITICAL
 Category: MAP_WORLD
 
 Element: MapLoadingService  
-Role: Marseille OSM, fallback legacy, attache WiGLE + placements.  
+Role: Metaverse OSM, fallback legacy, attache WiGLE + placements.  
 Criticality: CRITICAL  
 Category: MAP_WORLD
 
-Element: MarseilleMapProvider  
+Element: MetaverseMapProvider  
 Role: Terrain Vieux-Port, OSM, tokens, debug, wigle registry.  
 Criticality: CRITICAL  
 Category: MAP_WORLD
 
 Element: LegacyFloorMapProvider  
-Role: Fallback si Marseille échoue ou `mapEnabled=false`.  
+Role: Fallback si Metaverse échoue ou `mapEnabled=false`.  
 Criticality: CRITICAL  
 Category: MAP_WORLD
 
@@ -198,7 +198,7 @@ Criticality: SECONDARY
 Category: MAP_WORLD  
 Notes: Facade mince — voir candidates.
 
-Element: MarseilleGeoDebugService  
+Element: MetaverseGeoDebugService  
 Role: HUD F11 geo debug.  
 Criticality: DEBUG  
 Category: NETWORK_DEBUG
@@ -254,19 +254,19 @@ app-root (DartChain shell, hors scope)
 
 MapLoadingService
   ├── MapConfigService.effectiveProvider
-  ├── MarseilleMapProvider  (try)
+  ├── MetaverseMapProvider  (try)
   ├── LegacyFloorMapProvider (fallback)
   ├── WigleVisualizationService.attachNetworkLayer
   └── PlacementAnchorLayer.attachPlacementLayer
 
-MarseilleMapProvider
+MetaverseMapProvider
   ├── MapConfigService, GeoCoordinateService, OSMBuildingProvider
   ├── WorldStreamingManager, TokenCellService
   ├── M4t3rPickupFxService, M4t3rCoinPickupFxService
   ├── FootprintTrailManager, M4t3rCollectTrailVisualService
-  ├── M4t3rDebugOverlay, MarseilleGeoDebugService
+  ├── M4t3rDebugOverlay, MetaverseGeoDebugService
   ├── WigleBuildingRegistryService, WigleVisualizationService
-  └── marseille-twin/** (overlay, spawn, LOD — exclusive TS modules)
+  └── metaverse-twin/** (overlay, spawn, LOD — exclusive TS modules)
 
 CharacterControlService   ← HOTSPOT (17 injects)
   ├── CharacterNftService, CameraControlService
@@ -293,7 +293,7 @@ GeoCoordinateService → LocalOriginService
 ### Bottlenecks
 
 - `CharacterControlService` : move + tokens + rewards + wallet dans un seul service.
-- `MarseilleMapProvider` : provider + visuels + debug + wigle + tokens.
+- `MetaverseMapProvider` : provider + visuels + debug + wigle + tokens.
 - `map-configuration.ts` : constantes monde partagées avec Star Conquest (STOP-SHARED-DEPENDENCY).
 - `WalletSessionService` / `AuthService` : couplage floor ↔ DartChain.
 
@@ -334,7 +334,7 @@ Candidats de simplification / adjacents : voir `metaversebb-candidates-for-remov
 
 Toujours MetaVerseBB, à inclure dans un inventaire élargi :
 
-- `core/map/marseille-twin/**`
+- `core/map/metaverse-twin/**`
 - `core/map/geo-reference.config.ts`
 - `core/map/wigle/wigle-debug-overlay.ts`
 - `core/services/character-assets.config.ts`
@@ -351,7 +351,7 @@ map/         MapLoading + providers + geo + streaming
 placement/   facade + layer + panel
 tokens/      TokenCell + footprints + M4t3r*
 network/     wigle/*
-debug/       MarseilleGeoDebug + M4t3rDebugOverlay
+debug/       MetaverseGeoDebug + M4t3rDebugOverlay
 ```
 
 Aujourd’hui ces couches sont aplaties sous `core/map` et `core/services`. Ne pas déplacer les fichiers (deletion/move risk). Documenter seulement.
@@ -367,12 +367,12 @@ three-floor:
 - `joystick-shared/view-joystick.input.spec.ts`
 - `joystick-shared/virtual-joystick.pointer.spec.ts`
 
-map (échantillon critique) : `map-loading.service.spec.ts`, `map-config.service.spec.ts`, `geo-coordinate.service.spec.ts`, `osm-building.provider.spec.ts`, `placements/*.spec.ts`, `m4t3r-*.spec.ts`, `wigle/geo-mapping.service.spec.ts`, `marseille-twin/*.spec.ts`.
+map (échantillon critique) : `map-loading.service.spec.ts`, `map-config.service.spec.ts`, `geo-coordinate.service.spec.ts`, `osm-building.provider.spec.ts`, `placements/*.spec.ts`, `m4t3r-*.spec.ts`, `wigle/geo-mapping.service.spec.ts`, `metaverse-twin/*.spec.ts`.
 
 ## 9. Non-regression baseline
 
 - Host : `app-three-floor` + canvas `.floor-canvas`
-- Provider : `marseille-osm-three`, fallback `legacy-floor`
+- Provider : `metaverse-osm-three`, fallback `legacy-floor`
 - Spawn : `METRO_SPAWN_ANCHOR.spawnOffsetFromMirror`
 - Joysticks MOVE/VIEW exclusifs three-floor
 - Raycast placements → `app-placement-details-panel`
@@ -383,10 +383,10 @@ map (échantillon critique) : `map-loading.service.spec.ts`, `map-config.service
 
 ## 10. Architecture insights
 
-Strengths: arbre composants petit (7) ; fallback Marseille→legacy ; registres ThreeScene clairs.
+Strengths: arbre composants petit (7) ; fallback Metaverse→legacy ; registres ThreeScene clairs.
 
 Risks: CharacterControl god-object ; MapConfig constants partagées ; rewards couplés au wallet ; debug overlays attachés dans le provider.
 
-Coupling hotspots: CharacterControlService, MarseilleMapProvider, map-configuration.ts.
+Coupling hotspots: CharacterControlService, MetaverseMapProvider, map-configuration.ts.
 
 Suggested clarifications: adapters locaux pour Auth/Wallet ; extraire constantes quest de `map-configuration.ts` **sans éditer le fichier partagé dans cette boucle**.

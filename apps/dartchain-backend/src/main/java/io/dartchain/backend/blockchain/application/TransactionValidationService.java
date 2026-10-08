@@ -15,7 +15,9 @@ public class TransactionValidationService {
 
     private static final int MAX_DATA_LENGTH = 500;
     private static final int MIN_ADDRESS_LENGTH = 4;
-    private static final BigDecimal MIN_AMOUNT = new BigDecimal("0.00000001");
+    /** Aligné sur NUMERIC(38,26) de la chaîne / faucet (m4t3r). */
+    private static final int MAX_AMOUNT_SCALE = 26;
+    private static final BigDecimal MIN_AMOUNT = new BigDecimal("0.00000000000000000000000001");
 
     private final SecurityProperties securityProperties;
 
@@ -120,8 +122,12 @@ public class TransactionValidationService {
             throw new TransactionValidationException("amount must be greater than 0");
         }
 
-        if (amount.scale() > 8) {
-            throw new TransactionValidationException("amount must not exceed 8 decimal places");
+        int scale = amount.stripTrailingZeros().scale();
+        // BigDecimal scientifiques (1E-26) : scale peut rester élevé ; plafonner au stockage chaîne.
+        if (scale > MAX_AMOUNT_SCALE) {
+            throw new TransactionValidationException(
+                    "amount must not exceed " + MAX_AMOUNT_SCALE + " decimal places"
+            );
         }
     }
 
@@ -170,12 +176,31 @@ public class TransactionValidationService {
             throw new TransactionValidationException("legacy signature is not allowed");
         }
 
+        // Crédits SYSTEM (faucet, quêtes) : signature technique, pas AUTHv1 utilisateur.
+        if (isSystemCredit(transaction, signature)) {
+            return;
+        }
+
         if (securityProperties.isStrictPendingSignatures()) {
             validateStrictAuthSignature(signature, transaction, userAccountStore);
             return;
         }
 
         validateLegacyPermissiveSignature(signature, transaction, userAccountStore);
+    }
+
+    private static boolean isSystemCredit(PendingTransaction transaction, String signature) {
+        if (transaction == null) {
+            return false;
+        }
+        if (Boolean.TRUE.equals(transaction.getSystemReward())) {
+            return true;
+        }
+        String from = transaction.getFromAddress();
+        if (from != null && "SYSTEM".equalsIgnoreCase(from.trim())) {
+            return true;
+        }
+        return "SYSTEM".equalsIgnoreCase(signature.trim());
     }
 
     private void validateStrictAuthSignature(

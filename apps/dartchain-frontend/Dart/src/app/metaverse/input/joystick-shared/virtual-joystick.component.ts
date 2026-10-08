@@ -63,7 +63,7 @@ export interface JoystickVector {
         position: relative;
         width: 100%;
         height: 100%;
-        border-radius: 50%;
+        border-radius: var(--radius-circle);
         overflow: hidden;
         cursor: grab;
       }
@@ -73,33 +73,33 @@ export interface JoystickVector {
       .vj-base {
         position: absolute;
         inset: var(--vj-face-inset, 0px);
-        border-radius: 50%;
+        border-radius: var(--radius-circle);
         background: radial-gradient(
           circle at 35% 30%,
-          rgba(255, 255, 255, 0.28),
-          rgba(20, 28, 36, 0.72) 55%,
-          rgba(8, 12, 18, 0.82)
+          rgba(237, 231, 217, 0.28),
+          rgba(10, 18, 32, 0.72) 55%,
+          rgba(10, 18, 32, 0.82)
         );
-        border: 1px solid rgba(0, 180, 220, 0.45);
-        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(139, 157, 173, 0.45);
+        box-shadow: inset 0 0 10px rgba(10, 18, 32, 0.12);
       }
       .vj-base-walk-run {
         /* Same base design as VIEW — rings provide the walk/run feedback */
       }
       .vj-ring {
         position: absolute;
-        border-radius: 50%;
+        border-radius: var(--radius-circle);
         pointer-events: none;
         box-sizing: border-box;
       }
       .vj-ring-walk {
         inset: 19%;
-        border: 1px solid rgba(64, 224, 255, 0.85);
-        box-shadow: 0 0 4px rgba(64, 224, 255, 0.35);
+        border: 1px solid rgba(139, 157, 173, 0.85);
+        box-shadow: 0 0 4px rgba(139, 157, 173, 0.35);
       }
       .vj-ring-run {
         inset: 4%;
-        border: 1px dashed rgba(255, 62, 207, 0.7);
+        border: var(--stroke-w-hairline) dashed var(--stroke-danger);
       }
       .vj-knob {
         position: absolute;
@@ -109,14 +109,14 @@ export interface JoystickVector {
         height: var(--vj-knob-size, 36%);
         margin-left: calc(var(--vj-knob-size, 36%) / -2);
         margin-top: calc(var(--vj-knob-size, 36%) / -2);
-        border-radius: 50%;
+        border-radius: var(--radius-circle);
         background: radial-gradient(
           circle at 30% 25%,
-          rgba(255, 255, 255, 0.9),
-          rgba(160, 200, 220, 0.55) 70%
+          rgba(237, 231, 217, 0.9),
+          rgba(139, 157, 173, 0.55) 70%
         );
-        border: 1px solid rgba(0, 180, 220, 0.35);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(139, 157, 173, 0.35);
+        box-shadow: 0 1px 4px rgba(10, 18, 32, 0.2);
         will-change: transform;
         transform: translate(0px, 0px);
       }

@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { MapConfigService } from './map-config.service';
 
 /**
- * Origine locale autour de Marseille (Vieux-Port par défaut).
+ * Origine locale autour de Metaverse (Vieux-Port par défaut).
  * Évite les grandes coordonnées Three.js.
  */
 @Injectable({ providedIn: 'root' })

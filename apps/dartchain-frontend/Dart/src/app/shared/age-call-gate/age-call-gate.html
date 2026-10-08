@@ -1,0 +1,112 @@
+@if (visible()) {
+  <div
+ class="age-call"
+ [class.age-call--ringing]="ringing()"
+ [class.age-call--answering]="answering()"
+ [class.age-call--zooming]="zooming()"
+ [class.age-call--handoff]="handoff()"
+ [class.age-call--token-ready]="tokenReady()"
+ role="dialog"
+ aria-modal="true"
+ >
+    <div class="age-call__wallpaper" aria-hidden="true"></div>
+    <div class="age-call__shade" aria-hidden="true"></div>
+
+    <header class="age-call__top">
+      <p class="age-call__carrier">
+        <span class="age-call__carrier-at" aria-hidden="true">@</span><span class="age-call__carrier-name">R4V3army</span>
+      </p>
+      <p class="age-call__status" [class.age-call__status--live]="ringing()">
+        <span class="age-call__status-dot" aria-hidden="true"></span>
+        <span class="age-call__status-label">Appel entrant</span>
+        <span class="age-call__status-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      </p>
+    </header>
+
+    <div class="age-call__identity">
+      <div class="age-call__avatar-wrap" aria-hidden="true">
+        <div #token class="age-call__avatar age-call__avatar--token"></div>
+      </div>
+    </div>
+
+    <!-- Sonnerie MGS Codec — préchargée ; play piloté par le composant -->
+    <audio
+      #codecRing
+      class="age-call__codec-audio"
+      preload="auto"
+      loop
+      muted
+      playsinline
+      src="/assets/sound/mgs_codec_sound.mp3"
+      aria-hidden="true"
+    ></audio>
+
+    <div class="age-call__actions">
+      <button
+ type="button"
+ class="age-call__btn age-call__btn--decline"
+ (click)="decline($event)"
+ >
+        <span class="age-call__btn-icon" aria-hidden="true">
+          <svg class="age-call__phone-icon age-call__phone-icon--decline" viewBox="0 0 24 24" focusable="false">
+            <path
+              fill="currentColor"
+              d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.6 22 2 13.4 2 2.9 2 2.4 2.4 2 3 2h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"
+            />
+          </svg>
+        </span>
+        <span class="age-call__btn-meta">
+          <span class="age-call__btn-age">−21 ans</span>
+        </span>
+        <span class="age-call__btn-caption">Refuser</span>
+      </button>
+
+      <button
+        type="button"
+        class="age-call__btn age-call__btn--answer"
+        [class.is-pressed]="answerPressed()"
+        [class.is-hover]="answerHover()"
+        (pointerenter)="onAnswerPointerEnter($event)"
+        (pointerleave)="onAnswerPointerLeave($event)"
+        (pointerdown)="onAnswerPointerDown($event)"
+        (pointerup)="onAnswerPointerUp($event)"
+        (pointercancel)="onAnswerPointerCancel($event)"
+        (click)="answer($event)"
+      >
+        <span class="age-call__fx">
+          <span class="age-call__fx-ring" aria-hidden="true"></span>
+          <span class="age-call__fx-scan" aria-hidden="true"></span>
+          <span class="age-call__fx-ghost age-call__fx-ghost--cyan" aria-hidden="true">
+            <svg class="age-call__phone-icon" viewBox="0 0 24 24" focusable="false">
+              <path
+                fill="currentColor"
+                d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.6 22 2 13.4 2 2.9 2 2.4 2.4 2 3 2h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"
+              />
+            </svg>
+          </span>
+          <span class="age-call__fx-ghost age-call__fx-ghost--mag" aria-hidden="true">
+            <svg class="age-call__phone-icon" viewBox="0 0 24 24" focusable="false">
+              <path
+                fill="currentColor"
+                d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.6 22 2 13.4 2 2.9 2 2.4 2.4 2 3 2h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"
+              />
+            </svg>
+          </span>
+          <span class="age-call__btn-icon" aria-hidden="true">
+            <svg class="age-call__phone-icon" viewBox="0 0 24 24" focusable="false">
+              <path
+                fill="currentColor"
+                d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.6 22 2 13.4 2 2.9 2 2.4 2.4 2 3 2h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"
+              />
+            </svg>
+          </span>
+        </span>
+        <span class="age-call__btn-meta">
+          <span class="age-call__btn-age">+21 ans</span>
+        </span>
+        <span class="age-call__btn-caption">Répondre</span>
+      </button>
+    </div>
+  </div>
+}
+

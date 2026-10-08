@@ -1,0 +1,588 @@
+:host {
+  display: contents;
+}
+
+.onboarding-tour {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.onboarding-tour--paused .onboarding-tour__bubble {
+  opacity: 0.78;
+}
+
+.onboarding-tour--park .onboarding-tour__veil-shape {
+  fill: rgba(10, 18, 32, 0.28);
+}
+
+.onboarding-tour--park .onboarding-tour__bubble {
+  opacity: 0.96;
+}
+
+.onboarding-tour__veil-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.onboarding-tour__veil {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.onboarding-tour__veil-shape {
+  /* Voile plus dense : le reste du hub est davantage assombri. */
+  fill: rgba(10, 18, 32, 0.82);
+}
+
+.onboarding-tour__veil-catch {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  background: transparent;
+}
+
+/* Ancre géométrique seulement — aucune bordure / glow visible */
+.onboarding-tour__spotlight {
+  position: absolute;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.onboarding-tour__token {
+  position: absolute;
+  z-index: 2;
+  opacity: 1;
+  filter: drop-shadow(0 6px 16px rgba(35, 87, 137, 0.4));
+}
+
+/* Pose figée = traveler intro — pas de fade ni de jump. */
+.onboarding-tour__token--from-handoff {
+  transition:  none !important;
+}
+
+/* —— Bulle BD compacte, toujours lisible —— */
+.onboarding-tour__bubble {
+  --bubble-bg: rgba(10, 18, 32, 0.94);
+  --bubble-border: rgba(139, 157, 173, 0.32);
+  --tail-offset: 50%;
+
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-sizing: border-box;
+  max-width: calc(100vw - 12px);
+  max-height: calc(100vh - 12px);
+  min-height: 0;
+  padding: 6px 6px 4px;
+  border-radius: var(--radius-md);
+  background: var(--bubble-bg);
+  border: 1px solid var(--bubble-border);
+  box-shadow: 0 6px 16px rgba(10, 18, 32, 0.3);
+  color: #ede7d9;
+  text-align: center;
+  pointer-events: auto;
+  overflow: hidden;
+  overscroll-behavior: none;
+  font-family:
+    'Roboto', sans-serif;
+  animation: onboarding-bubble-in var(--motion-enter) var(--motion-ease-enter) both;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
+}
+
+/* Toutes les bulles tutoriel : padding / gaps resserrés. */
+.onboarding-tour__bubble--led {
+  padding: 3px 4px 2px;
+  max-width: min(168px, calc(100vw - 16px));
+}
+
+.onboarding-tour__bubble--led .onboarding-tour__top {
+  margin-bottom: 2px;
+  min-height: 1em;
+}
+
+.onboarding-tour__bubble--led .onboarding-tour__title {
+  margin: 0 0 2px;
+}
+
+.onboarding-tour__bubble--led .onboarding-tour__led-list {
+  margin: 0 0 3px;
+  gap: 2px;
+}
+
+.onboarding-tour__bubble--led .onboarding-tour__led-row {
+  gap: 3px;
+}
+
+.onboarding-tour__bubble--led .onboarding-tour__body--register {
+  margin: 0 0 3px;
+}
+
+.onboarding-tour__bubble--led .onboarding-tour__footer {
+  margin-top: 0;
+  padding-top: 1px;
+  padding-bottom: 10px;
+  gap: 1px;
+}
+
+.onboarding-tour__bubble--led .onboarding-tour__actions {
+  gap: 3px;
+}
+
+.onboarding-tour__bubble--led .onboarding-tour__btn {
+  min-height: 1.25rem;
+  padding: 1px 6px;
+}
+
+@keyframes onboarding-bubble-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.onboarding-tour__bubble-tail {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Queue vers le haut (bulle sous le logo) */
+.onboarding-tour__bubble--below .onboarding-tour__bubble-tail {
+  top: -9px;
+  left: var(--tail-offset);
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--bubble-border);
+  filter: drop-shadow(0 -1px 0 var(--bubble-bg));
+}
+
+.onboarding-tour__bubble--below .onboarding-tour__bubble-tail::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: -6px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 8px solid var(--bubble-bg);
+}
+
+/* Queue vers le bas (bulle au-dessus) */
+.onboarding-tour__bubble--above .onboarding-tour__bubble-tail {
+  bottom: -9px;
+  left: var(--tail-offset);
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--bubble-border);
+}
+
+.onboarding-tour__bubble--above .onboarding-tour__bubble-tail::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: -6px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid var(--bubble-bg);
+}
+
+/* Queue à gauche (bulle à droite du logo) */
+.onboarding-tour__bubble--right .onboarding-tour__bubble-tail {
+  left: -9px;
+  top: var(--tail-offset);
+  transform: translateY(-50%);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid var(--bubble-border);
+}
+
+.onboarding-tour__bubble--right .onboarding-tour__bubble-tail::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: -6px;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-right: 8px solid var(--bubble-bg);
+}
+
+/* Queue à droite (bulle à gauche du logo) */
+.onboarding-tour__bubble--left .onboarding-tour__bubble-tail {
+  right: -9px;
+  top: var(--tail-offset);
+  transform: translateY(-50%);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid var(--bubble-border);
+}
+
+.onboarding-tour__bubble--left .onboarding-tour__bubble-tail::after {
+  content: '';
+  position: absolute;
+  right: 2px;
+  top: -6px;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 8px solid var(--bubble-bg);
+}
+
+.onboarding-tour__title {
+  margin: 0 0 4px;
+  padding: 0;
+  font-size: var(--fs-form);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-transform: none;
+}
+
+.onboarding-tour__body {
+  margin: 0 0 4px;
+  padding: 0;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  font-size: var(--fs-form);
+  line-height: 1.25;
+  color: rgba(237, 231, 217, 0.86);
+  text-align: center;
+}
+
+.onboarding-tour__body--register {
+  overflow: visible;
+  text-wrap: pretty;
+}
+
+.onboarding-tour__body--bandeau {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  overflow: visible;
+  text-wrap: pretty;
+}
+
+.onboarding-tour__body--bandeau .onboarding-tour__line {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  font: inherit;
+  line-height: 1.25;
+  color: inherit;
+  text-align: center;
+}
+
+.onboarding-tour__dyor {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15em;
+  margin-left: 0.2em;
+  color: var(--text-link, var(--accent-cyan, #8b9dad));
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.onboarding-tour__dyor-go {
+  font-size: 0.92em;
+  line-height: 1;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.onboarding-tour__dyor:hover,
+.onboarding-tour__dyor:focus-visible {
+  color: var(--accent-primary, #8b9dad);
+  filter: brightness(1.18);
+}
+
+.onboarding-tour__dyor:focus-visible {
+  outline: 1px solid rgba(var(--accent-cyan-rgb, 139, 157, 173), 0.65);
+  outline-offset: 2px;
+}
+
+/* Légende LED (1ʳᵉ bulle — Direct / activité). */
+.onboarding-tour__led-list {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.onboarding-tour__led-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  font-size: var(--fs-form);
+  line-height: 1.2;
+  color: rgba(237, 231, 217, 0.9);
+}
+
+.onboarding-tour__led {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(10, 18, 32, 0.55);
+}
+
+.onboarding-tour__led--orange {
+  background: #d5a021;
+  box-shadow:
+    0 0 0 1px rgba(10, 18, 32, 0.45),
+    0 0 6px rgba(213, 160, 33, 0.55);
+}
+
+.onboarding-tour__led--green {
+  background: #09814a;
+  box-shadow:
+    0 0 0 1px rgba(10, 18, 32, 0.45),
+    0 0 6px rgba(9, 129, 74, 0.5);
+}
+
+.onboarding-tour__led--red {
+  background: #7b0d1e;
+  box-shadow:
+    0 0 0 1px rgba(10, 18, 32, 0.45),
+    0 0 6px rgba(123, 13, 30, 0.5);
+}
+
+.onboarding-tour__led-sep {
+  flex: 0 0 auto;
+  color: rgba(237, 231, 217, 0.72);
+  font-weight: 600;
+}
+
+.onboarding-tour__led-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+}
+
+.onboarding-tour__hint {
+  margin: 0 0 4px;
+  font-size: var(--fs-form);
+  line-height: 1.2;
+  text-align: center;
+  color: rgba(139, 157, 173, 0.9);
+}
+
+/* Ligne 1 : « Tutoriel » en haut à gauche, compteur en haut à droite. */
+.onboarding-tour__top {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-height: 1.1em;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.onboarding-tour__kicker {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-size: var(--fs-form);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(139, 157, 173, 0.7);
+  line-height: 1;
+  text-align: left;
+  font-weight: 600;
+}
+
+.onboarding-tour__progress {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: var(--fs-form);
+  letter-spacing: 0.04em;
+  color: rgba(139, 157, 173, 0.65);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Pied : actions centrées ; Passer collé angle bas-droit de la bulle. */
+.onboarding-tour__footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  width: 100%;
+  margin-top: 2px;
+  padding-top: 2px;
+  padding-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.onboarding-tour__skip {
+  appearance: none;
+  border: 0;
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: rgba(139, 157, 173, 0.78);
+  font: inherit;
+  font-size: calc(var(--fs-form) - 1px);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 1px;
+  white-space: nowrap;
+}
+
+.onboarding-tour__skip:hover,
+.onboarding-tour__skip:focus-visible {
+  color: #ede7d9;
+  outline: none;
+}
+
+.onboarding-tour__actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.onboarding-tour__btn {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  /* ~28px : compact mais encore cliquable. */
+  min-height: 1.45rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: var(--fs-form);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition: background var(--motion-state) var(--motion-ease-state), color var(--motion-state) var(--motion-ease-state), opacity var(--motion-state) var(--motion-ease-state);
+}
+
+.onboarding-tour__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.onboarding-tour__btn--ghost {
+  background: transparent;
+  color: rgba(139, 157, 173, 0.88);
+  box-shadow: inset 0 0 0 1px rgba(139, 157, 173, 0.3);
+}
+
+.onboarding-tour__btn--ghost:hover:not(:disabled) {
+  background: rgba(139, 157, 173, 0.1);
+}
+
+.onboarding-tour__btn--primary {
+  background: linear-gradient(165deg, #09814a, #235789);
+  color: #ede7d9;
+  box-shadow: 0 0 0 1px rgba(9, 129, 74, 0.45);
+}
+
+.onboarding-tour__btn--primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.onboarding-tour--reduced .onboarding-tour__token,
+.onboarding-tour--reduced .onboarding-tour__spotlight,
+.onboarding-tour--reduced .onboarding-tour__bubble {
+  transition:  none;
+  animation:  none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-tour__token,
+  .onboarding-tour__spotlight,
+  .onboarding-tour__bubble {
+    transition:  none;
+    animation:  none;
+  }
+}
+
+/* Portrait téléphone (436×653…) : bulle compacte, ne masque pas tout le shell. */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 600px) {
+  .onboarding-tour__bubble {
+    max-width: min(320px, calc(100vw - 24px));
+    max-height: min(42vh, 280px);
+    padding: 8px 8px 6px;
+  }
+
+  .onboarding-tour__bubble--led {
+    max-width: min(168px, calc(100vw - 16px));
+    max-height: min(36vh, 200px);
+    padding: 3px 4px 2px;
+  }
+
+  .onboarding-tour__title,
+  .onboarding-tour__body,
+  .onboarding-tour__hint,
+  .onboarding-tour__kicker,
+  .onboarding-tour__btn,
+  .onboarding-tour__progress,
+  .onboarding-tour__led-row {
+    font-size: 11px;
+  }
+
+  .onboarding-tour__skip {
+    font-size: 10px;
+    right: 1px;
+    bottom: 1px;
+  }
+
+  .onboarding-tour__body {
+    overflow-y: auto;
+    -webkit-line-clamp: unset;
+    max-height: 12em;
+  }
+
+  .onboarding-tour__led {
+    width: 9px;
+    height: 9px;
+  }
+
+  .onboarding-tour__btn {
+    min-height: 28px;
+    padding: 4px 10px;
+  }
+}

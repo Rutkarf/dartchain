@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 import { tickWetPavementMaterials } from './wet-pavement.util';
 
 describe('wet-pavement Phase 14', () => {

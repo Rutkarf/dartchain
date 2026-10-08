@@ -19,7 +19,7 @@ interface RingFx {
 }
 
 /**
- * FX Kill-to-earn — beams épais, muzzle, sparks, anneau KO.
+ * FX Éliminer pour gagner — beams épais, muzzle, sparks, anneau KO.
  */
 @Injectable({ providedIn: 'root' })
 export class ArenaFxService {
@@ -48,7 +48,7 @@ export class ArenaFxService {
     const rInner = hit ? 0.05 : 0.028;
     const geom = new THREE.CylinderGeometry(rOuter, rInner, len, 6);
     const mat = new THREE.MeshBasicMaterial({
-      color: hit ? 0x8aa8b8 : 0x9a8060,
+      color: hit ? 0x8a95a5 : 0x8a95a5,
       transparent: true,
       opacity: 0.55,
       depthWrite: false,
@@ -63,7 +63,7 @@ export class ArenaFxService {
   spawnMuzzle(at: THREE.Vector3): void {
     if (!this.scene) return;
     if (!this.muzzle) {
-      this.muzzle = new THREE.PointLight(0xc04088, 2.2, 6);
+      this.muzzle = new THREE.PointLight(0x7b0d1e, 2.2, 6);
       this.muzzle.name = 'arena-muzzle-light';
       this.scene.add(this.muzzle);
     }
@@ -71,7 +71,7 @@ export class ArenaFxService {
       this.muzzleSprite = new THREE.Mesh(
         new THREE.SphereGeometry(0.12, 8, 8),
         new THREE.MeshBasicMaterial({
-          color: 0xffa0d0,
+          color: 0x7b0d1e,
           transparent: true,
           opacity: 0.7,
           depthWrite: false,
@@ -96,7 +96,7 @@ export class ArenaFxService {
       const mesh = new THREE.Mesh(
         new THREE.BoxGeometry(0.1, 0.1, 0.1),
         new THREE.MeshBasicMaterial({
-          color: heavy ? 0xc0a070 : 0x8a7060,
+          color: heavy ? 0xd5a021 : 0x8a95a5,
           transparent: true,
           opacity: 0.65,
         })
@@ -122,7 +122,7 @@ export class ArenaFxService {
     const mesh = new THREE.Mesh(
       new THREE.RingGeometry(0.35, 1.1, 28),
       new THREE.MeshBasicMaterial({
-        color: 0xc04088,
+        color: 0x7b0d1e,
         transparent: true,
         opacity: 0.55,
         side: THREE.DoubleSide,

@@ -1,22 +1,28 @@
 <div
-  class="faucet-summary-bar"
-  role="status"
-  aria-live="polite"
-  [attr.aria-label]="barAriaLabel()"
+ class="faucet-summary-bar"
+ role="status"
+ aria-live="polite"
 >
-  <span class="faucet-summary-bar__balance" [attr.title]="headline()">
-    {{ headline() }}
+  <span
+    class="faucet-summary-bar__balance"
+    [class.is-bumping]="bumping()"
+    [attr.title]="fullBalance()"
+  >
+    <span class="faucet-summary-bar__amount" aria-hidden="true">
+      <span class="faucet-summary-bar__whole">{{ wholePart() }}</span>
+      <span class="faucet-summary-bar__sep">,</span>
+      <span class="faucet-summary-bar__decimals">{{ decimalDigitsSpaced() }}</span>
+    </span>
   </span>
 
   <button
-    type="button"
-    class="faucet-summary-bar__claim"
-    [disabled]="claimDisabled()"
-    [class.is-cooling]="isCooling()"
-    (click)="onClaim($event)"
-    aria-label="Claim faucet"
-    title="Claim"
-  >
+ type="button"
+ class="faucet-summary-bar__claim"
+ [disabled]="claimDisabled()"
+ [class.is-cooling]="isCooling()"
+ (click)="onClaim($event)"
+ title="Réclamer"
+ >
     CLAIM
   </button>
 </div>

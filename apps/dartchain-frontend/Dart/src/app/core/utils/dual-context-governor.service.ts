@@ -25,7 +25,7 @@ export interface DualContextFrameHints {
 const DUAL_STREAM_INTERVAL_SCALE = 1.5;
 
 /**
- * Phase 21 — gouverneur charge combinée Star Conquest + MetaVerseBB floor.
+ * Phase 21 — gouverneur charge combinée Conquête stellaire + MetaVerseBB floor.
  * Scale la fréquence simulation ; le rendu et les visuels restent intacts.
  */
 @Injectable({ providedIn: 'root' })

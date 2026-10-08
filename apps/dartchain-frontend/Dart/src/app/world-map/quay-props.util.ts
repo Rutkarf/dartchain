@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-import { MARSEILLE_HARBOR_WATER } from './map-configuration';
+import { METAVERSE_HARBOR_WATER } from './map-configuration';
 import type { MapQuality } from './map-configuration';
 import {
   type UrbanPropsScope,
@@ -36,24 +36,24 @@ export function buildQuayStreetProps(options: {
   const spacing = options.spacing ?? 7.5;
   const includeLamps = options.includeLamps ?? true;
   const group = new THREE.Group();
-  group.name = 'marseille-quay-props';
+  group.name = 'metaverse-quay-props';
 
   const bollardGeo = new THREE.CylinderGeometry(0.11, 0.14, 0.72, 8);
   const bollardMat = new THREE.MeshStandardMaterial({
-    color: 0x6a7078,
+    color: 0x8a95a5,
     roughness: 0.55,
     metalness: 0.38,
   });
   const lampPoleGeo = new THREE.CylinderGeometry(0.07, 0.09, 3.4, 8);
   const lampHeadGeo = new THREE.SphereGeometry(0.22, 8, 8);
   const lampPoleMat = new THREE.MeshStandardMaterial({
-    color: 0x404850,
+    color: 0x18314f,
     roughness: 0.48,
     metalness: 0.42,
   });
   const lampHeadMat = new THREE.MeshStandardMaterial({
-    color: 0xfff0d8,
-    emissive: 0xffd890,
+    color: 0xede7d9,
+    emissive: 0x7b0d1e,
     emissiveIntensity: 0.55,
     roughness: 0.35,
     metalness: 0.12,
@@ -68,7 +68,7 @@ export function buildQuayStreetProps(options: {
   }
 
   const bollardMesh = new THREE.InstancedMesh(bollardGeo, bollardMat, positions.length);
-  bollardMesh.name = 'marseille-quay-bollards';
+  bollardMesh.name = 'metaverse-quay-bollards';
   const dummy = new THREE.Object3D();
 
   positions.forEach((pos, idx) => {
@@ -80,12 +80,12 @@ export function buildQuayStreetProps(options: {
 
     if (pos.lamp) {
       const pole = new THREE.Mesh(lampPoleGeo, lampPoleMat);
-      pole.name = `marseille-quay-lamp-pole-${idx}`;
+      pole.name = `metaverse-quay-lamp-pole-${idx}`;
       pole.position.set(pos.x, options.y + 1.7, options.z - 0.35);
       group.add(pole);
 
       const head = new THREE.Mesh(lampHeadGeo, lampHeadMat);
-      head.name = `marseille-quay-lamp-head-${idx}`;
+      head.name = `metaverse-quay-lamp-head-${idx}`;
       head.position.set(pos.x, options.y + 3.55, options.z - 0.35);
       group.add(head);
       lampSpecs.push({ x: pos.x, y: options.y + 3.55, z: options.z - 0.35 });
@@ -128,25 +128,25 @@ export function buildQuayHarborExtras(
 ): HarborExtrasBuildResult | null {
   if (scope === 'none') return null;
 
-  const harbor = MARSEILLE_HARBOR_WATER;
+  const harbor = METAVERSE_HARBOR_WATER;
   const budget = urbanPropsBudget(scope);
   const maxRadius = urbanPropsRadius(scope);
   const group = new THREE.Group();
-  group.name = 'marseille-quay-harbor-extras';
+  group.name = 'metaverse-quay-harbor-extras';
 
   const boatGeo = createBoatSilhouetteGeometry();
   const buoyGeo = createBuoyGeometry();
   const boatMat = new THREE.MeshStandardMaterial({
-    color: 0x2a3848,
+    color: 0x18314f,
     roughness: 0.58,
     metalness: 0.22,
     envMapIntensity: 0.75,
   });
   const buoyMat = new THREE.MeshStandardMaterial({
-    color: 0xff5533,
+    color: 0x7b0d1e,
     roughness: 0.35,
     metalness: 0.12,
-    emissive: 0x661100,
+    emissive: 0x7b0d1e,
     emissiveIntensity: quality === 'ultra-low' ? 0.05 : 0.18,
   });
 
@@ -178,7 +178,7 @@ export function buildQuayHarborExtras(
 
   if (boats.length > 0) {
     const boatMesh = new THREE.InstancedMesh(boatGeo, boatMat, boats.length);
-    boatMesh.name = 'marseille-quay-boats';
+    boatMesh.name = 'metaverse-quay-boats';
     boats.forEach((slot, idx) => {
       dummy.position.set(slot.x, waterY + 0.15, slot.z);
       dummy.rotation.set(0, slot.rot, 0);
@@ -191,7 +191,7 @@ export function buildQuayHarborExtras(
 
   if (buoys.length > 0) {
     const buoyMesh = new THREE.InstancedMesh(buoyGeo, buoyMat, buoys.length);
-    buoyMesh.name = 'marseille-quay-buoys';
+    buoyMesh.name = 'metaverse-quay-buoys';
     buoys.forEach((slot, idx) => {
       dummy.position.set(slot.x, waterY + 0.05, slot.z);
       dummy.rotation.set(0, 0, 0);

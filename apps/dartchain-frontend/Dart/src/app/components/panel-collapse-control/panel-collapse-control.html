@@ -8,9 +8,11 @@
   (click)="onActivate($event)"
   (pointerdown)="$event.stopPropagation()"
 >
-  <app-icon-relief-3d
-    class="panel-collapse-control__icon"
-    kind="chevron"
-    [flipped]="collapsed()"
-  />
+  <svg
+    class="icon panel-collapse-control__chevron"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <use [attr.href]="collapsed() ? '#icon-chevron-down' : '#icon-chevron-up'" />
+  </svg>
 </button>

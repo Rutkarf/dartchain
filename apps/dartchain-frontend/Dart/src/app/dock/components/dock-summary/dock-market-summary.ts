@@ -88,8 +88,8 @@ export class DockMarketSummaryComponent implements OnInit, OnDestroy {
     }
 
     return trimmed
-      .replace('LaunchLab', 'LL')
-      .replace('Peg CHF', 'Peg')
+      .replace('Laboratoire', 'Labo')
+      .replace('Parité CHF', 'Parité')
       .replace(/\s*R4V3\b/gi, '')
       .replace(/\s+/g, ' ')
       .trim();

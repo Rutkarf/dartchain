@@ -4,12 +4,20 @@ import { AppLocale, LocaleKey, nextLocale, translate } from './locale.messages';
 
 const STORAGE_KEY = 'dartchain.locale';
 
+/** L’interface est uniquement en français. */
+export function detectAppLocale(
+  _languages: readonly string[] | undefined,
+  _language: string | undefined,
+): AppLocale {
+  return 'fr';
+}
+
 @Injectable({ providedIn: 'root' })
 export class LocaleService {
   private readonly localeSignal = signal<AppLocale>(this.readStoredLocale());
 
   readonly locale = this.localeSignal.asReadonly();
-  readonly localeLabel = computed(() => (this.locale() === 'fr' ? 'FR' : 'EN'));
+  readonly localeLabel = computed(() => 'FR');
 
   t(key: LocaleKey): string {
     return translate(this.locale(), key);
@@ -23,12 +31,7 @@ export class LocaleService {
   }
 
   private readStoredLocale(): AppLocale {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'en' || stored === 'fr') {
-      document.documentElement.lang = stored;
-      return stored;
-    }
-
+    localStorage.setItem(STORAGE_KEY, 'fr');
     document.documentElement.lang = 'fr';
     return 'fr';
   }

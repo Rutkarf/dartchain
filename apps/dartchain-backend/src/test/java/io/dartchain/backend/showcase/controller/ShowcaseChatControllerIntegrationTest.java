@@ -1,5 +1,7 @@
 package io.dartchain.backend.showcase.controller;
 
+import io.dartchain.backend.auth.model.UserRole;
+import io.dartchain.backend.auth.store.UserAccountStore;
 import io.dartchain.backend.support.MockMvcIntegrationSupport;
 import io.dartchain.backend.support.MockMvcIntegrationSupport.Session;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,9 @@ class ShowcaseChatControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private UserAccountStore userAccountStore;
 
     @Test
     void getMessages_isPublic() throws Exception {
@@ -102,7 +107,7 @@ class ShowcaseChatControllerIntegrationTest {
     }
 
     @Test
-    void clearMessages_isPublicAndEmptiesRoom() throws Exception {
+    void clearMessages_withoutAdmin_keepsRoom() throws Exception {
         mockMvc.perform(post("/api/showcase/chat/messages")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -114,10 +119,35 @@ class ShowcaseChatControllerIntegrationTest {
                 .andExpect(status().isCreated());
 
         mockMvc.perform(delete("/api/showcase/chat/messages"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isUnauthorized());
+
+        Session user = MockMvcIntegrationSupport.register(mockMvc);
+        mockMvc.perform(delete("/api/showcase/chat/messages")
+                        .header("Authorization", user.authHeader()))
+                .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/showcase/chat/messages"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.messages").isEmpty());
+                .andExpect(jsonPath("$.messages[?(@.text == 'to-clear')]").exists());
+    }
+
+    @Test
+    void clearMessages_asAdmin_emptiesRoom() throws Exception {
+        mockMvc.perform(post("/api/showcase/chat/messages")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "author": "Anonymous",
+                                  "text": "admin-clear"
+                                }
+                                """))
+                .andExpect(status().isCreated());
+
+        Session admin = MockMvcIntegrationSupport.register(mockMvc);
+        userAccountStore.updateRole(admin.userId(), UserRole.ADMIN);
+
+        mockMvc.perform(delete("/api/showcase/chat/messages")
+                        .header("Authorization", admin.authHeader()))
+                .andExpect(status().isNoContent());
     }
 }

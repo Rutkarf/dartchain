@@ -5,6 +5,7 @@ import io.dartchain.backend.auth.security.RoleAuthorizationService;
 import io.dartchain.backend.blockchain.dto.AddPendingTransactionResponse;
 import io.dartchain.backend.blockchain.dto.CreatePendingTransactionRequest;
 import io.dartchain.backend.blockchain.dto.MinePendingTransactionResponse;
+import io.dartchain.backend.blockchain.dto.MineRequest;
 import io.dartchain.backend.blockchain.dto.PendingTransactionResponse;
 import io.dartchain.backend.blockchain.application.PendingTransactionService;
 import io.dartchain.backend.web.RequestClientInfo;
@@ -49,11 +50,17 @@ public class PendingTransactionController {
     @PostMapping("/pending-transactions/{id}/mine")
     public MinePendingTransactionResponse minePendingTransaction(
             @PathVariable String id,
+            @RequestBody(required = false) MineRequest request,
             @RequestHeader(value = "Authorization", required = false) String authorization,
             HttpServletRequest httpRequest
     ) {
         String ip = RequestClientInfo.clientIp(httpRequest);
-        roleAuthorizationService.authorizeMutation(authorization, "pending.mine", id, ip);
-        return pendingTransactionService.minePendingTransaction(id);
+        var account = roleAuthorizationService.authorizeMutation(authorization, "pending.mine", id, ip);
+        String minerAddress = request != null && request.getMinerAddress() != null
+                && !request.getMinerAddress().isBlank()
+                ? request.getMinerAddress()
+                : account.getWalletAddress();
+        authService.ensureWalletOwnership(account, minerAddress);
+        return pendingTransactionService.minePendingTransaction(id, minerAddress);
     }
 }

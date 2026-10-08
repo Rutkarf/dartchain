@@ -27,10 +27,22 @@ final class ProductionSecretPolicy {
 
     private ProductionSecretPolicy() {}
 
+    static final String SHIPPED_ADMIN_SEED_SHA256 =
+            "3c7af8f4a99c61e08acb2bb85b972eb022db4ec432c1e338cb6be24abb2c8d9f";
+
     static void validate(Environment environment) {
         validateJwtSecret(environment.getProperty("dartchain.auth.jwt-secret", "").trim());
         validateActuatorToken(environment.getProperty("dartchain.ops.actuator-token", "").trim());
         validateDatabasePassword(resolveDatabasePassword(environment));
+        validateAdminSeed(environment.getProperty("dartchain.admin.seed-sha256", "").trim());
+    }
+
+    private static void validateAdminSeed(String seedSha256) {
+        if (SHIPPED_ADMIN_SEED_SHA256.equalsIgnoreCase(seedSha256)) {
+            throw new IllegalStateException(
+                    "Profil prod/staging/commercial : DARTCHAIN_ADMIN_SEED_SHA256 obligatoire "
+                            + "(remplacer la valeur livrée dans le fichier de base).");
+        }
     }
 
     private static String resolveDatabasePassword(Environment environment) {

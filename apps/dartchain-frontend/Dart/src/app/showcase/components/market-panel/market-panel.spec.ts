@@ -14,16 +14,16 @@ import { MARKET_ASSETS } from './market-panel.constants';
 import { MarketAssetRow } from './market-panel.model';
 
 const mockMetrics = {
-  volumeLabel: 'LaunchLab',
+  volumeLabel: 'Laboratoire',
   liquidityLabel: '25k R4V3',
   marketCapLabel: '12k / 50k',
   momentum: 'warm' as const,
-  momentumLabel: 'Momentum',
+  momentumLabel: 'Élan',
   holdersLabel: '420',
   tokenAgeLabel: '14j',
   recentActivityLabel: 'Calme',
   progressPercent: 24,
-  creatorLabel: 'LaunchLab · R4V3',
+  creatorLabel: 'Laboratoire · R4V3',
   statusLabel: 'LIVE',
 };
 
@@ -33,7 +33,7 @@ function mockRow(overrides: Partial<MarketAssetRow> = {}): MarketAssetRow {
     price: '0,05 €',
     changePercent: 1.2,
     positive: true,
-    volume: 'LaunchLab',
+    volume: 'Laboratoire',
     favorite: true,
     createdAtMs: Date.now(),
     metrics: mockMetrics,
@@ -179,11 +179,15 @@ describe('MarketPanelComponent', () => {
     fixture.destroy();
   });
 
-  it('should create and render compact market toolbar', () => {
+  it('should create and render category rail with search toolbar', () => {
     expect(fixture.componentInstance).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.market-panel__search-input')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('.market-panel__menu-btn')).toBeNull();
-    expect(fixture.nativeElement.textContent).not.toContain('TOUS');
+    expect(fixture.nativeElement.querySelector('.market-panel__rail')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('app-market-carousel-3d')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('NFT');
+    expect(fixture.nativeElement.textContent).toContain('SERVICES');
+    expect(fixture.nativeElement.textContent).toContain('ACTIFS');
+    expect(fixture.nativeElement.textContent).toContain('TOUT');
     expect(fixture.nativeElement.textContent).not.toContain('TRAD');
   });
 
@@ -192,20 +196,32 @@ describe('MarketPanelComponent', () => {
     expect(marketData.refreshAll).toHaveBeenCalledWith(true);
   });
 
-  it('should open token drawer when a card is clicked', () => {
-    const card = fixture.nativeElement.querySelector('.market-panel__row') as HTMLElement;
-    card.click();
+  it('should open token drawer when a carousel product is selected', () => {
+    const row = fixture.componentInstance['sortedRows']()[0];
+    expect(row).toBeTruthy();
+    fixture.componentInstance['openTokenDrawer'](row!);
     fixture.detectChanges();
-    expect(fixture.componentInstance['drawerRow']()?.config.exchangeToken).toBe('PXD');
+    expect(fixture.componentInstance['drawerRow']()?.config.exchangeToken).toBe(row!.config.exchangeToken);
     expect(fixture.nativeElement.querySelector('.market-token-drawer')).toBeTruthy();
   });
 
-  it('should toggle history panel without hiding asset list', () => {
-    expect(fixture.componentInstance['historyExpanded']()).toBe(false);
-    fixture.componentInstance['toggleHistory']();
+  it('should expose a carousel lane per category', () => {
+    const lanes = fixture.componentInstance['carouselLanes']();
+    expect(lanes.length).toBe(fixture.componentInstance['categoryRail'].length);
+    expect(lanes[0]?.category.id).toBe('all');
+  });
+
+  it('should filter by offer kind nft', () => {
+    marketData.rows.set([
+      mockRow({ config: MARKET_ASSETS[0] }),
+      mockRow({ config: MARKET_ASSETS[1] }),
+      mockRow({ config: MARKET_ASSETS[2] }),
+    ]);
+    fixture.componentInstance['setFilter']('nft');
     fixture.detectChanges();
-    expect(fixture.componentInstance['historyExpanded']()).toBe(true);
-    expect(fixture.nativeElement.querySelector('.market-panel__list')).toBeTruthy();
+    const filtered = fixture.componentInstance['filteredRows']();
+    expect(filtered.every((row) => row.config.offerKind === 'nft')).toBe(true);
+    expect(filtered.some((row) => row.config.exchangeToken === 'PXD')).toBe(true);
   });
 
   it('should pin R4V3 first and sort others by creation date', () => {

@@ -1,14 +1,14 @@
 :host {
   --rate-gap: 0px;
   --rate-pad: 0px 0px;
-  --rate-font: 5px;
-  --rate-font-sm: 5px;
-  --rate-title-font: 6px;
+  --rate-font: var(--fs-price);
+  --rate-font-sm: var(--fs-price);
+  --rate-title-font: var(--fs-title);
   --rate-meta-h: 2px;
-  --rate-head-h: 11px;
+  --rate-head-h: var(--comp-title-row-h, 16px);
   --rate-search-h: var(--rate-head-h);
   --rate-col-gap: 0;
-  --rate-card-row-h: clamp(3px, 3.2cqh, 5px);
+  --rate-card-row-h: var(--comp-rate-row-h, 8px);
   --rate-card-row-gap: 0;
   --rate-column-rows: 7;
   --rate-shell-rows: calc(var(--rate-column-rows) + 1);
@@ -29,15 +29,15 @@
   :host {
     --rate-gap: 0;
     --rate-pad: 0 0px;
-    --rate-font: 4px;
-    --rate-font-sm: 4px;
-    --rate-title-font: 5px;
+    --rate-font: var(--fs-price);
+    --rate-font-sm: var(--fs-price);
+    --rate-title-font: var(--fs-title);
     --rate-head-h: 8px;
-    --rate-card-row-h: clamp(2px, 2.8cqh, 4px);
+    --rate-card-row-h: var(--comp-rate-row-h, 8px);
   }
 
   .rate-panel-root {
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
   }
 
   .rate-panel__head {
@@ -62,14 +62,13 @@
   padding: var(--rate-pad);
   box-sizing: border-box;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   background: var(--glass-fill) padding-box, var(--glass-border) border-box;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    var(--glass-shadow, 0 2px 8px rgba(0, 0, 0, 0.25));
+    inset 0 1px 0 rgba(237, 231, 217, 0.05);
 }
 
 .rate-panel__shell {
@@ -95,7 +94,7 @@
   min-height: 0;
   height: 100%;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(var(--accent-primary-rgb), 0.08);
   background: rgba(var(--brand-black-rgb), 0.18);
 }
@@ -117,7 +116,7 @@
 .rate-panel__accent {
   width: 1px;
   height: calc(var(--rate-head-h) - 2px);
-  border-radius: 1px;
+  border-radius: var(--radius-none);
   flex-shrink: 0;
   margin-left: 1px;
   align-self: center;
@@ -131,7 +130,7 @@
 .rate-panel__title {
   flex-shrink: 0;
   font-family: var(--font-display);
-  font-size: var(--rate-title-font);
+  font-size: var(--fs-title);
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -182,26 +181,24 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0 3px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(var(--accent-primary-rgb), 0.14);
   background: rgba(var(--brand-black-rgb), 0.35);
   color: var(--text-primary);
-  font-size: var(--rate-font-sm);
+  font-size: var(--fs-price);
   font-weight: 600;
   line-height: 1;
   font-family: inherit;
   outline: none;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+  box-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.04);
+  transition: border-color var(--motion-state) var(--motion-ease-state);
 }
 
 .rate-panel-search__field-wrap--focused .rate-panel-search__input,
 .rate-panel-search__field-wrap--open .rate-panel-search__input {
   border-color: rgba(var(--accent-primary-rgb), 0.48);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(237, 231, 217, 0.06),
     0 0 0 1px rgba(var(--accent-primary-rgb), 0.22);
 }
 
@@ -214,8 +211,8 @@
   position: absolute;
   right: 4px;
   width: 8px;
-  height: 6px;
-  border-radius: 999px;
+  height: var(--comp-pastille, 4px);
+  border-radius: var(--radius-pill);
   border: 1px solid rgba(var(--accent-primary-rgb), 0.25);
   border-top-color: rgba(var(--accent-primary-rgb), 0.85);
   animation: rate-search-spin 700ms linear infinite;
@@ -238,12 +235,12 @@
   list-style: none;
   max-height: min(28dvh, 94px);
   overflow-y: auto;
-  border-radius: 5px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(var(--accent-primary-rgb), 0.35);
   background: var(--glass-dropdown-fill);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.42);
+  box-shadow: none;
 }
 
 .rate-panel-search__option,
@@ -253,8 +250,8 @@
   gap: 2px;
   min-width: 0;
   padding: 1px 2px;
-  border-radius: 3px;
-  font-size: clamp(4px, 2.6cqmin, 6px);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-label);
   line-height: 1.1;
   cursor: pointer;
 }
@@ -270,9 +267,9 @@
 
 .rate-panel-search__thumb {
   flex-shrink: 0;
-  width: 10px;
+  width: var(--comp-hud-h, 16px);
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 
 .rate-panel-search__symbol {
@@ -316,7 +313,7 @@
   padding: 0 0px 0 0;
   box-sizing: border-box;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
 }
 
@@ -401,7 +398,7 @@
     rgba(var(--brand-black-rgb), 0.28) 100%
   );
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(237, 231, 217, 0.08),
     0 0 12px rgba(var(--accent-primary-rgb), 0.14);
 }
 
@@ -413,7 +410,7 @@
 .rate-card--featured.rate-card--selected {
   border-color: rgba(var(--accent-primary-rgb), 0.55);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(237, 231, 217, 0.1),
     0 0 0 1px rgba(var(--accent-primary-rgb), 0.32),
     0 0 14px rgba(var(--accent-primary-rgb), 0.24);
 }
@@ -430,13 +427,13 @@
   grid-template-rows: minmax(0, 1fr) auto;
   padding: 0 0px 0px;
   gap: 0;
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
   box-shadow: none;
 }
 
 :host-context(.app-market-card--rate) .rate-panel-graph-zone {
   border-top: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   margin-top: 0;
   padding-top: 0;
   flex: 1 1 0;
@@ -463,7 +460,7 @@
 
 :host-context(.app-market-card--rate) .rate-card__area-segment,
 :host-context(.app-market-card--rate) .rate-card__line-segment {
-  animation: none;
+  animation:  none;
   stroke-dashoffset: 0;
   opacity: 0.8;
   transform: none;
@@ -480,21 +477,18 @@
   display: block;
   padding: 0;
   line-height: 0;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
   border: 1px solid rgba(var(--accent-primary-rgb), 0.08);
   background: rgba(var(--brand-black-rgb), 0.24);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background 180ms ease;
+  box-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.04);
+  transition: border-color var(--motion-state) var(--motion-ease-state), background var(--motion-state) var(--motion-ease-state);
 }
 
 .rate-card:hover {
   border-color: rgba(var(--accent-primary-rgb), 0.28);
   background: rgba(var(--brand-black-rgb), 0.32);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(237, 231, 217, 0.06),
     0 0 8px rgba(var(--accent-primary-rgb), 0.12);
 }
 
@@ -506,7 +500,7 @@
   outline: none;
   border-color: rgba(var(--accent-primary-rgb), 0.48);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(237, 231, 217, 0.06),
     0 0 0 1px rgba(var(--accent-primary-rgb), 0.28);
 }
 
@@ -514,7 +508,7 @@
   border-color: rgba(var(--accent-primary-rgb), 0.42);
   background: rgba(var(--accent-primary-rgb), 0.08);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(237, 231, 217, 0.08),
     0 0 0 1px rgba(var(--accent-primary-rgb), 0.22),
     0 0 10px rgba(var(--accent-primary-rgb), 0.18);
 }
@@ -555,7 +549,7 @@
 .rate-card__symbol {
   flex: 0 0 auto;
   font-family: var(--font-display);
-  font-size: var(--rate-font);
+  font-size: var(--fs-price);
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -567,7 +561,7 @@
 .rate-card__value {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: var(--rate-font-sm);
+  font-size: var(--fs-price);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -581,7 +575,7 @@
 
 .rate-card__change {
   flex: 0 0 auto;
-  font-size: var(--rate-font-sm);
+  font-size: var(--fs-price);
   font-weight: 800;
   line-height: 1;
   white-space: nowrap;
@@ -628,12 +622,12 @@
 
 .rate-card--loading .rate-card__line-segment,
 .rate-card--loading .rate-card__area-segment {
-  animation: none;
+  animation:  none;
 }
 
 .rate-card__area-segment {
   opacity: 0.72;
-  animation: rateAreaIn 450ms ease-out both;
+  animation: rateAreaIn var(--motion-enter) var(--motion-ease-enter) both;
 }
 
 .rate-card__area-segment--up {
@@ -653,7 +647,7 @@
   pathLength: 100;
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
-  animation: rateLineIn 850ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: rateLineIn var(--motion-enter) var(--motion-ease-enter) forwards;
 }
 
 .rate-card__line-segment--up {
@@ -673,19 +667,15 @@
 @keyframes rateAreaIn {
   from {
     opacity: 0;
-    transform: scaleY(0.84);
-    transform-origin: bottom;
   }
   to {
     opacity: 0.8;
-    transform: scaleY(1);
-    transform-origin: bottom;
   }
 }
 
 @supports not (width: 1cqw) {
   :host {
-    --rate-card-row-h: 5px;
+    --rate-card-row-h: var(--comp-rate-row-h, 8px);
   }
 
   .rate-panel-column {
@@ -695,15 +685,15 @@
 
 @media (max-width: 280px) {
   :host {
-    --rate-font: 5px;
-    --rate-font-sm: 5px;
+    --rate-font: var(--fs-price);
+    --rate-font-sm: var(--fs-price);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .rate-card__line,
   .rate-card__area {
-    animation: none;
+    animation:  none;
   }
 }
 
@@ -717,20 +707,20 @@
 
 @media (max-width: 399px) {
   :host {
-    --rate-font: 5px;
-    --rate-font-sm: 5px;
+    --rate-font: var(--fs-price);
+    --rate-font-sm: var(--fs-price);
   }
 }
 
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
-    --rate-title-font: 6px;
+    --rate-title-font: var(--fs-title);
     --rate-head-h: 10px;
     --rate-search-h: var(--rate-head-h);
     --rate-meta-h: 2px;
-    --rate-font: 4px;
-    --rate-font-sm: 4px;
-    --rate-card-row-h: clamp(3px, 3cqh, 4px);
+    --rate-font: var(--fs-price);
+    --rate-font-sm: var(--fs-price);
+    --rate-card-row-h: var(--comp-rate-row-h, 8px);
     --rate-pad: 0px 0px;
   }
 
@@ -745,13 +735,13 @@
 
 @media (min-width: 400px) {
   :host {
-    --rate-font: 6px;
-    --rate-font-sm: 6px;
-    --rate-title-font: 7px;
+    --rate-font: var(--fs-price);
+    --rate-font-sm: var(--fs-price);
+    --rate-title-font: var(--fs-title);
     --rate-head-h: 12px;
     --rate-search-h: var(--rate-head-h);
     --rate-meta-h: 2px;
-    --rate-card-row-h: clamp(5px, 3.8cqh, 7px);
+    --rate-card-row-h: var(--comp-rate-row-h, 8px);
   }
 }
 
@@ -769,7 +759,7 @@
   min-height: 0;
   padding: 0;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
@@ -786,22 +776,21 @@
   min-height: 0;
   height: 100%;
   overflow: visible;
-  border-radius: clamp(6px, 1.8vw, 10px);
+  border-radius: var(--radius-sm, 4px);
 }
 
 :host(.rate-panel--hub-graph) .rate-panel__shell.ds-surface.ds-surface--card {
   /* Pas de border layout (évite un décalage 1px vs Showcase/Dock) — trait via box-shadow */
   border: none;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 10px 28px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 0 0 1px rgba(237, 231, 217, 0.08),
+    inset 0 1px 0 rgba(237, 231, 217, 0.04);
   background:
     linear-gradient(
       165deg,
-      rgba(255, 255, 255, 0.03) 0%,
-      rgba(6, 12, 22, 0.9) 42%,
-      rgba(4, 8, 16, 0.96) 100%
+      rgba(237, 231, 217, 0.03) 0%,
+      rgba(10, 18, 32, 0.9) 42%,
+      rgba(10, 18, 32, 0.96) 100%
     );
 }
 
@@ -813,7 +802,7 @@
   flex-direction: column;
   padding: 0;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
   box-shadow: none;
   overflow: visible;
@@ -834,15 +823,15 @@
 :host(.rate-panel--hub-graph) .rate-panel-graph-zone--hub::before {
   bottom: 1px;
   left: 3px;
-  border-bottom: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.35);
-  border-left: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.35);
+  border-bottom: 1px solid rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.35);
+  border-left: 1px solid rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.35);
 }
 
 :host(.rate-panel--hub-graph) .rate-panel-graph-zone--hub::after {
   bottom: 1px;
   right: 3px;
-  border-bottom: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.35);
-  border-right: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.35);
+  border-bottom: 1px solid rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.35);
+  border-right: 1px solid rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.35);
 }
 
 :host(.rate-panel--hub-graph) .rate-panel-chart {
@@ -852,7 +841,7 @@
   overflow: visible;
   /* Pas de padding horizontal : l’inset droit du menu actions est partagé (Graph/Showcase/Dock) */
   padding: 0;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
   box-sizing: border-box;
 }

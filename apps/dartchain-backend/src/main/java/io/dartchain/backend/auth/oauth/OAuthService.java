@@ -53,10 +53,16 @@ public class OAuthService {
     public OAuthProvidersResponse listProviders() {
         List<OAuthProviderInfo> providers = new ArrayList<>();
         for (OAuthProvider provider : OAuthProvider.values()) {
+            boolean real = isRealProviderConfigured(provider)
+                    && (provider == OAuthProvider.APPLE
+                    ? oauthProperties.getApple().isEnabled()
+                    : standardProviderConfig(provider).isEnabled());
+            boolean available = isProviderAvailable(provider);
             providers.add(new OAuthProviderInfo(
                     provider.id(),
                     provider.label(),
-                    isProviderAvailable(provider)
+                    available,
+                    available && !real
             ));
         }
         return new OAuthProvidersResponse(providers);
@@ -148,8 +154,8 @@ public class OAuthService {
             UserAccount account = userProvisioner.resolveOrCreate(
                     provider,
                     "dev-mock-" + provider.id(),
-                    "oauth." + provider.id() + "@dartchain.local",
-                    "OAuth " + provider.id()
+                    provider.id() + ".dev@dartchain.local",
+                    provider.id() + "_dev"
             );
             return redirectWithExchangeCode(frontendRedirect, account);
         }
@@ -405,7 +411,10 @@ public class OAuthService {
                 OAuthProvider.GITHUB,
                 profile.id(),
                 email,
-                profile.name() == null || profile.name().isBlank() ? profile.login() : profile.name()
+                // Login GitHub stable (évite un display name libre type "OAuth github").
+                profile.login() == null || profile.login().isBlank()
+                        ? (profile.name() == null || profile.name().isBlank() ? "github" : profile.name())
+                        : profile.login()
         );
     }
 
@@ -607,7 +616,14 @@ public class OAuthService {
     }
 
     private AuthException unavailableProviderException(OAuthProvider provider) {
-        return new AuthException(503, "Connexion " + provider.id() + " non configurée");
+        return new AuthException(
+                503,
+                "Connexion " + provider.label()
+                        + " non configurée. Renseignez OAUTH_"
+                        + provider.id().toUpperCase()
+                        + "_ENABLED=true et les credentials client, "
+                        + "ou désactivez le bouton jusqu’à configuration."
+        );
     }
 
     private String backendCallbackUrl(OAuthProvider provider) {

@@ -2,7 +2,7 @@ import type { MapQuality } from './map-configuration';
 
 /** Phase 8 + 14 — éclairage de nuit (parité visuelle). */
 export const NIGHT_LIGHTING_DEFAULTS = {
-  spotColor: 0xffe8c8,
+  spotColor: 0xede7d9,
   spotIntensity: 0.72,
   spotDistance: 16,
   spotAngle: Math.PI / 5.2,

@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import * as THREE from 'three';
 
-import { MARSEILLE_START_POSITION } from './map-configuration';
+import { METAVERSE_START_POSITION } from './map-configuration';
 import { GeoCoordinateService } from './geo-coordinate.service';
 import { LocalOriginService } from './local-origin.service';
 import { MapConfigService } from './map-config.service';
@@ -16,8 +16,8 @@ describe('GeoCoordinateService', () => {
 
   it('place l origine Ombrière au centre du monde local', () => {
     const world = geo.geoToWorld(
-      MARSEILLE_START_POSITION.latitude,
-      MARSEILLE_START_POSITION.longitude,
+      METAVERSE_START_POSITION.latitude,
+      METAVERSE_START_POSITION.longitude,
       0
     );
 
@@ -70,14 +70,14 @@ describe('GeoCoordinateService', () => {
     expect(east.z).toBeCloseTo(origin.z, 3);
   });
 
-  it('expose marseille-local-v1 via getReferenceConfig', () => {
-    expect(geo.getReferenceConfig().coordinateSystemVersion).toBe('marseille-local-v1');
+  it('expose metaverse-local-v1 via getReferenceConfig', () => {
+    expect(geo.getReferenceConfig().coordinateSystemVersion).toBe('metaverse-local-v1');
   });
 
   it('expose l origine via LocalOriginService', () => {
     const origin = TestBed.inject(LocalOriginService);
-    expect(origin.latitude).toBe(MARSEILLE_START_POSITION.latitude);
-    expect(origin.longitude).toBe(MARSEILLE_START_POSITION.longitude);
+    expect(origin.latitude).toBe(METAVERSE_START_POSITION.latitude);
+    expect(origin.longitude).toBe(METAVERSE_START_POSITION.longitude);
     expect(origin.worldScale).toBe(1);
   });
 

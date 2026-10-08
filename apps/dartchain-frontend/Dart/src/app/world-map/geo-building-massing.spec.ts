@@ -48,7 +48,7 @@ describe('geo-building massing Phase 3', () => {
   });
 
   it('extrude batiment GPS > box AABB en volume utile', () => {
-    const wall = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+    const wall = new THREE.MeshStandardMaterial({ color: 0xede7d9, side: THREE.DoubleSide });
     const extrude = createGeoBuildingMesh(building, stubGeo as never, { wall }, { massing: 'extrude' });
     const box = createBoxBuildingFromGeoData(building, stubGeo as never, { wall });
     expect(extrude).not.toBeNull();
@@ -69,8 +69,8 @@ describe('geo-building massing Phase 3', () => {
   });
 
   it('tier cadastre ajoute socle et corniche', () => {
-    const wall = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide });
-    const roof = new THREE.MeshStandardMaterial({ color: 0xeeeeee, side: THREE.DoubleSide });
+    const wall = new THREE.MeshStandardMaterial({ color: 0xede7d9, side: THREE.DoubleSide });
+    const roof = new THREE.MeshStandardMaterial({ color: 0xede7d9, side: THREE.DoubleSide });
     const built = createGeoBuildingMesh(
       building,
       stubGeo as never,

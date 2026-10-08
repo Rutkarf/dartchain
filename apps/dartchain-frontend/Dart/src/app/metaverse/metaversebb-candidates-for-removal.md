@@ -11,9 +11,9 @@ Aucun composant/service de la liste n’est unused. Tous ont un usage runtime da
 |---|---|---|---|---|---|
 | LocalOriginService | Service | Facade mince (getters MapConfig) | YES (GeoCoordinateService, GeoMappingService) | Lire MapConfigService directement | CONSERVER ; option ISOLER/inliner plus tard |
 | CharacterNftApiService | Service | Stub HTTP, catch → null | YES (`app-character` only) | Mesh local déjà fallback | CONSERVER (prépare mint) |
-| M4t3rDebugOverlay | Service | Debug F9, pas UX joueur | YES (MarseilleMapProvider) | — | CONSERVER (debug) |
-| MarseilleGeoDebugService | Service | Debug F11 | YES (MarseilleMapProvider) | — | CONSERVER (debug) |
-| RunnerWorldService | Service | Surtout legacy / collisions | YES (CharacterControl, LegacyFloorMapProvider) | Colliders OSM Marseille | CONSERVER (fallback + collisions) |
+| M4t3rDebugOverlay | Service | Debug F9, pas UX joueur | YES (MetaverseMapProvider) | — | CONSERVER (debug) |
+| MetaverseGeoDebugService | Service | Debug F11 | YES (MetaverseMapProvider) | — | CONSERVER (debug) |
+| RunnerWorldService | Service | Surtout legacy / collisions | YES (CharacterControl, LegacyFloorMapProvider) | Colliders OSM Metaverse | CONSERVER (fallback + collisions) |
 | RunnerStateService | Service | Progress runner | YES (CharacterControl only) | — | CONSERVER |
 
 ## Adjacent (not in the listed 41)
@@ -22,7 +22,7 @@ Découverts pendant l’audit. Hors liste d’origine. Ne pas supprimer.
 
 | Element | Type | Reason | Usage detected | Alternative | Recommendation |
 |---|---|---|---|---|---|
-| CitySceneService `core/services/city-scene.service.ts` | Service | Ville procédurale legacy ; `app-city-scene` ne l’injecte pas | NO import | MapLoadingService + MarseilleMapProvider | CANDIDATE_FOR_REMOVAL — DÉPRÉCIER, ne pas supprimer |
+| CitySceneService `core/services/city-scene.service.ts` | Service | Ville procédurale legacy ; `app-city-scene` ne l’injecte pas | NO import | MapLoadingService + MetaverseMapProvider | CANDIDATE_FOR_REMOVAL — DÉPRÉCIER, ne pas supprimer |
 | `wigle/wigle-integration.service.ts` | Barrel | Re-export alias `WigleIntegrationService` ; aucun import du fichier | NO import of file | Importer `wigle-visualization.service` | CANDIDATE_FOR_REMOVAL — barrel mort |
 | `app-ladder-climb-scene` | Component | Scène climb séparée, non montée dans `app.html` | NO host | Prompt climb dans `app-character` | OUT_OF_SCOPE / CANDIDATE — hors MetaVerseBB host |
 | `StarJoystickBridgeService` | Service | Pont floor ↔ Star Conquest ; register unused | Comments only | Layout DOM query | OUT_OF_SCOPE (Star Conquest) |

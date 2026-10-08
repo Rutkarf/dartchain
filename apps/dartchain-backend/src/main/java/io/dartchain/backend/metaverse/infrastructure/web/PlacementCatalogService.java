@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 public class PlacementCatalogService {
 
-    static final String COORDINATE_SYSTEM = "marseille-local-v1";
+    static final String COORDINATE_SYSTEM = "metaverse-local-v1";
     static final double DEFAULT_SOUTH = 43.28;
     static final double DEFAULT_NORTH = 43.3095;
     static final double DEFAULT_WEST = 5.354;

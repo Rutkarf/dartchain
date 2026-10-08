@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
 import { GeoCoordinateService } from '../geo-coordinate.service';
-import { MARSEILLE_LANDMARK_BUILDINGS } from '../geo-reference.config';
+import { METAVERSE_LANDMARK_BUILDINGS } from '../geo-reference.config';
 import { footprintCentroid } from '../geo-building.util';
 import { createDevPlacementFixtures } from './placement-fixtures.dev';
 import {
   groundFloorAnchorFromGeoFootprint,
-  projectGeoToMarseilleWorld,
+  projectGeoToMetaverseWorld,
 } from './ground-floor-anchor.util';
 
 /**
@@ -79,7 +79,7 @@ describe('placement-geo-precision (GEO-PREC-2)', () => {
     const fixtures = createDevPlacementFixtures();
     const buildings = fixtures.buildings ?? [];
     for (const building of buildings) {
-      const def = MARSEILLE_LANDMARK_BUILDINGS.find((item) => item.id === building.id);
+      const def = METAVERSE_LANDMARK_BUILDINGS.find((item) => item.id === building.id);
       expect(def).toBeDefined();
       const center = footprintCentroid(def!.footprint, geo);
       const err = Math.hypot(center.x - building.world.x, center.z - building.world.z);
@@ -90,7 +90,7 @@ describe('placement-geo-precision (GEO-PREC-2)', () => {
   it('aligne le projecteur fixtures sur GeoCoordinateService à l origine', () => {
     const sample = { latitude: 43.2946667, longitude: 5.3748399, altitude: 1.2 };
     const serviceWorld = geo.geoToWorld(sample.latitude, sample.longitude, sample.altitude);
-    const utilWorld = projectGeoToMarseilleWorld(
+    const utilWorld = projectGeoToMetaverseWorld(
       sample.latitude,
       sample.longitude,
       sample.altitude
@@ -106,7 +106,7 @@ describe('placement-geo-precision (GEO-PREC-2)', () => {
   it('dérive chaque ancre RDC du bord de footprint OSM (pas d un offset AABB)', () => {
     const fixtures = createDevPlacementFixtures();
     for (const placement of fixtures.placements) {
-      const landmark = MARSEILLE_LANDMARK_BUILDINGS.find(
+      const landmark = METAVERSE_LANDMARK_BUILDINGS.find(
         (item) => item.id === placement.buildingId
       );
       expect(landmark).toBeDefined();

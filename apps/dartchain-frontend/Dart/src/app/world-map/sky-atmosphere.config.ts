@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { activeAtmospherePreset } from './marseille-atmosphere.config';
+import { activeAtmospherePreset } from './metaverse-atmosphere.config';
 
 export interface SkyAtmosphereColors {
   zenith: THREE.Color;
@@ -14,11 +14,11 @@ export function resolveSkyAtmosphereColors(): SkyAtmosphereColors {
   const preset = activeAtmospherePreset();
   const fog = new THREE.Color(preset.fogColor);
 
-  const zenith = fog.clone().lerp(new THREE.Color(0x060810), 0.55);
-  zenith.lerp(new THREE.Color(0x101828), 0.35);
+  const zenith = fog.clone().lerp(new THREE.Color(0x0d0630), 0.55);
+  zenith.lerp(new THREE.Color(0x0d0630), 0.35);
 
-  const horizon = fog.clone().lerp(new THREE.Color(0x283850), 0.42);
-  const glow = new THREE.Color(0x42a8ff).lerp(fog, 0.62);
+  const horizon = fog.clone().lerp(new THREE.Color(0x18314f), 0.42);
+  const glow = new THREE.Color(0x8a95a5).lerp(fog, 0.62);
 
   const starIntensity =
     'starIntensity' in preset && typeof preset.starIntensity === 'number'

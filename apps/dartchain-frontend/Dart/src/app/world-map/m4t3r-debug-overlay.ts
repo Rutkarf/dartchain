@@ -97,13 +97,13 @@ export class M4t3rDebugOverlay {
         position: 'fixed',
         top: '8px',
         left: '8px',
-        background: 'rgba(0,0,0,0.88)',
-        color: '#40e0ff',
-        fontFamily: 'monospace',
+        background: 'rgba(10, 18, 32,0.88)',
+        color: '#8b9dad',
+        fontFamily: 'Inter, sans-serif',
         fontSize: '10px',
         padding: '10px 14px',
-        borderRadius: '6px',
-        border: '1px solid #40e0ff33',
+        borderRadius: 'var(--radius-sm)',
+        border: '1px solid #8b9dad33', // Bleu gris luluw + alpha
         zIndex: '99999',
         pointerEvents: 'none',
         lineHeight: '1.55',
@@ -146,10 +146,10 @@ export class M4t3rDebugOverlay {
     const rewardDebug = this.rewardRuntime.debugInfo();
 
     this.panel.innerHTML = [
-      '<b style="color:#ffe600">M4T3R WORLD DEBUG (F9)</b>',
+      '<b style="color:#d5a021">M4T3R WORLD DEBUG (F9)</b>',
       '',
       '<b>Hierarchy</b>',
-      `m4t3rRoot parent: <span style="color:#7f7">${rootParent}</span>`,
+      `m4t3rRoot parent: <span style="color:#09814a">${rootParent}</span>`,
       `m4t3rRoot worldPos: ${this.fv(rootWorldPos)}`,
       `frustumCulled: variant-based (default true)`,
       '',
@@ -186,7 +186,7 @@ export class M4t3rDebugOverlay {
       `Token anim Hz: near ${s.nearAnimationFrequencyHz} / mid ${s.midAnimationFrequencyHz}`,
       `R4V3 tokens: ${s.variantCounts['r4v3-token'] ?? s.visibleInstances}`,
       `LOD near/mid/far: ${s.lodCounts.near}/${s.lodCounts.mid}/${s.lodCounts.far}`,
-      `Init at startup: ${s.chunksInitialized ? '<span style="color:#7f7">YES</span>' : '<span style="color:#f77">NO</span>'}`,
+      `Init at startup: ${s.chunksInitialized ? '<span style="color:#09814a">YES</span>' : '<span style="color:#7b0d1e">NO</span>'}`,
       this.rendererMetrics
         ? `Renderer calls/triangles: ${this.rendererMetrics.drawCalls}/${this.rendererMetrics.triangles}`
         : 'Renderer calls/triangles: n/a',
@@ -197,7 +197,7 @@ export class M4t3rDebugOverlay {
         ? `Canvas ${this.rendererMetrics.canvasWidth}x${this.rendererMetrics.canvasHeight} @${this.rendererMetrics.pixelRatio.toFixed(2)}x`
         : 'Canvas: n/a',
       '',
-      '<b style="color:#ffe600">M4T3R REWARD DEBUG</b>',
+      '<b style="color:#d5a021">M4T3R REWARD DEBUG</b>',
       rewardDebug
         ? [
             `rewardId: ${rewardDebug.rewardId}`,

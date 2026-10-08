@@ -33,7 +33,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--font-display, inherit);
-  font-size: clamp(0.26rem, 1.55vw, 0.355rem);
+  font-size: var(--fs-chain);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -46,15 +46,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: calc(clamp(0.28rem, 1.7vw, 0.375rem) + 1px);
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-chain);
   font-weight: 700;
   letter-spacing: 0.01em;
-  color: rgba(244, 251, 255, 0.94);
+  color: rgba(237, 231, 217, 0.94);
 }
 
 .quests-summary-bar__quest.is-empty {
-  color: rgba(168, 180, 196, 0.62);
+  color: rgba(139, 157, 173, 0.62);
   font-weight: 600;
 }
 
@@ -71,19 +71,19 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  height: 11px;
+  height: var(--comp-hud-h, 16px);
   margin: 0;
   padding: 0 5px;
-  border: 1px solid rgba(255, 184, 77, 0.35);
-  border-radius: 0;
+  border: 1px solid rgba(123, 13, 30, 0.35);
+  border-radius: var(--radius-none);
   background: linear-gradient(
     180deg,
-    rgba(255, 184, 77, 0.18) 0%,
-    rgba(255, 184, 77, 0.06) 100%
+    rgba(123, 13, 30, 0.18) 0%,
+    rgba(123, 13, 30, 0.06) 100%
   );
-  color: rgba(244, 251, 255, 0.72);
+  color: rgba(237, 231, 217, 0.72);
   font-family: var(--font-display, inherit);
-  font-size: clamp(0.24rem, 1.4vw, 0.32rem);
+  font-size: var(--fs-chain);
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -96,29 +96,30 @@
 }
 
 .quests-summary-bar__claim.is-ready {
-  border-color: rgba(61, 214, 140, 0.5);
+  border-color: rgba(9, 129, 74, 0.5);
   background: linear-gradient(
     180deg,
-    rgba(61, 214, 140, 0.34) 0%,
-    rgba(61, 214, 140, 0.12) 100%
+    rgba(9, 129, 74, 0.34) 0%,
+    rgba(9, 129, 74, 0.12) 100%
   );
-  color: rgba(244, 251, 255, 0.96);
+  color: rgba(237, 231, 217, 0.96);
 }
 
 .quests-summary-bar__claim.is-ready:hover:not(:disabled) {
-  color: #fff;
-  border-color: rgba(61, 214, 140, 0.72);
+  color: var(--text-primary, #ede7d9);
+  border-color: var(--state-hover-border);
+  background: var(--cta-accent-bg-hover);
+  box-shadow: var(--cta-accent-shadow-hover);
 }
 
 .quests-summary-bar__claim:disabled {
-  opacity: 0.38;
-  cursor: default;
-  pointer-events: none;
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
 }
 
 .quests-summary-bar__claim:focus-visible {
-  outline: 1px solid rgba(61, 214, 140, 0.55);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: var(--state-focus-ring);
 }
 
 @container (max-width: 160px) {

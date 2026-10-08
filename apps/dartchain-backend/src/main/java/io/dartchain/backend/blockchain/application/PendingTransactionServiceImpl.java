@@ -91,19 +91,14 @@ public class PendingTransactionServiceImpl implements PendingTransactionService 
     }
 
     @Override
-    public synchronized MinePendingTransactionResponse minePendingTransaction(String id) {
+    public synchronized MinePendingTransactionResponse minePendingTransaction(String id, String minerAddress) {
         PendingTransaction transaction = transactionPoolService.findById(id);
         if (transaction == null) {
-            throw new IllegalArgumentException("Pending transaction not found: " + id);
+            throw new IllegalArgumentException("Transaction en attente introuvable : " + id);
         }
 
         validationService.validatePendingTransaction(transaction, userAccountStore);
-
-        String blockData = buildBlockData(transaction);
-        Block block = blockchainService.addBlock(blockData);
-
-        transaction.setStatus("MINED");
-        transactionPoolService.removeById(id);
+        Block block = blockchainService.mineSinglePending(id, minerAddress);
 
         return new MinePendingTransactionResponse(
                 "Transaction minée avec succès.",
@@ -156,26 +151,11 @@ public class PendingTransactionServiceImpl implements PendingTransactionService 
         );
     }
 
-    private String buildBlockData(PendingTransaction transaction) {
-        return "txId=" + safe(transaction.getId())
-                + ";from=" + safe(transaction.getFromAddress())
-                + ";to=" + safe(transaction.getToAddress())
-                + ";amount=" + safeAmount(transaction.getAmount())
-                + ";data=" + safe(transaction.getData())
-                + ";signature=" + safe(transaction.getSignature())
-                + ";status=" + safe(transaction.getStatus())
-                + ";createdAt=" + safeLong(transaction.getCreatedAt());
-    }
-
     private String safe(String value) {
         return value == null ? "" : value;
     }
 
     private String safeAmount(BigDecimal value) {
         return value == null ? "0" : value.stripTrailingZeros().toPlainString();
-    }
-
-    private String safeLong(Long value) {
-        return value == null ? "0" : value.toString();
     }
 }

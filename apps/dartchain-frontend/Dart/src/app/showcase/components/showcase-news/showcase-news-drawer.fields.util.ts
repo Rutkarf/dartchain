@@ -57,15 +57,15 @@ export function drawerActionTypeLabel(item: NewsItem): string | null {
       return 'Voir bloc';
     case 'VIEW_PENDING':
     case 'OPEN_PENDING':
-      return 'Pending';
+      return 'En attente';
     case 'OPEN_PEERS':
-      return 'Peers';
+      return 'Pairs';
     case 'OPEN_FAUCET':
-      return 'Faucet';
+      return 'Robinet';
     case 'OPEN_SWAP':
-      return 'Swap';
+      return 'Échange';
     case 'OPEN_WALLET':
-      return 'Wallet';
+      return 'Portefeuille';
     default:
       return null;
   }
@@ -74,7 +74,7 @@ export function drawerActionTypeLabel(item: NewsItem): string | null {
 export function drawerSourceLabel(source: NewsSource): string {
   switch (source) {
     case 'CHAIN':
-      return 'On-chain';
+      return 'Sur la chaîne';
     case 'EDITORIAL':
       return 'Édito';
     default:

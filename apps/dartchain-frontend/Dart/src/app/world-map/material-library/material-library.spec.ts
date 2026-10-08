@@ -40,9 +40,9 @@ describe('material-library Phase 7', () => {
     const fullOwner = { textures: [] as import('three').Texture[] };
     const full = createHaussmannFacadePbrMaps(
       {
-        baseColor: 0xcbbda6,
-        windowColor: '#d9ebf5',
-        accentColor: '#8d6f55',
+        baseColor: 0xede7d9,
+        windowColor: '#ede7d9',
+        accentColor: '#8b9dad',
         seed: 42,
       },
       'full',
@@ -53,9 +53,9 @@ describe('material-library Phase 7', () => {
 
     const medium = createHaussmannFacadePbrMaps(
       {
-        baseColor: 0xcbbda6,
-        windowColor: '#d9ebf5',
-        accentColor: '#8d6f55',
+        baseColor: 0xede7d9,
+        windowColor: '#ede7d9',
+        accentColor: '#8b9dad',
         seed: 42,
       },
       'albedo'
@@ -68,9 +68,9 @@ describe('material-library Phase 7', () => {
     const heightSurface = createPbrCanvas(16);
     if (!heightSurface) return;
     const { canvas: height, ctx } = heightSurface;
-    ctx.fillStyle = '#808080';
+    ctx.fillStyle = '#8b9dad';
     ctx.fillRect(0, 0, 16, 16);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#ede7d9';
     ctx.fillRect(4, 4, 8, 8);
     const normal = normalMapFromHeightCanvas(height, undefined, 2);
     expect(normal.image.width).toBe(16);

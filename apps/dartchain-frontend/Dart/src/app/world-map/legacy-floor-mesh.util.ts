@@ -1,7 +1,8 @@
 import * as THREE from 'three';
+import { createStrokeLineMaterial, STROKE } from '../core/constants/stroke-bevel';
 
 /** Noir plein — aligné fond app. */
-const SCENE_BG = 0x000000;
+const SCENE_BG = 0x0d0630;
 
 export interface LegacyFloorMeshes {
   floor: THREE.Mesh;
@@ -25,7 +26,7 @@ export function createLegacyFloorMeshes(scene: THREE.Scene): LegacyFloorMeshes {
   floorTexture.colorSpace = THREE.SRGBColorSpace;
 
   const floorMaterial = new THREE.MeshLambertMaterial({
-    color: 0xffffff,
+    color: 0xede7d9,
     map: floorTexture,
     side: THREE.FrontSide,
     transparent: false,
@@ -45,12 +46,7 @@ export function createLegacyFloorMeshes(scene: THREE.Scene): LegacyFloorMeshes {
   ]);
   const pathLine = new THREE.Line(
     pathGeo,
-    new THREE.LineBasicMaterial({
-      color: 0x111111,
-      transparent: true,
-      opacity: 0.45,
-      depthWrite: false,
-    })
+    createStrokeLineMaterial(STROKE.seam, { depthWrite: false })
   );
   pathLine.name = 'path-line';
   pathLine.raycast = () => {};
@@ -81,9 +77,9 @@ function createDenseGridTexture(): THREE.CanvasTexture {
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = '#f4f4f4';
+  ctx.fillStyle = '#ede7d9';
   ctx.fillRect(0, 0, size, size);
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.38)';
+  ctx.strokeStyle = 'rgba(10, 18, 32, 0.38)';
   ctx.lineWidth = 1;
   const step = size / 8;
   for (let i = 0; i <= 8; i++) {
@@ -97,17 +93,17 @@ function createDenseGridTexture(): THREE.CanvasTexture {
     ctx.lineTo(size, p);
     ctx.stroke();
   }
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
+  ctx.strokeStyle = 'rgba(10, 18, 32, 0.55)';
   ctx.beginPath();
   ctx.moveTo(0.5, 0);
   ctx.lineTo(0.5, size);
   ctx.moveTo(0, 0.5);
   ctx.lineTo(size, 0.5);
   ctx.stroke();
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+  ctx.strokeStyle = 'rgba(10, 18, 32, 0.45)';
   ctx.lineWidth = 1.25;
   ctx.strokeRect(0.5, 0.5, size - 1, size - 1);
-  ctx.strokeStyle = 'rgba(20, 20, 20, 0.5)';
+  ctx.strokeStyle = 'rgba(10, 18, 32, 0.5)';
   ctx.beginPath();
   ctx.moveTo(size * 0.5 + 0.5, 0);
   ctx.lineTo(size * 0.5 + 0.5, size);

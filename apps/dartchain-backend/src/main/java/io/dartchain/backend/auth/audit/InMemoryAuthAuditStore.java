@@ -25,6 +25,7 @@ public class InMemoryAuthAuditStore implements AuthAuditStore {
         ));
     }
 
+    @Override
     public List<AuthAuditEntry> snapshot() {
         synchronized (entries) {
             return List.copyOf(entries);

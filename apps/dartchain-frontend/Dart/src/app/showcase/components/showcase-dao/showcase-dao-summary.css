@@ -16,7 +16,7 @@
   min-width: 0;
   height: 100%;
   max-height: 100%;
-  padding: 0 1px 0 2px;
+  padding: 0 2px 0 2px;
   box-sizing: border-box;
   overflow: hidden;
   line-height: 1;
@@ -37,7 +37,7 @@
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   width: 100%;
   min-width: 0;
   height: 100%;
@@ -45,48 +45,48 @@
 }
 
 .dao-summary-line__slide--enter {
-  animation: dao-summary-line-rise 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: dao-summary-line-rise var(--motion-enter) var(--motion-ease-enter) both;
 }
 
 .dao-summary-line__status {
   flex: 0 0 auto;
   padding: 0 2px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 0;
-  font-size: clamp(0.26rem, 1.6vw, 0.34rem);
+  border: 1px solid rgba(237, 231, 217, 0.12);
+  border-radius: var(--radius-none);
+  font-size: var(--fs-module);
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   line-height: 1.35;
-  color: rgba(168, 184, 200, 0.72);
+  color: rgba(139, 157, 173, 0.72);
   white-space: nowrap;
 }
 
 .dao-summary-line__status--active {
-  color: #9dffd0;
-  border-color: rgba(61, 214, 140, 0.45);
+  color: #09814a;
+  border-color: rgba(9, 129, 74, 0.45);
   background: linear-gradient(
     180deg,
-    rgba(61, 214, 140, 0.16) 0%,
-    rgba(61, 214, 140, 0.06) 100%
+    rgba(9, 129, 74, 0.16) 0%,
+    rgba(9, 129, 74, 0.06) 100%
   );
 }
 
 .dao-summary-line__status--creating {
-  color: rgba(245, 215, 110, 0.9);
-  border-color: rgba(245, 215, 110, 0.28);
-  background: rgba(245, 215, 110, 0.1);
+  color: rgba(213, 160, 33, 0.9);
+  border-color: rgba(213, 160, 33, 0.28);
+  background: rgba(213, 160, 33, 0.1);
 }
 
 .dao-summary-line__status--closed {
-  color: rgba(140, 152, 168, 0.72);
-  border-color: rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  color: rgba(139, 157, 173, 0.72);
+  border-color: rgba(237, 231, 217, 0.1);
+  background: rgba(237, 231, 217, 0.04);
 }
 
 .dao-summary-line__symbol {
   flex: 0 0 auto;
-  font-size: clamp(0.3rem, 1.9vw, 0.4rem);
+  font-size: var(--fs-module);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -97,9 +97,9 @@
 .dao-summary-line__name {
   flex: 0 1 auto;
   min-width: 0;
-  font-size: clamp(0.3rem, 1.9vw, 0.4rem);
+  font-size: var(--fs-module);
   font-weight: 700;
-  color: var(--text-soft, rgba(220, 232, 244, 0.82));
+  color: var(--text-soft, rgba(237, 231, 217, 0.82));
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -107,55 +107,53 @@
 
 .dao-summary-line__sep {
   flex: 0 0 auto;
-  color: rgba(255, 255, 255, 0.28);
-  font-size: clamp(0.28rem, 1.7vw, 0.36rem);
+  color: rgba(237, 231, 217, 0.28);
+  font-size: var(--fs-module);
   line-height: 1;
 }
 
 .dao-summary-line__stats {
   flex: 0 0 auto;
-  font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.28rem, 1.7vw, 0.36rem);
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-module);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
-  color: rgba(92, 225, 255, 0.82);
+  color: rgba(139, 157, 173, 0.82);
   white-space: nowrap;
 }
 
 .dao-summary-line__summary {
   flex: 1 1 0;
   min-width: 0;
-  font-size: clamp(0.28rem, 1.7vw, 0.36rem);
+  font-size: var(--fs-module);
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(237, 231, 217, 0.55);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .dao-summary-line__fallback {
-  font-size: clamp(0.3rem, 1.9vw, 0.4rem);
+  font-size: var(--fs-module);
   font-weight: 700;
-  color: var(--text-muted, rgba(255, 255, 255, 0.58));
+  color: var(--text-secondary, #8b9dad);
   white-space: nowrap;
 }
 
 @keyframes dao-summary-line-rise {
   from {
     opacity: 0;
-    transform: translateY(2px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .dao-summary-line__slide,
   .dao-summary-line__slide--enter {
-    animation: none !important;
+    animation:  none !important;
   }
 }
 

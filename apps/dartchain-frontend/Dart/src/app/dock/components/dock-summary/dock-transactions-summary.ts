@@ -51,9 +51,9 @@ export class DockTransactionsSummaryComponent implements OnInit, OnDestroy {
       return 'Chargement…';
     }
     if (this.pendingState.error()) {
-      return 'Mempool indisponible';
+      return 'File indisponible';
     }
-    return 'Mempool vide';
+    return 'File vide';
   });
 
   readonly updatedAgeLabel = computed(() => {
@@ -68,7 +68,7 @@ export class DockTransactionsSummaryComponent implements OnInit, OnDestroy {
     const tip = this.tipTxLabel();
     const age = this.updatedAgeLabel();
     const parts = [
-      hash ? `Tx à miner ${hash}` : 'Mempool vide',
+      hash ? `Transaction à miner ${hash}` : 'File vide',
       tip ? `${tip} dernier bloc` : '',
       age,
     ].filter(Boolean);

@@ -183,7 +183,7 @@ export class ShowcaseR4v3StateService {
   sourceFilterLabel(): string {
     switch (this.sourceFilter()) {
       case 'CHAIN':
-        return 'On-chain';
+        return 'Sur la chaîne';
       case 'EDITORIAL':
         return 'Édito';
       default:

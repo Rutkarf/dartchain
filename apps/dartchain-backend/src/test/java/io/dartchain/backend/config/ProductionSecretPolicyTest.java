@@ -37,6 +37,20 @@ class ProductionSecretPolicyTest {
     }
 
     @Test
+    void rejectsShippedAdminSeed() {
+        MockEnvironment environment = strongEnvironment();
+        environment.setProperty(
+                "dartchain.admin.seed-sha256",
+                ProductionSecretPolicy.SHIPPED_ADMIN_SEED_SHA256
+        );
+
+        assertThatThrownBy(() -> ProductionSecretPolicy.validate(environment))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("DARTCHAIN_ADMIN_SEED_SHA256")
+                .hasMessageNotContaining(ProductionSecretPolicy.SHIPPED_ADMIN_SEED_SHA256);
+    }
+
+    @Test
     void rejectsDockerDefaultActuatorToken() {
         MockEnvironment environment = strongEnvironment();
         environment.setProperty("dartchain.ops.actuator-token", "local-docker-actuator-token");

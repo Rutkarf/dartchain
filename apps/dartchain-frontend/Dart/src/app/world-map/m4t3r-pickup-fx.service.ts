@@ -181,27 +181,27 @@ export class M4t3rPickupFxService {
     ctx.clearRect(0, 0, width, height);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '900 240px Impact, "Arial Black", system-ui, sans-serif';
+    ctx.font = '900 188px Orbitron, sans-serif';
     ctx.lineJoin = 'round';
     ctx.miterLimit = 2;
     const x = width / 2;
     const y = height / 2 + 12;
     const glow = ctx.createRadialGradient(x, y, 18, x, y, width * 0.44);
-    glow.addColorStop(0, `rgba(130,255,182,${M4T3R_PICKUP_FX.glowOpacity})`);
-    glow.addColorStop(1, 'rgba(130,255,182,0)');
+    glow.addColorStop(0, `rgba(9, 129, 74,${M4T3R_PICKUP_FX.glowOpacity})`);
+    glow.addColorStop(1, 'rgba(9, 129, 74,0)');
     ctx.fillStyle = glow;
     ctx.beginPath();
     ctx.arc(x, y, width * 0.42, 0, Math.PI * 2);
     ctx.fill();
     ctx.lineWidth = 36;
-    ctx.strokeStyle = '#041208';
+    ctx.strokeStyle = '#0a1220';
     ctx.strokeText(M4T3R_PICKUP_FX.text, x, y);
     ctx.lineWidth = 16;
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = '#ede7d9';
     ctx.strokeText(M4T3R_PICKUP_FX.text, x, y);
-    ctx.fillStyle = '#1cff4a';
+    ctx.fillStyle = '#09814a';
     ctx.fillText(M4T3R_PICKUP_FX.text, x, y);
-    ctx.fillStyle = 'rgba(118, 244, 255, 0.34)';
+    ctx.fillStyle = 'rgba(237, 231, 217, 0.34)';
     ctx.fillRect(x - 8, y + 20, 16, 86);
   }
 }

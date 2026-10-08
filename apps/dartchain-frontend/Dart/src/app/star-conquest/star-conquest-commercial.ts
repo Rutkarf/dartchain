@@ -1,5 +1,5 @@
 /**
- * Process commercial Star Conquest — pas le scale visuel.
+ * Process commercial Conquête stellaire — pas le scale visuel.
  *
  * Méthode : mesurer le funnel, poser des portes KPI, n’autoriser
  * le level-up que lorsque les portes tiennent. C’est le levier

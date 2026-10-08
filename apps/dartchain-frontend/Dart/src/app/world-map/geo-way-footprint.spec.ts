@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { GeoCoordinateService } from './geo-coordinate.service';
 import { createBuildingFromGeoData, footprintCentroid } from './geo-building.util';
 import {
-  MARSEILLE_LANDMARK_BUILDINGS,
+  METAVERSE_LANDMARK_BUILDINGS,
   closedOsmWayFootprint,
 } from './geo-reference.config';
 
@@ -45,7 +45,7 @@ describe('geo-way-footprint (GEO-WAY-1)', () => {
   });
 
   it('remplace les rectangles AABB par les sommets des 4 ways OSM', () => {
-    for (const def of MARSEILLE_LANDMARK_BUILDINGS) {
+    for (const def of METAVERSE_LANDMARK_BUILDINGS) {
       expect(def.sourceId).toBe(OSM_WAY_IDS[def.id as keyof typeof OSM_WAY_IDS]);
       const unique = def.footprint.slice(0, -1);
       expect(unique.length).toBeGreaterThan(4);
@@ -54,7 +54,7 @@ describe('geo-way-footprint (GEO-WAY-1)', () => {
   });
 
   it('garde les centroïdes way à moins de 15 m des anciens rectangles', () => {
-    for (const def of MARSEILLE_LANDMARK_BUILDINGS) {
+    for (const def of METAVERSE_LANDMARK_BUILDINGS) {
       const center = footprintCentroid(def.footprint, geo);
       const previous = RECTANGLE_CENTROIDS[def.id];
       const err = Math.hypot(center.x - previous.x, center.z - previous.z);
@@ -64,8 +64,8 @@ describe('geo-way-footprint (GEO-WAY-1)', () => {
   });
 
   it('extrude toujours les 4 héros depuis l empreinte OSM', () => {
-    const wall = new THREE.MeshLambertMaterial({ color: 0xffffff });
-    for (const def of MARSEILLE_LANDMARK_BUILDINGS) {
+    const wall = new THREE.MeshLambertMaterial({ color: 0xede7d9 });
+    for (const def of METAVERSE_LANDMARK_BUILDINGS) {
       const built = createBuildingFromGeoData(def, geo, { wall });
       expect(built).not.toBeNull();
       expect(built!.group.userData['sourceId']).toBe(def.sourceId);

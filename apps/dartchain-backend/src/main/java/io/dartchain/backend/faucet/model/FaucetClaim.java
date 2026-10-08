@@ -1,11 +1,17 @@
 package io.dartchain.backend.faucet.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.dartchain.backend.faucet.M4t3rUnitCount;
+import io.dartchain.backend.shared.json.PlainBigDecimalSerializer;
+
 import java.math.BigDecimal;
 
 public class FaucetClaim {
 
     private String id;
     private String walletAddress;
+    @JsonSerialize(using = PlainBigDecimalSerializer.class)
     private BigDecimal amount;
     private long claimedAt;
     private long nextEligibleAt;
@@ -47,6 +53,12 @@ public class FaucetClaim {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    /** Dérivé de {@code amount} — sérialisé en lecture seule, jamais persisté. */
+    @JsonProperty(value = "m4t3rCount", access = JsonProperty.Access.READ_ONLY)
+    public String getM4t3rCount() {
+        return M4t3rUnitCount.of(amount);
     }
 
     public long getClaimedAt() {

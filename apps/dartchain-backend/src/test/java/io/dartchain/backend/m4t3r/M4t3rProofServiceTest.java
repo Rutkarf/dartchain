@@ -21,7 +21,7 @@ class M4t3rProofServiceTest {
         reward.setRewardId("reward-1");
         reward.setUserIdHash("0xabc");
         reward.setWalletAddress("R4V3test");
-        reward.setTokenId("m4t3r:marseille:chunk:0:0:1:2:cycle-0");
+        reward.setTokenId("m4t3r:metaverse:chunk:0:0:1:2:cycle-0");
         reward.setAmount(new BigDecimal("0.00000000000000000000000001"));
         reward.setPlayerSpeed(new BigDecimal("1.420"));
         reward.setMaxAllowedSpeed(new BigDecimal("5.000"));

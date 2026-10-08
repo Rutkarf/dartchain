@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import type { BuildingLodLevel } from './marseille-twin/building-lod.model';
+import type { BuildingLodLevel } from './metaverse-twin/building-lod.model';
 
 export const IMPOSTOR_NAME = 'building-lod-impostor-billboard';
 
@@ -25,7 +25,7 @@ export function syncBuildingImpostor(
     options?.height ??
     (group.userData['heightMeters'] as number | undefined) ??
     14;
-  const color = options?.color ?? 0x8a9aa8;
+  const color = options?.color ?? 0x8a95a5;
 
   if (!impostor) {
     const geo = new THREE.PlaneGeometry(width, height);

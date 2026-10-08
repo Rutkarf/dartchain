@@ -27,7 +27,7 @@ export function createStreetLampLightPool(
   if (specs.length === 0 || cap <= 0) return null;
 
   const group = new THREE.Group();
-  group.name = 'marseille-street-lamp-lights';
+  group.name = 'metaverse-street-lamp-lights';
   const effectiveCap = Math.min(cap, specs.length);
   const lights: THREE.SpotLight[] = [];
   const targets: THREE.Object3D[] = [];
@@ -42,14 +42,14 @@ export function createStreetLampLightPool(
       D.spotPenumbra,
       D.spotDecay
     );
-    spot.name = `marseille-street-lamp-spot-${i}`;
+    spot.name = `metaverse-street-lamp-spot-${i}`;
     if (options.castShadow) {
       spot.castShadow = true;
       spot.shadow.mapSize.set(256, 256);
     }
 
     const target = new THREE.Object3D();
-    target.name = `marseille-street-lamp-target-${i}`;
+    target.name = `metaverse-street-lamp-target-${i}`;
     spot.target = target;
 
     group.add(spot);

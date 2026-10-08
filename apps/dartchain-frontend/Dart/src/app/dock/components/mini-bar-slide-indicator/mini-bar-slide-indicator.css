@@ -14,7 +14,7 @@
   align-items: center;
   gap: 0px;
   opacity: 0.58;
-  animation: mini-bar-grabber-breathe 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation: mini-bar-grabber-breathe 2.6s ease-in-out infinite;
 }
 
 .mini-bar-grabber__chevron {
@@ -38,7 +38,7 @@
   width: clamp(18px, 5vw, 24px);
   height: 0px;
   margin: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(var(--tab-accent-rgb), 0.5);
   box-shadow:
     0 0 3px rgba(var(--tab-accent-rgb), 0.22),
@@ -60,7 +60,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mini-bar-grabber {
-    animation: none;
+    animation:  none;
     opacity: 0.58;
   }
 }

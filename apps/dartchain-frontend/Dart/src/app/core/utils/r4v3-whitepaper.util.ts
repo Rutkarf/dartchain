@@ -13,7 +13,7 @@ export async function openR4v3Whitepaper(): Promise<R4v3WhitepaperResult> {
   try {
     const response = await fetch(R4V3_WHITEPAPER_TXT_URL, { cache: 'no-store' });
     if (!response.ok) {
-      return { ok: false, message: 'White paper indisponible' };
+      return { ok: false, message: 'Livre blanc indisponible' };
     }
 
     const blob = await response.blob();
@@ -32,6 +32,6 @@ export async function openR4v3Whitepaper(): Promise<R4v3WhitepaperResult> {
     window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
     return { ok: true };
   } catch {
-    return { ok: false, message: 'White paper inaccessible' };
+    return { ok: false, message: 'Livre blanc inaccessible' };
   }
 }

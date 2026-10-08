@@ -37,7 +37,7 @@ export class DockBlockStateService {
       case 'error':
         return 'Erreur';
       case 'loading':
-        return 'Sync…';
+        return 'Synchro…';
       default:
         return this.latestBlock() ? 'Validé' : 'Prêt';
     }

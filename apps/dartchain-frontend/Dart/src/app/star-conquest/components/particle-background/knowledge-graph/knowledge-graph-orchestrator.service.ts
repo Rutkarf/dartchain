@@ -16,7 +16,7 @@ import type { StarConquestUniverseId } from '@star-conquest/star-conquest-univer
 import { starConquestUniverseTheme } from '@star-conquest/star-conquest-universes.config';
 
 /**
- * Orchestrates P2P/IA data → Star Conquest particles (pas de couche Three.js séparée).
+ * Orchestrates P2P/IA data → Conquête stellaire particles (pas de couche Three.js séparée).
  */
 @Injectable({ providedIn: 'root' })
 export class KnowledgeGraphOrchestratorService {

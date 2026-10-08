@@ -55,7 +55,7 @@ Actual result: PASS
 
 ## ITER-006 — classification
 
-Protected existing behavior: previous Marseille backlog over-classified core services as SHARED  
+Protected existing behavior: previous Metaverse backlog over-classified core services as SHARED  
 New additive capability: usage-based EXCLUSIVE for all 41  
 Files modified: `metaversebb-scope-map.md`, `ai-loop-metaversebb-audit-backlog.md`  
 Audit insight: `map-configuration.ts` stays SHARED ; MapConfigService is exclusive  
@@ -93,14 +93,14 @@ Regression risk: none
 Verification method: read character-control.service.ts  
 Actual result: PASS
 
-## ITER-010 — MarseilleMapProvider hotspot
+## ITER-010 — MetaverseMapProvider hotspot
 
 Protected existing behavior: provider untouched  
 New additive capability: listed injects OSM/tokens/debug/wigle  
 Files modified: `metaversebb-scope-map.md`  
 Audit insight: debug overlays attached inside provider  
 Regression risk: none  
-Verification method: read marseille-map.provider.ts injects  
+Verification method: read metaverse-map.provider.ts injects  
 Actual result: PASS
 
 ## ITER-011 — tokens/trails/rewards graph
@@ -108,7 +108,7 @@ Actual result: PASS
 Protected existing behavior: M4T3R runtime untouched  
 New additive capability: layer TOKENS_REWARDS documented  
 Files modified: `metaversebb-scope-map.md`  
-Audit insight: all M4t3r* used via CharacterControl and/or Marseille provider  
+Audit insight: all M4t3r* used via CharacterControl and/or Metaverse provider  
 Regression risk: none  
 Verification method: grep  
 Actual result: PASS
@@ -135,7 +135,7 @@ Actual result: PASS
 
 ## ITER-014 — exclusive deps outside list
 
-Protected existing behavior: marseille-twin untouched  
+Protected existing behavior: metaverse-twin untouched  
 New additive capability: §6 missing modules  
 Files modified: `metaversebb-scope-map.md`  
 Audit insight: WigleDebugOverlay, character-assets, joystick input not in original list  
@@ -168,9 +168,9 @@ Actual result: PASS
 Protected existing behavior: spawn/joysticks/providers  
 New additive capability: §9 baseline  
 Files modified: `metaversebb-scope-map.md`  
-Audit insight: matches Marseille twin baseline  
+Audit insight: matches Metaverse twin baseline  
 Regression risk: none  
-Verification method: cross-read ai-loop-marseille-backlog.md  
+Verification method: cross-read ai-loop-metaverse-backlog.md  
 Actual result: PASS
 
 ## ITER-018 — correct prior SHARED classification

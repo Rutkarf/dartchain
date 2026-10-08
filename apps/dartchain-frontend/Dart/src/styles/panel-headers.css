@@ -57,25 +57,25 @@
   width: var(--panel-action-menu-w, 26px) !important;
   min-width: var(--panel-action-menu-w, 26px) !important;
   max-width: var(--panel-action-menu-w, 26px) !important;
-  height: var(--panel-action-menu-h, 7px);
-  min-height: var(--panel-action-menu-h, 7px);
-  max-height: var(--panel-action-menu-h, 7px);
+  height: var(--panel-action-menu-h, 16px);
+  min-height: var(--panel-action-menu-h, 16px);
+  max-height: var(--panel-action-menu-h, 16px);
   margin: 0 0 0 auto;
   padding: 0;
   pointer-events: auto !important;
 }
 
 .showcase-header-actions app-collapsed-bar-actions {
-  --cba-h: var(--panel-action-menu-h, 7px);
+  --cba-h: var(--panel-action-menu-h, 16px);
   --cba-item-w: var(--panel-action-item-w, 11px);
   --cba-menu-w: var(--panel-action-menu-w, 26px);
   display: inline-flex;
   width: var(--panel-action-menu-w, 26px);
   min-width: var(--panel-action-menu-w, 26px);
   max-width: var(--panel-action-menu-w, 26px);
-  height: var(--panel-action-menu-h, 7px);
-  min-height: var(--panel-action-menu-h, 7px);
-  max-height: var(--panel-action-menu-h, 7px);
+  height: var(--panel-action-menu-h, 16px);
+  min-height: var(--panel-action-menu-h, 16px);
+  max-height: var(--panel-action-menu-h, 16px);
   margin: 0;
   pointer-events: auto !important;
 }

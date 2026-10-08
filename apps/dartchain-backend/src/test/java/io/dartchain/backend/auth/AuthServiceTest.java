@@ -47,7 +47,7 @@ class AuthServiceTest {
         AuthProperties authProperties = new AuthProperties();
         NativeJwtService nativeJwtService = new NativeJwtService(authProperties);
         InMemoryRefreshTokenStore refreshTokenStore = new InMemoryRefreshTokenStore(authProperties);
-        InMemorySessionStore sessionStore = new InMemorySessionStore(3600);
+        InMemorySessionStore sessionStore = new InMemorySessionStore(3600, authProperties);
         AuthTokenResolver authTokenResolver = new AuthTokenResolver(
                 nativeJwtService,
                 refreshTokenStore,

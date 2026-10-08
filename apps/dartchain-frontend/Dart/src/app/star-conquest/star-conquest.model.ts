@@ -1,5 +1,5 @@
 /**
- * Star Conquest — modèle Quest (frontend-first, prêt API Spring Boot).
+ * Conquête stellaire — modèle Quest (frontend-first, prêt API Spring Boot).
  */
 
 import type { StarQuestFamily } from './star-conquest-families';
@@ -109,10 +109,10 @@ export function cloneStarQuest(quest: StarQuest): StarQuest {
 }
 
 export const STAR_QUEST_CATEGORY_LABEL: Record<StarQuestCategory, string> = {
-  swap: 'Swap',
+  swap: 'Échange',
   showcase: 'Showcase',
-  dock: 'Dock',
-  graph: 'Graph',
+  dock: 'Barre',
+  graph: 'Graphique',
   three: 'Three.js',
   angular: 'Angular',
   backend: 'Backend',

@@ -61,12 +61,18 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
   readonly askTitle = signal('');
   readonly askBody = signal('');
   readonly askCategory = signal('');
+  readonly categoryMenuOpen = signal(false);
 
   readonly wikiCategories = R4V3_FAQ_CATEGORIES;
   readonly wikiCategoryOptions = [
     { id: '', label: 'Sans catégorie' },
     ...R4V3_FAQ_CATEGORIES.map((category) => ({ id: category.id, label: category.label })),
   ];
+
+  readonly askCategoryLabel = computed(() => {
+    const id = this.askCategory();
+    return this.wikiCategoryOptions.find((option) => option.id === id)?.label ?? 'Sans catégorie';
+  });
 
   readonly payload = input<R4v3HubDrawerPayload | null>(null);
   readonly showBackToWiki = input(false);
@@ -204,7 +210,10 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
         this.askTitle.set('');
         this.askBody.set('');
         this.askCategory.set('');
+        this.categoryMenuOpen.set(false);
         this.formSuccess.set(false);
+      } else {
+        this.categoryMenuOpen.set(false);
       }
 
       if (item?.kind === 'official-wiki') {
@@ -230,8 +239,19 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.categoryMenuOpen()) {
+      this.categoryMenuOpen.set(false);
+      return;
+    }
     if (this.payload()) {
       this.closeDrawer.emit();
+    }
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.categoryMenuOpen()) {
+      this.categoryMenuOpen.set(false);
     }
   }
 
@@ -279,8 +299,11 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
     this.wikiSearchQuery.set(value);
   }
 
-  protected wikiCategoryIcon(categoryId: R4v3FaqEntry['categoryId']): string {
-    return r4v3FaqCategoryIcon(categoryId);
+  protected wikiCategoryIcon(categoryId: string): string {
+    if (!categoryId) {
+      return '·';
+    }
+    return r4v3FaqCategoryIcon(categoryId as R4v3FaqEntry['categoryId']);
   }
 
   protected isWikiCategoryActive(categoryId: R4v3FaqCategoryFilter): boolean {
@@ -289,6 +312,17 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
 
   protected selectWikiCategory(categoryId: R4v3FaqCategoryFilter): void {
     this.faq.setCategoryFilter(categoryId);
+  }
+
+  protected toggleCategoryMenu(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.categoryMenuOpen.update((open) => !open);
+  }
+
+  protected selectAskCategory(categoryId: string): void {
+    this.askCategory.set(categoryId);
+    this.categoryMenuOpen.set(false);
   }
 
   protected openWikiEntry(entry: R4v3FaqEntry): void {
@@ -356,12 +390,12 @@ export class ShowcaseR4v3HubDrawerComponent implements OnDestroy {
 
   protected copyButtonLabel(): string {
     if (this.copied()) {
-      return 'Copié ✓';
+      return 'COPIÉ ✓';
     }
     if (this.copyFailed()) {
-      return 'Échec';
+      return 'ÉCHEC';
     }
-    return 'Copier';
+    return 'COPIER';
   }
 
   protected buildCopyText(): string {

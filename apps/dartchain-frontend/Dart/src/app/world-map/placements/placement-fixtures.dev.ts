@@ -1,8 +1,8 @@
-import { MARSEILLE_LANDMARK_BUILDINGS } from '../geo-reference.config';
-import { MARSEILLE_COORDINATE_SYSTEM_VERSION } from './coordinate-system';
+import { METAVERSE_LANDMARK_BUILDINGS } from '../geo-reference.config';
+import { METAVERSE_COORDINATE_SYSTEM_VERSION } from './coordinate-system';
 import {
   groundFloorAnchorFromGeoFootprint,
-  projectMarseilleWorldToGeo,
+  projectMetaverseWorldToGeo,
 } from './ground-floor-anchor.util';
 import type { MetaversePlacementsResponseDto } from './placement.dto';
 
@@ -65,7 +65,7 @@ const DEV_PLACEMENT_SPECS: readonly DevPlacementSpec[] = [
 ];
 
 function facadeAnchorDto(buildingId: string) {
-  const landmark = MARSEILLE_LANDMARK_BUILDINGS.find((item) => item.id === buildingId);
+  const landmark = METAVERSE_LANDMARK_BUILDINGS.find((item) => item.id === buildingId);
   if (!landmark) {
     throw new Error(`[placement-fixtures] Landmark OSM introuvable: ${buildingId}`);
   }
@@ -73,7 +73,7 @@ function facadeAnchorDto(buildingId: string) {
   if (!anchor) {
     throw new Error(`[placement-fixtures] Façade RDC incalculable: ${buildingId}`);
   }
-  const geo = projectMarseilleWorldToGeo(
+  const geo = projectMetaverseWorldToGeo(
     anchor.world.x,
     anchor.world.y,
     anchor.world.z
@@ -83,7 +83,7 @@ function facadeAnchorDto(buildingId: string) {
       x: anchor.world.x,
       y: anchor.world.y,
       z: anchor.world.z,
-      coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
+      coordinateSystemVersion: METAVERSE_COORDINATE_SYSTEM_VERSION,
     },
     anchorGeo: {
       latitude: geo.latitude,
@@ -115,7 +115,7 @@ export function createDevPlacementFixtures(
           x: 57.75,
           y: 0,
           z: -6.58,
-          coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
+          coordinateSystemVersion: METAVERSE_COORDINATE_SYSTEM_VERSION,
         },
         visualVariant: 'ground-storefront-v1',
         status: 'active',
@@ -132,7 +132,7 @@ export function createDevPlacementFixtures(
           x: 51.99,
           y: 0,
           z: -25.36,
-          coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
+          coordinateSystemVersion: METAVERSE_COORDINATE_SYSTEM_VERSION,
         },
         visualVariant: 'ground-storefront-v1',
         status: 'active',
@@ -149,7 +149,7 @@ export function createDevPlacementFixtures(
           x: -27.58,
           y: 0,
           z: 85.98,
-          coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
+          coordinateSystemVersion: METAVERSE_COORDINATE_SYSTEM_VERSION,
         },
         visualVariant: 'ground-storefront-v1',
         status: 'active',
@@ -166,7 +166,7 @@ export function createDevPlacementFixtures(
           x: 113.7,
           y: 0,
           z: -10.96,
-          coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
+          coordinateSystemVersion: METAVERSE_COORDINATE_SYSTEM_VERSION,
         },
         visualVariant: 'ground-storefront-v1',
         status: 'active',

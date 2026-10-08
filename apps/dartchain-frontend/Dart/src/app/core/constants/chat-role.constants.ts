@@ -11,7 +11,7 @@ export interface ChatRoleMeta {
 
 const ROLE_META: Record<ChatRoleKey, ChatRoleMeta> = {
   self: { key: 'self', icon: '◆', label: 'Vous' },
-  guest: { key: 'guest', icon: '◇', label: 'Anonymous' },
+  guest: { key: 'guest', icon: '◇', label: 'Anonyme' },
   mod: { key: 'mod', icon: '✦', label: 'Modérateur' },
   bot: { key: 'bot', icon: '▣', label: 'Bot' },
   member: { key: 'member', icon: '●', label: 'Membre' },

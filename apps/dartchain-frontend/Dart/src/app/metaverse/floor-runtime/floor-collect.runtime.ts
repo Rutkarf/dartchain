@@ -44,12 +44,12 @@ export class FloorCollectRuntime {
   ): void {
     const groundY = this.getGroundYAt(mesh.position.x, mesh.position.z);
     this.footprints.update(mesh.position, velocity, deltaSeconds, groundY);
-    this.updateMarseilleTrail(mesh, playerId, deltaSeconds);
+    this.updateMetaverseTrail(mesh, playerId, deltaSeconds);
     this.pickupFx.update(deltaSeconds);
     this.coinPickupFx.update(deltaSeconds);
   }
 
-  private updateMarseilleTrail(
+  private updateMetaverseTrail(
     mesh: THREE.Object3D,
     playerId: string,
     deltaSeconds: number

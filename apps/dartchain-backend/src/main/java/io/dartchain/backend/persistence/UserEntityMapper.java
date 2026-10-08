@@ -24,6 +24,9 @@ public final class UserEntityMapper {
         entity.setWalletPublicKey(account.getWalletPublicKey());
         entity.setCreatedAt(Instant.ofEpochMilli(account.getCreatedAt()));
         entity.setRole(account.getRole().name());
+        entity.setEmailVerified(account.isEmailVerified());
+        entity.setTotpSecret(account.getTotpSecret());
+        entity.setTotpEnabled(account.isTotpEnabled());
         return entity;
     }
 
@@ -38,6 +41,9 @@ public final class UserEntityMapper {
         account.setWalletPublicKey(entity.getWalletPublicKey());
         account.setCreatedAt(entity.getCreatedAt().toEpochMilli());
         account.setRole(UserRole.fromValue(entity.getRole()));
+        account.setEmailVerified(entity.isEmailVerified());
+        account.setTotpSecret(entity.getTotpSecret());
+        account.setTotpEnabled(entity.isTotpEnabled());
         return account;
     }
 }

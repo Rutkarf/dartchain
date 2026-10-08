@@ -18,7 +18,6 @@ export interface ArenaPowerUpState {
   activeUntil: number;
 }
 
-const AGE_KEY = 'arena-bb-age-ok-v1';
 const MODE_KEY = 'arena-bb-mode-v1';
 const QUEST_KEY = 'arena-bb-quest-kills-v1';
 const QUEST_CLAIMED_KEY = 'arena-bb-quest-claimed-v1';
@@ -26,7 +25,7 @@ const QUEST_TARGET = 3;
 const QUEST_REWARD_FAUCET = 25;
 
 /**
- * Méta Kill-to-earn : streak, waves, quête dock ledger, earnings session.
+ * Méta Éliminer pour gagner : streak, waves, quête dock ledger, earnings session.
  */
 @Injectable({ providedIn: 'root' })
 export class ArenaMetaService {
@@ -34,7 +33,8 @@ export class ArenaMetaService {
   private readonly streakSignal = signal(0);
   private readonly bestStreakSignal = signal(0);
   private readonly pauseSignal = signal(false);
-  private readonly ageOkSignal = signal(this.readAgeOk());
+  /** Age gate retiré — jouable dès l’arrivée hub (plus de modal 21+). */
+  private readonly ageOkSignal = signal(true);
   private readonly killCamUntilSignal = signal(0);
   private readonly freezeUntilSignal = signal(0);
   private readonly powerUpsSignal = signal<ArenaPowerUpState[]>([]);
@@ -94,17 +94,12 @@ export class ArenaMetaService {
   readonly kteTagline = computed(() => {
     const e = this.sessionEarnedSignal();
     const s = this.streakSignal();
-    if (s >= 3) return `Kill-to-earn · streak ×${s} · +${e} ƒ`;
-    return `Kill-to-earn · +${e} ƒ session`;
+    if (s >= 3) return `Streak ×${s} · +${e} ƒ session`;
+    return `+${e} ƒ session`;
   });
 
   acceptAgeGate(): void {
     this.ageOkSignal.set(true);
-    try {
-      localStorage.setItem(AGE_KEY, '1');
-    } catch {
-      /* ignore */
-    }
   }
 
   setMode(mode: ArenaGameMode): void {
@@ -214,7 +209,7 @@ export class ArenaMetaService {
   }
 
   mockClaimNotice(): string {
-    return 'Claim on-chain = hors Arène. Ici : ledger Kill-to-earn (ƒ faucet non claimé).';
+    return 'La réclamation sur la chaîne est hors arène. Ici : registre éliminer-pour-gagner (jetons du robinet non réclamés).';
   }
 
   tryPickup(x: number, z: number): ArenaPowerUpState | null {
@@ -253,14 +248,6 @@ export class ArenaMetaService {
     }
     rows.sort((a, b) => b.earned - a.earned || b.kills - a.kills);
     this.leaderSignal.set(rows.slice(0, 8));
-  }
-
-  private readAgeOk(): boolean {
-    try {
-      return localStorage.getItem(AGE_KEY) === '1';
-    } catch {
-      return false;
-    }
   }
 
   private readMode(): ArenaGameMode {

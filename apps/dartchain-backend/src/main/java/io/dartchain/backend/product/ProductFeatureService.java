@@ -28,6 +28,8 @@ public class ProductFeatureService {
     }
 
     public void requireFaucet() {
-        // Faucet toujours actif — voir ProductProperties#isFaucetEnabled.
+        if (!productProperties.isFaucetEnabled()) {
+            throw new FeatureDisabledException("Le faucet est désactivé.");
+        }
     }
 }

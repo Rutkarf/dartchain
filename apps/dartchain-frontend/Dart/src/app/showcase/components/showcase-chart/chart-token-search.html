@@ -5,12 +5,6 @@
   [class.chart-token-search--open]="searchFocused() || searchMenuOpen()"
 >
   <form class="chart-token-search__form" (submit)="onSearchSubmit($event)">
-    <span class="chart-token-search__icon" aria-hidden="true">
-      <svg viewBox="0 0 16 16" focusable="false">
-        <circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.2" />
-        <path d="M10.5 10.5 L14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
-      </svg>
-    </span>
     <input
       #searchInput
       class="chart-token-search__input"
@@ -19,7 +13,7 @@
       placeholder="Token…"
       autocomplete="off"
       spellcheck="false"
-      aria-label="Rechercher un token (R4V3, LaunchLab, CoinGecko…)"
+      aria-label="Rechercher un token (R4V3, Laboratoire, CoinGecko…)"
       (input)="onSearchInput($any($event.target).value)"
       (focus)="onSearchFocus()"
       (blur)="onSearchBlur()"
@@ -27,14 +21,16 @@
     @if (searchLoading()) {
       <span class="chart-token-search__spinner" aria-hidden="true"></span>
     }
+    <span class="chart-token-search__icon" aria-hidden="true">
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+    </span>
   </form>
 
   @if (searchMenuOpen() && searchQuery().trim().length >= 2) {
     <div
-      class="chart-token-search__panel"
-      role="listbox"
-      aria-label="Résultats de recherche"
-    >
+ class="chart-token-search__panel"
+ role="listbox"
+ >
       @if (searchError(); as errorMessage) {
         <p class="chart-token-search__empty">{{ errorMessage }}</p>
       } @else if (searchLoading()) {

@@ -12,7 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 
 @Component
 @ConditionalOnProperty(name = "dartchain.persistence.mode", havingValue = "postgres")
@@ -62,13 +65,16 @@ public class JpaExchangeLedgerStore implements ExchangeLedgerStore {
             return;
         }
 
+        Instant now = Instant.now();
         ExchangeLedgerAdjustmentEntity entity = adjustmentRepository.findById(id)
                 .orElseGet(() -> {
                     ExchangeLedgerAdjustmentEntity created = new ExchangeLedgerAdjustmentEntity();
                     created.setId(id);
+                    created.setCreatedAt(now);
                     return created;
                 });
         entity.setAdjustment(next.setScale(SCALE, RoundingMode.HALF_UP));
+        entity.setUpdatedAt(now);
         adjustmentRepository.save(entity);
     }
 
@@ -88,6 +94,30 @@ public class JpaExchangeLedgerStore implements ExchangeLedgerStore {
                 .map(ExchangeLedgerAdjustmentEntity::getAdjustment)
                 .orElse(BigDecimal.ZERO)
                 .setScale(SCALE, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, BigDecimal> listAdjustments(String walletAddress) {
+        if (walletAddress == null || walletAddress.isBlank()) {
+            return Map.of();
+        }
+
+        Map<String, BigDecimal> result = new LinkedHashMap<>();
+        for (ExchangeLedgerAdjustmentEntity entity
+                : adjustmentRepository.findByIdWalletAddress(normalizeWallet(walletAddress))) {
+            if (entity.getId() == null || entity.getAdjustment() == null) {
+                continue;
+            }
+            if (entity.getAdjustment().compareTo(BigDecimal.ZERO) == 0) {
+                continue;
+            }
+            result.put(
+                    entity.getId().getToken(),
+                    entity.getAdjustment().setScale(SCALE, RoundingMode.HALF_UP)
+            );
+        }
+        return result;
     }
 
     private static String normalizeWallet(String walletAddress) {

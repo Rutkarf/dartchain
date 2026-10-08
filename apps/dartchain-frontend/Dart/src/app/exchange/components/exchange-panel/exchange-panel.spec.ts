@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { AuthService } from '@auth/services/auth.service';
 import { BrandCryptoSelectionService } from '@navbar/services/brand-crypto-selection.service';
 import { ShowcaseNavigationService } from '@showcase/services/showcase-navigation.service';
 import { WalletSessionService } from '@wallet/services/wallet-session.service';
@@ -33,7 +34,14 @@ describe('ExchangePanelComponent', () => {
 
   afterEach(() => {
     walletSession.clearWallet();
+    localStorage.removeItem('dartchain_auth_token');
+    localStorage.removeItem('dartchain_auth_user');
+    localStorage.removeItem('dartchain_auth_refresh');
+    localStorage.removeItem('dartchain_auth_expires_at');
     flushBackgroundHttp();
+    httpMock
+      .match((request) => request.url.includes('/quests/'))
+      .forEach((request) => request.flush({}));
     flushExchangePanelRequests();
     httpMock.verify();
   });
@@ -166,6 +174,33 @@ describe('ExchangePanelComponent', () => {
     flushPanel();
     expect((component as any).fromToken()).toBe('R4V3');
     expect((component as any).toToken()).toBe('PXD');
+  });
+
+  it('shows convert CTA when account already has a linked wallet', () => {
+    walletSession.clearWallet();
+    const auth = TestBed.inject(AuthService);
+    (
+      auth as unknown as {
+        userSignal: { set: (value: unknown) => void };
+        tokenSignal: { set: (value: unknown) => void };
+      }
+    ).userSignal.set({
+      id: 'u1',
+      username: 'alice',
+      email: 'alice@example.com',
+      createdAt: Date.now(),
+      walletAddress: 'R4V3linkedwalletaddress',
+    });
+    (
+      auth as unknown as { tokenSignal: { set: (value: unknown) => void } }
+    ).tokenSignal.set('test-token');
+    fixture.detectChanges();
+    flushPanel({ fromBalance: 5 });
+
+    expect((component as any).walletAddress()).toBe('R4V3linkedwalletaddress');
+    expect((component as any).hasWallet()).toBe(true);
+    expect((component as any).swapAction()).toBe('enter-amount');
+    expect((component as any).swapButtonLabel()).toBe('Convertir →');
   });
 
   it('executes swap and refreshes ecosystem', () => {

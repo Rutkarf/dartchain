@@ -2,8 +2,8 @@
   display: block;
   width: 100%;
   min-width: 0;
-  --dock-tab-cyan: var(--tab-push-cyan, var(--ds-neon-cyan, #00f5ff));
-  --dock-tab-cyan-rgb: var(--tab-push-cyan-rgb, var(--ds-neon-cyan-rgb, 0, 245, 255));
+  --dock-tab-cyan: var(--tab-push-cyan, var(--ds-neon-cyan, #8b9dad));
+  --dock-tab-cyan-rgb: var(--tab-push-cyan-rgb, var(--ds-neon-cyan-rgb, 139, 157, 173));
   --dock-hub-tab-h: var(--dock-hub-tab-h, var(--showcase-hub-tab-h, 15px));
   --dock-hub-tab-w: var(--dock-hub-tab-w, clamp(2rem, 10vw, 2.75rem));
 }
@@ -88,9 +88,9 @@
   box-sizing: border-box;
   border: none;
   border-radius: var(--tab-push-radius, 0);
-  color: var(--tab-push-label-idle, rgba(168, 180, 196, 0.52));
+  color: var(--tab-push-label-idle, rgba(139, 157, 173, 0.52));
   font-family: inherit;
-  font-size: clamp(5px, 1.9vw, 7px);
+  font-size: var(--fs-label);
   font-weight: 600;
   letter-spacing: 0.05em;
   line-height: 1.1;
@@ -122,22 +122,12 @@
   overflow: visible;
   min-width: min-content;
   color: inherit;
-  font-family: 'Open Sans', var(--font-body, system-ui, sans-serif);
-  font-size: inherit;
+  font-family: 'Roboto', sans-serif;
+  font-size: var(--fs-label);
   font-weight: 600;
   font-style: normal;
   transform: skewX(-11deg);
   transform-origin: center center;
-  transition:
-    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
-    font-weight 200ms ease;
-}
-
-.dock-tab:hover .dock-tab-label,
-.dock-tab:active .dock-tab-label,
-.dock-tab.is-active .dock-tab-label {
-  transform: skewX(0deg);
-  font-style: normal;
 }
 
 .dock-tab.is-active .dock-tab-label {
@@ -147,13 +137,13 @@
 @media (max-width: 500px) {
   .dock-tab,
   .dock-tab-label {
-    font-size: clamp(5px, 1.9vw, 7px);
+    font-size: var(--fs-label);
   }
 }
 
 @media (max-width: 349px) {
   .dock-tab {
-    font-size: 5px;
+    font-size: var(--fs-label);
     letter-spacing: 0.04em;
     padding: 0 1px;
   }

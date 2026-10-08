@@ -48,6 +48,7 @@ import {
   layoutQuestsInBand,
   measurePlayableBand,
   readFloorPeekPx,
+  type StarConquestBand,
 } from '@star-conquest/star-conquest-layout';
 import { STAR_CONQUEST_MOCK_QUESTS } from '@star-conquest/star-conquest.mock';
 import type { StarQuest } from '@star-conquest/star-conquest.model';
@@ -72,6 +73,7 @@ import {
   starConquestFramePerfHints,
   starConquestLayoutHeight,
   starConquestLayoutWidth,
+  starConquestLayoutYToDomPx,
   starConquestNdcToLayout,
   starConquestRenderSize,
 } from '@star-conquest/star-conquest-viewport.util';
@@ -93,7 +95,7 @@ import {
 import type { Subscription } from 'rxjs';
 
 /**
- * Arrière-plan global = univers neuronal Star Conquest (z-index 0).
+ * Arrière-plan global = univers neuronal Conquête stellaire (z-index 0).
  */
 @Component({
   selector: 'app-particle-background',
@@ -122,6 +124,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private conquest?: StarConquestGraph;
   /** Groupe parent global — constellations uniquement. */
   private world?: StarConquestWorld;
+  private playableBand: StarConquestBand | null = null;
   private quests: StarQuest[] = [];
 
   private schedulerUnregister?: () => void;
@@ -155,6 +158,14 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private orbitStroke: StarConquestPointerStroke | null = null;
   private orbitPendingHit: StarConquestHit | null = null;
   private lastEmptyTapMs = 0;
+  /**
+   * Cerceau intro Feed : SC orbite autour de l’axe Y du token (taille),
+   * sens inverse, lent — constellations passent devant puis derrière.
+   */
+  private introHoopRad = 0;
+  /** Mobile : les contextes WebGL appel/intro peuvent tuer le canvas SC. */
+  private contextLost = false;
+  private introFeedObserver?: MutationObserver;
   private bindFacade(): void {
     this.facadeSubs = [
       this.facade.dismiss$.subscribe(() => this.zone.run(() => this.clearSelection())),
@@ -166,7 +177,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         this.zone.run(() => {
           const id = detail.questId ?? null;
           this.hoverPreviewId = id;
-          this.conquest?.setFocus(id);
+          this.conquest?.setHover(id);
           this.refreshRewardLabels();
           if (this.canvas) this.canvas.style.cursor = id ? 'pointer' : 'default';
         });
@@ -192,7 +203,10 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.zone.runOutsideAngular(() => this.initWebGl());
+    this.zone.runOutsideAngular(() => {
+      this.initWebGl();
+      this.watchIntroFeedSc();
+    });
   }
 
   private initWebGl(): void {
@@ -219,7 +233,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
           ? Math.min(window.devicePixelRatio || 1, starConquestDprCap(gpuQuality))
           : 1;
       this.renderer.setPixelRatio(dpr);
-      this.renderer.setClearColor(0x000000, 0);
+      this.renderer.setClearColor(0x0d0630, 0);
       this.renderer.autoClear = true;
 
       if (typeof localStorage !== 'undefined' && localStorage.getItem('PERF_DEBUG') === '1') {
@@ -237,7 +251,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       created.canvas.style.background = 'transparent';
       created.canvas.setAttribute('data-star-conquest', 'canvas');
       created.canvas.setAttribute('data-sc-tier', STAR_CONQUEST_SCALE_TIER);
-      created.canvas.setAttribute('aria-label', 'Univers neuronal Star Conquest');
+      created.canvas.setAttribute('aria-label', 'Univers neuronal Conquête stellaire');
       created.canvas.removeAttribute('title');
       this.hostRef.nativeElement.appendChild(created.canvas);
 
@@ -293,6 +307,8 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.introFeedObserver?.disconnect();
+    this.introFeedObserver = undefined;
     this.unbindFacade();
     window.removeEventListener('resize', this.onWindowLayout);
     this.unbindSafetyListeners();
@@ -320,6 +336,104 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.world = undefined;
     }
     this.renderer?.dispose();
+    if (typeof document !== 'undefined') {
+      document.documentElement.style.removeProperty('--sc-playable-top');
+      document.documentElement.style.removeProperty('--sc-playable-bottom');
+      document.documentElement.style.removeProperty('--sc-playable-height');
+    }
+  }
+
+  /** Quand l’intro affiche le bandeau SC, récupère le WebGL si iOS l’a tué. */
+  private watchIntroFeedSc(): void {
+    if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return;
+    this.introFeedObserver = new MutationObserver(() => {
+      if (!document.documentElement.classList.contains('intro-feed-sc')) return;
+      this.ensureWebGlAliveForIntro();
+    });
+    this.introFeedObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+  }
+
+  private isRendererDead(): boolean {
+    if (this.contextLost || !this.renderer || !this.canvas) return true;
+    try {
+      const gl = this.renderer.getContext();
+      return !gl || (typeof gl.isContextLost === 'function' && gl.isContextLost());
+    } catch {
+      return true;
+    }
+  }
+
+  private ensureWebGlAliveForIntro(): void {
+    if (!this.isRendererDead()) {
+      this.renderFrame();
+      return;
+    }
+    this.recoverWebGlRenderer();
+  }
+
+  /** Recrée uniquement le renderer/canvas — scène + graphe déjà en mémoire. */
+  private recoverWebGlRenderer(): void {
+    if (!this.scene || !this.camera) {
+      this.contextLost = false;
+      this.initWebGl();
+      return;
+    }
+    this.unbindPointer();
+    try {
+      this.renderer?.dispose();
+    } catch {
+      /* canvas déjà mort */
+    }
+    this.canvas?.remove();
+    this.renderer = undefined;
+    this.canvas = undefined;
+
+    const created = createWebGlRenderer({ alpha: true });
+    if (!created) {
+      recordStarConquestDiag('webgl-lost');
+      return;
+    }
+    this.renderer = created.renderer;
+    this.canvas = created.canvas;
+    const { width, height } = starConquestRenderSize();
+    this.renderer.setSize(width, height, false);
+    this.renderer.setPixelRatio(
+      typeof window !== 'undefined'
+        ? Math.min(window.devicePixelRatio || 1, starConquestDprCap(this.gpuQuality))
+        : 1,
+    );
+    this.renderer.setClearColor(0x0d0630, 0);
+    applyCanvasLayerStyles(created.canvas, 'background');
+    created.canvas.style.pointerEvents = 'auto';
+    created.canvas.style.touchAction = 'none';
+    created.canvas.style.cursor = 'default';
+    created.canvas.style.background = 'transparent';
+    created.canvas.setAttribute('data-star-conquest', 'canvas');
+    this.hostRef.nativeElement.appendChild(created.canvas);
+    this.bindPointer(created.canvas);
+    this.contextLost = false;
+    this.conquestState.setRuntime('ready');
+    this.renderFrame();
+  }
+
+  private applyPlayableBand(band: StarConquestBand): void {
+    this.playableBand = band;
+    this.publishPlayableBandCss(band);
+  }
+
+  /** Clip CSS en px DOM : haut viewport → au-dessus MetaVerseBB. */
+  private publishPlayableBandCss(band: StarConquestBand): void {
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+    // Pendant intro Feed, l’intro pilote le clip (soulignage sous le token).
+    if (document.documentElement.classList.contains('intro-feed-sc')) return;
+    const topDom = Math.max(0, Math.round(starConquestLayoutYToDomPx(band.topPx)));
+    const bottomEdgeDom = Math.round(starConquestLayoutYToDomPx(band.bottomPx));
+    const bottomClip = Math.max(0, Math.round(window.innerHeight - bottomEdgeDom));
+    document.documentElement.style.setProperty('--sc-playable-top', `${topDom}px`);
+    document.documentElement.style.setProperty('--sc-playable-bottom', `${bottomClip}px`);
   }
 
   @HostListener('document:keydown.escape')
@@ -375,6 +489,9 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
     const vw = starConquestLayoutWidth();
     const vh = starConquestLayoutHeight();
+    const band = measurePlayableBand(readFloorPeekPx());
+    this.applyPlayableBand(band);
+
     const viewportChanged =
       Math.abs(vw - this.lastViewportW) > 1 || Math.abs(vh - this.lastViewportH) > 1;
     const allowStructure =
@@ -395,15 +512,17 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.syncUiChrome();
   }
 
-  /** Placement monde des Quests — ancré, indépendant de l’état des panneaux Angular. */
+  /** Placement monde des Quests — bande du haut viewport jusqu’au floor. */
   private layoutQuestStructure(): void {
     if (!this.camera || !this.conquest) return;
     const band = measurePlayableBand(readFloorPeekPx());
+    this.applyPlayableBand(band);
+    this.world?.clearVerticalScreenAnchor();
     layoutQuestsInBand(this.quests, band, this.camera, 0);
     this.conquest.applyPositions(this.quests);
     this.conquest.setSafeScreenBand(
       band.topPx,
-      Math.max(band.topPx + 40, band.viewportH - 8),
+      Math.max(band.topPx + 40, band.bottomPx),
       band.worldLeftPx,
       band.worldRightPx
     );
@@ -413,6 +532,8 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   /** Occlusion / panel — suit l’UI sans bouger la constellation. */
   private syncUiChrome(): void {
     if (!this.camera) return;
+    const band = measurePlayableBand(readFloorPeekPx());
+    this.applyPlayableBand(band);
     this.refreshOcclusion();
     this.syncPanelAnchor();
     this.renderFrame();
@@ -512,8 +633,16 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
 
   private readonly onContextLost = (event: Event): void => {
     event.preventDefault();
+    this.contextLost = true;
     recordStarConquestDiag('webgl-lost');
     this.zone.run(() => this.conquestState.setRuntime('error', 'Rendu WebGL interrompu.'));
+    // Si le bandeau intro est déjà actif, récupère tout de suite (cas téléphone).
+    if (
+      typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('intro-feed-sc')
+    ) {
+      queueMicrotask(() => this.recoverWebGlRenderer());
+    }
   };
 
   private readonly onWindowBlur = (): void => {
@@ -592,12 +721,16 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         );
         this.world.panByDelta(delta.dxWorld, delta.dyWorld);
         this.zone.run(() => this.conquestState.setStick(0, 0));
+        return;
+      }
+      // Pas encore un drag : garder l’illumination sous le doigt / curseur.
+      if (!this.conquestState.selected()) {
+        this.applyHoverAt(event.clientX, event.clientY);
       }
       return;
     }
 
     if (this.conquestState.worldNavigating()) return;
-    if (event.pointerType === 'touch') return;
 
     // Sélection ouverte : pas de parallaxe / pull (la structure ne doit pas bouger)
     if (this.conquestState.selected()) {
@@ -606,15 +739,20 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
+    this.applyHoverAt(event.clientX, event.clientY);
+  };
+
+  /** Illumination galaxy / constellation sous le pointeur (souris ou touch). */
+  private applyHoverAt(clientX: number, clientY: number): void {
     if (this.canvas && this.camera) {
       const rect = this.canvas.getBoundingClientRect();
       if (rect.width > 0 && rect.height > 0) {
-        this.pointerNdc.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        this.pointerNdc.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        this.pointerNdc.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+        this.pointerNdc.y = -((clientY - rect.top) / rect.height) * 2 + 1;
         this.conquest?.setPointerNdc({ x: this.pointerNdc.x, y: this.pointerNdc.y });
       }
     }
-    const hit = this.hitTest(event.clientX, event.clientY);
+    const hit = this.hitTest(clientX, clientY);
     if (this.canvas) {
       this.canvas.style.cursor = hit ? 'pointer' : 'default';
     }
@@ -622,16 +760,18 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       if (!hit) {
         if (this.hoverPreviewId) {
           this.hoverPreviewId = null;
-          this.conquest?.setFocus(null);
+          this.conquest?.setHover(null);
+          this.refreshRewardLabels();
         }
         return;
       }
       if (this.hoverPreviewId === hit.questId) return;
       this.hoverPreviewId = hit.questId;
-      this.conquest?.setFocus(hit.questId);
+      // Survol : illumine la constellation, sans mode solo (setFocus).
+      this.conquest?.setHover(hit.questId);
       this.refreshRewardLabels();
     });
-  };
+  }
 
   private readonly onPointerLeave = (): void => {
     if (this.canvas) this.canvas.style.cursor = 'default';
@@ -639,7 +779,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     if (this.conquestState.selected()) return;
     this.zone.run(() => {
       this.hoverPreviewId = null;
-      this.conquest?.setFocus(null);
+      this.conquest?.setHover(null);
       this.refreshRewardLabels();
     });
   };
@@ -651,6 +791,10 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     if (isScreenPointBlockedByUi(event.clientX, event.clientY)) return;
 
     const questHit = this.hitTest(event.clientX, event.clientY);
+    // Touch : illumine dès le contact (pas de hover OS).
+    if (isTouch && questHit && !this.conquestState.selected()) {
+      this.applyHoverAt(event.clientX, event.clientY);
+    }
 
     if (STAR_CONQUEST_FEATURES.canvasOrbit) {
       event.preventDefault();
@@ -725,22 +869,47 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     });
   };
 
+  private isIntroFeedSc(): boolean {
+    return (
+      typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('intro-feed-sc')
+    );
+  }
+
+  /** Bande jouable : CSS intro-feed-sc (autour du token) ou bande hub classique. */
+  private hitPlayableBand(): { topPx: number; floorTopPx: number; bottomPx?: number } {
+    if (this.isIntroFeedSc() && typeof window !== 'undefined') {
+      const root = document.documentElement;
+      const top = Number.parseFloat(root.style.getPropertyValue('--sc-playable-top')) || 0;
+      const bottomClip =
+        Number.parseFloat(root.style.getPropertyValue('--sc-playable-bottom')) || 0;
+      const vh = window.innerHeight || 550;
+      return { topPx: top, floorTopPx: Math.max(top + 40, vh - bottomClip), bottomPx: vh - bottomClip };
+    }
+    const band = measurePlayableBand(readFloorPeekPx());
+    return { topPx: band.topPx, floorTopPx: band.floorTopPx, bottomPx: band.bottomPx };
+  }
+
   private hitTest(clientX: number, clientY: number) {
     if (!this.camera || !this.conquest || !this.canvas) return null;
-    const band = measurePlayableBand(readFloorPeekPx());
-    // Autorise toute la hauteur (y compris sous le floor) — seules les Quests hors bande haute sont exclues
+    const band = this.hitPlayableBand();
+    // Intro Feed : restreindre au bandeau autour du token ; hub : hors bande haute.
     if (clientY < band.topPx - 8) return null;
+    if (band.bottomPx !== undefined && clientY > band.bottomPx + 8) return null;
 
     const rect = this.canvas.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) return null;
     this.pointerNdc.x = ((clientX - rect.left) / rect.width) * 2 - 1;
     this.pointerNdc.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-    // Hit plus large en bas (floor) pour les racines underFloor
+    // Hit plus large en bas (floor) / bandeau intro étroit autour du token
     const nearFloor = clientY >= band.floorTopPx - 12;
     const pick = STAR_CONQUEST_SCALE.pickRadiusPx;
+    const introBoost = this.isIntroFeedSc() ? 10 : 0;
     const radiusPx = nearFloor
-      ? Math.max(pick + 8, Math.min(pick + 18, rect.width * 0.16))
-      : Math.max(pick, Math.min(pick + 8, rect.width * 0.1));
+      ? Math.max(pick + 8 + introBoost, Math.min(pick + 18 + introBoost, rect.width * 0.16))
+      : Math.max(pick + introBoost, Math.min(pick + 8 + introBoost, rect.width * 0.12));
+    // Matrice à jour (cerceau Y) avant le pick.
+    this.world?.content.updateMatrixWorld(true);
     return this.conquest.pick(
       this.raycaster,
       this.camera,
@@ -754,14 +923,11 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
   private applySelection(quest: StarQuest, world: THREE.Vector3): void {
     this.focusedId = quest.id;
     this.hoverPreviewId = null;
-    // Pas de pull/parallaxe pendant la sélection — structure figée
+    // Pas de pull/parallaxe ni zoom caméra au clic — structure figée.
     this.conquest?.setPointerNdc(null);
     this.conquest?.setFocus(quest.id);
     this.conquest?.pulseFocus();
     this.kgOrchestrator.focusNode(`quest:${quest.id}`);
-    if (this.world && this.camera) {
-      this.kgOrchestrator.cameraController.focusNode(this.world, this.camera, world);
-    }
     this.lastAnchorX = 0;
     this.lastAnchorY = 0;
     const anchor = this.projectToScreen(world);
@@ -799,23 +965,18 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
     this.conquest.pulseFocus();
   }
 
-  private applyKnowledgeNodeSelection(nodeId: string, world: THREE.Vector3): void {
+  private applyKnowledgeNodeSelection(nodeId: string, _world: THREE.Vector3): void {
     this.kgOrchestrator.focusNode(nodeId);
     this.conquest?.setNetworkFocus(nodeId);
-    if (this.world && this.camera) {
-      const cluster = nodeId.startsWith('ai-agent:');
-      this.kgOrchestrator.cameraController.focusNode(this.world, this.camera, world, cluster);
-    }
+    // Pas de zoom caméra au clic knowledge-graph non plus.
   }
 
   private clearSelection(): void {
     this.focusedId = null;
     this.hoverPreviewId = null;
     this.conquest?.setFocus(null);
+    this.conquest?.setHover(null);
     this.kgOrchestrator.clearFocus();
-    if (this.world && this.camera) {
-      this.kgOrchestrator.cameraController.restore(this.world, this.camera);
-    }
     this.conquestState.clear();
     if (this.canvas) this.canvas.style.cursor = 'default';
     this.refreshRewardLabels();
@@ -1018,6 +1179,7 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
           this.world.releaseStick(false);
         }
         this.world.tick(delta);
+        this.tickIntroCounterSpin(delta);
         this.world.root.updateMatrixWorld(true);
         if (this.camera) {
           this.kgOrchestrator.cameraController.tick(delta, this.camera);
@@ -1037,9 +1199,13 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
         }
       }
       if (this.conquest) {
-        // Navigation stick : sim pleine (décimée si floor actif) ; idle throttle via gouverneur P21
-        if (this.conquestState.worldNavigating()) {
-          if (shouldRunScActiveSimTick(ctx.frameIndex, ctx.dual.decimateScActiveSim)) {
+        // Survol / intro Feed : tick plein pour l’illumination galaxy (pulse + filaments).
+        const hoverLit = !!this.hoverPreviewId || !!this.focusedId || this.isIntroFeedSc();
+        if (this.conquestState.worldNavigating() || hoverLit) {
+          if (
+            hoverLit ||
+            shouldRunScActiveSimTick(ctx.frameIndex, ctx.dual.decimateScActiveSim)
+          ) {
             this.conquest.tick(delta, this.camera);
           }
           this.conquestSimAccMs = 0;
@@ -1077,6 +1243,35 @@ export class ParticleBackgroundComponent implements AfterViewInit, OnDestroy {
       this.renderFrame();
     }
     this.combinedPerfHud.reportStarConquest(this.renderer.info);
+  }
+
+  /**
+   * Pendant intro-feed-sc : SC = cerceau autour de la taille du token.
+   * Même axe Y que le spin token, sens inverse, vitesse basse (anti-nausée).
+   * Les constellations passent devant le token puis derrière, en boucle.
+   */
+  private tickIntroCounterSpin(deltaMs: number): void {
+    if (!this.world) return;
+    const introSc =
+      typeof document !== 'undefined' &&
+      document.documentElement.classList.contains('intro-feed-sc');
+    const dt = Math.min(0.05, deltaMs / 1000);
+    // Token load ≈ 1.68 rad/s — cerceau ~1/8e, tour complet ≈ 30 s.
+    const hoopRadPerSec = 0.22;
+    if (introSc) {
+      this.introHoopRad += hoopRadPerSec * dt;
+      // world.tick() remet rotation à 0 — on réapplique juste après.
+      this.world.content.rotation.set(0, -this.introHoopRad, 0);
+    } else if (Math.abs(this.introHoopRad) > 1e-4) {
+      this.introHoopRad *= Math.exp(-dt * 2.4);
+      if (Math.abs(this.introHoopRad) < 1e-3) this.introHoopRad = 0;
+      this.world.content.rotation.set(0, -this.introHoopRad, 0);
+    } else if (
+      this.world.content.rotation.y !== 0 ||
+      this.world.content.rotation.z !== 0
+    ) {
+      this.world.content.rotation.set(0, 0, 0);
+    }
   }
 
   /** Skip render idle si dual-context over-budget (fill rate 250×550 déjà bas). */

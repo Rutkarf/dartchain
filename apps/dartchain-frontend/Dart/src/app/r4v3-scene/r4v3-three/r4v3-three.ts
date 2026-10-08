@@ -16,16 +16,17 @@ import { CommonModule } from '@angular/common';
 import * as THREE from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { hexToThree } from '../../core/constants/palette';
 import {
-  LOGO_ELECTRIC_CLICK_INDICES,
-  PALETTE_STOPS,
-  THREE_CORE_DEFAULT,
-  THREE_LOGO_GLASS,
-  THREE_RIM_DEFAULT,
-  hexToThree,
-  threeElectricLogoPalette,
-  threePaletteVariant,
-} from '../../core/constants/palette';
+  LOGO_HOLO,
+  LOGO_HOLO_EMISSIVE_HEX,
+  LOGO_HOLO_SHEEN_HEX,
+  addLogoHoloLights,
+  createLogoHoloMaterial,
+  logoHoloPaletteVariant,
+  tickLogoHoloAppearance,
+  type LogoHoloCenterDarkUniforms,
+} from '../../shared/logo-stl-viewer/logo-stl-holo';
 import {
   bindContainerResize,
   type ContainerResizeBinding,
@@ -84,6 +85,16 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
   private frontLight!: THREE.DirectionalLight;
   private rimLight!: THREE.PointLight;
   private coreLight!: THREE.PointLight;
+  private fillLight?: THREE.DirectionalLight;
+  private rimLightB?: THREE.PointLight;
+  private holoCenterDark?: LogoHoloCenterDarkUniforms;
+  private holoEmissiveStops: THREE.Color[] = [];
+  private holoSheenStops: THREE.Color[] = [];
+  private holoScratchA = new THREE.Color();
+  private holoScratchB = new THREE.Color();
+  private holoEdgeBright = new THREE.Color(LOGO_HOLO.edgeBright);
+  private holoEdgeGlow = new THREE.Color(LOGO_HOLO.edgeGlow);
+  private readonly holoClock = new THREE.Timer();
 
   private electricClickIndex = 0;
   private controlsActive = false;
@@ -184,11 +195,30 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     this.scene?.clear();
     this.renderer?.dispose();
+    this.holoClock.dispose();
   }
 
   randomizeFromParentClick(): void {
     this.changeLogoPalette();
     this.kickLogoRotation();
+  }
+
+  /** Impulse de spin — idle = Y ; Acheter utilise l'autre axe (X). */
+  kickSpin(axis: 'x' | 'y' | 'z' = 'y'): void {
+    if (!this.spinGroup) return;
+    const impulse = THREE.MathUtils.randFloat(Math.PI * 0.85, Math.PI * 1.35);
+    this.spinGroup.rotation[axis] += impulse;
+    if (this.mesh) {
+      this.coreLight.intensity = 4.8;
+      this.rimLight.intensity = 3.6;
+      this.mesh.material.emissiveIntensity = 1.5;
+      setTimeout(() => {
+        if (!this.mesh) return;
+        this.mesh.material.emissiveIntensity = 1.35;
+        this.coreLight.intensity = 4.2;
+        this.rimLight.intensity = 3.2;
+      }, 220);
+    }
   }
 
   private initScene(): void {
@@ -213,7 +243,7 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
     this.renderer = created.renderer;
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.setSize(width, height, false);
-    this.renderer.setClearColor(0x000000, 0);
+    this.renderer.setClearColor(0x0d0630, 0);
 
     const rendererWithColorSpace = this.renderer as THREE.WebGLRenderer & {
       outputColorSpace?: THREE.ColorSpace;
@@ -229,45 +259,27 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   private addPlaceholderMesh(): void {
-    const palette = threePaletteVariant(8);
     const geometry = new THREE.IcosahedronGeometry(4.5, 1);
-    const material = new THREE.MeshPhysicalMaterial({
-      color: palette.color,
-      emissive: palette.emissive,
-      ...THREE_LOGO_GLASS,
-      reflectivity: 0.85,
-      side: THREE.DoubleSide,
-    });
-
+    const { material } = createLogoHoloMaterial(THREE);
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.rotation.copy(this.presentationRotation);
     this.mesh.scale.setScalar(Math.max(0.8, this.modelTargetSize / 10));
     this.spinGroup.add(this.mesh);
-    this.applyPalette(palette, false);
+    this.applyPalette(logoHoloPaletteVariant(0), false);
     this.resetOrbitToFrontView();
   }
 
   private initLights(): void {
-    this.ambientLight = new THREE.AmbientLight(
-      hexToThree(PALETTE_STOPS[8].hex),
-      1.05
-    );
-    this.scene.add(this.ambientLight);
-
-    this.frontLight = new THREE.DirectionalLight(
-      hexToThree(PALETTE_STOPS[7].hex),
-      2.45
-    );
-    this.frontLight.position.set(80, 40, 120);
-    this.scene.add(this.frontLight);
-
-    this.rimLight = new THREE.PointLight(THREE_RIM_DEFAULT, 2.6, 220);
-    this.rimLight.position.set(-30, -10, 80);
-    this.scene.add(this.rimLight);
-
-    this.coreLight = new THREE.PointLight(THREE_CORE_DEFAULT, 3.4, 220);
-    this.coreLight.position.set(10, 10, 70);
-    this.scene.add(this.coreLight);
+    const lights = addLogoHoloLights(THREE, this.scene, 28);
+    this.ambientLight = lights.ambient;
+    this.frontLight = lights.key;
+    this.fillLight = lights.fill;
+    this.rimLight = lights.rimA;
+    this.rimLightB = lights.rimB;
+    this.coreLight = lights.core;
+    this.holoEmissiveStops = LOGO_HOLO_EMISSIVE_HEX.map((hex) => new THREE.Color(hexToThree(hex)));
+    this.holoSheenStops = LOGO_HOLO_SHEEN_HEX.map((hex) => new THREE.Color(hexToThree(hex)));
+    this.holoClock.connect(document);
   }
 
   private initControls(): void {
@@ -332,14 +344,8 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
         const sphere = geometry.boundingSphere;
         if (!sphere) return;
 
-        const initial = threePaletteVariant(8);
-        const material = new THREE.MeshPhysicalMaterial({
-          color: initial.color,
-          emissive: initial.emissive,
-          ...THREE_LOGO_GLASS,
-          reflectivity: 0.85,
-          side: THREE.DoubleSide,
-        });
+        const { material, centerDark } = createLogoHoloMaterial(THREE, geometry);
+        this.holoCenterDark = centerDark;
 
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.position.set(0, 0, 0);
@@ -353,7 +359,7 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
         this.spinGroup.rotation.set(0, 0, 0);
         this.spinGroup.add(this.mesh);
 
-        this.applyPalette(threePaletteVariant(8), false);
+        this.applyPalette(logoHoloPaletteVariant(0), false);
         this.resetOrbitToFrontView();
         this.resizeRendererToContainer();
         this.renderFrame();
@@ -371,20 +377,23 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   private applyPalette(
-    palette: ReturnType<typeof threePaletteVariant>,
+    palette: ReturnType<typeof logoHoloPaletteVariant>,
     electricBoost: boolean
   ): void {
     if (!this.mesh) return;
 
     this.mesh.material.color.setHex(palette.color);
     this.mesh.material.emissive.setHex(palette.emissive);
-    this.mesh.material.emissiveIntensity = electricBoost ? 1.35 : 0.85;
+    this.mesh.material.emissiveIntensity = electricBoost ? 1.15 : 0.7;
+    this.holoEdgeBright.setHex(palette.color);
+    this.holoEdgeGlow.setHex(palette.emissive);
     this.rimLight.color.setHex(palette.rim);
     this.coreLight.color.setHex(palette.core);
+    if (this.rimLightB) this.rimLightB.color.setHex(LOGO_HOLO.rimB);
     this.mesh.material.needsUpdate = true;
 
-    this.coreLight.intensity = electricBoost ? 4.2 : 3.4;
-    this.rimLight.intensity = electricBoost ? 3.2 : 2.6;
+    this.coreLight.intensity = electricBoost ? 3.6 : 2.55;
+    this.rimLight.intensity = electricBoost ? 2.8 : 2.15;
   }
 
   /** Centre monde du mesh (cible OrbitControls = axe de rotation). */
@@ -491,11 +500,8 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
     if (!this.mesh) return;
 
     this.electricClickIndex =
-      (this.electricClickIndex + 1) % LOGO_ELECTRIC_CLICK_INDICES.length;
-    this.applyPalette(
-      threeElectricLogoPalette(this.electricClickIndex),
-      true
-    );
+      (this.electricClickIndex + 1) % LOGO_HOLO_EMISSIVE_HEX.length;
+    this.applyPalette(logoHoloPaletteVariant(this.electricClickIndex), true);
   }
 
   private kickLogoRotation(): void {
@@ -533,12 +539,13 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
   }
 
-  private animate = (): void => {
+  private animate = (now = performance.now()): void => {
     if (!this.animating) {
       return;
     }
 
     this.frameId = requestAnimationFrame(this.animate);
+    this.holoClock.update(now);
 
     if (!shouldAnimateWebGl()) {
       this.controls.update();
@@ -568,6 +575,20 @@ export class R4v3ThreeComponent implements AfterViewInit, OnDestroy, OnChanges {
       );
     }
 
+    if (this.mesh) {
+      tickLogoHoloAppearance({
+        material: this.mesh.material,
+        centerDark: this.holoCenterDark,
+        emissiveStops: this.holoEmissiveStops,
+        sheenStops: this.holoSheenStops,
+        scratchA: this.holoScratchA,
+        scratchB: this.holoScratchB,
+        edgeBright: this.holoEdgeBright,
+        edgeGlow: this.holoEdgeGlow,
+        elapsed: this.holoClock.getElapsed(),
+        bright: 0.62,
+      });
+    }
     this.controls.update();
     this.renderFrame();
   };

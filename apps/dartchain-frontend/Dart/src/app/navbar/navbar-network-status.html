@@ -2,15 +2,22 @@
   <button
     type="button"
     class="network-trust-chip"
+    data-tour="network-status"
     [class.is-live]="trust.trustState() === 'live'"
     [class.is-slow]="trust.trustState() === 'slow'"
     [class.is-offline]="trust.trustState() === 'offline'"
     [class.is-checking]="trust.trustState() === 'checking'"
     [class.is-stream-live]="trust.streamLive()"
+    [class.is-session-guest]="!auth.isAuthenticated()"
+    [class.is-session-auth]="auth.isAuthenticated()"
+    [class.is-led-orange]="ledTone() === 'orange'"
+    [class.is-led-green]="ledTone() === 'green'"
+    [class.is-led-red]="ledTone() === 'red'"
+    [class.is-led-checking]="ledTone() === 'checking'"
     [class.is-panel-open]="panelOpen()"
     [attr.aria-expanded]="panelOpen()"
+    [attr.aria-label]="chipAria()"
     aria-haspopup="dialog"
-    [attr.aria-label]="trust.chipAriaLabel()"
     (click)="openDetails($event)"
   >
     <span class="network-trust-chip__led-wrap nv-drawer-led-anchor" aria-hidden="true">

@@ -11,7 +11,7 @@
   width: 100%;
   min-width: 0;
   height: 100%;
-  max-height: var(--smart-bar-h, var(--showcase-smart-bar-h, 13.5px));
+  max-height: var(--smart-bar-h, var(--showcase-smart-bar-h, 16px));
   min-height: 0;
   overflow: hidden;
   box-sizing: border-box;
@@ -203,7 +203,7 @@
   .chart-summary-bar__range
 ) {
   align-self: center;
-  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 13.5px)) - 2px);
+  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 16px)) - 2px);
   min-height: 0;
   line-height: 1;
 }
@@ -211,17 +211,17 @@
 /* WP R4V3 : ancienne icône, sans border */
 .collapsed-summary-bar .r4v3-summary-bar__wp-btn {
   align-self: center;
-  flex: 0 0 8.5px !important;
-  width: 8.5px !important;
-  height: 8.5px !important;
-  min-width: 8.5px !important;
-  min-height: 8.5px !important;
-  max-width: 8.5px !important;
-  max-height: 8.5px !important;
+  flex: 0 0 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
   overflow: visible !important;
   line-height: 0 !important;
   border: 0 !important;
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
   background: transparent !important;
   box-shadow: none !important;
 }
@@ -229,10 +229,10 @@
 .collapsed-summary-bar .r4v3-summary-bar__wp-btn-icon,
 .collapsed-summary-bar .r4v3-summary-bar__wp-btn-icon svg {
   display: block !important;
-  width: 8.5px !important;
-  height: 8.5px !important;
-  max-width: 8.5px !important;
-  max-height: 8.5px !important;
+  
+  
+  
+  
   overflow: visible !important;
   border: 0 !important;
   background: transparent !important;
@@ -255,7 +255,7 @@
   .dock-summary-actions__btn
 ) {
   align-self: center;
-  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 13.5px)) - 1px);
+  max-height: calc(var(--smart-bar-h, var(--showcase-smart-bar-h, 16px)) - 1px);
 }
 
 /* Zones meta / actions */
@@ -292,9 +292,9 @@
 
 .app-bottom-stack.is-dock-collapsed,
 .app-market-stack--rate.is-chart-collapsed {
-  --smart-bar-h: var(--dock-smart-bar-h, var(--showcase-smart-bar-h, 13.5px));
+  --smart-bar-h: var(--dock-smart-bar-h, var(--showcase-smart-bar-h, 16px));
 }
 
 .app-market-stack--rate.is-chart-collapsed {
-  --smart-bar-h: var(--chart-smart-bar-h, var(--showcase-smart-bar-h, 13.5px));
+  --smart-bar-h: var(--chart-smart-bar-h, var(--showcase-smart-bar-h, 16px));
 }

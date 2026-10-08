@@ -15,7 +15,9 @@
     (click)="onRefresh($event)"
     (pointerdown)="$event.stopPropagation()"
   >
-    <app-icon-relief-3d kind="refresh" [spinning]="refreshBusy()" />
+    <svg class="icon collapsed-bar-actions__refresh-icon" aria-hidden="true" focusable="false">
+      <use href="#icon-refresh" />
+    </svg>
   </button>
 
   <span class="collapsed-bar-actions__rail" aria-hidden="true"></span>

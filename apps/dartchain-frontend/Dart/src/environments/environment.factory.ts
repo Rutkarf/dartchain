@@ -3,7 +3,12 @@ export interface ProductEnvironment {
   faucetEnabled: boolean;
   showcaseEnabled: boolean;
   /**
-   * Master kill-switch Star Conquest (canvas + overlays).
+   * Dev only — saute l’appel @R4V3army et Feed The R4V3 (composants inchangés).
+   * Le tutoriel hub n’est pas coupé. Remettre false avant livraison / prod.
+   */
+  skipBootAnimations?: boolean;
+  /**
+   * Master kill-switch Conquête stellaire (canvas + overlays).
    * false = non monté ; code intact, réactivation = true.
    */
   starConquestEnabled?: boolean;
@@ -12,7 +17,7 @@ export interface ProductEnvironment {
   /** Ligne KPI R&D dans le scanner — pas un UX utilisateur. */
   starConquestKpiDebug?: boolean;
   /**
-   * Arène BB (ex-MetaVerseBB) — combat + profil map dans le floor bas de page.
+   * MetaVerseBB — combat + profil map dans le floor bas de page.
    * Activé par défaut : jouable automatiquement (guest OK).
    */
   metaverseArenaEnabled?: boolean;
@@ -20,7 +25,7 @@ export interface ProductEnvironment {
 
 export interface MapEnvironment {
   mapEnabled?: boolean;
-  mapProvider?: 'legacy-floor' | 'marseille-osm-three';
+  mapProvider?: 'legacy-floor' | 'metaverse-osm-three';
   enableOsmBuildings?: boolean;
   enableTerrain?: boolean;
   mapDebug?: boolean;
@@ -41,6 +46,7 @@ const DEFAULT_PRODUCT: ProductEnvironment = {
   commercial: true,
   faucetEnabled: true,
   showcaseEnabled: true,
+  skipBootAnimations: false,
   starConquestEnabled: false,
   starConquestOverlayEnabled: true,
   starConquestKpiDebug: false,
@@ -49,7 +55,7 @@ const DEFAULT_PRODUCT: ProductEnvironment = {
 
 const DEFAULT_MAP: MapEnvironment = {
   mapEnabled: true,
-  mapProvider: 'marseille-osm-three',
+  mapProvider: 'metaverse-osm-three',
   enableOsmBuildings: true,
   enableTerrain: true,
   mapDebug: false,

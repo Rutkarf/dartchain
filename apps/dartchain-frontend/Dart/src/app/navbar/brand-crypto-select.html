@@ -1,23 +1,21 @@
 <div class="token-select brand-crypto-select" [class.token-select--open]="menuOpen">
   <button
-    type="button"
-    class="token-field token-select__trigger"
-    (click)="toggleMenu($event)"
-    [attr.aria-expanded]="menuOpen"
-    aria-haspopup="listbox"
-    aria-label="Sélectionner un token de la plateforme"
-  >
+ type="button"
+ class="token-field token-select__trigger"
+ (click)="toggleMenu($event)"
+ [attr.aria-expanded]="menuOpen"
+ aria-haspopup="listbox"
+ >
       <span class="token-select__value">{{ selection.selected() }}</span>
     <span class="token-select__chevron" aria-hidden="true"></span>
   </button>
 
   @if (menuOpen) {
   <ul
-    class="token-select__menu"
-    role="listbox"
-    aria-label="Tokens plateforme"
-    (click)="$event.stopPropagation()"
-  >
+ class="token-select__menu"
+ role="listbox"
+ (click)="$event.stopPropagation()"
+ >
     <li class="token-select__section" role="presentation">Natif</li>
     <li
       role="option"
@@ -27,11 +25,11 @@
       (click)="selectSymbol(nativeToken)"
     >
       <span class="token-select__option-symbol">{{ nativeToken }}</span>
-      <span class="token-select__option-name">Token natif</span>
+      <span class="token-select__option-name">Jeton natif</span>
     </li>
 
     <li class="token-select__section token-select__section--launch" role="presentation">
-      LaunchLab
+      Laboratoire
       @if (hasLaunchProjects()) {
         <span class="token-select__section-count">{{ platformLaunchProjects().length }}</span>
       }
@@ -42,7 +40,7 @@
     } @else if (launchState.error() && !hasLaunchProjects()) {
       <li class="token-select__empty" role="presentation">Lancements indisponibles</li>
     } @else if (!hasLaunchProjects()) {
-      <li class="token-select__empty" role="presentation">Aucun token lancé pour le moment</li>
+      <li class="token-select__empty" role="presentation">Aucun jeton lancé pour le moment</li>
     } @else {
       @for (project of platformLaunchProjects(); track project.id) {
       <li

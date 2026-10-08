@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -17,10 +18,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Pending faucet balances — JSON file (valable mémoire et postgres local).
- * Les pièces M4T3R y sont accrues sans créer de bloc.
+ * Pending faucet balances — fichier JSON, mode memory seulement.
+ * En postgres, {@code JpaFaucetPendingBalanceStore} écrit la table.
  */
 @Component
+@ConditionalOnProperty(name = "dartchain.persistence.mode", havingValue = "memory", matchIfMissing = true)
 public class JsonFaucetPendingBalanceStore implements FaucetPendingBalanceStore {
 
     private static final Logger log = LoggerFactory.getLogger(JsonFaucetPendingBalanceStore.class);

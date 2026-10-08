@@ -5,8 +5,8 @@ import {
 
 describe('floor-horizon-blend.config', () => {
   it('force un ciel et un fog noirs (pas le navy WORLD_BACKGROUND)', () => {
-    expect(FLOOR_HORIZON_BLEND.skyColor).toBe(0x000000);
-    expect(FLOOR_HORIZON_BLEND.fog.color).toBe(0x000000);
+    expect(FLOOR_HORIZON_BLEND.skyColor).toBe(0x0d0630);
+    expect(FLOOR_HORIZON_BLEND.fog.color).toBe(0x0d0630);
     expect(FLOOR_HORIZON_BLEND.clearAlpha).toBe(1);
     expect(FLOOR_HORIZON_BLEND.fog.far).toBeGreaterThan(FLOOR_HORIZON_BLEND.fog.near);
     expect(FLOOR_HORIZON_BLEND.fog.near).toBeGreaterThanOrEqual(400);
@@ -29,7 +29,7 @@ describe('floor-horizon-blend.config', () => {
   it('génère un linear-gradient CSS utilisable en mask-image', () => {
     const image = floorHorizonMaskImage();
     expect(image.startsWith('linear-gradient(to top,')).toBe(true);
-    expect(image).toContain('rgba(0, 0, 0, 1)');
-    expect(image).toContain('rgba(0, 0, 0, 0)');
+    expect(image).toContain('rgba(10, 18, 32, 1)');
+    expect(image).toContain('rgba(10, 18, 32, 0)');
   });
 });

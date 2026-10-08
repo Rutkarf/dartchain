@@ -36,7 +36,7 @@ export interface StarConquestBand {
   worldRightPx: number;
 }
 
-const SAFE_MARGIN_BELOW_SWAP_PX = 10;
+const SAFE_MARGIN_BELOW_STACK_PX = 0;
 const MIN_LABEL_DIST_PX = 20;
 /** Au plus 1 particule sous le bas du viewport à l’init. */
 const MAX_BOTTOM_OFFSCREEN = 1;
@@ -114,8 +114,9 @@ export function measureGapAboveFloor(floorPeekPx = 220): {
 }
 
 /**
- * Zone jouable : sous Navbar+Swap → horizon du floor.
- * Monde horizontal plus large que le viewport (fenêtre sur la galaxie).
+ * Zone jouable Conquête stellaire :
+ * haut = sommet du viewport (plein ciel dès le haut),
+ * bas = horizon MetaVerseBB (sans chevauchement).
  */
 export const DEFAULT_FLOOR_PEEK_PX = 220;
 
@@ -129,28 +130,53 @@ export function readFloorPeekPx(): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_FLOOR_PEEK_PX;
 }
 
+/**
+ * Bas du hub replié = bas de la dernière smart bar visible
+ * (graph → dock → showcase → swap → navbar). Pas `.app-main-layout`
+ * (souvent étiré jusqu’en bas d’écran → bande SC à hauteur nulle).
+ */
+export function measureSmartBarsBottomPx(viewportH: number): number {
+  const selectors = [
+    'app-graph',
+    'app-dock-tabs-dock-tabs',
+    'app-showcase-tab-showcase',
+    'app-swap',
+    'app-navbar',
+  ] as const;
+
+  let bottomDom = 0;
+  for (const sel of selectors) {
+    const el = document.querySelector(sel);
+    if (!el) continue;
+    const r = el.getBoundingClientRect();
+    if (r.height > 2 && r.width > 2) {
+      bottomDom = Math.max(bottomDom, r.bottom);
+    }
+  }
+
+  if (bottomDom > 0) {
+    return starConquestScaleDomLength(bottomDom, 'y');
+  }
+
+  const stack = measureAngularStackBottomPx();
+  if (stack > 0) {
+    return stack;
+  }
+
+  return viewportH * 0.28;
+}
+
 export function measurePlayableBand(floorPeekPx = readFloorPeekPx()): StarConquestBand {
   const viewportW = starConquestLayoutWidth();
   const viewportH = starConquestLayoutHeight();
 
-  const swap = document.querySelector('app-swap');
-  const navbar = document.querySelector('app-navbar');
-  let swapBottom = viewportH * 0.22;
-  if (swap) {
-    const r = swap.getBoundingClientRect();
-    if (r.height > 0) swapBottom = starConquestScaleDomLength(r.bottom, 'y');
-  } else if (navbar) {
-    const r = navbar.getBoundingClientRect();
-    if (r.height > 0) swapBottom = starConquestScaleDomLength(r.bottom, 'y');
-  }
-
+  const stackBottomPx = measureSmartBarsBottomPx(viewportH);
   const floorTopPx = measureFloorTopPx(floorPeekPx, viewportH);
-  const topPx = Math.min(
-    viewportH - 120,
-    Math.max(swapBottom + SAFE_MARGIN_BELOW_SWAP_PX, 8)
-  );
-  // Bas viewport : particules visibles sous le floor (z-order), quasiment au ras
-  const bottomPx = Math.max(topPx + 96, viewportH - 4);
+
+  // Démarre en haut du viewport — le clip CSS suit topPx (0 = pas de coupe haut).
+  const topPx = SAFE_MARGIN_BELOW_STACK_PX;
+  // S’arrête au bord du peek MetaVerseBB (pas de bande morte / ligne dure).
+  const bottomPx = Math.max(topPx + 64, Math.min(viewportH - 2, floorTopPx));
 
   // Débord léger uniquement — cible affichage 250×550 (presque tout visible)
   const overflowXPx = Math.round(
@@ -161,10 +187,10 @@ export function measurePlayableBand(floorPeekPx = readFloorPeekPx()): StarConque
     topPx,
     bottomPx,
     widthPx: viewportW,
-    heightPx: Math.max(96, bottomPx - topPx),
+    heightPx: Math.max(64, bottomPx - topPx),
     viewportW,
     viewportH,
-    swapBottomPx: swapBottom,
+    swapBottomPx: stackBottomPx,
     floorTopPx,
     overflowXPx,
     worldLeftPx: -overflowXPx,

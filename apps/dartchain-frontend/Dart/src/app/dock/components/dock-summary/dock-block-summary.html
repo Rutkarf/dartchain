@@ -1,15 +1,14 @@
-<div class="dock-summary-bar" role="status" aria-live="polite" aria-label="Résumé blocs">
+<div class="dock-summary-bar" role="status" aria-live="polite">
   <div class="dock-summary-main">
     <span class="dock-summary-main__rail" aria-hidden="true"></span>
     <span
-      class="dock-summary-status"
-      [ngClass]="statusClass(phase())"
-      [attr.aria-label]="'État : ' + statusLabel()"
-    >
+ class="dock-summary-status"
+ [ngClass]="statusClass(phase())"
+ >
       {{ statusLabel() }}
     </span>
     @if (blockHeight() !== null) {
-      <span class="dock-summary-badge" [attr.aria-label]="'Hauteur ' + blockHeight()">#{{ blockHeight() }}</span>
+      <span class="dock-summary-badge">#{{ blockHeight() }}</span>
     }
   </div>
 
@@ -30,11 +29,10 @@
 
   <div class="dock-summary-actions">
     <button
-      type="button"
-      class="dock-summary-actions__btn dock-summary-actions__primary"
-      (click)="onCompose($event)"
-      aria-label="Ouvrir le composeur de bloc"
-    >
+ type="button"
+ class="dock-summary-actions__btn dock-summary-actions__primary"
+ (click)="onCompose($event)"
+ >
       Composer
     </button>
   </div>

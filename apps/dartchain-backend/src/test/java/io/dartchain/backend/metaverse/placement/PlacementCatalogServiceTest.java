@@ -28,7 +28,7 @@ class PlacementCatalogServiceTest {
     }
 
     @Test
-    void list_returnsInventoryInsideDefaultMarseilleBbox() {
+    void list_returnsInventoryInsideDefaultMetaverseBbox() {
         MetaversePlacementsResponse response = service.list(43.28, 43.3095, 5.354, 5.394);
 
         assertThat(response.type()).isEqualTo("METAVERSE_PLACEMENTS");
@@ -45,7 +45,7 @@ class PlacementCatalogServiceTest {
                         "dev-placement-04"
                 );
         assertThat(response.placements().getFirst().anchorWorld().coordinateSystemVersion())
-                .isEqualTo("marseille-local-v1");
+                .isEqualTo("metaverse-local-v1");
     }
 
     @Test

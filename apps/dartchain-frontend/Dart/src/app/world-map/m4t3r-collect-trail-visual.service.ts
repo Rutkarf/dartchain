@@ -43,7 +43,7 @@ export class M4t3rCollectTrailVisualService {
       transparent: true,
       depthWrite: false,
       side: THREE.DoubleSide,
-      color: 0xffffff,
+      color: 0xede7d9,
       opacity: COLLECT_TRAIL_VISUAL_CONFIG.opacity,
       blending: THREE.AdditiveBlending,
     });
@@ -104,7 +104,7 @@ export class M4t3rCollectTrailVisualService {
     const points = sampleCollectTrailVisualPoints(this.prevScratch, this.curScratch);
     for (const point of points) {
       if (isGroundCellExcluded(point.x, point.z)) continue;
-      this.placeQuad(point.x, y, point.z, point.yaw, 0xff3ecf);
+      this.placeQuad(point.x, y, point.z, point.yaw, 0x7b0d1e);
     }
 
     const seen = new Set<string>();
@@ -114,7 +114,7 @@ export class M4t3rCollectTrailVisualService {
       const center = clusterWorldCenter(id);
       if (!center || isGroundCellExcluded(center.x, center.z)) continue;
       const yaw = Math.atan2(this.curScratch.x - this.prevScratch.x, this.curScratch.z - this.prevScratch.z);
-      this.placeQuad(center.x, y, center.z, yaw, 0x40e0ff);
+      this.placeQuad(center.x, y, center.z, yaw, 0x8a95a5);
     }
   }
 
@@ -210,7 +210,7 @@ export class M4t3rCollectTrailVisualService {
     slot: CollectTrailSlot,
     scale: number,
     colorIntensity: number,
-    tint = 0xff3ecf
+    tint = 0x7b0d1e
   ): void {
     const mesh = this.mesh;
     if (!mesh) return;
@@ -249,15 +249,15 @@ export class M4t3rCollectTrailVisualService {
     const cy = canvas.height / 2;
     const rMax = canvas.width * 0.48;
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rMax);
-    grad.addColorStop(0, 'rgba(255,255,255,0.95)');
-    grad.addColorStop(0.25, 'rgba(255,62,207,0.55)');
-    grad.addColorStop(0.55, 'rgba(64,224,255,0.28)');
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    grad.addColorStop(0, 'rgba(237, 231, 217,0.95)');
+    grad.addColorStop(0.25, 'rgba(123, 13, 30,0.55)');
+    grad.addColorStop(0.55, 'rgba(139, 157, 173,0.28)');
+    grad.addColorStop(1, 'rgba(10, 18, 32,0)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Anneau R4V3 léger.
-    ctx.strokeStyle = 'rgba(64,224,255,0.35)';
+    ctx.strokeStyle = 'rgba(139, 157, 173,0.35)';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(cx, cy, rMax * 0.72, 0, Math.PI * 2);

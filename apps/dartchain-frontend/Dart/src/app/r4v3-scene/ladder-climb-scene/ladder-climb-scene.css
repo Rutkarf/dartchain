@@ -19,16 +19,16 @@
   overflow: hidden;
   -webkit-mask-image: linear-gradient(
     to top,
-    #000 0%,
-    #000 72%,
-    rgba(0, 0, 0, 0.55) 90%,
+    #0a1220 0%,
+    #0a1220 72%,
+    rgba(10, 18, 32, 0.55) 90%,
     transparent 100%
   );
   mask-image: linear-gradient(
     to top,
-    #000 0%,
-    #000 72%,
-    rgba(0, 0, 0, 0.55) 90%,
+    #0a1220 0%,
+    #0a1220 72%,
+    rgba(10, 18, 32, 0.55) 90%,
     transparent 100%
   );
 }
@@ -47,9 +47,9 @@
   transform: translateX(-50%);
   pointer-events: none;
   padding: 0.45rem 0.9rem;
-  border-radius: 6px;
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  font-family: 'Roboto', sans-serif;
+  font-size: var(--fs-module);
   letter-spacing: 0.04em;
   text-align: center;
   white-space: nowrap;
@@ -57,16 +57,16 @@
 
 .ladder-climb__prompt {
   bottom: 18%;
-  color: #fff;
-  background: rgba(10, 16, 28, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ede7d9;
+  background: rgba(10, 18, 32, 0.72);
+  border: 1px solid rgba(237, 231, 217, 0.25);
 }
 
 .ladder-climb__status {
   top: 12%;
-  color: #1a1a1a;
-  background: rgba(255, 220, 120, 0.92);
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #0a1220;
+  background: rgba(237, 231, 217, 0.92);
+  border: 1px solid rgba(10, 18, 32, 0.15);
   font-weight: 600;
 }
 
@@ -74,12 +74,12 @@
   position: absolute;
   left: 10px;
   bottom: 8px;
-  font-size: 10px;
+  font-size: var(--fs-module);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(237, 231, 217, 0.55);
   pointer-events: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(10, 18, 32, 0.5);
 }
 
 @media (max-width: 480px) {
@@ -90,7 +90,7 @@
 
   .ladder-climb__prompt,
   .ladder-climb__status {
-    font-size: 0.75rem;
+    font-size: var(--fs-module);
     white-space: normal;
     max-width: 90vw;
   }

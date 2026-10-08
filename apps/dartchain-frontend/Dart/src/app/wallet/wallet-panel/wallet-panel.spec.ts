@@ -32,7 +32,7 @@ describe('WalletPanel', () => {
     ) as HTMLButtonElement | null;
     expect(cta).toBeTruthy();
     expect(cta?.disabled).toBe(true);
-    expect(root.querySelector('.wallet-display__create-cta-label')?.textContent).toContain('Créer un wallet');
+    expect(root.querySelector('.wallet-display__create-cta-label')?.textContent).toContain('Créer un portefeuille');
     expect(root.querySelector('.wallet-display__actions .wallet-display__create-cta')).toBeFalsy();
     expect(root.querySelector('.wallet-display__create-bar')).toBeFalsy();
     expect(root.querySelector('.wallet-display__status-line')).toBeFalsy();
@@ -46,8 +46,12 @@ describe('WalletPanel', () => {
     expect(root.querySelector('.wallet-display__balance-glass')).toBeTruthy();
     expect(root.querySelector('.wallet-display__balance-brand')?.textContent).toContain('R4V3');
     expect(root.querySelector('.wallet-display__balance-amount')).toBeTruthy();
+    expect(root.querySelector('.wallet-display__balance-line--whole')).toBeTruthy();
+    expect(root.querySelector('.wallet-display__balance-line--frac')).toBeTruthy();
     expect(root.querySelector('.wallet-display__balance-whole')).toBeTruthy();
-    expect(root.querySelector('.wallet-display__balance-frac')).toBeTruthy();
+    expect(root.querySelector('.wallet-display__balance-sep')?.textContent).toContain(',');
+    const frac = root.querySelector('.wallet-display__balance-frac')?.textContent?.trim() ?? '';
+    expect(frac).toBe('0'.repeat(26));
     expect(root.querySelector('.wallet-display__balance-divider')).toBeFalsy();
     expect(root.querySelector('.wallet-display__balance-chf')).toBeTruthy();
     expect(root.querySelector('.wallet-display__balance-chf-value')).toBeTruthy();
@@ -57,7 +61,7 @@ describe('WalletPanel', () => {
     expect(root.querySelector('.wallet-faucet__label')).toBeFalsy();
     expect(root.querySelector('.wallet-faucet__corner')).toBeFalsy();
     expect(root.querySelector('.wallet-display__action-btn--swap')).toBeTruthy();
-    expect(root.querySelector('.wallet-display__action-btn--swap')?.textContent).toContain('Swap');
+    expect(root.querySelector('.wallet-display__action-btn--swap')?.textContent).toContain('Échange');
   });
 
   it('should render explorer address under the faucet', () => {

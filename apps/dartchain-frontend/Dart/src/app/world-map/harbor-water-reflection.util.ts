@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 
-import { MARSEILLE_HARBOR_WATER } from './map-configuration';
+import { METAVERSE_HARBOR_WATER } from './map-configuration';
 
 /** Réflexion planaire calme — Vieux-Port devant le spawn (tier high). */
 export function createHarborPlanarReflector(options?: {
@@ -12,7 +12,7 @@ export function createHarborPlanarReflector(options?: {
   y?: number;
   textureSize?: number;
 }): Reflector {
-  const harbor = MARSEILLE_HARBOR_WATER;
+  const harbor = METAVERSE_HARBOR_WATER;
   const width = options?.width ?? 52;
   const depth = options?.depth ?? 38;
   const centerX = options?.centerX ?? 0;
@@ -24,9 +24,9 @@ export function createHarborPlanarReflector(options?: {
     clipBias: 0.004,
     textureWidth: tex,
     textureHeight: tex,
-    color: 0x6a8898,
+    color: 0x8a95a5,
   });
-  reflector.name = 'marseille-harbor-planar-reflector';
+  reflector.name = 'metaverse-harbor-planar-reflector';
   reflector.rotation.x = -Math.PI / 2;
   reflector.position.set(centerX, y, centerZ);
   reflector.renderOrder = 1;

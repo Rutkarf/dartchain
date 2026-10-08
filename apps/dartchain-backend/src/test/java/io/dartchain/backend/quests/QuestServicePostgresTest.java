@@ -66,6 +66,6 @@ class QuestServicePostgresTest {
 
         var reloaded = questService.getState(authHeader);
         assertThat(reloaded.tasks().get("faucet-claim").progress()).isEqualTo(1);
-        assertThat(reloaded.tasks().get("faucet-claim").claimed()).isTrue();
+        assertThat(reloaded.tasks().get("faucet-claim").claimed()).isFalse();
     }
 }

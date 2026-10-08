@@ -19,7 +19,7 @@
   min-width: 0;
   height: 100%;
   max-height: 100%;
-  padding: 0 1px 0 2px;
+  padding: 0 2px 0 2px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -36,23 +36,23 @@
 
 .showcase-chat-main--preview .showcase-chat__live-led {
   flex: 0 0 6px;
-  width: 6px;
+  width: var(--comp-led-size, 4px);
   height: 4px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
 }
 
 .showcase-chat-main--preview .showcase-chat__live-led--active {
-  background: var(--success, #2ecc8a);
+  background: var(--success, #09814a);
   box-shadow: none;
 }
 
 .showcase-chat-main--preview .showcase-chat__live-led--pending {
-  background: var(--warning, #e6b84d);
+  background: var(--warning, #d5a021);
   box-shadow: none;
 }
 
 .showcase-chat-main--preview .showcase-chat__live-led--offline {
-  background: var(--danger, #e85d75);
+  background: var(--danger, #7b0d1e);
   box-shadow: none;
 }
 
@@ -61,15 +61,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 12px;
+  min-width: var(--comp-hud-h, 16px);
   height: auto;
   max-height: 100%;
-  padding: 0 1px;
-  border-radius: 999px;
-  background: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.2);
-  color: var(--accent-cyan, #2ec4d6);
+  padding: 0 2px;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--accent-cyan-rgb, 139, 157, 173), 0.2);
+  color: var(--accent-cyan, #8b9dad);
   font-family: var(--font-display);
-  font-size: clamp(0.3375rem, 2vw, 0.4375rem);
+  font-size: var(--fs-chat-chrome);
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -85,11 +85,11 @@
 
 .showcase-chat-preview__author {
   flex: 0 0 auto;
-  font-family: 'DejaVu Sans Mono', 'Liberation Mono', 'Share Tech Mono', monospace;
-  font-size: clamp(0.375rem, 2.35vw, 0.5625rem);
+  font-family: 'Inter', sans-serif;
+  font-size: var(--fs-chat-chrome);
   font-weight: 800;
   line-height: 1;
-  color: #b8bcc4;
+  color: #8b9dad;
   white-space: nowrap;
 }
 
@@ -110,12 +110,12 @@
 
 .showcase-chat-preview__line--in,
 .unread-badge--in {
-  animation: showcase-chat-summary-message-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: showcase-chat-summary-message-in var(--motion-enter) var(--motion-ease-enter) both;
 }
 
 .showcase-chat-preview__line--out,
 .unread-badge--out {
-  animation: showcase-chat-summary-message-out 280ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation: showcase-chat-summary-message-out var(--motion-enter) var(--motion-ease-enter) both;
 }
 
 .showcase-chat-preview__text {
@@ -123,7 +123,7 @@
   min-width: 0;
   display: inline-flex;
   align-items: center;
-  font-size: clamp(0.375rem, 2.35vw, 0.5625rem);
+  font-size: var(--fs-chat-chrome);
   font-weight: 600;
   line-height: 1;
   color: var(--text-primary);
@@ -134,7 +134,7 @@
 
 .showcase-chat-preview__text--muted {
   font-weight: 500;
-  color: var(--text-muted, rgba(255, 255, 255, 0.58));
+  color: var(--text-secondary, #8b9dad);
 }
 
 .showcase-chat-meta {
@@ -181,22 +181,18 @@
 @keyframes showcase-chat-summary-message-in {
   from {
     opacity: 0;
-    transform: translateY(2px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 @keyframes showcase-chat-summary-message-out {
   from {
     opacity: 1;
-    transform: translateY(0);
   }
   to {
     opacity: 0;
-    transform: translateY(-2px);
   }
 }
 
@@ -211,7 +207,7 @@
   margin: 0;
   padding: 0;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: rgba(var(--tab-accent-rgb), 0.12);
   color: var(--text-primary);
   cursor: pointer;
@@ -219,7 +215,8 @@
 }
 
 .showcase-chat-meta__refresh:hover {
-  background: rgba(var(--tab-accent-rgb), 0.22);
+  background: var(--state-hover-fill);
+  border-color: var(--state-hover-border);
 }
 
 .showcase-chat-meta__refresh:focus {
@@ -227,18 +224,8 @@
 }
 
 .showcase-chat-meta__refresh:focus-visible {
-  outline: 1px solid rgba(var(--tab-accent-rgb), 0.55);
-  outline-offset: 1px;
-}
-
-.showcase-chat-meta__refresh svg {
-  width: 10px;
-  height: 8px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  outline: none;
+  box-shadow: var(--state-focus-ring);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -247,6 +234,6 @@
   .showcase-chat-preview__line--out,
   .unread-badge--in,
   .unread-badge--out {
-    animation: none;
+    animation:  none;
   }
 }

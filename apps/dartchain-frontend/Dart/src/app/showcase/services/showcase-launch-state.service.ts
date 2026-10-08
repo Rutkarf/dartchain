@@ -80,7 +80,7 @@ export class ShowcaseLaunchStateService {
       case 'done':
         return 'Terminé';
       default:
-        return 'Launch';
+        return 'Lancement';
     }
   });
 
@@ -158,13 +158,13 @@ export class ShowcaseLaunchStateService {
   readonly collapsedStatusLabel = computed(() => {
     switch (this.collapsedStatusKey()) {
       case 'LIVE':
-        return 'Live';
+        return 'Direct';
       case 'SOON':
         return 'Soon';
       case 'ENDED':
         return 'Ended';
       default:
-        return this.loading() ? 'Sync…' : 'Launch';
+        return this.loading() ? 'Synchro…' : 'Lancement';
     }
   });
 
@@ -258,7 +258,7 @@ export class ShowcaseLaunchStateService {
 
   createProject(request: CreateLaunchProjectRequest): void {
     if (!this.authService().promptLogin()) {
-      this.launchDrawer.setError('Connectez-vous pour créer un projet LaunchLab.');
+      this.launchDrawer.setError('Connectez-vous pour créer un projet de laboratoire.');
       return;
     }
 
@@ -282,7 +282,7 @@ export class ShowcaseLaunchStateService {
   private statusLabelFor(status: LaunchStatus): string {
     switch (status) {
       case 'LIVE':
-        return 'Live';
+        return 'Direct';
       case 'ENDED':
         return 'Ended';
       default:

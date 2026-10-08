@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createFxLineMaterial, STROKE } from '../core/constants/stroke-bevel';
 import { KNOWLEDGE_GRAPH_COLORS } from '@star-conquest/components/particle-background/knowledge-graph/knowledge-graph.config';
 import type { KnowledgeGraphStore } from '@star-conquest/components/particle-background/knowledge-graph/knowledge-graph.store';
 import type {
@@ -28,7 +29,7 @@ function hexToRgb01(hex: string): [number, number, number] {
 }
 
 /**
- * Couche réseau IA/P2P intégrée au graphe Star Conquest.
+ * Couche réseau IA/P2P intégrée au graphe Conquête stellaire.
  * Chaque satellite (peer / agent / system) orbite une Quest — pas de nœud orphelin.
  */
 export class StarConquestNetworkLayer {
@@ -93,12 +94,9 @@ export class StarConquestNetworkLayer {
     const lineGeom = new THREE.BufferGeometry();
     lineGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(0), 3));
     lineGeom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(0), 3));
-    const lineMat = new THREE.LineBasicMaterial({
+    const lineMat = createFxLineMaterial(STROKE.ok, {
       vertexColors: true,
-      transparent: true,
-      opacity: 0.52,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
+      color: 0xffffff,
     });
     this.networkLines = new THREE.LineSegments(lineGeom, lineMat);
     this.networkLines.name = 'sc-network-links';

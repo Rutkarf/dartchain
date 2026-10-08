@@ -26,10 +26,10 @@ import {
 const BOT_DAMAGE = 14;
 const LOCK_CONE_DOT = 0.22;
 /** Fuchsia local player — lisible vs bots / peers atténués. */
-const ARENA_LOCAL_FUCHSIA = 0xff2d9a;
-const ARENA_LOCAL_FUCHSIA_EMISSIVE = 0xb01068;
-const ARENA_LOCAL_BODY = 0xf0ebe3;
-const ARENA_LOCAL_BODY_EMISSIVE = 0x1a1428;
+const ARENA_LOCAL_FUCHSIA = 0x8a95a5;
+const ARENA_LOCAL_FUCHSIA_EMISSIVE = 0x7b0d1e;
+const ARENA_LOCAL_BODY = 0xede7d9;
+const ARENA_LOCAL_BODY_EMISSIVE = 0x0d0630;
 
 interface BotAi {
   strafeDir: number;
@@ -40,7 +40,7 @@ interface BotAi {
 }
 
 /**
- * Combat Kill-to-earn — FX punchy, lock-on, bots IA, loot streak.
+ * Combat Éliminer pour gagner — FX punchy, lock-on, bots IA, loot streak.
  */
 @Injectable({ providedIn: 'root' })
 export class ArenaCombatService implements OnDestroy {
@@ -73,7 +73,9 @@ export class ArenaCombatService implements OnDestroy {
   private fpsFrames = 0;
   private shadowsDimmed = false;
   private characterTinted = false;
-  private safeZoneRing: THREE.Mesh | null = null;
+  private safeZoneRing: THREE.Object3D | null = null;
+  private readonly dancePadMats: THREE.MeshBasicMaterial[] = [];
+  private dancePadBeatT = 0;
   private readonly tmpFrom = new THREE.Vector3();
   private readonly tmpTo = new THREE.Vector3();
   private readonly tmpFwd = new THREE.Vector3();
@@ -97,11 +99,17 @@ export class ArenaCombatService implements OnDestroy {
 
   ensureAttached(): void {
     if (!this.product.metaverseArenaEnabled) return;
+
+    const scene = this.threeScene.getScene();
+    // Cercle SPAWN visible dès l’intro (nadir) — pas seulement en phase playing.
+    if (scene) {
+      this.ensureSafeZoneRing(scene);
+    }
+
     if (this.session.phase() !== 'playing') {
       this.cameraControl.setArenaPeekMode(false);
       this.clearBotsVisual();
       this.clearPowerMeshes();
-      this.clearSafeZoneRing();
       this.fx.dispose();
       this.powerSeeded = false;
       this.restoreShadows();
@@ -109,11 +117,9 @@ export class ArenaCombatService implements OnDestroy {
       return;
     }
 
-    const scene = this.threeScene.getScene();
     if (!scene) return;
 
     this.fx.attach(scene);
-    this.ensureSafeZoneRing(scene);
     this.cameraControl.setArenaPeekMode(true);
     this.dimShadowsForCombat();
     this.bindKeys();
@@ -143,6 +149,14 @@ export class ArenaCombatService implements OnDestroy {
 
   update(deltaSeconds: number): void {
     if (!this.product.metaverseArenaEnabled) return;
+
+    // Intro + idle : garder le plateau SAFE animé et complet.
+    const sceneEarly = this.threeScene.getScene();
+    if (sceneEarly) {
+      this.ensureSafeZoneRing(sceneEarly);
+      this.animateDancePad(deltaSeconds);
+    }
+
     if (this.session.phase() !== 'playing') return;
     if (this.meta.paused()) return;
     if (this.meta.isFrozen()) {
@@ -367,7 +381,7 @@ export class ArenaCombatService implements OnDestroy {
           obj.material instanceof THREE.MeshBasicMaterial &&
           obj.geometry.type === 'RingGeometry'
         ) {
-          obj.material.color.setHex(locked ? 0x9a6a88 : 0x6a5048);
+          obj.material.color.setHex(locked ? 0x7b0d1e : 0x7b0d1e);
           obj.material.opacity = locked ? 0.55 : 0.35;
         }
       });
@@ -380,15 +394,15 @@ export class ArenaCombatService implements OnDestroy {
     root.name = `arena-peer-${label}`;
 
     const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x2a3858,
-      emissive: 0x081018,
+      color: 0x18314f,
+      emissive: 0x0d0630,
       emissiveIntensity: 0.22,
       roughness: 0.7,
       metalness: 0.12,
     });
     const accentMat = new THREE.MeshStandardMaterial({
-      color: 0x4a6888,
-      emissive: 0x0a2030,
+      color: 0x8a95a5,
+      emissive: 0x0d0630,
       emissiveIntensity: 0.28,
       roughness: 0.55,
     });
@@ -408,7 +422,7 @@ export class ArenaCombatService implements OnDestroy {
     const ring = new THREE.Mesh(
       new THREE.RingGeometry(0.55, 0.72, 24),
       new THREE.MeshBasicMaterial({
-        color: 0x3a4a68,
+        color: 0x18314f,
         transparent: true,
         opacity: 0.35,
         side: THREE.DoubleSide,
@@ -450,7 +464,7 @@ export class ArenaCombatService implements OnDestroy {
     if (local.spawnShieldUntil && Date.parse(local.spawnShieldUntil) > Date.now()) {
       return;
     }
-    // Zone intouchable miroir Vieux-Port — pas de dégâts / tirs bots.
+    // Zone SPAWN SAFE ombrière — pas de dégâts / tirs bots.
     if (isInsideMirrorSpawnSafeZone(player.position.x, player.position.z)) {
       return;
     }
@@ -694,9 +708,9 @@ export class ArenaCombatService implements OnDestroy {
     const skin = this.meta.skin();
     // Accents blaster un cran plus doux que le fuchsia corps.
     const accent =
-      skin === 'r4v3' ? 0xd44a78 : skin === 'pxd' ? 0x6a9860 : 0xc04088;
+      skin === 'r4v3' ? 0x7b0d1e : skin === 'pxd' ? 0x09814a : 0x7b0d1e;
     const emissive =
-      skin === 'r4v3' ? 0x601028 : skin === 'pxd' ? 0x203818 : 0x601040;
+      skin === 'r4v3' ? 0x7b0d1e : skin === 'pxd' ? 0x18314f : 0x7b0d1e;
     this.blaster.traverse((obj) => {
       if (
         obj instanceof THREE.Mesh &&
@@ -778,33 +792,285 @@ export class ArenaCombatService implements OnDestroy {
   private ensureSafeZoneRing(scene: THREE.Scene): void {
     if (this.safeZoneRing) return;
     const r = MIRROR_SPAWN_SAFE_ZONE.radiusMeters;
-    const ring = new THREE.Mesh(
-      new THREE.RingGeometry(r - 0.35, r, 48),
+    const fillColor = MIRROR_SPAWN_SAFE_ZONE.fillColor;
+    const ringColor = MIRROR_SPAWN_SAFE_ZONE.ringColor;
+    const accent = MIRROR_SPAWN_SAFE_ZONE.accentColor;
+    const padDim = MIRROR_SPAWN_SAFE_ZONE.padDimColor;
+
+    const group = new THREE.Group();
+    group.name = 'arena-mirror-safe-zone';
+
+    const flat = (mesh: THREE.Mesh, y: number): void => {
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.position.y = y;
+      mesh.renderOrder = 6;
+      const mat = mesh.material as THREE.MeshBasicMaterial;
+      mat.depthWrite = false;
+      mat.depthTest = true;
+      mat.polygonOffset = true;
+      mat.polygonOffsetFactor = -2;
+      mat.polygonOffsetUnits = -2;
+    };
+
+    // Dallage PCB holographique — disque complet (lisible depuis intro nadir).
+    const pcbTex = this.createHoloPcbFloorTexture();
+    const pcb = new THREE.Mesh(
+      new THREE.CircleGeometry(r - 0.05, 96),
       new THREE.MeshBasicMaterial({
-        color: 0x9a4068,
+        map: pcbTex,
+        color: 0xede7d9,
         transparent: true,
-        opacity: 0.28,
+        opacity: 0.88,
         side: THREE.DoubleSide,
         depthWrite: false,
       })
     );
-    ring.name = 'arena-mirror-safe-zone';
-    ring.rotation.x = -Math.PI / 2;
-    ring.position.set(
+    flat(pcb, 0.07);
+    group.add(pcb);
+
+    // Teinte fuchsia SAFE sous le PCB.
+    const fill = new THREE.Mesh(
+      new THREE.CircleGeometry(r - 0.02, 96),
+      new THREE.MeshBasicMaterial({
+        color: fillColor,
+        transparent: true,
+        opacity: 0.22,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      })
+    );
+    flat(fill, 0.055);
+    group.add(fill);
+
+    // Pads dance animés — remplissage jusqu’au bord (pas de trou).
+    this.dancePadMats.length = 0;
+    const padGeo = new THREE.PlaneGeometry(1.55, 1.55);
+    const cols = 9;
+    const step = (r * 1.72) / cols;
+    const r2 = (r - 0.35) * (r - 0.35);
+    for (let iz = 0; iz < cols; iz++) {
+      for (let ix = 0; ix < cols; ix++) {
+        const x = (ix - (cols - 1) / 2) * step;
+        const z = (iz - (cols - 1) / 2) * step;
+        if (x * x + z * z > r2) continue;
+        const mat = new THREE.MeshBasicMaterial({
+          color: padDim,
+          transparent: true,
+          opacity: 0.2,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        });
+        const pad = new THREE.Mesh(padGeo, mat);
+        flat(pad, 0.085);
+        pad.position.x = x;
+        pad.position.z = z;
+        group.add(pad);
+        this.dancePadMats.push(mat);
+      }
+    }
+
+    // Anneau extérieur CONTINU — bien visible depuis l’intro (segments élevés).
+    const outer = new THREE.Mesh(
+      new THREE.RingGeometry(r - 0.55, r + 0.08, 128),
+      new THREE.MeshBasicMaterial({
+        color: ringColor,
+        transparent: true,
+        opacity: 0.95,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      })
+    );
+    flat(outer, 0.1);
+    group.add(outer);
+
+    // Halo externe pour éviter les “parties manquantes” en plongée.
+    const halo = new THREE.Mesh(
+      new THREE.RingGeometry(r + 0.08, r + 0.55, 128),
+      new THREE.MeshBasicMaterial({
+        color: accent,
+        transparent: true,
+        opacity: 0.35,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      })
+    );
+    flat(halo, 0.095);
+    group.add(halo);
+
+    const inner = new THREE.Mesh(
+      new THREE.RingGeometry(r - 1.15, r - 0.7, 96),
+      new THREE.MeshBasicMaterial({
+        color: accent,
+        transparent: true,
+        opacity: 0.55,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      })
+    );
+    flat(inner, 0.09);
+    group.add(inner);
+
+    group.position.set(
       MIRROR_SPAWN_SAFE_ZONE.centerX,
-      0.05,
+      0,
       MIRROR_SPAWN_SAFE_ZONE.centerZ
     );
-    scene.add(ring);
-    this.safeZoneRing = ring;
+    group.userData['sharedPadGeo'] = padGeo;
+    scene.add(group);
+    this.safeZoneRing = group;
+  }
+
+  /** Sol spawn — PCB holographique fuchsia / cyan (circuit dance floor). */
+  private createHoloPcbFloorTexture(): THREE.CanvasTexture {
+    const size = 1024;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#0a1220';
+      ctx.fillRect(0, 0, size, size);
+
+      // Traces PCB.
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      for (let i = 0; i < 48; i++) {
+        const y = 24 + i * 20;
+        ctx.strokeStyle =
+          i % 3 === 0
+            ? 'rgba(123, 13, 30, 0.55)'
+            : i % 3 === 1
+              ? 'rgba(139, 157, 173, 0.35)'
+              : 'rgba(123, 13, 30, 0.4)';
+        ctx.lineWidth = i % 5 === 0 ? 3.5 : 1.6;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        for (let x = 0; x <= size; x += 32) {
+          const bump = ((i * 17 + x * 3) % 24) - 12;
+          ctx.lineTo(x, y + bump);
+        }
+        ctx.stroke();
+      }
+      for (let i = 0; i < 40; i++) {
+        const x = 30 + i * 25;
+        ctx.strokeStyle =
+          i % 2 === 0 ? 'rgba(123, 13, 30, 0.45)' : 'rgba(139, 157, 173, 0.28)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x + ((i * 13) % 40) - 20, size);
+        ctx.stroke();
+      }
+
+      // Pads / vias holographiques.
+      for (let row = 0; row < 16; row++) {
+        for (let col = 0; col < 16; col++) {
+          if ((row + col) % 2 !== 0) continue;
+          const cx = 32 + col * 64;
+          const cy = 32 + row * 64;
+          ctx.fillStyle = 'rgba(123, 13, 30, 0.22)';
+          ctx.fillRect(cx - 18, cy - 18, 36, 36);
+          ctx.strokeStyle = 'rgba(237, 231, 217, 0.7)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(cx - 18, cy - 18, 36, 36);
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(139, 157, 173, 0.65)';
+          ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Flèches dance pad.
+      const drawArrow = (cx: number, cy: number, rot: number): void => {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rot);
+        ctx.fillStyle = 'rgba(123, 13, 30, 0.85)';
+        ctx.beginPath();
+        ctx.moveTo(0, -40);
+        ctx.lineTo(28, 14);
+        ctx.lineTo(10, 14);
+        ctx.lineTo(10, 40);
+        ctx.lineTo(-10, 40);
+        ctx.lineTo(-10, 14);
+        ctx.lineTo(-28, 14);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      };
+      drawArrow(512, 280, 0);
+      drawArrow(512, 744, Math.PI);
+      drawArrow(280, 512, -Math.PI / 2);
+      drawArrow(744, 512, Math.PI / 2);
+
+      // Masque circulaire soft.
+      const mask = ctx.createRadialGradient(512, 512, 120, 512, 512, 500);
+      mask.addColorStop(0, 'rgba(10, 18, 32,0)');
+      mask.addColorStop(0.82, 'rgba(10, 18, 32,0)');
+      mask.addColorStop(1, 'rgba(10, 18, 32,0.55)');
+      ctx.fillStyle = mask;
+      ctx.fillRect(0, 0, size, size);
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 4;
+    tex.needsUpdate = true;
+    return tex;
+  }
+
+  /** Beat dance-pad — cases qui s’allument en combo (arcade). */
+  private animateDancePad(deltaSeconds: number): void {
+    if (!this.dancePadMats.length) return;
+    this.dancePadBeatT += deltaSeconds;
+    const bpm = 128;
+    const beat = this.dancePadBeatT * (bpm / 60);
+    const step = Math.floor(beat * 2) % this.dancePadMats.length;
+    const pulse = 0.5 + 0.5 * Math.sin(beat * Math.PI * 2);
+    const lit = MIRROR_SPAWN_SAFE_ZONE.padLitColor;
+    const dim = MIRROR_SPAWN_SAFE_ZONE.padDimColor;
+
+    for (let i = 0; i < this.dancePadMats.length; i++) {
+      const mat = this.dancePadMats[i];
+      // Pattern combo : colonne / diagonale qui court.
+      const combo =
+        i === step ||
+        (i + step) % 5 === 0 ||
+        Math.abs(i - step) === 7;
+      if (combo) {
+        mat.color.setHex(lit);
+        mat.opacity = 0.35 + pulse * 0.45;
+      } else {
+        mat.color.setHex(dim);
+        mat.opacity = 0.12 + pulse * 0.06;
+      }
+    }
   }
 
   private clearSafeZoneRing(): void {
     if (!this.safeZoneRing) return;
+    const sharedGeo = this.safeZoneRing.userData['sharedPadGeo'] as
+      | THREE.BufferGeometry
+      | undefined;
+    this.safeZoneRing.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      if (mesh.geometry && mesh.geometry !== sharedGeo) {
+        mesh.geometry.dispose();
+      }
+      const mat = mesh.material;
+      const disposeMat = (m: THREE.Material): void => {
+        const mapped = m as THREE.MeshBasicMaterial;
+        if (mapped.map) mapped.map.dispose();
+        m.dispose();
+      };
+      if (Array.isArray(mat)) mat.forEach(disposeMat);
+      else if (mat) disposeMat(mat);
+    });
+    sharedGeo?.dispose();
     this.safeZoneRing.removeFromParent();
-    this.safeZoneRing.geometry.dispose();
-    (this.safeZoneRing.material as THREE.Material).dispose();
     this.safeZoneRing = null;
+    this.dancePadMats.length = 0;
+    this.dancePadBeatT = 0;
   }
 
   private syncBotMeshes(scene: THREE.Scene): void {
@@ -947,7 +1213,7 @@ export class ArenaCombatService implements OnDestroy {
     for (const pu of list) {
       let mesh = this.powerMeshes.get(pu.id);
       if (!mesh) {
-        const color = pu.kind === 'shield' ? 0x3a6080 : 0x8a7040;
+        const color = pu.kind === 'shield' ? 0x18314f : 0xd5a021;
         mesh = new THREE.Mesh(
           new THREE.OctahedronGeometry(0.4, 0),
           new THREE.MeshBasicMaterial({
@@ -980,15 +1246,15 @@ export class ArenaCombatService implements OnDestroy {
     root.name = `arena-bot-${label}`;
 
     const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x6a4a40,
-      emissive: 0x2a1810,
+      color: 0x7b0d1e,
+      emissive: 0x0d0630,
       emissiveIntensity: 0.2,
       roughness: 0.72,
       metalness: 0.08,
     });
     const accentMat = new THREE.MeshStandardMaterial({
-      color: 0x4a6068,
-      emissive: 0x0a2830,
+      color: 0x18314f,
+      emissive: 0x0d0630,
       emissiveIntensity: 0.25,
       roughness: 0.6,
     });
@@ -1008,7 +1274,7 @@ export class ArenaCombatService implements OnDestroy {
     const ring = new THREE.Mesh(
       new THREE.RingGeometry(0.55, 0.72, 24),
       new THREE.MeshBasicMaterial({
-        color: 0x6a5a48,
+        color: 0x7b0d1e,
         transparent: true,
         opacity: 0.35,
         side: THREE.DoubleSide,

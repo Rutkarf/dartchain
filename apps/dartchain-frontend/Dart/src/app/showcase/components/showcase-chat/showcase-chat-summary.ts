@@ -119,7 +119,7 @@ export class ShowcaseChatSummaryComponent implements OnInit, OnDestroy {
         this.previousUnreadCount.set(0);
         this.transitionTimer = null;
       }, ShowcaseChatSummaryComponent.MESSAGE_TRANSITION_MS);
-    }, { allowSignalWrites: true });
+    });
   }
 
   ngOnInit(): void {

@@ -41,7 +41,7 @@ public class AdminUnlockService {
                 digest.getBytes(StandardCharsets.UTF_8),
                 properties.getSeedSha256().getBytes(StandardCharsets.UTF_8)
         )) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Seed admin invalide");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Graine d’administration invalide");
         }
         purgeExpired();
         String token = UUID.randomUUID().toString();
@@ -74,7 +74,8 @@ public class AdminUnlockService {
     }
 
     public boolean isConfigured() {
-        return properties.getSeedSha256() != null && properties.getSeedSha256().length() == 64;
+        String seed = properties.getSeedSha256();
+        return seed != null && seed.matches("^[0-9a-fA-F]{64}$");
     }
 
     public static String normalizeSeed(String seed) {

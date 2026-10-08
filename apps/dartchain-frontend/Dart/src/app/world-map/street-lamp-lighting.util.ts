@@ -24,7 +24,7 @@ export function createStreetLampSpotLights(
   } = {}
 ): StreetLampLightsResult {
   const group = new THREE.Group();
-  group.name = 'marseille-street-lamp-lights';
+  group.name = 'metaverse-street-lamp-lights';
   const lights: THREE.SpotLight[] = [];
   const D = NIGHT_LIGHTING_DEFAULTS;
 
@@ -38,7 +38,7 @@ export function createStreetLampSpotLights(
       D.spotPenumbra,
       D.spotDecay
     );
-    spot.name = `marseille-street-lamp-spot-${i}`;
+    spot.name = `metaverse-street-lamp-spot-${i}`;
     spot.position.set(lamp.x, lamp.y, lamp.z);
     if (options.castShadow) {
       spot.castShadow = true;
@@ -46,7 +46,7 @@ export function createStreetLampSpotLights(
     }
 
     const target = new THREE.Object3D();
-    target.name = `marseille-street-lamp-target-${i}`;
+    target.name = `metaverse-street-lamp-target-${i}`;
     target.position.set(lamp.x + 0.4, lamp.y - 2.8, lamp.z - 1.6);
     spot.target = target;
 

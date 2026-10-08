@@ -80,6 +80,8 @@ dartchain:
       - https://127.0.0.1:*
       - https://dartchain.pages.dev
       - https://*.dartchain.pages.dev
+      - https://*.workers.dev
+      - https://*.*.workers.dev
       - ${DARTCHAIN_CORS_EXTRA:https://dartzvz01-tagname.onrender.com}
 
 management:

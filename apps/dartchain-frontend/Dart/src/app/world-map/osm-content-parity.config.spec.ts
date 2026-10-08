@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 import {
   OSM_CONTENT_PARITY,
   osmContentBuildingCap,

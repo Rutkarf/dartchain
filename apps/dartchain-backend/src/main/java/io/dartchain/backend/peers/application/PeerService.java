@@ -170,7 +170,7 @@ public class PeerService {
         closeOutboundSession(normalized);
         peers.remove(normalized);
         peer.setStatus(PeerStatus.DISCONNECTED);
-        peer.setMessage("Peer déconnecté");
+        peer.setMessage("Pair déconnecté");
 
         return peer;
     }

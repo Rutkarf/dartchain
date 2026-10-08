@@ -187,7 +187,7 @@ export class ChartTokenSearchComponent {
           name: project.name,
           thumb: project.logoUrl?.trim() || '',
           source: 'launchlab',
-          network: 'LaunchLab',
+          network: 'Laboratoire',
         })
       );
 

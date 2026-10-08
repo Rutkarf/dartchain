@@ -18,7 +18,7 @@ import type {
 } from '@star-conquest/star-conquest-universe.types';
 
 /**
- * État de l’univers spatial Star Conquest (indépendant du metaverse floor).
+ * État de l’univers spatial Conquête stellaire (indépendant du metaverse floor).
  */
 @Injectable({ providedIn: 'root' })
 export class StarConquestUniverseService {

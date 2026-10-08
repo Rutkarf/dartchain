@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class M4t3rRewardValidationService {
 
-    private static final double MAX_ACCELERATION_MPS2 = 25.0;
+    private static final double MAX_ACCELERATION_MPS2 = 120.0;
 
     private final M4t3rRewardConfig config;
     private final M4t3rNonceStore nonceStore;

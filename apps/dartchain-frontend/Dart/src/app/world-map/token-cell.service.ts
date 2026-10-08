@@ -6,6 +6,7 @@ import {
   M4T3R_DENSITY_CONFIG,
   M4T3R_LOD_CONFIG,
   M4T3R_RENDER_CONFIG,
+  MIRROR_SPAWN_SAFE_ZONE,
   R4V3_GROUND_FIELD,
   TRAIL_CONFIG,
   WORLD_SCALE,
@@ -20,7 +21,11 @@ import {
   type M4T3RLodBand,
 } from './m4t3r-lod.util';
 import { isGroundCellExcluded, shouldRenderGroundCell } from './m4t3r-ground-exclusion.util';
-import { isOnDiagonalCheckerboard, isWorldPositionOnCheckerboard } from './m4t3r-grid.util';
+import {
+  isM4t3rGroundPositionActive,
+  isOnDiagonalCheckerboard,
+  M4T3R_SPAWN_DENSE_CELL_SIZE,
+} from './m4t3r-grid.util';
 import {
   clustersAlongMovement,
   worldToCluster,
@@ -60,7 +65,7 @@ export interface M4T3RDebugStats {
   lodCounts: Record<M4T3RLodBand, number>;
 }
 
-const R4V3_TOKEN_COLORS = [0x40e0ff, 0xff3ecf, 0x7a5cff, 0xffe600, 0x235789];
+const R4V3_TOKEN_COLORS = [0x8a95a5, 0x7b0d1e, 0x8a95a5, 0xd5a021, 0x18314f];
 const CELLS_PER_CLUSTER =
   (M4T3R_DENSITY_CONFIG.visualClusterSize / M4T3R_DENSITY_CONFIG.logicalCellSize) ** 2;
 
@@ -181,10 +186,10 @@ export class TokenCellService {
     const maxInstances = this.getMaxInstancesForQuality();
     const geometry = createR4v3TokenGeometry();
     const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
+      color: 0xede7d9,
       roughness: 0.34,
       metalness: 0.52,
-      emissive: 0x2d3f66,
+      emissive: 0x18314f,
       emissiveIntensity: 0.9,
       polygonOffset: true,
       polygonOffsetFactor: -2,
@@ -318,12 +323,21 @@ export class TokenCellService {
     for (const key of Object.keys(this.variantCounts)) delete this.variantCounts[key];
 
     const candidates: GridCandidate[] = [];
+    const spawnCx = MIRROR_SPAWN_SAFE_ZONE.centerX;
+    const spawnCz = MIRROR_SPAWN_SAFE_ZONE.centerZ;
+    const spawnR2 = MIRROR_SPAWN_SAFE_ZONE.radiusMeters ** 2;
+
+    // Pass 1 — extérieur spawn : densité inchangée (damier 1,25 m).
     for (let gz = minZ; gz <= maxZ; gz++) {
       for (let gx = minX; gx <= maxX; gx++) {
         const x = (gx + 0.5) * size;
         const z = (gz + 0.5) * size;
         if (Math.hypot(x - centerPosition.x, z - centerPosition.z) > radius) continue;
         totalCells++;
+
+        const inSpawn =
+          (x - spawnCx) * (x - spawnCx) + (z - spawnCz) * (z - spawnCz) <= spawnR2;
+        if (inSpawn) continue;
 
         if (!isOnDiagonalCheckerboard(gx, gz)) continue;
 
@@ -332,6 +346,29 @@ export class TokenCellService {
         if (!shouldRenderGroundCell(gx, gz, x, z, lod)) continue;
         if (this.isRenderCellHidden(x, z, now)) continue;
         candidates.push({ gx, gz, x, z, dist, lod });
+      }
+    }
+
+    // Pass 2 — cercle SPAWN : ×10 densifié (grille dense, sans damier).
+    const dense = M4T3R_SPAWN_DENSE_CELL_SIZE;
+    const dMinX = Math.floor((spawnCx - MIRROR_SPAWN_SAFE_ZONE.radiusMeters) / dense);
+    const dMaxX = Math.ceil((spawnCx + MIRROR_SPAWN_SAFE_ZONE.radiusMeters) / dense);
+    const dMinZ = Math.floor((spawnCz - MIRROR_SPAWN_SAFE_ZONE.radiusMeters) / dense);
+    const dMaxZ = Math.ceil((spawnCz + MIRROR_SPAWN_SAFE_ZONE.radiusMeters) / dense);
+    for (let gz = dMinZ; gz <= dMaxZ; gz++) {
+      for (let gx = dMinX; gx <= dMaxX; gx++) {
+        const x = (gx + 0.5) * dense;
+        const z = (gz + 0.5) * dense;
+        if ((x - spawnCx) * (x - spawnCx) + (z - spawnCz) * (z - spawnCz) > spawnR2) {
+          continue;
+        }
+        if (Math.hypot(x - centerPosition.x, z - centerPosition.z) > radius) continue;
+        totalCells++;
+        if (isGroundCellExcluded(x, z)) continue;
+        if (this.isRenderCellHidden(x, z, now)) continue;
+        const dist = lodDistanceFromPlayer(playerPosition.x, playerPosition.z, x, z);
+        // Force near — dense spawn lisible / “infini” au sol.
+        candidates.push({ gx, gz, x, z, dist, lod: 'near' });
       }
     }
 
@@ -489,7 +526,7 @@ export class TokenCellService {
       const z = (Number(parts[2]) + 0.5) * M4T3R_DENSITY_CONFIG.visualClusterSize;
       const x = (Number(parts[1]) + 0.5) * M4T3R_DENSITY_CONFIG.visualClusterSize;
       return (
-        isWorldPositionOnCheckerboard(x, z) &&
+        isM4t3rGroundPositionActive(x, z) &&
         !isGroundCellExcluded(x, z) &&
         (this.hiddenUntil.get(id) ?? 0) <= now
       );

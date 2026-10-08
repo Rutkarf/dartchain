@@ -35,12 +35,39 @@ public class NativeJwtService {
     public String createAccessToken(String userId, UserRole role) {
         long now = Instant.now().getEpochSecond();
         long exp = now + authProperties.getAccessTokenTtlSeconds();
+        return signToken("""
+                {"sub":"%s","role":"%s","purpose":"access","iat":%d,"exp":%d,"jti":"%s"}
+                """.formatted(userId, role.name(), now, exp, UUID.randomUUID()));
+    }
+
+    public String createChallengeToken(String userId, String purpose, long ttlSeconds) {
+        long now = Instant.now().getEpochSecond();
+        long exp = now + Math.max(30, ttlSeconds);
+        return signToken("""
+                {"sub":"%s","purpose":"%s","iat":%d,"exp":%d,"jti":"%s"}
+                """.formatted(userId, purpose, now, exp, UUID.randomUUID()));
+    }
+
+    public Optional<String> parseChallenge(String token, String purpose) {
+        JsonNode payload = readVerifiedPayload(token);
+        if (payload == null) {
+            return Optional.empty();
+        }
+        if (!purpose.equals(payload.path("purpose").asText(""))) {
+            return Optional.empty();
+        }
+        String subject = payload.path("sub").asText("");
+        if (subject.isBlank()) {
+            return Optional.empty();
+        }
+        return Optional.of(subject);
+    }
+
+    private String signToken(String payloadJson) {
         String header = encodeJson("""
                 {"alg":"HS256","typ":"JWT"}
                 """);
-        String payload = encodeJson("""
-                {"sub":"%s","role":"%s","iat":%d,"exp":%d,"jti":"%s"}
-                """.formatted(userId, role.name(), now, exp, UUID.randomUUID()));
+        String payload = encodeJson(payloadJson);
         String signature = sign(header + "." + payload);
         return header + "." + payload + "." + signature;
     }
@@ -50,9 +77,32 @@ public class NativeJwtService {
             return Optional.empty();
         }
 
+        JsonNode payload = readVerifiedPayload(token);
+        if (payload == null) {
+            return Optional.empty();
+        }
+        String purpose = payload.path("purpose").asText("");
+        if (!purpose.isEmpty() && !"access".equals(purpose)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new JwtClaims(
+                payload.path("sub").asText(""),
+                payload.path("role").asText(UserRole.USER.name()),
+                payload.path("iat").asLong(0),
+                payload.path("exp").asLong(0),
+                payload.path("jti").asText("")
+        ));
+    }
+
+    private JsonNode readVerifiedPayload(String token) {
+        if (token == null || token.isBlank()) {
+            return null;
+        }
+
         String[] parts = token.trim().split("\\.");
         if (parts.length != 3) {
-            return Optional.empty();
+            return null;
         }
 
         String expectedSignature = sign(parts[0] + "." + parts[1]);
@@ -60,25 +110,18 @@ public class NativeJwtService {
                 expectedSignature.getBytes(StandardCharsets.UTF_8),
                 parts[2].getBytes(StandardCharsets.UTF_8)
         )) {
-            return Optional.empty();
+            return null;
         }
 
         try {
             JsonNode payload = MAPPER.readTree(URL_DECODER.decode(parts[1]));
             long exp = payload.path("exp").asLong(0);
             if (exp <= Instant.now().getEpochSecond()) {
-                return Optional.empty();
+                return null;
             }
-
-            return Optional.of(new JwtClaims(
-                    payload.path("sub").asText(""),
-                    payload.path("role").asText(UserRole.USER.name()),
-                    payload.path("iat").asLong(0),
-                    exp,
-                    payload.path("jti").asText("")
-            ));
+            return payload;
         } catch (Exception exception) {
-            return Optional.empty();
+            return null;
         }
     }
 

@@ -20,7 +20,7 @@ export function starQuestFamilyLabel(family: StarQuestFamily): string {
 }
 
 export function starQuestFamilyHex(family: StarQuestFamily): string {
-  return STAR_QUEST_FAMILIES[family]?.hex ?? '#4FE0EC';
+  return STAR_QUEST_FAMILIES[family]?.hex ?? '#8b9dad';
 }
 
 export function starQuestFamilyRgb(family: StarQuestFamily): string {

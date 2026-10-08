@@ -6,13 +6,13 @@ export function createArcadeBlasterGroup(): THREE.Group {
   group.name = 'bb-pulse-rifle';
 
   const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x1e2228,
+    color: 0x0d0630,
     metalness: 0.35,
     roughness: 0.55,
   });
   const accentMat = new THREE.MeshStandardMaterial({
-    color: 0xa04078,
-    emissive: 0x501030,
+    color: 0x7b0d1e,
+    emissive: 0x7b0d1e,
     emissiveIntensity: 0.35,
     metalness: 0.15,
     roughness: 0.45,

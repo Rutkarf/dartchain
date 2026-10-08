@@ -8,7 +8,7 @@ public class ChainProperties {
     /** Identifiant réseau natif DartChain (EIP-155 compatible, non-Ethereum). */
     private long chainId = 3377L;
 
-    private String networkName = "R4V3 Testnet";
+    private String networkName = "DartChain Native";
 
     private String nativeToken = "R4V3";
 

@@ -63,7 +63,7 @@ describe('CharacterControlService façade', () => {
     expect(reset).toHaveBeenCalled();
   });
 
-  it('n’appelle collect que si le move runtime rend un frame Marseille', () => {
+  it('n’appelle collect que si le move runtime rend un frame Metaverse', () => {
     control.update(0.016);
     expect(updateGround).not.toHaveBeenCalled();
     update.mockReturnValue({

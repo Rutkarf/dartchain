@@ -7,6 +7,7 @@ import {
   ROCKET_CONFIG,
   type HorizonScaleConfig,
 } from './wigle-visual.config';
+import { createStrokeLineMaterial, STROKE } from '../../core/constants/stroke-bevel';
 import type { HorizonScaleDebugStats } from './wigle.types';
 
 interface RungPulse {
@@ -119,13 +120,13 @@ export class HorizonScaleManager {
     const height = this.config.maxHeight - this.config.baseHeight;
     const fogColor = new THREE.Color(WORLD_BACKGROUND_CONFIG.fogColor);
     const horizonColor = new THREE.Color(WORLD_BACKGROUND_CONFIG.horizonColor);
-    const accent = new THREE.Color(0x5efcff);
-    const accentHot = new THREE.Color(0xff4fd8);
+    const accent = new THREE.Color(0x8a95a5);
+    const accentHot = new THREE.Color(0x7b0d1e);
 
     this.buildLaunchPad(fogColor, accent);
 
     const railMaterial = new THREE.MeshStandardMaterial({
-      color: 0x1a2844,
+      color: 0x18314f,
       emissive: accent,
       emissiveIntensity: 0.55,
       metalness: 0.72,
@@ -147,7 +148,7 @@ export class HorizonScaleManager {
     }
 
     const rungMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd8f4ff,
+      color: 0xede7d9,
       emissive: accent,
       emissiveIntensity: 0.85,
       metalness: 0.55,
@@ -169,10 +170,8 @@ export class HorizonScaleManager {
       this.rungMeshes.push({ mesh: rung, phase: t * Math.PI * 2 });
     }
 
-    const spineMaterial = new THREE.LineBasicMaterial({
+    const spineMaterial = createStrokeLineMaterial(STROKE.active, {
       color: accentHot.clone().lerp(accent, 0.35).getHex(),
-      transparent: true,
-      opacity: 0.42,
       depthWrite: false,
       fog: true,
       toneMapped: false,
@@ -192,10 +191,10 @@ export class HorizonScaleManager {
       128,
       512,
       [
-        { stop: 0, color: 'rgba(111,247,255,0.22)' },
-        { stop: 0.35, color: 'rgba(95,180,255,0.12)' },
-        { stop: 0.72, color: 'rgba(17,26,56,0.08)' },
-        { stop: 1, color: 'rgba(17,26,56,0)' },
+        { stop: 0, color: 'rgba(237, 231, 217,0.22)' },
+        { stop: 0.35, color: 'rgba(139, 157, 173,0.12)' },
+        { stop: 0.72, color: 'rgba(10, 18, 32,0.08)' },
+        { stop: 1, color: 'rgba(10, 18, 32,0)' },
       ],
       3.8,
       height * 0.55
@@ -208,9 +207,9 @@ export class HorizonScaleManager {
       96,
       96,
       [
-        { stop: 0, color: 'rgba(255,79,216,0.35)' },
-        { stop: 0.55, color: 'rgba(95,252,255,0.18)' },
-        { stop: 1, color: 'rgba(17,26,56,0)' },
+        { stop: 0, color: 'rgba(123, 13, 30,0.35)' },
+        { stop: 0.55, color: 'rgba(139, 157, 173,0.18)' },
+        { stop: 1, color: 'rgba(10, 18, 32,0)' },
       ],
       5.6,
       2.4
@@ -240,7 +239,7 @@ export class HorizonScaleManager {
     if (!this.root) return;
 
     const padMaterial = new THREE.MeshStandardMaterial({
-      color: 0x0c1428,
+      color: 0x0d0630,
       emissive: accent,
       emissiveIntensity: 0.28,
       metalness: 0.62,
@@ -259,7 +258,7 @@ export class HorizonScaleManager {
     const ring = new THREE.Mesh(
       new THREE.TorusGeometry(3.5, 0.08, 8, 32),
       new THREE.MeshBasicMaterial({
-        color: 0xff4fd8,
+        color: 0x7b0d1e,
         transparent: true,
         opacity: 0.72,
         depthWrite: false,
@@ -283,16 +282,16 @@ export class HorizonScaleManager {
     this.rocketGroup.scale.setScalar(ROCKET_CONFIG.scale);
 
     const bodyMaterial = new THREE.MeshStandardMaterial({
-      color: 0xe8f0ff,
+      color: 0xede7d9,
       metalness: 0.78,
       roughness: 0.22,
-      emissive: 0x2a4068,
+      emissive: 0x18314f,
       emissiveIntensity: 0.45,
       fog: true,
     });
     const accentMaterial = new THREE.MeshStandardMaterial({
-      color: 0xff4fd8,
-      emissive: 0xff4fd8,
+      color: 0x7b0d1e,
+      emissive: 0x7b0d1e,
       emissiveIntensity: 0.85,
       metalness: 0.42,
       roughness: 0.18,
@@ -317,7 +316,7 @@ export class HorizonScaleManager {
 
     const window = new THREE.Mesh(
       new THREE.SphereGeometry(0.2, 10, 10),
-      new THREE.MeshBasicMaterial({ color: 0x7cf9ff, fog: false, toneMapped: false })
+      new THREE.MeshBasicMaterial({ color: 0xede7d9, fog: false, toneMapped: false })
     );
     window.position.set(0, 2.35, 0.66);
     this.rocketGroup.add(window);
@@ -325,8 +324,8 @@ export class HorizonScaleManager {
     const pad = new THREE.Mesh(
       new THREE.CylinderGeometry(1.35, 1.55, 0.22, 10),
       new THREE.MeshStandardMaterial({
-        color: 0x101828,
-        emissive: 0x0f2740,
+        color: 0x0d0630,
+        emissive: 0x18314f,
         emissiveIntensity: 0.55,
         metalness: 0.55,
         roughness: 0.42,
@@ -340,9 +339,9 @@ export class HorizonScaleManager {
       64,
       64,
       [
-        { stop: 0, color: 'rgba(255,255,255,0.95)' },
-        { stop: 0.4, color: 'rgba(124,249,255,0.55)' },
-        { stop: 1, color: 'rgba(255,79,216,0)' },
+        { stop: 0, color: 'rgba(237, 231, 217,0.95)' },
+        { stop: 0.4, color: 'rgba(237, 231, 217,0.55)' },
+        { stop: 1, color: 'rgba(123, 13, 30,0)' },
       ],
       2.8,
       2.8
@@ -358,10 +357,10 @@ export class HorizonScaleManager {
       const ctx = flameCanvas.getContext('2d');
       if (ctx) {
         const gradient = ctx.createLinearGradient(32, 0, 32, 128);
-        gradient.addColorStop(0, 'rgba(255,240,120,0.98)');
-        gradient.addColorStop(0.35, 'rgba(255,140,40,0.82)');
-        gradient.addColorStop(0.72, 'rgba(255,60,20,0.45)');
-        gradient.addColorStop(1, 'rgba(255,60,20,0)');
+        gradient.addColorStop(0, 'rgba(237, 231, 217,0.98)');
+        gradient.addColorStop(0.35, 'rgba(123, 13, 30,0.82)');
+        gradient.addColorStop(0.72, 'rgba(123, 13, 30,0.45)');
+        gradient.addColorStop(1, 'rgba(123, 13, 30,0)');
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.moveTo(32, 0);

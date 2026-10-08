@@ -19,7 +19,7 @@
       (click)="dismiss(); $event.stopPropagation()"
       (pointerdown)="$event.stopPropagation()"
     >
-      <span aria-hidden="true">×</span>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
     </button>
 
     <h2 id="star-quest-panel-title" class="star-quest-panel__title">{{ panel.quest.title }}</h2>
@@ -33,13 +33,12 @@
     </p>
 
     <button
-      type="button"
-      class="star-quest-panel__claim"
-      [disabled]="!panel.ctaEnabled"
-      [attr.aria-label]="panel.ctaLabel"
-      (click)="onCta(); $event.stopPropagation()"
-      (pointerdown)="$event.stopPropagation()"
-    >
+ type="button"
+ class="star-quest-panel__claim"
+ [disabled]="!panel.ctaEnabled"
+ (click)="onCta(); $event.stopPropagation()"
+ (pointerdown)="$event.stopPropagation()"
+ >
       {{ panel.ctaLabel }}
     </button>
 

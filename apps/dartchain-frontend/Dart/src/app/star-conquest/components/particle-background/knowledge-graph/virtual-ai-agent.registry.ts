@@ -14,7 +14,7 @@ const AGENT_ROLES = [
 const AGENT_STATES: VirtualAIAgent['state'][] = [
   'idle',
   'thinking',
-  'synced',
+  'synchronisé',
   'communicating',
 ];
 

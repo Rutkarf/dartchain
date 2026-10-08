@@ -40,7 +40,7 @@
   width: 2px;
   height: 100%;
   max-height: 100%;
-  border-radius: 1px;
+  border-radius: var(--radius-none);
   background: linear-gradient(180deg, var(--tab-accent), var(--tab-accent-2));
   box-shadow: none;
 }
@@ -49,9 +49,9 @@
   flex: 0 1 auto;
   min-width: 0;
   padding: 0 2px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-size: clamp(0.3375rem, 2vw, 0.4375rem);
+  font-size: var(--fs-label);
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -65,23 +65,24 @@
 .dock-summary-status--ready,
 .dock-summary-status--synced,
 .dock-summary-status--connected {
-  color: #7dffb2;
-  background: rgba(61, 214, 140, 0.14);
-  border-color: rgba(61, 214, 140, 0.32);
+  color: var(--state-success-fg);
+  background: var(--state-success-bg);
+  border-color: var(--state-success-border);
 }
 
 .dock-summary-status--waiting,
 .dock-summary-status--partial {
-  color: #f5d76e;
-  background: rgba(245, 215, 110, 0.12);
-  border-color: rgba(245, 215, 110, 0.28);
+  color: var(--warning, #d5a021);
+  background: var(--surface-warning-bg, rgba(213, 160, 33, 0.1));
+  border-color: var(--surface-warning-border, rgba(213, 160, 33, 0.28));
 }
 
 .dock-summary-status--loading,
 .dock-summary-status--busy {
-  color: var(--tab-accent);
-  background: rgba(var(--tab-accent-rgb), 0.1);
-  border-color: rgba(var(--tab-accent-rgb), 0.22);
+  color: var(--text-primary, #ede7d9);
+  background: var(--state-hover-bg);
+  border-color: var(--state-hover-border);
+  opacity: var(--state-loading-opacity);
 }
 
 .dock-summary-status--empty,
@@ -92,9 +93,9 @@
 }
 
 .dock-summary-status--error {
-  color: #ff9b8a;
-  background: rgba(255, 120, 100, 0.14);
-  border-color: rgba(255, 120, 100, 0.32);
+  color: var(--state-error-fg);
+  background: var(--state-error-bg);
+  border-color: var(--state-error-border);
 }
 
 .dock-summary-badge {
@@ -102,14 +103,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 12px;
+  min-width: var(--comp-hud-h, 16px);
   height: auto;
   max-height: 100%;
   padding: 0 1px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(var(--tab-accent-rgb), 0.18);
   color: var(--text-primary);
-  font-size: clamp(0.3375rem, 2vw, 0.4375rem);
+  font-size: var(--fs-shell);
   font-weight: 800;
   line-height: 1;
   text-align: center;
@@ -131,7 +132,7 @@
   margin: 0;
   display: inline-flex;
   align-items: center;
-  font-size: clamp(0.375rem, 2.35vw, 0.5625rem);
+  font-size: var(--fs-shell);
   font-weight: 600;
   line-height: 1;
   color: var(--text-primary);
@@ -142,7 +143,7 @@
 
 .dock-summary-progress__text--muted {
   font-weight: 500;
-  color: var(--text-muted, rgba(255, 255, 255, 0.58));
+  color: var(--text-secondary, #8b9dad);
 }
 
 .dock-summary-meta {
@@ -156,8 +157,8 @@
 }
 
 .dock-summary-meta__time {
-  font-size: clamp(0.3375rem, 2vw, 0.4375rem);
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--fs-label);
+  color: var(--text-secondary, #8b9dad);
 }
 
 .dock-summary-actions {
@@ -179,9 +180,9 @@
   margin: 0;
   padding: 0 3px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-display);
-  font-size: clamp(0.3375rem, 2vw, 0.4375rem);
+  font-size: var(--fs-shell);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -191,28 +192,18 @@
 }
 
 .dock-summary-actions__refresh {
-  width: 14px;
+  width: var(--comp-hud-h, 16px);
   padding: 0;
   background: rgba(var(--tab-accent-rgb), 0.12);
   color: var(--text-primary);
 }
 
-.dock-summary-actions__refresh svg {
-  width: 9px;
-  height: 7px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .dock-summary-actions__primary {
   background: linear-gradient(135deg, var(--tab-accent), var(--tab-accent-2));
-  color: var(--brand-porcelain, #fff);
+  color: var(--brand-porcelain, #ede7d9);
 }
 
 .dock-summary-actions__btn:focus-visible {
-  outline: 1px solid rgba(var(--tab-accent-rgb), 0.55);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: var(--state-focus-ring);
 }

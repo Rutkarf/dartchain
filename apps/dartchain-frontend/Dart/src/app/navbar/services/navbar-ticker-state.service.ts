@@ -53,7 +53,7 @@ export class NavbarTickerStateService {
     const segments: NavbarTickerSegment[] = [
       {
         id: 'network',
-        label: 'Net',
+        label: 'Réseau',
         value: networkValue,
         detail: {
           eyebrow: 'Infrastructure',
@@ -62,11 +62,11 @@ export class NavbarTickerStateService {
             'DartChain s’appuie sur un réseau distribué optimisé pour la latence et la disponibilité des nœuds.',
           bullets: [
             'Consensus synchronisé en temps réel avec les pairs actifs.',
-            'Launch prévu Q4 — accès anticipé via le LaunchLab R4V3.',
-            'Compatible avec les flux live WebSocket de l’explorateur.',
+            'Lancement prévu au 4e trimestre — accès anticipé via le laboratoire R4V3.',
+            'Compatible avec les flux en direct de l’explorateur.',
           ],
           metrics: [
-            { label: 'Réseau', value: 'DartChain P2P' },
+            { label: 'Réseau', value: 'DartChain pair à pair' },
             { label: 'Statut', value: this.loading() ? 'Synchronisation…' : 'Opérationnel' },
             { label: 'Mise à jour', value: ageLabel },
           ],
@@ -74,22 +74,22 @@ export class NavbarTickerStateService {
       },
       {
         id: 'token',
-        label: 'Token',
+        label: 'Jeton',
         value: tokenValue,
         detail: {
           eyebrow: 'Actif sélectionné',
           title: tokenValue,
           summary:
-            'Le token actif pilote le graphique, l’échange et les métriques affichées dans le hub marché.',
+            'Le jeton actif pilote le graphique, l’échange et les métriques affichées dans le hub marché.',
           bullets: [
             'R4V3 — jeton natif de l’écosystème DartChain.',
-            'Tokens LaunchLab disponibles dans le menu déroulant adjacent.',
-            'Rewards distribués aux participants actifs du réseau.',
+            'Jetons du laboratoire disponibles dans le menu déroulant adjacent.',
+            'Récompenses distribuées aux participants actifs du réseau.',
           ],
           metrics: [
             { label: 'TVL', value: '12.4M' },
-            { label: 'Launch', value: 'Q4 2026' },
-            { label: 'Rewards', value: 'Actifs' },
+            { label: 'Lancement', value: 'Q4 2026' },
+            { label: 'Récompenses', value: 'Actifs' },
           ],
         },
       },
@@ -98,30 +98,30 @@ export class NavbarTickerStateService {
         label: 'Tx',
         value: txValue,
         detail: {
-          eyebrow: 'Mempool',
+          eyebrow: 'File',
           title: 'Dernière transaction',
           summary:
             'Flux des transactions en attente de validation, mis à jour via le canal live du nœud.',
           bullets: [
             'Hash tronqué dans le ticker pour la lisibilité compacte.',
-            'Ouvrez le dock Transactions pour l’historique complet.',
-            'Rafraîchissement automatique à chaque snapshot réseau.',
+            'Ouvrez la barre Transactions pour l’historique complet.',
+            'Rafraîchissement automatique à chaque instantané réseau.',
           ],
           metrics: [{ label: 'Hash', value: txValue }],
         },
       },
       {
         id: 'peers',
-        label: 'Peers',
+        label: 'Pairs',
         value: peersLabel,
         detail: {
           eyebrow: 'Topologie P2P',
           title: `${peersLabel} pairs`,
           summary:
-            'Nombre de nœuds connectés au réseau DartChain, mesuré via les statistiques peers du backend.',
+            'Nombre de nœuds connectés au réseau DartChain, mesuré via les statistiques des pairs.',
           bullets: [
             'Les pairs actifs contribuent à la propagation des blocs.',
-            'Consultez le dock Peers pour le détail de chaque connexion.',
+            'Consultez la barre Pairs pour le détail de chaque connexion.',
             'Actualisation automatique toutes les 30 secondes.',
           ],
           metrics: [
@@ -144,11 +144,11 @@ export class NavbarTickerStateService {
           summary:
             'Index du dernier bloc confirmé sur la chaîne DartChain, rafraîchi toutes les 5 secondes.',
           bullets: [
-            'Pointe de chaîne synchronisée avec le dock Chain.',
+            'Pointe de chaîne synchronisée avec la barre Chaîne.',
             'Cliquez sur un bloc dans l’explorateur pour ouvrir le détail.',
             'Indicateur de progression du nœud local.',
           ],
-          metrics: [{ label: 'Tip', value: tip }],
+          metrics: [{ label: 'Sommet', value: tip }],
         },
       });
     }

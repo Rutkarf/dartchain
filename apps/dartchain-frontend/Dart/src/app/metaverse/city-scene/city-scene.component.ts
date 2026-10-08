@@ -11,7 +11,7 @@ import { CharacterControlService } from '@metaverse/services/character-control.s
 import { ThreeSceneService } from '@metaverse/services/three-scene.service';
 
 /**
- * Bootstrap du monde 3D (legacy floor ou Marseille OSM selon configuration).
+ * Bootstrap du monde 3D (legacy floor ou Metaverse OSM selon configuration).
  */
 @Component({
   selector: 'app-city-scene',

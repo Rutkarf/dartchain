@@ -12,7 +12,7 @@ SCOPE_POLICY: STRICT_METAVERSEBB_SCOPE
 
 - `apps/dartchain-frontend/Dart/src/app/metaverse/**`
 - Les 34 services listés (usages uniquement floor/map/character)
-- `core/map/marseille-twin/**` (déjà documenté ailleurs)
+- `core/map/metaverse-twin/**` (déjà documenté ailleurs)
 
 ### SHARED_DEPENDENCY (lecture seule)
 
@@ -38,7 +38,7 @@ SCOPE_POLICY: STRICT_METAVERSEBB_SCOPE
 | ITER-007 | Spec inventaire sélecteurs + counts | DONE |
 | ITER-008 | Documenter point d’entrée Angular | DONE |
 | ITER-009 | Documenter hotspot CharacterControlService | DONE |
-| ITER-010 | Documenter hotspot MarseilleMapProvider | DONE |
+| ITER-010 | Documenter hotspot MetaverseMapProvider | DONE |
 | ITER-011 | Cartographier tokens / trails / rewards | DONE |
 | ITER-012 | Cartographier WiGLE / network | DONE |
 | ITER-013 | Cartographier placements | DONE |
@@ -46,7 +46,7 @@ SCOPE_POLICY: STRICT_METAVERSEBB_SCOPE
 | ITER-015 | Proposer découpage en couches | DONE |
 | ITER-016 | Documenter scripts test/build | DONE |
 | ITER-017 | Baseline non-régression | DONE |
-| ITER-018 | Corriger classification vs backlog Marseille (services core exclusifs par usage) | DONE |
+| ITER-018 | Corriger classification vs backlog Metaverse (services core exclusifs par usage) | DONE |
 | ITER-019 | Insights architecture + risques | DONE |
 | ITER-020 | Freeze inventaire machine-readable + verify tests | DONE |
 | ITER-021 | Façade locale Auth/Wallet (adapter) | TODO — additive, in-scope |

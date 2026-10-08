@@ -8,7 +8,7 @@ import {
 } from '@blockchain/services/blockchain-api.service';
 import { formatDockRelativeTime } from '@core/utils/dock-time.util';
 
-export type DockChainPhase = 'error' | 'loading' | 'empty' | 'synced';
+export type DockChainPhase = 'error' | 'loading' | 'empty' | 'synchronisé';
 
 @Injectable({ providedIn: 'root' })
 export class DockChainStateService {
@@ -39,7 +39,7 @@ export class DockChainStateService {
     if (this.blockCount() === 0) {
       return 'empty';
     }
-    return 'synced';
+    return 'synchronisé';
   });
 
   readonly statusLabel = computed(() => {
@@ -47,7 +47,7 @@ export class DockChainStateService {
       case 'error':
         return 'Erreur';
       case 'loading':
-        return 'Sync…';
+        return 'Synchro…';
       case 'empty':
         return 'Vide';
       default:

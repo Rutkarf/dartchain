@@ -1,8 +1,7 @@
 <div
-  class="launch-summary-bar"
-  role="status"
-  aria-live="polite"
-  aria-label="Résumé LaunchLab"
+ class="launch-summary-bar"
+ role="status"
+ aria-live="polite"
 >
   <div class="launch-summary-line" aria-live="polite">
     @if (carouselProject(); as project) {
@@ -32,13 +31,12 @@
         </span>
 
         <button
-          type="button"
-          class="launch-summary-line__swap ds-surface ds-surface--showcase-tab"
-          [class.launch-summary-line__swap--muted]="!canSwapProject(project)"
-          [disabled]="!canSwapProject(project)"
-          (click)="swapProject(project, $event)"
-          [attr.aria-label]="swapAriaLabel(project)"
-        >
+ type="button"
+ class="launch-summary-line__swap ds-surface ds-surface--showcase-tab"
+ [class.launch-summary-line__swap--muted]="!canSwapProject(project)"
+ [disabled]="!canSwapProject(project)"
+ (click)="swapProject(project, $event)"
+ >
           Swap
         </button>
 
@@ -51,12 +49,7 @@
           [attr.title]="whitepaperAriaLabel(project)"
           (click)="openWhitepaper(project, $event)"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <path d="M14 2v6h6" />
-            <path d="M12 11v7" />
-            <path d="M9 15l3 3 3-3" />
-          </svg>
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-file-down"/></svg>
         </button>
       </div>
     } @else if (loading()) {

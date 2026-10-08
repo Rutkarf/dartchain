@@ -19,36 +19,36 @@
   margin: 0;
   padding: 0;
   border: 1px solid transparent;
-  border-radius: clamp(3px, 1vw, 5px);
+  border-radius: var(--radius-sm, 4px);
   background: transparent;
-  color: #ffffff;
+  color: #ede7d9;
   cursor: pointer;
   touch-action: manipulation;
   appearance: none;
   -webkit-appearance: none;
-  transition:
-    background 160ms ease,
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+  transition: background var(--motion-state) var(--motion-ease-state), border-color var(--motion-state) var(--motion-ease-state);
 }
 
-.panel-collapse-control__icon {
-  display: inline-flex;
-  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
-  animation: panel-collapse-nudge-up 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+.panel-collapse-control__chevron {
+  display: block;
+  width: var(--comp-icon-sm, 12px);
+  height: var(--comp-icon-sm, 12px);
+  color: inherit;
+  transition: transform var(--motion-state) var(--motion-ease-state);
+  animation: panel-collapse-nudge-up 1.8s ease-in-out infinite;
 }
 
-.panel-collapse-control.is-collapsed .panel-collapse-control__icon {
+.panel-collapse-control.is-collapsed .panel-collapse-control__chevron {
   animation-name: panel-collapse-nudge-down;
 }
 
 .panel-collapse-control:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(237, 231, 217, 0.04);
+  border-color: rgba(237, 231, 217, 0.1);
 }
 
-.panel-collapse-control:hover .panel-collapse-control__icon,
-.panel-collapse-control:focus-visible .panel-collapse-control__icon {
+.panel-collapse-control:hover .panel-collapse-control__chevron,
+.panel-collapse-control:focus-visible .panel-collapse-control__chevron {
   animation-play-state: paused;
 }
 
@@ -57,8 +57,8 @@
 }
 
 .panel-collapse-control:focus-visible {
-  background: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.08);
-  border-color: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.28);
+  background: rgba(var(--accent-cyan-rgb, 139, 157, 173), 0.08);
+  border-color: rgba(var(--accent-cyan-rgb, 139, 157, 173), 0.28);
   outline: none;
   box-shadow: var(--shadow-focus);
 }
@@ -100,7 +100,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .panel-collapse-control__icon {
+  .panel-collapse-control__chevron {
     animation: none;
     transition: none;
   }

@@ -1,5 +1,5 @@
 import type { MapQuality } from './map-configuration';
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 
 /** Phase 11 + 14 — couverture props urbains (toujours plein Vieux-Port). */
 export type UrbanPropsScope = 'none' | 'spawn' | 'full';

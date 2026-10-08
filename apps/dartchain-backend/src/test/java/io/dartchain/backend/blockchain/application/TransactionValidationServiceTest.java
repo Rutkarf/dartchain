@@ -77,6 +77,34 @@ class TransactionValidationServiceTest {
                 .doesNotThrowAnyException();
     }
 
+    @Test
+    void strictMode_acceptsSystemCreditSignature() {
+        TransactionValidationService service = new TransactionValidationService(strictSecurity());
+
+        pending.setFromAddress("SYSTEM");
+        pending.setToAddress("alice-wallet");
+        pending.setAmount(new BigDecimal("0.00000000000000000000000001"));
+        pending.setData("FAUCET_CLAIM");
+        pending.setSystemReward(true);
+        pending.setSignature("SYSTEM");
+
+        assertThatCode(() -> service.validatePendingTransaction(pending, userAccountStore))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void acceptsChainPrecisionAmountLoadedFromDb() {
+        TransactionValidationService service = new TransactionValidationService(strictSecurity());
+        when(userAccountStore.findById(account.getId())).thenReturn(Optional.of(account));
+
+        // NUMERIC(38,26) reload — trailing zeros must not block mining.
+        pending.setAmount(new BigDecimal("1.00000000000000000000000000"));
+        pending.setSignature(PendingTransactionAttestation.sign(account, pending));
+
+        assertThatCode(() -> service.validatePendingTransaction(pending, userAccountStore))
+                .doesNotThrowAnyException();
+    }
+
     private static SecurityProperties strictSecurity() {
         SecurityProperties properties = new SecurityProperties();
         properties.setStrictPendingSignatures(true);

@@ -1,32 +1,26 @@
 <section
-  class="app-bottom-stack"
-  [class.is-dock-collapsed]="dockCollapsed"
-  aria-label="Dock navigation"
+ class="app-bottom-stack"
+ [class.is-dock-collapsed]="dockCollapsed"
 >
   <div class="showcase-block__shell bottom-stack__shell ds-surface ds-surface--card">
     <header
-      class="showcase-header showcase-header--tabs app-bottom-stack__header"
-      aria-label="Navigation principale"
-    >
+ class="showcase-header showcase-header--tabs app-bottom-stack__header"
+ >
       <div class="showcase-header-tabs">
-        <nav class="showcase-tabs app-bottom-stack__tabs" role="tablist">
+        <nav
+          class="showcase-tabs app-bottom-stack__tabs"
+          role="tablist"
+          (pointerdown)="onTabPointerDown($event)"
+          (dblclick)="onTabDoubleClick($event)"
+        >
           <button
             type="button"
             class="showcase-tab ds-surface ds-surface--showcase-tab"
             role="tab"
-            [attr.aria-selected]="activeTab === 'admin'"
-            [class.is-active]="activeTab === 'admin'"
-            (click)="tabChange.emit('admin')"
-          >
-            <span class="showcase-tab__label">{{ locale.t('dock.admin') }}</span>
-          </button>
-          <button
-            type="button"
-            class="showcase-tab ds-surface ds-surface--showcase-tab"
-            role="tab"
+            data-dock-tab="chain"
             [attr.aria-selected]="activeTab === 'chain'"
             [class.is-active]="activeTab === 'chain'"
-            (click)="tabChange.emit('chain')"
+            (click)="selectDockTab('chain')"
           >
             <span class="showcase-tab__label">{{ locale.t('chain.title') }}</span>
           </button>
@@ -35,9 +29,10 @@
               type="button"
               class="showcase-tab ds-surface ds-surface--showcase-tab"
               role="tab"
+              data-dock-tab="faucet"
               [attr.aria-selected]="activeTab === 'faucet'"
               [class.is-active]="activeTab === 'faucet'"
-              (click)="tabChange.emit('faucet')"
+              (click)="selectDockTab('faucet')"
             >
               <span class="showcase-tab__label">{{ locale.t('dock.faucet') }}</span>
             </button>
@@ -46,9 +41,10 @@
             type="button"
             class="showcase-tab showcase-tab--mempool ds-surface ds-surface--showcase-tab"
             role="tab"
+            data-dock-tab="transactions"
             [attr.aria-selected]="activeTab === 'transactions'"
             [class.is-active]="activeTab === 'transactions'"
-            (click)="tabChange.emit('transactions')"
+            (click)="selectDockTab('transactions')"
           >
             <span class="showcase-tab__label">{{ locale.t('dock.transactions') }}</span>
           </button>
@@ -56,9 +52,10 @@
             type="button"
             class="showcase-tab ds-surface ds-surface--showcase-tab"
             role="tab"
+            data-dock-tab="peers"
             [attr.aria-selected]="activeTab === 'peers'"
             [class.is-active]="activeTab === 'peers'"
-            (click)="tabChange.emit('peers')"
+            (click)="selectDockTab('peers')"
           >
             <span class="showcase-tab__label">{{ locale.t('dock.peers') }}</span>
           </button>
@@ -66,19 +63,30 @@
             type="button"
             class="showcase-tab ds-surface ds-surface--showcase-tab"
             role="tab"
+            data-dock-tab="quests"
             [attr.aria-selected]="activeTab === 'quests'"
             [class.is-active]="activeTab === 'quests'"
-            (click)="tabChange.emit('quests')"
+            (click)="selectDockTab('quests')"
           >
             <span class="showcase-tab__label">{{ locale.t('dock.quests') }}</span>
+            @if (questsState.claimableCount() > 0) {
+              <span
+                class="showcase-tab__unread-toast"
+                [class.showcase-tab__unread-toast--live]="questsState.phase() === 'urgent'"
+                aria-hidden="true"
+              >
+                <app-badge-digit-3d [text]="claimableBadgeLabel()" />
+              </span>
+            }
           </button>
           <button
             type="button"
             class="showcase-tab ds-surface ds-surface--showcase-tab"
             role="tab"
+            data-dock-tab="wallet"
             [attr.aria-selected]="activeTab === 'wallet'"
             [class.is-active]="activeTab === 'wallet'"
-            (click)="tabChange.emit('wallet')"
+            (click)="selectDockTab('wallet')"
           >
             <span class="showcase-tab__label">{{ locale.t('dock.wallet') }}</span>
           </button>

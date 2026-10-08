@@ -144,13 +144,14 @@ describe('ShowcaseR4v3Component', () => {
 
     expect(fixture.nativeElement.querySelectorAll('.showcase-r4v3__pillar').length).toBe(6);
     expect(fixture.nativeElement.querySelectorAll('.showcase-r4v3__pillar-column').length).toBe(3);
+    expect(fixture.nativeElement.querySelector('app-showcase-r4v3-fx')).toBeTruthy();
     const pegText = fixture.nativeElement.querySelector('.showcase-r4v3__peg--hero')?.textContent ?? '';
     expect(pegText.replace(/\s+/g, ' ').trim()).toContain('1 R4V3 = 1 CHF');
     expect(pegText).not.toContain('GBP');
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__wp-btn')).toBeTruthy();
     expect(
       fixture.nativeElement.querySelector('.showcase-r4v3__wp-btn-label')?.textContent?.trim()
-    ).toBe('White paper');
+    ).toBe('Livre blanc');
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__wp-btn-hint')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-meta__refresh')).toBeFalsy();
     expect(fixture.nativeElement.querySelector('.showcase-r4v3__live-quote')).toBeFalsy();

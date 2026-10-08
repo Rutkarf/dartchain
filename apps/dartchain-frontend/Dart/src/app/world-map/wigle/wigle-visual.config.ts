@@ -1,10 +1,10 @@
 import type { MapQuality } from '../map-configuration';
 
 export const WIGLE_VISUAL_CONFIG = {
-  lowDensity: 0x00e5ff,
-  mediumDensity: 0xffd166,
-  highDensity: 0xff4fd8,
-  unknown: 0x8f9bb3,
+  lowDensity: 0x8a95a5,
+  mediumDensity: 0x7b0d1e,
+  highDensity: 0x7b0d1e,
+  unknown: 0x8a95a5,
   maxIndicatorHeight: 8,
   baseRadius: 0.35,
   opacity: 0.72,
@@ -55,7 +55,7 @@ export const HORIZON_SCALE_CONFIG: HorizonScaleConfig = {
   visualScale: 1.85,
 };
 
-/** Bbox OSM élargi (~1.6 km) — aligné sur MarseilleMapProvider.OSM_QUERY_BOUNDS. */
+/** Bbox OSM élargi (~1.6 km) — aligné sur MetaverseMapProvider.OSM_QUERY_BOUNDS. */
 export const WIGLE_OSM_QUERY_BOUNDS = {
   south: 43.2800,
   north: 43.3095,
@@ -76,10 +76,10 @@ export const WIGLE_GEO_CONFIG = {
   meshConnectRadius: 55,
   groundOffsetY: 0.22,
   colors: {
-    wifi: 0x00f3ff,
-    cell: 0xff00ff,
-    ble: 0x7b2cbf,
-    unknown: 0x8f9bb3,
+    wifi: 0x8a95a5,
+    cell: 0x8a95a5,
+    ble: 0x8a95a5,
+    unknown: 0x8a95a5,
   },
 } as const;
 

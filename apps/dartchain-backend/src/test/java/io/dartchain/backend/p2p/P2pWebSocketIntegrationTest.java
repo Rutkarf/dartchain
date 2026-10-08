@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -68,6 +69,10 @@ class P2pWebSocketIntegrationTest {
         CountDownLatch latch = new CountDownLatch(2);
         List<String> payloads = new CopyOnWriteArrayList<>();
 
+        Session account = MockMvcIntegrationSupport.register(mockMvc);
+        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+        headers.add("Authorization", account.authHeader());
+
         StandardWebSocketClient client = new StandardWebSocketClient();
         WebSocketSession session = client.execute(
                 new TextWebSocketHandler() {
@@ -77,7 +82,7 @@ class P2pWebSocketIntegrationTest {
                         latch.countDown();
                     }
                 },
-                null,
+                headers,
                 URI.create("ws://127.0.0.1:" + port + "/ws/peers")
         ).get(10, TimeUnit.SECONDS);
 

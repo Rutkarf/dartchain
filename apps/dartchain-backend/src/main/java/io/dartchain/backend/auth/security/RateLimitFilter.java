@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final Pattern PENDING_MINE_PATH = Pattern.compile("^/api/pending-transactions/[^/]+/mine$");
+    private static final Pattern GROUPED_MINE_PATH = Pattern.compile("^/api/blockchain/mine/[^/]+$");
 
     private final RateLimitProperties rateLimitProperties;
     private final RateLimitCounterStore rateLimitCounterStore;
@@ -76,7 +77,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (limitedPaths.contains(path)) {
             return true;
         }
-        return PENDING_MINE_PATH.matcher(path).matches();
+        return PENDING_MINE_PATH.matcher(path).matches()
+                || GROUPED_MINE_PATH.matcher(path).matches();
     }
 
     private String resolveClientKey(HttpServletRequest request) {

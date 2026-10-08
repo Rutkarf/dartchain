@@ -58,9 +58,9 @@ export function createSkyDomeMaterial(): SkyDomeMaterial {
     depthWrite: false,
     fog: false,
     uniforms: {
-      uZenithColor: { value: new THREE.Color(0x0a1018) },
-      uHorizonColor: { value: new THREE.Color(0x1a2840) },
-      uGlowColor: { value: new THREE.Color(0x3a88cc) },
+      uZenithColor: { value: new THREE.Color(0x0d0630) },
+      uHorizonColor: { value: new THREE.Color(0x18314f) },
+      uGlowColor: { value: new THREE.Color(0x8a95a5) },
       uStarIntensity: { value: 0.8 },
       uTime: { value: 0 },
     },

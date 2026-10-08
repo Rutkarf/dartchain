@@ -68,7 +68,7 @@ export class ShowcaseR4v3SummaryComponent implements OnInit, OnDestroy {
     if (this.whitepaperLoading()) {
       return 'Téléchargement du white paper…';
     }
-    return error ? `White paper — ${error}` : 'Télécharger le white paper R4V3';
+    return error ? `Livre blanc — ${error}` : 'Télécharger le white paper R4V3';
   });
 
   ngOnInit(): void {

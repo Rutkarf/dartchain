@@ -44,7 +44,7 @@ export class StarConquestUnderStackBand {
       geom,
       new THREE.PointsMaterial({
         map: this.discTex,
-        color: 0xc8d8e8,
+        color: 0xede7d9,
         size: 2.8,
         transparent: true,
         opacity: 0.78,

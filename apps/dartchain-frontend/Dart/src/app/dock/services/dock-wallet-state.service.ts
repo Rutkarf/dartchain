@@ -52,7 +52,7 @@ export class DockWalletStateService {
       case 'error':
         return 'Erreur';
       case 'loading':
-        return 'Sync…';
+        return 'Synchro…';
       case 'disconnected':
         return 'Hors ligne';
       default:

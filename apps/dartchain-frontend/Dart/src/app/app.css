@@ -16,25 +16,25 @@
 
   --shell-gap: 0px;
   --section-gap: 0px;
-  --panel-radius: var(--radius-lg, 16px);
+  --panel-radius: var(--ds-surface-radius, var(--radius-none, 0));
   /* Gouttière horizontale entre panneaux juxtaposés */
   --panel-column-gap: 4px;
   /* Bande marché : pile verticale Graph → Swap */
   --hub-market-swap-col: 1fr;
   --hub-market-rate-col: 1fr;
 
-  /* Alignement horizontal : contenu (hub/showcase/dock) vs navbar (+2px chaque côté) */
+  /* Gouttière : les bandes la portent via --app-side-gutter-* (pas ici, sinon double inset).
+     Navbar = même token. 0 = pas de second pad sur le hub. */
   --band-inline-pad: 0px;
-  --navbar-inline-overflow: 2px;
-  --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
-  /* Swap : 1px plus étroit chaque côté que la navbar (= navbar-pad + 1) */
-  --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
+  --navbar-inline-overflow: 0px;
+  --navbar-inline-pad: var(--ds-shell-gutter, 2px);
+  --swap-inline-pad: var(--ds-shell-gutter, 2px);
 
   /*
    * Floor peek = canvas Three.js réservé sous Graph (+ --ds-graph-floor-gap).
    * Budgets @ 250×550 : tokens --ds-zone-* (zero-scroll).
    */
-  --floor-canvas-height: var(--ds-zone-floor-peek, 220px);
+  --floor-canvas-height: var(--ds-zone-floor-peek, 200px);
   --floor-peek-height: var(--floor-canvas-height);
   --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
   --app-bottom-footer-space: calc(var(--floor-peek-height) + var(--graph-floor-gap));
@@ -42,12 +42,12 @@
 
   --section-stack-gap: 0px;
   /* Bandes : gouttières verticales entre sections majeures */
-  --band-air-gap: var(--ds-band-gap, 2px);
-  --showcase-dock-offset: 1px;
-  /* swap → showcase · showcase → dock · dock → graph : UNE seule gouttière */
-  --navbar-hub-gap: 2px;
-  --hub-market-internal-gap: 2px;
-  --stack-section-gap: 2px;
+  --band-air-gap: var(--ds-gap-seam);
+  --showcase-dock-offset: var(--ds-gap-seam);
+  /* DA @ 250×550 : gouttières bands = 2px (vp-compact renforce via polish) */
+  --navbar-hub-gap: var(--ds-gap-seam);
+  --hub-market-internal-gap: var(--ds-gap-seam);
+  --stack-section-gap: var(--ds-gap-seam);
   --stack-section-gap-collapsed: 0px;
   --hub-swap-showcase-gap: var(--stack-section-gap);
   --hub-market-showcase-gap: var(--stack-section-gap);
@@ -67,7 +67,7 @@
 
   /* Menu actions panneau — tertiary, discret */
   --panel-action-item-w: 11px;
-  --panel-action-menu-h: 7px;
+  --panel-action-menu-h: var(--comp-btn-hud-h, 16px);
   --panel-action-menu-w: 26px;
   --panel-action-edge-inset: 0px;
 
@@ -77,9 +77,9 @@
 
   /* —— Hiérarchie spatiale MVP 250×550 zero-scroll —— */
   --mvp-swap-h: var(--ds-zone-exchange, 32px);
-  --mvp-chart-h: var(--ds-zone-chart, 120px);
-  --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
-  --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
+  --mvp-chart-h: var(--ds-zone-chart, 80px);
+  --mvp-showcase-body-h: var(--ds-zone-showcase-body, 80px);
+  --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 80px);
 
   --market-exchange-strip-h: var(--mvp-swap-h);
   --market-exchange-height-estimate: var(--mvp-swap-h);
@@ -91,7 +91,7 @@
   );
   --market-height: var(--market-band-height);
   /* Tokens swap (miroir exchange-panel) pour l’écart sous MONTANT */
-  --swap-row-h: 11px;
+  --swap-row-h: var(--comp-row-h, 16px);
   --swap-mid-h: 8px;
   --swap-pad-block: 0px;
   --swap-flex-gap-block: 0px;
@@ -112,8 +112,8 @@
   /* --hub-market-showcase-gap / stack-gap-showcase-dock : 4px (showcase → dock) */
   --showcase-tab-fusion-overlap: 0px;
   /* Smart bars repliées : graph flush ; dock/showcase = 2e ligne à ~moitié */
-  --showcase-smart-bar-h: 13.5px;
-  --chart-smart-bar-h: 11px;
+  --showcase-smart-bar-h: var(--comp-smart-bar-h, 16px);
+  --chart-smart-bar-h: var(--comp-smart-bar-h, 16px);
   --swap-smart-bar-h: 32px;
   --chart-stack-header-h: 0px;
   --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
@@ -143,9 +143,10 @@
   --dock-hub-tab-w: 2.5rem;
   --dock-panel-height: var(--mvp-bottom-panel-h);
   --dock-panel-handle-h: 8px;
-  --dock-smart-bar-h: 13.5px;
+  --dock-smart-bar-h: var(--comp-smart-bar-h, 16px);
   --dock-toggle-w: 24px;
-  --dock-collapsed-band-h: var(--dock-panel-handle-h);
+  /* Smart-collapsed : même budget que la smart-bar (plus le handle 8px). */
+  --dock-collapsed-band-h: var(--dock-smart-bar-h);
   --app-dock-stack-height: calc(
     var(--dock-hub-tab-h) + var(--dock-panel-height) - var(--showcase-tab-fusion-overlap)
   );
@@ -161,9 +162,9 @@
   );
   --showcase-hub-fill-chat: linear-gradient(
     165deg,
-    rgba(12, 12, 12, 0.96) 0%,
-    rgba(18, 18, 18, 0.98) 46%,
-    rgba(10, 10, 10, 0.99) 100%
+    rgba(10, 18, 32, 0.96) 0%,
+    rgba(10, 18, 32, 0.98) 46%,
+    rgba(10, 18, 32, 0.99) 100%
   );
   --showcase-hub-fill-launchlab: linear-gradient(
     165deg,
@@ -178,7 +179,7 @@
   /* Activity dépliée — surface de lecture (meta + liste) */
   --showcase-band-height: var(--mvp-showcase-body-h);
   --faucet-band-height: auto;
-  --faucet-row-h: 16px;
+  --faucet-row-h: var(--comp-row-h, 16px);
   --hub-faucet-pad-block: 0px;
   --showcase-tabs-width: var(--tab-rail-width, 20px);
   --dock-rail-width: var(--tab-rail-width, var(--showcase-tabs-width));
@@ -229,10 +230,10 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 10000;
+  z-index: var(--z-skip, 10000);
   transform: translateY(-120%);
-  padding: 6px 10px;
-  border-radius: 0 0 8px 0;
+  padding: var(--ds-pad-panel) var(--ds-gap-cluster);
+  border-radius: 0 0 var(--radius-sm) 0;
   background: var(--text-primary);
   color: var(--brand-black);
   font-weight: 700;
@@ -259,39 +260,18 @@
   padding-bottom: 0;
   margin-top: 0;
   isolation: isolate;
-  background-color: #000000;
+  background-color: #0a1220;
   /* Laisse passer les events vers Star Conquest (canvas z-index 0) hors panneaux */
   pointer-events: none;
 }
 
-/* Fond Star Conquest — dégradé radial par univers (--sc-universe-*). */
+/* Fond plein noir — derrière particules (0) et floor (1) */
 .app-game-background {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 70% 38% at 50% 22%,
-      rgba(var(--sc-universe-aurora-rgb, 97, 219, 245), 0.18) 0%,
-      transparent 52%
-    ),
-    radial-gradient(
-      ellipse 36% 22% at 22% 58%,
-      rgba(90, 210, 240, 0.1) 0%,
-      transparent 62%
-    ),
-    radial-gradient(
-      ellipse 48% 28% at 78% 68%,
-      rgba(120, 72, 210, 0.14) 0%,
-      transparent 58%
-    ),
-    radial-gradient(
-      ellipse 125% 88% at 50% 42%,
-      var(--sc-universe-bg-center, #040308) 0%,
-      var(--sc-universe-bg-edge, #0a0614) 72%,
-      #010104 100%
-    );
+  background: #0a1220;
 }
 
 .app-shell > app-navbar,
@@ -300,6 +280,7 @@
 .app-shell > app-block-detail-drawer,
 .app-shell > app-launch-form-drawer,
 .app-shell > app-auth-drawer,
+.app-shell > app-market-cart-drawer,
 .app-shell > app-star-quest-panel,
 .app-shell > app-star-quest-scanner,
 .app-shell > .app-r4v3-scene-layer,
@@ -357,7 +338,7 @@ app-launch-form-drawer {
 /* ==========================================================================
  * Architecture de profondeur (3 niveaux)
  * --------------------------------------------------------------------------
- * Niveau 3 — app-particle-background (+ labels M4T3R z-index 0) : ciel neuronal
+ * Niveau 3 — app-particle-background (+ labels M4T3R z-index 2) : ciel neuronal
  * Niveau 2 — app-three-floor (z-index 1) : floor / horizon intermédiaire
  * Niveau 1 — Navbar/Swap/Showcase/Dock/Graph (z-index ≥2) + scanner/panel
  * ========================================================================== */
@@ -365,11 +346,11 @@ app-launch-form-drawer {
 .app-background {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: var(--z-base, 0);
   pointer-events: none;
 }
 
-/* Calques WebGL — annule width/height:0 du bloc grille (flex shell) */
+/* Calques WebGL — clip host ; pendant Feed, styles.css gère le feather (pas d’arête). */
 app-particle-background,
 app-particle-background.app-background {
   position: fixed !important;
@@ -387,23 +368,32 @@ app-particle-background.app-background {
   min-height: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
-  z-index: 0 !important;
+  z-index: 2 !important;
   pointer-events: none !important;
   display: block !important;
-  overflow: visible !important;
+  overflow: hidden !important;
+  clip-path: inset(var(--sc-playable-top, 0px) 0 var(--sc-playable-bottom, 0px) 0);
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+html.intro-feed-sc app-particle-background,
+html.intro-feed-sc app-particle-background.app-background {
+  /* Annule le clip dur host — le feather Feed est dans styles.css */
+  clip-path: none;
 }
 
 app-three-floor {
   position: fixed !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100vw !important;
+  left: var(--app-side-gutter, 2px) !important;
+  right: var(--app-side-gutter, 2px) !important;
+  bottom: var(--ds-safe-bottom, 0px) !important;
+  width: auto !important;
   height: auto !important;
   max-height: none !important;
   min-height: 0 !important;
   /* Niveau 2 : devant neuronal, derrière UI (main≥2, navbar 4, dock/graph 6) */
-  z-index: 1 !important;
+  z-index: var(--z-floor, 1) !important;
   pointer-events: none !important;
   display: block !important;
   overflow: visible !important;
@@ -412,7 +402,7 @@ app-three-floor {
 /* Aria joystick : body (pas host z=0) — juste sous le stick, devant le floor */
 .star-conquest-joy-hotspot {
   position: fixed;
-  z-index: 2;
+  z-index: var(--z-band, 2);
   pointer-events: none;
   transform: translate(-50%, 0);
   text-align: center;
@@ -425,7 +415,7 @@ app-three-floor {
   display: block;
   position: sticky;
   top: 0;
-  z-index: 4;
+  z-index: var(--z-navbar, 4);
   width: 100%;
   min-width: 0;
   margin: 0;
@@ -445,14 +435,14 @@ app-three-floor {
 .app-navbar-zone:has(.is-token-menu-open),
 .app-navbar-zone:has([data-token-menu-open='true']),
 .app-navbar-zone:has(app-navbar-ticker-drawer.is-drawer-open) {
-  z-index: 120;
+  z-index: var(--z-navbar-open, 120);
   overflow: visible;
 }
 
 .app-bottom-stack {
   flex: 0 0 var(--bottom-stack-active-height);
   position: relative;
-  z-index: 6;
+  z-index: var(--z-stack, 6);
   width: 100%;
   min-width: 0;
   min-height: var(--bottom-stack-active-height);
@@ -465,13 +455,6 @@ app-three-floor {
   padding-inline: var(--band-inline-pad);
   box-sizing: border-box;
   overflow: hidden;
-  transition:
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-bottom-stack.is-dock-collapsed {
@@ -491,22 +474,19 @@ app-three-floor {
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  border-radius: 0;
-  transition:
-    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 220ms ease;
+  border-radius: var(--radius-none);
+  transition: opacity var(--motion-state) var(--motion-ease-state);
 }
 
 .app-hub-showcase-block .showcase-block__shell.ds-surface.ds-surface--card {
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   box-shadow: var(--ds-surface-shadow);
 }
 
 .app-bottom-stack .showcase-block__shell.ds-surface.ds-surface--card {
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   box-shadow: var(--ds-surface-shadow);
 }
 
@@ -524,7 +504,7 @@ app-three-floor {
 }
 
 .app-bottom-stack.is-dock-collapsed .showcase-block__shell {
-  overflow: visible;
+  overflow: hidden;
 }
 
 .app-bottom-stack.is-dock-collapsed .app-bottom-stack__content.is-smart-collapsed,
@@ -535,7 +515,7 @@ app-three-floor {
   height: var(--dock-smart-bar-h);
   opacity: 1;
   pointer-events: auto;
-  overflow: visible;
+  overflow: hidden;
   padding-top: 0;
   padding-bottom: 0;
   margin-top: 0;
@@ -574,13 +554,7 @@ app-three-floor {
   overflow: hidden;
   position: relative;
   z-index: 1;
-  transition:
-    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 220ms ease;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
 }
 
 .app-bottom-stack__panel {
@@ -589,7 +563,7 @@ app-three-floor {
   height: 100%;
   min-height: 0;
   max-height: 100%;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   overflow: hidden;
   border: none;
   background: transparent;
@@ -656,20 +630,20 @@ app-three-floor {
   place-content: center;
   gap: 4px;
   text-align: center;
-  color: rgba(214, 240, 255, 0.82);
+  color: rgba(237, 231, 217, 0.82);
 }
 
 .app-bottom-stack__placeholder h3 {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--fs-title);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .app-bottom-stack__placeholder p {
   margin: 0;
-  font-size: 10px;
-  color: rgba(177, 205, 224, 0.72);
+  font-size: var(--fs-title);
+  color: rgba(237, 231, 217, 0.72);
 }
 
 .app-navbar-zone app-navbar {
@@ -700,14 +674,15 @@ app-three-floor {
   justify-content: flex-start;
   align-items: stretch;
   align-content: flex-start;
-  gap: var(--stack-section-gap, 4px);
-  row-gap: var(--stack-section-gap, 4px);
+  gap: var(--stack-section-gap, var(--ds-gap-seam));
+  row-gap: var(--stack-section-gap, var(--ds-gap-seam));
   margin: 0;
   margin-block-start: 0;
   margin-block-end: 0;
-  padding-inline: var(--band-inline-pad);
+  /* Gouttières par section (exchange plus large que showcase/dock/graph). */
+  padding-inline: 0;
   padding-bottom: calc(
-    var(--floor-peek-height, var(--floor-canvas-height, 220px)) + var(--graph-floor-gap, 6px)
+    var(--floor-peek-height, var(--floor-canvas-height, 200px)) + var(--graph-floor-gap, 6px)
   );
   width: 100%;
   min-width: 0;
@@ -731,6 +706,8 @@ app-three-floor {
   min-height: 0;
   margin: 0;
   order: 1;
+  padding-inline: var(--app-side-gutter-exchange, calc(var(--app-side-gutter, 5%) - 2%));
+  box-sizing: border-box;
 }
 
 .app-main-layout > app-showcase-tab-showcase,
@@ -741,15 +718,13 @@ app-three-floor {
   margin-top: 0;
   overflow: hidden;
   order: 2;
-  transition:
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  padding-inline: var(--app-side-gutter-band, calc(var(--app-side-gutter, 5%) - 1%));
+  box-sizing: border-box;
 }
 
 .app-main-layout > app-showcase-tab-showcase:not(.is-showcase-collapsed):not(.is-showcase-disabled),
 .app-main-layout > .app-showcase-tab-showcase-section:not(.is-showcase-collapsed):not(.is-showcase-disabled) {
-  max-height: var(--hub-showcase-block-height);
+  max-height: var(--bottom-stack-height-expanded);
 }
 
 .app-main-layout > app-showcase-tab-showcase.is-showcase-collapsed,
@@ -774,9 +749,8 @@ app-three-floor {
   max-height: none;
   margin: 0;
   order: 3;
-  transition:
-    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  padding-inline: var(--app-side-gutter-band, calc(var(--app-side-gutter, 5%) - 1%));
+  box-sizing: border-box;
 }
 
 .app-main-layout > app-dock-tabs-dock-tabs.is-dock-collapsed,
@@ -809,6 +783,8 @@ app-three-floor {
   margin-bottom: 0;
   overflow: hidden;
   order: 4;
+  padding-inline: var(--app-side-gutter-band, calc(var(--app-side-gutter, 5%) - 1%));
+  box-sizing: border-box;
 }
 
 .app-main-layout.is-chart-collapsed > app-graph,
@@ -846,7 +822,6 @@ app-three-floor {
   height: fit-content;
   padding-inline: var(--band-inline-pad);
   box-sizing: border-box;
-  transition: grid-template-rows 0.28s ease;
 }
 
 /* CRITICAL: ne jamais appliquer ce template 5 pistes à .app-main-layout
@@ -1026,10 +1001,16 @@ app-three-floor {
   height: auto;
   overflow: hidden;
   box-sizing: border-box;
-  border-radius: clamp(6px, 1.8vw, 10px);
+  border-radius: var(--radius-sm, 4px);
 }
 
-@media (max-width:420px){.app-hub.is-exchange-collapsed,app-exchange-panel.app-hub-swap-stack{--swap-smart-bar-h:clamp(48px,13vw,54px)}}
+/* Hors MVP compact : swap replié peut s’ouvrir un peu. ≤349 garde 32px (LOCK). */
+@media (min-width: 350px) and (max-width: 420px) {
+  .app-hub.is-exchange-collapsed,
+  app-exchange-panel.app-hub-swap-stack {
+    --swap-smart-bar-h: clamp(48px, 13vw, 54px);
+  }
+}
 
 .app-market-card--rate {
   flex: 1 1 0;
@@ -1041,7 +1022,7 @@ app-three-floor {
   max-height: none;
   padding: 0;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
   box-shadow: none;
   overflow: visible;
@@ -1066,10 +1047,6 @@ app-three-floor {
   pointer-events: auto;
   position: relative;
   box-sizing: border-box;
-  transition:
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Swap en piste 3 ; gouttières = pistes 2/4 (pas de margins) */
@@ -1084,7 +1061,7 @@ app-three-floor {
 
 /* Replié : gouttière showcase→dock — hub legacy seulement pour margin */
 .app-hub.is-showcase-collapsed {
-  margin-block-end: var(--stack-section-gap-collapsed, 5px);
+  margin-block-end: var(--stack-section-gap-collapsed, var(--ds-gap-seam));
 }
 
 .app-market-card--rate.is-summary-expandable,
@@ -1104,7 +1081,7 @@ app-three-floor {
   height: 100%;
   max-height: 100%;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
 }
 
 .app-market-stack--rate app-rate-panel {
@@ -1131,9 +1108,6 @@ app-three-floor {
   box-sizing: border-box;
   position: relative;
   z-index: 1;
-  transition:
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .showcase-block__shell {
@@ -1145,12 +1119,12 @@ app-three-floor {
   min-height: 0;
   height: 100%;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: var(--radius-none);
 }
 
 .app-hub-showcase-block .showcase-block__shell.ds-surface.ds-surface--card {
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   box-shadow: var(--ds-surface-shadow);
 }
 
@@ -1170,13 +1144,13 @@ app-three-floor {
   margin: 0;
   padding: 0;
   gap: 0;
-  overflow: visible;
+  overflow: hidden;
   box-sizing: border-box;
   position: relative;
   z-index: 6;
   border: none;
-  border-bottom: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.1);
-  border-radius: 0;
+  border-bottom: 1px solid rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.1);
+  border-radius: var(--radius-none);
   box-shadow: none;
 }
 
@@ -1201,7 +1175,7 @@ app-three-floor {
 .app-hub-showcase-block .showcase-tab-panel .showcase-view--chat,
 .app-hub-showcase-block .showcase-tab-panel .showcase-view--launch {
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -1212,7 +1186,7 @@ app-three-floor {
 .app-hub-showcase-block .showcase-block__shell .showcase-launch__meta-bar,
 .app-hub-showcase-block .showcase-tab-panel .showcase-news__meta-bar,
 .app-hub-showcase-block .showcase-tab-panel .showcase-launch__meta-bar {
-  border-color: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.1);
+  border-color: rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.1);
   background: rgba(var(--ds-surface-base-deep-rgb), 0.22);
 }
 
@@ -1231,26 +1205,27 @@ app-three-floor {
   height: calc(100% - 2px);
   margin: 0;
   padding: 0 0px;
-  border: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.14);
-  border-radius: 4px;
+  border: 1px solid rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.14);
+  border-radius: var(--radius-sm);
   background: rgba(var(--ds-surface-base-deep-rgb), 0.35);
   color: var(--ds-text-primary, var(--text-primary));
   font-family: inherit;
-  font-size: clamp(5px, 1.8vw, 7px);
+  font-size: var(--fs-fallback);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5' height='3' viewBox='0 0 5 3'%3E%3Cpath d='M0 .5l2.5 2L5 .5' fill='none' stroke='%2388aabb' stroke-width='1'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%238a95a5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 2px center;
-  padding-right: 8px;
+  background-size: 12px 12px;
+  padding-right: 16px;
 }
 
 .showcase-meta__filter-select:focus-visible {
-  outline: 1px solid rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.45);
+  outline: 1px solid rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.45);
   outline-offset: 1px;
 }
 
@@ -1268,6 +1243,42 @@ app-three-floor {
   max-width: none;
 }
 
+/* Même géométrie qu’un onglet du dock : une part sur 7, même corps de texte. */
+.app-hub-showcase-block .showcase-header-tabs .showcase-tab {
+  flex: 0 0 calc((100% - 6 * var(--tab-push-gap, 1px)) / 7) !important;
+  width: calc((100% - 6 * var(--tab-push-gap, 1px)) / 7) !important;
+  min-width: 0 !important;
+  max-width: calc((100% - 6 * var(--tab-push-gap, 1px)) / 7) !important;
+  height: auto !important;
+  min-height: 100% !important;
+  max-height: none !important;
+  padding: 0 !important;
+  font-size: var(--fs-shell)!important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.1 !important;
+}
+
+.app-hub-showcase-block .showcase-header-tabs .showcase-tab .showcase-tab__label {
+  font-family: 'Roboto', sans-serif;
+  font-size: var(--fs-label)!important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1.1 !important;
+  transform: skewX(-11deg) !important;
+}
+
+.app-hub-showcase-block .showcase-header-tabs .showcase-tab.is-active .showcase-tab__label {
+  font-weight: 800 !important;
+}
+
+.app-hub-showcase-block:not(.is-showcase-collapsed) .app-showcase-band {
+  flex: 0 0 var(--bottom-stack-panel-height);
+  height: var(--bottom-stack-panel-height);
+  min-height: var(--bottom-stack-panel-height);
+  max-height: var(--bottom-stack-panel-height);
+}
+
 /* Ancien chevron flottant remplacé par app-panel-collapse-control (classe .showcase-toggle conservée). */
 
 .app-hub-showcase-block.is-showcase-collapsed {
@@ -1275,30 +1286,15 @@ app-three-floor {
   min-height: var(--hub-showcase-block-height-collapsed);
   max-height: var(--hub-showcase-block-height-collapsed);
   height: var(--hub-showcase-block-height-collapsed);
-  overflow: visible;
+  overflow: hidden;
   margin-top: 0;
   margin-bottom: 0;
   padding-top: 0;
   padding-bottom: 0;
-  transition:
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.app-hub-showcase-block:not(.is-showcase-collapsed) {
-  transition:
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-hub-showcase-block.is-showcase-collapsed .showcase-block__shell {
-  overflow: visible;
+  overflow: hidden;
   margin-top: 0;
   margin-bottom: 0;
   padding-top: 0;
@@ -1310,7 +1306,7 @@ app-three-floor {
   min-height: var(--showcase-smart-bar-h);
   height: var(--showcase-smart-bar-h);
   max-height: var(--showcase-smart-bar-h);
-  overflow: visible;
+  overflow: hidden;
   margin-top: 0;
   margin-bottom: 0;
   padding-top: 0;
@@ -1319,8 +1315,8 @@ app-three-floor {
 
 .app-hub-showcase-block.is-showcase-collapsed .showcase-tab-panel {
   padding: 0;
-  overflow: visible;
-  border-radius: 0;
+  overflow: hidden;
+  border-radius: var(--radius-none);
   min-height: var(--showcase-smart-bar-h);
   height: var(--showcase-smart-bar-h);
   max-height: var(--showcase-smart-bar-h);
@@ -1329,9 +1325,11 @@ app-three-floor {
 
 .app-hub-showcase-block.is-showcase-collapsed .showcase-tab-panel > * {
   flex: 0 0 100%;
+  min-width: 0;
   min-height: 0;
   height: 100%;
   max-height: 100%;
+  overflow: hidden;
 }
 
 .app-hub-showcase-block.is-showcase-collapsed app-showcase-panel,
@@ -1339,7 +1337,7 @@ app-three-floor {
 .app-hub-showcase-block.is-showcase-collapsed app-showcase-window,
 .app-hub-showcase-block.is-showcase-collapsed .showcase-window,
 .app-hub-showcase-block.is-showcase-collapsed .showcase-window__body {
-  overflow: visible;
+  overflow: hidden;
   min-height: 0;
   height: 100%;
   max-height: 100%;
@@ -1352,7 +1350,7 @@ app-three-floor {
 /* (showcase → dock replié : --stack-gap-showcase-dock-collapsed, défini plus haut) */
 
 .app-hub-showcase-block .app-showcase-band.is-collapsed:has(.collapsed-summary-bar) {
-  overflow: visible;
+  overflow: hidden;
   min-height: var(--showcase-smart-bar-h);
   height: var(--showcase-smart-bar-h);
   max-height: var(--showcase-smart-bar-h);
@@ -1375,17 +1373,10 @@ app-three-floor {
   box-sizing: border-box;
   overflow: hidden;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
   box-shadow: none;
-  transition:
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 220ms ease;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
 }
 
 .app-hub-showcase-block .app-showcase-band:not(.is-collapsed) {
@@ -1440,7 +1431,7 @@ app-three-floor {
   min-width: 0;
   max-width: 100%;
   margin-inline: auto;
-  --faucet-row-h: clamp(16px, 4.5vw, 20px);
+  --faucet-row-h: var(--comp-row-h, 16px);
 }
 
 .app-hub-faucet-slot app-faucet {
@@ -1467,10 +1458,6 @@ app-three-floor {
   padding: 0;
   box-sizing: border-box;
   overflow: hidden;
-  transition:
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .app-dock-stack.is-dock-collapsed {
@@ -1550,13 +1537,9 @@ app-three-floor {
   padding: 0;
   box-sizing: border-box;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
-  box-shadow: var(--ui-glow);
-  transition:
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: none;
 }
 
 .app-dock-band.is-collapsed {
@@ -1572,7 +1555,7 @@ app-three-floor {
 }
 
 .app-dock-band.is-collapsed:has(.dock-summary-bar) {
-  overflow: visible;
+  overflow: hidden;
   min-height: var(--dock-smart-bar-h);
   height: var(--dock-smart-bar-h);
   max-height: var(--dock-smart-bar-h);
@@ -1582,12 +1565,13 @@ app-three-floor {
   flex: 0 0 var(--dock-collapsed-band-h);
   height: var(--dock-collapsed-band-h);
   max-height: var(--dock-collapsed-band-h);
+  overflow: hidden;
 }
 
 .app-dock-band.is-collapsed:has(.dock-summary-bar) app-dock-panel {
   height: 100%;
   max-height: 100%;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .app-dock-band app-dock-panel {
@@ -1779,7 +1763,7 @@ app-three-floor {
 .app-dock-band:not(.is-collapsed)[data-active-panel] .dock-view,
 .app-dock-band:not(.is-collapsed)[data-active-panel] .pending-view {
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -1811,7 +1795,7 @@ app-three-floor {
 .app-showcase-band.is-collapsed:has(.collapsed-summary-bar) app-showcase-panel {
   height: 100%;
   max-height: 100%;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .app-dock-stack app-dock-tabs {
@@ -1911,19 +1895,19 @@ app-exchange-panel:has(.exchange-panel__grid-popover),
 app-exchange-panel:has(.exchange-panel__token-menu),
 app-exchange-panel:has(.token-select--open) {
   overflow: visible;
-  z-index: 25;
+  z-index: var(--z-popover, 25);
 }
 
 .app-hub:has(.token-select--open) {
   overflow: visible;
-  z-index: 100;
+  z-index: var(--z-dropdown, 100);
 }
 
 .app-hub-swap-stack:has(.exchange-panel__grid-popover),
 .app-hub-swap-stack:has(.exchange-panel__token-menu),
 .app-hub-swap-stack:has(.token-select--open) {
   overflow: visible;
-  z-index: 110;
+  z-index: var(--z-dropdown-raised, 110);
 }
 
 app-rate-panel {
@@ -1995,18 +1979,17 @@ app-block-detail-drawer {
 
 .app-status-drawer {
   position: fixed;
-  top: calc(var(--navbar-stack-estimate, 56px) + 8px);
+  top: calc(var(--navbar-stack-estimate, 32px) + 8px);
   right: clamp(6px, 2vw, 12px);
-  z-index: 130;
+  z-index: var(--z-toast, 130);
   display: flex;
   flex-direction: column;
   width: min(88vw, 220px);
   max-height: none;
-  border-radius: 10px;
+  border-radius: var(--radius-md, 8px);
   border: 1px solid rgba(var(--ui-accent-rgb), 0.28);
-  background: rgba(4, 13, 24, 0.97);
+  background: rgba(10, 18, 32, 0.97);
   box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.42),
     0 0 0 1px rgba(var(--ui-accent-rgb), 0.06);
   overflow: hidden;
 }
@@ -2025,10 +2008,10 @@ app-block-detail-drawer {
 
 .app-shell-error-banner {
   position: fixed;
-  top: calc(var(--navbar-stack-estimate, 56px) + 8px);
+  top: calc(var(--navbar-stack-estimate, 32px) + 8px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 125;
+  z-index: var(--z-banner, 125);
   width: min(92vw, 420px);
   pointer-events: none;
 }
@@ -2038,37 +2021,37 @@ app-block-detail-drawer {
   bottom: calc(var(--bottom-dock-h, 52px) + 8px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 120;
+  z-index: var(--z-feedback, 120);
   max-width: min(92vw, 360px);
   padding: 4px 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 255, 136, 0.45);
-  background: rgba(2, 18, 14, 0.94);
-  color: #b8ffd8;
-  font-size: 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(9, 129, 74, 0.45);
+  background: rgba(10, 18, 32, 0.94);
+  color: #09814a;
+  font-size: var(--fs-fallback);
   font-weight: 700;
   line-height: 1.25;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: none;
   pointer-events: none;
 }
 
 .app-quest-feedback.is-info {
-  border-color: rgba(0, 217, 255, 0.45);
-  background: rgba(2, 14, 24, 0.94);
-  color: #baf3ff;
+  border-color: rgba(139, 157, 173, 0.45);
+  background: rgba(10, 18, 32, 0.94);
+  color: #ede7d9;
 }
 
 .app-quest-feedback.is-error {
-  border-color: rgba(255, 96, 96, 0.5);
-  background: rgba(28, 6, 6, 0.94);
-  color: #ffb4b4;
+  border-color: rgba(123, 13, 30, 0.5);
+  background: rgba(10, 18, 32, 0.94);
+  color: #7b0d1e;
 }
 
 /* Écrans compacts en hauteur uniquement (n’affecte pas 390×844, 450×800) */
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
-    --swap-row-h: 11px;
+    --swap-row-h: var(--comp-row-h, 16px);
     --swap-mid-h: 8px;
     --showcase-tab-fusion-overlap: 0px;
     /* Ne pas élargir les gaps — budgets MVP 6px */
@@ -2083,13 +2066,14 @@ app-block-detail-drawer {
 
 @media (min-width: 400px) {
   :host {
-    --swap-row-h: 14px;
+    --swap-row-h: var(--comp-row-h, 16px);
     --swap-mid-h: 11px;
   }
 }
 
-/* Hauteurs fluides désactivées sous 350px — budgets MVP (lock final) priment */
-@media (max-height: 640px) and (min-width: 350px) {
+/* Hauteurs fluides : hors portrait téléphone (le lock ≤480 porte la grille). */
+@media (max-height: 640px) and (min-width: 481px),
+       (max-height: 640px) and (min-width: 350px) and (orientation: landscape) {
   :host {
     --section-stack-gap: clamp(2px, 1vw, 4px);
     --showcase-band-height: max(var(--mvp-showcase-body-h), min(calc(139px * var(--showcase-tab-scale)), 24vh));
@@ -2100,11 +2084,11 @@ app-block-detail-drawer {
   }
 }
 
-/* Ancien couple showcase↔dock fluide : désactivé sous 350px (lock MVP final). */
-@media (min-width: 350px) and (max-width: 449px) and (max-height: 640px) {
+/* Ancien couple showcase↔dock fluide : paysage étroit seulement. */
+@media (min-width: 350px) and (max-width: 449px) and (max-height: 640px) and (orientation: landscape) {
   :host {
     --wallet-display-extra: 0px;
-    --navbar-stack-estimate: calc(var(--ds-zone-navbar, 56px) + var(--ds-navbar-top-inset, 0px));
+    --navbar-stack-estimate: calc(var(--ds-zone-navbar, 32px) + var(--ds-navbar-top-inset, 0px));
     --market-height: clamp(134px, 21.5vh, 152px);
     --showcase-band-height-base: clamp(127px, 18vh, 159px);
     --showcase-tab-fusion-overlap: 0px;
@@ -2134,8 +2118,8 @@ app-block-detail-drawer {
   }
 }
 
-/* Dock legacy clamps — hors MVP ≤349 (budgets verrouillés plus bas). */
-@media (min-width: 350px) and (max-width: 449px) {
+/* Dock legacy clamps — paysage étroit. Portrait ≤480 = lock. */
+@media (min-width: 350px) and (max-width: 449px) and (orientation: landscape) {
   :host {
     --dock-panel-height: clamp(118px, 22vh, calc(175px * 0.9));
     --dock-hub-tab-h: clamp(12px, 3.8vw, 16px);
@@ -2155,14 +2139,15 @@ app-block-detail-drawer {
   }
 }
 
-@media (max-height: 520px) and (min-width: 350px) {
+@media (max-height: 520px) and (min-width: 481px),
+       (max-height: 520px) and (min-width: 350px) and (orientation: landscape) {
   :host {
     --showcase-band-height: max(var(--mvp-showcase-body-h), min(calc(139px * var(--showcase-tab-scale)), 22vh));
     --section-stack-gap: 0px;
   }
 }
 
-/* Largeurs 250–500px : voir src/narrow-viewport.css (paliers progressifs) */
+/* Paliers nommés : --bp-* dans design-system-tokens.css (compact ≤349, mid, roomy, desktop). */
 
 @media (prefers-reduced-motion: reduce) {
   * {
@@ -2199,13 +2184,13 @@ app-block-detail-drawer {
   .app-hub { column-gap: var(--panel-column-gap); }
 }
 @media (max-width: 399px) {
-  .app-showcase-band { border-radius: 0 !important; }
+  .app-showcase-band { border-radius: var(--radius-none) !important; }
 }
 @media (max-width: 349px) {
   .navbar-faucet-slot { min-width: 0; }
 }
 @media (max-width: 299px) {
-  .app-dock-stack { border-radius: 0 !important; }
+  .app-dock-stack { border-radius: var(--radius-none) !important; }
 }
 
 /* === Viewport MVP 250×550 — zero-scroll, budgets tokens === */
@@ -2218,19 +2203,19 @@ app-block-detail-drawer {
     --band-air-gap: 2px;
     --section-stack-gap: 0px;
     --mvp-swap-h: var(--ds-zone-exchange, 32px);
-    --mvp-chart-h: var(--ds-zone-chart, 120px);
-    --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
-    --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
+    --mvp-chart-h: var(--ds-zone-chart, 80px);
+    --mvp-showcase-body-h: var(--ds-zone-showcase-body, 80px);
+    --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 80px);
     --market-exchange-strip-h: var(--mvp-swap-h);
     --market-exchange-height-estimate: var(--mvp-swap-h);
     --market-chart-height-expanded: var(--mvp-chart-h);
     --market-chart-height: var(--mvp-chart-h);
     --showcase-band-height: var(--mvp-showcase-body-h);
-    --showcase-hub-tab-h: var(--ds-zone-showcase-header, 14px);
-    --showcase-hub-header-h: var(--ds-zone-showcase-header, 14px);
-    --showcase-smart-bar-h: 12.5px;
-    --chart-smart-bar-h: 10px;
-    --dock-smart-bar-h: 12.5px;
+    --showcase-hub-tab-h: var(--ds-zone-showcase-header, 16px);
+    --showcase-hub-header-h: var(--ds-zone-showcase-header, 16px);
+    --showcase-smart-bar-h: var(--comp-smart-bar-h, 16px);
+    --chart-smart-bar-h: var(--comp-smart-bar-h, 16px);
+    --dock-smart-bar-h: var(--comp-smart-bar-h, 16px);
     --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
     --hub-showcase-block-height-collapsed: calc(
       var(--showcase-hub-header-h) + var(--showcase-smart-bar-h)
@@ -2242,7 +2227,7 @@ app-block-detail-drawer {
     --market-chart-block-height-collapsed: var(--chart-smart-bar-h);
     --market-chart-collapsed-h: var(--chart-smart-bar-h);
     --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
-    --floor-canvas-height: var(--ds-zone-floor-peek, 220px);
+    --floor-canvas-height: var(--ds-zone-floor-peek, 200px);
     --floor-peek-height: var(--floor-canvas-height);
     --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
     --showcase-tab-gap: 0px;
@@ -2254,8 +2239,8 @@ app-block-detail-drawer {
       var(--showcase-hub-header-h) + var(--bottom-stack-panel-height)
     );
     --bottom-stack-active-height: var(--bottom-stack-height-expanded);
-    --stack-section-gap: 2px;
-    --navbar-hub-gap: 2px;
+    --stack-section-gap: var(--ds-gap-seam);
+    --navbar-hub-gap: var(--ds-gap-seam);
   }
 
   .app-shell {
@@ -2298,7 +2283,7 @@ app-block-detail-drawer {
 
   .showcase-header {
     z-index: 6;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .app-showcase-band__window {
@@ -2317,7 +2302,7 @@ app-block-detail-drawer {
     height: var(--showcase-hub-tab-h);
     min-height: var(--showcase-hub-tab-h);
     max-height: var(--showcase-hub-tab-h);
-    overflow: visible;
+    overflow: hidden;
   }
 
   .navbar-faucet-slot {
@@ -2339,13 +2324,13 @@ app-block-detail-drawer {
   :host {
     --band-air-gap: 2px;
     --mvp-swap-h: var(--ds-zone-exchange, 32px);
-    --mvp-chart-h: var(--ds-zone-chart, 120px);
-    --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
-    --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
+    --mvp-chart-h: var(--ds-zone-chart, 80px);
+    --mvp-showcase-body-h: var(--ds-zone-showcase-body, 80px);
+    --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 80px);
     --market-chart-height: var(--mvp-chart-h);
     --showcase-band-height: var(--mvp-showcase-body-h);
     --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
-    --floor-peek-height: var(--ds-zone-floor-peek, 220px);
+    --floor-peek-height: var(--ds-zone-floor-peek, 200px);
     --floor-canvas-height: var(--floor-peek-height);
     --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
     --showcase-tab-gap: 0px;
@@ -2363,7 +2348,7 @@ app-block-detail-drawer {
 
   .showcase-header {
     z-index: 6;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .app-showcase-band__window {
@@ -2423,8 +2408,8 @@ app-block-detail-drawer {
   }
 }
 
-/* === Viewport 399×640px === */
-@media (min-width: 351px) and (max-width: 399px) {
+/* === Viewport 399×640px — paysage. Portrait = lock. === */
+@media (min-width: 351px) and (max-width: 399px) and (orientation: landscape) {
   :host {
     --showcase-band-height: var(--nv-showcase-height, max(var(--mvp-showcase-body-h), min(calc(135px * var(--showcase-tab-scale)), 22vh)));
     --faucet-band-height: auto;
@@ -2434,7 +2419,7 @@ app-block-detail-drawer {
   }
 }
 
-@media (min-width: 351px) and (max-width: 399px) and (max-height: 640px) {
+@media (min-width: 351px) and (max-width: 399px) and (max-height: 640px) and (orientation: landscape) {
   .app-showcase-band {
     z-index: 1;
     overflow: hidden;
@@ -2476,8 +2461,8 @@ app-block-detail-drawer {
   }
 }
 
-/* === Viewport 449×700px === */
-@media (min-width: 400px) and (max-width: 449px) {
+/* === Viewport 449×700px — paysage. Portrait = lock. === */
+@media (min-width: 400px) and (max-width: 449px) and (orientation: landscape) {
   :host {
     --showcase-band-height: var(--nv-showcase-height, max(var(--mvp-showcase-body-h), min(calc(131px * var(--showcase-tab-scale)), 20vh)));
     --faucet-band-height: auto;
@@ -2487,7 +2472,7 @@ app-block-detail-drawer {
   }
 }
 
-@media (min-width: 400px) and (max-width: 449px) and (max-height: 700px) {
+@media (min-width: 400px) and (max-width: 449px) and (max-height: 700px) and (orientation: landscape) {
   .app-showcase-band {
     z-index: 1;
     overflow: hidden;
@@ -2537,13 +2522,13 @@ app-block-detail-drawer {
     --panel-column-gap: 0px;
     --section-stack-gap: 0px;
     --band-air-gap: 0px;
-    --band-inline-pad: 2px;
-    --navbar-inline-overflow: 2px;
-    --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
-    --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
-    --navbar-hub-gap: 2px;
+    --band-inline-pad: 0px;
+    --navbar-inline-overflow: 0px;
+    --navbar-inline-pad: var(--ds-shell-gutter, 2px);
+    --swap-inline-pad: var(--ds-shell-gutter, 2px);
+    --navbar-hub-gap: var(--ds-gap-seam);
     --hub-market-internal-gap: 2px;
-    --stack-section-gap: 2px;
+    --stack-section-gap: var(--ds-gap-seam);
     --stack-section-gap-collapsed: 2px;
     --hub-swap-showcase-gap: var(--stack-section-gap);
     --hub-market-showcase-gap: var(--stack-section-gap);
@@ -2553,19 +2538,19 @@ app-block-detail-drawer {
     --stack-gap-showcase-dock-collapsed: var(--stack-section-gap-collapsed);
     --stack-gap-dock-graph-collapsed: var(--stack-section-gap-collapsed);
     --hub-market-internal-gap-collapsed: var(--stack-section-gap-collapsed);
-    --showcase-dock-offset: 1px;
+    --showcase-dock-offset: var(--ds-gap-seam, 2px);
     --band-external-gap: 0px;
     --mvp-swap-h: var(--ds-zone-exchange, 32px);
-    --mvp-chart-h: var(--ds-zone-chart, 120px);
-    --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
-    --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
+    --mvp-chart-h: var(--ds-zone-chart, 80px);
+    --mvp-showcase-body-h: var(--ds-zone-showcase-body, 80px);
+    --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 80px);
     --market-exchange-height: var(--mvp-swap-h);
     --market-exchange-height-estimate: var(--mvp-swap-h);
     --market-chart-height-expanded: var(--mvp-chart-h);
     --chart-stack-header-h: 0px;
-    --chart-smart-bar-h: 10px;
-    --showcase-smart-bar-h: 12.5px;
-    --dock-smart-bar-h: 12.5px;
+    --chart-smart-bar-h: var(--comp-smart-bar-h, 16px);
+    --showcase-smart-bar-h: var(--comp-smart-bar-h, 16px);
+    --dock-smart-bar-h: var(--comp-smart-bar-h, 16px);
     --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
     --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
     --hub-showcase-block-height-collapsed: calc(
@@ -2584,12 +2569,12 @@ app-block-detail-drawer {
     --market-height: var(--market-band-height);
     --hub-wallet-gap: 0px;
     --wallet-display-extra: 0px;
-    --floor-peek-height: var(--ds-zone-floor-peek, 220px);
+    --floor-peek-height: var(--ds-zone-floor-peek, 200px);
     --floor-canvas-height: var(--floor-peek-height);
     --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
     --shell-vertical-gaps: 4px;
-    --showcase-hub-tab-h: var(--ds-zone-showcase-header, 14px);
-    --showcase-hub-header-h: var(--ds-zone-showcase-header, 14px);
+    --showcase-hub-tab-h: var(--ds-zone-showcase-header, 16px);
+    --showcase-hub-header-h: var(--ds-zone-showcase-header, 16px);
     --showcase-band-height: var(--mvp-showcase-body-h);
     --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
     --hub-showcase-block-height: calc(
@@ -2650,7 +2635,7 @@ app-block-detail-drawer {
     min-height: 0;
     overflow: hidden;
     border: none;
-    border-radius: 0;
+    border-radius: var(--radius-none);
   }
 
   .app-market-stack--rate:not(.is-chart-collapsed) {
@@ -2710,8 +2695,10 @@ app-block-detail-drawer {
   }
 }
 
-/* === LOCK FINAL — hiérarchie spatiale MVP 250×550 (cascade last, −1px/zone) === */
-@media (max-width: 349px) {
+/* === LOCK FINAL — grille 250×550.
+   Canon ≤349 (toute orientation) et téléphone portrait ≤480. === */
+@media (max-width: 349px),
+       (orientation: portrait) and (max-width: 480px) {
   :host {
     height: 100% !important;
     min-height: 0;
@@ -2719,13 +2706,19 @@ app-block-detail-drawer {
     overflow: hidden !important;
     --band-air-gap: 0px;
     --section-stack-gap: 0px;
-    --band-inline-pad: 2px;
-    --navbar-inline-overflow: 2px;
-    --navbar-inline-pad: max(0px, calc(var(--band-inline-pad) - var(--navbar-inline-overflow)));
-    --swap-inline-pad: calc(var(--navbar-inline-pad) + 0px);
-    --navbar-hub-gap: 2px;
+    /* Gouttière unique 2px. Navbar incluse. Pas de second inset sur le dock. */
+    --app-side-gutter: var(--ds-shell-gutter, 2px);
+    --app-side-gutter-exchange: var(--ds-shell-gutter, 2px);
+    --app-side-gutter-band: var(--ds-shell-gutter, 2px);
+    --band-inline-pad: 0px;
+    --navbar-inline-overflow: 0px;
+    --navbar-inline-pad: var(--ds-shell-gutter, 2px);
+    --swap-inline-pad: var(--ds-shell-gutter, 2px);
+    --panel-action-menu-w: 24px;
+    --shell-inline-gap: 0px;
+    --navbar-hub-gap: var(--ds-gap-seam);
     --hub-market-internal-gap: 2px;
-    --stack-section-gap: 2px;
+    --stack-section-gap: var(--ds-gap-seam);
     --stack-section-gap-collapsed: 2px;
     --hub-swap-showcase-gap: var(--stack-section-gap);
     --hub-market-showcase-gap: var(--stack-section-gap);
@@ -2736,9 +2729,9 @@ app-block-detail-drawer {
     --stack-gap-dock-graph-collapsed: var(--stack-section-gap-collapsed);
     --hub-market-internal-gap-collapsed: var(--stack-section-gap-collapsed);
     --mvp-swap-h: var(--ds-zone-exchange, 32px);
-    --mvp-chart-h: var(--ds-zone-chart, 120px);
-    --mvp-showcase-body-h: var(--ds-zone-showcase-body, 108px);
-    --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 118px);
+    --mvp-chart-h: var(--ds-zone-chart, 80px);
+    --mvp-showcase-body-h: var(--ds-zone-showcase-body, 80px);
+    --mvp-bottom-panel-h: var(--ds-zone-bottom-panel, 80px);
     --market-exchange-strip-h: var(--mvp-swap-h);
     --market-exchange-height: var(--mvp-swap-h);
     --market-exchange-height-estimate: var(--mvp-swap-h);
@@ -2748,12 +2741,12 @@ app-block-detail-drawer {
       var(--mvp-swap-h) + var(--mvp-chart-h) + var(--hub-market-internal-gap)
     );
     --market-height: var(--market-band-height);
-    --showcase-hub-tab-h: var(--ds-zone-showcase-header, 14px);
-    --showcase-hub-header-h: var(--ds-zone-showcase-header, 14px);
+    --showcase-hub-tab-h: var(--ds-zone-showcase-header, 16px);
+    --showcase-hub-header-h: var(--ds-zone-showcase-header, 16px);
     --showcase-band-height: var(--mvp-showcase-body-h);
-    --showcase-smart-bar-h: 12.5px;
-    --chart-smart-bar-h: 10px;
-    --dock-smart-bar-h: 12.5px;
+    --showcase-smart-bar-h: var(--comp-smart-bar-h, 16px);
+    --chart-smart-bar-h: var(--comp-smart-bar-h, 16px);
+    --dock-smart-bar-h: var(--comp-smart-bar-h, 16px);
     --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
     --hub-showcase-block-height-collapsed: calc(
       var(--showcase-hub-header-h) + var(--showcase-smart-bar-h)
@@ -2776,10 +2769,40 @@ app-block-detail-drawer {
     --bottom-dock-height: 16px;
     --dock-hub-tab-h: 16px;
     --dock-panel-height: var(--mvp-bottom-panel-h);
-    --floor-peek-height: var(--ds-zone-floor-peek, 220px);
-    --floor-canvas-height: var(--floor-peek-height);
     --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
     --navbar-stack-estimate: calc(var(--ds-zone-navbar, 32px) + var(--ds-navbar-top-inset, 0px));
+    /* Hauteurs actives. :host:has() les rabaisse quand une bande est repliée. */
+    --shell-exchange-h: var(--mvp-swap-h);
+    --shell-showcase-h: var(--hub-showcase-block-height);
+    --shell-dock-h: var(--bottom-stack-height-expanded);
+    --shell-chart-h: var(--market-chart-height);
+    --shell-occupied: calc(
+      var(--navbar-stack-estimate) + var(--navbar-hub-gap) +
+      var(--shell-exchange-h) + var(--stack-section-gap) +
+      var(--shell-showcase-h) + var(--stack-section-gap) +
+      var(--shell-dock-h) + var(--stack-section-gap) +
+      var(--shell-chart-h) + var(--graph-floor-gap)
+    );
+    /* Reste du viewport, moins la safe-area basse (le floor est posé au-dessus).
+       À 550, safe-area 0, tout ouvert = 200. */
+    --floor-peek-height: max(0px, calc(100svh - var(--shell-occupied) - var(--ds-safe-bottom, 0px)));
+    --floor-canvas-height: var(--floor-peek-height);
+  }
+
+  :host:has(.app-main-layout.is-showcase-collapsed) {
+    --shell-showcase-h: var(--hub-showcase-block-height-collapsed);
+  }
+
+  :host:has(.app-main-layout.is-dock-collapsed) {
+    --shell-dock-h: var(--bottom-stack-height-collapsed);
+  }
+
+  :host:has(.app-main-layout.is-chart-collapsed) {
+    --shell-chart-h: var(--market-chart-collapsed-h);
+  }
+
+  app-exchange-panel.app-hub-swap-stack {
+    --swap-smart-bar-h: var(--mvp-swap-h, 32px);
   }
 
   /* 250×550 : pile zero-scroll swap → showcase → dock → graph → floor */
@@ -2809,7 +2832,7 @@ app-block-detail-drawer {
     max-height: none !important;
     min-height: 0;
     overflow: hidden !important;
-    padding-bottom: calc(var(--floor-peek-height, 220px) + var(--graph-floor-gap, 6px)) !important;
+    padding-bottom: calc(var(--floor-peek-height, 200px) + var(--graph-floor-gap, 6px)) !important;
   }
 
   .app-main-layout > app-swap,
@@ -2889,5 +2912,183 @@ app-block-detail-drawer {
     height: var(--showcase-band-height);
     max-height: var(--showcase-band-height);
     min-height: var(--showcase-band-height);
+  }
+}
+
+/*
+ * Portrait téléphone moyen/haut (436×653, 390×844…) :
+ * le LOCK ci-dessus impose encore les budgets micro 250×550 sur :host
+ * (floor, smart-bars, --fs-*). On les aligne sur phone-tall pour que
+ * shell-occupied / floor-peek et la chrome restent cohérents.
+ */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 600px) {
+  :host {
+    --phone-tall-tab: 22px;
+    --phone-tall-panel: clamp(132px, 20vh, 190px);
+    --phone-tall-chart: clamp(56px, 9vh, 88px);
+    --phone-tall-swap: 36px;
+    --phone-tall-font: 10px;
+    --phone-tall-font-body: 11px;
+
+    --fs-label: var(--phone-tall-font);
+    --fs-shell: var(--phone-tall-font);
+    --fs-chart: var(--phone-tall-font);
+    --fs-price: var(--phone-tall-font);
+    --fs-title: var(--phone-tall-font);
+    --fs-chain: var(--phone-tall-font);
+    --fs-chat-chrome: var(--phone-tall-font);
+    --fs-module: var(--phone-tall-font-body);
+    --fs-chat-msg: var(--phone-tall-font-body);
+    --fs-form: var(--phone-tall-font-body);
+    --fs-body: var(--phone-tall-font-body);
+
+    --comp-hud-h: 22px;
+    --comp-row-h: 22px;
+    --comp-btn-hud-h: 22px;
+    --comp-smart-bar-h: 22px;
+    --comp-ticker-row-h: 22px;
+    --comp-logo-row-h: 22px;
+    --ds-zone-navbar: 44px;
+    --ds-zone-exchange: var(--phone-tall-swap);
+    --ds-zone-showcase-header: var(--phone-tall-tab);
+    --ds-zone-showcase-body: var(--phone-tall-panel);
+    --ds-zone-bottom-panel: var(--phone-tall-panel);
+    --ds-zone-chart: var(--phone-tall-chart);
+
+    --mvp-swap-h: var(--phone-tall-swap);
+    --mvp-chart-h: var(--phone-tall-chart);
+    --mvp-showcase-body-h: var(--phone-tall-panel);
+    --mvp-bottom-panel-h: var(--phone-tall-panel);
+    --market-exchange-strip-h: var(--mvp-swap-h);
+    --market-exchange-height: var(--mvp-swap-h);
+    --market-exchange-height-estimate: var(--mvp-swap-h);
+    --market-chart-height-expanded: var(--mvp-chart-h);
+    --market-chart-height: var(--mvp-chart-h);
+    --showcase-hub-tab-h: var(--phone-tall-tab);
+    --showcase-hub-header-h: var(--phone-tall-tab);
+    --showcase-band-height: var(--mvp-showcase-body-h);
+    --showcase-smart-bar-h: var(--phone-tall-tab);
+    --chart-smart-bar-h: var(--phone-tall-tab);
+    --dock-smart-bar-h: var(--phone-tall-tab);
+    --showcase-collapsed-band-h: var(--showcase-smart-bar-h);
+    --hub-showcase-block-height-collapsed: calc(
+      var(--showcase-hub-header-h) + var(--showcase-smart-bar-h)
+    );
+    --bottom-stack-height-collapsed: calc(
+      var(--showcase-hub-header-h) + var(--dock-smart-bar-h)
+    );
+    --market-chart-card-collapsed-h: var(--chart-smart-bar-h);
+    --market-chart-block-height-collapsed: var(--chart-smart-bar-h);
+    --market-chart-collapsed-h: var(--chart-smart-bar-h);
+    --bottom-stack-panel-height: var(--mvp-bottom-panel-h);
+    --paired-panel-block-height: var(--mvp-bottom-panel-h);
+    --hub-showcase-block-height: calc(
+      var(--showcase-hub-header-h) + var(--showcase-band-height)
+    );
+    --bottom-stack-height-expanded: calc(
+      var(--showcase-hub-header-h) + var(--bottom-stack-panel-height)
+    );
+    --bottom-stack-active-height: var(--bottom-stack-height-expanded);
+    --bottom-dock-height: var(--phone-tall-tab);
+    --dock-hub-tab-h: var(--phone-tall-tab);
+    --dock-panel-height: var(--mvp-bottom-panel-h);
+    --navbar-stack-estimate: calc(var(--ds-zone-navbar) + var(--ds-navbar-top-inset, 0px));
+    --shell-exchange-h: var(--mvp-swap-h);
+    --shell-showcase-h: var(--hub-showcase-block-height);
+    --shell-dock-h: var(--bottom-stack-height-expanded);
+    --shell-chart-h: var(--market-chart-height);
+  }
+}
+
+/* Gouttières par bande. La navbar reste pleine largeur. */
+.app-shell {
+  padding-inline: 0;
+}
+
+.app-main-layout {
+  padding-inline: 0;
+  box-sizing: border-box;
+}
+
+.app-main-layout > app-swap,
+.app-main-layout > .app-swap-section {
+  padding-inline: var(--app-side-gutter-exchange, calc(var(--app-side-gutter, 5%) - 2%));
+  box-sizing: border-box;
+}
+
+.app-main-layout > app-showcase-tab-showcase,
+.app-main-layout > .app-showcase-tab-showcase-section,
+.app-main-layout > app-dock-tabs-dock-tabs,
+.app-main-layout > .app-dock-tabs-section,
+.app-main-layout > app-graph,
+.app-main-layout > .app-graph-section {
+  padding-inline: var(--app-side-gutter-band, calc(var(--app-side-gutter, 5%) - 1%));
+  box-sizing: border-box;
+}
+
+.app-main-layout .app-bottom-stack,
+.app-main-layout .app-hub {
+  padding-inline: 0;
+}
+
+/* Hors portrait téléphone : shim mid (hauteurs historiques, gouttière %).
+   Portrait ≤480 porte le lock, pas ce bloc. */
+@media (min-width: 350px) and (orientation: landscape),
+       (min-width: 481px) {
+  :host {
+    --mvp-chart-h: var(--ds-zone-chart-mid, 120px);
+    --mvp-showcase-body-h: var(--ds-zone-showcase-body-mid, 106px);
+    --mvp-bottom-panel-h: var(--ds-zone-bottom-panel-mid, 116px);
+    --floor-canvas-height: var(--ds-zone-floor-peek-mid, 220px);
+    --floor-peek-height: var(--floor-canvas-height);
+    --app-side-gutter: 4%;
+    --app-side-gutter-exchange: calc(var(--app-side-gutter) - 2%);
+    --app-side-gutter-band: calc(var(--app-side-gutter) - 1%);
+    --navbar-inline-pad: 0px;
+    --swap-inline-pad: 0px;
+    --band-inline-pad: 0px;
+  }
+}
+
+/* Grande fenêtre : voir styles/dock-shell.css (hors encapsulation). */
+
+/*
+ * Écran court, même grille. Tout ouvert occupe 350 px ; le floor lisible
+ * commence à 140. On ne comprime donc pas à 640 ni à 560 (le floor y est
+ * encore large). Seuils = hauteur où le floor canon passerait sous 140,
+ * puis par pas de 16. Les rangées chrome (16) ne bougent pas.
+ * En dessous, le floor suit la formule jusqu’à 0.
+ */
+@media (max-height: 489px) and (max-width: 349px),
+       (max-height: 489px) and (orientation: portrait) and (max-width: 480px) {
+  :host {
+    --mvp-chart-h: var(--ds-zone-chart-short, 64px);
+  }
+}
+
+@media (max-height: 473px) and (max-width: 349px),
+       (max-height: 473px) and (orientation: portrait) and (max-width: 480px) {
+  :host {
+    --mvp-chart-h: var(--ds-zone-chart-short, 64px);
+    --mvp-showcase-body-h: var(--ds-zone-body-short, 64px);
+    --mvp-bottom-panel-h: var(--ds-zone-body-short, 64px);
+  }
+}
+
+@media (max-height: 441px) and (max-width: 349px),
+       (max-height: 441px) and (orientation: portrait) and (max-width: 480px) {
+  :host {
+    --mvp-chart-h: var(--ds-zone-band-min, 48px);
+    --mvp-showcase-body-h: var(--ds-zone-body-short, 64px);
+    --mvp-bottom-panel-h: var(--ds-zone-body-short, 64px);
+  }
+}
+
+@media (max-height: 425px) and (max-width: 349px),
+       (max-height: 425px) and (orientation: portrait) and (max-width: 480px) {
+  :host {
+    --mvp-chart-h: var(--ds-zone-band-min, 48px);
+    --mvp-showcase-body-h: var(--ds-zone-band-min, 48px);
+    --mvp-bottom-panel-h: var(--ds-zone-band-min, 48px);
   }
 }

@@ -40,44 +40,41 @@
   margin: 0;
   padding: var(--nv-brand-chip-pad-y, 0) var(--nv-brand-chip-pad-right, 0.26rem)
     var(--nv-brand-chip-pad-y, 0) var(--nv-brand-chip-pad-left, 0.22rem);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   border: none;
-  background: rgba(0, 0, 0, 0.26);
+  background: rgba(10, 18, 32, 0.26);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 2px 0 0 var(--network-trust-accent, rgba(var(--navbar-led-online-rgb, 57, 255, 20), 0.55));
+    inset 0 0 0 1px rgba(237, 231, 217, 0.05),
+    inset 2px 0 0 var(--network-trust-accent, rgba(var(--navbar-led-online-rgb, 9, 129, 74), 0.55));
   cursor: pointer;
   font: inherit;
   color: inherit;
   line-height: 1;
   white-space: nowrap;
-  transition:
-    background 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
+  transition: background var(--motion-state) var(--motion-ease-state), transform var(--motion-state) var(--motion-ease-state);
 }
 
 .network-trust-chip:hover {
-  background: rgba(0, 0, 0, 0.34);
+  background: rgba(10, 18, 32, 0.34);
   transform: scale(1.02);
 }
 
 .network-trust-chip.is-panel-open {
-  background: rgba(0, 0, 0, 0.38);
+  background: rgba(10, 18, 32, 0.38);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
-    inset 2px 0 0 var(--network-trust-accent, rgba(var(--success-rgb, 46, 204, 138), 0.72));
+    inset 0 0 0 1px rgba(237, 231, 217, 0.1),
+    inset 2px 0 0 var(--network-trust-accent, rgba(var(--success-rgb, 9, 129, 74), 0.72));
 }
 
 .network-trust-chip:focus-visible {
   outline: none;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 0 0 2px rgba(var(--nv-cyan-rgb, 0, 245, 255), 0.35);
+    inset 0 0 0 1px rgba(237, 231, 217, 0.08),
+    0 0 0 2px rgba(var(--nv-cyan-rgb, 139, 157, 173), 0.35);
 }
 
 .network-trust-chip__led {
-  background: var(--network-trust-led, var(--success, #2ecc8a));
+  background: var(--network-trust-led, var(--success, #09814a));
   box-shadow: none;
 }
 
@@ -88,56 +85,65 @@
 
 .network-trust-chip__label {
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--nv-brand-chip-font, 0.25rem);
+  font-size: var(--fs-shell);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ds-text-primary, #e8ecf0);
+  color: var(--ds-text-primary, #ede7d9);
 }
 
 .network-trust-chip__detail {
   font-family: var(--ds-font-mono, var(--font-body));
-  font-size: var(--nv-brand-chip-font, 0.25rem);
+  font-size: var(--fs-shell);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
-  color: var(--ds-text-muted, #8b929e);
+  color: var(--ds-text-secondary, #8b9dad);
 }
 
-.network-trust-chip.is-live {
-  --network-trust-accent: rgba(var(--success-rgb, 46, 204, 138), 0.55);
-  --network-trust-led: var(--success, #2ecc8a);
+/*
+ * Voyant Direct — priorité unique via is-led-* :
+ * orange = anonyme, vert = connecté, rouge = API/admin KO.
+ */
+.network-trust-chip.is-led-orange {
+  --network-trust-accent: rgba(213, 160, 33, 0.65);
+  --network-trust-led: #d5a021;
 }
 
-.network-trust-chip.is-live .network-trust-chip__label {
-  color: var(--ds-text-primary, #e8eef5);
+.network-trust-chip.is-led-orange .network-trust-chip__label {
+  color: #d5a021;
+}
+
+.network-trust-chip.is-led-green {
+  --network-trust-accent: rgba(var(--success-rgb, 9, 129, 74), 0.55);
+  --network-trust-led: var(--success, #09814a);
+}
+
+.network-trust-chip.is-led-green .network-trust-chip__label {
+  color: var(--ds-text-primary, #ede7d9);
   font-weight: 700;
 }
 
-.network-trust-chip.is-slow {
-  --network-trust-accent: rgba(255, 179, 71, 0.62);
-  --network-trust-led: #ffb347;
+.network-trust-chip.is-led-red {
+  --network-trust-accent: rgba(123, 13, 30, 0.62);
+  --network-trust-led: #7b0d1e;
 }
 
-.network-trust-chip.is-slow .network-trust-chip__label {
-  color: #ffd9a0;
+.network-trust-chip.is-led-red .network-trust-chip__label {
+  color: #7b0d1e;
 }
 
-.network-trust-chip.is-offline {
-  --network-trust-accent: rgba(255, 107, 138, 0.62);
-  --network-trust-led: #ff6b8a;
+.network-trust-chip.is-led-checking {
+  --network-trust-accent: rgba(var(--nv-cyan-rgb, 139, 157, 173), 0.45);
+  --network-trust-led: rgba(var(--nv-cyan-rgb, 139, 157, 173), 0.75);
 }
 
-.network-trust-chip.is-offline .network-trust-chip__label {
-  color: #ffb8c9;
+.network-trust-chip.is-led-green .network-trust-chip__led,
+.network-trust-chip.is-led-orange .network-trust-chip__led {
+  animation: network-trust-pulse 2s ease-in-out infinite;
 }
 
-.network-trust-chip.is-checking {
-  --network-trust-accent: rgba(var(--nv-cyan-rgb, 0, 245, 255), 0.45);
-  --network-trust-led: rgba(var(--nv-cyan-rgb, 0, 245, 255), 0.75);
-}
-
-.network-trust-chip.is-checking .network-trust-chip__led {
+.network-trust-chip.is-led-checking .network-trust-chip__led {
   animation: network-trust-pulse 1.2s ease-in-out infinite;
 }
 
@@ -170,18 +176,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .network-trust-chip:hover {
-    transform: none;
-  }
-
-  .network-trust-chip.is-live .network-trust-chip__led,
-  .network-trust-chip.is-stream-live .network-trust-chip__led,
-  .network-trust-chip.is-checking .network-trust-chip__led {
-    animation: none;
-  }
-}
-
 @media (max-width: 349px) {
   .network-trust-chip {
     padding: 0 0.24rem 0 0.2rem;
@@ -189,7 +183,7 @@
   }
 
   .network-trust-chip__label {
-    font-size: 0.25rem;
+    font-size: var(--fs-label);
   }
 
   .network-trust-chip__detail {
@@ -226,7 +220,9 @@
 
   .network-trust-chip.is-live .network-trust-chip__led,
   .network-trust-chip.is-stream-live .network-trust-chip__led,
-  .network-trust-chip.is-checking .network-trust-chip__led {
+  .network-trust-chip.is-led-green .network-trust-chip__led,
+  .network-trust-chip.is-led-orange .network-trust-chip__led,
+  .network-trust-chip.is-led-checking .network-trust-chip__led {
     animation: none;
   }
 }

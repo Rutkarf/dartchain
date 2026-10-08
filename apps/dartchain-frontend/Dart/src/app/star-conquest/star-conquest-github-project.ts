@@ -1,5 +1,5 @@
 /**
- * Star Conquest ↔ GitHub Project (colonnes produit).
+ * Conquête stellaire ↔ GitHub Project (colonnes produit).
  *
  * Audit : 2026-08-21 — codebase `improveDynamiqueBar@3d441c9` + rendu
  * https://dartchain.pages.dev (bundle main, catalogue sc-*).

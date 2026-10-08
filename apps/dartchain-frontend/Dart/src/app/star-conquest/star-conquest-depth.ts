@@ -1,5 +1,5 @@
 /**
- * Couches de profondeur Star Conquest — taille / opacite / vitesse / parallaxe.
+ * Couches de profondeur Conquête stellaire — taille / opacite / vitesse / parallaxe.
  * Camera typique : z ≈ 120 (palier produit). Plus le Z monde est bas, plus l’élément est lointain.
  */
 
@@ -35,7 +35,7 @@ export const STAR_DEPTH_LAYERS: Record<StarDepthLayerId, StarDepthLayerConfig> =
     /** ~22–40 px à fov 75 / cam z160 — dérive latérale vraiment lisible. */
     driftAmp: 14,
     parallax: 0.05,
-    color: 0xffffff,
+    color: 0xede7d9,
     count: 35,
   },
   far: {
@@ -47,7 +47,7 @@ export const STAR_DEPTH_LAYERS: Record<StarDepthLayerId, StarDepthLayerConfig> =
     driftSpeed: 0.22,
     driftAmp: 1.6,
     parallax: 0.006,
-    color: 0x3a4558,
+    color: 0x18314f,
     count: 0,
   },
   mid: {
@@ -59,7 +59,7 @@ export const STAR_DEPTH_LAYERS: Record<StarDepthLayerId, StarDepthLayerConfig> =
     driftSpeed: 0.42,
     driftAmp: 3.2,
     parallax: 0.024,
-    color: 0x5a8aa8,
+    color: 0x8a95a5,
     count: 0,
   },
   near: {
@@ -71,7 +71,7 @@ export const STAR_DEPTH_LAYERS: Record<StarDepthLayerId, StarDepthLayerConfig> =
     driftSpeed: 0.58,
     driftAmp: 2.8,
     parallax: 0.055,
-    color: 0x9a8cc8,
+    color: 0x8a95a5,
     count: 0,
   },
 };

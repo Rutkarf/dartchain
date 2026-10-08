@@ -3,7 +3,7 @@ import { RUNNER_CONFIG } from './runner.config';
 
 /**
  * Surface type « planète » : cylindre d’axe X (latéral).
- * progress=0 → (0,0,0) ; avance → −Z avec y qui s’abaisse légèrement (horizon).
+ * progress=0 → (0, 0, 0) ; avance → −Z avec y qui s’abaisse légèrement (horizon).
  */
 export interface PathFrame {
   position: THREE.Vector3;

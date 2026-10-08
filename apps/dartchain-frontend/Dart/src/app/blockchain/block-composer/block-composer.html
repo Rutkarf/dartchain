@@ -31,11 +31,10 @@
       <div class="block-view__compact-scroll">
         @if (!showCompactToolbar && !hideCompactTip && latestBlock(); as tip) {
           <button
-            type="button"
-            class="block-view__compact-tip block-view__compact-tip--featured"
-            (click)="openLatestBlock()"
-            [attr.aria-label]="'Ouvrir le bloc #' + tip.index"
-          >
+ type="button"
+ class="block-view__compact-tip block-view__compact-tip--featured"
+ (click)="openLatestBlock()"
+ >
             BLOCK #{{ tip.index }}
           </button>
         }
@@ -159,7 +158,7 @@
         <div class="dock-view__scroll">
           <div class="block-view__quick-actions">
             <button type="button" class="dock-view__mini-btn" (click)="fillFromWallet()" [disabled]="!walletAddress()">
-              Mon wallet
+              Mon portefeuille
             </button>
             <button type="button" class="dock-view__mini-btn" (click)="clearForm()" [disabled]="loading()">
               Reset

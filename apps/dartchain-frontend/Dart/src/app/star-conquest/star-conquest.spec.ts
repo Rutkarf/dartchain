@@ -83,7 +83,7 @@ import { StarConquestFacade } from '@star-conquest/services/star-conquest.facade
 import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
 import type { QuestPersistedState, QuestTaskView } from '@quests/quests-panel/quests-panel.model';
 
-describe('Star Conquest mock catalog', () => {
+describe('Conquête stellaire mock catalog', () => {
   it(`exposes exactly ${STAR_CONQUEST_QUEST_COUNT} interactive quests`, () => {
     expect(STAR_CONQUEST_MOCK_QUESTS.length).toBe(STAR_CONQUEST_QUEST_COUNT);
     const ids = new Set(STAR_CONQUEST_MOCK_QUESTS.map((q) => q.id));
@@ -180,11 +180,11 @@ describe('StarConquest occlusion', () => {
 });
 
 describe('StarConquest playable band', () => {
-  it('keeps top below mid-viewport by default', () => {
+  it('starts the band from the top of the viewport', () => {
     const band = measurePlayableBand(64);
-    expect(band.topPx).toBeGreaterThan(0);
+    expect(band.topPx).toBe(0);
     expect(band.bottomPx).toBeGreaterThan(band.topPx);
-    expect(band.heightPx).toBeGreaterThan(80);
+    expect(band.heightPx).toBeGreaterThan(60);
   });
 
   it('keeps horizontal world nearly within the 250×550 viewport', () => {
@@ -197,10 +197,35 @@ describe('StarConquest playable band', () => {
     expect(band.floorTopPx).toBeGreaterThan(0);
   });
 
-  it('extends the playable band near the bottom of the viewport', () => {
+  it('keeps the playable band above the MetaVerseBB floor peek', () => {
     const band = measurePlayableBand(64);
-    expect(band.bottomPx).toBeGreaterThanOrEqual(band.viewportH - 8);
-    expect(band.bottomPx).toBeGreaterThan(band.floorTopPx);
+    expect(band.bottomPx).toBeLessThanOrEqual(band.floorTopPx);
+    expect(band.bottomPx).toBeGreaterThan(band.topPx);
+  });
+
+  it('keeps band top at viewport top even when app-graph is present', () => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 250 });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 550 });
+    const graph = document.createElement('app-graph');
+    graph.getBoundingClientRect = () =>
+      ({
+        x: 0,
+        y: 120,
+        left: 0,
+        top: 120,
+        right: 250,
+        bottom: 131,
+        width: 250,
+        height: 11,
+        toJSON: () => ({}),
+      }) as DOMRect;
+    document.body.appendChild(graph);
+    try {
+      const band = measurePlayableBand(64);
+      expect(band.topPx).toBe(0);
+    } finally {
+      graph.remove();
+    }
   });
 });
 
@@ -455,6 +480,36 @@ describe('StarConquestGraph', () => {
     graph.dispose();
   });
 
+  it('hover lights the constellation without extinguishing the rest of Star Conquest', () => {
+    const graph = new StarConquestGraph(STAR_CONQUEST_MOCK_QUESTS);
+    const first = STAR_CONQUEST_MOCK_QUESTS[0];
+    graph.setHover(first.id);
+    expect(graph.getHoverId()).toBe(first.id);
+    expect(graph.constellationGuides.visible).toBe(true);
+    const colors = graph.questPoints.geometry.getAttribute('color') as THREE.BufferAttribute;
+    const hoverIdx = STAR_CONQUEST_MOCK_QUESTS.findIndex((q) => q.id === first.id);
+    let otherFamilyIdx = -1;
+    for (let i = 0; i < STAR_CONQUEST_MOCK_QUESTS.length; i++) {
+      if (STAR_CONQUEST_MOCK_QUESTS[i].family !== first.family) {
+        otherFamilyIdx = i;
+        break;
+      }
+    }
+    expect(otherFamilyIdx).toBeGreaterThanOrEqual(0);
+    const hoverLum =
+      colors.getX(hoverIdx) + colors.getY(hoverIdx) + colors.getZ(hoverIdx);
+    const restLum =
+      colors.getX(otherFamilyIdx) +
+      colors.getY(otherFamilyIdx) +
+      colors.getZ(otherFamilyIdx);
+    expect(hoverLum).toBeGreaterThan(restLum);
+    // Soft dim : le reste reste largement visible (pas le DIM_FACTOR sélection).
+    expect(restLum).toBeGreaterThan(0.15);
+    graph.setHover(null);
+    expect(graph.getHoverId()).toBeNull();
+    graph.dispose();
+  });
+
   it('moves quest positions over time (real spatial drift)', () => {
     const quests = STAR_CONQUEST_MOCK_QUESTS.map((q) => ({
       ...q,
@@ -616,7 +671,7 @@ describe('Joystick exclusion zone', () => {
   });
 });
 
-describe('Star Conquest universes', () => {
+describe('Conquête stellaire universes', () => {
   it('uses Ruche as the sole global universe', () => {
     expect(STAR_CONQUEST_UNIVERSE_ORDER.length).toBe(1);
     expect(STAR_CONQUEST_UNIVERSE_ORDER[0]).toBe('agent-swarm');
@@ -663,7 +718,7 @@ describe('Star Conquest universes', () => {
 
   it('keeps Ruche on a near-black void with visible neural links', () => {
     const theme = starConquestUniverseTheme('agent-swarm');
-    expect(theme.bgCenter).toBe('#040308');
+    expect(theme.bgCenter).toBe('#0a1220');
     expect(theme.showNeuralLinks).toBe(true);
     expect(theme.linkOpacity).toBeGreaterThan(0.5);
     expect(theme.coreOpacity).toBeGreaterThan(0.9);
@@ -674,7 +729,7 @@ describe('Star Conquest universes', () => {
   });
 });
 
-describe('Star Conquest product scale', () => {
+describe('Conquête stellaire product scale', () => {
   it('runs at the product palier with company as visual ceiling', () => {
     expect(STAR_CONQUEST_SCALE_TIER).toBe('product');
     expect(STAR_CONQUEST_SCALE.visual).toBe(
@@ -747,7 +802,7 @@ describe('Star Conquest product scale', () => {
   });
 });
 
-describe('Star Conquest render materials', () => {
+describe('Conquête stellaire render materials', () => {
   it('builds filament ribbons with a screen-space width and traveling spark uniforms', () => {
     const ribbon = createFilamentRibbonMaterial();
     const core = createFilamentCoreLineMaterial();
@@ -779,7 +834,7 @@ describe('Star Conquest render materials', () => {
   });
 });
 
-describe('Star Conquest product progress', () => {
+describe('Conquête stellaire product progress', () => {
   it('hydrates claimed quests and unlocks locked neighbors', () => {
     const available = STAR_CONQUEST_MOCK_QUESTS.find((q) => q.id === 'sc-swap-confirm');
     const locked = STAR_CONQUEST_MOCK_QUESTS.find((q) => q.id === 'sc-security-tx');
@@ -847,7 +902,7 @@ describe('Star Conquest product progress', () => {
   });
 });
 
-describe('Star Conquest live Dock mapping', () => {
+describe('Conquête stellaire live Dock mapping', () => {
   it('maps catalog stars onto Dock tasks, hub and product surfaces', () => {
     expect(STAR_CONQUEST_LIVE_LINKS.length).toBe(10);
     expect(STAR_CONQUEST_LIVE_LINKS.length / STAR_CONQUEST_QUEST_COUNT).toBeGreaterThanOrEqual(
@@ -1047,7 +1102,7 @@ describe('StarConquestProgressService live gate', () => {
   });
 });
 
-describe('Star Conquest commercial process', () => {
+describe('Conquête stellaire commercial process', () => {
   it('measures KPIs and waits for session volume once live coverage holds', () => {
     const empty = emptyStarConquestProgress();
     const kpis = starConquestKpis(empty, STAR_CONQUEST_QUEST_COUNT);

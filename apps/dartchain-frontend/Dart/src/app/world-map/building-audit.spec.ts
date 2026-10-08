@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { GeoCoordinateService } from './geo-coordinate.service';
 import {
   LEGACY_HAND_PLACED_LANDMARKS,
-  MARSEILLE_LANDMARK_BUILDINGS,
+  METAVERSE_LANDMARK_BUILDINGS,
   VIEUX_PORT_CORE_BUILDING_RADIUS,
   landmarkPlacementErrorMeters,
 } from './geo-reference.config';
@@ -18,7 +18,7 @@ describe('building-audit', () => {
   });
 
   it('documente les écarts legacy vs géoréférencement OSM', () => {
-    for (const def of MARSEILLE_LANDMARK_BUILDINGS) {
+    for (const def of METAVERSE_LANDMARK_BUILDINGS) {
       const center = footprintCentroid(def.footprint, geo);
       const legacyErr = landmarkPlacementErrorMeters(def.id, center);
       const legacy = LEGACY_HAND_PLACED_LANDMARKS[def.id];
@@ -28,7 +28,7 @@ describe('building-audit', () => {
   });
 
   it('place les landmarks corrigés dans le cœur Vieux-Port', () => {
-    for (const def of MARSEILLE_LANDMARK_BUILDINGS) {
+    for (const def of METAVERSE_LANDMARK_BUILDINGS) {
       const center = footprintCentroid(def.footprint, geo);
       expect(Math.abs(center.x)).toBeLessThan(200);
       expect(Math.abs(center.z)).toBeLessThan(200);

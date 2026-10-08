@@ -228,7 +228,7 @@ export class ShowcaseDaoStateService {
       launchStatus: project.status,
       status,
       summary: this.buildSummary(project, status),
-      objective: project.description?.trim() || this.defaultObjective(project),
+      objective: this.defaultObjective(project),
       proposalsCount,
       votesCount,
       membersActive: Math.max(
@@ -240,8 +240,7 @@ export class ShowcaseDaoStateService {
 
   private buildSummary(project: LaunchProject, status: DaoGovernanceStatus): string {
     if (project.description?.trim()) {
-      const trimmed = project.description.trim();
-      return trimmed.length > 72 ? `${trimmed.slice(0, 69)}…` : trimmed;
+      return project.description.trim();
     }
 
     switch (status) {
@@ -255,7 +254,7 @@ export class ShowcaseDaoStateService {
   }
 
   private defaultObjective(project: LaunchProject): string {
-    return `Coordonner les décisions communautaires, la trésorerie et la roadmap de ${project.name}.`;
+    return `Coordonner décisions, trésorerie et roadmap ${project.symbol}.`;
   }
 
   private parseRaised(value: string): number {

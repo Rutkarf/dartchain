@@ -1,5 +1,5 @@
 import { isHarborWaterAt, distanceToHarborWaterEdge } from './vieux-port-layout.util';
-import { MARSEILLE_GROUND_EXCLUSION_ZONES, MARSEILLE_HARBOR_WATER, type GroundExclusionZone } from './map-configuration';
+import { METAVERSE_GROUND_EXCLUSION_ZONES, METAVERSE_HARBOR_WATER, type GroundExclusionZone } from './map-configuration';
 import type { M4T3RLodBand } from './m4t3r-lod.util';
 import { shouldRenderCellAtLod } from './m4t3r-lod.util';
 import { isOnDiagonalCheckerboard } from './m4t3r-grid.util';
@@ -8,12 +8,12 @@ import { isOnDiagonalCheckerboard } from './m4t3r-grid.util';
 export function groundExclusionFactorAt(
   x: number,
   z: number,
-  zones: readonly GroundExclusionZone[] = MARSEILLE_GROUND_EXCLUSION_ZONES
+  zones: readonly GroundExclusionZone[] = METAVERSE_GROUND_EXCLUSION_ZONES
 ): number {
   if (isHarborWaterAt(x, z)) return 0;
 
   const harborEdge = distanceToHarborWaterEdge(x, z);
-  const soft = MARSEILLE_HARBOR_WATER.softEdgeMeters;
+  const soft = METAVERSE_HARBOR_WATER.softEdgeMeters;
   let factor = 1;
   if (harborEdge < soft) {
     factor = Math.min(factor, harborEdge / soft);
@@ -32,7 +32,7 @@ export function groundExclusionFactorAt(
 export function isGroundCellExcluded(
   x: number,
   z: number,
-  zones: readonly GroundExclusionZone[] = MARSEILLE_GROUND_EXCLUSION_ZONES
+  zones: readonly GroundExclusionZone[] = METAVERSE_GROUND_EXCLUSION_ZONES
 ): boolean {
   return groundExclusionFactorAt(x, z, zones) <= 0;
 }
@@ -46,7 +46,7 @@ export function shouldRenderGroundCell(
   x: number,
   z: number,
   band: M4T3RLodBand,
-  zones: readonly GroundExclusionZone[] = MARSEILLE_GROUND_EXCLUSION_ZONES
+  zones: readonly GroundExclusionZone[] = METAVERSE_GROUND_EXCLUSION_ZONES
 ): boolean {
   const exclusionFactor = groundExclusionFactorAt(x, z, zones);
   if (exclusionFactor <= 0) return false;

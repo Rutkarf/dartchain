@@ -850,13 +850,13 @@ export class CharacterNftService {
     root.name = 'walk-rig';
 
     const bodyMat = new THREE.MeshLambertMaterial({
-      color: 0xffffff,
-      emissive: 0xff2d9a,
+      color: 0xede7d9,
+      emissive: 0x8a95a5,
       emissiveIntensity: 0.55,
     });
     const headMat = new THREE.MeshLambertMaterial({
-      color: 0xffffff,
-      emissive: 0xff66b3,
+      color: 0xede7d9,
+      emissive: 0x7b0d1e,
       emissiveIntensity: 0.5,
     });
 
@@ -1126,10 +1126,10 @@ export class CharacterNftService {
   private getCharacterBodyMaterial(): THREE.MeshStandardMaterial {
     if (!this.fbxBodyMat) {
       this.fbxBodyMat = new THREE.MeshStandardMaterial({
-        color: 0xf0ebe3,
+        color: 0xede7d9,
         roughness: 0.68,
         metalness: 0.08,
-        emissive: new THREE.Color(0x1a1428),
+        emissive: new THREE.Color(0x0d0630),
         emissiveIntensity: 0.14,
         side: THREE.FrontSide,
       });

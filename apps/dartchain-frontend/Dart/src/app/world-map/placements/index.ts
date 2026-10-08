@@ -1,5 +1,5 @@
 export {
-  MARSEILLE_COORDINATE_SYSTEM_VERSION,
+  METAVERSE_COORDINATE_SYSTEM_VERSION,
   toWorldCoordinate,
   type WorldCoordinate,
 } from './coordinate-system';

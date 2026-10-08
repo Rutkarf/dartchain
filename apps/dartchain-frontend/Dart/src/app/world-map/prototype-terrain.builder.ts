@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { MARSEILLE_HARBOR_WATER } from './map-configuration';
+import { METAVERSE_HARBOR_WATER } from './map-configuration';
 
 /** Trou rectangulaire (sens horaire — requis pour Shape.holes). */
 function rectHolePath(minX: number, minZ: number, maxX: number, maxZ: number): THREE.Path {
@@ -19,7 +19,7 @@ function rectHolePath(minX: number, minZ: number, maxX: number, maxZ: number): T
  */
 export function buildPrototypeTerrainGeometry(
   terrainWidth: number,
-  harbor: typeof MARSEILLE_HARBOR_WATER = MARSEILLE_HARBOR_WATER
+  harbor: typeof METAVERSE_HARBOR_WATER = METAVERSE_HARBOR_WATER
 ): THREE.BufferGeometry {
   const halfW = terrainWidth * 0.5;
   const minZ = harbor.landMinZ;

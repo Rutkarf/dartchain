@@ -12,6 +12,10 @@ public class FaucetStateResponse {
     private long configCooldownSeconds;
     /** Solde faucet pending (pièces ramassées, pas encore claimées). */
     private String pendingAmount;
+    /** Même pending, en nombre entier de m4t3r. */
+    private String pendingM4t3r;
+    /** Dernier claim, en nombre entier de m4t3r. */
+    private String lastClaimM4t3r;
 
     public FaucetStateResponse() {
     }
@@ -86,5 +90,21 @@ public class FaucetStateResponse {
 
     public void setPendingAmount(String pendingAmount) {
         this.pendingAmount = pendingAmount;
+    }
+
+    public String getPendingM4t3r() {
+        return pendingM4t3r;
+    }
+
+    public void setPendingM4t3r(String pendingM4t3r) {
+        this.pendingM4t3r = pendingM4t3r;
+    }
+
+    public String getLastClaimM4t3r() {
+        return lastClaimM4t3r;
+    }
+
+    public void setLastClaimM4t3r(String lastClaimM4t3r) {
+        this.lastClaimM4t3r = lastClaimM4t3r;
     }
 }

@@ -44,7 +44,7 @@ class M4t3rRewardServiceTest {
         setField(config, "signingKeyId", "test-key");
         setField(config, "amountPerToken", "0.00000000000000000000000001");
         setField(config, "maxSpeedMps", "5.0");
-        setField(config, "worldId", "marseille");
+        setField(config, "worldId", "metaverse");
         setField(config, "settlementMode", "OFFCHAIN");
 
         proofService = new M4t3rProofService(config);

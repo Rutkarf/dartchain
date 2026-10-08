@@ -1,6 +1,7 @@
 package io.dartchain.backend.auth.persistence;
 
 import io.dartchain.backend.auth.store.SessionStore;
+import io.dartchain.backend.config.AuthProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -23,13 +24,21 @@ public class InMemorySessionStore implements SessionStore {
 
     private final Map<String, SessionEntry> sessions = new ConcurrentHashMap<>();
     private final long ttlSeconds;
+    private final boolean legacySessionEnabled;
 
-    public InMemorySessionStore(@Value("${auth.session.ttl-seconds:604800}") long ttlSeconds) {
+    public InMemorySessionStore(
+            @Value("${auth.session.ttl-seconds:604800}") long ttlSeconds,
+            AuthProperties authProperties
+    ) {
         this.ttlSeconds = ttlSeconds;
+        this.legacySessionEnabled = authProperties.isLegacySessionEnabled();
     }
 
     @Override
     public String createSession(String userId) {
+        if (!legacySessionEnabled) {
+            throw new IllegalStateException("session legacy désactivée");
+        }
         String token = UUID.randomUUID().toString();
         sessions.put(token, new SessionEntry(userId, Instant.now().plusSeconds(ttlSeconds)));
         return token;

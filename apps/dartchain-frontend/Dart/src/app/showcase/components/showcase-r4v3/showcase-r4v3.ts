@@ -36,11 +36,11 @@ import {
   R4v3FaqCategoryFilter,
   R4v3FaqStateService,
 } from '@showcase/services/r4v3-faq-state.service';
-import { ShellFeedbackService } from '@core/services/shell-feedback.service';
 import { ShowcaseNavigationService } from '@showcase/services/showcase-navigation.service';
 import { ShowcaseR4v3StateService } from '@showcase/services/showcase-r4v3-state.service';
 import { ShowcaseHubUiService } from '@showcase/services/showcase-hub-ui.service';
 import { ShowcaseR4v3HubDrawerComponent } from './showcase-r4v3-hub-drawer';
+import { ShowcaseR4v3FxComponent } from './showcase-r4v3-fx';
 import {
   SHOWCASE_REFRESH_EVENT,
   refreshEventMatchesTab,
@@ -49,7 +49,7 @@ import {
 @Component({
   selector: 'app-showcase-r4v3',
   standalone: true,
-  imports: [CommonModule, ShowcaseR4v3HubDrawerComponent],
+  imports: [CommonModule, ShowcaseR4v3HubDrawerComponent, ShowcaseR4v3FxComponent],
   templateUrl: './showcase-r4v3.html',
   styleUrls: ['./showcase-r4v3.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,7 +77,6 @@ export class ShowcaseR4v3Component {
   private readonly nav = inject(ShowcaseNavigationService);
   private readonly brandCrypto = inject(BrandCryptoSelectionService);
   private readonly walletState = inject(DockWalletStateService);
-  private readonly shell = inject(ShellFeedbackService);
   private readonly hubUi = inject(ShowcaseHubUiService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -237,7 +236,7 @@ export class ShowcaseR4v3Component {
     this.whitepaperLoading.set(false);
 
     if (!result.ok) {
-      this.whitepaperFeedback.set(result.message ?? 'White paper indisponible');
+      this.whitepaperFeedback.set(result.message ?? 'Livre blanc indisponible');
       window.setTimeout(() => this.whitepaperFeedback.set(''), 4_000);
     }
   }
@@ -251,7 +250,9 @@ export class ShowcaseR4v3Component {
     if (now - this.lastBrandTapAt < 350) {
       event.preventDefault();
       event.stopPropagation();
-      this.shell.toggleR4v3Scene();
+      // Fond `app-r4v3-scene` en pause — réactiver via
+      // ShellFeedbackService.R4V3_SCENE_TOGGLE_ENABLED.
+      // this.shell.toggleR4v3Scene();
       this.lastBrandTapAt = 0;
       return;
     }
@@ -351,7 +352,7 @@ export class ShowcaseR4v3Component {
         this.openPillar(this.pillars[index - 1]);
         break;
       case 'faq':
-        this.openEntry(this.filteredEntries()[index - 1]);
+        this.openEntry(this.filteredEntries()[index - 1], this.drawerOpenedFromWiki());
         break;
       case 'community':
         this.openCommunityQuestion(this.communityQuestions()[index - 1]);
@@ -371,7 +372,7 @@ export class ShowcaseR4v3Component {
         this.openPillar(this.pillars[index + 1]);
         break;
       case 'faq':
-        this.openEntry(this.filteredEntries()[index + 1]);
+        this.openEntry(this.filteredEntries()[index + 1], this.drawerOpenedFromWiki());
         break;
       case 'community':
         this.openCommunityQuestion(this.communityQuestions()[index + 1]);

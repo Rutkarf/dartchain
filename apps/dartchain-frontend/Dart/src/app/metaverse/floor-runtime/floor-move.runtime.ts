@@ -6,7 +6,7 @@ import { GeoCoordinateService } from '@world-map/geo-coordinate.service';
 import { MapConfigService } from '@world-map/map-config.service';
 import { MapLoadingService } from '@world-map/map-loading.service';
 import { METRO_SPAWN_ANCHOR, MOVE_JOYSTICK_CONFIG } from '@world-map/map-configuration';
-import { mapPerfProfile } from '@world-map/marseille-perf.config';
+import { mapPerfProfile } from '@world-map/metaverse-perf.config';
 import { DualContextGovernorService } from '../../core/utils/dual-context-governor.service';
 import { CHARACTER_ASSETS } from '@metaverse/services/character-assets.config';
 import { CameraControlService } from '@metaverse/services/camera-control.service';
@@ -70,6 +70,14 @@ export class FloorMoveRuntime {
   private readonly moveSpeed = 9;
 
   onMovementJoystickUpdate(vector: { x: number; y: number }): void {
+    if (this.cameraControl.isIntroActive()) {
+      if (Math.hypot(vector.x, vector.y) > 0.35) {
+        this.cameraControl.trySkipIntro();
+      }
+      this.moveX = 0;
+      this.moveY = 0;
+      return;
+    }
     this.moveX = THREE.MathUtils.clamp(vector.x, -1, 1);
     this.moveY = THREE.MathUtils.clamp(vector.y, -1, 1);
   }
@@ -100,8 +108,8 @@ export class FloorMoveRuntime {
     );
     const state = this.character.getState();
     if (state.mesh && state.isLoaded) {
-      if (this.isMarseilleMode()) {
-        const spawn = this.getMarseilleSpawnPosition();
+      if (this.isMetaverseMode()) {
+        const spawn = this.getMetaverseSpawnPosition();
         this.character.setWorldXZ(spawn.x, spawn.z);
         const groundY = this.getGroundYAt(spawn.x, spawn.z);
         state.mesh.position.y = groundY + this.footClearanceMeters;
@@ -114,7 +122,7 @@ export class FloorMoveRuntime {
   }
 
   /**
-   * Avance le perso. Si Marseille + mesh au sol, retourne le frame collect.
+   * Avance le perso. Si Metaverse + mesh au sol, retourne le frame collect.
    */
   update(deltaSeconds: number): FloorMoveCollectFrame | null {
     this.bindKeys();
@@ -122,6 +130,21 @@ export class FloorMoveRuntime {
     if (!state.mesh || !state.isLoaded) {
       this.cameraControl.update(deltaSeconds);
       return null;
+    }
+
+    // Intro MetaVerseBB : caméra seule, perso figé.
+    if (this.cameraControl.isIntroActive()) {
+      this.moveX = 0;
+      this.moveY = 0;
+      this.velocity.set(0, 0, 0);
+      this.lastSpeed = 0;
+      this.character.updateAnimation(deltaSeconds, 0, this.moveSpeed, false);
+      this.cameraControl.update(deltaSeconds);
+      return {
+        mesh: state.mesh,
+        playerId: state.userId || 'local',
+        velocity: this.velocity,
+      };
     }
 
     if (this.isClimbingMode) {
@@ -174,11 +197,11 @@ export class FloorMoveRuntime {
     const prevZ = state.mesh.position.z;
     let nextX = prevX + this.velocity.x;
     let nextZ = prevZ + this.velocity.z;
-    const marseille = this.isMarseilleMode();
+    const metaverse = this.isMetaverseMode();
     const walkRadius = RUNNER_CONFIG.characterRadius;
 
-    if (marseille) {
-      const clamped = this.clampWalkableMarseille(prevX, prevZ, nextX, nextZ, walkRadius);
+    if (metaverse) {
+      const clamped = this.clampWalkableMetaverse(prevX, prevZ, nextX, nextZ, walkRadius);
       nextX = clamped.x;
       nextZ = clamped.z;
     } else {
@@ -201,7 +224,7 @@ export class FloorMoveRuntime {
     }
 
     this.character.setWorldXZ(nextX, nextZ);
-    if (this.isMarseilleMode()) {
+    if (this.isMetaverseMode()) {
       const groundY = this.getGroundYAt(nextX, nextZ);
       state.mesh.position.y = groundY + this.footClearanceMeters;
     } else {
@@ -213,7 +236,7 @@ export class FloorMoveRuntime {
       this.character.setRotationY(Math.atan2(this.velocity.x, this.velocity.z));
     }
 
-    if (!marseille) {
+    if (!metaverse) {
       this.checkLadderInteraction(nextX, nextZ);
       this.runnerState.progress = Math.max(0, -nextZ);
       this.world.update(this.runnerState.progress);
@@ -246,7 +269,7 @@ export class FloorMoveRuntime {
     );
     this.cameraControl.update(deltaSeconds);
 
-    if (!marseille) return null;
+    if (!metaverse) return null;
     return {
       mesh: state.mesh,
       playerId: state.userId || 'local',
@@ -272,7 +295,7 @@ export class FloorMoveRuntime {
     return 0;
   }
 
-  private getMarseilleSpawnPosition(): THREE.Vector3 {
+  private getMetaverseSpawnPosition(): THREE.Vector3 {
     const start = this.mapConfig.configuration.startPosition;
     const world = this.geo.geoToWorld(
       start.latitude,
@@ -284,47 +307,47 @@ export class FloorMoveRuntime {
     return world;
   }
 
-  private isMarseilleMode(): boolean {
+  private isMetaverseMode(): boolean {
     const state = this.mapLoading.getState();
-    return state.activeProviderId === 'marseille-osm-three' && !state.fallbackActive;
+    return state.activeProviderId === 'metaverse-osm-three' && !state.fallbackActive;
   }
 
   private getStartCharacterRotationY(): number {
-    if (this.isMarseilleMode()) {
+    if (this.isMetaverseMode()) {
       return this.mapConfig.configuration.startOrientation.characterRotationY;
     }
     return Math.PI;
   }
 
   private getStartCameraYaw(): number {
-    if (this.isMarseilleMode()) {
+    if (this.isMetaverseMode()) {
       return this.mapConfig.configuration.startOrientation.cameraYaw;
     }
     return 0;
   }
 
   private getStartCameraPitch(): number {
-    if (this.isMarseilleMode()) {
+    if (this.isMetaverseMode()) {
       return this.mapConfig.configuration.startOrientation.cameraPitch;
     }
     return Math.PI / 6;
   }
 
   private getStartCameraDistance(): number {
-    if (this.isMarseilleMode()) {
+    if (this.isMetaverseMode()) {
       return this.mapConfig.configuration.startOrientation.cameraDistance;
     }
     return RUNNER_CONFIG.camDistance;
   }
 
   private getStartCameraLookAhead(): number {
-    if (this.isMarseilleMode()) {
+    if (this.isMetaverseMode()) {
       return this.mapConfig.configuration.startOrientation.cameraLookAhead;
     }
     return 0;
   }
 
-  private clampWalkableMarseille(
+  private clampWalkableMetaverse(
     prevX: number,
     prevZ: number,
     nextX: number,
@@ -412,7 +435,7 @@ export class FloorMoveRuntime {
     if (key === 'a') this.keys.a = down;
     if (key === 'd') this.keys.d = down;
     if (key === 'e') this.keys.e = down;
-    if (key === 'v' && down && !e.repeat && this.isMarseilleMode()) {
+    if (key === 'v' && down && !e.repeat && this.isMetaverseMode()) {
       this.cameraControl.toggleValidationView();
     }
     if (key === 'arrowleft') this.keys.camL = down;

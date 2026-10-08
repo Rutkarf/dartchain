@@ -22,15 +22,15 @@
   box-sizing: border-box;
   overflow: hidden;
   container-type: inline-size;
-  border-radius: var(--ds-surface-radius, 10px);
+  border-radius: var(--ds-surface-radius, var(--radius-none, 0));
   background-color: var(--ds-surface-tint);
   background-image: var(--ds-surface-metallic), var(--ds-surface-bg);
   backdrop-filter: var(--ds-surface-backdrop);
   -webkit-backdrop-filter: var(--ds-surface-backdrop);
-  border: 1px solid rgba(0, 229, 255, 0.28);
+  border: 1px solid rgba(139, 157, 173, 0.28);
   box-shadow:
     var(--ds-surface-shadow),
-    0 0 12px rgba(0, 229, 255, 0.08);
+    0 0 12px rgba(139, 157, 173, 0.08);
 }
 
 .chain-dock__head {
@@ -38,8 +38,8 @@
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 2px;
-  min-height: 13px;
-  max-height: 14px;
+  min-height: var(--comp-hud-h, 16px);
+  max-height: var(--comp-hud-h, 16px);
   padding: 0 0px;
   overflow: hidden;
   flex-shrink: 0;
@@ -74,61 +74,61 @@
 
 .chain-dock__sync-label {
   margin: 0;
-  font-size: 4.5px;
+  font-size: var(--fs-chain);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: lowercase;
-  color: rgba(167, 209, 228, 0.78);
+  color: rgba(237, 231, 217, 0.78);
   white-space: nowrap;
 }
 
 .chain-dock__badge {
   flex-shrink: 0;
   padding: 0 2px;
-  border-radius: 999px;
-  font-size: 4.5px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-chain);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   line-height: 1.25;
-  min-height: 11px;
+  min-height: var(--comp-hud-h, 16px);
   display: inline-flex;
   align-items: center;
 }
 
 .chain-dock__badge--valid {
-  color: #b8ffd8;
-  border: 1px solid rgba(0, 255, 136, 0.35);
-  background: rgba(0, 255, 136, 0.1);
+  color: var(--state-success-fg);
+  border: 1px solid var(--state-success-border);
+  background: var(--state-success-bg);
 }
 
 .chain-dock__badge--invalid {
-  color: #ffb4b4;
-  border: 1px solid rgba(255, 96, 96, 0.35);
-  background: rgba(255, 96, 96, 0.1);
+  color: var(--state-error-fg);
+  border: 1px solid var(--state-error-border);
+  background: var(--state-error-bg);
 }
 
 .chain-dock__badge--sync {
-  color: rgba(188, 240, 255, 0.92);
-  border: 1px solid rgba(0, 229, 255, 0.35);
-  background: rgba(0, 229, 255, 0.1);
+  color: rgba(237, 231, 217, 0.92);
+  border: 1px solid rgba(139, 157, 173, 0.35);
+  background: rgba(139, 157, 173, 0.1);
 }
 
 .chain-dock__block-pill {
   flex-shrink: 0;
-  min-height: 11px;
-  height: 11px;
-  padding: 0 3px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 229, 255, 0.42);
+  min-height: var(--comp-hud-h, 16px);
+  height: var(--comp-hud-h, 16px);
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(139, 157, 173, 0.42);
   background: linear-gradient(
     90deg,
-    rgba(0, 229, 255, 0.16),
-    rgba(0, 229, 255, 0.06)
+    rgba(139, 157, 173, 0.16),
+    rgba(139, 157, 173, 0.06)
   );
-  color: rgba(188, 240, 255, 0.98);
+  color: rgba(237, 231, 217, 0.98);
   font-family: inherit;
-  font-size: 4.5px;
+  font-size: var(--fs-chain);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -136,8 +136,8 @@
   white-space: nowrap;
   cursor: pointer;
   box-shadow:
-    0 0 8px rgba(0, 229, 255, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 0 8px rgba(139, 157, 173, 0.12),
+    inset 0 1px 0 rgba(237, 231, 217, 0.08);
 }
 
 .chain-dock__block-pill--static {
@@ -146,27 +146,28 @@
 }
 
 .chain-dock__block-pill:hover:not(.chain-dock__block-pill--static) {
-  border-color: rgba(0, 229, 255, 0.62);
+  border-color: var(--state-hover-border);
+  background: var(--state-hover-fill);
 }
 
 .chain-dock__view-toggle {
   display: inline-flex;
   gap: 0px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  border: 1px solid rgba(0, 229, 255, 0.22);
+  border: 1px solid rgba(139, 157, 173, 0.22);
   flex-shrink: 0;
 }
 
 .chain-dock__view-btn {
-  min-height: 11px;
-  height: 11px;
+  min-height: var(--comp-hud-h, 16px);
+  height: var(--comp-hud-h, 16px);
   padding: 0 2px;
   border: 0;
-  background: rgba(0, 12, 22, 0.8);
-  color: rgba(167, 209, 228, 0.85);
+  background: rgba(10, 18, 32, 0.8);
+  color: rgba(237, 231, 217, 0.85);
   font-family: inherit;
-  font-size: 4.5px;
+  font-size: var(--fs-chain);
   font-weight: 800;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -175,21 +176,21 @@
 }
 
 .chain-dock__view-btn.is-active {
-  color: rgba(216, 244, 255, 0.98);
-  background: rgba(0, 229, 255, 0.18);
+  color: var(--text-primary, #ede7d9);
+  background: var(--state-active-fill);
 }
 
 .chain-dock__export {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0px;
+  gap: var(--icon-gap-label);
   margin: 0;
   padding: 0;
   border: none;
   background: transparent;
-  color: rgba(17, 217, 255, 0.92);
-  font-size: 4px;
+  color: rgba(139, 157, 173, 0.92);
+  font-size: var(--fs-chain);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -198,13 +199,14 @@
 }
 
 .chain-dock__export svg {
-  width: 9px;
-  height: 7px;
+  
+  
   flex: 0 0 auto;
 }
 
 .chain-dock__export:hover {
-  color: #5ce8ff;
+  color: var(--text-primary, #ede7d9);
+  background: var(--state-hover-bg);
 }
 
 .chain-dock__toast {
@@ -216,19 +218,19 @@
   max-width: calc(100% - 12px);
   margin: 0;
   padding: 0px 4px;
-  border-radius: 6px;
-  font-size: clamp(5px, 1.8cqw, 7px);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-chain);
   text-align: center;
-  color: #b8ffd8;
-  border: 1px solid rgba(0, 255, 136, 0.35);
-  background: rgba(4, 24, 16, 0.92);
+  color: var(--state-success-fg);
+  border: 1px solid var(--state-success-border);
+  background: var(--state-success-bg);
   pointer-events: none;
 }
 
 .chain-dock__toast--error {
-  color: #ffb4b4;
-  border-color: rgba(255, 96, 96, 0.35);
-  background: rgba(40, 8, 8, 0.92);
+  color: var(--state-error-fg);
+  border-color: var(--state-error-border);
+  background: var(--state-error-bg);
 }
 
 .chain-dock__alert,
@@ -244,16 +246,16 @@
   justify-content: space-between;
   gap: 2px;
   margin: 0;
-  padding: 1px 3px;
-  border-radius: 6px;
-  font-size: clamp(5px, 1.8cqw, 7px);
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-chain);
   font-weight: 600;
 }
 
 .chain-dock__alert--error {
-  color: var(--chart-trend-down, #ff6b6b);
-  border: 1px solid rgba(255, 96, 96, 0.35);
-  background: rgba(40, 8, 8, 0.55);
+  color: var(--state-error-fg);
+  border: 1px solid var(--state-error-border);
+  background: var(--state-error-bg);
 }
 
 .chain-dock__alert span {
@@ -268,11 +270,11 @@
   border: none;
   background: transparent;
   padding: 0;
-  font-size: inherit;
+  font-size: var(--fs-chain);
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(0, 229, 255, 0.95);
+  color: rgba(139, 157, 173, 0.95);
   cursor: pointer;
 }
 
@@ -292,23 +294,23 @@
   gap: 0px;
   min-height: 0;
   padding: 0px;
-  border-radius: 6px;
-  border: 1px solid rgba(0, 229, 255, 0.14);
-  background: rgba(0, 12, 22, 0.55);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 157, 173, 0.14);
+  background: rgba(10, 18, 32, 0.55);
   flex-shrink: 0;
 }
 
 .chain-dock__input {
   width: 100%;
   min-width: 0;
-  height: 12px;
+  height: var(--comp-hud-h, 16px);
   padding: 0 2px;
-  border-radius: 4px;
-  border: 1px solid rgba(0, 229, 255, 0.18);
-  background: rgba(0, 8, 16, 0.85);
-  color: rgba(216, 244, 255, 0.95);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 157, 173, 0.18);
+  background: rgba(10, 18, 32, 0.85);
+  color: rgba(237, 231, 217, 0.95);
   font-family: inherit;
-  font-size: 5px;
+  font-size: var(--fs-chain);
   font-weight: 600;
   outline: none;
   box-sizing: border-box;
@@ -330,18 +332,18 @@
 .chain-dock__input--index::-webkit-outer-spin-button {
   opacity: 1;
   height: 8px;
-  margin-left: 1px;
-  background: rgba(0, 229, 255, 0.12);
-  border-left: 1px solid rgba(0, 229, 255, 0.28);
+  margin-left: 2px;
+  background: rgba(139, 157, 173, 0.12);
+  border-left: 1px solid rgba(139, 157, 173, 0.28);
 }
 
 .chain-dock__input--index:hover::-webkit-inner-spin-button,
 .chain-dock__input--index:hover::-webkit-outer-spin-button {
-  background: rgba(0, 229, 255, 0.22);
+  background: var(--state-hover-bg);
 }
 
 .chain-dock__input::placeholder {
-  color: rgba(167, 209, 228, 0.55);
+  color: rgba(237, 231, 217, 0.55);
 }
 
 .chain-dock__input:focus-visible,
@@ -349,8 +351,8 @@
 .chain-dock__export:focus-visible,
 .chain-dock__block-pill:focus-visible {
   outline: none;
-  border-color: rgba(0, 229, 255, 0.55);
-  box-shadow: 0 0 0 1px rgba(0, 229, 255, 0.25);
+  border-color: var(--state-focus-border);
+  box-shadow: var(--state-focus-ring);
 }
 
 .chain-dock__body {
@@ -359,22 +361,22 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 229, 255, 0.14);
-  background: rgba(0, 12, 22, 0.45);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(139, 157, 173, 0.14);
+  background: rgba(10, 18, 32, 0.45);
 }
 
 .chain-dock__body:has(app-chain-graph) {
-  background: #000;
+  background: #0a1220;
 }
 
 .chain-dock__list {
   list-style: none;
   margin: 0;
-  padding: 0px;
+  padding: 2px;
   display: flex;
   flex-direction: column;
-  gap: 0px;
+  gap: 2px;
   flex: 1 1 0;
   min-height: 0;
   overflow-x: hidden;
@@ -385,27 +387,30 @@
 }
 
 .chain-dock__item {
-  border-radius: 3px;
-  border: 1px solid rgba(0, 229, 255, 0.12);
-  background: rgba(0, 8, 16, 0.65);
+  position: relative;
+  border-radius: var(--radius-none);
+  border: 1px solid rgba(139, 157, 173, 0.14);
+  background: rgba(10, 18, 32, 0.72);
   flex: 0 0 auto;
 }
 
 .chain-dock__item.is-head {
-  border-color: rgba(0, 229, 255, 0.45);
-  background: rgba(0, 229, 255, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.18);
+  border-color: rgba(139, 157, 173, 0.48);
+  background: rgba(139, 157, 173, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(139, 157, 173, 0.2);
 }
 
 .chain-dock__item-btn {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: 6px auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
   width: 100%;
-  min-height: 9px;
-  height: 9px;
-  padding: 0 1px;
+  /* Dense fixed rows: ≥5 tip blocks visible; overflow scrolls → genesis */
+  min-height: var(--comp-hud-h, 16px);
+  height: var(--comp-hud-h, 16px);
+  max-height: var(--comp-hud-h, 16px);
+  padding: 0 4px 0 0;
   border: 0;
   background: transparent;
   color: inherit;
@@ -415,37 +420,166 @@
   box-sizing: border-box;
 }
 
+.chain-dock__spine {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 6px;
+  height: 100%;
+  min-height: inherit;
+  align-self: stretch;
+  pointer-events: none;
+}
+
+.chain-dock__spine-rail {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: rgba(139, 157, 173, 0.28);
+}
+
+.chain-dock__item:first-child .chain-dock__spine-rail {
+  top: 50%;
+}
+
+.chain-dock__item:last-child .chain-dock__spine-rail {
+  bottom: 50%;
+}
+
+.chain-dock__item:only-child .chain-dock__spine-rail {
+  display: none;
+}
+
+.chain-dock__spine-node {
+  position: relative;
+  z-index: 1;
+  width: 3px;
+  height: var(--comp-pastille, 4px);
+  border: 1px solid rgba(139, 157, 173, 0.75);
+  background: rgba(139, 157, 173, 0.35);
+  box-shadow: 0 0 3px rgba(139, 157, 173, 0.3);
+}
+
+.chain-dock__item.is-head .chain-dock__spine-node {
+  background: rgba(139, 157, 173, 0.85);
+  border-color: rgba(237, 231, 217, 0.95);
+  box-shadow: 0 0 4px rgba(139, 157, 173, 0.5);
+}
+
+.chain-dock__index-wrap {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 2px;
+  min-width: 16px;
+  line-height: 1;
+}
+
+.chain-dock__head-tag {
+  font-size: var(--fs-chain);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: rgba(139, 157, 173, 0.95);
+  margin: 0;
+}
+
 .chain-dock__cell {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 4.5px;
+  font-size: var(--fs-chain);
   font-weight: 600;
-  color: rgba(167, 209, 228, 0.88);
+  color: rgba(237, 231, 217, 0.88);
 }
 
 .chain-dock__cell--index {
+  font-size: var(--fs-chain);
   font-weight: 800;
-  color: rgba(216, 244, 255, 0.95);
+  color: rgba(237, 231, 217, 0.98);
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
 .chain-dock__cell--hash {
-  text-align: center;
-  font-weight: 700;
+  text-align: left;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--fs-chain);
+  color: rgba(237, 231, 217, 0.58);
+  letter-spacing: 0.01em;
 }
 
-.chain-dock__cell--tx {
-  text-align: right;
+.chain-dock__meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.chain-dock__tx {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.chain-dock__tx-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--comp-hud-h, 16px);
+  padding: 0 2px;
+  border: 1px solid rgba(139, 157, 173, 0.38);
+  background: rgba(139, 157, 173, 0.12);
+  color: rgba(237, 231, 217, 0.95);
+  font-size: var(--fs-chain);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
   font-variant-numeric: tabular-nums;
-  color: rgba(167, 209, 228, 0.7);
+  white-space: nowrap;
+}
+
+.chain-dock__tx-ticks {
+  display: grid;
+  grid-template-columns: repeat(4, 2px);
+  gap: 2px;
+  height: var(--comp-pastille, 4px);
+  align-content: center;
+}
+
+.chain-dock__tx-tick {
+  display: block;
+  width: 2px;
+  height: 100%;
+  border: 1px solid rgba(139, 157, 173, 0.28);
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.chain-dock__tx-tick.is-on {
+  border-color: rgba(139, 157, 173, 0.7);
+  background: rgba(139, 157, 173, 0.75);
 }
 
 .chain-dock__cell--time {
   text-align: right;
+  min-width: 26px;
+  font-size: var(--fs-chain);
   font-variant-numeric: tabular-nums;
-  color: rgba(167, 209, 228, 0.65);
+  color: rgba(237, 231, 217, 0.48);
+  font-weight: 600;
 }
 
 .chain-dock__empty {
@@ -454,10 +588,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
+  gap: 2px;
   padding: 2px;
-  font-size: clamp(6px, 2.1cqw, 9px);
-  color: rgba(167, 209, 228, 0.75);
+  font-size: var(--fs-chain);
+  color: rgba(237, 231, 217, 0.75);
   text-align: center;
 }
 
@@ -473,9 +607,9 @@
 
 .chain-dock__skeleton {
   height: clamp(11px, 3.8cqw, 15px);
-  border-radius: 4px;
-  border: 1px solid rgba(0, 229, 255, 0.08);
-  background: rgba(0, 229, 255, 0.06);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 157, 173, 0.08);
+  background: rgba(139, 157, 173, 0.06);
   animation: chain-dock-pulse 1.2s ease-in-out infinite;
 }
 
@@ -502,62 +636,62 @@
   }
 
   .chain-dock__sync-label {
-    font-size: 4px;
+    font-size: var(--fs-chain);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .chain-dock__skeleton {
-    animation: none;
+    animation:  none;
   }
 }
 
 /* ── Dock polish V4 (Wallet charter) — LIST mode only; graph untouched ── */
 .chain-dock:not(:has(app-chain-graph)) {
-  --dock-cyan: #2ec4d6;
-  --dock-cyan-rgb: 46, 196, 214;
-  --dock-green: #3dd68c;
-  --dock-green-rgb: 61, 214, 140;
+  --dock-cyan: #8b9dad;
+  --dock-cyan-rgb: 139, 157, 173;
+  --dock-green: var(--state-success);
+  --dock-green-rgb: 9, 129, 74;
   --dock-glass-bg: linear-gradient(
     165deg,
-    rgba(255, 255, 255, 0.06) 0%,
+    rgba(237, 231, 217, 0.06) 0%,
     rgba(var(--dock-cyan-rgb), 0.06) 42%,
-    rgba(0, 0, 0, 0.28) 100%
+    rgba(10, 18, 32, 0.28) 100%
   );
   --dock-glass-border: rgba(var(--dock-cyan-rgb), 0.28);
   --dock-glass-blur: blur(10px) saturate(135%);
   --dock-glass-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
-    0 4px 14px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(237, 231, 217, 0.12),
+    inset 0 -1px 0 rgba(10, 18, 32, 0.35),
+    0 4px 14px rgba(10, 18, 32, 0.35);
 
   gap: 2px;
-  padding: 3px;
-  border-radius: 0;
+  padding: 4px;
+  border-radius: var(--radius-none);
   border: 1px solid rgba(var(--dock-cyan-rgb), 0.2);
-  background-color: #070b10;
+  background-color: #0a1220;
   background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 28%),
+    linear-gradient(180deg, rgba(237, 231, 217, 0.03) 0%, transparent 28%),
     repeating-linear-gradient(
       0deg,
       transparent 0 7px,
-      rgba(255, 255, 255, 0.012) 7px 8px
+      rgba(237, 231, 217, 0.012) 7px 8px
     ),
     repeating-linear-gradient(
       90deg,
       transparent 0 7px,
-      rgba(255, 255, 255, 0.01) 7px 8px
+      rgba(237, 231, 217, 0.01) 7px 8px
     );
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(237, 231, 217, 0.04),
+    inset 0 0 0 1px rgba(10, 18, 32, 0.35);
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__toolbar,
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__list {
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
   border: 1px solid var(--dock-glass-border) !important;
   background: var(--dock-glass-bg) !important;
   backdrop-filter: var(--dock-glass-blur);
@@ -565,42 +699,47 @@
   box-shadow: var(--dock-glass-shadow) !important;
 }
 
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__list {
+  gap: 2px !important;
+  padding: 2px !important;
+}
+
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__input,
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__export,
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__alert-btn {
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
   border: 1px solid rgba(var(--dock-cyan-rgb), 0.28) !important;
-  background: rgba(0, 0, 0, 0.42) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45) !important;
-  color: rgba(244, 251, 255, 0.9) !important;
+  background: rgba(10, 18, 32, 0.42) !important;
+  box-shadow: inset 0 1px 2px rgba(10, 18, 32, 0.45) !important;
+  color: rgba(237, 231, 217, 0.9) !important;
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__block-pill {
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
   border: 1px solid rgba(var(--dock-cyan-rgb), 0.4) !important;
   background: linear-gradient(
     180deg,
     rgba(var(--dock-cyan-rgb), 0.2) 0%,
-    rgba(0, 0, 0, 0.4) 100%
+    rgba(10, 18, 32, 0.4) 100%
   ) !important;
-  color: #f4fbff !important;
+  color: #ede7d9 !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(237, 231, 217, 0.12),
     0 0 8px rgba(var(--dock-cyan-rgb), 0.18) !important;
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__view-toggle {
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
   border: 1px solid rgba(var(--dock-cyan-rgb), 0.28);
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(10, 18, 32, 0.35);
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__view-btn {
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
   border: none !important;
   background: transparent !important;
-  color: rgba(168, 184, 200, 0.7) !important;
+  color: rgba(139, 157, 173, 0.7) !important;
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__view-btn.is-active {
@@ -609,36 +748,88 @@
     rgba(var(--dock-cyan-rgb), 0.88) 0%,
     rgba(var(--dock-cyan-rgb), 0.55) 100%
   ) !important;
-  color: #041018 !important;
+  color: #0a1220 !important;
   font-weight: 800 !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+  box-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.28) !important;
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__item,
-.chain-dock:not(:has(app-chain-graph)) .chain-dock__item-btn {
-  border-radius: 0 !important;
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__item-btn,
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__tx-chip,
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__spine-node {
+  border-radius: var(--radius-none) !important;
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__item {
-  border: 1px solid rgba(var(--dock-cyan-rgb), 0.12) !important;
+  border: 1px solid rgba(var(--dock-cyan-rgb), 0.16) !important;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.03) 0%,
-    rgba(0, 0, 0, 0.28) 100%
+    rgba(237, 231, 217, 0.035) 0%,
+    rgba(10, 18, 32, 0.32) 100%
   ) !important;
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__item.is-head {
-  border-color: rgba(var(--dock-cyan-rgb), 0.4) !important;
-  box-shadow: inset 0 0 0 1px rgba(var(--dock-cyan-rgb), 0.18) !important;
+  border-color: rgba(var(--dock-cyan-rgb), 0.48) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--dock-cyan-rgb), 0.16) 0%,
+    rgba(10, 18, 32, 0.28) 100%
+  ) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--dock-cyan-rgb), 0.2),
+    inset 3px 0 0 rgba(var(--dock-cyan-rgb), 0.55) !important;
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__item-btn:hover {
-  background: linear-gradient(
-    180deg,
-    rgba(var(--dock-cyan-rgb), 0.12) 0%,
-    rgba(0, 0, 0, 0.3) 100%
-  ) !important;
+  background: var(--state-hover-fill) !important;
+  border-color: var(--state-hover-border) !important;
+  transform: none;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__spine-rail {
+  background: rgba(var(--dock-cyan-rgb), 0.32) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__spine-node {
+  border-color: rgba(var(--dock-cyan-rgb), 0.7) !important;
+  background: rgba(var(--dock-cyan-rgb), 0.4) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__item.is-head .chain-dock__spine-node {
+  background: rgba(var(--dock-cyan-rgb), 0.92) !important;
+  border-color: #ede7d9 !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__cell--index {
+  color: #ede7d9 !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__cell--hash {
+  color: rgba(139, 157, 173, 0.58) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__cell--time {
+  color: rgba(139, 157, 173, 0.45) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__tx-chip {
+  border-color: rgba(var(--dock-cyan-rgb), 0.42) !important;
+  background: rgba(var(--dock-cyan-rgb), 0.14) !important;
+  color: #ede7d9 !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__tx-tick {
+  border-color: rgba(var(--dock-cyan-rgb), 0.28) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__tx-tick.is-on {
+  border-color: rgba(var(--dock-cyan-rgb), 0.75) !important;
+  background: rgba(var(--dock-cyan-rgb), 0.8) !important;
+}
+
+.chain-dock:not(:has(app-chain-graph)) .chain-dock__head-tag {
+  color: var(--dock-cyan) !important;
 }
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__badge--valid {
@@ -648,5 +839,5 @@
 
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__toast,
 .chain-dock:not(:has(app-chain-graph)) .chain-dock__alert {
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
 }

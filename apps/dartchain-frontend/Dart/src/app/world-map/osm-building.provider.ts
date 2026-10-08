@@ -82,7 +82,7 @@ export class OSMBuildingProvider {
 
     const all = [...this.footprintCache.values()].filter((b) => footprintInBounds(b, bounds));
     if (all.length === 0 && lastError) {
-      // Soft-fail : le caller (Marseille) conserve le catalogue accurate.
+      // Soft-fail : le caller (Metaverse) conserve le catalogue accurate.
       console.warn(
         '[OSMBuildingProvider] Overpass indisponible — cache vide, fallback accurate attendu.',
         lastError
@@ -132,7 +132,7 @@ out geom;
     }
   }
 
-  /** Footprints déjà chargés (ex. Marseille) filtrés autour d'un point. */
+  /** Footprints déjà chargés (ex. Metaverse) filtrés autour d'un point. */
   filterCachedAround(
     latitude: number,
     longitude: number,

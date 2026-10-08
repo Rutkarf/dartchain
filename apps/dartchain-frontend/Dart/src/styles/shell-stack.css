@@ -77,3 +77,157 @@ app-graph.app-graph-section.is-chart-collapsed {
 .app-main-layout .app-bottom-stack {
   margin-bottom: 0 !important;
 }
+
+/* Grande fenêtre : navbar, échange, showcase, graphique et dock suivent la hauteur.
+   Le téléphone (≤480 ou moins de 640 de haut) ne passe pas ici. */
+@media (min-width: 481px) and (min-height: 640px) {
+  .app-shell {
+    --wide-tab: clamp(24px, 3vh, 32px);
+    /* Panneau un peu plus haut : plus de lignes visibles, moins de scroll. */
+    --wide-panel: clamp(180px, 26vh, 240px);
+    --wide-chart: clamp(72px, 11vh, 110px);
+    --wide-swap: clamp(40px, 5.5vh, 56px);
+    --wide-font: clamp(12px, 1.45vh, 13px);
+    --wide-font-body: clamp(12px, 1.55vh, 14px);
+
+    --fs-label: var(--wide-font);
+    --fs-shell: var(--wide-font);
+    --fs-chart: var(--wide-font);
+    --fs-price: var(--wide-font);
+    --fs-title: var(--wide-font);
+    --fs-chain: var(--wide-font);
+    --fs-chat-chrome: var(--wide-font);
+    --fs-module: var(--wide-font-body);
+    --fs-chat-msg: var(--wide-font-body);
+    --fs-form: var(--wide-font-body);
+    --fs-body: var(--wide-font-body);
+
+    --showcase-hub-tab-h: var(--wide-tab);
+    --showcase-hub-header-h: var(--wide-tab);
+    --dock-hub-tab-h: var(--wide-tab);
+    --dock-smart-bar-h: var(--wide-tab);
+    --chart-smart-bar-h: var(--wide-tab);
+    --showcase-smart-bar-h: var(--wide-tab);
+    --market-chart-collapsed-h: var(--wide-tab);
+
+    --bottom-stack-panel-height: var(--wide-panel);
+    --mvp-bottom-panel-h: var(--wide-panel);
+    --mvp-showcase-body-h: var(--wide-panel);
+    --showcase-band-height: var(--wide-panel);
+    --dock-panel-height: var(--wide-panel);
+    --bottom-stack-height-expanded: calc(var(--wide-tab) + var(--wide-panel));
+    --bottom-stack-height-collapsed: calc(var(--wide-tab) * 2);
+    --bottom-stack-active-height: var(--bottom-stack-height-expanded);
+    --hub-showcase-block-height: var(--bottom-stack-height-expanded);
+    --hub-showcase-block-height-collapsed: var(--bottom-stack-height-collapsed);
+
+    --mvp-chart-h: var(--wide-chart);
+    --market-chart-height: var(--wide-chart);
+    --market-chart-height-expanded: var(--wide-chart);
+
+    --mvp-swap-h: var(--wide-swap);
+    --market-exchange-height: var(--wide-swap);
+    --market-exchange-strip-h: var(--wide-swap);
+    --market-exchange-height-estimate: var(--wide-swap);
+  }
+
+  app-navbar {
+    --nv-logo-h: var(--wide-tab);
+    --nv-ticker-row-h: var(--wide-tab);
+    --nv-action-btn: var(--wide-tab);
+    --nv-shell-min-h: calc(var(--wide-tab) * 2);
+  }
+}
+
+/* Téléphone portrait haut (436×653, 390×844, 480×800…) : texte + panneaux lisibles.
+   Canon 250×550 / 320×568 restent sur le lock micro (largeur < 360).
+   Seuil hauteur 600 : couvre ~640–699 (ex. 436×653) hors du précédent plancher 700. */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 600px) {
+  .app-shell {
+    --phone-tall-tab: 22px;
+    /* Panneaux un peu plus bas sous ~700px pour laisser le floor respirer. */
+    --phone-tall-panel: clamp(132px, 20vh, 190px);
+    --phone-tall-chart: clamp(56px, 9vh, 88px);
+    --phone-tall-swap: 36px;
+    --phone-tall-font: 10px;
+    --phone-tall-font-body: 11px;
+
+    --fs-label: var(--phone-tall-font);
+    --fs-shell: var(--phone-tall-font);
+    --fs-chart: var(--phone-tall-font);
+    --fs-price: var(--phone-tall-font);
+    --fs-title: var(--phone-tall-font);
+    --fs-chain: var(--phone-tall-font);
+    --fs-chat-chrome: var(--phone-tall-font);
+    --fs-module: var(--phone-tall-font-body);
+    --fs-chat-msg: var(--phone-tall-font-body);
+    --fs-form: var(--phone-tall-font-body);
+    --fs-body: var(--phone-tall-font-body);
+
+    --showcase-hub-tab-h: var(--phone-tall-tab);
+    --showcase-hub-header-h: var(--phone-tall-tab);
+    --dock-hub-tab-h: var(--phone-tall-tab);
+    --dock-smart-bar-h: var(--phone-tall-tab);
+    --chart-smart-bar-h: var(--phone-tall-tab);
+    --showcase-smart-bar-h: var(--phone-tall-tab);
+    --market-chart-collapsed-h: var(--phone-tall-tab);
+
+    --mvp-showcase-body-h: var(--phone-tall-panel);
+    --mvp-bottom-panel-h: var(--phone-tall-panel);
+    --showcase-band-height: var(--phone-tall-panel);
+    --dock-panel-height: var(--phone-tall-panel);
+    --bottom-stack-panel-height: var(--phone-tall-panel);
+    --bottom-stack-height-expanded: calc(var(--phone-tall-tab) + var(--phone-tall-panel));
+    --bottom-stack-height-collapsed: calc(var(--phone-tall-tab) * 2);
+    --bottom-stack-active-height: var(--bottom-stack-height-expanded);
+    --hub-showcase-block-height: var(--bottom-stack-height-expanded);
+    --hub-showcase-block-height-collapsed: var(--bottom-stack-height-collapsed);
+
+    --mvp-chart-h: var(--phone-tall-chart);
+    --market-chart-height: var(--phone-tall-chart);
+    --market-chart-height-expanded: var(--phone-tall-chart);
+
+    --mvp-swap-h: var(--phone-tall-swap);
+    --market-exchange-height: var(--phone-tall-swap);
+    --market-exchange-strip-h: var(--phone-tall-swap);
+    --market-exchange-height-estimate: var(--phone-tall-swap);
+
+    /* Touch / rangées : sortir du HUD 16px micro. */
+    --comp-hud-h: var(--phone-tall-tab);
+    --comp-row-h: var(--phone-tall-tab);
+    --comp-btn-hud-h: var(--phone-tall-tab);
+    --comp-smart-bar-h: var(--phone-tall-tab);
+    --comp-ticker-row-h: var(--phone-tall-tab);
+    --comp-logo-row-h: var(--phone-tall-tab);
+    --ds-zone-navbar: calc(var(--phone-tall-tab) * 2);
+    --ds-zone-exchange: var(--phone-tall-swap);
+    --ds-zone-showcase-header: var(--phone-tall-tab);
+    --ds-zone-chart: var(--phone-tall-chart);
+  }
+
+  /* Fonts aussi sur html : composants hors .app-shell (tiroirs, tour). */
+  html.vp-compact {
+    --fs-label: 10px;
+    --fs-shell: 10px;
+    --fs-chart: 10px;
+    --fs-price: 10px;
+    --fs-title: 10px;
+    --fs-chain: 10px;
+    --fs-chat-chrome: 10px;
+    --fs-module: 11px;
+    --fs-chat-msg: 11px;
+    --fs-form: 11px;
+    --fs-body: 11px;
+    --comp-hud-h: 22px;
+    --comp-row-h: 22px;
+    --comp-btn-hud-h: 22px;
+    --comp-smart-bar-h: 22px;
+  }
+
+  app-navbar {
+    --nv-logo-h: var(--phone-tall-tab);
+    --nv-ticker-row-h: var(--phone-tall-tab);
+    --nv-action-btn: var(--phone-tall-tab);
+    --nv-shell-min-h: calc(var(--phone-tall-tab) * 2);
+  }
+}

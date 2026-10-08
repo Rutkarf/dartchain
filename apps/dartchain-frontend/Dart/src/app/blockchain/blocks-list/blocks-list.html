@@ -1,4 +1,4 @@
-<div class="chain-dock ds-surface ds-surface--showcase-body" [attr.aria-label]="locale.t('chain.title')">
+<div class="chain-dock ds-surface ds-surface--showcase-body">
   <header class="chain-dock__head">
     <div class="chain-dock__head-left" aria-live="polite">
       @if (chainValid() === true) {
@@ -13,11 +13,10 @@
     <div class="chain-dock__head-center" aria-live="polite">
       @if (latestBlock(); as head) {
         <button
-          type="button"
-          class="chain-dock__block-pill"
-          (click)="openBlock(head)"
-          [attr.aria-label]="'Ouvrir le bloc #' + head.index"
-        >
+ type="button"
+ class="chain-dock__block-pill"
+ (click)="openBlock(head)"
+ >
           BLOCK #{{ head.index }}
         </button>
       } @else {
@@ -27,7 +26,7 @@
     </div>
 
     <div class="chain-dock__head-right">
-      <div class="chain-dock__view-toggle" role="group" [attr.aria-label]="locale.t('chain.viewMode')">
+      <div class="chain-dock__view-toggle" role="group">
         <button
           type="button"
           class="chain-dock__view-btn"
@@ -49,36 +48,12 @@
       </div>
 
       <button
-        type="button"
-        class="chain-dock__export"
-        (click)="exportFilteredBlocks()"
-        [attr.aria-label]="locale.t('chain.export')"
-        [title]="locale.t('chain.export')"
-      >
-        <svg viewBox="0 0 16 16" focusable="false" aria-hidden="true">
-          <path
-            d="M3.2 1.6h6.1L12.8 5v9.4H3.2z"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.2"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M9.2 1.6V5h3.6"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.2"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M8 7.2v4.2M6.2 9.8 8 11.6l1.8-1.8"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+ type="button"
+ class="chain-dock__export"
+ (click)="exportFilteredBlocks()"
+ [title]="locale.t('chain.export')"
+ >
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-file-down"/></svg>
         <span>.Json</span>
       </button>
     </div>
@@ -113,27 +88,56 @@
               (selectBlock)="openBlock($event)"
             />
           } @else {
-            <ul class="chain-dock__list" aria-label="Blocs de la blockchain">
+            <ul class="chain-dock__list">
               @for (block of filteredBlocks(); track block.index) {
-                <li class="chain-dock__item" [class.is-head]="latestBlock() && block.index === latestBlock()!.index">
+                <li
+                  class="chain-dock__item"
+                  [class.is-head]="latestBlock() && block.index === latestBlock()!.index"
+                >
                   <button
-                    type="button"
-                    class="chain-dock__item-btn"
-                    (click)="openBlock(block)"
-                    [attr.aria-label]="'Ouvrir le bloc #' + block.index"
-                    [attr.aria-current]="latestBlock() && block.index === latestBlock()!.index ? 'true' : null"
-                  >
-                    <span class="chain-dock__cell chain-dock__cell--index">#{{ block.index }}</span>
-                    <span class="chain-dock__cell chain-dock__cell--hash" [title]="block.hash || 'Hash indisponible'">
+ type="button"
+ class="chain-dock__item-btn"
+ (click)="openBlock(block)"
+ [attr.aria-current]="latestBlock() && block.index === latestBlock()!.index ? 'true' : null"
+ >
+                    <span class="chain-dock__spine" aria-hidden="true">
+                      <span class="chain-dock__spine-rail"></span>
+                      <span class="chain-dock__spine-node"></span>
+                    </span>
+
+                    <span class="chain-dock__index-wrap">
+                      <span class="chain-dock__cell chain-dock__cell--index">#{{ block.index }}</span>
+                      @if (latestBlock() && block.index === latestBlock()!.index) {
+                        <span class="chain-dock__head-tag">HEAD</span>
+                      }
+                    </span>
+
+                    <span
+                      class="chain-dock__cell chain-dock__cell--hash"
+                      [title]="block.hash || 'Hash indisponible'"
+                    >
                       {{ shortHash(block.hash) }}
                     </span>
-                    <span class="chain-dock__cell chain-dock__cell--tx">{{ blockTxCount(block) }} tx</span>
-                    <span class="chain-dock__cell chain-dock__cell--time">
-                      @if (block.timestamp) {
-                        {{ block.timestamp | date:'dd/MM HH:mm' }}
-                      } @else {
-                        —
-                      }
+
+                    <span class="chain-dock__meta">
+                      <span class="chain-dock__tx">
+                        <span class="chain-dock__tx-chip">{{ blockTxCount(block) }} TX</span>
+                        <span class="chain-dock__tx-ticks" aria-hidden="true">
+                          @for (filled of txLoadTicks(block); track $index) {
+                            <span
+                              class="chain-dock__tx-tick"
+                              [class.is-on]="filled"
+                            ></span>
+                          }
+                        </span>
+                      </span>
+                      <span class="chain-dock__cell chain-dock__cell--time">
+                        @if (block.timestamp) {
+                          {{ block.timestamp | date:'dd/MM HH:mm' }}
+                        } @else {
+                          —
+                        }
+                      </span>
                     </span>
                   </button>
                 </li>

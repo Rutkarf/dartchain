@@ -17,7 +17,7 @@
 
       <header class="auth-drawer__head">
         <h2 id="authDrawerTitle" class="auth-drawer__sr-title">
-          {{ auth.drawerMode() === 'login' ? locale.t('auth.loginTitle') : locale.t('auth.registerTitle') }}
+          {{ drawerTitle() }}
         </h2>
         <button
           type="button"
@@ -26,16 +26,14 @@
           [disabled]="auth.loading()"
           (click)="close()"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M6 6l12 12M18 6L6 18" />
-          </svg>
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg>
         </button>
 
+        @if (!auth.challenge()) {
         <div
-          class="auth-drawer__tabs"
-          role="tablist"
-          [attr.aria-label]="locale.t('auth.tabListLabel')"
-        >
+ class="auth-drawer__tabs"
+ role="tablist"
+ >
           <button
             type="button"
             role="tab"
@@ -57,6 +55,7 @@
             <span class="auth-drawer__tab-label">{{ locale.t('auth.tabLogin') }}</span>
           </button>
         </div>
+        }
       </header>
 
       <div class="auth-drawer__body">
@@ -64,7 +63,65 @@
           <p class="auth-drawer__error" role="alert">{{ errorMessage }}</p>
         }
 
-        @if (auth.drawerMode() === 'login') {
+        @if (auth.challenge(); as step) {
+          <form class="auth-drawer__form" [formGroup]="codeForm" (ngSubmit)="submitChallenge()">
+            <div class="auth-drawer__fields">
+              @if (step.status === 'EMAIL_VERIFICATION') {
+                <p class="auth-drawer__hint">
+                  {{ locale.t('auth.emailCodeHint') }}
+                  <strong>{{ step.email }}</strong>
+                </p>
+              } @else if (step.status === 'TWO_FACTOR') {
+                <p class="auth-drawer__hint">{{ locale.t('auth.twoFactorHint') }}</p>
+              } @else if (step.status === 'TOTP_SETUP') {
+                <p class="auth-drawer__hint">{{ locale.t('auth.twoFactorSetupHint') }}</p>
+                <p class="auth-drawer__secret" aria-live="polite">{{ step.secret }}</p>
+              } @else {
+                <p class="auth-drawer__hint">{{ locale.t('auth.twoFactorDisableHint') }}</p>
+              }
+
+              <label class="auth-drawer__field">
+                <span class="auth-drawer__label">
+                  {{ step.status === 'EMAIL_VERIFICATION' ? locale.t('auth.emailCodeLabel') : locale.t('auth.twoFactorLabel') }}
+                </span>
+                <div class="auth-drawer__input-shell">
+                  <input
+                    class="auth-drawer__input"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    maxlength="6"
+                    formControlName="code"
+                    [placeholder]="'000000'"
+                  />
+                </div>
+              </label>
+            </div>
+            <div class="auth-drawer__actions">
+              <button
+                type="submit"
+                class="auth-drawer__submit cta cta--md cta--primary"
+                [class.is-loading]="auth.loading()"
+                [disabled]="auth.loading()"
+              >
+                {{ challengeSubmitLabel(step.status) }}
+              </button>
+              @if (step.status === 'EMAIL_VERIFICATION') {
+                <button
+                  type="button"
+                  class="auth-drawer__text-btn"
+                  [disabled]="auth.loading()"
+                  (click)="resendEmail()"
+                >
+                  {{ locale.t('auth.emailResend') }}
+                </button>
+              }
+              <button type="button" class="auth-drawer__text-btn" (click)="backFromChallenge()">
+                {{ locale.t('auth.challengeBack') }}
+              </button>
+            </div>
+          </form>
+        } @else if (auth.drawerMode() === 'login') {
           <form class="auth-drawer__form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
             <div class="auth-drawer__fields">
               <label class="auth-drawer__field">
@@ -98,24 +155,15 @@
                     [class.is-invalid]="showFieldError(loginForm.controls.password)"
                   />
                   <button
-                    type="button"
-                    class="auth-drawer__password-toggle"
-                    (click)="togglePassword()"
-                    [attr.aria-label]="showPassword() ? locale.t('auth.hidePassword') : locale.t('auth.showPassword')"
-                    [attr.aria-pressed]="showPassword()"
-                  >
+ type="button"
+ class="auth-drawer__password-toggle"
+ (click)="togglePassword()"
+ [attr.aria-pressed]="showPassword()"
+  [attr.aria-label]="showPassword() ? locale.t('auth.hidePassword') : locale.t('auth.showPassword')">
                     @if (showPassword()) {
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M3 3l18 18" />
-                        <path d="M10.58 10.58A2 2 0 0 0 12 16a2 2 0 0 0 1.42-3.42" />
-                        <path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c5 0 9.27 3.11 11 7.5a11.62 11.62 0 0 1-2.12 3.24" />
-                        <path d="M6.61 6.61A11.86 11.86 0 0 0 1 12.5C2.73 16.39 7 19.5 12 19.5a11.5 11.5 0 0 0 4.22-.79" />
-                      </svg>
+                      <svg class="icon icon--md" aria-hidden="true" focusable="false"><use href="#icon-eye-off"/></svg>
                     } @else {
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M2 12.5C3.73 8.11 8 5 13 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S3.73 16.89 2 12.5Z" />
-                        <circle cx="12" cy="12.5" r="3" />
-                      </svg>
+                      <svg class="icon icon--md" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg>
                     }
                   </button>
                 </div>
@@ -133,6 +181,7 @@
               <button
                 type="submit"
                 class="auth-drawer__submit cta cta--md cta--primary"
+                [class.is-loading]="auth.loading()"
                 [disabled]="auth.loading() || auth.oauthRedirecting()"
               >
                 {{ auth.loading() ? locale.t('auth.submitLoginLoading') : locale.t('auth.submitLogin') }}
@@ -192,24 +241,15 @@
                     [class.is-invalid]="showFieldError(registerForm.controls.password)"
                   />
                   <button
-                    type="button"
-                    class="auth-drawer__password-toggle"
-                    (click)="togglePassword()"
-                    [attr.aria-label]="showPassword() ? locale.t('auth.hidePassword') : locale.t('auth.showPassword')"
-                    [attr.aria-pressed]="showPassword()"
-                  >
+ type="button"
+ class="auth-drawer__password-toggle"
+ (click)="togglePassword()"
+ [attr.aria-pressed]="showPassword()"
+ >
                     @if (showPassword()) {
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M3 3l18 18" />
-                        <path d="M10.58 10.58A2 2 0 0 0 12 16a2 2 0 0 0 1.42-3.42" />
-                        <path d="M9.88 5.09A10.94 10.94 0 0 1 12 5c5 0 9.27 3.11 11 7.5a11.62 11.62 0 0 1-2.12 3.24" />
-                        <path d="M6.61 6.61A11.86 11.86 0 0 0 1 12.5C2.73 16.39 7 19.5 12 19.5a11.5 11.5 0 0 0 4.22-.79" />
-                      </svg>
+                      <svg class="icon icon--md" aria-hidden="true" focusable="false"><use href="#icon-eye-off"/></svg>
                     } @else {
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M2 12.5C3.73 8.11 8 5 13 5s9.27 3.11 11 7.5c-1.73 4.39-6 7.5-11 7.5S3.73 16.89 2 12.5Z" />
-                        <circle cx="12" cy="12.5" r="3" />
-                      </svg>
+                      <svg class="icon icon--md" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg>
                     }
                   </button>
                 </div>
@@ -227,6 +267,7 @@
               <button
                 type="submit"
                 class="auth-drawer__submit cta cta--md cta--primary"
+                [class.is-loading]="auth.loading()"
                 [disabled]="auth.loading() || auth.oauthRedirecting()"
               >
                 {{ auth.loading() ? locale.t('auth.submitRegisterLoading') : locale.t('auth.submitRegister') }}
@@ -247,20 +288,19 @@
     <div class="auth-drawer__oauth-grid">
       @for (provider of oauthProviders; track provider.id) {
         <button
-          type="button"
-          [class]="'auth-drawer__oauth-btn auth-drawer__oauth-btn--' + provider.id"
-          [disabled]="auth.loading() || auth.oauthRedirecting() || !auth.isOAuthProviderEnabled(provider.id)"
-          [attr.title]="auth.isOAuthProviderEnabled(provider.id) ? locale.t(provider.labelKey) : locale.t('auth.oauthUnavailable')"
-          [attr.aria-label]="locale.t(provider.labelKey)"
-          (click)="startOAuth(provider.id)"
-        >
+ type="button"
+ [class]="'auth-drawer__oauth-btn auth-drawer__oauth-btn--' + provider.id"
+ [disabled]="auth.loading() || auth.oauthRedirecting() || !auth.isOAuthProviderEnabled(provider.id)"
+ [attr.title]="oauthButtonTitle(provider.id)"
+ (click)="startOAuth(provider.id)"
+  [attr.aria-label]="locale.t(provider.labelKey)">
           @switch (provider.id) {
             @case ('google') {
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="#4285F4" d="M22 12.24c0-.82-.07-1.42-.22-2.05H12v3.72h5.76c-.11.9-.72 2.26-2.07 3.17l-.02.13 3.01 2.34.21.02c1.9-1.75 3-4.33 3-7.33Z" />
-                <path fill="#34A853" d="M12 22c2.7 0 4.97-.89 6.62-2.43l-3.15-2.45c-.85.58-1.98.98-3.47.98-2.65 0-4.9-1.79-5.7-4.21l-.12.01-3.08 2.39-.04.11C4.06 19.54 7.76 22 12 22Z" />
-                <path fill="#FBBC05" d="M6.3 14.89c-.2-.58-.32-1.2-.32-1.89s.12-1.31.31-1.89l-.01-.13-3.12-2.43-.1.05C2.57 10.28 2 11.58 2 12.99s.57 2.71 1.36 3.89l3.94-2.99Z" />
-                <path fill="#EA4335" d="M12 5.38c1.88 0 3.14.81 3.86 1.49l2.82-2.75C16.95 2.89 14.69 2 12 2 7.76 2 4.06 4.46 2.36 8.01l3.94 2.99C7.1 8.78 9.35 5.38 12 5.38Z" />
+                <path fill="#8b9dad" d="M22 12.24c0-.82-.07-1.42-.22-2.05H12v3.72h5.76c-.11.9-.72 2.26-2.07 3.17l-.02.13 3.01 2.34.21.02c1.9-1.75 3-4.33 3-7.33Z" />
+                <path fill="#09814a" d="M12 22c2.7 0 4.97-.89 6.62-2.43l-3.15-2.45c-.85.58-1.98.98-3.47.98-2.65 0-4.9-1.79-5.7-4.21l-.12.01-3.08 2.39-.04.11C4.06 19.54 7.76 22 12 22Z" />
+                <path fill="#7b0d1e" d="M6.3 14.89c-.2-.58-.32-1.2-.32-1.89s.12-1.31.31-1.89l-.01-.13-3.12-2.43-.1.05C2.57 10.28 2 11.58 2 12.99s.57 2.71 1.36 3.89l3.94-2.99Z" />
+                <path fill="#7b0d1e" d="M12 5.38c1.88 0 3.14.81 3.86 1.49l2.82-2.75C16.95 2.89 14.69 2 12 2 7.76 2 4.06 4.46 2.36 8.01l3.94 2.99C7.1 8.78 9.35 5.38 12 5.38Z" />
               </svg>
             }
             @case ('meta') {
@@ -276,10 +316,10 @@
             }
             @case ('microsoft') {
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="3" y="3" width="8.2" height="8.2" fill="#F25022" />
-                <rect x="12.8" y="3" width="8.2" height="8.2" fill="#7FBA00" />
-                <rect x="3" y="12.8" width="8.2" height="8.2" fill="#00A4EF" />
-                <rect x="12.8" y="12.8" width="8.2" height="8.2" fill="#FFB900" />
+                <rect x="3" y="3" width="8.2" height="8.2" fill="#7b0d1e" />
+                <rect x="12.8" y="3" width="8.2" height="8.2" fill="#09814a" />
+                <rect x="3" y="12.8" width="8.2" height="8.2" fill="#8b9dad" />
+                <rect x="12.8" y="12.8" width="8.2" height="8.2" fill="#7b0d1e" />
               </svg>
             }
             @case ('github') {

@@ -11,6 +11,10 @@ public class UserAccount {
     private String walletAddress;
     private String walletPublicKey;
     private UserRole role = UserRole.USER;
+    /** null = compte existant, traité comme déjà confirmé. */
+    private Boolean emailVerified;
+    private String totpSecret;
+    private boolean totpEnabled;
 
     public UserAccount() {
     }
@@ -101,5 +105,33 @@ public class UserAccount {
 
     public void setRole(UserRole role) {
         this.role = role == null ? UserRole.USER : role;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified == null || emailVerified;
+    }
+
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public String getTotpSecret() {
+        return totpSecret;
+    }
+
+    public void setTotpSecret(String totpSecret) {
+        this.totpSecret = totpSecret;
+    }
+
+    public boolean isTotpEnabled() {
+        return totpEnabled;
+    }
+
+    public void setTotpEnabled(boolean totpEnabled) {
+        this.totpEnabled = totpEnabled;
     }
 }

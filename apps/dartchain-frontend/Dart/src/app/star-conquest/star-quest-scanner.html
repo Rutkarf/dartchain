@@ -21,21 +21,19 @@
     (click)="$event.stopPropagation()"
   >
     <header class="sc-scanner__head">
-      <span id="sc-scanner-title" class="sc-scanner__title">Quest · hors vue</span>
+      <span id="sc-scanner-title" class="sc-scanner__title">Quête · hors vue</span>
       <button
         type="button"
         class="sc-scanner__close"
         aria-label="Fermer le scanner"
         (click)="closeList()"
-      >
-        ×
-      </button>
+      ><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
       <span class="sc-scanner__stats">
-        <span class="sc-scanner__conquest" aria-label="Quêtes conquises et live">
+        <span class="sc-scanner__conquest">
           {{ progress.claimedCount() }}/{{ progress.catalogCount }}
           · Live {{ progress.liveCompletedCount() }}/{{ progress.liveLinkCount }}
         </span>
-        <span class="sc-scanner__network" [attr.aria-label]="networkLabel()">{{
+        <span class="sc-scanner__network">{{
           networkLabel()
         }}</span>
       </span>
@@ -51,7 +49,7 @@
       </p>
     }
     @if (state.hiddenCount() === 0) {
-      <p class="sc-scanner__empty">Toutes les Quests sont visibles.</p>
+      <p class="sc-scanner__empty">Toutes les quêtes sont visibles.</p>
     } @else {
       <ul class="sc-scanner__list">
         @for (quest of state.hiddenQuests(); track quest.id) {

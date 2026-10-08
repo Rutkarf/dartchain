@@ -210,7 +210,7 @@ export class ShowcaseApiService {
       lastTransaction: '—',
       featuredId: null,
       items: [],
-      categories: ['Réseau', 'R4V3', 'Peers', 'Écosystème'],
+      categories: ['Réseau', 'R4V3', 'Pairs', 'Écosystème'],
       liveActivity: 'Chaîne en attente',
       lastRefreshedAt: new Date().toISOString(),
       totalCount: 0,

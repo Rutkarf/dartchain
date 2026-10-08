@@ -1,6 +1,7 @@
 @import './styles/google-fonts.css';
 @import './theme.css';
 @import './styles/design-system-tokens.css';
+@import './styles/icon.css';
 @import './styles/ds-scrollbar.css';
 @import './styles/ds-surface.css';
 @import './styles/showcase-tabs-global.css';
@@ -14,11 +15,14 @@
 @import './styles/dock-view-tokens.css';
 @import './styles/tab-push-button-v4.css';
 @import './styles/ds-pass3-polish.css';
+@import './styles/phone-portrait-overlay.css';
+@import './styles/wide-shell-fit.css';
+@import './styles/phone-tall-fit.css';
 
 /* —— Viewport one-page @ 250×550 —— */
 html,
 body {
-  background-color: #000000;
+  background-color: #0a1220;
   background-image: none;
 }
 
@@ -31,6 +35,244 @@ app-root {
   overflow: hidden;
   margin: 0;
   padding: 0;
+  /* Gouttière canon compact = 2px. Au-dessus de 349 px, app.css restaure le % historique. */
+  --app-side-gutter: var(--ds-shell-gutter, 2px);
+  --app-side-gutter-exchange: var(--ds-shell-gutter, 2px);
+  --app-side-gutter-band: var(--ds-shell-gutter, 2px);
+}
+
+html.intro-active,
+html.intro-active body,
+html.age-gate-active,
+html.age-gate-active body {
+  overflow: hidden;
+  background: #0a1220 !important;
+}
+
+/* Refus d’âge : écran noir total jusqu’à about:blank — zéro flash du hub. */
+html.age-gate-kick,
+html.age-gate-kick body {
+  background: #0a1220 !important;
+  overflow: hidden !important;
+}
+
+html.age-gate-kick app-root,
+html.age-gate-kick .app-shell,
+html.age-gate-kick #age-call-boot {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#age-call-kick {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: var(--z-agegate, 10060) !important;
+  background: #0a1220 !important;
+  pointer-events: auto !important;
+}
+
+/* Pendant l’appel d’âge, l’intro ne doit ni se voir ni capter les clics. */
+html.age-gate-active:not(.intro-active) .intro {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Pont appel → INSERT : l’intro apparaît sous le flyer pendant le vol. */
+html.intro-handoff,
+html.intro-handoff body {
+  /* Filet anti-flash noir si une couche est un frame en retard. */
+  background-color: #0a1220 !important;
+}
+
+html.intro-handoff .intro,
+html.intro-active.intro-handoff .intro {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+html.intro-handoff .intro__atmosphere {
+  opacity: 1 !important;
+}
+
+/*
+ * Hub / blockchain invisibles pendant l’appel puis l’intro,
+ * jusqu’au reveal (token qui recule) ou fin d’intro.
+ * Star Conquest reste visible pendant intro-feed-sc (soulignage token).
+ */
+html.age-gate-active .app-shell > :not(app-age-call-gate):not(app-intro-overlay):not(app-particle-background),
+html.intro-active:not(.intro-reveal) .app-shell > :not(app-age-call-gate):not(app-intro-overlay):not(app-particle-background) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* Pendant l’intro Feed : SC sous le token — sans arête horizontale dure. */
+html.intro-active:not(.intro-feed-sc) app-particle-background {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+html.intro-feed-sc app-particle-background,
+html.intro-feed-sc app-particle-background.app-background {
+  --sc-edge-feather: 96px;
+  visibility: visible !important;
+  opacity: var(--intro-sc-opacity, 0) !important;
+  pointer-events: auto !important;
+  z-index: 19000 !important;
+  transition: opacity 0.85s cubic-bezier(0.33, 0.08, 0.2, 1) !important;
+  /*
+   * Clip élargi (hit-test) : l’arête dure est hors de la zone opaque.
+   * Le fondu visuel = mask soft uniquement → plus de ligne de coupure.
+   */
+  clip-path: inset(
+    max(0px, calc(var(--sc-playable-top, 40%) - var(--sc-edge-feather)))
+      0
+      max(0px, calc(var(--sc-playable-bottom, 40%) - var(--sc-edge-feather)))
+      0
+  ) !important;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent max(0px, calc(var(--sc-playable-top, 40%) - 28px)),
+    rgba(0, 0, 0, 0.12) max(0px, calc(var(--sc-playable-top, 40%) + 6px)),
+    rgba(0, 0, 0, 0.55) max(0px, calc(var(--sc-playable-top, 40%) + 32px)),
+    #000 max(0px, calc(var(--sc-playable-top, 40%) + 64px)),
+    #000 max(0px, calc(100% - var(--sc-playable-bottom, 40%) - 64px)),
+    rgba(0, 0, 0, 0.55) max(0px, calc(100% - var(--sc-playable-bottom, 40%) - 32px)),
+    rgba(0, 0, 0, 0.14) max(0px, calc(100% - var(--sc-playable-bottom, 40%) - 6px)),
+    transparent calc(100% - var(--sc-playable-bottom, 40%) + 28px),
+    transparent 100%
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent max(0px, calc(var(--sc-playable-top, 40%) - 28px)),
+    rgba(0, 0, 0, 0.12) max(0px, calc(var(--sc-playable-top, 40%) + 6px)),
+    rgba(0, 0, 0, 0.55) max(0px, calc(var(--sc-playable-top, 40%) + 32px)),
+    #000 max(0px, calc(var(--sc-playable-top, 40%) + 64px)),
+    #000 max(0px, calc(100% - var(--sc-playable-bottom, 40%) - 64px)),
+    rgba(0, 0, 0, 0.55) max(0px, calc(100% - var(--sc-playable-bottom, 40%) - 32px)),
+    rgba(0, 0, 0, 0.14) max(0px, calc(100% - var(--sc-playable-bottom, 40%) - 6px)),
+    transparent calc(100% - var(--sc-playable-bottom, 40%) + 28px),
+    transparent 100%
+  ) !important;
+}
+
+html.intro-feed-sc.intro-feed-sc-lift app-particle-background,
+html.intro-feed-sc.intro-feed-sc-lift app-particle-background.app-background {
+  clip-path: none !important;
+  pointer-events: none !important;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.15) max(0px, calc(var(--sc-playable-top, 40%) - 56px)),
+    rgba(0, 0, 0, 0.65) max(0px, calc(var(--sc-playable-top, 40%) + 4px)),
+    #000 max(0px, calc(var(--sc-playable-top, 40%) + 48px)),
+    #000 max(0px, calc(100% - var(--sc-playable-bottom, 40%) + 8px)),
+    rgba(0, 0, 0, 0.3) max(0px, calc(100% - var(--sc-playable-bottom, 40%) + 64px)),
+    transparent 100%
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.15) max(0px, calc(var(--sc-playable-top, 40%) - 56px)),
+    rgba(0, 0, 0, 0.65) max(0px, calc(var(--sc-playable-top, 40%) + 4px)),
+    #000 max(0px, calc(var(--sc-playable-top, 40%) + 48px)),
+    #000 max(0px, calc(100% - var(--sc-playable-bottom, 40%) + 8px)),
+    rgba(0, 0, 0, 0.3) max(0px, calc(100% - var(--sc-playable-bottom, 40%) + 64px)),
+    transparent 100%
+  ) !important;
+}
+
+html.intro-feed-sc app-particle-background canvas {
+  pointer-events: auto !important;
+}
+
+html.intro-feed-sc.intro-feed-sc-lift app-particle-background canvas {
+  pointer-events: none !important;
+}
+
+/* Trou fond : feather long — pas de lame horizontale autour du bandeau SC. */
+html.intro-feed-sc .intro__atmosphere,
+html.intro-feed-sc .intro__grid,
+html.intro-feed-sc .intro__grain,
+html.intro-feed-sc .intro__gl {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 max(0px, calc(var(--intro-sc-mask-top, 40%) - 140px)),
+    rgba(0, 0, 0, 0.55) max(0px, calc(var(--intro-sc-mask-top, 40%) - 72px)),
+    rgba(0, 0, 0, 0.18) max(0px, calc(var(--intro-sc-mask-top, 40%) - 28px)),
+    rgba(0, 0, 0, 0.04) max(0px, calc(var(--intro-sc-mask-top, 40%) - 4px)),
+    transparent var(--intro-sc-mask-top, 40%),
+    transparent var(--intro-sc-mask-bottom, 55%),
+    rgba(0, 0, 0, 0.04) calc(var(--intro-sc-mask-bottom, 55%) + 8px),
+    rgba(0, 0, 0, 0.18) calc(var(--intro-sc-mask-bottom, 55%) + 36px),
+    rgba(0, 0, 0, 0.55) calc(var(--intro-sc-mask-bottom, 55%) + 80px),
+    #000 calc(var(--intro-sc-mask-bottom, 55%) + 140px),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 max(0px, calc(var(--intro-sc-mask-top, 40%) - 140px)),
+    rgba(0, 0, 0, 0.55) max(0px, calc(var(--intro-sc-mask-top, 40%) - 72px)),
+    rgba(0, 0, 0, 0.18) max(0px, calc(var(--intro-sc-mask-top, 40%) - 28px)),
+    rgba(0, 0, 0, 0.04) max(0px, calc(var(--intro-sc-mask-top, 40%) - 4px)),
+    transparent var(--intro-sc-mask-top, 40%),
+    transparent var(--intro-sc-mask-bottom, 55%),
+    rgba(0, 0, 0, 0.04) calc(var(--intro-sc-mask-bottom, 55%) + 8px),
+    rgba(0, 0, 0, 0.18) calc(var(--intro-sc-mask-bottom, 55%) + 36px),
+    rgba(0, 0, 0, 0.55) calc(var(--intro-sc-mask-bottom, 55%) + 80px),
+    #000 calc(var(--intro-sc-mask-bottom, 55%) + 140px),
+    #000 100%
+  );
+}
+
+/* Pendant la montée : trou atmosphère s’ouvre vers le ciel, bas figé (pas de lame). */
+html.intro-feed-sc.intro-feed-sc-lift .intro__atmosphere,
+html.intro-feed-sc.intro-feed-sc-lift .intro__grid,
+html.intro-feed-sc.intro-feed-sc-lift .intro__grain,
+html.intro-feed-sc.intro-feed-sc-lift .intro__gl {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 max(0px, calc(var(--intro-sc-mask-top, 40%) - 160px)),
+    rgba(0, 0, 0, 0.25) max(0px, calc(var(--intro-sc-mask-top, 40%) - 80px)),
+    transparent max(0px, calc(var(--intro-sc-mask-top, 40%) - 20px)),
+    transparent calc(var(--intro-sc-mask-bottom, 55%) + 40px),
+    rgba(0, 0, 0, 0.2) calc(var(--intro-sc-mask-bottom, 55%) + 90px),
+    #000 calc(var(--intro-sc-mask-bottom, 55%) + 150px),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 max(0px, calc(var(--intro-sc-mask-top, 40%) - 160px)),
+    rgba(0, 0, 0, 0.25) max(0px, calc(var(--intro-sc-mask-top, 40%) - 80px)),
+    transparent max(0px, calc(var(--intro-sc-mask-top, 40%) - 20px)),
+    transparent calc(var(--intro-sc-mask-bottom, 55%) + 40px),
+    rgba(0, 0, 0, 0.2) calc(var(--intro-sc-mask-bottom, 55%) + 90px),
+    #000 calc(var(--intro-sc-mask-bottom, 55%) + 150px),
+    #000 100%
+  );
+}
+
+/* Pendant la descente logo.stl haut → Live : pas de 2ᵉ logo navbar concurrent. */
+html.intro-token-entering .logo-shell {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Pendant le vol logo appel → fente, l’intro reste visible sous le flyer. */
+html.intro-active app-age-call-gate {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
 }
 
 /* Dock stack : onglets horizontaux visibles au-dessus du panneau repliable */
@@ -368,11 +610,32 @@ body {
 body :where(input, textarea, select) {
   color: var(--text-primary);
   -webkit-text-fill-color: var(--text-primary);
+  /* Empêche le rendu « light » navigateur (fond crème/jaune) sur UI dark. */
+  color-scheme: dark;
+  caret-color: var(--text-primary);
 }
 
 body :where(input, textarea)::placeholder {
   color: var(--text-placeholder) !important;
   -webkit-text-fill-color: var(--text-placeholder) !important;
+}
+
+/*
+ * Autofill navigateur (Chrome/Edge/Safari) : fond jaune opaque par défaut,
+ * illisible avec le texte porcelain. On force la charte dark via inset shadow
+ * (background-color est ignoré sur :-webkit-autofill).
+ */
+body :where(input, textarea, select):-webkit-autofill,
+body :where(input, textarea, select):-webkit-autofill:hover,
+body :where(input, textarea, select):-webkit-autofill:focus,
+body :where(input, textarea, select):-webkit-autofill:active,
+body :where(input, textarea, select):autofill {
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary);
+  border-color: var(--ds-input-border, rgba(237, 231, 217, 0.08));
+  box-shadow: 0 0 0 1000px var(--bg-0, #0a1220) inset !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-0, #0a1220) inset !important;
+  transition:  background-color 99999s ease-in-out 0s;
 }
 
 body :where(button, input, textarea, select):disabled {
@@ -388,8 +651,9 @@ body {
   background: var(--bg-base);
 }
 
-/* Compact ≤349 (cible 250×550) — zero-scroll, hauteur verrouillée viewport */
-@media (max-width: 349px) {
+/* Canon ≤349 et téléphone portrait ≤480 — zero-scroll, hauteur verrouillée */
+@media (max-width: 349px),
+       (orientation: portrait) and (max-width: 480px) {
   html,
   body,
   app-root {
@@ -432,7 +696,7 @@ body {
 .app-bottom-stack .app-bottom-stack__panel .wallet-display:not(.ds-surface),
 .app-bottom-stack .app-bottom-stack__panel .faucet-panel:not(.ds-surface) {
   border: none !important;
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
   background: transparent !important;
   box-shadow: none !important;
 }
@@ -445,7 +709,7 @@ body {
 .app-bottom-stack .app-bottom-stack__panel .faucet-panel.ds-surface,
 .app-bottom-stack .app-bottom-stack__panel .wallet-display.ds-surface {
   border: none !important;
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
   box-shadow: none !important;
 }
 
@@ -471,7 +735,7 @@ body {
 .showcase-tab.ds-surface.ds-surface--showcase-tab,
 .app-bottom-stack .showcase-tab,
 .app-bottom-stack .showcase-tab.ds-surface.ds-surface--showcase-tab {
-  border-radius: 0 !important;
+  border-radius: var(--radius-none) !important;
 }
 
 /* TOUS collapsed: same text sizing as dock collapsed, stronger override */
@@ -485,13 +749,13 @@ app-showcase-news-summary .news-summary-bar__cat {
 }
 
 app-showcase-news-summary .news-summary-bar__headline {
-  font-size: clamp(0.375rem, 2.35vw, 0.5625rem) !important;
+  font-size: var(--fs-module)!important;
   font-weight: 600 !important;
   line-height: 1.1 !important;
 }
 
 app-showcase-news-summary .news-summary-bar__age {
-  font-size: clamp(0.3375rem, 2vw, 0.4375rem) !important;
+  font-size: var(--fs-module)!important;
   font-weight: 600 !important;
 }
 
@@ -507,4 +771,56 @@ app-showcase-news-summary .news-summary-bar__age {
   height: 100% !important;
   max-height: 100% !important;
   min-height: 0 !important;
+}
+
+/* Onboarding tour — cible nette + légère surbrillance (reste après Suivant si sticky). */
+.onboarding-tour-target-focus {
+  position: relative;
+  z-index: 9100;
+  outline: 1px solid rgba(213, 160, 33, 0.55);
+  outline-offset: 2px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 3px rgba(213, 160, 33, 0.12);
+}
+
+/* Grossissement ludique sur la zone nette active */
+.onboarding-tour-target-lure {
+  transform-origin: center center;
+  animation: onboarding-tour-lure 1.15s ease-in-out infinite;
+  will-change: transform;
+  filter: brightness(1.06);
+}
+
+@keyframes onboarding-tour-lure {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Legacy pulse (compat) — sans bordure */
+.onboarding-tour-target-pulse {
+  position: relative;
+  z-index: 1;
+  animation: onboarding-tour-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes onboarding-tour-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-tour-target-pulse,
+  .onboarding-tour-target-lure {
+    animation:  none;
+  }
 }

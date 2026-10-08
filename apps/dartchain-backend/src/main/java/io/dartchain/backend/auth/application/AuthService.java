@@ -4,10 +4,14 @@ import io.dartchain.backend.auth.audit.AuthAuditService;
 import io.dartchain.backend.auth.model.UserAccount;
 import io.dartchain.backend.auth.model.UserRole;
 import io.dartchain.backend.auth.dto.AuthResponse;
+import io.dartchain.backend.auth.dto.EmailCodeRequest;
 import io.dartchain.backend.auth.dto.LinkWalletRequest;
 import io.dartchain.backend.auth.dto.LoginRequest;
 import io.dartchain.backend.auth.dto.RefreshRequest;
 import io.dartchain.backend.auth.dto.RegisterRequest;
+import io.dartchain.backend.auth.dto.TotpCodeRequest;
+import io.dartchain.backend.auth.dto.TotpSetupResponse;
+import io.dartchain.backend.auth.dto.TotpVerifyRequest;
 import io.dartchain.backend.auth.dto.UserProfileResponse;
 import io.dartchain.backend.auth.jwt.NativeJwtService;
 import io.dartchain.backend.auth.store.RefreshTokenStore;
@@ -38,6 +42,7 @@ public class AuthService {
     private final AuthAuditService authAuditService;
     private final QuestService questService;
     private final ApplicationMetricsCollector metricsCollector;
+    private final AccountFactorService accountFactorService;
 
     public AuthService(
             UserAccountStore userAccountStore,
@@ -47,7 +52,20 @@ public class AuthService {
             AuthProperties authProperties,
             AuthAuditService authAuditService
     ) {
-        this(userAccountStore, refreshTokenStore, authTokenResolver, nativeJwtService, authProperties, authAuditService, null, null);
+        this(userAccountStore, refreshTokenStore, authTokenResolver, nativeJwtService, authProperties, authAuditService, null, null, null);
+    }
+
+    public AuthService(
+            UserAccountStore userAccountStore,
+            RefreshTokenStore refreshTokenStore,
+            AuthTokenResolver authTokenResolver,
+            NativeJwtService nativeJwtService,
+            AuthProperties authProperties,
+            AuthAuditService authAuditService,
+            @Lazy QuestService questService,
+            ApplicationMetricsCollector metricsCollector
+    ) {
+        this(userAccountStore, refreshTokenStore, authTokenResolver, nativeJwtService, authProperties, authAuditService, questService, metricsCollector, null);
     }
 
     @Autowired
@@ -59,7 +77,8 @@ public class AuthService {
             AuthProperties authProperties,
             AuthAuditService authAuditService,
             @Lazy QuestService questService,
-            ApplicationMetricsCollector metricsCollector
+            ApplicationMetricsCollector metricsCollector,
+            AccountFactorService accountFactorService
     ) {
         this.userAccountStore = userAccountStore;
         this.refreshTokenStore = refreshTokenStore;
@@ -69,6 +88,7 @@ public class AuthService {
         this.authAuditService = authAuditService;
         this.questService = questService;
         this.metricsCollector = metricsCollector;
+        this.accountFactorService = accountFactorService;
     }
 
     public AuthResponse register(RegisterRequest request, String ipAddress) {
@@ -76,13 +96,21 @@ public class AuthService {
         String email = request.email().trim();
         String password = request.password();
         validatePassword(password);
-
-        if (userAccountStore.findByUsername(username).isPresent()) {
-            throw new AuthException(409, "Ce nom d'utilisateur est déjà utilisé");
+        if (requiresEmailVerification() && !accountFactorService.mailConfigured()) {
+            throw new AuthException(
+                    503,
+                    "L'envoi d'email n'est pas configuré. Renseignez DARTCHAIN_MAIL_HOST, DARTCHAIN_MAIL_USERNAME et DARTCHAIN_MAIL_PASSWORD."
+            );
         }
 
-        if (userAccountStore.findByEmail(email).isPresent()) {
-            throw new AuthException(409, "Cet email est déjà utilisé");
+        Optional<UserAccount> existingUsername = userAccountStore.findByUsername(username);
+        if (existingUsername.isPresent()) {
+            return resumeUnverifiedRegistration(existingUsername.get(), email);
+        }
+
+        Optional<UserAccount> existingEmail = userAccountStore.findByEmail(email);
+        if (existingEmail.isPresent()) {
+            return resumeUnverifiedRegistration(existingEmail.get(), email);
         }
 
         UserAccount account = new UserAccount(
@@ -94,12 +122,18 @@ public class AuthService {
                 System.currentTimeMillis()
         );
         account.setRole(resolveBootstrapRole(username));
+        if (requiresEmailVerification()) {
+            account.setEmailVerified(Boolean.FALSE);
+        }
 
         userAccountStore.create(account);
         if (metricsCollector != null) {
             metricsCollector.recordAuthRegistration(username);
         }
         authAuditService.registerSuccess(account.getId(), ipAddress);
+        if (requiresEmailVerification()) {
+            return AuthResponse.emailVerification(accountFactorService.issueEmailCode(account), toProfile(account));
+        }
         return buildAuthResponse(account);
     }
 
@@ -129,8 +163,49 @@ public class AuthService {
             metricsCollector.recordAuthLogin(identifier);
         }
         authAuditService.loginSuccess(account.getId(), ipAddress);
+        if (requiresEmailVerification() && !account.isEmailVerified()) {
+            return AuthResponse.emailVerification(accountFactorService.issueEmailCode(account), toProfile(account));
+        }
+        return finishLogin(account);
+    }
 
+    public AuthResponse confirmEmail(EmailCodeRequest request, String ipAddress) {
+        UserAccount account = accountFactorService.consumeEmailCode(request.verificationId(), request.code());
+        account = userAccountStore.markEmailVerified(account.getId());
+        authAuditService.loginSuccess(account.getId(), ipAddress);
+        return finishLogin(account);
+    }
+
+    public AuthResponse resendEmail(String verificationId) {
+        String nextId = accountFactorService.resendEmailCode(verificationId);
+        UserAccount account = accountFactorService.pendingAccount(nextId);
+        return AuthResponse.emailVerification(nextId, toProfile(account));
+    }
+
+    public AuthResponse confirmTotp(TotpVerifyRequest request, String ipAddress) {
+        UserAccount account = accountFactorService.consumeTotpChallenge(request.challengeToken(), request.code());
+        authAuditService.loginSuccess(account.getId(), ipAddress);
         return buildAuthResponse(account);
+    }
+
+    public TotpSetupResponse beginTotpSetup(String authorization) {
+        return accountFactorService.beginTotpSetup(requireAuthenticatedAccount(authorization));
+    }
+
+    public UserProfileResponse enableTotp(String authorization, TotpCodeRequest request) {
+        UserAccount account = accountFactorService.enableTotp(
+                requireAuthenticatedAccount(authorization),
+                request.code()
+        );
+        return toProfile(account);
+    }
+
+    public UserProfileResponse disableTotp(String authorization, TotpCodeRequest request) {
+        UserAccount account = accountFactorService.disableTotp(
+                requireAuthenticatedAccount(authorization),
+                request.code()
+        );
+        return toProfile(account);
     }
 
     public AuthResponse loginOAuth(UserAccount account, String ipAddress) {
@@ -138,7 +213,7 @@ public class AuthService {
             metricsCollector.recordAuthLogin(account.getUsername());
         }
         authAuditService.loginSuccess(account.getId(), ipAddress);
-        return buildAuthResponse(account);
+        return finishLogin(account);
     }
 
     public AuthResponse refresh(RefreshRequest request, String ipAddress) {
@@ -196,6 +271,8 @@ public class AuthService {
             if (!derivedAddress.equals(walletAddress)) {
                 throw new AuthException(400, "La clé publique ne correspond pas à l'adresse wallet");
             }
+        } catch (AuthException exception) {
+            throw exception;
         } catch (RuntimeException exception) {
             throw new AuthException(400, "Clé publique invalide");
         }
@@ -222,7 +299,7 @@ public class AuthService {
 
     public void ensureWalletOwnership(UserAccount account, String walletAddress) {
         if (account.getWalletAddress() == null || account.getWalletAddress().isBlank()) {
-            throw new AuthException(403, "Aucun wallet lié au compte. Liez un wallet avant de continuer.");
+            throw new AuthException(403, "Aucun portefeuille lié au compte. Liez un portefeuille avant de continuer.");
         }
 
         if (!account.getWalletAddress().equalsIgnoreCase(WalletValidator.normalize(walletAddress))) {
@@ -242,6 +319,29 @@ public class AuthService {
             return Optional.empty();
         }
         return userAccountStore.findByWalletAddress(WalletValidator.normalize(walletAddress));
+    }
+
+    private AuthResponse resumeUnverifiedRegistration(UserAccount existing, String email) {
+        boolean sameEmail = AuthNormalizer.normalizeEmail(existing.getEmail())
+                .equals(AuthNormalizer.normalizeEmail(email));
+        if (requiresEmailVerification() && !existing.isEmailVerified() && sameEmail) {
+            return AuthResponse.emailVerification(accountFactorService.issueEmailCode(existing), toProfile(existing));
+        }
+        if (AuthNormalizer.normalizeEmail(existing.getEmail()).equals(AuthNormalizer.normalizeEmail(email))) {
+            throw new AuthException(409, "Cet email est déjà utilisé");
+        }
+        throw new AuthException(409, "Ce nom d'utilisateur est déjà utilisé");
+    }
+
+    private boolean requiresEmailVerification() {
+        return accountFactorService != null && accountFactorService.emailVerificationRequired();
+    }
+
+    private AuthResponse finishLogin(UserAccount account) {
+        if (account.isTotpEnabled() && accountFactorService != null) {
+            return AuthResponse.twoFactor(accountFactorService.issueTotpChallenge(account.getId()), toProfile(account));
+        }
+        return buildAuthResponse(account);
     }
 
     private AuthResponse buildAuthResponse(UserAccount account) {
@@ -297,7 +397,8 @@ public class AuthService {
                 account.getCreatedAt(),
                 account.getWalletAddress(),
                 account.getWalletPublicKey(),
-                account.getRole().name()
+                account.getRole().name(),
+                account.isTotpEnabled()
         );
     }
 

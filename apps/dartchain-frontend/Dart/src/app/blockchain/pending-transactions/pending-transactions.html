@@ -66,7 +66,7 @@
             (click)="mineAll()"
             [disabled]="isBusy()"
           >
-            {{ miningAll() ? '…' : 'Mine tout' }}
+            {{ miningAll() ? '…' : 'Miner tout' }}
           </button>
         }
       </div>
@@ -93,7 +93,7 @@
         }
       </ul>
     } @else if (hasFilteredTransactions()) {
-      <ul class="pending-view__list" [class.pending-view__list--compact]="compact" aria-label="Mempool">
+      <ul class="pending-view__list" [class.pending-view__list--compact]="compact">
         @if (compact && hideCompactBar) {
           <li class="pending-view__item pending-view__item--head" aria-hidden="true">
             <div class="pending-view__item-row pending-view__item-row--compact pending-view__item-row--head">
@@ -125,7 +125,7 @@
                 [title]="(resolveFrom(tx) || '—') + ' → ' + (resolveTo(tx) || '—')"
               >
                 {{ resolveFrom(tx) ? shortHash(resolveFrom(tx)) : '—' }}
-                <span class="pending-view__route-arrow" aria-hidden="true">→</span>
+                <span class="pending-view__route-arrow" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-right"/></svg></span>
                 {{ resolveTo(tx) ? shortHash(resolveTo(tx)) : '—' }}
               </span>
               <span class="pending-view__amount">{{ formatAmount(tx.amount) }}</span>
@@ -157,7 +157,7 @@
                 [title]="(resolveFrom(tx) || '—') + ' → ' + (resolveTo(tx) || '—')"
               >
                 {{ resolveFrom(tx) ? shortHash(resolveFrom(tx)) : '—' }}
-                <span class="pending-view__route-arrow" aria-hidden="true">→</span>
+                <span class="pending-view__route-arrow" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-right"/></svg></span>
                 {{ resolveTo(tx) ? shortHash(resolveTo(tx)) : '—' }}
               </span>
               <span class="pending-view__amount">{{ formatAmount(tx.amount) }}</span>
@@ -168,15 +168,12 @@
                 {{ isMining(tx.id) ? 'Mining' : statusLabel(tx.status) }}
               </span>
               <button
-                type="button"
-                class="pending-view__mine"
-                (click)="mineTransaction(tx.id || tx.hash || '')"
-                [disabled]="loading() || isMining(tx.id || tx.hash || '') || !(tx.id || tx.hash)"
-                [attr.aria-busy]="isMining(tx.id || tx.hash || '')"
-                [attr.aria-label]="isMining(tx.id)
-                  ? 'Minage en cours pour ' + shortHash(tx.hash || tx.id)
-                  : 'Miner ' + shortHash(tx.hash || tx.id)"
-              >
+ type="button"
+ class="pending-view__mine"
+ (click)="mineTransaction(tx.id || tx.hash || '')"
+ [disabled]="loading() || isMining(tx.id || tx.hash || '') || !(tx.id || tx.hash)"
+ [attr.aria-busy]="isMining(tx.id || tx.hash || '')"
+ >
                 {{ isMining(tx.id) ? '…' : 'Mine' }}
               </button>
             </div>
@@ -196,7 +193,7 @@
             (click)="mineAll()"
             [disabled]="isBusy()"
           >
-            {{ miningAll() ? 'Minage…' : 'Mine tout' }}
+            {{ miningAll() ? 'Minage…' : 'Miner tout' }}
           </button>
         </footer>
       }

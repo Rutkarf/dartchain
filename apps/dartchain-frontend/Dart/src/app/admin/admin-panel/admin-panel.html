@@ -1,4 +1,4 @@
-<section class="admin-panel" aria-label="Administration globale">
+<section class="admin-panel">
   @if (!unlocked()) {
     <div class="admin-panel__gate" role="dialog" aria-labelledby="admin-seed-title">
       <h2 id="admin-seed-title" class="admin-panel__title">{{ locale.t('admin.seedTitle') }}</h2>
@@ -45,7 +45,7 @@
       </button>
     </header>
 
-    <nav class="admin-panel__tabs" aria-label="Sections admin">
+    <nav class="admin-panel__tabs">
       <button
         type="button"
         class="admin-panel__tab"
@@ -73,13 +73,13 @@
     </nav>
 
     @if (section() === 'soc') {
-      <section class="admin-panel__soc" aria-label="Contrôles SOC">
+      <section class="admin-panel__soc">
         <p class="admin-panel__lead">{{ locale.t('admin.socLead') }}</p>
         <div class="admin-panel__table-wrap">
           <table class="admin-panel__table">
             <thead>
               <tr>
-                <th>Framework</th>
+                <th>Cadre</th>
                 <th>Type</th>
                 <th>Critère</th>
                 <th>Contrôle</th>
@@ -111,7 +111,7 @@
     }
 
     @if (section() === 'export') {
-      <section class="admin-panel__export" aria-label="Exports">
+      <section class="admin-panel__export">
         <p class="admin-panel__lead">{{ locale.t('admin.exportLead') }}</p>
         <div class="admin-panel__domains">
           @for (domain of domains; track domain) {
@@ -158,7 +158,7 @@
       }
 
       @if (snapshot(); as data) {
-        <section class="admin-panel__meta" aria-label="Métadonnées">
+        <section class="admin-panel__meta">
           <span class="admin-panel__badge">Phase {{ data.phase }}</span>
           <span class="admin-panel__meta-item">
             {{ locale.t('admin.collected') }}: {{ formatTimestamp(data.collectedAt) }}
@@ -166,7 +166,7 @@
         </section>
 
         @if (data.alerts.length > 0) {
-          <section class="admin-panel__alerts" aria-label="Alertes">
+          <section class="admin-panel__alerts">
             <h3 class="admin-panel__section-title">{{ locale.t('admin.alerts') }}</h3>
             <ul class="admin-panel__alert-list">
               @for (alert of data.alerts; track alert.code) {
@@ -181,7 +181,7 @@
           <p class="admin-panel__ok">{{ locale.t('admin.noAlerts') }}</p>
         }
 
-        <section class="admin-panel__stats" aria-label="Jauges">
+        <section class="admin-panel__stats">
           <h3 class="admin-panel__section-title">{{ locale.t('admin.gauges') }}</h3>
           <div class="admin-panel__grid">
             @for (entry of gaugeEntries(); track entry.key) {
@@ -193,7 +193,7 @@
           </div>
         </section>
 
-        <section class="admin-panel__stats" aria-label="Latence">
+        <section class="admin-panel__stats">
           <h3 class="admin-panel__section-title">{{ locale.t('admin.latency') }}</h3>
           <div class="admin-panel__grid">
             @for (entry of latencyEntries(); track entry.key) {
@@ -205,7 +205,7 @@
           </div>
         </section>
 
-        <section class="admin-panel__stats" aria-label="Compteurs">
+        <section class="admin-panel__stats">
           <h3 class="admin-panel__section-title">{{ locale.t('admin.counters') }}</h3>
           <div class="admin-panel__grid admin-panel__grid--compact">
             @for (entry of counterEntries(); track entry.key) {

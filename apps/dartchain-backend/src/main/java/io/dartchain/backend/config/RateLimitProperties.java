@@ -8,7 +8,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "dartchain.rate-limit")
 public class RateLimitProperties {
 
-    private int maxRequests = 20;
+    private int maxRequests = 60;
     private long windowMs = 60_000L;
     private List<String> paths = defaultPaths();
 
@@ -40,7 +40,12 @@ public class RateLimitProperties {
         return List.of(
                 "/api/auth/register",
                 "/api/auth/login",
-                "/api/wallets/create",
+                "/api/v1/auth/register",
+                "/api/v1/auth/login",
+                "/api/v1/auth/refresh",
+                "/api/v1/auth/email/confirm",
+                "/api/v1/auth/email/resend",
+                "/api/v1/auth/2fa/verify",
                 "/api/wallets/create-client",
                 "/api/wallets/verify",
                 "/api/faucet/claim",

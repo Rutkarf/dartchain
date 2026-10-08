@@ -1,5 +1,5 @@
 /**
- * Star Conquest UI maturity — profondeur, ruche, repos calme, 250×550.
+ * Conquête stellaire UI maturity — profondeur, ruche, repos calme, 250×550.
  * Ne remplace pas le thème univers : les multiplicateurs s’appliquent au rendu.
  */
 

@@ -1,20 +1,15 @@
-<div class="showcase-launch-hub showcase-view showcase-view--news" role="region" aria-label="LaunchLab — projets">
+<div
+ class="showcase-launch-hub showcase-view showcase-view--news"
+ [class.is-drawer-open]="!!selectedProject()"
+ role="region"
+>
   @if (isExpanded) {
     <header class="showcase-news__head">
       <div class="showcase-meta showcase-news__meta-bar showcase-launch__meta-bar">
         <label class="showcase-meta__search showcase-launch__search-inline">
           <span class="sr-only">Rechercher un projet</span>
           <span class="showcase-launch__search-icon" aria-hidden="true">
-            <svg viewBox="0 0 16 16" focusable="false">
-              <circle cx="6.5" cy="6.5" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5" />
-              <path
-                d="M9.8 9.8 13.2 13.2"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-            </svg>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
           </span>
           <span
             class="showcase-launch__search-hint"
@@ -61,22 +56,25 @@
           }
         </div>
       } @else {
-        <ul class="showcase-news__list showcase-launch__list" aria-label="Projets launch">
+        <ul class="showcase-news__list showcase-launch__list">
           @for (project of filteredProjects(); track project.id) {
             <li
               class="showcase-news__item showcase-launch__item"
+              [attr.data-launch-symbol]="project.symbol"
+              [attr.data-symbol]="project.symbol"
               [class.showcase-launch__item--selected]="selectedProject()?.id === project.id"
+              [class.showcase-launch__item--native]="project.symbol === 'R4V3'"
             >
               <div
-                class="showcase-launch__item-row"
-                role="button"
-                tabindex="0"
-                [attr.aria-expanded]="selectedProject()?.id === project.id"
-                [attr.aria-label]="'Voir les infos ' + project.name"
-                (click)="openProject(project)"
-                (keydown.enter)="openProject(project)"
-                (keydown.space)="$event.preventDefault(); openProject(project)"
-              >
+ class="showcase-launch__item-row"
+ role="button"
+ tabindex="0"
+ [attr.data-launch-symbol]="project.symbol"
+ [attr.aria-expanded]="selectedProject()?.id === project.id"
+ (click)="openProject(project)"
+ (keydown.enter)="openProject(project)"
+ (keydown.space)="$event.preventDefault(); openProject(project)"
+ >
                 <span
                   class="showcase-launch__badge"
                   [class.showcase-launch__badge--live]="project.status === 'LIVE'"
@@ -97,13 +95,12 @@
                 </span>
 
                 <button
-                  type="button"
-                  class="showcase-launch__action ds-surface ds-surface--showcase-tab"
-                  [class.showcase-launch__action--muted]="!canSwapProject(project)"
-                  [disabled]="!canSwapProject(project)"
-                  (click)="swapProject(project, $event)"
-                  [attr.aria-label]="swapAriaLabel(project)"
-                >
+ type="button"
+ class="showcase-launch__action ds-surface ds-surface--showcase-tab"
+ [class.showcase-launch__action--muted]="!canSwapProject(project)"
+ [disabled]="!canSwapProject(project)"
+ (click)="swapProject(project, $event)"
+ >
                   Swap
                 </button>
 
@@ -116,12 +113,7 @@
                   [attr.title]="whitepaperAriaLabel(project)"
                   (click)="openWhitepaper(project, $event)"
                 >
-                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <path d="M14 2v6h6" />
-                    <path d="M12 11v7" />
-                    <path d="M9 15l3 3 3-3" />
-                  </svg>
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-file-down"/></svg>
                 </button>
               </div>
             </li>

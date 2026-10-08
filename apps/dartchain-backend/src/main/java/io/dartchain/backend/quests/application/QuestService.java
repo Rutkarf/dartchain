@@ -92,7 +92,6 @@ public class QuestService {
 
         if (!task.isClaimed()) {
             task.setProgress(Math.min(definition.target(), task.getProgress() + 1));
-            tryAutoClaimTask(account, state, definition, task);
         }
 
         saveAndPublish(account, state);
@@ -115,45 +114,15 @@ public class QuestService {
     }
 
     /**
-     * Après liaison wallet : crédite les quêtes AUTO terminées mais non réclamées
-     * (ex. daily-login avant création du wallet).
+     * Après liaison wallet : plus de mint auto — les quêtes terminées restent
+     * à réclamer manuellement (badge dock + bouton claim).
      */
     public void flushPendingAutoClaims(String userId) {
-        if (userId == null || userId.isBlank()) {
-            return;
-        }
-
-        authService.findAccountById(userId).ifPresent(account -> {
-            if (account.getWalletAddress() == null || account.getWalletAddress().isBlank()) {
-                return;
-            }
-
-            QuestProgressState state = loadNormalizedState(userId);
-            boolean changed = false;
-
-            for (QuestCatalog.DailyQuestDefinition definition : QuestCatalog.DAILY_QUESTS) {
-                if (!QuestCatalog.isServerHooked(definition.id())) {
-                    continue;
-                }
-
-                QuestTaskState task = state.getTasks().get(definition.id());
-                if (task == null || task.isClaimed() || task.getProgress() < definition.target()) {
-                    continue;
-                }
-
-                tryAutoClaimTask(account, state, definition, task);
-                changed = true;
-            }
-
-            if (changed) {
-                saveAndPublish(account, state);
-            }
-        });
+        // No-op volontaire : la récompense n'est créditée que via claimTask / mission / weekly.
     }
 
     /**
-     * Quête faucet : progression + XP sans second mint on-chain
-     * (le faucet a déjà crédité le wallet via {@code FAUCET_CLAIM}).
+     * Quête faucet : progression seulement — le mint R4V3 attend le claim manuel.
      */
     public void completeFaucetClaimQuest(String userId) {
         if (userId == null || userId.isBlank()) {
@@ -278,7 +247,6 @@ public class QuestService {
         if (!task.isClaimed()) {
             int safeIncrement = Math.max(1, increment);
             task.setProgress(Math.min(definition.target(), task.getProgress() + safeIncrement));
-            tryAutoClaimTask(account, state, definition, task);
         }
 
         saveAndPublish(account, state);
@@ -288,10 +256,10 @@ public class QuestService {
     private void mintQuestReward(UserAccount account, BigDecimal amount, String payload) {
         String walletAddress = account.getWalletAddress();
         if (walletAddress == null || walletAddress.isBlank()) {
-            throw new QuestException(400, "Wallet requis pour recevoir la récompense R4V3");
+            throw new QuestException(400, "Portefeuille requis pour recevoir la récompense R4V3");
         }
 
-        blockchainService.mintSystemCredit(walletAddress, amount, payload);
+        blockchainService.enqueueSystemCredit(walletAddress, amount, payload);
     }
 
     private void applyFaucetQuestCompletion(UserAccount account) {
@@ -306,48 +274,7 @@ public class QuestService {
             task.setProgress(Math.min(definition.target(), task.getProgress() + 1));
         }
 
-        if (task.isClaimed() || task.getProgress() < definition.target()) {
-            saveAndPublish(account, state);
-            return;
-        }
-
-        completeServerHookedTaskWithoutMint(account, state, definition, task);
         saveAndPublish(account, state);
-    }
-
-    private void tryAutoClaimTask(
-            UserAccount account,
-            QuestProgressState state,
-            QuestCatalog.DailyQuestDefinition definition,
-            QuestTaskState task
-    ) {
-        if (task.isClaimed() || task.getProgress() < definition.target()) {
-            return;
-        }
-
-        String walletAddress = account.getWalletAddress();
-        if (walletAddress == null || walletAddress.isBlank()) {
-            return;
-        }
-
-        task.setClaimed(true);
-        blockchainService.mintSystemCredit(walletAddress, definition.rewardMts(), "QUEST_TASK:" + definition.id());
-        state.setPendingMts(state.getPendingMts().add(definition.rewardMts()));
-        state.setTotalXp(state.getTotalXp() + definition.rewardXp());
-    }
-
-    private void completeServerHookedTaskWithoutMint(
-            UserAccount account,
-            QuestProgressState state,
-            QuestCatalog.DailyQuestDefinition definition,
-            QuestTaskState task
-    ) {
-        if (task.isClaimed() || task.getProgress() < definition.target()) {
-            return;
-        }
-
-        task.setClaimed(true);
-        state.setTotalXp(state.getTotalXp() + definition.rewardXp());
     }
 
     private QuestProgressState loadNormalizedState(String userId) {

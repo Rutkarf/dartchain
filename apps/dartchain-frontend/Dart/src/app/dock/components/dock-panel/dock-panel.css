@@ -8,19 +8,19 @@
 
   /* Hérite --dock-smart-bar-h du shell (pas de clamp local qui gonfle la barre) */
   --dock-panel-handle-h: 8px;
-  --dock-panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --dock-panel-duration: 280ms;
+  --dock-panel-ease: var(--motion-ease-enter);
+  --dock-panel-duration: var(--motion-enter);
 }
 
 @keyframes panel-smart-bar-slide-down {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: scale(0.985);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
 }
 
@@ -29,7 +29,7 @@
 :host(.is-collapsed.is-wallet),
 :host(.is-collapsed.is-chain),
 :host(.is-collapsed.is-peers) {
-  overflow: visible;
+  overflow: hidden;
 }
 
 .dock-panel {
@@ -64,15 +64,15 @@
 .dock-panel.is-collapsed.is-wallet,
 .dock-panel.is-collapsed.is-chain,
 .dock-panel.is-collapsed.is-peers {
-  --dock-panel-handle-h: var(--dock-smart-bar-h, 13.5px);
-  overflow: visible;
+  --dock-panel-handle-h: var(--dock-smart-bar-h, 16px);
+  overflow: hidden;
 }
 
 .dock-panel__handle.dock-summary-bar {
-  flex: 0 0 var(--dock-smart-bar-h, 13.5px);
-  min-height: var(--dock-smart-bar-h, 13.5px);
-  height: var(--dock-smart-bar-h, 13.5px);
-  max-height: var(--dock-smart-bar-h, 13.5px);
+  flex: 0 0 var(--dock-smart-bar-h, 16px);
+  min-height: var(--dock-smart-bar-h, 16px);
+  height: var(--dock-smart-bar-h, 16px);
+  max-height: var(--dock-smart-bar-h, 16px);
   flex-direction: row;
   align-items: center;
   gap: 0;
@@ -119,14 +119,11 @@
   display: grid;
   grid-template-rows: 1fr;
   overflow: hidden;
-  transition: grid-template-rows var(--dock-panel-duration) var(--dock-panel-ease);
 }
 
 .dock-panel__body > .dock-tabs-panel {
   min-height: 0;
   overflow: hidden;
-  transform: translateY(0);
-  transition: transform var(--dock-panel-duration) var(--dock-panel-ease);
 }
 
 .dock-panel.is-collapsed .dock-panel__body {
@@ -162,7 +159,7 @@
   padding: 0;
   overflow: hidden;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -204,8 +201,8 @@
   .dock-panel__body,
   .dock-panel__body > .dock-tabs-panel,
   .dock-panel__handle.dock-summary-bar {
-    transition: none;
-    animation: none;
+    transition:  none;
+    animation:  none;
     transform: none;
   }
 }

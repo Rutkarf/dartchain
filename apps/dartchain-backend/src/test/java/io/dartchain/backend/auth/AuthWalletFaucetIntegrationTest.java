@@ -129,7 +129,7 @@ class AuthWalletFaucetIntegrationTest {
     }
 
     @Test
-    void faucetClaimQueuesMempoolThenMineCreditsBalance() throws Exception {
+    void faucetClaimEnqueuesExactAmountUntilMinedWithoutMiningReward() throws Exception {
         JsonQuestProgressStore questStore = new JsonQuestProgressStore(
                 objectMapper,
                 tempDir.resolve("quest-progress-faucet-amount.json").toString()
@@ -167,20 +167,28 @@ class AuthWalletFaucetIntegrationTest {
 
         BigDecimal balanceAfterLink = blockchainService.getBalance(walletAddress);
         int tipBefore = blockchainService.getLatestBlock().getIndex();
+        int mempoolBefore = transactionPoolService.getAll().size();
         faucetService.claim(
                 faucetClaimRequest(walletAddress, "client-amount-user", claimAmount.toPlainString()),
                 "Bearer " + login.token()
         );
 
-        // Claim ne mine pas : solde inchangé, tip inchangé, tx en mempool.
+        // Claim → File uniquement : solde et tip inchangés tant qu’on ne mine pas.
         assertThat(blockchainService.getBalance(walletAddress)).isEqualByComparingTo(balanceAfterLink);
         assertThat(blockchainService.getLatestBlock().getIndex()).isEqualTo(tipBefore);
-        assertThat(transactionPoolService.getAll().size()).isGreaterThan(0);
+        assertThat(transactionPoolService.getAll().size()).isEqualTo(mempoolBefore + 1);
+        assertThat(transactionPoolService.getAll())
+                .anyMatch(tx -> "FAUCET_CLAIM".equals(tx.getData()));
 
         blockchainService.minePendingTransactions(walletAddress);
+
         assertThat(blockchainService.getBalance(walletAddress))
-                .isGreaterThanOrEqualTo(balanceAfterLink.add(claimAmount));
-        assertThat(blockchainService.getLatestBlock().getIndex()).isGreaterThan(tipBefore);
+                .isEqualByComparingTo(balanceAfterLink.add(claimAmount));
+        assertThat(blockchainService.getLatestBlock().getIndex()).isEqualTo(tipBefore + 1);
+        assertThat(transactionPoolService.getAll()).isEmpty();
+        // Crédit SYSTEM seul : pas de +10 MINING_REWARD.
+        assertThat(blockchainService.getLatestBlock().getTransactions())
+                .noneMatch(tx -> "MINING_REWARD".equals(tx.getPayload()));
     }
 
     @Test
@@ -207,12 +215,12 @@ class AuthWalletFaucetIntegrationTest {
         var login = authService.login(new LoginRequest("quest-user", "password123"), AuthServiceTestSupport.LOCAL_IP);
         var questState = questService.getState("Bearer " + login.token());
         assertThat(questState.tasks().get("faucet-claim").progress()).isEqualTo(1);
-        assertThat(questState.tasks().get("faucet-claim").claimed()).isTrue();
+        assertThat(questState.tasks().get("faucet-claim").claimed()).isFalse();
         assertThat(faucetService.getState(walletAddress).isEligible()).isFalse();
     }
 
     @Test
-    void linkWalletAndClaimQueuesMempool() throws Exception {
+    void linkWalletAndClaimEnqueuesThenMinesOnChain() throws Exception {
         authService.register(new RegisterRequest("alice", "alice@dartchain.dev", "password123"), AuthServiceTestSupport.LOCAL_IP);
         var login = authService.login(new LoginRequest("alice", "password123"), AuthServiceTestSupport.LOCAL_IP);
 
@@ -230,6 +238,7 @@ class AuthWalletFaucetIntegrationTest {
 
         BigDecimal balanceAfterLink = blockchainService.getBalance(walletAddress);
         int tipBefore = blockchainService.getLatestBlock().getIndex();
+        int mempoolBefore = transactionPoolService.getAll().size();
         var claim = faucetService.claim(
                 faucetClaimRequest(walletAddress, "test-client", claimAmount.toPlainString()),
                 "Bearer " + login.token()
@@ -238,9 +247,17 @@ class AuthWalletFaucetIntegrationTest {
         assertThat(claim.isSuccess()).isTrue();
         assertThat(claim.getTxHash()).isNotBlank();
         assertThat(claim.getAmount()).isEqualTo(claimAmount.toPlainString());
+        assertThat(claim.getM4t3rCount()).isEqualTo("42");
         assertThat(blockchainService.getBalance(walletAddress)).isEqualByComparingTo(balanceAfterLink);
         assertThat(blockchainService.getLatestBlock().getIndex()).isEqualTo(tipBefore);
-        assertThat(transactionPoolService.getAll().size()).isGreaterThan(0);
+        assertThat(transactionPoolService.getAll().size()).isEqualTo(mempoolBefore + 1);
+
+        blockchainService.minePendingTransactions(walletAddress);
+
+        assertThat(blockchainService.getBalance(walletAddress))
+                .isEqualByComparingTo(balanceAfterLink.add(claimAmount));
+        assertThat(blockchainService.getLatestBlock().getIndex()).isEqualTo(tipBefore + 1);
+        assertThat(transactionPoolService.getAll()).isEmpty();
     }
 
     @Test

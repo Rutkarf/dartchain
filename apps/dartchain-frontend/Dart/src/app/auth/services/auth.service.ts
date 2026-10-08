@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
+  AuthChallenge,
   AuthMode,
   AuthResponse,
   LoginRequest,
@@ -11,6 +12,7 @@ import {
   OAuthProviderInfo,
   OAuthProvidersResponse,
   RegisterRequest,
+  TotpSetupResponse,
   UserProfile,
 } from '@auth/models/auth.model';
 import {
@@ -37,6 +39,7 @@ export class AuthService {
   private readonly drawerModeSignal = signal<AuthMode>('login');
   private readonly oauthProvidersSignal = signal<OAuthProviderInfo[]>([]);
   private readonly oauthRedirectingSignal = signal(false);
+  private readonly challengeSignal = signal<AuthChallenge | null>(null);
 
   readonly user = this.userSignal.asReadonly();
   readonly token = this.tokenSignal.asReadonly();
@@ -46,6 +49,7 @@ export class AuthService {
   readonly drawerMode = this.drawerModeSignal.asReadonly();
   readonly oauthProviders = this.oauthProvidersSignal.asReadonly();
   readonly oauthRedirecting = this.oauthRedirectingSignal.asReadonly();
+  readonly challenge = this.challengeSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.userSignal() !== null && !!this.tokenSignal());
   readonly isAdmin = computed(() => this.userSignal()?.role === 'ADMIN');
 
@@ -56,15 +60,26 @@ export class AuthService {
 
   openDrawer(mode: AuthMode = 'login'): void {
     this.errorSignal.set(null);
+    this.challengeSignal.set(null);
     this.drawerModeSignal.set(mode);
     this.drawerOpenSignal.set(true);
     void this.loadOAuthProviders();
+  }
+
+  clearChallenge(): void {
+    this.challengeSignal.set(null);
+    this.errorSignal.set(null);
   }
 
   /** Ouvre le drawer login si la session est absente. Retourne true si déjà authentifié. */
   promptLogin(): boolean {
     if (this.isAuthenticated()) {
       return true;
+    }
+
+    if (this.challengeSignal()) {
+      this.drawerOpenSignal.set(true);
+      return false;
     }
 
     this.openDrawer('login');
@@ -74,6 +89,7 @@ export class AuthService {
   closeDrawer(): void {
     this.drawerOpenSignal.set(false);
     this.errorSignal.set(null);
+    this.challengeSignal.set(null);
   }
 
   setDrawerMode(mode: AuthMode): void {
@@ -190,6 +206,12 @@ export class AuthService {
     );
   }
 
+  isOAuthProviderMock(providerId: string): boolean {
+    return this.oauthProvidersSignal().some(
+      (provider) => provider.id === providerId && provider.enabled && provider.mock === true
+    );
+  }
+
   startOAuth(providerId: string): void {
     if (!this.isOAuthProviderEnabled(providerId)) {
       return;
@@ -220,10 +242,7 @@ export class AuthService {
       const response = await firstValueFrom(
         this.http.post<AuthResponse>(this.authV1('/oauth/exchange'), { code })
       );
-      this.applySession(response);
-      await this.questsProgress.mergeGuestProgressOnLogin();
-      this.questsProgress.recordDailyLogin();
-      this.closeDrawer();
+      await this.consumeAuthResponse(response);
     } catch (error) {
       this.errorSignal.set(this.extractErrorMessage(error));
       this.openDrawer('login');
@@ -243,11 +262,7 @@ export class AuthService {
     try {
       const url = kind === 'register' ? this.authV1('/register') : this.authV1('/login');
       const response = await firstValueFrom(this.http.post<AuthResponse>(url, payload));
-      this.applySession(response);
-      await this.questsProgress.mergeGuestProgressOnLogin();
-      this.questsProgress.recordDailyLogin();
-      this.closeDrawer();
-      return true;
+      return await this.consumeAuthResponse(response);
     } catch (error) {
       this.errorSignal.set(this.extractErrorMessage(error));
       return false;
@@ -297,6 +312,150 @@ export class AuthService {
     }
   }
 
+  async confirmEmailCode(code: string): Promise<boolean> {
+    const verificationId = this.challengeSignal()?.verificationId;
+    if (!verificationId) {
+      return false;
+    }
+    return this.postChallenge(this.authV1('/email/confirm'), { verificationId, code });
+  }
+
+  async confirmTotpCode(code: string): Promise<boolean> {
+    const challengeToken = this.challengeSignal()?.challengeToken;
+    if (!challengeToken) {
+      return false;
+    }
+    return this.postChallenge(this.authV1('/2fa/verify'), { challengeToken, code });
+  }
+
+  async resendEmailCode(): Promise<void> {
+    const verificationId = this.challengeSignal()?.verificationId;
+    if (!verificationId) {
+      return;
+    }
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
+    try {
+      const response = await firstValueFrom(
+        this.http.post<AuthResponse>(this.authV1('/email/resend'), { verificationId })
+      );
+      await this.consumeAuthResponse(response);
+    } catch (error) {
+      this.errorSignal.set(this.extractErrorMessage(error));
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  async openTwoFactorSetup(): Promise<void> {
+    const token = this.tokenSignal();
+    if (!token) {
+      return;
+    }
+    this.errorSignal.set(null);
+    this.drawerOpenSignal.set(true);
+    if (this.userSignal()?.totpEnabled) {
+      this.challengeSignal.set({ status: 'TOTP_DISABLE' });
+      return;
+    }
+    this.loadingSignal.set(true);
+    try {
+      const setup = await firstValueFrom(
+        this.http.post<TotpSetupResponse>(this.authV1('/2fa/setup'), null, {
+          headers: this.buildAuthHeaders(token),
+        })
+      );
+      this.challengeSignal.set({
+        status: 'TOTP_SETUP',
+        secret: setup.secret,
+        otpauthUrl: setup.otpauthUrl,
+      });
+    } catch (error) {
+      this.errorSignal.set(this.extractErrorMessage(error));
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  async enableTotp(code: string): Promise<boolean> {
+    return this.postTotpChange(this.authV1('/2fa/enable'), code);
+  }
+
+  async disableTotp(code: string): Promise<boolean> {
+    return this.postTotpChange(this.authV1('/2fa/disable'), code);
+  }
+
+  private async postChallenge(url: string, body: object): Promise<boolean> {
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
+    try {
+      const response = await firstValueFrom(this.http.post<AuthResponse>(url, body));
+      return await this.consumeAuthResponse(response);
+    } catch (error) {
+      this.errorSignal.set(this.extractErrorMessage(error));
+      return false;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  private async postTotpChange(url: string, code: string): Promise<boolean> {
+    const token = this.tokenSignal();
+    if (!token) {
+      return false;
+    }
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
+    try {
+      const user = await firstValueFrom(
+        this.http.post<UserProfile>(url, { code }, { headers: this.buildAuthHeaders(token) })
+      );
+      this.userSignal.set(user);
+      localStorage.setItem('dartchain_auth_user', JSON.stringify(user));
+      this.challengeSignal.set(null);
+      this.closeDrawer();
+      return true;
+    } catch (error) {
+      this.errorSignal.set(this.extractErrorMessage(error));
+      return false;
+    } finally {
+      this.loadingSignal.set(false);
+    }
+  }
+
+  private async consumeAuthResponse(response: AuthResponse): Promise<boolean> {
+    if (response.status === 'EMAIL_VERIFICATION' && response.verificationId) {
+      this.challengeSignal.set({
+        status: 'EMAIL_VERIFICATION',
+        verificationId: response.verificationId,
+        email: response.user?.email ?? null,
+      });
+      this.drawerOpenSignal.set(true);
+      this.errorSignal.set(null);
+      return false;
+    }
+    if (response.status === 'TWO_FACTOR' && response.challengeToken) {
+      this.challengeSignal.set({
+        status: 'TWO_FACTOR',
+        challengeToken: response.challengeToken,
+      });
+      this.drawerOpenSignal.set(true);
+      this.errorSignal.set(null);
+      return false;
+    }
+    const accessToken = response.accessToken ?? response.token;
+    if (!accessToken) {
+      this.errorSignal.set('Réponse d’authentification incomplète.');
+      return false;
+    }
+    this.challengeSignal.set(null);
+    this.applySession(response);
+    await this.questsProgress.mergeGuestProgressOnLogin();
+    this.questsProgress.recordDailyLogin();
+    this.closeDrawer();
+    return true;
+  }
+
   private applySession(response: AuthResponse): void {
     const accessToken = response.accessToken ?? response.token;
     this.tokenSignal.set(accessToken);
@@ -326,9 +485,12 @@ export class AuthService {
       return 'Une erreur est survenue.';
     }
 
-    const body = error.error as { message?: string } | null;
+    const body = error.error as { message?: string; detail?: string } | null;
     if (body?.message) {
       return body.message;
+    }
+    if (body?.detail) {
+      return body.detail;
     }
 
     if (error.status === 0) {

@@ -8,6 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * État OAuth tenu dans le processus. Il n'est pas repris après un redémarrage.
+ */
 @Component
 public class InMemoryOAuthStateStore {
 

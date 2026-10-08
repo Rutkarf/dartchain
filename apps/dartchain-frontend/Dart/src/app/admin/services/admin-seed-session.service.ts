@@ -85,7 +85,7 @@ export class AdminSeedSessionService {
       const message =
         (err as { error?: { message?: string; detail?: string } })?.error?.message ||
         (err as { error?: { detail?: string } })?.error?.detail ||
-        'Seed admin invalide';
+        'Graine d’administration invalide';
       this.error.set(message);
       return false;
     } finally {

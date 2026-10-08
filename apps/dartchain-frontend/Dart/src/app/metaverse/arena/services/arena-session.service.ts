@@ -64,7 +64,7 @@ export class ArenaSessionService {
     if (this.phaseSignal() === 'playing' && this.localSignal()) return;
 
     const user = this.auth.user();
-    // Guest autorisé : l’Arène BB doit être jouable sans bouton / sans login obligatoire.
+    // Guest autorisé : MetaVerseBB doit être jouable sans bouton / sans login obligatoire.
     const userId = user?.id ?? `guest-local`;
     const displayName = user?.username ?? 'Guest';
 
@@ -170,7 +170,7 @@ export class ArenaSessionService {
     this.economy.creditFaucet(local.userId, amount);
     this.refreshLocalFromEconomy();
     this.telemetry.recordEarn(amount);
-    this.noticeSignal.set(`Quête dock : +${amount} ƒ ledger Kill-to-earn`);
+    this.noticeSignal.set(`Quête dock : +${amount} ƒ ledger Éliminer pour gagner`);
     return amount;
   }
 

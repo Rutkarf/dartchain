@@ -160,7 +160,7 @@ export class ArenaEconomyMockService extends ArenaEconomyPort {
     };
   }
 
-  /** Crédit ledger quête dock (Kill-to-earn local). */
+  /** Crédit ledger quête dock (Éliminer pour gagner local). */
   creditFaucet(userId: string, amount: number): number {
     const state = this.states.get(userId);
     if (!state || amount <= 0) return 0;

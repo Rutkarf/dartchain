@@ -1,4 +1,4 @@
-/** Identifiants des 10 univers spatiaux Star Conquest (100 % autonomes, sans lien metaverse floor). */
+/** Identifiants des 10 univers spatiaux Conquête stellaire (100 % autonomes, sans lien metaverse floor). */
 export type StarConquestUniverseId =
   | 'stellar-nebula'
   | 'synaptic-cortex'

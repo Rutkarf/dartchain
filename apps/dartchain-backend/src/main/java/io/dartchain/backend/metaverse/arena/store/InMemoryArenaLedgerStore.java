@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Ledger arène isolé (Q1=C) — jamais le store faucet pending / blockchain.
+ * La durée de vie est celle du processus : ce ledger n'a pas de table.
  */
 @Component
 public class InMemoryArenaLedgerStore {

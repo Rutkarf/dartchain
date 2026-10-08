@@ -47,7 +47,7 @@ class LaunchLabServiceTest {
                         "My Token",
                         "MTK",
                         new BigDecimal("5000"),
-                        "Token expérimental pour tests LaunchLab.",
+                        "Token expérimental pour tests Laboratoire.",
                         null,
                         "DartChain",
                         null,
@@ -66,7 +66,7 @@ class LaunchLabServiceTest {
 
         assertThat(created.symbol()).isEqualTo("MTK");
         assertThat(created.status()).isEqualTo("SOON");
-        assertThat(created.description()).isEqualTo("Token expérimental pour tests LaunchLab.");
+        assertThat(created.description()).isEqualTo("Token expérimental pour tests Laboratoire.");
         assertThat(created.whitepaperUrl()).isEqualTo("https://dartchain.io/whitepaper/mtk.pdf");
         assertThat(created.website()).isEqualTo("https://dartchain.io");
         assertThat(created.launchDate()).isEqualTo("2026-Q4");

@@ -34,8 +34,8 @@ describe('QuestsPanel', () => {
       buildTaskViews: vi.fn(() => [
         {
           id: 'daily-login',
-          title: 'Daily Login',
-          description: 'Log in',
+          title: 'Connexion quotidienne',
+          description: 'Connexion',
           target: 1,
           progress: 0,
           progressLabel: '0/1',
@@ -49,8 +49,8 @@ describe('QuestsPanel', () => {
         },
         {
           id: 'faucet-claim',
-          title: 'Faucet Claim',
-          description: 'Claim faucet',
+          title: 'Réclamation du robinet',
+          description: 'Réclame au robinet',
           target: 1,
           progress: 1,
           progressLabel: '1/1',
@@ -70,8 +70,8 @@ describe('QuestsPanel', () => {
       isAuthenticated: vi.fn(() => authenticated),
       getCurrentMission: vi.fn(() => ({
         id: 'network-guardian',
-        title: 'Network Guardian',
-        description: 'Maintain network integrity by completing daily and weekly tasks.',
+        title: 'Gardien du réseau',
+        description: 'Maintiens l’intégrité du réseau en terminant les tâches quotidiennes et hebdomadaires.',
         rewardMts: 1,
         rewardXp: 150,
         progressTarget: 100,
@@ -125,11 +125,11 @@ describe('QuestsPanel', () => {
     expect(questsDataMock.init).toHaveBeenCalled();
   });
 
-  it('renders compact header with Network Guardian, countdown and refresh', async () => {
+  it('renders compact header with Gardien du réseau, countdown and refresh', async () => {
     await setup();
     const element = fixture.nativeElement as HTMLElement;
     expect(element.querySelector('.quests-panel__title')).toBeNull();
-    expect(element.querySelector('.quests-panel__guardian')?.textContent).toContain('Network Guardian');
+    expect(element.querySelector('.quests-panel__guardian')?.textContent).toContain('Gardien du réseau');
     expect(element.querySelector('.quests-panel__guardian-rank')?.textContent).toContain('Rôle actif');
     expect(element.querySelector('.quests-panel__guardian-line')).toBeTruthy();
     expect(element.querySelector('.quests-panel__countdown-value')?.textContent).toContain('11:59:59');

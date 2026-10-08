@@ -1,12 +1,19 @@
-import { R4V3_GROUND_FIELD } from './map-configuration';
+import { isInsideMirrorSpawnSafeZone, R4V3_GROUND_FIELD } from './map-configuration';
 
 /**
  * Période du damier diagonal (puissance de 2).
- * 4 = 1 jeton visible sur 4 après deux passes « 1 sur 2 ».
+ * 2 = 1 jeton visible sur 2 (diagonales existantes + diagonales intercalées).
  */
-export const M4T3R_CHECKERBOARD_PERIOD = 4;
+export const M4T3R_CHECKERBOARD_PERIOD = 2;
 
-/** Quadrillage diagonal : 1 jeton visible sur 4. */
+/**
+ * Densité spawn SAFE = 10× l’extérieur.
+ * Extérieur : ½ cellule / (1.25²) → spawn plein sur cellule 1.25/√5.
+ */
+export const M4T3R_SPAWN_DENSE_CELL_SIZE =
+  R4V3_GROUND_FIELD.cellSize / Math.sqrt(5);
+
+/** Quadrillage diagonal : 1 jeton visible sur 2. */
 export function isOnDiagonalCheckerboard(gx: number, gz: number): boolean {
   return ((gx + gz) & (M4T3R_CHECKERBOARD_PERIOD - 1)) === 0;
 }
@@ -17,6 +24,14 @@ export function isWorldPositionOnCheckerboard(x: number, z: number): boolean {
   const gx = Math.floor(x / size);
   const gz = Math.floor(z / size);
   return isOnDiagonalCheckerboard(gx, gz);
+}
+
+/**
+ * Collecte / présence M4T3R : damier dehors, plein densifié dans le cercle SPAWN.
+ */
+export function isM4t3rGroundPositionActive(x: number, z: number): boolean {
+  if (isInsideMirrorSpawnSafeZone(x, z)) return true;
+  return isWorldPositionOnCheckerboard(x, z);
 }
 
 export function parseClusterGrid(clusterId: string): { gx: number; gz: number } | null {

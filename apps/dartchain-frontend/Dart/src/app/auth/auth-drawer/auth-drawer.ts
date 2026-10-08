@@ -13,7 +13,7 @@ import {
 } from '@angular/forms';
 
 import { AuthService } from '@auth/services/auth.service';
-import { AuthMode } from '@auth/models/auth.model';
+import { AuthChallengeStatus, AuthMode } from '@auth/models/auth.model';
 import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
 import { LocaleService } from '../../core/i18n/locale.service';
 import { AUTH_OAUTH_PROVIDERS } from './auth-drawer.oauth';
@@ -41,6 +41,10 @@ export class AuthDrawerComponent {
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
+  readonly codeForm = this.fb.group({
+    code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+  });
+
   readonly registerForm = this.fb.group({
     username: [
       '',
@@ -56,7 +60,69 @@ export class AuthDrawerComponent {
   });
 
   close(): void {
+    this.codeForm.reset();
     this.auth.closeDrawer();
+  }
+
+  drawerTitle(): string {
+    const step = this.auth.challenge()?.status;
+    if (step === 'EMAIL_VERIFICATION') {
+      return this.locale.t('auth.emailCodeTitle');
+    }
+    if (step === 'TWO_FACTOR' || step === 'TOTP_SETUP' || step === 'TOTP_DISABLE') {
+      return this.locale.t('auth.twoFactorTitle');
+    }
+    return this.auth.drawerMode() === 'login'
+      ? this.locale.t('auth.loginTitle')
+      : this.locale.t('auth.registerTitle');
+  }
+
+  challengeSubmitLabel(status: AuthChallengeStatus): string {
+    if (status === 'EMAIL_VERIFICATION') {
+      return this.locale.t('auth.emailCodeSubmit');
+    }
+    if (status === 'TOTP_SETUP') {
+      return this.locale.t('auth.twoFactorEnable');
+    }
+    if (status === 'TOTP_DISABLE') {
+      return this.locale.t('auth.twoFactorDisable');
+    }
+    return this.locale.t('auth.twoFactorSubmit');
+  }
+
+  backFromChallenge(): void {
+    this.codeForm.reset();
+    const stayOpen = !this.auth.isAuthenticated();
+    this.auth.clearChallenge();
+    if (!stayOpen) {
+      this.auth.closeDrawer();
+    }
+  }
+
+  resendEmail(): void {
+    void this.auth.resendEmailCode();
+  }
+
+  async submitChallenge(): Promise<void> {
+    if (this.codeForm.invalid) {
+      this.codeForm.markAllAsTouched();
+      return;
+    }
+    const code = this.codeForm.getRawValue().code ?? '';
+    const status = this.auth.challenge()?.status;
+    let done = false;
+    if (status === 'EMAIL_VERIFICATION') {
+      done = await this.auth.confirmEmailCode(code);
+    } else if (status === 'TWO_FACTOR') {
+      done = await this.auth.confirmTotpCode(code);
+    } else if (status === 'TOTP_SETUP') {
+      done = await this.auth.enableTotp(code);
+    } else if (status === 'TOTP_DISABLE') {
+      done = await this.auth.disableTotp(code);
+    }
+    if (done) {
+      this.codeForm.reset();
+    }
   }
 
   switchMode(mode: AuthMode): void {
@@ -69,6 +135,18 @@ export class AuthDrawerComponent {
 
   startOAuth(providerId: string): void {
     this.auth.startOAuth(providerId);
+  }
+
+  oauthButtonTitle(providerId: string): string {
+    if (!this.auth.isOAuthProviderEnabled(providerId)) {
+      return this.locale.t('auth.oauthUnavailable');
+    }
+    if (this.auth.isOAuthProviderMock(providerId)) {
+      return this.locale.t('auth.oauthMock');
+    }
+    return this.locale.t(
+      this.oauthProviders.find((provider) => provider.id === providerId)?.labelKey ?? 'auth.orContinueWith'
+    );
   }
 
   showFieldError(control: AbstractControl | null): boolean {

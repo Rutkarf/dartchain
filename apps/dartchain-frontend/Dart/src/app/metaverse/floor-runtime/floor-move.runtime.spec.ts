@@ -33,6 +33,8 @@ describe('FloorMoveRuntime', () => {
             getYaw: () => 0,
             updateFromJoystick: vi.fn(),
             toggleValidationView: vi.fn(),
+            isIntroActive: () => false,
+            trySkipIntro: vi.fn(),
           },
         },
         { provide: RunnerWorldService, useValue: { isWalkable: () => true, update: vi.fn() } },

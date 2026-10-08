@@ -55,9 +55,9 @@ export function createHaussmannWallMaterial(
   seed: number,
   owner?: FacadeTextureOwnership,
   tint: HaussmannFacadeOptions = {
-    baseColor: 0xcbbda6,
-    windowColor: '#d9ebf5',
-    accentColor: '#8d6f55',
+    baseColor: 0xede7d9,
+    windowColor: '#ede7d9',
+    accentColor: '#8b9dad',
     shutters: true,
     seed,
   }
@@ -68,8 +68,8 @@ export function createHaussmannWallMaterial(
   const windowScale = nightWindowEmissiveScale(quality);
   const baseEmissive = detail === 'full' ? 0.48 : 0.42;
   const material = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    emissive: new THREE.Color(0xffe8a8),
+    color: 0xede7d9,
+    emissive: new THREE.Color(0xede7d9),
     emissiveIntensity: windowScale > 0 ? baseEmissive * (windowScale / 0.42) : 0,
     roughness: detail === 'full' ? 1 : 0.84,
     metalness: 0.05,
@@ -88,7 +88,7 @@ export function createHaussmannRoofMaterial(
   const detail = pbrDetailForQuality(quality);
   const maps = createHaussmannRoofPbrMaps(detail, owner);
   const material = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
+    color: 0xede7d9,
     roughness: detail === 'full' ? 1 : 0.93,
     metalness: 0.07,
     envMapIntensity: detail === 'full' ? 0.42 : 0.35,
@@ -106,10 +106,10 @@ export function createHaussmannRoofMaterial(
 export function createCorniceMaterial(quality: MapQuality = 'medium'): THREE.MeshStandardMaterial {
   const detail = pbrDetailForQuality(quality);
   const material = new THREE.MeshStandardMaterial({
-    color: 0x8a7a68,
+    color: 0x8a95a5,
     roughness: detail === 'full' ? 0.72 : 0.78,
     metalness: 0.08,
-    emissive: new THREE.Color(0x1a1410),
+    emissive: new THREE.Color(0x0d0630),
     emissiveIntensity: 0.12,
     fog: false,
     side: THREE.DoubleSide,
@@ -128,10 +128,10 @@ export function createCadastrePlinthMaterial(
   const detail = pbrDetailForQuality(quality);
   const maps = createPlinthPbrMaps(detail, owner);
   const material = new THREE.MeshStandardMaterial({
-    color: detail === 'flat' ? 0x6a5c50 : 0xffffff,
+    color: detail === 'flat' ? 0x18314f : 0xede7d9,
     roughness: detail === 'full' ? 1 : 0.9,
     metalness: 0.04,
-    emissive: new THREE.Color(0x0a0806),
+    emissive: new THREE.Color(0x0d0630),
     emissiveIntensity: 0.08,
     fog: false,
     side: THREE.DoubleSide,
@@ -148,9 +148,9 @@ export function createCadastreWallMaterial(
 ): THREE.MeshStandardMaterial {
   const quality = tint?.quality ?? 'medium';
   const material = createHaussmannWallMaterial(seed, owner, {
-    baseColor: 0xd8ccb4,
-    windowColor: '#eef4fa',
-    accentColor: '#a08870',
+    baseColor: 0xede7d9,
+    windowColor: '#ede7d9',
+    accentColor: '#8b9dad',
     shutters: true,
     windowLitRatio: 0.54,
     seed,
@@ -171,8 +171,8 @@ export function createCadastreRoofMaterial(
   quality: MapQuality = 'medium'
 ): THREE.MeshStandardMaterial {
   const material = createHaussmannRoofMaterial(owner, quality);
-  material.color = new THREE.Color(0xf0f0f0);
-  material.emissive = new THREE.Color(0x0c1018);
+  material.color = new THREE.Color(0xede7d9);
+  material.emissive = new THREE.Color(0x0d0630);
   material.emissiveIntensity = 0.06;
   return material;
 }

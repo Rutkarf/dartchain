@@ -78,17 +78,34 @@ export class ShowcaseLaunchComponent {
   readonly filteredProjects = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
     const list = this.projects();
+    const withNative = this.ensureNativeR4v3(list);
 
     if (!query) {
-      return list;
+      return withNative;
     }
 
-    return list.filter((project) => {
+    return withNative.filter((project) => {
       const name = project.name.toLowerCase();
       const symbol = project.symbol.toLowerCase();
       return name.includes(query) || symbol.includes(query);
     });
   });
+
+  private ensureNativeR4v3(list: LaunchProject[]): LaunchProject[] {
+    if (list.some((p) => p.symbol.toUpperCase() === EXCHANGE_NATIVE_TOKEN)) {
+      return list;
+    }
+    const native: LaunchProject = {
+      id: 'native-r4v3',
+      name: 'R4V3',
+      symbol: EXCHANGE_NATIVE_TOKEN,
+      status: 'LIVE',
+      raised: '—',
+      description: 'Token natif DartChain — hub, swap et faucet.',
+      chain: 'DartChain',
+    };
+    return [native, ...list];
+  }
 
   constructor() {
     if (this.launchState.projects().length === 0 && !this.launchState.loading()) {
@@ -200,7 +217,7 @@ export class ShowcaseLaunchComponent {
   protected whitepaperAriaLabel(project: LaunchProject): string {
     return this.hasWhitepaper(project)
       ? `Ouvrir le whitepaper ${project.symbol}`
-      : `Whitepaper indisponible pour ${project.symbol}`;
+      : `Livre blanc indisponible pour ${project.symbol}`;
   }
 
   protected openWhitepaper(project: LaunchProject, event: MouseEvent): void {

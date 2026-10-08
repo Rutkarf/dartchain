@@ -1,8 +1,7 @@
 <div
-  class="showcase-dao-hub showcase-view showcase-view--news"
-  [class.is-drawer-open]="!!selectedCard()"
-  role="region"
-  aria-label="Gouvernance D.A.O"
+ class="showcase-dao-hub showcase-view showcase-view--news"
+ [class.is-drawer-open]="!!selectedCard()"
+ role="region"
 >
   @if (isExpanded) {
     <div class="showcase-news__content showcase-dao__content">
@@ -28,48 +27,43 @@
           <p>Aucune DAO disponible.</p>
         </div>
       } @else {
-        <ul class="showcase-news__list showcase-dao__list" aria-label="DAO communautaires">
+        <ul class="showcase-news__list showcase-dao__list">
           @for (card of filteredCards(); track card.id) {
             <li class="showcase-news__item showcase-dao__item">
               <button
-                type="button"
-                class="showcase-dao__card"
-                [class.showcase-dao__card--active]="card.status === 'active'"
-                (click)="openDao(card)"
-                [attr.aria-label]="'Accéder à la DAO ' + card.symbol"
-              >
-                <span class="showcase-dao__line showcase-dao__line--head">
-                  @if (card.logoUrl) {
-                    <img
-                      class="showcase-dao__logo"
-                      [src]="card.logoUrl"
-                      [alt]=""
-                      width="10"
-                      height="10"
-                    />
-                  } @else {
-                    <span class="showcase-dao__logo showcase-dao__logo--placeholder" aria-hidden="true">
-                      {{ cardInitials(card) }}
-                    </span>
-                  }
+ type="button"
+ class="showcase-dao__card"
+ [attr.data-dao-symbol]="card.symbol"
+ [attr.data-symbol]="card.symbol"
+ [class.showcase-dao__card--active]="card.status === 'active'"
+ (click)="openDao(card)"
+ >
+                <span class="showcase-dao__col showcase-dao__col--ticker">
+                  <span class="showcase-dao__ticker">{{ card.symbol }}</span>
+                </span>
+
+                <span class="showcase-dao__col showcase-dao__col--identity">
                   <span class="showcase-dao__title">
                     <span class="showcase-dao__name">{{ card.name }}</span>
                     <span class="showcase-dao__sep" aria-hidden="true">·</span>
                     <span class="showcase-dao__symbol">{{ card.symbol }}</span>
                   </span>
+                  <span class="showcase-dao__stats">
+                    {{ card.proposalsCount }}P {{ card.votesCount }}V {{ card.membersActive }}M
+                  </span>
+                </span>
+
+                <span class="showcase-dao__col showcase-dao__col--summary">
+                  <span class="showcase-dao__summary">{{ card.summary }}</span>
+                </span>
+
+                <span class="showcase-dao__col showcase-dao__col--action">
                   <span class="showcase-dao__chip">
                     <span class="showcase-dao__status" [ngClass]="statusClass(card)">
                       {{ statusShortLabel(card) }}
                     </span>
-                    <span class="showcase-dao__enter" aria-hidden="true">›</span>
+                    <span class="showcase-dao__enter" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-chevron-right"/></svg></span>
                   </span>
-                </span>
-
-                <span class="showcase-dao__line showcase-dao__line--foot">
-                  <span class="showcase-dao__stats" aria-label="Statistiques DAO">
-                    {{ card.proposalsCount }}P · {{ card.votesCount }}V · {{ card.membersActive }}M
-                  </span>
-                  <span class="showcase-dao__summary">{{ card.summary }}</span>
                 </span>
 
                 <span class="showcase-dao__xp" aria-hidden="true">

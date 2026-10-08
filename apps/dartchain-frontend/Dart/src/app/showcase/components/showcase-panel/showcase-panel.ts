@@ -22,6 +22,7 @@ export class ShowcasePanelComponent {
   @Input() collapsed = false;
 
   readonly selectBlock = output<number>();
+  readonly tabChange = output<ShowcaseTab>();
 
   @HostBinding('class.is-collapsed')
   get isCollapsedClass(): boolean {
@@ -64,7 +65,7 @@ export class ShowcasePanelComponent {
 
   panelTitle(tab: ShowcaseTab): string {
     const match = {
-      tours: 'TOUS',
+      tours: 'NEWS',
       r4v3: 'R4V3',
       rv23: 'CHAT',
       dao: 'LABZ',

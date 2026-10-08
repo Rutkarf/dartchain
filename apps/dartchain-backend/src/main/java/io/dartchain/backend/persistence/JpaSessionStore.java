@@ -1,6 +1,7 @@
 package io.dartchain.backend.persistence;
 
 import io.dartchain.backend.auth.store.SessionStore;
+import io.dartchain.backend.config.AuthProperties;
 import io.dartchain.backend.persistence.entity.AuthSessionEntity;
 import io.dartchain.backend.persistence.repository.AuthSessionJpaRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,18 +19,24 @@ public class JpaSessionStore implements SessionStore {
 
     private final AuthSessionJpaRepository sessionRepository;
     private final long ttlSeconds;
+    private final boolean legacySessionEnabled;
 
     public JpaSessionStore(
             AuthSessionJpaRepository sessionRepository,
-            @Value("${auth.session.ttl-seconds:604800}") long ttlSeconds
+            @Value("${auth.session.ttl-seconds:604800}") long ttlSeconds,
+            AuthProperties authProperties
     ) {
         this.sessionRepository = sessionRepository;
         this.ttlSeconds = ttlSeconds;
+        this.legacySessionEnabled = authProperties.isLegacySessionEnabled();
     }
 
     @Override
     @Transactional
     public String createSession(String userId) {
+        if (!legacySessionEnabled) {
+            throw new IllegalStateException("session legacy désactivée");
+        }
         UUID token = UUID.randomUUID();
         Instant now = Instant.now();
 

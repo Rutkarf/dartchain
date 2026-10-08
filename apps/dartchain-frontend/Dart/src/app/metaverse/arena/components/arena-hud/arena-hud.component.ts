@@ -17,7 +17,6 @@ import {
 } from '../../services/arena-meta.service';
 import { ArenaTelemetryService } from '../../services/arena-telemetry.service';
 import {
-  ARENA_KTE_TAG,
   ARENA_WEAPON_UI_NAME,
 } from '../../models/game-balance.config';
 
@@ -43,7 +42,6 @@ export class ArenaHudComponent implements OnInit {
   readonly notice = this.session.notice;
   readonly disclaimer = this.session.disclaimer;
   readonly weaponName = ARENA_WEAPON_UI_NAME;
-  readonly kteTag = ARENA_KTE_TAG;
   readonly hitFlash = this.combat.hitFlash;
   readonly lastShot = this.combat.lastShot;
   readonly lockedTarget = this.combat.lockedTarget;
@@ -54,7 +52,6 @@ export class ArenaHudComponent implements OnInit {
   readonly muted = this.audio.muted;
   readonly streak = this.meta.streak;
   readonly paused = this.meta.paused;
-  readonly ageOk = this.meta.ageOk;
   readonly mode = this.meta.mode;
   readonly skin = this.meta.skin;
   readonly roomId = this.meta.roomId;
@@ -94,7 +91,7 @@ export class ArenaHudComponent implements OnInit {
       .filter((r) => r.status === 'alive' && !r.userId.startsWith('bot-')).length;
   });
 
-  readonly title = 'Arène BB';
+  readonly title = 'MetaVerseBB';
   readonly shotLabel = computed(() => {
     const s = this.lastShot();
     if (s === 'hit') return 'HIT';
@@ -132,10 +129,6 @@ export class ArenaHudComponent implements OnInit {
 
   togglePause(): void {
     this.meta.setPaused(!this.meta.paused());
-  }
-
-  acceptAge(): void {
-    this.meta.acceptAgeGate();
   }
 
   setMode(mode: ArenaGameMode): void {

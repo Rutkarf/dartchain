@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  computed,
   effect,
   input,
   output,
@@ -26,9 +27,27 @@ export class ShowcaseLaunchProjectDrawerComponent {
   private readonly drawerPanel = viewChild<ElementRef<HTMLElement>>('drawerPanel');
 
   readonly project = input<LaunchProject | null>(null);
-
   readonly closeDrawer = output<void>();
   readonly swap = output<LaunchProject>();
+
+  readonly progress = computed(() => {
+    const item = this.project();
+    return item ? this.progressPercent(item) : null;
+  });
+
+  readonly raisedOnly = computed(() => this.project()?.raised?.trim() || '—');
+
+  readonly targetOnly = computed(() => {
+    const target = this.project()?.target?.trim();
+    return target && target !== '—' ? target : '—';
+  });
+
+  readonly hasWhitepaper = computed(() => !!this.project()?.whitepaperUrl?.trim());
+  readonly hasWebsite = computed(() => !!this.project()?.website?.trim());
+  readonly swapReady = computed(() => {
+    const item = this.project();
+    return item ? this.canSwap(item) : false;
+  });
 
   constructor() {
     effect(() => {
@@ -102,6 +121,13 @@ export class ShowcaseLaunchProjectDrawerComponent {
       return;
     }
     globalThis.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  triggerSwap(project: LaunchProject): void {
+    if (!this.canSwap(project)) {
+      return;
+    }
+    this.swap.emit(project);
   }
 
   private parseAmount(value: string | null | undefined): number | null {

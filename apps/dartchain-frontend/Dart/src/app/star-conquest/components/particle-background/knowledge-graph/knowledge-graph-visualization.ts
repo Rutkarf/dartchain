@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createFxLineMaterial, STROKE } from '@core/constants/stroke-bevel';
 import {
   GRAPH_RENDER_LIMITS,
   KNOWLEDGE_GRAPH_COLORS,
@@ -93,24 +94,15 @@ export class KnowledgeGraphVisualization {
     const edgeGeom = new THREE.BufferGeometry();
     edgeGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(0), 3));
     edgeGeom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(0), 3));
-    const edgeMat = new THREE.LineBasicMaterial({
+    const edgeMat = createFxLineMaterial(STROKE.ok, {
       vertexColors: true,
-      transparent: true,
-      opacity: 0.55,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
+      color: 0xffffff,
     });
     this.edgeLines = new THREE.LineSegments(edgeGeom, edgeMat);
     this.edgeLines.name = 'kg-edges';
 
     const pulseGeom = edgeGeom.clone();
-    const pulseMat = new THREE.LineBasicMaterial({
-      color: 0x66ffcc,
-      transparent: true,
-      opacity: 0,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const pulseMat = createFxLineMaterial(STROKE.ok, { opacity: 0 });
     this.syncPulseLines = new THREE.LineSegments(pulseGeom, pulseMat);
     this.syncPulseLines.name = 'kg-sync-pulse';
 
@@ -335,7 +327,7 @@ export class KnowledgeGraphVisualization {
   }
 }
 
-/** Camera state machine for the quest / knowledge-graph layer (Star Conquest canvas). */
+/** Camera state machine for the quest / knowledge-graph layer (Conquête stellaire canvas). */
 export class QuestCameraController {
   private mode: CameraControlMode = 'world-player';
   private baseTargetZ: number = QUEST_ORBIT_CONFIG.defaultCameraZ;

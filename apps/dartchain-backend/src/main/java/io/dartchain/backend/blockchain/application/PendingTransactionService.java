@@ -18,7 +18,7 @@ public interface PendingTransactionService {
             UserAccount account
     );
 
-    MinePendingTransactionResponse minePendingTransaction(String id);
+    MinePendingTransactionResponse minePendingTransaction(String id, String minerAddress);
 
     List<PendingTransaction> getAll();
 

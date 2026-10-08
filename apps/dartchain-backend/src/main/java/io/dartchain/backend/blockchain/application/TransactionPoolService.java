@@ -90,6 +90,17 @@ public class TransactionPoolService {
         return removed;
     }
 
+    public synchronized void removeByIds(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+
+        boolean removed = pool.removeIf(tx -> tx.getId() != null && ids.contains(tx.getId()));
+        if (removed) {
+            persistPool();
+        }
+    }
+
     public synchronized List<PendingTransaction> drainAll() {
         List<PendingTransaction> drained = List.copyOf(pool);
         pool.clear();

@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 public class ChainAccountEntity {
 
     @Id
-    @Column(length = 42)
+    @Column(length = 128)
     private String address;
 
     @Column(name = "address_scheme", nullable = false, length = 16)

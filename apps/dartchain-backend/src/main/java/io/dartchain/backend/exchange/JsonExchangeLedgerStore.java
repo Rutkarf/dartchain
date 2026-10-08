@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -117,6 +118,26 @@ public class JsonExchangeLedgerStore implements ExchangeLedgerStore {
         return walletAdjustments
                 .getOrDefault(normalizeToken(token), BigDecimal.ZERO)
                 .setScale(SCALE, java.math.RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public Map<String, BigDecimal> listAdjustments(String walletAddress) {
+        if (walletAddress == null || walletAddress.isBlank()) {
+            return Map.of();
+        }
+
+        Map<String, BigDecimal> walletAdjustments = adjustments.get(normalizeWallet(walletAddress));
+        if (walletAdjustments == null || walletAdjustments.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<String, BigDecimal> result = new LinkedHashMap<>();
+        walletAdjustments.forEach((token, value) -> {
+            if (value != null && value.compareTo(BigDecimal.ZERO) != 0) {
+                result.put(token, value.setScale(SCALE, java.math.RoundingMode.HALF_UP));
+            }
+        });
+        return result;
     }
 
     private synchronized void persist() {

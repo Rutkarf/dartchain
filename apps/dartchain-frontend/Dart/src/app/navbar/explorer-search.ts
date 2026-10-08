@@ -165,7 +165,7 @@ export class ExplorerSearchComponent {
       case 'TRANSACTION':
         return 'TX';
       case 'PENDING':
-        return 'Pending';
+        return 'En attente';
       case 'ADDRESS':
         return 'Adresse';
       default:

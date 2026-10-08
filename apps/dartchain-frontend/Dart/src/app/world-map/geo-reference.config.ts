@@ -1,15 +1,15 @@
 import * as THREE from 'three';
 
 import {
-  MARSEILLE_COORDINATE_SYSTEM_VERSION,
-  type MarseilleCoordinateSystemVersion,
+  METAVERSE_COORDINATE_SYSTEM_VERSION,
+  type MetaverseCoordinateSystemVersion,
 } from './placements/coordinate-system';
 
 /**
  * Origine scène = Ombrière du Vieux-Port (OSM way/200273945).
  * Le miroir gameplay reste à world (0, 0) — coïncide avec cette origine géographique.
  */
-export const MARSEILLE_GEO_ORIGIN = {
+export const METAVERSE_GEO_ORIGIN = {
   latitude: 43.2945995,
   longitude: 5.3741227,
   altitude: 0,
@@ -19,7 +19,7 @@ export const MARSEILLE_GEO_ORIGIN = {
 };
 
 export interface GeoReferenceConfig {
-  coordinateSystemVersion: MarseilleCoordinateSystemVersion;
+  coordinateSystemVersion: MetaverseCoordinateSystemVersion;
   sourceCrs: string;
   worldCrs: string;
   originLatitude: number;
@@ -35,12 +35,12 @@ export interface GeoReferenceConfig {
 }
 
 export const GEO_REFERENCE_CONFIG: GeoReferenceConfig = {
-  coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
+  coordinateSystemVersion: METAVERSE_COORDINATE_SYSTEM_VERSION,
   sourceCrs: 'EPSG:4326',
   worldCrs: 'local-equirectangular-meters',
-  originLatitude: MARSEILLE_GEO_ORIGIN.latitude,
-  originLongitude: MARSEILLE_GEO_ORIGIN.longitude,
-  originAltitude: MARSEILLE_GEO_ORIGIN.altitude,
+  originLatitude: METAVERSE_GEO_ORIGIN.latitude,
+  originLongitude: METAVERSE_GEO_ORIGIN.longitude,
+  originAltitude: METAVERSE_GEO_ORIGIN.altitude,
   metersPerWorldUnit: 1,
   northRotationRadians: 0,
   axisMapping: {
@@ -77,7 +77,7 @@ export interface GeographicDataSource {
 /** Sources réellement présentes ou configurées dans le dépôt (inventaire Phase 3). */
 export const GEOGRAPHIC_DATA_SOURCES: readonly GeographicDataSource[] = [
   {
-    id: 'osm-overpass-marseille-buildings',
+    id: 'osm-overpass-metaverse-buildings',
     type: 'osm',
     pathOrEndpoint: '/api/metaverse/overpass (backend) | /overpass (dev proxy → lz4.overpass-api.de)',
     coordinateSystem: 'EPSG:4326',
@@ -100,9 +100,9 @@ export const GEOGRAPHIC_DATA_SOURCES: readonly GeographicDataSource[] = [
     isUsed: true,
   },
   {
-    id: 'marseille-prototype-landmarks',
+    id: 'metaverse-prototype-landmarks',
     type: 'json',
-    pathOrEndpoint: 'geo-reference.config.ts MARSEILLE_LANDMARK_BUILDINGS',
+    pathOrEndpoint: 'geo-reference.config.ts METAVERSE_LANDMARK_BUILDINGS',
     coordinateSystem: 'EPSG:4326',
     coverage: 'Miroir + 4 héros bâtiments',
     accuracy: 'sommets OSM way/* (cadastre DGI, snapshot API 0.6) — pas une vérité cm',
@@ -111,9 +111,9 @@ export const GEOGRAPHIC_DATA_SOURCES: readonly GeographicDataSource[] = [
     isUsed: true,
   },
   {
-    id: 'marseille-harbor-layout',
+    id: 'metaverse-harbor-layout',
     type: 'json',
-    pathOrEndpoint: 'map-configuration.ts MARSEILLE_HARBOR_WATER + vieux-port-layout.util.ts',
+    pathOrEndpoint: 'map-configuration.ts METAVERSE_HARBOR_WATER + vieux-port-layout.util.ts',
     coordinateSystem: 'local-meters',
     coverage: 'Bassin Vieux-Port (approximation)',
     accuracy: 'estimated — aligné sur repère miroir',
@@ -163,13 +163,13 @@ export const GEOGRAPHIC_DATA_SOURCES: readonly GeographicDataSource[] = [
   {
     id: 'glb-gltf-buildings',
     type: 'glb',
-    pathOrEndpoint: '(aucun modèle GLB bâtiment Marseille)',
+    pathOrEndpoint: '(aucun modèle GLB bâtiment Metaverse)',
     isAuthorized: false,
     isUsed: false,
   },
 ];
 
-export interface MarseilleValidationAnchor {
+export interface MetaverseValidationAnchor {
   id: string;
   name: string;
   latitude: number;
@@ -219,7 +219,7 @@ export function closedOsmWayFootprint(
  * Bâtiments héros — anneaux OSM way/* (API 0.6, snapshot 2026-08-20).
  * Licence ODbL. Hauteurs catalogue (hardcoded) — surchargeables via tags OSM au runtime.
  */
-export const MARSEILLE_LANDMARK_BUILDINGS: readonly GeoBuilding[] = [
+export const METAVERSE_LANDMARK_BUILDINGS: readonly GeoBuilding[] = [
   {
     id: 'mirror-adjacent-building-01',
     sourceId: 'osm-way-67705148',
@@ -317,8 +317,8 @@ export interface WigleProfessionalAnchor {
 export const WIGLE_PROFESSIONAL_ANCHORS: readonly WigleProfessionalAnchor[] = [
   {
     id: 'vp-ombriere',
-    latitude: MARSEILLE_GEO_ORIGIN.latitude,
-    longitude: MARSEILLE_GEO_ORIGIN.longitude,
+    latitude: METAVERSE_GEO_ORIGIN.latitude,
+    longitude: METAVERSE_GEO_ORIGIN.longitude,
     networkName: 'VieuxPort-Ombriere',
     networkType: 'WIFI',
     signalStrength: -58,
@@ -453,22 +453,22 @@ export const WIGLE_PROFESSIONAL_ANCHORS: readonly WigleProfessionalAnchor[] = [
   },
 ];
 
-export const MARSEILLE_VALIDATION_ANCHORS: readonly MarseilleValidationAnchor[] = [
+export const METAVERSE_VALIDATION_ANCHORS: readonly MetaverseValidationAnchor[] = [
   {
     id: 'ombriere-mirror',
     name: 'Ombrière / miroir',
-    latitude: MARSEILLE_GEO_ORIGIN.latitude,
-    longitude: MARSEILLE_GEO_ORIGIN.longitude,
+    latitude: METAVERSE_GEO_ORIGIN.latitude,
+    longitude: METAVERSE_GEO_ORIGIN.longitude,
     expectedWorldPosition: new THREE.Vector3(0, 0, 0),
     toleranceMeters: 1,
     confidence: 'high',
-    source: MARSEILLE_GEO_ORIGIN.sourceId,
+    source: METAVERSE_GEO_ORIGIN.sourceId,
   },
   {
     id: 'metro-station-offset',
     name: 'Station Miroir (offset local)',
-    latitude: MARSEILLE_GEO_ORIGIN.latitude,
-    longitude: MARSEILLE_GEO_ORIGIN.longitude,
+    latitude: METAVERSE_GEO_ORIGIN.latitude,
+    longitude: METAVERSE_GEO_ORIGIN.longitude,
     expectedWorldPosition: new THREE.Vector3(-16.4, 0, -11.2),
     toleranceMeters: 2,
     confidence: 'high',
@@ -477,8 +477,8 @@ export const MARSEILLE_VALIDATION_ANCHORS: readonly MarseilleValidationAnchor[] 
   {
     id: 'spawn-offset',
     name: 'Spawn joueur (offset local)',
-    latitude: MARSEILLE_GEO_ORIGIN.latitude,
-    longitude: MARSEILLE_GEO_ORIGIN.longitude,
+    latitude: METAVERSE_GEO_ORIGIN.latitude,
+    longitude: METAVERSE_GEO_ORIGIN.longitude,
     expectedWorldPosition: new THREE.Vector3(0, 0, 5),
     toleranceMeters: 2,
     confidence: 'high',
@@ -487,18 +487,18 @@ export const MARSEILLE_VALIDATION_ANCHORS: readonly MarseilleValidationAnchor[] 
   {
     id: 'south-channel-water',
     name: 'Centre bras sud eau',
-    latitude: MARSEILLE_GEO_ORIGIN.latitude,
-    longitude: MARSEILLE_GEO_ORIGIN.longitude,
+    latitude: METAVERSE_GEO_ORIGIN.latitude,
+    longitude: METAVERSE_GEO_ORIGIN.longitude,
     expectedWorldPosition: new THREE.Vector3(0, -1.15, 263),
     toleranceMeters: 20,
     confidence: 'medium',
-    source: 'MARSEILLE_HARBOR_WATER (estimated layout)',
+    source: 'METAVERSE_HARBOR_WATER (estimated layout)',
   },
   {
     id: 'north-quay',
     name: 'Quai du Port (centre approx.)',
-    latitude: MARSEILLE_GEO_ORIGIN.latitude,
-    longitude: MARSEILLE_GEO_ORIGIN.longitude,
+    latitude: METAVERSE_GEO_ORIGIN.latitude,
+    longitude: METAVERSE_GEO_ORIGIN.longitude,
     expectedWorldPosition: new THREE.Vector3(-424, 0.05, -60),
     toleranceMeters: 20,
     confidence: 'low',
@@ -530,7 +530,7 @@ export function landmarkPlacementErrorMeters(
 
 /** IDs OSM à exclure du chargement bulk (déjà rendus comme landmarks stylisés). */
 export const LANDMARK_OSM_SOURCE_IDS = new Set(
-  MARSEILLE_LANDMARK_BUILDINGS.map((b) => b.sourceId)
+  METAVERSE_LANDMARK_BUILDINGS.map((b) => b.sourceId)
 );
 
 export interface BuildingPlacementAudit {

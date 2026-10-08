@@ -35,9 +35,9 @@ describe('urban-props Phase 14', () => {
 
   it('construit des InstancedMesh trottoir', () => {
     const built = buildVieuxPortStreetProps('full', 'ultra-low');
-    expect(built.group.name).toBe('marseille-street-props');
+    expect(built.group.name).toBe('metaverse-street-props');
     expect(built.counts.tree).toBeGreaterThan(0);
-    expect(built.group.children.some((c) => c.name === 'marseille-street-trees')).toBe(true);
+    expect(built.group.children.some((c) => c.name === 'metaverse-street-trees')).toBe(true);
   });
 
   it('ajoute bateaux et bouées au quai des Belges', () => {
@@ -45,7 +45,7 @@ describe('urban-props Phase 14', () => {
     expect(extras).not.toBeNull();
     expect(extras!.boatCount).toBe(6);
     expect(extras!.buoyCount).toBeGreaterThan(0);
-    expect(extras!.group.getObjectByName('marseille-quay-boats')).toBeDefined();
+    expect(extras!.group.getObjectByName('metaverse-quay-boats')).toBeDefined();
 
     expect(buildQuayHarborExtras('none', 'medium')).toBeNull();
   });

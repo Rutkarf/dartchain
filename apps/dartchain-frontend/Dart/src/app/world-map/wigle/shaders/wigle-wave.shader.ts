@@ -57,13 +57,13 @@ export function createWigleWaveMaterial(color: THREE.ColorRepresentation): THREE
 export function colorForNetworkType(type: string): number {
   switch (type.toUpperCase()) {
     case 'WIFI':
-      return 0x00f3ff;
+      return 0x8a95a5;
     case 'CELL':
-      return 0xff00ff;
+      return 0x8a95a5;
     case 'BLE':
-      return 0x7b2cbf;
+      return 0x8a95a5;
     default:
-      return 0x8f9bb3;
+      return 0x8a95a5;
   }
 }
 

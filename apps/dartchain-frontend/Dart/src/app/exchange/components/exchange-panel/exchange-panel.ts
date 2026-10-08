@@ -193,7 +193,14 @@ export class ExchangePanelComponent implements AfterViewInit {
     amount: ['', [Validators.required]],
   });
 
-  protected readonly walletAddress = computed(() => this.walletSession.address());
+  /** Session locale ou adresse déjà liée au compte (comme faucet / wallet). */
+  protected readonly walletAddress = computed(() => {
+    const local = this.walletSession.address()?.trim() ?? '';
+    if (local) {
+      return local;
+    }
+    return this.auth.user()?.walletAddress?.trim() ?? '';
+  });
   protected readonly hasWallet = computed(() => !!this.walletAddress());
 
   protected readonly parsedAmount = computed(() => {
@@ -310,7 +317,7 @@ export class ExchangePanelComponent implements AfterViewInit {
   protected readonly compactMetaHint = computed(() => {
     switch (this.swapAction()) {
       case 'create-wallet':
-        return 'Wallet requis';
+        return 'Portefeuille requis';
       case 'login-required':
         return 'Connexion requise';
       case 'enter-amount':
@@ -345,12 +352,12 @@ export class ExchangePanelComponent implements AfterViewInit {
     }
 
     const change = this.change24hLabel();
-    if (change !== '—' && change !== 'LaunchLab') {
+    if (change !== '—' && change !== 'Laboratoire') {
       lines.push(`${this.toToken()} ${change} · 24 h`);
     }
 
     lines.push(this.trustLine());
-    lines.push('Flux LaunchLab actif');
+    lines.push('Flux du laboratoire actif');
 
     return lines;
   });
@@ -367,7 +374,7 @@ export class ExchangePanelComponent implements AfterViewInit {
   protected readonly footerMetaLine = computed(() => {
     switch (this.swapAction()) {
       case 'create-wallet':
-        return 'Wallet requis pour convertir · ~30 s';
+        return 'Portefeuille requis pour convertir · environ 30 s';
       case 'login-required':
         return 'Connectez-vous pour valider la conversion';
       default:
@@ -476,7 +483,7 @@ export class ExchangePanelComponent implements AfterViewInit {
     const usd = this.unitUsdPriceFrom();
     const balance = this.fromBalance();
     if (usd == null) {
-      return 'LaunchLab testnet';
+      return 'Laboratoire, réseau de test';
     }
 
     const totalUsd = balance * usd;
@@ -490,7 +497,7 @@ export class ExchangePanelComponent implements AfterViewInit {
   protected readonly prixSubline = computed(() => {
     const usd = this.unitUsdPriceTo();
     if (usd == null) {
-      return 'LaunchLab testnet';
+      return 'Laboratoire, réseau de test';
     }
 
     return `${this.formatUsd(usd, 4)} CHF`;
@@ -542,7 +549,7 @@ export class ExchangePanelComponent implements AfterViewInit {
   protected readonly swapButtonLabel = computed(() => {
     switch (this.swapAction()) {
       case 'create-wallet':
-        return 'Créer un wallet';
+        return 'Créer un portefeuille';
       case 'login-required':
         return 'Se connecter';
       case 'enter-amount':
@@ -583,7 +590,7 @@ export class ExchangePanelComponent implements AfterViewInit {
   protected readonly swapCtaHint = computed(() => {
     switch (this.swapAction()) {
       case 'create-wallet':
-        return 'Wallet requis pour convertir vos tokens en actifs LaunchLab.';
+        return 'Portefeuille requis pour convertir vos jetons en actifs du laboratoire.';
       case 'login-required':
         return 'Connectez-vous pour valider la conversion.';
       case 'enter-amount':
@@ -654,7 +661,7 @@ export class ExchangePanelComponent implements AfterViewInit {
     });
 
     effect(() => {
-      this.walletSession.address();
+      this.walletAddress();
       this.fromToken();
       this.toToken();
       this.fetchExchangePanel();
@@ -690,7 +697,7 @@ export class ExchangePanelComponent implements AfterViewInit {
       const coinId = useFrom ? fromCoinId : toCoinId;
 
       if (!coinId) {
-        this.change24hLabel.set('LaunchLab');
+        this.change24hLabel.set('Laboratoire');
         this.change24hPositive.set(true);
         this.unitUsdPriceFetched.set(null);
         this.unitUsdPriceFetchedIsFrom.set(true);
@@ -936,6 +943,18 @@ export class ExchangePanelComponent implements AfterViewInit {
     window.setTimeout(() => {
       this.host.nativeElement.classList.remove('is-quest-focus');
     }, 1800);
+  }
+
+  @HostListener('window:exchange-panel-select-token', ['$event'])
+  onExternalTokenSelect(event: Event): void {
+    const detail = (event as CustomEvent<{ token?: string }>).detail;
+    const token = detail?.token?.trim().toUpperCase();
+    if (!token || isExchangeNativeToken(token)) {
+      this.onExternalFocusRequest();
+      return;
+    }
+    this.setSwapPair(EXCHANGE_NATIVE_TOKEN, token);
+    this.onExternalFocusRequest();
   }
 
   protected onAmountInput(): void {

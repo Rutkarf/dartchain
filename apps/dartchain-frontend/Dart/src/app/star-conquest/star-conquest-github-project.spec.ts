@@ -7,7 +7,7 @@ import {
   type StarConquestGithubColumn,
 } from './star-conquest-github-project';
 
-describe('Star Conquest GitHub project board', () => {
+describe('Conquête stellaire GitHub project board', () => {
   it('mappe chaque statut catalogue vers une colonne GitHub', () => {
     expect(STAR_CONQUEST_GITHUB_COLUMN.completed).toBe('Done');
     expect(STAR_CONQUEST_GITHUB_COLUMN.active).toBe('In Progress');

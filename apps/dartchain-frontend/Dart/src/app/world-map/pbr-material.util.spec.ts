@@ -24,7 +24,7 @@ describe('pbr-material.util', () => {
   });
 
   it('vitrage high = MeshPhysicalMaterial avec transmission', () => {
-    const mat = createArchitecturalGlassMaterial('high', { color: 0xffffff });
+    const mat = createArchitecturalGlassMaterial('high', { color: 0xede7d9 });
     expect(mat).toBeInstanceOf(THREE.MeshPhysicalMaterial);
     expect((mat as THREE.MeshPhysicalMaterial).transmission).toBeGreaterThan(0);
     mat.dispose();

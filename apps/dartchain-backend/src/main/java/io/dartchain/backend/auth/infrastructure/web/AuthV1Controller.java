@@ -2,10 +2,15 @@ package io.dartchain.backend.auth.infrastructure.web;
 
 import io.dartchain.backend.auth.application.AuthService;
 import io.dartchain.backend.auth.dto.AuthResponse;
+import io.dartchain.backend.auth.dto.EmailCodeRequest;
+import io.dartchain.backend.auth.dto.EmailResendRequest;
 import io.dartchain.backend.auth.dto.LinkWalletRequest;
 import io.dartchain.backend.auth.dto.LoginRequest;
 import io.dartchain.backend.auth.dto.RefreshRequest;
 import io.dartchain.backend.auth.dto.RegisterRequest;
+import io.dartchain.backend.auth.dto.TotpCodeRequest;
+import io.dartchain.backend.auth.dto.TotpSetupResponse;
+import io.dartchain.backend.auth.dto.TotpVerifyRequest;
 import io.dartchain.backend.auth.dto.UserProfileResponse;
 import io.dartchain.backend.config.ApiRoutes;
 import io.dartchain.backend.web.RequestClientInfo;
@@ -40,6 +45,42 @@ public class AuthV1Controller {
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         return authService.login(request, RequestClientInfo.clientIp(httpRequest));
+    }
+
+    @PostMapping("/email/confirm")
+    public AuthResponse confirmEmail(@Valid @RequestBody EmailCodeRequest request, HttpServletRequest httpRequest) {
+        return authService.confirmEmail(request, RequestClientInfo.clientIp(httpRequest));
+    }
+
+    @PostMapping("/email/resend")
+    public AuthResponse resendEmail(@Valid @RequestBody EmailResendRequest request) {
+        return authService.resendEmail(request.verificationId());
+    }
+
+    @PostMapping("/2fa/verify")
+    public AuthResponse verifyTotp(@Valid @RequestBody TotpVerifyRequest request, HttpServletRequest httpRequest) {
+        return authService.confirmTotp(request, RequestClientInfo.clientIp(httpRequest));
+    }
+
+    @PostMapping("/2fa/setup")
+    public TotpSetupResponse setupTotp(@RequestHeader(value = "Authorization", required = false) String authorization) {
+        return authService.beginTotpSetup(authorization);
+    }
+
+    @PostMapping("/2fa/enable")
+    public UserProfileResponse enableTotp(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @Valid @RequestBody TotpCodeRequest request
+    ) {
+        return authService.enableTotp(authorization, request);
+    }
+
+    @PostMapping("/2fa/disable")
+    public UserProfileResponse disableTotp(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @Valid @RequestBody TotpCodeRequest request
+    ) {
+        return authService.disableTotp(authorization, request);
     }
 
     @PostMapping("/refresh")

@@ -15,8 +15,8 @@ import { CharacterControlService } from '@metaverse/services/character-control.s
 import { ThreeSceneService } from '@metaverse/services/three-scene.service';
 import { MapConfigService } from '@world-map/map-config.service';
 import type { MapQuality } from '@world-map/map-configuration';
-import { mapPerfProfile } from '@world-map/marseille-perf.config';
-import { MarseilleAtmosphereService } from '@world-map/marseille-atmosphere.service';
+import { mapPerfProfile } from '@world-map/metaverse-perf.config';
+import { MetaverseAtmosphereService } from '@world-map/metaverse-atmosphere.service';
 import {
   MetaverseBbRenderPipeline,
   shouldUseRenderPipeline,
@@ -48,6 +48,8 @@ import { ArenaHudComponent } from './arena/components/arena-hud/arena-hud.compon
 import { ArenaCombatService } from './arena/services/arena-combat.service';
 import { ArenaSessionService } from './arena/services/arena-session.service';
 import { ProductConfigService } from '@core/config/product-config.service';
+import { isArenaSlimWorld } from '@world-map/arena/metaverse-arena-profile';
+import { MetaverseIntroCameraService } from './services/metaverse-intro-camera.service';
 
 const FLOOR_HEIGHT_FALLBACK = 420;
 const PERF_DEBUG = isPerfDebugEnabled();
@@ -88,18 +90,28 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private readonly characterControl = inject(CharacterControlService);
   private readonly cameraControl = inject(CameraControlService);
   private readonly mapConfig = inject(MapConfigService);
-  private readonly atmosphere = inject(MarseilleAtmosphereService);
+  private readonly atmosphere = inject(MetaverseAtmosphereService);
   private readonly zone = inject(NgZone);
   private readonly animationScheduler = inject(WebGlAnimationSchedulerService);
   private readonly combinedPerfHud = inject(CombinedPerfHudService);
   private readonly product = inject(ProductConfigService);
   private readonly arenaCombat = inject(ArenaCombatService);
   private readonly arenaSession = inject(ArenaSessionService);
+  private readonly introCamera = inject(MetaverseIntroCameraService);
 
-  /** Peek plus haut + masque adouci quand l’Arène BB est active. */
+  /** Voile d’intro MetaVerseBB (signal — sync hors NgZone). Pas de logo HUD. */
+  readonly introVeilPhase = this.introCamera.veilPhase;
+  readonly introVeilOpacity = this.introCamera.veilOpacity;
+
+  /** Peek plus haut + masque adouci quand MetaVerseBB est actif. */
   @HostBinding('class.arena-active')
   get arenaActiveClass(): boolean {
     return this.product.metaverseArenaEnabled;
+  }
+
+  /** Monde allégé MetaVerseBB — bâtiments / placements off. */
+  slimWorld(): boolean {
+    return isArenaSlimWorld(this.product.metaverseArenaEnabled);
   }
 
   private scene?: THREE.Scene;
@@ -121,6 +133,7 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.clearArenaPeekCssVar();
+    this.introCamera.cancel();
     this.unsubControl?.();
     this.characterControl.unbindKeys();
     this.cameraControl.detachOrbit();
@@ -181,8 +194,7 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       this.scene = new THREE.Scene();
 
       this.camera = new THREE.PerspectiveCamera(52, width / height, 0.18, 1600);
-      this.camera.position.set(0, 14, 18);
-      this.camera.lookAt(0, 2, -14);
+      // Placeholder : armMetaverseIntro / resetOrbit placent immédiatement la plongée Ombrière.
 
       const quality = this.mapConfig.configuration.quality;
 
@@ -242,6 +254,8 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
 
       this.threeScene.register(this.scene, this.camera, this.renderer);
       this.cameraControl.attachOrbit(this.camera, canvas);
+      // Nadir Ombrière dès la 1ʳᵉ frame — évite le flash POV perso.
+      this.cameraControl.armMetaverseIntro();
       this.cameraControl.resetOrbit();
       this.unsubControl = this.threeScene.registerUpdate((dt) => {
         this.characterControl.update(dt);
@@ -254,7 +268,15 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
 
       this.resizeBinding = bindContainerResize(
         container,
-        (nextWidth, nextHeight) => this.applyRendererSize(nextWidth, nextHeight),
+        (nextWidth, nextHeight) => {
+          const rawHeight = container.getBoundingClientRect().height;
+          if (rawHeight < 1) {
+            this.animationScheduler.pauseSubscriber('metaverse-floor');
+            return;
+          }
+          this.animationScheduler.resumeSubscriber('metaverse-floor');
+          this.applyRendererSize(nextWidth, nextHeight);
+        },
         { width: window.innerWidth, height: FLOOR_HEIGHT_FALLBACK }
       );
 
@@ -269,7 +291,7 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
       });
       this.animationScheduler.resumeSubscriber('metaverse-floor');
 
-      // Arène BB : session jouable dès que le floor WebGL est prêt (guest OK).
+      // MetaVerseBB : session jouable dès que le floor WebGL est prêt (guest OK).
       if (this.product.metaverseArenaEnabled) {
         this.arenaSession.ensureAutoPlay();
       }
@@ -359,7 +381,7 @@ export class ThreeFloor implements AfterViewInit, OnDestroy {
   private applyHorizonBlendMask(): void {
     const wrapper = this.floorWrapper?.nativeElement;
     if (!wrapper) return;
-    // Arène BB : pas de fondu / coupure — le peek remplit sous les onglets.
+    // MetaVerseBB : pas de fondu / coupure — le peek remplit sous les onglets.
     if (this.product.metaverseArenaEnabled) {
       wrapper.style.setProperty('-webkit-mask-image', 'none');
       wrapper.style.setProperty('mask-image', 'none');

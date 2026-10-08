@@ -1,7 +1,6 @@
 <section
-  class="rate-panel-root"
-  [class.rate-panel-root--hub-graph]="hubGraphOnly()"
-  [attr.aria-label]="hubGraphOnly() ? 'Graphique marché' : 'Marché, graphique et taux crypto'"
+ class="rate-panel-root"
+ [class.rate-panel-root--hub-graph]="hubGraphOnly()"
 >
   <div
     class="rate-panel__shell"
@@ -12,7 +11,7 @@
     @if (!hubGraphOnly()) {
     <header class="rate-panel__head">
       <span class="rate-panel__accent" aria-hidden="true"></span>
-      <span class="rate-panel__title">Graph</span>
+      <span class="rate-panel__title">Graphique</span>
 
       <form class="rate-panel-search" (submit)="onSearchSubmit($event)" role="search">
     <label class="rate-panel-search__label rate-panel-search__label--sr-only" for="rate-panel-search-input">
@@ -50,11 +49,10 @@
 
     @if (searchMenuOpen() && hasSearchQuery()) {
       <ul
-        id="rate-panel-search-results"
-        class="rate-panel-search__menu"
-        role="listbox"
-        aria-label="Résultats CoinGecko"
-      >
+ id="rate-panel-search-results"
+ class="rate-panel-search__menu"
+ role="listbox"
+ >
         @if (searchResults().length === 0 && !searchLoading()) {
           <li class="rate-panel-search__empty" role="option" aria-disabled="true">
             {{ searchError() || 'Aucun résultat.' }}
@@ -134,7 +132,7 @@
           }
         </div>
 
-        <div class="rate-panel-column" aria-label="Colonne droite personnalisable">
+        <div class="rate-panel-column">
           @for (panel of view.right; track panel.symbol) {
             <article
               class="rate-card rate-card--interactive rate-card--custom"

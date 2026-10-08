@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 import { VIEUX_PORT_CORE_BUILDING_RADIUS } from './geo-reference.config';
-import { activeAtmospherePreset } from './marseille-atmosphere.config';
+import { activeAtmospherePreset } from './metaverse-atmosphere.config';
 import { streamingCoreFadeFactor } from './world-streaming-visual.util';
 
 export interface StreamingDistrictHazeResult {

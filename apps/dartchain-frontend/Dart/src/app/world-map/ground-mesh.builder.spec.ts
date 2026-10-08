@@ -17,16 +17,17 @@ import {
 
 function stubGroundMaterials(): GroundMaterialSet {
   return {
-    road: new THREE.MeshStandardMaterial({ color: 0x333333 }),
-    sidewalk: new THREE.MeshStandardMaterial({ color: 0xaaaaaa }),
-    curb: new THREE.MeshStandardMaterial({ color: 0x888888 }),
-    gutter: new THREE.MeshStandardMaterial({ color: 0x222222 }),
-    esplanade: new THREE.MeshStandardMaterial({ color: 0xcccccc }),
-    quay: new THREE.MeshPhysicalMaterial({ color: 0xaaaaaa }),
-    contactShadow: new THREE.MeshBasicMaterial({ color: 0x000000 }),
-    centerLine: new THREE.MeshBasicMaterial({ color: 0xffff00 }),
-    laneGlow: new THREE.MeshBasicMaterial({ color: 0x00ffff }),
-    crosswalkStripe: new THREE.MeshStandardMaterial({ color: 0xffffff }),
+    road: new THREE.MeshStandardMaterial({ color: 0x18314f }),
+    sidewalk: new THREE.MeshStandardMaterial({ color: 0x8a95a5 }),
+    curb: new THREE.MeshStandardMaterial({ color: 0x8a95a5 }),
+    gutter: new THREE.MeshStandardMaterial({ color: 0x0d0630 }),
+    esplanade: new THREE.MeshStandardMaterial({ color: 0xede7d9 }),
+    quay: new THREE.MeshPhysicalMaterial({ color: 0x8a95a5 }),
+    spawnCircleGround: new THREE.MeshLambertMaterial({ color: 0x18314f }),
+    contactShadow: new THREE.MeshBasicMaterial({ color: 0x0d0630 }),
+    centerLine: new THREE.MeshBasicMaterial({ color: 0xd5a021 }),
+    laneGlow: new THREE.MeshBasicMaterial({ color: 0x8a95a5 }),
+    crosswalkStripe: new THREE.MeshStandardMaterial({ color: 0xede7d9 }),
   };
 }
 
@@ -52,12 +53,13 @@ describe('ground-mesh.builder (Phase 1)', () => {
       materials
     );
 
-    expect(built.group.name).toBe('marseille-city-ground');
+    expect(built.group.name).toBe('metaverse-city-ground');
     const names = built.group.children.map((c) => c.name);
     expect(names.some((n) => n.includes('ground-road-canebiere'))).toBe(true);
     expect(names.some((n) => n.includes('ground-sidewalk-canebiere'))).toBe(true);
     expect(names.some((n) => n.includes('ground-plate-ombriere-esplanade'))).toBe(true);
     expect(names.some((n) => n.includes('ground-plate-quai-belges-walk'))).toBe(true);
+    expect(names).toContain('ground-spawn-circle-fill');
     expect(built.geometries.length).toBeGreaterThan(10);
 
     for (const geo of built.geometries) geo.dispose();

@@ -1,60 +1,79 @@
-/** Palette UI — Gris informatique · Porcelain · Baltic Blue · Violet ultra-sombre · Black */
-export const BRAND = {
-  infoGrey: { hex: '#8B9DAD', rgb: '139, 157, 173' },
-  porcelain: { hex: '#FDFFFC', rgb: '253, 255, 252' },
-  balticBlue: { hex: '#235789', rgb: '35, 87, 137' },
-  ultraPurple: { hex: '#120A1E', rgb: '18, 10, 30' },
-  black: { hex: '#020100', rgb: '2, 1, 0' },
+/**
+ * Rôles UI — un hex, un métier.
+ * Source : docs/directionArtistique/mapping semantique couleur role.txt
+ * Le cycle ELECTRIC / BG / BTN reste un cycle de scène, pas ces rôles.
+ */
+export const COLOR_ROLE = {
+  textPrimary: { hex: '#ede7d9', rgb: '237, 231, 217' },
+  textSecondary: { hex: '#8b9dad', rgb: '139, 157, 173' },
+  textMuted: { hex: '#ede7d9', rgb: '237, 231, 217', alpha: 0.45 },
+  surface: { hex: '#0a1220', rgb: '10, 18, 32' },
+  controlSecondary: { hex: '#235789', rgb: '35, 87, 137' },
+  cta: { hex: '#d5a021', rgb: '213, 160, 33' },
+  warning: { hex: '#d5a021', rgb: '213, 160, 33' },
+  positive: { hex: '#09814a', rgb: '9, 129, 74' },
+  negative: { hex: '#7b0d1e', rgb: '123, 13, 30' },
 } as const;
 
-/** Accents UI — graphiques, logo navbar, sparklines */
+/** Palette UI — alias marque. Les rôles vivent dans COLOR_ROLE. */
+export const BRAND = {
+  infoGrey: { hex: '#8b9dad', rgb: '139, 157, 173' }, // Gris informatique
+  porcelain: { hex: '#ede7d9', rgb: '237, 231, 217' }, // Blanc cassé
+  balticBlue: { hex: '#235789', rgb: '35, 87, 137' }, // Baltic Blue (pré-remap)
+  ultraPurple: { hex: '#0a1220', rgb: '10, 18, 32' }, // Navy surface (alias legacy)
+  black: { hex: '#0a1220', rgb: '10, 18, 32' }, // Navy surface
+} as const;
+
+/** Accents UI — 7 métiers DA (cycle logo / graphiques) */
 export const ELECTRIC_PALETTE_STOPS = [
-  { hex: BRAND.balticBlue.hex, rgb: BRAND.balticBlue.rgb },
-  { hex: BRAND.infoGrey.hex, rgb: BRAND.infoGrey.rgb },
-  { hex: BRAND.ultraPurple.hex, rgb: BRAND.ultraPurple.rgb },
-  { hex: '#4A87AD', rgb: '74, 135, 173' },
+  { hex: '#0a1220', rgb: '10, 18, 32' }, // Navy surface
+  { hex: '#235789', rgb: '35, 87, 137' }, // Baltic Blue
+  { hex: '#8b9dad', rgb: '139, 157, 173' }, // Gris informatique
+  { hex: '#ede7d9', rgb: '237, 231, 217' }, // Blanc cassé
+  { hex: '#d5a021', rgb: '213, 160, 33' }, // Jaune doré
+  { hex: '#09814a', rgb: '9, 129, 74' }, // Vert sea green
+  { hex: '#7b0d1e', rgb: '123, 13, 30' }, // Rouge boursier
 ] as const;
 
-/** Palette site — profondeur noir → bleu → porcelaine */
+/** Palette site — profondeur navy → Baltic → porcelaine (rampe fintech) */
 export const BG_PALETTE_STOPS = [
   { hex: BRAND.black.hex, rgb: BRAND.black.rgb },
-  { hex: '#0A1018', rgb: '10, 16, 24' },
-  { hex: '#121F2E', rgb: '18, 31, 46' },
-  { hex: '#1A3048', rgb: '26, 48, 72' },
+  { hex: '#0a1018', rgb: '10, 16, 24' },
+  { hex: '#121f2e', rgb: '18, 31, 46' },
+  { hex: '#1a3048', rgb: '26, 48, 72' },
   { hex: BRAND.balticBlue.hex, rgb: BRAND.balticBlue.rgb },
-  { hex: '#3D6F9E', rgb: '61, 111, 158' },
-  { hex: '#6A95B8', rgb: '106, 149, 184' },
-  { hex: '#A8C4D8', rgb: '168, 196, 216' },
+  { hex: '#3d6f9e', rgb: '61, 111, 158' },
+  { hex: '#6a95b8', rgb: '106, 149, 184' },
+  { hex: '#a8c4d8', rgb: '168, 196, 216' },
   { hex: BRAND.porcelain.hex, rgb: BRAND.porcelain.rgb },
 ] as const;
 
 /** Palette boutons */
 export const BTN_PALETTE_STOPS = [
-  { hex: '#020100', rgb: '2, 1, 0' },
-  { hex: '#0D1824', rgb: '13, 24, 36' },
+  { hex: '#0a1220', rgb: '10, 18, 32' },
+  { hex: '#0d1824', rgb: '13, 24, 36' },
   { hex: '#152535', rgb: '21, 37, 53' },
-  { hex: '#1C3550', rgb: '28, 53, 80' },
+  { hex: '#1c3550', rgb: '28, 53, 80' },
   { hex: BRAND.balticBlue.hex, rgb: BRAND.balticBlue.rgb },
-  { hex: '#2D6A94', rgb: '45, 106, 148' },
-  { hex: '#4A87AD', rgb: '74, 135, 173' },
-  { hex: '#6BA3C4', rgb: '107, 163, 196' },
-  { hex: '#8FC0DC', rgb: '143, 192, 220' },
+  { hex: '#2d6a94', rgb: '45, 106, 148' },
+  { hex: '#4a87ad', rgb: '74, 135, 173' },
+  { hex: '#6ba3c4', rgb: '107, 163, 196' },
+  { hex: '#8fc0dc', rgb: '143, 192, 220' },
 ] as const;
 
 /** @deprecated Utiliser BG_PALETTE_STOPS */
 export const PALETTE_STOPS = BG_PALETTE_STOPS;
 
-/** Clic logo — bleu · gris · or */
-export const LOGO_ELECTRIC_CLICK_INDICES = [0, 1, 2] as const;
+/** Clic logo — 7 métiers DA */
+export const LOGO_ELECTRIC_CLICK_INDICES = [0, 1, 2, 3, 4, 5, 6] as const;
 
 /**
- * Couleurs Three.js sol + particules — inchangées (retrowave legacy).
- * Ne pas dériver de BRAND / ELECTRIC_PALETTE_STOPS.
+ * Couleurs Three.js sol + particules — navy + gris info.
  */
 const THREE_LEGACY = {
-  sceneBg: '#0A0612',
-  floorLight: '#00F5FF',
-  floorGlow: '#FF2D9A',
+  sceneBg: '#0a1220', // Navy surface
+  floorLight: '#8b9dad', // Gris informatique
+  floorGlow: '#8b9dad',
 } as const;
 
 export interface CardPaletteColors {
@@ -139,15 +158,17 @@ export const THREE_GLASS_MATERIAL = {
   ior: 1.38,
 } as const;
 
+/** @deprecated Prefer `createLogoHoloMaterial` / `LOGO_HOLO_PHYSICAL` (logo-stl-holo). */
 export const THREE_LOGO_GLASS = {
-  ...THREE_GLASS_MATERIAL,
-  emissiveIntensity: 0.62,
-  metalness: 0.22,
-  roughness: 0.22,
-  transmission: 0.36,
+  emissiveIntensity: 0.55,
+  metalness: 0.34,
+  roughness: 0.38,
+  clearcoat: 1,
+  clearcoatRoughness: 0.12,
+  transmission: 0,
   opacity: 1,
-  transparent: true,
-  clearcoat: 0.68,
+  transparent: false,
+  reflectivity: 0.62,
 } as const;
 
 export interface ThreeNavbarPalette {
@@ -194,18 +215,18 @@ function lightenHex(hex: string, amount: number): string {
   return toHex(r + (255 - r) * amount, g + (255 - g) * amount, b + (255 - b) * amount);
 }
 
-/** Fond CSS / scène — noir plein */
-export const THEME_BG_BASE = '#000000';
+/** Fond CSS / scène — blanc plein */
+export const THEME_BG_BASE = '#ede7d9';
 
-/** Scène particules — même fond noir */
+/** Scène particules — même fond blanc */
 export const THREE_SCENE_BG = hexToThree(THEME_BG_BASE);
-export const THREE_AMBIENT_DARK = hexToThree('#111111');
+export const THREE_AMBIENT_DARK = hexToThree('#0a1220');
 export const THREE_SCENE_CLEAR_LIGHT = hexToThree(THEME_BG_BASE);
 export const THREE_RIM_DEFAULT = hexToThree(THREE_LEGACY.floorLight);
 export const THREE_CORE_DEFAULT = hexToThree(THREE_LEGACY.floorGlow);
 
 /** Particules — blanc pur */
-export const THREE_PARTICLE_WHITE = 0xffffff;
+export const THREE_PARTICLE_WHITE = 0xede7d9;
 export const THREE_PARTICLE_STAR = THREE_PARTICLE_WHITE;
 
 /** Sol Three.js — néons legacy (inchangé) */

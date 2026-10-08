@@ -1,0 +1,40 @@
+/* Tooltip global actions (survol / focus / long-press) */
+.action-hint-tip {
+  position: fixed;
+  z-index: 10000;
+  max-width: min(240px, calc(100vw - 16px));
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(var(--ds-neon-cyan-rgb, var(--accent-cyan-rgb, 139, 157, 173)), 0.35);
+  background: rgba(10, 18, 32, 0.96);
+  color: rgba(237, 231, 217, 0.96);
+  font-family: var(--ds-font-ui, var(--font-body, 'Roboto', sans-serif));
+  font-size: var(--fs-label);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.985);
+  transition:
+    opacity var(--motion-enter) var(--motion-ease-enter),
+    transform var(--motion-enter) var(--motion-ease-enter),
+    visibility var(--motion-enter) ease-out;
+  box-shadow: none;
+  word-break: break-word;
+}
+
+.action-hint-tip.is-visible,
+.action-hint-tip.is-visible.is-below {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-hint-tip {
+    transition:  none;
+  }
+}

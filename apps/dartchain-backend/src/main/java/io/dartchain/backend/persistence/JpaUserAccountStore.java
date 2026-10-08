@@ -97,12 +97,35 @@ public class JpaUserAccountStore implements UserAccountStore {
 
     @Override
     @Transactional
+    public UserAccount markEmailVerified(String userId) {
+        UserEntity entity = requireUser(userId);
+        entity.setEmailVerified(true);
+        return UserEntityMapper.toAccount(userRepository.save(entity));
+    }
+
+    @Override
+    @Transactional
+    public UserAccount updateTotp(String userId, String totpSecret, boolean totpEnabled) {
+        UserEntity entity = requireUser(userId);
+        entity.setTotpSecret(totpSecret);
+        entity.setTotpEnabled(totpEnabled);
+        return UserEntityMapper.toAccount(userRepository.save(entity));
+    }
+
+    @Override
+    @Transactional
     public UserAccount updateRole(String userId, io.dartchain.backend.auth.model.UserRole role) {
         UserEntity entity = parseUuid(userId)
                 .flatMap(userRepository::findById)
                 .orElseThrow(() -> new AuthException(404, "Utilisateur introuvable"));
         entity.setRole(role == null ? "USER" : role.name());
         return UserEntityMapper.toAccount(userRepository.save(entity));
+    }
+
+    private UserEntity requireUser(String userId) {
+        return parseUuid(userId)
+                .flatMap(userRepository::findById)
+                .orElseThrow(() -> new AuthException(404, "Utilisateur introuvable"));
     }
 
     private Optional<UUID> parseUuid(String id) {

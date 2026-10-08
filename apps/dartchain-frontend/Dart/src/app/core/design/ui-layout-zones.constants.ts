@@ -1,7 +1,8 @@
 /**
- * Budgets spatiaux MVP — viewport exclusif 250 × 550, zero-scroll.
- * Ordre : navbar → swap → showcase → dock → graph → floor-peek
- * Somme dépliée (zones + 3×gap 2px + nav-gap 2px + marge graph→floor 6px) ≤ 550.
+ * Budgets spatiaux MVP — viewport canonique 250 × 550, zero-scroll.
+ * Tout déplié : navbar 32 + exchange 32 + showcase 96 + dock 96 + chart 80
+ * + 4 coutures 2 + marge floor 6 + floor 200 = 550.
+ * Le floor rendu (≤349) prend le reste du viewport ; 200 est le résultat à 550 tout ouvert.
  */
 
 export const TARGET_VIEWPORT = {
@@ -27,18 +28,18 @@ export const READING_ORDER = [
 export type LayoutZoneId = (typeof READING_ORDER)[number];
 
 /**
- * Budgets dépliés @ 250×550 (zero-scroll).
- * Chart / dock / activity compacts ; floor peek réservé sous Graph.
+ * Budgets dépliés @ 250×550.
+ * min = replié, target = déplié. Floor target = résultat tout ouvert à 550 px.
  */
 export const LAYOUT_ZONE_BUDGET_PX: Record<LayoutZoneId, { min: number; target: number; max: number }> = {
-  navbar: { min: 26, target: 32, max: 34 },
-  exchange: { min: 12, target: 14, max: 16 },
-  chart: { min: 64, target: 80, max: 92 },
-  'showcase-header': { min: 12, target: 12, max: 14 },
-  'showcase-panel': { min: 52, target: 64, max: 72 },
-  'bottom-panel': { min: 52, target: 64, max: 72 },
-  'bottom-dock': { min: 12, target: 12, max: 14 },
-  'floor-peek': { min: 200, target: 220, max: 240 },
+  navbar: { min: 32, target: 32, max: 32 },
+  exchange: { min: 32, target: 32, max: 32 },
+  chart: { min: 16, target: 80, max: 80 },
+  'showcase-header': { min: 16, target: 16, max: 16 },
+  'showcase-panel': { min: 16, target: 80, max: 80 },
+  'bottom-panel': { min: 16, target: 80, max: 80 },
+  'bottom-dock': { min: 16, target: 16, max: 16 },
+  'floor-peek': { min: 0, target: 200, max: 200 },
 };
 
 /** Écarts entre bandes majeures (grille 2px). */

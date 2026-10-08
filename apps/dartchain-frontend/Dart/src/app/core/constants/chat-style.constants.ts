@@ -25,17 +25,17 @@ export interface ChatBubbleStyleOption {
 }
 
 export const CHAT_FONT_OPTIONS: ChatFontOption[] = [
-  { key: 'arial', label: 'Arial' },
-  { key: 'calibri', label: 'Calibri' },
-  { key: 'times', label: 'Times' },
-  { key: 'georgia', label: 'Georgia' },
-  { key: 'verdana', label: 'Verdana' },
-  { key: 'trebuchet', label: 'Trebuchet' },
-  { key: 'comic', label: 'Comic' },
-  { key: 'courier', label: 'Courier' },
-  { key: 'impact', label: 'Impact' },
-  { key: 'script', label: 'Script' },
-  { key: 'orbit', label: 'Orbit' },
+  { key: 'orbit', label: 'Orbitron' },
+  { key: 'impact', label: 'Orbitron' },
+  { key: 'arial', label: 'Roboto' },
+  { key: 'calibri', label: 'Roboto' },
+  { key: 'times', label: 'Roboto' },
+  { key: 'georgia', label: 'Roboto' },
+  { key: 'verdana', label: 'Roboto' },
+  { key: 'trebuchet', label: 'Roboto' },
+  { key: 'comic', label: 'Roboto' },
+  { key: 'script', label: 'Roboto' },
+  { key: 'courier', label: 'Inter' },
 ];
 
 export const CHAT_BUBBLE_STYLE_OPTIONS: ChatBubbleStyleOption[] = [

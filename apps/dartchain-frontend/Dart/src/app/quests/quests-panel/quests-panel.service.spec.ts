@@ -5,6 +5,7 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import { QuestsPanelService } from './quests-panel.service';
 import { QUESTS_STORAGE_KEY } from './quests-panel.constants';
 
@@ -92,7 +93,7 @@ describe('QuestsPanelService', () => {
         {
           id: 'daily-login',
           title: 'Login',
-          description: 'Log in',
+          description: 'Connexion',
           target: 1,
           rewardMts: 1,
           rewardXp: 10,
@@ -123,9 +124,23 @@ describe('QuestsPanelService', () => {
     expect(service.getDailyQuests().length).toBeGreaterThan(0);
   });
 
-  it('rejects server-hooked task claims', async () => {
-    const result = await service.claimTask('faucet-claim');
-    expect(result.ok).toBe(false);
-    expect(result.error).toContain('automatiquement');
+  it('marks completed server-hooked tasks as claimable when wallet is linked', () => {
+    const walletSession = TestBed.inject(WalletSessionService);
+    walletSession.setWallet({
+      address: 'wallet-test',
+      publicKey: 'pk',
+      privateKey: 'sk',
+    });
+
+    const state = {
+      ...service.snapshot(),
+      tasks: {
+        ...service.snapshot().tasks,
+        'faucet-claim': { progress: 1, claimed: false },
+      },
+    };
+    const view = service.buildTaskViews(state).find((task) => task.id === 'faucet-claim');
+    expect(view?.claimable).toBe(true);
+    expect(view?.pendingWallet).toBe(false);
   });
 });

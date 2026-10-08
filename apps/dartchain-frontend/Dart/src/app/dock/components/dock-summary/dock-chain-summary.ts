@@ -93,7 +93,7 @@ export class DockChainSummaryComponent implements OnInit, OnDestroy {
       error: 'error',
       loading: 'loading',
       empty: 'empty',
-      synced: 'synced',
+      synchronisé: 'synced',
     };
     return `dock-summary-status--${map[phase]}`;
   }

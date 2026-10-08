@@ -131,7 +131,7 @@ public class OpsMetricsService {
             alerts.add(new OpsAlertResponse(
                     "warn",
                     "P2P_DISCONNECTED",
-                    "Peers enregistrés mais aucune session WebSocket P2P active"
+                    "Pairs enregistrés mais aucune session temps réel active"
             ));
         }
 

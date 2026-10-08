@@ -24,12 +24,12 @@ import { CombinedPerfHudService } from './combined-perf-hud.service';
         left: 4px;
         bottom: 4px;
         z-index: 99999;
-        font: 10px/1.35 monospace;
-        color: #a8ffb0;
-        background: rgba(0, 0, 0, 0.72);
+        font: 10px/1.35 Inter, sans-serif;
+        color: #09814a;
+        background: rgba(10, 18, 32, 0.72);
         padding: 4px 6px;
         pointer-events: none;
-        border-radius: 3px;
+        border-radius: var(--radius-sm);
       }
     `,
   ],

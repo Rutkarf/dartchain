@@ -36,7 +36,7 @@ class PlacementControllerIntegrationTest {
                 .andExpect(jsonPath("$.buildings", hasSize(4)))
                 .andExpect(jsonPath("$.placements[0].id").value("dev-placement-01"))
                 .andExpect(jsonPath("$.placements[0].anchorWorld.coordinateSystemVersion")
-                        .value("marseille-local-v1"))
+                        .value("metaverse-local-v1"))
                 .andExpect(jsonPath("$.placements[0].anchorGeo.latitude").isNumber())
                 .andExpect(jsonPath("$.offers", hasSize(4)));
     }

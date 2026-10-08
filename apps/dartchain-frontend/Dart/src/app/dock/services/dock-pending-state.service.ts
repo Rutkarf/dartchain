@@ -48,7 +48,7 @@ export class DockPendingStateService {
         return 'Erreur';
       case 'loading':
       case 'busy':
-        return this.mining() ? 'Minage…' : 'Sync…';
+        return this.mining() ? 'Minage…' : 'Synchro…';
       case 'empty':
         return 'Vide';
       default:
@@ -143,7 +143,7 @@ export class DockPendingStateService {
     void this.load(force);
   }
 
-  /** Mine toutes les txs pending (même logique que le dock mempool). */
+  /** Miner toutes les txs pending (même logique que le dock mempool). */
   async mineAll(): Promise<boolean> {
     if (!this.canMine()) {
       return false;

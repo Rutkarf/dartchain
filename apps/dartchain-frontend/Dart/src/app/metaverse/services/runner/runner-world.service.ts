@@ -65,7 +65,7 @@ export class RunnerWorldService {
   /** Route douce — invert LCD (clair) pour coller au floor. */
   private readonly roadMat = this.sharedMat(
     new THREE.MeshLambertMaterial({
-      color: 0xd8d8d8,
+      color: 0xede7d9,
       transparent: false,
       opacity: 1,
       side: THREE.DoubleSide,
@@ -73,24 +73,24 @@ export class RunnerWorldService {
   );
   private readonly railMat = this.sharedMat(
     new THREE.MeshLambertMaterial({
-      color: 0x1a1a1a,
+      color: 0x0d0630,
     })
   );
   private readonly roofMat = this.sharedMat(
     new THREE.MeshLambertMaterial({
-      color: 0x465d73,
+      color: 0x18314f,
       transparent: false,
       depthWrite: true,
       depthTest: true,
     })
   );
   private readonly accentMat = this.sharedMat(
-    new THREE.MeshLambertMaterial({ color: 0x52e6ed })
+    new THREE.MeshLambertMaterial({ color: 0x8a95a5 })
   );
   private readonly bulbMat = this.sharedMat(
     new THREE.MeshLambertMaterial({
-      color: 0xffe6a8,
-      emissive: 0xffc878,
+      color: 0xede7d9,
+      emissive: 0x7b0d1e,
       emissiveIntensity: 0.9,
     })
   );
@@ -319,7 +319,7 @@ export class RunnerWorldService {
 
     for (const seg of this.active.values()) {
       for (const b of seg.buildings) {
-        const bucket = ((b.bucket % 12) + 12) % 12;
+        const bucket = ((b.bucket % 7) + 7) % 7;
         const bi = bodyCounts[bucket];
         if (bi < RunnerWorldService.MAX_PER_BUCKET) {
           dummy.position.set(b.sideX, 0.02 + b.h * 0.5, -b.progress);
@@ -398,22 +398,34 @@ export class RunnerWorldService {
 
   private wallMatFor(color: number): THREE.MeshLambertMaterial {
     // Legacy — redirige vers arc-en-ciel
-    return this.rainbowWallMat(Math.abs(color) % 12);
+    return this.rainbowWallMat(Math.abs(color) % 7);
   }
 
+  /** Palette luluw (7) — murs / toits runner (plus d’arc-en-ciel HSL libre). */
+  private static readonly LULUW_HEX = [
+    '#0a1220', // Bleu Foncé
+    '#235789', // Bleu clair terne
+    '#8b9dad', // Bleu gris
+    '#ede7d9', // Blanc cassé
+    '#d5a021', // Jaune doré
+    '#09814a', // Vert sea green
+    '#7b0d1e', // Rouge boursier
+  ] as const;
+
   /**
-   * Matériau mur : dégradé arc-en-ciel flash (12 variantes hue, textures partagées).
+   * Matériau mur : dégradé luluw (7 teintes, textures partagées).
    */
   private rainbowWallMat(bucket: number): THREE.MeshLambertMaterial {
-    const key = ((bucket % 12) + 12) % 12;
+    const key = ((bucket % 7) + 7) % 7;
     let mat = this.wallMats.get(key);
     if (!mat) {
       const map = this.rainbowTexture(key);
+      const emissiveHex = RunnerWorldService.LULUW_HEX[key];
       mat = this.sharedMat(
         new THREE.MeshLambertMaterial({
           map,
-          color: 0xffffff,
-          emissive: new THREE.Color().setHSL(key / 12, 1, 0.22),
+          color: 0xede7d9,
+          emissive: new THREE.Color(emissiveHex),
           emissiveMap: map,
           emissiveIntensity: 0.55,
           transparent: false,
@@ -429,8 +441,8 @@ export class RunnerWorldService {
   }
 
   private rainbowRoofMat(bucket: number): THREE.MeshLambertMaterial {
-    // Toit : même famille rainbow, teinte décalée
-    return this.rainbowWallMat((bucket + 4) % 12);
+    // Toit : même famille luluw, teinte décalée
+    return this.rainbowWallMat((bucket + 3) % 7);
   }
 
   private rainbowTexture(bucket: number): THREE.CanvasTexture {
@@ -442,38 +454,40 @@ export class RunnerWorldService {
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d')!;
-    const hue0 = bucket * 30;
+    const palette = RunnerWorldService.LULUW_HEX;
+    const n = palette.length;
 
-    // Dégradé diagonal flash (arc-en-ciel saturé)
+    // Dégradé diagonal — cycle des 7 luluw
     const g = ctx.createLinearGradient(0, 0, size, size);
     const stops = 10;
     for (let i = 0; i <= stops; i++) {
       const t = i / stops;
-      const h = (hue0 + t * 360) % 360;
-      g.addColorStop(t, `hsl(${h}, 100%, ${48 + Math.sin(t * Math.PI) * 12}%)`);
+      const hex = palette[(bucket + i) % n];
+      g.addColorStop(t, hex);
     }
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, size, size);
 
-    // Bandes horizontales néon pour effet « flash »
+    // Bandes horizontales — accents luluw semi-transparents
     const gFlash = ctx.createLinearGradient(0, 0, 0, size);
     for (let i = 0; i <= 6; i++) {
       const t = i / 6;
-      const h = (hue0 + 60 + t * 300) % 360;
-      gFlash.addColorStop(
-        t,
-        `hsla(${h}, 100%, 65%, ${i % 2 === 0 ? 0.55 : 0.15})`
-      );
+      const hex = palette[(bucket + 2 + i) % n];
+      const alpha = i % 2 === 0 ? 0.55 : 0.15;
+      const r = Number.parseInt(hex.slice(1, 3), 16);
+      const gCh = Number.parseInt(hex.slice(3, 5), 16);
+      const b = Number.parseInt(hex.slice(5, 7), 16);
+      gFlash.addColorStop(t, `rgba(${r}, ${gCh}, ${b}, ${alpha})`);
     }
     ctx.fillStyle = gFlash;
     ctx.fillRect(0, 0, size, size);
 
     // Spec highlight
     const shine = ctx.createLinearGradient(0, 0, size, 0);
-    shine.addColorStop(0, 'rgba(255,255,255,0)');
-    shine.addColorStop(0.45, 'rgba(255,255,255,0.45)');
-    shine.addColorStop(0.55, 'rgba(255,255,255,0.15)');
-    shine.addColorStop(1, 'rgba(255,255,255,0)');
+    shine.addColorStop(0, 'rgba(237, 231, 217,0)');
+    shine.addColorStop(0.45, 'rgba(237, 231, 217,0.45)');
+    shine.addColorStop(0.55, 'rgba(237, 231, 217,0.15)');
+    shine.addColorStop(1, 'rgba(237, 231, 217,0)');
     ctx.fillStyle = shine;
     ctx.fillRect(0, 0, size, size);
 
@@ -503,8 +517,8 @@ export class RunnerWorldService {
 
     const wallMat = this.sharedMat(
       new THREE.MeshLambertMaterial({
-        color: 0x1a2840,
-        emissive: 0x001133,
+        color: 0x18314f,
+        emissive: 0x0d0630,
         emissiveIntensity: 0.35,
         side: THREE.DoubleSide,
       })
@@ -517,8 +531,8 @@ export class RunnerWorldService {
 
     const skirtingMat = this.sharedMat(
       new THREE.MeshLambertMaterial({
-        color: 0x00ffff,
-        emissive: 0x0088ff,
+        color: 0x8a95a5,
+        emissive: 0x8a95a5,
         emissiveIntensity: 0.6,
       })
     );
@@ -528,8 +542,8 @@ export class RunnerWorldService {
 
     const metal = this.sharedMat(
       new THREE.MeshLambertMaterial({
-        color: 0x00ffff,
-        emissive: 0x0088ff,
+        color: 0x8a95a5,
+        emissive: 0x8a95a5,
         emissiveIntensity: 0.55,
       })
     );
@@ -575,7 +589,7 @@ export class RunnerWorldService {
     const stopMarker = new THREE.Mesh(
       new THREE.RingGeometry(0.8, 1.0, 16),
       new THREE.MeshBasicMaterial({
-        color: 0x00ff00,
+        color: 0x09814a,
         transparent: true,
         opacity: 0.5,
         side: THREE.DoubleSide,
@@ -753,7 +767,7 @@ export class RunnerWorldService {
     const h = 16 + rng() * 20; // ×2 vs 8–18
 
     // Chaque bâtiment : variante arc-en-ciel (hue shift déterministe)
-    const rainbowBucket = Math.abs(variant * 3 + Math.floor(rng() * 12)) % 12;
+    const rainbowBucket = Math.abs(variant * 3 + Math.floor(rng() * 7)) % 7;
 
     buildings.push({
       bucket: rainbowBucket,
@@ -783,7 +797,7 @@ export class RunnerWorldService {
   }
 
   private particleColors(): number[] {
-    return [0x1a2840, 0x2a1a40, 0x122038, 0x241838];
+    return [0x18314f, 0x18314f, 0x0d0630, 0x0d0630];
   }
 }
 

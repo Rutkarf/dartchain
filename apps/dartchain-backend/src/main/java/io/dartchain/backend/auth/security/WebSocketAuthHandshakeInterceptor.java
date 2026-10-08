@@ -1,5 +1,6 @@
 package io.dartchain.backend.auth.security;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -24,8 +25,17 @@ public class WebSocketAuthHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Map<String, Object> attributes
     ) {
-        webSocketAuthSupport.resolveFromRequest(request)
-                .ifPresent(user -> webSocketAuthSupport.attachToAttributes(attributes, user));
+        var user = webSocketAuthSupport.resolveFromRequest(request);
+        user.ifPresent(resolved -> webSocketAuthSupport.attachToAttributes(attributes, resolved));
+
+        String path = request.getURI() != null ? request.getURI().getPath() : "";
+        // L'arène est un canal joueur. /ws/peers reste ouvert : les nœuds se synchronisent
+        // sans compte partagé. Les réponses P2P sensibles restent contrôlées dans P2pService.
+        // /ws/live et /ws/chat restent ouverts sans compte.
+        if (path.startsWith("/ws/metaverse-arena") && user.isEmpty()) {
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return false;
+        }
         return true;
     }
 

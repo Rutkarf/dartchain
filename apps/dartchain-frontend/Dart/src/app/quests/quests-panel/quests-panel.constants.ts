@@ -16,8 +16,8 @@ export const SERVER_HOOKED_QUEST_IDS = new Set([
 
 export const CURRENT_MISSION = {
   id: 'network-guardian',
-  title: 'Network Guardian',
-  description: 'Maintain network integrity by completing daily and weekly tasks.',
+  title: 'Gardien du réseau',
+  description: 'Maintiens l’intégrité du réseau en terminant les tâches quotidiennes et hebdomadaires.',
   rewardMts: 1,
   rewardXp: 150,
   progressTarget: 100,
@@ -32,8 +32,8 @@ export const WEEKLY_REWARD = {
 export const DAILY_QUESTS: readonly DailyQuestDefinition[] = [
   {
     id: 'daily-login',
-    title: 'Daily Login',
-    description: 'Log in to the app',
+    title: 'Connexion quotidienne',
+    description: 'Connecte-toi à l’application',
     target: 1,
     rewardMts: 1,
     rewardXp: 10,
@@ -41,8 +41,8 @@ export const DAILY_QUESTS: readonly DailyQuestDefinition[] = [
   },
   {
     id: 'faucet-claim',
-    title: 'Faucet Claim',
-    description: 'Claim from the faucet',
+    title: 'Réclamation du robinet',
+    description: 'Réclame depuis le robinet',
     target: 1,
     rewardMts: 1,
     rewardXp: 15,
@@ -50,8 +50,8 @@ export const DAILY_QUESTS: readonly DailyQuestDefinition[] = [
   },
   {
     id: 'explore-blocks',
-    title: 'Explore Blocks',
-    description: 'Ouvrir les détails d’un bloc via Explore Block',
+    title: 'Explorer les blocs',
+    description: 'Ouvrir le détail d’un bloc dans l’explorateur',
     target: 5,
     rewardMts: 1,
     rewardXp: 20,
@@ -59,8 +59,8 @@ export const DAILY_QUESTS: readonly DailyQuestDefinition[] = [
   },
   {
     id: 'swap-tokens',
-    title: 'Swap Tokens',
-    description: 'Swapper un token LaunchLab (hors paires BTC/ETH standard) via le panneau Swap',
+    title: 'Échanger des jetons',
+    description: 'Échanger un jeton du laboratoire (hors paires BTC/ETH standard) via le panneau d’échange',
     target: 10,
     rewardMts: 1,
     rewardXp: 25,

@@ -1,5 +1,5 @@
 /**
- * Constellations zodiacales — silhouettes d’ancrage pour Star Conquest (niveau 3).
+ * Constellations zodiacales — silhouettes d’ancrage pour Conquête stellaire (niveau 3).
  * Inspiration formelle uniquement ; les Quests restent des améliorations produit.
  * Cadre exclusif 250×550 : hubs et boîtes restent dans le viewport.
  */

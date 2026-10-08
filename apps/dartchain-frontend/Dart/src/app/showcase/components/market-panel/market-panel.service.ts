@@ -282,7 +282,7 @@ export class MarketPanelService {
     const volumeLabel =
       row.config.native && r4v3Chart?.volume
         ? r4v3Chart.volume
-        : row.volume && row.volume !== 'LaunchLab'
+        : row.volume && row.volume !== 'Laboratoire'
           ? row.volume
           : launchProject?.raised && launchProject.raised !== '—'
             ? launchProject.raised
@@ -292,7 +292,7 @@ export class MarketPanelService {
       rate && rate > 0
         ? `${this.formatCompactNumber(rate * 1250)} R4V3`
         : row.config.native
-          ? 'Peg natif'
+          ? 'UTILITY 1 R4V3:1CHF'
           : '—';
 
     const marketCapLabel = launchProject
@@ -300,7 +300,7 @@ export class MarketPanelService {
         ? `${launchProject.raised} / ${launchProject.target}`
         : launchProject.raised
       : row.config.native
-        ? 'Peg CHF'
+        ? 'UTILITY 1 R4V3:1CHF'
         : '—';
 
     const holdersLabel = this.estimateHolders(row.config.exchangeToken, launchProject);
@@ -320,10 +320,10 @@ export class MarketPanelService {
       tokenAgeLabel,
       recentActivityLabel,
       progressPercent,
-      creatorLabel: launchProject ? `LaunchLab · ${launchProject.chain ?? 'R4V3'}` : 'DartChain',
+      creatorLabel: launchProject ? `Laboratoire · ${launchProject.chain ?? 'R4V3'}` : 'DartChain',
       statusLabel: launchProject?.status ?? (row.config.native ? 'LIVE' : 'LIVE'),
       logoUrl: launchProject?.logoUrl ?? null,
-      description: launchProject?.description ?? null,
+      description: launchProject?.description ?? row.config.shortPitch,
       launchDate: launchProject?.launchDate ?? null,
     };
   }
@@ -347,7 +347,7 @@ export class MarketPanelService {
       case 'hot':
         return 'Fort momentum';
       case 'warm':
-        return 'Momentum';
+        return 'Élan';
       case 'neutral':
         return 'Stable';
       default:
@@ -371,7 +371,7 @@ export class MarketPanelService {
 
   private tokenAgeLabel(project: LaunchProject | null): string {
     if (!project?.launchDate) {
-      return 'LaunchLab';
+      return 'Laboratoire';
     }
 
     const launched = Date.parse(project.launchDate);
@@ -445,7 +445,7 @@ export class MarketPanelService {
         price: this.formatEur(tokenEur),
         changePercent,
         positive,
-        volume: 'LaunchLab',
+        volume: 'Laboratoire',
         priceUnavailable: false,
         walletBalance,
         rate,
@@ -458,7 +458,7 @@ export class MarketPanelService {
       price: this.formatEur(LAUNCH_TOKEN_EUR_FALLBACK),
       changePercent,
       positive,
-      volume: 'LaunchLab',
+      volume: 'Laboratoire',
       priceUnavailable: rate == null,
       walletBalance,
       rate,
@@ -472,6 +472,21 @@ export class MarketPanelService {
     walletBalance?: number,
     rate?: number | null
   ): MarketAssetRowCore {
+    // R4V3 = utility 1:1 CHF — ignorer les cours chart (souvent un prix BTC parasite).
+    if (config.native) {
+      return {
+        config,
+        favorite,
+        price: '1,00 CHF',
+        changePercent: 0,
+        positive: true,
+        volume: chart?.volume || 'UTILITY 1 R4V3:1CHF',
+        priceUnavailable: false,
+        walletBalance,
+        rate: rate ?? 1,
+      };
+    }
+
     if (!chart) {
       return { ...this.fallbackRow(config, favorite), walletBalance, rate: rate ?? null };
     }
@@ -523,7 +538,7 @@ export class MarketPanelService {
         price: '1,00 CHF',
         changePercent: 0,
         positive: true,
-        volume: 'Peg CHF',
+        volume: 'UTILITY 1 R4V3:1CHF',
         priceUnavailable: false,
         rate: 1,
       },
@@ -531,7 +546,7 @@ export class MarketPanelService {
         price: '0,05 €',
         changePercent: 1.8,
         positive: true,
-        volume: 'LaunchLab',
+        volume: 'Laboratoire',
         priceUnavailable: true,
         rate: 20,
       },
@@ -539,7 +554,7 @@ export class MarketPanelService {
         price: '0,05 €',
         changePercent: 0.4,
         positive: true,
-        volume: 'LaunchLab',
+        volume: 'Laboratoire',
         priceUnavailable: true,
         rate: 18,
       },
@@ -547,7 +562,7 @@ export class MarketPanelService {
         price: '0,05 €',
         changePercent: 0,
         positive: true,
-        volume: 'LaunchLab',
+        volume: 'Laboratoire',
         priceUnavailable: true,
         rate: 16,
       },
@@ -555,7 +570,7 @@ export class MarketPanelService {
         price: '0,05 €',
         changePercent: 0.2,
         positive: true,
-        volume: 'LaunchLab',
+        volume: 'Laboratoire',
         priceUnavailable: true,
         rate: 22,
       },

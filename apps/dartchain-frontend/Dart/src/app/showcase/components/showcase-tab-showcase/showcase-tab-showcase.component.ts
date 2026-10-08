@@ -33,6 +33,7 @@ export class ShowcaseTabShowcaseComponent {
   @Input() refreshBusy = false;
 
   @Output() readonly tabChange = new EventEmitter<ShowcaseTab>();
+  @Output() readonly tabDoubleClick = new EventEmitter<boolean>();
   @Output() readonly collapseToggle = new EventEmitter<void>();
   @Output() readonly refresh = new EventEmitter<Event>();
   @Output() readonly summaryExpand = new EventEmitter<void>();

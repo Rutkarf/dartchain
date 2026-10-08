@@ -7,6 +7,7 @@ public record UserProfileResponse(
         long createdAt,
         String walletAddress,
         String walletPublicKey,
-        String role
+        String role,
+        boolean totpEnabled
 ) {
 }

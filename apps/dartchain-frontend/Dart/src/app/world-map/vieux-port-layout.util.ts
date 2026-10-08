@@ -1,4 +1,4 @@
-import { MARSEILLE_HARBOR_WATER } from './map-configuration';
+import { METAVERSE_HARBOR_WATER } from './map-configuration';
 
 type Rect = { minX: number; maxX: number; minZ: number; maxZ: number };
 
@@ -43,8 +43,8 @@ export const VIEUX_PORT_EAST_QUAY: Rect = {
 };
 
 const WEST_BASIN_INNER: Rect = {
-  minX: MARSEILLE_HARBOR_WATER.basinMinX,
-  maxX: MARSEILLE_HARBOR_WATER.basinMaxX,
+  minX: METAVERSE_HARBOR_WATER.basinMinX,
+  maxX: METAVERSE_HARBOR_WATER.basinMaxX,
   minZ: -48,
   maxZ: 48,
 };
@@ -52,8 +52,8 @@ const WEST_BASIN_INNER: Rect = {
 const SOUTH_CHANNEL: Rect = {
   minX: -102,
   maxX: 102,
-  minZ: MARSEILLE_HARBOR_WATER.waterMinZ,
-  maxZ: MARSEILLE_HARBOR_WATER.waterMaxZ,
+  minZ: METAVERSE_HARBOR_WATER.waterMinZ,
+  maxZ: METAVERSE_HARBOR_WATER.waterMaxZ,
 };
 
 /** Corridors de rue : jamais traités comme eau, colliders bâtiments ignorés si chevauchement. */
@@ -71,7 +71,7 @@ function isInStreetCorridor(x: number, z: number, margin = 0): boolean {
 
 /** Polygone d'exclusion M4T3R — bassin ouest + bras sud visible depuis le miroir. */
 export function vieuxPortHarborExclusionPolygon(): ReadonlyArray<{ x: number; z: number }> {
-  const { basinMinX, basinMaxX, basinMinZ, waterMaxZ, waterMinZ } = MARSEILLE_HARBOR_WATER;
+  const { basinMinX, basinMaxX, basinMinZ, waterMaxZ, waterMinZ } = METAVERSE_HARBOR_WATER;
   return [
     { x: SOUTH_CHANNEL.maxX, z: waterMinZ },
     { x: SOUTH_CHANNEL.maxX, z: waterMaxZ },

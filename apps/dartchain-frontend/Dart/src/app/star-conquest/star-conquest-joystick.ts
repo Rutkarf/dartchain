@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createStrokeLineMaterial, STROKE } from '../core/constants/stroke-bevel';
 import {
   measureGapAboveFloor,
   screenToWorldOnPlane,
@@ -21,14 +22,14 @@ import {
  * Blancs argentés + accents ambre/cyan (pas de logo PlayStation).
  */
 const COL = {
-  graphite: 0xd8dee6,
-  chrome: 0xf0f4f8,
-  silver: 0xffffff,
-  glass: 0xc8d2dc,
-  ink: 0x8a949e,
-  amber: 0xf2c878,
-  cyan: 0xb0e8f0,
-  green: 0xa8c4a0,
+  graphite: 0xede7d9,
+  chrome: 0xede7d9,
+  silver: 0xede7d9,
+  glass: 0xede7d9,
+  ink: 0x8a95a5,
+  amber: 0x7b0d1e,
+  cyan: 0xede7d9,
+  green: 0x09814a,
 } as const;
 
 /** Tooltip / aria au survol du joystick. */
@@ -174,9 +175,7 @@ export class StarConquestJoystick {
     ]);
     this.trail = new THREE.Line(
       trailGeom,
-      new THREE.LineBasicMaterial({
-        color: COL.cyan,
-        transparent: true,
+      createStrokeLineMaterial(STROKE.frame, {
         opacity: 0,
         depthWrite: false,
       })
@@ -187,7 +186,7 @@ export class StarConquestJoystick {
     this.hitProxy = new THREE.Mesh(
       new THREE.CircleGeometry(RING_R * 0.5, 16),
       new THREE.MeshBasicMaterial({
-        color: 0x00ffff,
+        color: 0x8a95a5,
         transparent: true,
         opacity: 0,
         visible: false,
@@ -236,9 +235,8 @@ export class StarConquestJoystick {
     }
     const line = new THREE.Line(
       new THREE.BufferGeometry().setFromPoints(pts),
-      new THREE.LineBasicMaterial({
+      createStrokeLineMaterial(STROKE.frame, {
         color,
-        transparent: true,
         opacity,
         depthWrite: false,
       })
@@ -265,9 +263,7 @@ export class StarConquestJoystick {
     geom.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
     const lines = new THREE.LineSegments(
       geom,
-      new THREE.LineBasicMaterial({
-        color: COL.silver,
-        transparent: true,
+      createStrokeLineMaterial(STROKE.frame, {
         opacity: 0.75,
         depthWrite: false,
       })
@@ -641,19 +637,19 @@ function createGlassDiscTexture(size: number): THREE.CanvasTexture {
   }
   const cx = size / 2;
   const g = ctx.createRadialGradient(cx * 0.7, cx * 0.55, 0, cx, cx, cx);
-  g.addColorStop(0, 'rgba(255,255,255,0.95)');
-  g.addColorStop(0.3, 'rgba(236,242,248,0.85)');
-  g.addColorStop(0.65, 'rgba(200,210,222,0.7)');
-  g.addColorStop(1, 'rgba(160,172,186,0.35)');
+  g.addColorStop(0, 'rgba(237, 231, 217,0.95)');
+  g.addColorStop(0.3, 'rgba(237, 231, 217,0.85)');
+  g.addColorStop(0.65, 'rgba(237, 231, 217,0.7)');
+  g.addColorStop(1, 'rgba(139, 157, 173,0.35)');
   ctx.fillStyle = g;
   ctx.beginPath();
   ctx.arc(cx, cx, cx - 1, 0, Math.PI * 2);
   ctx.fill();
   // Reflet chrome clair
   const shine = ctx.createLinearGradient(0, 0, size, size * 0.4);
-  shine.addColorStop(0, 'rgba(255,255,255,0.85)');
-  shine.addColorStop(0.35, 'rgba(255,255,255,0.35)');
-  shine.addColorStop(1, 'rgba(255,255,255,0)');
+  shine.addColorStop(0, 'rgba(237, 231, 217,0.85)');
+  shine.addColorStop(0.35, 'rgba(237, 231, 217,0.35)');
+  shine.addColorStop(1, 'rgba(237, 231, 217,0)');
   ctx.fillStyle = shine;
   ctx.beginPath();
   ctx.ellipse(cx, cx * 0.55, cx * 0.7, cx * 0.28, -0.35, 0, Math.PI * 2);
@@ -679,14 +675,14 @@ function createOrbitLabelTexture(): THREE.CanvasTexture {
     return empty;
   }
   ctx.clearRect(0, 0, 512, 96);
-  ctx.font = '600 11px ui-monospace, SF Mono, Menlo, monospace';
+  ctx.font = '600 10px Inter, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(248, 252, 255, 0.98)';
-  ctx.shadowColor = 'rgba(176, 232, 240, 0.5)';
+  ctx.fillStyle = 'rgba(237, 231, 217, 0.98)';
+  ctx.shadowColor = 'rgba(237, 231, 217, 0.5)';
   ctx.shadowBlur = 4;
   ctx.fillText("Déplace l'univers", 256, 36);
-  ctx.font = '600 8px ui-monospace, SF Mono, Menlo, monospace';
+  ctx.font = '600 10px Inter, sans-serif';
   ctx.fillText('de particules', 256, 64);
   const tex = new THREE.CanvasTexture(canvas);
   tex.generateMipmaps = false;

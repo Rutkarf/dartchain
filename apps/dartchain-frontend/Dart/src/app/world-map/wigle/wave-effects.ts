@@ -6,6 +6,7 @@ import {
   colorForNetworkType,
   createWigleWaveMaterial,
 } from './shaders/wigle-wave.shader';
+import { createFxLineMaterial, STROKE } from '../../core/constants/stroke-bevel';
 import type { WigleGeoPoint } from './wigle-point.types';
 
 export interface WaveEffectSlot {
@@ -212,13 +213,7 @@ export class WaveEffectSystem {
 
     this.meshLines = new THREE.LineSegments(
       new THREE.BufferGeometry().setFromPoints(segments),
-      new THREE.LineBasicMaterial({
-        color: 0x00f3ff,
-        transparent: true,
-        opacity: 0.35,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
+      createFxLineMaterial(STROKE.struct, { opacity: 0.35 })
     );
     this.meshLines.name = 'network-mesh-lines';
     this.root.add(this.meshLines);

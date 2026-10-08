@@ -8,6 +8,13 @@ export type NavbarDrawerId = 'status' | 'node' | 'ticker';
 export class ShellFeedbackService {
   private readonly injector = inject(Injector);
 
+  /**
+   * Fond WebGL plein écran (`app-r4v3-scene`) — désactivé pour l’instant
+   * (Star Conquest occupe déjà le fond quand il sera réactivé).
+   * Remettre à `true` pour réactiver le toggle sans supprimer le code.
+   */
+  private static readonly R4V3_SCENE_TOGGLE_ENABLED = false;
+
   readonly bannerError = signal<string | null>(null);
   readonly statusPanelOpen = signal(false);
   readonly nodePanelOpen = signal(false);
@@ -46,6 +53,9 @@ export class ShellFeedbackService {
   }
 
   toggleR4v3Scene(): void {
+    if (!ShellFeedbackService.R4V3_SCENE_TOGGLE_ENABLED) {
+      return;
+    }
     this.r4v3SceneVisible.update((visible) => !visible);
   }
 }

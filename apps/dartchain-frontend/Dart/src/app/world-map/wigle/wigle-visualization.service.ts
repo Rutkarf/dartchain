@@ -16,7 +16,7 @@ import { HorizonScaleManager } from './horizon-scale.manager';
 import { WigleDebugOverlay } from './wigle-debug-overlay';
 import { WIGLE_GEO_CONFIG, maxActivePointsForQuality } from './wigle-visual.config';
 import { mapGeoPointsToBuildingEntrances } from './wifi-entrance-mapper.util';
-import { MARSEILLE_GEO_ORIGIN } from '../geo-reference.config';
+import { METAVERSE_GEO_ORIGIN } from '../geo-reference.config';
 import type { WigleGeoPoint, WigleGeoDebugStats } from './wigle-point.types';
 import type { HorizonScaleDebugStats } from './wigle.types';
 
@@ -64,7 +64,7 @@ export class WigleVisualizationService {
     this.debugOverlay.attach();
     this.debugOverlay.setEffectsToggleHandler((enabled) => this.setEffectsEnabled(enabled));
 
-    void this.loadGeoPointsAround(MARSEILLE_GEO_ORIGIN.latitude, MARSEILLE_GEO_ORIGIN.longitude);
+    void this.loadGeoPointsAround(METAVERSE_GEO_ORIGIN.latitude, METAVERSE_GEO_ORIGIN.longitude);
     void this.refreshBuildingMapping();
   }
 
@@ -139,7 +139,7 @@ export class WigleVisualizationService {
     this.debugOverlay.setLegendVisible(enabled);
   }
 
-  /** Résolveur hauteur sol (Marseille SurfaceProvider) — 1 point GPS = 1 emplacement 3D au sol. */
+  /** Résolveur hauteur sol (Metaverse SurfaceProvider) — 1 point GPS = 1 emplacement 3D au sol. */
   setGroundResolver(resolver: ((worldX: number, worldZ: number) => number) | null): void {
     this.groundResolver = resolver;
     if (this.allPoints.length > 0) {

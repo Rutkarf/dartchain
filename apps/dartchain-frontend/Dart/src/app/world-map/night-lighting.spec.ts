@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { mapQualityTier } from './map-configuration';
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 import {
   harborAccentIntensityAtDistance,
   nightStreetLampsEnabled,

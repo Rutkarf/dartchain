@@ -1,16 +1,522 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" class="age-gate-active">
 <head>
   <meta charset="utf-8">
   <title>DartChain</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="DartChain — démo wallet, faucet, swap R4V3 et jumeau 3D Marseille. Tokens de démonstration uniquement.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="DartChain — démo portefeuille, robinet, échange R4V3 et jumeau 3D Metaverse. Tokens de démonstration uniquement.">
   <meta name="color-scheme" content="dark light">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="/logo.stl" as="fetch" crossorigin="anonymous">
+  <!-- Orbitron (display) — prêt avant l’intro MetaVerseBB (évite FOUT). -->
+  <link
+    rel="preload"
+    href="https://fonts.gstatic.com/s/orbitron/v35/yMJRMIlzdpvBhQQL_Qq7dy0.woff2"
+    as="font"
+    type="font/woff2"
+    crossorigin
+  >
+  <link rel="prefetch" href="/assets/sound/mgs_codec_sound.mp3">
+  <script>
+    /* Dev only : fresh lambda à chaque chargement — avant Angular / AuthService. */
+    (function () {
+      var h = location.hostname;
+      if (h !== 'localhost' && h !== '127.0.0.1') return;
+      try { localStorage.clear(); } catch (_) {}
+      try { sessionStorage.clear(); } catch (_) {}
+    })();
+
+    /* Prefetch STL dès le parse HTML — zéro Three.js, zéro Angular. */
+    window.__DARTCHAIN_LOGO_STL__ = fetch('/logo.stl', {
+      credentials: 'same-origin',
+      priority: 'high'
+    }).then(function (r) { return r.ok ? r.arrayBuffer() : null; })
+      .catch(function () { return null; });
+
+    /* Flag geste utilisateur uniquement — aucun AudioContext ici (évite le spam console). */
+    (function () {
+      var api = {
+        unlocked: false,
+        unlock: function () {
+          api.unlocked = true;
+        }
+      };
+      window.__DARTCHAIN_AUDIO__ = api;
+      var unlock = function () { api.unlock(); };
+      window.addEventListener('pointerdown', unlock, true);
+      window.addEventListener('touchstart', unlock, true);
+      window.addEventListener('keydown', unlock, true);
+    })();
+  </script>
+  <style>
+    /*
+     * Squelette = clone visuel de la séquence d’appel calibrée.
+     * Visible cash ; Angular reprend la même UI ; seul le token R4V3 central arrive après.
+     */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #0a1220 !important;
+      overflow: hidden;
+    }
+    html.age-gate-active, html.age-gate-active body {
+      background: #0a1220 !important;
+    }
+    #age-call-boot {
+      position: fixed;
+      inset: 0;
+      height: 100svh;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      z-index: 50000;
+      display: grid;
+      grid-template-rows: 98px minmax(0, 1fr) 132px;
+      align-items: stretch;
+      justify-items: center;
+      color: #ede7d9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      pointer-events: none;
+      isolation: isolate;
+      overflow: hidden;
+    }
+    #age-call-boot[hidden] { display: none !important; }
+    html:has(app-age-call-gate .age-call) #age-call-boot {
+      display: none !important;
+    }
+    #age-call-boot .acb-wall,
+    #age-call-boot .acb-shade {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    #age-call-boot .acb-wall {
+      background:
+        radial-gradient(140% 90% at 50% -10%, rgba(139, 157, 173, 0.55), transparent 52%),
+        radial-gradient(90% 60% at 80% 90%, rgba(35, 87, 137, 0.35), transparent 55%),
+        linear-gradient(168deg, #235789 0%, #0a1220 42%, #0a1220 100%);
+    }
+    #age-call-boot .acb-shade {
+      backdrop-filter: blur(22px) saturate(1.15);
+      -webkit-backdrop-filter: blur(22px) saturate(1.15);
+      background: rgba(10, 18, 32, 0.34);
+    }
+    #age-call-boot .acb-top,
+    #age-call-boot .acb-actions {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      max-width: 250px;
+      box-sizing: border-box;
+    }
+    #age-call-boot .acb-top {
+      grid-row: 1;
+    }
+    #age-call-boot .acb-actions {
+      grid-row: 3;
+    }
+    #age-call-boot .acb-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.42rem;
+      padding: 22px 16px 0;
+      text-align: center;
+      width: 250px;
+      max-width: 250px;
+      min-width: 250px;
+      height: 98px;
+      box-sizing: border-box;
+      contain: strict;
+    }
+    #age-call-boot .acb-carrier {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.02em;
+      width: 218px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      font-size: var(--fs-form);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      color: #ede7d9;
+      text-shadow:
+        0 1px 0 rgba(237, 231, 217, 0.12),
+        0 8px 22px rgba(10, 18, 32, 0.45),
+        0 0 28px rgba(35, 87, 137, 0.35);
+    }
+    #age-call-boot .acb-carrier-at {
+      display: inline-flex;
+      align-items: center;
+      font-weight: 700;
+      font-size: var(--fs-form);
+      line-height: 1;
+      color: rgba(139, 157, 173, 0.92);
+    }
+    #age-call-boot .acb-carrier-name {
+      display: inline-flex;
+      align-items: center;
+      font-weight: 400;
+      font-size: var(--fs-form);
+      line-height: 1;
+      background: linear-gradient(180deg, #ede7d9 0%, #ede7d9 42%, #ede7d9 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    #age-call-boot .acb-status {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.38rem;
+      box-sizing: border-box;
+      width: 156px;
+      min-width: 156px;
+      max-width: 156px;
+      height: 22px;
+      min-height: 22px;
+      padding: 0.22rem 0.55rem 0.26rem;
+      border-radius: 999px;
+      flex: 0 0 auto;
+      background: rgba(10, 18, 32, 0.42);
+      box-shadow:
+        inset 0 0 0 1px rgba(237, 231, 217, 0.1),
+        0 4px 14px rgba(10, 18, 32, 0.28);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+      font-size: var(--fs-fallback);
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      line-height: 1;
+      color: rgba(237, 231, 217, 0.92);
+    }
+    #age-call-boot .acb-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      background: #09814a;
+      animation: acb-status-dot 1.35s ease-in-out infinite;
+    }
+    #age-call-boot .acb-status-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      width: 14px;
+    }
+    #age-call-boot .acb-status-dots i {
+      display: block;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: rgba(9, 129, 74, 0.85);
+      opacity: 0.25;
+    }
+    #age-call-boot .acb-status-dots i:nth-child(1) { animation: acb-ellip 1.2s ease-in-out infinite; }
+    #age-call-boot .acb-status-dots i:nth-child(2) { animation: acb-ellip 1.2s ease-in-out 0.18s infinite; }
+    #age-call-boot .acb-status-dots i:nth-child(3) { animation: acb-ellip 1.2s ease-in-out 0.36s infinite; }
+    @keyframes acb-status-dot {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(9, 129, 74, 0.5); }
+      50% { transform: scale(1.12); box-shadow: 0 0 0 6px rgba(9, 129, 74, 0); background: #09814a; }
+    }
+    @keyframes acb-ellip {
+      0%, 100% { opacity: 0.22; transform: translateY(0); }
+      40% { opacity: 1; transform: translateY(-1px); }
+    }
+    #age-call-boot .acb-mid {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      max-width: none;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      min-height: 0;
+      padding: 0;
+      margin: 0;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
+    #age-call-boot .acb-wrap {
+      position: relative;
+      width: min(220px, 88vw);
+      height: min(220px, 88vw);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      overflow: visible;
+    }
+    #age-call-boot .acb-wrap::before,
+    #age-call-boot .acb-wrap::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      transform: translate(-50%, -50%) scale(0.94);
+      transform-origin: center center;
+    }
+    #age-call-boot .acb-wrap::before {
+      width: 72%;
+      height: 72%;
+      background: radial-gradient(circle, rgba(9, 129, 74, 0.45) 0%, rgba(9, 129, 74, 0.2) 42%, transparent 68%);
+      filter: blur(6px);
+      animation: acb-aura 2.6s ease-in-out infinite;
+    }
+    #age-call-boot .acb-wrap::after {
+      width: 96%;
+      height: 96%;
+      background: radial-gradient(circle, transparent 28%, rgba(139, 157, 173, 0.28) 48%, rgba(35, 87, 137, 0.12) 62%, transparent 74%);
+      filter: blur(8px);
+      animation: acb-aura 2.6s ease-in-out 1.3s infinite;
+    }
+    @keyframes acb-aura {
+      0%, 100% { opacity: 0.72; transform: translate(-50%, -50%) scale(0.94); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+    }
+    /* Emplacement token : vide — le R4V3 3D arrive après Angular. */
+    #age-call-boot .acb-slot {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    #age-call-boot .acb-actions {
+      position: relative;
+      height: 100%;
+      padding: 0 14px 18px;
+    }
+    #age-call-boot .acb-btn {
+      position: absolute;
+      bottom: 48px;
+      width: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      color: #ede7d9;
+    }
+    #age-call-boot .acb-btn--decline { left: 34px; }
+    #age-call-boot .acb-btn--answer { right: 34px; }
+    #age-call-boot .acb-ico {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 6px 14px rgba(10, 18, 32, 0.35);
+      color: #ede7d9;
+    }
+    #age-call-boot .acb-btn--decline .acb-ico {
+      background: radial-gradient(circle at 35% 30%, #7b0d1e, #7b0d1e 72%);
+      animation: acb-decline 1.7s ease-in-out infinite;
+    }
+    #age-call-boot .acb-btn--answer .acb-ico {
+      background: radial-gradient(circle at 35% 30%, #09814a, #09814a 72%);
+      position: relative;
+      z-index: 3;
+    }
+    #age-call-boot .acb-fx {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      animation:
+        acb-feed-breathe 1.8s ease-in-out infinite,
+        acb-feed-micro 1.35s steps(1, end) infinite,
+        acb-feed-burst 5.2s steps(1, end) infinite;
+    }
+    #age-call-boot .acb-fx-ring,
+    #age-call-boot .acb-fx-scan,
+    #age-call-boot .acb-fx-ghost {
+      position: absolute;
+      pointer-events: none;
+    }
+    #age-call-boot .acb-fx-ring {
+      inset: -6px;
+      border: 1px solid rgba(35, 87, 137, 0.6);
+      border-radius: 50%;
+      animation: acb-feed-ring 2.4s ease-out infinite;
+    }
+    #age-call-boot .acb-fx-scan {
+      left: 6%;
+      right: 6%;
+      top: 28%;
+      height: 4px;
+      z-index: 4;
+      border-radius: 2px;
+      opacity: 0;
+      background: linear-gradient(90deg, transparent, rgba(139, 157, 173, 0.85), rgba(237, 231, 217, 0.75), transparent);
+      animation: acb-feed-scan 5.2s infinite;
+    }
+    #age-call-boot .acb-fx-ghost {
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 2;
+      opacity: 0;
+    }
+    #age-call-boot .acb-fx-ghost--cyan { color: #8b9dad; animation: acb-feed-cyan 5.2s infinite; }
+    #age-call-boot .acb-fx-ghost--mag { color: #8b9dad; animation: acb-feed-mag 5.2s infinite; }
+    #age-call-boot .acb-btn--answer .acb-cap {
+      animation: acb-feed-slice 5.2s infinite;
+      text-shadow: 0 0 8px rgba(35, 87, 137, 0.45);
+    }
+    #age-call-boot .acb-phone {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+    #age-call-boot .acb-phone--x {
+      transform: rotate(135deg);
+    }
+    #age-call-boot .acb-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.05;
+    }
+    #age-call-boot .acb-age {
+      font-size: var(--fs-form);
+      font-weight: 700;
+      color: rgba(237, 231, 217, 0.95);
+    }
+    #age-call-boot .acb-cap {
+      font-size: var(--fs-form);
+      font-weight: 500;
+      color: rgba(237, 231, 217, 0.9);
+    }
+    @keyframes acb-decline {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(123, 13, 30, 0.5); }
+      55% { box-shadow: 0 0 0 12px rgba(123, 13, 30, 0); }
+    }
+    @keyframes acb-feed-breathe {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(139, 157, 173, 0.35), 0 0 14px rgba(35, 87, 137, 0.35); }
+      50% { box-shadow: 0 0 0 1px rgba(139, 157, 173, 0.7), 0 0 22px rgba(35, 87, 137, 0.55); }
+    }
+    @keyframes acb-feed-micro {
+      0%, 78%, 90%, 100% { transform: none; }
+      80%, 83% { transform: translateX(1.5px); }
+      85%, 87% { transform: translateX(-2px); }
+    }
+    @keyframes acb-feed-burst {
+      0%, 7%, 13%, 44%, 52%, 68%, 76%, 100% { filter: none; transform: none; }
+      8%, 11% { filter: contrast(1.35) saturate(1.6); transform: translateX(-3px) skewX(-8deg); }
+      45%, 47% { filter: contrast(1.5) hue-rotate(-18deg); transform: translateX(4px) skewX(10deg); }
+      70%, 73% { filter: contrast(1.4) saturate(1.8); transform: translate(-2px, 1px) skewX(-6deg); }
+    }
+    @keyframes acb-feed-cyan {
+      0%, 7%, 13%, 44%, 52%, 68%, 76%, 100% { opacity: 0; transform: none; }
+      8%, 10% { opacity: 0.9; transform: translate(-5px, 1px); }
+      45%, 48% { opacity: 0.9; transform: translate(-6px, -1px); }
+      71%, 73% { opacity: 0.8; transform: translate(-4px, 2px); }
+    }
+    @keyframes acb-feed-mag {
+      0%, 7%, 13%, 44%, 52%, 68%, 76%, 100% { opacity: 0; transform: none; }
+      8%, 10% { opacity: 0.85; transform: translate(6px, -1px); }
+      45%, 48% { opacity: 0.85; transform: translate(7px, 1px); }
+      71%, 73% { opacity: 0.75; transform: translate(5px, -2px); }
+    }
+    @keyframes acb-feed-scan {
+      0%, 7%, 13%, 44%, 52%, 68%, 76%, 100% { opacity: 0; transform: translateY(0); }
+      8%, 11% { opacity: 0.95; transform: translateY(8px); }
+      45%, 48% { opacity: 1; transform: translateY(-5px); }
+      70%, 73% { opacity: 0.85; transform: translateY(3px); }
+    }
+    @keyframes acb-feed-ring {
+      0%, 18% { opacity: 0.75; transform: scale(1); }
+      32% { opacity: 0.35; }
+      70%, 100% { opacity: 0; transform: scale(1.28); }
+    }
+    @keyframes acb-feed-slice {
+      0%, 7%, 13%, 44%, 52%, 68%, 76%, 100% { transform: none; letter-spacing: 0.02em; }
+      8% { transform: translateX(2px); letter-spacing: 0.08em; }
+      10% { transform: translateX(-2px); }
+      46% { transform: translate(2px, 0); }
+      72% { transform: translateX(-1px); }
+    }
+  </style>
 </head>
 <body>
+  <div id="age-call-boot" aria-hidden="true">
+    <div class="acb-wall"></div>
+    <div class="acb-shade"></div>
+
+    <header class="acb-top">
+      <p class="acb-carrier">
+        <span class="acb-carrier-at">@</span><span class="acb-carrier-name">R4V3army</span>
+      </p>
+      <p class="acb-status">
+        <span class="acb-status-dot"></span>
+        <span>Appel entrant</span>
+        <span class="acb-status-dots"><i></i><i></i><i></i></span>
+      </p>
+    </header>
+
+    <div class="acb-mid">
+      <div class="acb-wrap">
+        <!-- Vide : le token R4V3 n’apparaît qu’après le boot Angular / Three.js -->
+        <div class="acb-slot"></div>
+      </div>
+    </div>
+
+    <div class="acb-actions">
+      <div class="acb-btn acb-btn--decline">
+        <span class="acb-ico">
+          <svg class="acb-phone acb-phone--x" viewBox="0 0 24 24" focusable="false">
+            <path fill="currentColor" d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.6 22 2 13.4 2 2.9 2 2.4 2.4 2 3 2h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/>
+          </svg>
+        </span>
+        <span class="acb-meta">
+          <span class="acb-age">−21 ans</span>
+        </span>
+        <span class="acb-cap">Refuser</span>
+      </div>
+      <div class="acb-btn acb-btn--answer">
+        <span class="acb-fx">
+          <span class="acb-fx-ring"></span>
+          <span class="acb-fx-scan"></span>
+          <span class="acb-fx-ghost acb-fx-ghost--cyan">
+            <svg class="acb-phone" viewBox="0 0 24 24" focusable="false">
+              <path fill="currentColor" d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.6 22 2 13.4 2 2.9 2 2.4 2.4 2 3 2h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/>
+            </svg>
+          </span>
+          <span class="acb-fx-ghost acb-fx-ghost--mag">
+            <svg class="acb-phone" viewBox="0 0 24 24" focusable="false">
+              <path fill="currentColor" d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.6 22 2 13.4 2 2.9 2 2.4 2.4 2 3 2h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/>
+            </svg>
+          </span>
+          <span class="acb-ico">
+            <svg class="acb-phone" viewBox="0 0 24 24" focusable="false">
+              <path fill="currentColor" d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.6 22 2 13.4 2 2.9 2 2.4 2.4 2 3 2h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z"/>
+            </svg>
+          </span>
+        </span>
+        <span class="acb-meta">
+          <span class="acb-age">+21 ans</span>
+        </span>
+        <span class="acb-cap">Répondre</span>
+      </div>
+    </div>
+  </div>
   <app-root></app-root>
 </body>
 </html>

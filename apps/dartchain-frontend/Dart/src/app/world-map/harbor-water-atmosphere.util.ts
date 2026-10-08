@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
-import { activeAtmospherePreset } from './marseille-atmosphere.config';
-import { MARSEILLE_HARBOR_WATER } from './map-configuration';
+import { activeAtmospherePreset } from './metaverse-atmosphere.config';
+import { METAVERSE_HARBOR_WATER } from './map-configuration';
 import type { MapQuality } from './map-configuration';
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 import type { HarborWaterShaderMaterial } from './harbor-water.shader';
 
 export interface HarborWaterColorSet {
@@ -18,17 +18,17 @@ export function resolveHarborWaterColorsFromAtmosphere(): HarborWaterColorSet {
   const preset = activeAtmospherePreset();
   const fog = new THREE.Color(preset.fogColor);
 
-  const shallow = new THREE.Color(MARSEILLE_HARBOR_WATER.shallowColor);
+  const shallow = new THREE.Color(METAVERSE_HARBOR_WATER.shallowColor);
   shallow.lerp(fog, 0.1);
-  shallow.lerp(new THREE.Color(0x7adce8), 0.72);
+  shallow.lerp(new THREE.Color(0x8a95a5), 0.72);
 
-  const deep = new THREE.Color(MARSEILLE_HARBOR_WATER.deepColor);
+  const deep = new THREE.Color(METAVERSE_HARBOR_WATER.deepColor);
   deep.lerp(fog, 0.32);
 
-  const foam = new THREE.Color(MARSEILLE_HARBOR_WATER.foamColor);
+  const foam = new THREE.Color(METAVERSE_HARBOR_WATER.foamColor);
   foam.lerp(fog, 0.08);
 
-  const horizon = fog.clone().lerp(new THREE.Color(0xa8e8ff), 0.35);
+  const horizon = fog.clone().lerp(new THREE.Color(0xede7d9), 0.35);
 
   return { shallow, deep, foam, horizon };
 }

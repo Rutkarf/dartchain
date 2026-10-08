@@ -9,7 +9,7 @@ import {
 describe('building-gpu-batch Phase 24', () => {
   it('fusionne les polygones sol OSM par matériau', () => {
     const root = new THREE.Group();
-    const mat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+    const mat = new THREE.MeshStandardMaterial({ color: 0x18314f });
     for (let i = 0; i < 4; i++) {
       const mesh = new THREE.Mesh(new THREE.BoxGeometry(2, 0.2, 2), mat);
       mesh.name = `ground-osm-poly-${i}`;
@@ -27,7 +27,7 @@ describe('building-gpu-batch Phase 24', () => {
   it('instancie le massing LOD sans retirer le mesh source', () => {
     const root = new THREE.Group();
     const pool = new BuildingMassingInstancedPool(root, 64);
-    const mat = new THREE.MeshStandardMaterial({ color: 0x888888 });
+    const mat = new THREE.MeshStandardMaterial({ color: 0x8a95a5 });
 
     const group = new THREE.Group();
     group.name = 'b1';

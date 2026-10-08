@@ -1,4 +1,4 @@
-import { MARSEILLE_COORDINATE_SYSTEM_VERSION } from './coordinate-system';
+import { METAVERSE_COORDINATE_SYSTEM_VERSION } from './coordinate-system';
 import { inquiryImpliesReservation } from './inquiry.model';
 import type { MetaversePlacementsResponseDto } from './placement.dto';
 import { createDevPlacementFixtures } from './placement-fixtures.dev';
@@ -22,7 +22,7 @@ describe('placement.mapper', () => {
     ).toBe(true);
   });
 
-  it('ignore un placement dont le CRS n’est pas marseille-local-v1', () => {
+  it('ignore un placement dont le CRS n’est pas metaverse-local-v1', () => {
     const dto = mapPlacementDto({
       id: 'dev-placement-bad-crs',
       buildingId: 'mirror-adjacent-building-01',
@@ -45,7 +45,7 @@ describe('placement.mapper', () => {
         x: 1,
         y: 1.2,
         z: 1,
-        coordinateSystemVersion: MARSEILLE_COORDINATE_SYSTEM_VERSION,
+        coordinateSystemVersion: METAVERSE_COORDINATE_SYSTEM_VERSION,
       },
       status: 'sold' as never,
     });
@@ -83,7 +83,7 @@ describe('placement.mapper', () => {
     const catalog = mapPlacementsResponse(raw);
     expect(catalog!.placements.map((item) => item.id)).toEqual(['ok']);
     expect(catalog!.placements[0].anchorWorld.coordinateSystemVersion).toBe(
-      MARSEILLE_COORDINATE_SYSTEM_VERSION
+      METAVERSE_COORDINATE_SYSTEM_VERSION
     );
   });
 

@@ -1,5 +1,6 @@
 package io.dartchain.backend.persistence;
 
+import io.dartchain.backend.auth.audit.AuthAuditEntry;
 import io.dartchain.backend.auth.audit.AuthAuditStore;
 import io.dartchain.backend.persistence.entity.AuthAuditLogEntity;
 import io.dartchain.backend.persistence.repository.AuthAuditLogJpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -39,5 +41,19 @@ public class JpaAuthAuditStore implements AuthAuditStore {
         }
 
         repository.save(entity);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AuthAuditEntry> snapshot() {
+        return repository.findAll().stream()
+                .map(entity -> new AuthAuditEntry(
+                        entity.getUserId() == null ? null : entity.getUserId().toString(),
+                        entity.getAction(),
+                        entity.getDetail(),
+                        entity.getIpAddress(),
+                        entity.getCreatedAt() == null ? 0L : entity.getCreatedAt().toEpochMilli()
+                ))
+                .toList();
     }
 }

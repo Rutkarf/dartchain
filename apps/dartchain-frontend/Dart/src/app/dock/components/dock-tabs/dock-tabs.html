@@ -1,10 +1,9 @@
 <div class="dock-tabstrip">
   <nav
-    class="dock-tabs"
-    role="tablist"
-    aria-label="Panneaux blockchain"
-    aria-orientation="horizontal"
-  >
+ class="dock-tabs"
+ role="tablist"
+ aria-orientation="horizontal"
+ >
     <button
       #dockTabButton
       type="button"
@@ -18,7 +17,7 @@
       aria-controls="panel-dock"
       (click)="openPanel('composer')"
     >
-      <span class="dock-tab-label">Block</span>
+      <span class="dock-tab-label">Bloc</span>
     </button>
 
     <button
@@ -34,7 +33,7 @@
       aria-controls="panel-dock"
       (click)="openPanel('chain')"
     >
-      <span class="dock-tab-label">Chain</span>
+      <span class="dock-tab-label">Chaîne</span>
     </button>
 
     <button
@@ -50,7 +49,7 @@
       aria-controls="panel-dock"
       (click)="openPanel('pending')"
     >
-      <span class="dock-tab-label">Pending</span>
+      <span class="dock-tab-label">En attente</span>
     </button>
   </nav>
 </div>

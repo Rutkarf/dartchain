@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { MARSEILLE_HARBOR_WATER } from './map-configuration';
+import { METAVERSE_HARBOR_WATER } from './map-configuration';
 
 /** Paramètres shader eau Phase 2 — profondeur / fresnel / houle. */
 export const HARBOR_WATER_SHADER_CONFIG = {
@@ -17,13 +17,13 @@ export const HARBOR_WATER_SHADER_CONFIG = {
   shoreDistortion: 0.72,
   bobAmplitude: 0.014,
   bobSpeed: 0.00055,
-  shallowColor: new THREE.Color(MARSEILLE_HARBOR_WATER.shallowColor),
-  deepColor: new THREE.Color(MARSEILLE_HARBOR_WATER.deepColor),
-  foamColor: new THREE.Color(MARSEILLE_HARBOR_WATER.foamColor),
+  shallowColor: new THREE.Color(METAVERSE_HARBOR_WATER.shallowColor),
+  deepColor: new THREE.Color(METAVERSE_HARBOR_WATER.deepColor),
+  foamColor: new THREE.Color(METAVERSE_HARBOR_WATER.foamColor),
 } as const;
 
 import type { MapQuality } from './map-configuration';
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 
 export function harborWaterSubdivisionsForQuality(quality: MapQuality): number {
   return mapPerfProfile(quality).harborSubdivisions;

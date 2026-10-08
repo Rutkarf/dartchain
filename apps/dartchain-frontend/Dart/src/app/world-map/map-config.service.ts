@@ -30,16 +30,16 @@ export class MapConfigService {
 
   readonly configuration: MapConfiguration = this.buildConfiguration();
 
-  /** Provider effectif — Marseille OSM prioritaire dès que la carte est activée. */
+  /** Provider effectif — Metaverse OSM prioritaire dès que la carte est activée. */
   effectiveProvider(): MapProviderId {
     if (!this.configuration.enabled) {
       return 'legacy-floor';
     }
-    // MetaVerseBB : forcer Marseille sauf demande explicite legacy.
+    // MetaVerseBB : forcer Metaverse sauf demande explicite legacy.
     if (this.configuration.provider === 'legacy-floor') {
       return 'legacy-floor';
     }
-    return 'marseille-osm-three';
+    return 'metaverse-osm-three';
   }
 
   isLegacyProvider(): boolean {
@@ -74,8 +74,8 @@ export class MapConfigService {
       fallback: DEFAULT_MAP_CONFIGURATION.quality,
     });
 
-    // Garde-fou : Marseille sans bâtiments = carte vide.
-    if (base.provider === 'marseille-osm-three' && base.enabled) {
+    // Garde-fou : Metaverse sans bâtiments = carte vide.
+    if (base.provider === 'metaverse-osm-three' && base.enabled) {
       base.enableBuildings = true;
     }
 

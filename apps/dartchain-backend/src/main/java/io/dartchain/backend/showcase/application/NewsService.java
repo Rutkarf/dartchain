@@ -25,7 +25,7 @@ public class NewsService {
 
     private static final int MAX_ITEMS = 60;
     private static final List<String> ALL_CATEGORIES = List.of(
-            "Réseau", "R4V3", "Peers", "Écosystème"
+            "Réseau", "R4V3", "Pairs", "Écosystème"
     );
 
     private final CopyOnWriteArrayList<NewsItem> items = new CopyOnWriteArrayList<>();
@@ -81,10 +81,10 @@ public class NewsService {
         ));
         items.add(editorial(
                 "editorial-3",
-                "Peers",
+                "Pairs",
                 "Synchronisation multi-nœuds",
-                "Connecte des peers pour propager la chaîne.",
-                "Ouvre le panneau Peers dans le dock pour ajouter des nœuds et synchroniser "
+                "Connecte des pairs pour propager la chaîne.",
+                "Ouvre le panneau Pairs dans la barre pour ajouter des nœuds et synchroniser "
                         + "ta copie locale de la blockchain avec le réseau.",
                 now.minus(Duration.ofHours(1)),
                 "OPEN_PEERS",
@@ -93,10 +93,10 @@ public class NewsService {
         items.add(editorial(
                 "editorial-4",
                 "Écosystème",
-                "Faucet actif — claim R4V3 testnet",
+                "Robinet actif — réclamation R4V3 sur le réseau de test",
                 "Récupère des jetons pour tester les transactions.",
-                "Le faucet distribue des R4V3 de test pour alimenter ton wallet et expérimenter "
-                        + "les envois, le minage et les swaps sans risque.",
+                "Le robinet distribue des R4V3 de test pour alimenter ton portefeuille et expérimenter "
+                        + "les envois, le minage et les échanges sans risque.",
                 now.minus(Duration.ofHours(3)),
                 "OPEN_FAUCET",
                 null
@@ -107,7 +107,7 @@ public class NewsService {
                 "Proof-of-work difficulté 4",
                 "Chaque bloc respecte la règle des zéros en tête.",
                 "La difficulté actuelle impose que le hash des blocs commence par quatre zéros. "
-                        + "Mine les transactions pending pour valider la chaîne.",
+                        + "Mine les transactions en attente pour valider la chaîne.",
                 now.minus(Duration.ofHours(5)),
                 "OPEN_PENDING",
                 null
@@ -115,8 +115,8 @@ public class NewsService {
         items.add(editorial(
                 "editorial-6",
                 "R4V3",
-                "Exchange panel R4V3 ↔ launch tokens",
-                "Simule des swaps depuis le panneau gauche.",
+                "Panneau d’échange R4V3 ↔ jetons du laboratoire",
+                "Simule des échanges depuis le panneau gauche.",
                 "Le panneau d'échange en haut de l'écran permet de convertir entre R4V3 et "
                         + "d'autres actifs avec estimation en temps réel.",
                 now.minus(Duration.ofHours(8)),
@@ -126,9 +126,9 @@ public class NewsService {
         items.add(editorial(
                 "editorial-7",
                 "Écosystème",
-                "LaunchLab — déployer un token testnet",
-                "Crée un actif custom sur la chaîne R4V3.",
-                "LaunchLab permet de configurer un token, le déployer en testnet et le retrouver "
+                "Laboratoire — déployer un jeton de réseau de test",
+                "Crée un actif personnalisé sur la chaîne R4V3.",
+                "Le laboratoire permet de configurer un jeton, le déployer sur le réseau de test et le retrouver "
                         + "dans l'onglet dédié du showcase.",
                 now.minus(Duration.ofHours(12)),
                 "NONE",
@@ -139,7 +139,7 @@ public class NewsService {
                 "Réseau",
                 "Explorer les blocs minés",
                 "Consulte l'historique depuis le dock.",
-                "Chaque bloc miné apparaît dans le dock Blocks. Clique une news réseau pour "
+                "Chaque bloc miné apparaît dans la barre Blocs. Clique une actualité réseau pour "
                         + "ouvrir le détail du bloc associé.",
                 now.minus(Duration.ofHours(18)),
                 "NONE",
@@ -147,11 +147,11 @@ public class NewsService {
         ));
         items.add(editorial(
                 "editorial-9",
-                "Peers",
+                "Pairs",
                 "Statut réseau en direct",
-                "Le bandeau NEWS reflète l'activité chaîne.",
+                "Le bandeau ACTUS reflète l'activité de la chaîne.",
                 "Les événements réseau, blocs minés et peers apparaissent automatiquement "
-                        + "dans le fil NEWS avec horodatage relatif.",
+                        + "dans le fil ACTUS avec horodatage relatif.",
                 now.minus(Duration.ofHours(24)),
                 "NONE",
                 null
@@ -230,9 +230,9 @@ public class NewsService {
         NewsItem swapItem = editorial(
                 id,
                 "R4V3",
-                "Swap testnet exécuté",
+                "Échange sur le réseau de test exécuté",
                 summary,
-                "Wallet "
+                "Portefeuille "
                         + truncate(walletAddress, 12)
                         + " a échangé "
                         + (swap.amountIn() != null ? swap.amountIn().stripTrailingZeros().toPlainString() : "0")
@@ -242,7 +242,7 @@ public class NewsService {
                         + (swap.amountOut() != null ? swap.amountOut().stripTrailingZeros().toPlainString() : "0")
                         + " "
                         + swap.toToken()
-                        + " sur le simulateur R4V3chainz testnet.",
+                        + " sur le simulateur R4V3chainz du réseau de test.",
                 now,
                 "OPEN_SWAP",
                 swap.toToken()
@@ -306,9 +306,9 @@ public class NewsService {
         int peerHint = Math.min(3, Math.max(1, blocks.size()));
         items.add(chainNews(
                 "chain-peers-" + blocks.size(),
-                "Peers",
+                "Pairs",
                 peerHint + " nœud(s) peuvent synchroniser la chaîne",
-                "Utilise le panneau Peers pour te connecter",
+                "Utilise le panneau Pairs pour te connecter",
                 "La chaîne compte " + blocks.size() + " bloc(s). Connecte "
                         + peerHint + " peer(s) ou plus pour propager les blocs.",
                 now.minus(Duration.ofMinutes(45)),

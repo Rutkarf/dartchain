@@ -1,5 +1,5 @@
 /**
- * Ancres Quest — toute particule décorative Star Conquest
+ * Ancres Quest — toute particule décorative Conquête stellaire
  * (profondeur, motes, pulse, satellites réseau) se cale sur une Quest.
  */
 

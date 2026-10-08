@@ -152,7 +152,7 @@ const SEEDS: readonly QuestSeed[] = [
     category: 'swap',
     family: 'interface',
     description:
-      '[Ready · live] Exécuter un swap LaunchLab. L’étoile se complète via la quête Dock swap-tokens (pas de claim magique).',
+      '[Ready · live] Exécuter un swap Laboratoire. L’étoile se complète via la quête Dock swap-tokens (pas de claim magique).',
     rewardM4T3R: 140,
     rarity: 'epic',
     status: 'available',
@@ -311,7 +311,7 @@ const SEEDS: readonly QuestSeed[] = [
   // ——— Blockchain / M4T3R (7) ———
   {
     id: 'sc-wallet-copy',
-    title: 'Wallet Address Copy',
+    title: 'Copie d’adresse du portefeuille',
     category: 'dock',
     family: 'blockchain',
     description:
@@ -365,7 +365,7 @@ const SEEDS: readonly QuestSeed[] = [
   },
   {
     id: 'sc-security-wallet',
-    title: 'Wallet Key Mask',
+    title: 'Masque de clé du portefeuille',
     category: 'security',
     family: 'blockchain',
     description:
@@ -552,7 +552,7 @@ const SEEDS: readonly QuestSeed[] = [
   },
   {
     id: 'sc-tests-unit',
-    title: 'Star Conquest Specs',
+    title: 'Conquête stellaire Specs',
     category: 'tests',
     family: 'quality',
     description:

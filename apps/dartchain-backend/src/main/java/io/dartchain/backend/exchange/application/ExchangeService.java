@@ -14,6 +14,9 @@ import io.dartchain.backend.showcase.application.NewsService;
 import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.exchange.application.CryptoRatesProxyService;
 import io.dartchain.backend.blockchain.application.PendingTransactionService;
+import io.dartchain.backend.wallet.dto.WalletHoldingDto;
+import io.dartchain.backend.wallet.dto.WalletPortfolioResponse;
+import io.dartchain.backend.wallet.store.WalletBalanceStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -24,13 +27,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 @Service
 public class ExchangeService {
 
     public static final String NATIVE_TOKEN = "R4V3";
-    /** Contre-actif natif ; seuls R4V3 et les tokens LaunchLab sont échangeables. */
+    /** Contre-actif natif ; seuls R4V3 et les tokens Laboratoire sont échangeables. */
     private static final List<String> TOKENS = List.of(NATIVE_TOKEN);
     private static final int SCALE = 8;
     private static final int NATIVE_SCALE = 26;
@@ -40,6 +44,7 @@ public class ExchangeService {
     private final BlockchainService blockchainService;
     private final CryptoRatesProxyService cryptoRates;
     private final ExchangeLedgerStore ledgerStore;
+    private final WalletBalanceStore walletBalanceStore;
     private final PendingTransactionService pendingTransactionService;
     private final NewsService newsService;
     private final LaunchLabService launchLabService;
@@ -51,6 +56,7 @@ public class ExchangeService {
             BlockchainService blockchainService,
             CryptoRatesProxyService cryptoRates,
             ExchangeLedgerStore ledgerStore,
+            WalletBalanceStore walletBalanceStore,
             PendingTransactionService pendingTransactionService,
             NewsService newsService,
             LaunchLabService launchLabService,
@@ -61,6 +67,7 @@ public class ExchangeService {
                 blockchainService,
                 cryptoRates,
                 ledgerStore,
+                walletBalanceStore,
                 pendingTransactionService,
                 newsService,
                 launchLabService,
@@ -75,6 +82,7 @@ public class ExchangeService {
             BlockchainService blockchainService,
             CryptoRatesProxyService cryptoRates,
             ExchangeLedgerStore ledgerStore,
+            WalletBalanceStore walletBalanceStore,
             PendingTransactionService pendingTransactionService,
             NewsService newsService,
             LaunchLabService launchLabService,
@@ -85,6 +93,7 @@ public class ExchangeService {
         this.blockchainService = blockchainService;
         this.cryptoRates = cryptoRates;
         this.ledgerStore = ledgerStore;
+        this.walletBalanceStore = walletBalanceStore;
         this.pendingTransactionService = pendingTransactionService;
         this.newsService = newsService;
         this.launchLabService = launchLabService;
@@ -169,12 +178,103 @@ public class ExchangeService {
                         + toToken
         );
 
+        persistPortfolio(
+                walletAddress,
+                "SWAP",
+                fromToken + "->" + toToken + " in=" + formatAmount(amount) + " out=" + formatAmount(amountOut)
+        );
+
         recordSwapTrace(account, walletAddress, response);
         newsService.publishSwapEvent(walletAddress, response);
         recordSwapQuestProgress(walletAddress, fromToken, toToken);
         metricsCollector.recordSwap(fromToken + "->" + toToken);
 
         return response;
+    }
+
+    /**
+     * Portfolio wallet : R4V3 (chaîne + ledger) + tokens swap non nuls.
+     * Persiste les snapshots dans {@code wallet_balances} pour vérifications.
+     */
+    public WalletPortfolioResponse getPortfolio(String walletAddress) {
+        return persistPortfolio(walletAddress, "SYNC", null);
+    }
+
+    /** Synchronise le snapshot R4V3 (et tokens ledger) après mint / lecture solde. */
+    public void syncPersistedBalances(String walletAddress) {
+        if (walletAddress == null || walletAddress.isBlank()) {
+            return;
+        }
+        persistPortfolio(walletAddress, "SYNC", null);
+    }
+
+    private WalletPortfolioResponse persistPortfolio(String walletAddress, String eventType, String reference) {
+        if (walletAddress == null || walletAddress.isBlank()) {
+            return new WalletPortfolioResponse("", NATIVE_TOKEN, List.of(), 0, System.currentTimeMillis());
+        }
+
+        String wallet = walletAddress.trim();
+        List<WalletHoldingDto> holdings = buildHoldings(wallet);
+
+        for (WalletHoldingDto holding : holdings) {
+            walletBalanceStore.upsertAndAudit(
+                    wallet,
+                    holding.token(),
+                    new BigDecimal(holding.balance()),
+                    new BigDecimal(holding.chainBalance()),
+                    new BigDecimal(holding.ledgerAdjustment()),
+                    eventType,
+                    reference
+            );
+        }
+
+        int otherCount = (int) holdings.stream().filter(holding -> !holding.nativeToken()).count();
+        return new WalletPortfolioResponse(
+                wallet,
+                NATIVE_TOKEN,
+                holdings,
+                otherCount,
+                System.currentTimeMillis()
+        );
+    }
+
+    private List<WalletHoldingDto> buildHoldings(String walletAddress) {
+        List<WalletHoldingDto> holdings = new ArrayList<>();
+
+        BigDecimal chainBalance = blockchainService.getBalance(walletAddress);
+        BigDecimal nativeAdjustment = ledgerStore.getAdjustment(walletAddress, NATIVE_TOKEN);
+        BigDecimal nativeBalance = chainBalance.add(nativeAdjustment)
+                .setScale(NATIVE_SCALE, RoundingMode.HALF_UP);
+
+        holdings.add(new WalletHoldingDto(
+                NATIVE_TOKEN,
+                nativeBalance.toPlainString(),
+                chainBalance.setScale(NATIVE_SCALE, RoundingMode.HALF_UP).toPlainString(),
+                nativeAdjustment.setScale(NATIVE_SCALE, RoundingMode.HALF_UP).toPlainString(),
+                true
+        ));
+
+        Map<String, BigDecimal> adjustments = ledgerStore.listAdjustments(walletAddress);
+        for (Map.Entry<String, BigDecimal> entry : adjustments.entrySet()) {
+            String token = entry.getKey();
+            if (NATIVE_TOKEN.equalsIgnoreCase(token)) {
+                continue;
+            }
+            BigDecimal amount = entry.getValue();
+            if (amount == null || amount.compareTo(BigDecimal.ZERO) == 0) {
+                continue;
+            }
+            BigDecimal scaled = amount.setScale(SCALE, RoundingMode.HALF_UP);
+            holdings.add(new WalletHoldingDto(
+                    token.toUpperCase(Locale.ROOT),
+                    scaled.toPlainString(),
+                    BigDecimal.ZERO.setScale(SCALE, RoundingMode.HALF_UP).toPlainString(),
+                    scaled.toPlainString(),
+                    false
+            ));
+        }
+
+        return holdings;
     }
 
     private void recordSwapQuestProgress(String walletAddress, String fromToken, String toToken) {
@@ -271,7 +371,7 @@ public class ExchangeService {
         boolean toIsNative = NATIVE_TOKEN.equalsIgnoreCase(toToken);
         if (!fromIsNative && !toIsNative) {
             throw new IllegalArgumentException(
-                    "Les swaps LaunchLab exigent R4V3 (m4t3r) comme contre-actif"
+                    "Les échanges du laboratoire exigent R4V3 (m4t3r) comme contre-actif"
             );
         }
     }

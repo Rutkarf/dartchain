@@ -1,14 +1,13 @@
 <div
-  class="r4v3-summary-bar"
-  role="button"
-  tabindex="0"
-  aria-live="polite"
-  [attr.aria-label]="barAriaLabel()"
-  (click)="onBarClick($event)"
-  (keydown.enter)="onBarKeydown($event)"
-  (keydown.space)="onBarKeydown($event)"
+ class="r4v3-summary-bar"
+ role="button"
+ tabindex="0"
+ aria-live="polite"
+ (click)="onBarClick($event)"
+ (keydown.enter)="onBarKeydown($event)"
+ (keydown.space)="onBarKeydown($event)"
 >
-  <span class="r4v3-summary-bar__peg" aria-label="1 R4V3 = 1 CHF">
+  <span class="r4v3-summary-bar__peg">
     <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--token">1 R4V3</span>
     <span class="r4v3-summary-bar__peg-eq" aria-hidden="true">=</span>
     <span class="r4v3-summary-bar__peg-part r4v3-summary-bar__peg-part--fiat">1 CHF</span>
@@ -49,12 +48,7 @@
     [attr.title]="whitepaperLoading() ? 'Téléchargement…' : 'Télécharger le white paper R4V3'"
   >
     <span class="r4v3-summary-bar__wp-btn-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" focusable="false">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <path d="M14 2v6h6" />
-        <path d="M12 11v7" />
-        <path d="M9 15l3 3 3-3" />
-      </svg>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-file-down"/></svg>
     </span>
   </button>
 </div>

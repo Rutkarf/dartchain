@@ -18,11 +18,12 @@ import { ExplorerSearchComponent } from './explorer-search';
 import { SearchbarComponent } from './components/searchbar/searchbar';
 import { R4v3ThreeComponent } from '@r4v3-scene/r4v3-three/r4v3-three';
 import { AuthService } from '@auth/services/auth.service';
-import { ShellFeedbackService } from '@core/services/shell-feedback.service';
 import { LocaleService } from '../core/i18n/locale.service';
 import { NavbarNodePanelComponent } from './navbar-node-panel';
 import { NavbarHintDirective } from './navbar-hint.directive';
 import { NavbarTickerDrawerComponent } from './navbar-ticker-drawer/navbar-ticker-drawer';
+import { OnboardingTourService } from '../shared/onboarding-tour/onboarding-tour.service';
+import { DockNavigationService } from '@dock/services/dock-navigation.service';
 
 @Component({
   selector: 'app-navbar-shell',
@@ -45,7 +46,8 @@ import { NavbarTickerDrawerComponent } from './navbar-ticker-drawer/navbar-ticke
 export class NavbarShellComponent implements AfterViewInit {
   readonly auth = inject(AuthService);
   readonly locale = inject(LocaleService);
-  private readonly shell = inject(ShellFeedbackService);
+  private readonly tour = inject(OnboardingTourService);
+  private readonly dockNav = inject(DockNavigationService);
   private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild('brandHead', { read: ElementRef })
@@ -90,6 +92,13 @@ export class NavbarShellComponent implements AfterViewInit {
     return 'Compte';
   });
 
+  /** Admin dock retiré des tabs — icône navbar pour ADMIN / rutkarf. */
+  readonly showAdminEntry = computed(() => {
+    if (this.auth.isAdmin()) return true;
+    const username = this.auth.user()?.username?.trim().toLowerCase();
+    return username === 'rutkarf';
+  });
+
   @ViewChild('logoThree')
   logoThree?: R4v3ThreeComponent;
 
@@ -100,6 +109,8 @@ export class NavbarShellComponent implements AfterViewInit {
 
   private clickPulseTimeout: ReturnType<typeof setTimeout> | null = null;
   private lastLogoClickAt = 0;
+  /** Clics rapides consécutifs sur le logo.stl (fenêtre 420 ms). */
+  private logoClickStreak = 0;
 
   onRegister(): void {
     this.auth.openDrawer('register');
@@ -113,12 +124,30 @@ export class NavbarShellComponent implements AfterViewInit {
     void this.auth.logout();
   }
 
+  onTwoFactor(): void {
+    void this.auth.openTwoFactorSetup();
+  }
+
+  onOpenAdmin(): void {
+    if (!this.showAdminEntry()) return;
+    this.dockNav.requestTab('admin');
+  }
+
   onLogoPulse(): void {
     const now = Date.now();
     if (now - this.lastLogoClickAt < 420) {
-      this.shell.toggleR4v3Scene();
+      this.logoClickStreak += 1;
+    } else {
+      this.logoClickStreak = 1;
     }
     this.lastLogoClickAt = now;
+
+    // Scène 3D R4V3 (double-clic) : volontairement débranchée — voir
+    // ShellFeedbackService.R4V3_SCENE_TOGGLE_ENABLED.
+    if (this.logoClickStreak >= 5) {
+      this.logoClickStreak = 0;
+      this.tour.replay();
+    }
 
     this.logoClicked = false;
     requestAnimationFrame(() => {

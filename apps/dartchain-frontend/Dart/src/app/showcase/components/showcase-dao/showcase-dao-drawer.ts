@@ -21,6 +21,8 @@ import { R4v3CommunityFaqService } from '@showcase/services/r4v3-community-faq.s
 import { ShowcaseDaoStateService } from '@showcase/services/showcase-dao-state.service';
 import { FocusTrapDirective } from '@core/directives/focus-trap.directive';
 
+type DaoSubDrawer = 'proposal' | 'detail';
+
 @Component({
   selector: 'app-showcase-dao-drawer',
   standalone: true,
@@ -31,9 +33,9 @@ import { FocusTrapDirective } from '@core/directives/focus-trap.directive';
 })
 export class ShowcaseDaoDrawerComponent {
   private readonly drawerPanel = viewChild<ElementRef<HTMLElement>>('drawerPanel');
+  private readonly subDrawerPanel = viewChild<ElementRef<HTMLElement>>('subDrawerPanel');
 
   readonly card = input<DaoShowcaseCard | null>(null);
-
   readonly closeDrawer = output<void>();
   readonly refreshed = output<void>();
 
@@ -44,36 +46,22 @@ export class ShowcaseDaoDrawerComponent {
   readonly askTitle = signal('');
   readonly askBody = signal('');
   readonly formSuccess = signal(false);
-  readonly expandedQuestionId = signal<string | null>(null);
+  readonly subDrawer = signal<DaoSubDrawer | null>(null);
 
   readonly questions = computed(() => {
     const current = this.card();
-    if (!current) {
-      return [];
-    }
-    return this.daoState.questionsForDao(current.symbol);
+    return current ? this.daoState.questionsForDao(current.symbol) : [];
   });
 
   readonly openProposals = computed(
     () => this.questions().filter((question) => question.status === 'open').length
   );
 
-  readonly visibleQuestions = computed(() => {
-    const expandedId = this.expandedQuestionId();
-    const all = this.questions();
-    if (expandedId) {
-      const expanded = all.find((question) => question.id === expandedId);
-      return expanded ? [expanded] : all.slice(0, 4);
-    }
-    return all.slice(0, 4);
-  });
+  readonly previewQuestions = computed(() => this.questions().slice(0, 2));
 
-  readonly hiddenQuestionCount = computed(() => {
-    if (this.expandedQuestionId()) {
-      return Math.max(0, this.questions().length - 1);
-    }
-    return Math.max(0, this.questions().length - 4);
-  });
+  readonly hiddenQuestionCount = computed(() => Math.max(0, this.questions().length - 2));
+
+  readonly roleLabel = computed(() => (this.auth.isAuthenticated() ? 'Member' : 'Guest'));
 
   readonly submitMessage = this.community.submitMessage;
 
@@ -83,19 +71,40 @@ export class ShowcaseDaoDrawerComponent {
         queueMicrotask(() => this.drawerPanel()?.nativeElement.focus());
       } else {
         this.resetForm();
+        this.subDrawer.set(null);
+      }
+    });
+
+    effect(() => {
+      if (this.subDrawer()) {
+        queueMicrotask(() => this.subDrawerPanel()?.nativeElement.focus());
       }
     });
   }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.subDrawer()) {
+      this.closeSub();
+      return;
+    }
     if (this.card()) {
       this.dismiss();
     }
   }
 
   dismiss(): void {
+    this.subDrawer.set(null);
     this.closeDrawer.emit();
+  }
+
+  protected openSub(mode: DaoSubDrawer): void {
+    this.subDrawer.set(mode);
+  }
+
+  protected closeSub(): void {
+    this.subDrawer.set(null);
+    queueMicrotask(() => this.drawerPanel()?.nativeElement.focus());
   }
 
   protected statusLabel(card: DaoShowcaseCard): string {
@@ -112,14 +121,12 @@ export class ShowcaseDaoDrawerComponent {
     return Math.max(8, Math.min(100, raw));
   }
 
-  protected toggleQuestion(question: CommunityFaqQuestion): void {
-    this.expandedQuestionId.update((current) =>
-      current === question.id ? null : question.id
-    );
-  }
-
-  protected isQuestionExpanded(question: CommunityFaqQuestion): boolean {
-    return this.expandedQuestionId() === question.id;
+  protected intelText(card: DaoShowcaseCard): string {
+    const desc = card.description?.trim();
+    if (desc && desc !== card.summary && desc !== card.objective) {
+      return desc;
+    }
+    return `Gouvernance communautaire ${card.symbol} — décisions on-chain.`;
   }
 
   protected voteQuestion(question: CommunityFaqQuestion, direction: 'UP' | 'DOWN'): void {
@@ -132,18 +139,16 @@ export class ShowcaseDaoDrawerComponent {
     if (!current) {
       return;
     }
-
-    const ok = this.daoState.askDaoQuestion(
-      current.symbol,
-      this.askTitle(),
-      this.askBody()
-    );
-
+    const ok = this.daoState.askDaoQuestion(current.symbol, this.askTitle(), this.askBody());
     if (ok) {
       this.formSuccess.set(true);
       this.askTitle.set('');
       this.askBody.set('');
-      window.setTimeout(() => this.formSuccess.set(false), 2400);
+      this.refreshed.emit();
+      window.setTimeout(() => {
+        this.formSuccess.set(false);
+        this.closeSub();
+      }, 900);
     }
   }
 
@@ -151,17 +156,13 @@ export class ShowcaseDaoDrawerComponent {
     return this.auth.isAuthenticated();
   }
 
-  protected submitLabel(): string {
-    if (this.formSuccess()) {
-      return 'Question publiée';
-    }
-    return this.submitMessage() || 'Publier';
+  protected promptLogin(): void {
+    this.auth.openDrawer('login');
   }
 
   private resetForm(): void {
     this.askTitle.set('');
     this.askBody.set('');
     this.formSuccess.set(false);
-    this.expandedQuestionId.set(null);
   }
 }

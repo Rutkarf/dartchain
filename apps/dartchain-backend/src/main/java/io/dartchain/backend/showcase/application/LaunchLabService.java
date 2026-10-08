@@ -59,7 +59,7 @@ public class LaunchLabService {
                         "0",
                         "10000",
                         null,
-                        "Projet expérimental LaunchLab orienté gouvernance communautaire.",
+                        "Projet expérimental Laboratoire orienté gouvernance communautaire.",
                         "https://dartchain.io/whitepaper/lab3.pdf",
                         "https://dartchain.io/lab3",
                         "2026-Q3"
@@ -98,7 +98,7 @@ public class LaunchLabService {
                         "0",
                         "20000",
                         null,
-                        "AMM cross-chain à faible latence pour paires LaunchLab.",
+                        "AMM cross-chain à faible latence pour paires Laboratoire.",
                         null,
                         "https://orbitswap.example",
                         "2026-Q4"

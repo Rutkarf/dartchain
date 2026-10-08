@@ -1,5 +1,5 @@
 /**
- * Anneau de diagnostics Star Conquest — hors rAF critique.
+ * Anneau de diagnostics Conquête stellaire — hors rAF critique.
  * N’envoie rien au réseau. Cap fixe pour éviter les fuites.
  */
 

@@ -5,15 +5,15 @@
   padding: 0;
   line-height: 1;
 
-  --ticker-font-label: 0.25rem;
-  --ticker-font-value: 0.375rem;
+  --ticker-font-label: var(--fs-label);
+  --ticker-font-value: var(--fs-price);
   --ticker-chip-h: 0.8125rem;
   --ticker-gap: 0.24rem;
-  --ticker-accent-network: var(--ds-neon-cyan, #00f5ff);
-  --ticker-accent-token: #e8ecf0;
-  --ticker-accent-tx: #ffb347;
-  --ticker-accent-peers: #39ff14;
-  --ticker-accent-tip: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.72);
+  --ticker-accent-network: var(--ds-neon-cyan, #8b9dad);
+  --ticker-accent-token: #ede7d9;
+  --ticker-accent-tx: #7b0d1e;
+  --ticker-accent-peers: #09814a;
+  --ticker-accent-tip: rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.72);
 }
 
 .bandeau-accueil {
@@ -74,44 +74,41 @@
   max-height: var(--ticker-chip-h);
   padding: 0 0.3rem 0 0.26rem;
   border: none;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(0, 0, 0, 0.32) 100%
+    rgba(237, 231, 217, 0.04) 0%,
+    rgba(10, 18, 32, 0.32) 100%
   );
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
-    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.62));
+    inset 0 0 0 1px rgba(237, 231, 217, 0.07),
+    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.62));
   line-height: 1;
   flex-shrink: 0;
-  cursor: pointer;
+  cursor: inherit;
   font: inherit;
   color: inherit;
-  touch-action: manipulation;
-  transition:
-    transform 160ms ease,
-    filter 160ms ease,
-    box-shadow 160ms ease,
-    background 160ms ease;
+  /* none = drag horizontal du ticker depuis la chip (pas pan navigateur). */
+  touch-action: none;
+  transition: transform var(--motion-state) var(--motion-ease-state), background var(--motion-state) var(--motion-ease-state);
 }
 
 .bandeau-accueil__chip--active {
-  background: rgba(0, 0, 0, 0.38);
+  background: rgba(10, 18, 32, 0.38);
   transform: scale(1.02);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.92)),
-    0 0 0 1px color-mix(in srgb, var(--ticker-chip-accent, #00f5ff) 22%, transparent);
+    inset 0 0 0 1px rgba(237, 231, 217, 0.12),
+    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.92)),
+    0 0 0 1px color-mix(in srgb, var(--ticker-chip-accent, #8b9dad) 22%, transparent);
 }
 
 .bandeau-accueil__chip:hover {
   transform: none;
   filter: none;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(237, 231, 217, 0.04);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
-    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.75));
+    inset 0 0 0 1px rgba(237, 231, 217, 0.1),
+    inset 2px 0 0 var(--ticker-chip-accent, rgba(var(--accent-cyan-rgb, 139, 157, 173), 0.75));
 }
 
 .bandeau-accueil__chip:active {
@@ -145,21 +142,21 @@
 
 .bandeau-accueil__label {
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--ticker-font-label);
+  font-size: var(--fs-label);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.42);
+  color: rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.42);
   line-height: 1;
   white-space: nowrap;
 }
 
 .bandeau-accueil__value {
   font-family: var(--ds-font-mono, var(--font-body));
-  font-size: var(--ticker-font-value);
+  font-size: var(--fs-price);
   font-weight: 800;
   letter-spacing: 0.025em;
-  color: var(--ticker-chip-accent, var(--ds-text-primary, #e8ecf0));
+  color: var(--ticker-chip-accent, var(--ds-text-primary, #ede7d9));
   line-height: 1;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
@@ -199,8 +196,8 @@
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.22) 45%,
-    rgba(var(--ds-neon-cyan-rgb, 0, 245, 255), 0.22) 55%,
+    rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.22) 45%,
+    rgba(var(--ds-neon-cyan-rgb, 139, 157, 173), 0.22) 55%,
     transparent 100%
   );
   opacity: 0.85;
@@ -212,7 +209,7 @@
   }
 
   .bandeau-accueil__chip {
-    transition: none;
+    transition:  none;
   }
 
   .bandeau-accueil__chip:hover {
@@ -227,8 +224,8 @@
 
 @media (max-width: 500px) {
   :host {
-    --ticker-font-label: 0.2188rem;
-    --ticker-font-value: 0.3437rem;
+    --ticker-font-label: var(--fs-label);
+    --ticker-font-value: var(--fs-price);
     --ticker-chip-h: 0.8125rem;
     --ticker-gap: 0.22rem;
   }
@@ -252,8 +249,8 @@
 
 @media (max-width: 299px) {
   :host {
-    --ticker-font-label: 0.1875rem;
-    --ticker-font-value: 0.3125rem;
+    --ticker-font-label: var(--fs-label);
+    --ticker-font-value: var(--fs-price);
     --ticker-chip-h: 0.75rem;
     --ticker-gap: 0.18rem;
   }
@@ -280,8 +277,8 @@
 
 @media (min-width: 251px) and (max-width: 349px) {
   :host {
-    --ticker-font-label: 0.1875rem;
-    --ticker-font-value: 0.3125rem;
+    --ticker-font-label: var(--fs-label);
+    --ticker-font-value: var(--fs-price);
     --ticker-chip-h: 0.75rem;
     --ticker-gap: 0.18rem;
   }
@@ -295,7 +292,7 @@
 
 @media (min-width: 1100px) {
   :host {
-    --ticker-font-label: 0.2812rem;
-    --ticker-font-value: 0.4063rem;
+    --ticker-font-label: var(--fs-label);
+    --ticker-font-value: var(--fs-price);
   }
 }

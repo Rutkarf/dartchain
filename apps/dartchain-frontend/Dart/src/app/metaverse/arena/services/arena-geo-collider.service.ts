@@ -1,8 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 
 import { GeoJsonBuildingProvider } from '@world-map/geojson-building.provider';
-import { projectGeoToMarseilleWorld } from '@world-map/placements/ground-floor-anchor.util';
-import { MARSEILLE_ARENA_PROFILE } from '@world-map/arena/marseille-arena-profile';
+import { projectGeoToMetaverseWorld } from '@world-map/placements/ground-floor-anchor.util';
+import {
+  isArenaSlimWorld,
+  METAVERSE_ARENA_PROFILE,
+} from '@world-map/arena/metaverse-arena-profile';
+import { ProductConfigService } from '@core/config/product-config.service';
 
 export interface ArenaAabbCollider {
   minX: number;
@@ -14,19 +18,26 @@ export interface ArenaAabbCollider {
 
 /**
  * Colliders AABB dérivés du GeoJSON Vieux-Port déjà en repo.
- * Additif : n’altère pas les colliders MarseilleMapProvider.
+ * Additif : n’altère pas les colliders MetaverseMapProvider.
  */
 @Injectable({ providedIn: 'root' })
 export class ArenaGeoColliderService {
   private readonly geoJson = inject(GeoJsonBuildingProvider);
+  private readonly product = inject(ProductConfigService);
   private colliders: ArenaAabbCollider[] = [];
   private loaded = false;
 
   async ensureLoaded(): Promise<ArenaAabbCollider[]> {
     if (this.loaded) return this.colliders;
+    // Arena slim : zones de collision bâtiments désactivées (code intact).
+    if (isArenaSlimWorld(this.product.metaverseArenaEnabled)) {
+      this.colliders = [];
+      this.loaded = true;
+      return this.colliders;
+    }
     try {
       const buildings = await this.geoJson.loadVieuxPortBuildings();
-      const radius = MARSEILLE_ARENA_PROFILE.playRadiusMeters;
+      const radius = METAVERSE_ARENA_PROFILE.playRadiusMeters;
       const next: ArenaAabbCollider[] = [];
 
       for (const building of buildings) {
@@ -37,7 +48,7 @@ export class ArenaGeoColliderService {
         let minZ = Infinity;
         let maxZ = -Infinity;
         for (const pt of points) {
-          const world = projectGeoToMarseilleWorld(pt.latitude, pt.longitude);
+          const world = projectGeoToMetaverseWorld(pt.latitude, pt.longitude);
           minX = Math.min(minX, world.x);
           maxX = Math.max(maxX, world.x);
           minZ = Math.min(minZ, world.z);
@@ -89,7 +100,7 @@ export class ArenaGeoColliderService {
       const dist = 1.5 + (i % 5) * 1.2;
       const x = originX + Math.cos(angle) * dist;
       const z = originZ + Math.sin(angle) * dist;
-      if (Math.hypot(x, z) > MARSEILLE_ARENA_PROFILE.playRadiusMeters) continue;
+      if (Math.hypot(x, z) > METAVERSE_ARENA_PROFILE.playRadiusMeters) continue;
       if (!this.isBlocked(x, z, 0.6)) return { x, z };
     }
     return { x: originX, z: originZ };
@@ -97,7 +108,7 @@ export class ArenaGeoColliderService {
 
   /** Spawn sûr hors bâtiments, dans le rayon arène. */
   findSafeSpawn(attempts = 24): { x: number; z: number } {
-    const radius = MARSEILLE_ARENA_PROFILE.playRadiusMeters * 0.45;
+    const radius = METAVERSE_ARENA_PROFILE.playRadiusMeters * 0.45;
     for (let i = 0; i < attempts; i++) {
       const angle = Math.random() * Math.PI * 2;
       const dist = 4 + Math.random() * radius;

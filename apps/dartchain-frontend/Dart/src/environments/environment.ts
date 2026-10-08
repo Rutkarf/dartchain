@@ -9,9 +9,11 @@ export const environment = buildEnvironment({
   liveWsUrl: devWsUrl('/ws/live'),
   chatWsUrl: devWsUrl('/ws/chat'),
   commercial: false,
-  /** Star Conquest désactivé temporairement (code conservé). */
-  starConquestEnabled: false,
+  /** Conquête stellaire au-dessus du floor MetaVerseBB. */
+  starConquestEnabled: true,
   starConquestKpiDebug: true,
   /** Dev : prototype arène activé (mock local, ledger isolé). */
   metaverseArenaEnabled: true,
+  /** Dev : saute appel R4V3army + Feed The R4V3 (code intact). Tutoriel hub inchangé. */
+  skipBootAnimations: false,
 });

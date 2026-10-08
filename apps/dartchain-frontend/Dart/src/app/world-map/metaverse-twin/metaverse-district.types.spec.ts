@@ -1,0 +1,14 @@
+import { WORLD_SCALE } from '../map-configuration';
+import {
+  METAVERSE_TILE_STRATEGY,
+  districtForWorld,
+} from './metaverse-district.types';
+
+describe('metaverse-district.types (ITER-016)', () => {
+  it('réutilise la taille de chunk existante sans élargir la ville', () => {
+    expect(METAVERSE_TILE_STRATEGY.chunkSizeMeters).toBe(WORLD_SCALE.chunkSizeMeters);
+    expect(METAVERSE_TILE_STRATEGY.expandBeyondCore).toBe(false);
+    expect(districtForWorld(0, 0)).toBe('vieux-port-core');
+    expect(districtForWorld(1200, 0)).toBe('unknown');
+  });
+});

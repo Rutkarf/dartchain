@@ -1,8 +1,8 @@
 import {
   GROUND_FLOOR_ANCHOR_HEIGHT_METERS,
   groundFloorAnchorFromWorldRing,
-  projectGeoToMarseilleWorld,
-  projectMarseilleWorldToGeo,
+  projectGeoToMetaverseWorld,
+  projectMetaverseWorldToGeo,
 } from './ground-floor-anchor.util';
 import { PLACEMENTS_LAYER_CONFIG } from './placement-layer.config';
 
@@ -44,12 +44,12 @@ describe('ground-floor-anchor.util (GEO-FACADE-1)', () => {
     expect(groundFloorAnchorFromWorldRing([{ x: 0, z: 0 }, { x: 1, z: 0 }])).toBeNull();
   });
 
-  it('aligne projectGeoToMarseilleWorld sur l origine Ombrière', () => {
-    const origin = projectGeoToMarseilleWorld(43.2945995, 5.3741227, 0);
+  it('aligne projectGeoToMetaverseWorld sur l origine Ombrière', () => {
+    const origin = projectGeoToMetaverseWorld(43.2945995, 5.3741227, 0);
     expect(origin.x).toBeCloseTo(0, 6);
     expect(origin.z).toBeCloseTo(0, 6);
-    const back = projectMarseilleWorldToGeo(10, 1.2, -5);
-    const again = projectGeoToMarseilleWorld(back.latitude, back.longitude, back.altitude);
+    const back = projectMetaverseWorldToGeo(10, 1.2, -5);
+    const again = projectGeoToMetaverseWorld(back.latitude, back.longitude, back.altitude);
     expect(again.x).toBeCloseTo(10, 6);
     expect(again.y).toBeCloseTo(1.2, 6);
     expect(again.z).toBeCloseTo(-5, 6);

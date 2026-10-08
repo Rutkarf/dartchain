@@ -1,0 +1,302 @@
+/*
+ * Grande fenêtre : lettres lisibles + cases assez grandes,
+ * listes qui remplissent la hauteur pour limiter le scroll.
+ * Téléphone (≤480 ou <640 de haut) : inchangé.
+ */
+@media (min-width: 481px) and (min-height: 640px) {
+  /* ── Actus : 6 rangées = hauteur du panneau (scroll seulement au-delà). */
+  app-showcase-news {
+    --news-visible-rows: 6 !important;
+    --news-tag-w: 64px !important;
+    --news-time-w: 48px !important;
+  }
+
+  .showcase-news__list {
+    overflow-x: hidden !important;
+  }
+
+  .showcase-news__tag-badge {
+    height: auto !important;
+    min-height: 16px;
+    max-height: 100%;
+    line-height: 1.15 !important;
+    padding: 0 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .showcase-news__item-btn,
+  .showcase-news__item-title {
+    line-height: 1.15 !important;
+  }
+
+  /* ── Marché : catégories en entier, sans wrap. */
+  .market-panel {
+    --market-rail-w: 96px !important;
+    --market-toolbar-h: 26px !important;
+  }
+
+  .market-panel__rail-label {
+    white-space: nowrap !important;
+    overflow-wrap: normal !important;
+    word-break: keep-all !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1.15 !important;
+  }
+
+  /* ── D.A.O : 7 rangées = panneau ; identité sur une ligne pour tenir. */
+  app-showcase-dao {
+    --dao-visible-rows: 7 !important;
+    --dao-row-min: 0px !important;
+    --dao-ticker-w: 52px !important;
+    --dao-chip-h: 18px !important;
+    --dao-xp-h: 2px !important;
+    --dao-row-pad-y: 2px !important;
+    --dao-col-gap: 6px !important;
+    --dao-line: 1.15 !important;
+  }
+
+  .showcase-dao__item.showcase-news__item,
+  .showcase-dao__skeleton-item {
+    flex: 0 0 var(--dao-row-h) !important;
+    height: var(--dao-row-h) !important;
+    min-height: var(--dao-row-h) !important;
+    max-height: var(--dao-row-h) !important;
+  }
+
+  .showcase-dao__list.showcase-news__list {
+    overflow-y: auto !important;
+  }
+
+  .showcase-dao__col--identity {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    overflow: hidden !important;
+  }
+
+  .showcase-dao__title {
+    overflow: hidden !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .showcase-dao__name,
+  .showcase-dao__symbol,
+  .showcase-dao__ticker,
+  .showcase-dao__stats {
+    line-height: 1.15 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .showcase-dao__stats {
+    flex: 0 0 auto !important;
+  }
+
+  .showcase-dao__summary {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-break: normal !important;
+    line-height: 1.15 !important;
+  }
+
+  .showcase-dao__chip {
+    height: var(--dao-chip-h) !important;
+    min-height: var(--dao-chip-h) !important;
+    max-height: var(--dao-chip-h) !important;
+    padding: 0 5px !important;
+  }
+
+  .showcase-dao__status,
+  .showcase-dao__enter {
+    line-height: 1.1 !important;
+  }
+
+  /* ── Labo / Launch : 7 rangées dans le panneau. */
+  app-showcase-launch {
+    --launch-visible-rows: 7 !important;
+  }
+
+  /* ── Tchat : densifie les bulles visibles dans le panneau. */
+  app-showcase-chat {
+    --chat-visible-rows: 6 !important;
+  }
+
+  /* ── R4V3 : Livre blanc en colonne, lettres visibles. */
+  .showcase-r4v3__wp-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    overflow: hidden !important;
+    justify-content: flex-start !important;
+    gap: 2px !important;
+    padding: 3px 2px !important;
+    box-sizing: border-box !important;
+  }
+
+  .showcase-r4v3__wp-btn-label {
+    flex: 0 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    letter-spacing: 0 !important;
+    line-height: 1.05 !important;
+    font-size: 11px !important;
+  }
+
+  .showcase-r4v3__wp-btn-icon {
+    margin-top: 2px !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* ── Robinet : méta sur une ligne. */
+  .faucet-panel__meta-inline {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-height: 22px !important;
+    line-height: 1.2 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+
+  .faucet-panel__meta-inline > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .faucet-panel__history,
+  .faucet-panel__body {
+    overflow: hidden !important;
+  }
+
+  .faucet-panel__history {
+    overflow-y: auto !important;
+  }
+
+  /* ── File : lignes qui se partagent la hauteur, scroll seulement si trop. */
+  app-pending-transactions {
+    --pending-row-h: clamp(22px, 18cqh, 32px) !important;
+  }
+
+  .pending-view__list--compact,
+  .pending-view__list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .pending-view__item {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+  }
+
+  .pending-view__item-row,
+  .pending-view__item-row--compact {
+    grid-template-columns: 64px minmax(88px, 1.1fr) minmax(0, 1.6fr) 80px 64px !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    line-height: 1.15 !important;
+    column-gap: 6px !important;
+    align-items: center !important;
+  }
+
+  .pending-view__item-row--compact > .pending-view__mine {
+    height: auto !important;
+    min-height: 18px !important;
+    max-height: 100%;
+  }
+
+  /* ── Quêtes : les 4 quêtes remplissent le panneau, sans scroll. */
+  .quests-panel__guardian,
+  .quests-panel__countdown {
+    max-height: none !important;
+    min-height: 24px !important;
+    overflow: hidden !important;
+    line-height: 1.15 !important;
+  }
+
+  .quests-panel__countdown {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 2px 6px !important;
+  }
+
+  .quests-panel__list {
+    grid-auto-rows: minmax(0, 1fr) !important;
+    overflow: hidden !important;
+    align-content: stretch !important;
+    gap: 2px !important;
+  }
+
+  .quests-panel__row {
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    align-items: center !important;
+  }
+
+  /* ── Portefeuille : claim à côté de l’horloge. */
+  .wallet-faucet__top {
+    grid-template-columns: minmax(0, 1fr) 28px minmax(48px, 64px) !important;
+    min-height: 28px;
+    align-items: center;
+  }
+
+  .wallet-faucet__claim {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    min-height: 28px !important;
+  }
+
+  .wallet-faucet__cooldown-ring {
+    width: 100% !important;
+    height: 28px !important;
+  }
+
+  .wallet-faucet__cooldown-value {
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+  }
+
+  .wallet-faucet__tile--amount,
+  .wallet-faucet__tile--cooldown {
+    max-height: none !important;
+    min-height: 28px !important;
+    overflow: hidden;
+  }
+
+  .app-bottom-stack__panel app-wallet-panel {
+    overflow: hidden !important;
+  }
+
+  /* ── Graphique : axe du bas entier. */
+  .showcase-chart__axis,
+  .showcase-chart__axis--hub {
+    height: auto !important;
+    min-height: 20px !important;
+    max-height: none !important;
+    padding-bottom: 2px;
+    overflow: visible;
+  }
+
+  .showcase-chart__axis-tick {
+    top: auto !important;
+    bottom: 1px;
+    transform: translate(-50%, 0) !important;
+  }
+
+  .showcase-chart__axis-tick-label {
+    line-height: 1.15 !important;
+  }
+}

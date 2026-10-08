@@ -186,7 +186,7 @@ export class PendingTransactionsComponent {
         await firstValueFrom(this.api.minePendingTransaction({ id: tx.id }));
       } catch (mineError) {
         console.error(mineError);
-        this.actionError.set('Erreur lors du minage groupé.');
+        this.actionError.set(this.resolveMineError(mineError, 'Erreur lors du minage groupé.'));
         break;
       }
     }
@@ -218,10 +218,17 @@ export class PendingTransactionsComponent {
       this.data.scheduleRefresh(true);
     } catch (mineError) {
       console.error(mineError);
-      this.actionError.set('Erreur lors du minage.');
+      this.actionError.set(this.resolveMineError(mineError, 'Erreur lors du minage.'));
     } finally {
       this.miningTransactionId.set(null);
     }
+  }
+
+  private resolveMineError(error: unknown, fallback: string): string {
+    if (error instanceof Error && error.message.trim()) {
+      return error.message.trim();
+    }
+    return fallback;
   }
 
   isMining(txId: string): boolean {

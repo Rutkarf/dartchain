@@ -27,7 +27,7 @@ export interface GroundPbrLibrary {
 }
 
 function drawAsphaltHeight(ctx: CanvasRenderingContext2D, size: number): void {
-  ctx.fillStyle = '#808890';
+  ctx.fillStyle = '#8b9dad';
   ctx.fillRect(0, 0, size, size);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
@@ -37,11 +37,11 @@ function drawAsphaltHeight(ctx: CanvasRenderingContext2D, size: number): void {
       ctx.fillRect(x, y, 1, 1);
     }
   }
-  ctx.fillStyle = 'rgba(210, 225, 240, 0.14)';
+  ctx.fillStyle = 'rgba(237, 231, 217, 0.14)';
   for (let y = 18; y < size; y += 38) {
     ctx.fillRect(0, y, size, 2);
   }
-  ctx.fillStyle = 'rgba(20, 24, 30, 0.12)';
+  ctx.fillStyle = 'rgba(10, 18, 32, 0.12)';
   for (let i = 0; i < 120; i++) {
     const x = pbrHashNoise(i, 1, 9) * size;
     const y = pbrHashNoise(i, 2, 11) * size;
@@ -50,21 +50,21 @@ function drawAsphaltHeight(ctx: CanvasRenderingContext2D, size: number): void {
 }
 
 function drawAsphaltAlbedo(ctx: CanvasRenderingContext2D, size: number): void {
-  ctx.fillStyle = '#3a3f48';
+  ctx.fillStyle = '#235789';
   ctx.fillRect(0, 0, size, size);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const n = pbrHashNoise(x, y, 3);
       if (n > 0.72) {
-        ctx.fillStyle = `rgba(210, 220, 230, ${0.03 + n * 0.05})`;
+        ctx.fillStyle = `rgba(237, 231, 217, ${0.03 + n * 0.05})`;
         ctx.fillRect(x, y, 1, 1);
       } else if (n < 0.18) {
-        ctx.fillStyle = `rgba(20, 22, 26, ${0.04 + n * 0.04})`;
+        ctx.fillStyle = `rgba(10, 18, 32, ${0.04 + n * 0.04})`;
         ctx.fillRect(x, y, 1, 1);
       }
     }
   }
-  ctx.fillStyle = 'rgba(80, 90, 100, 0.18)';
+  ctx.fillStyle = 'rgba(35, 87, 137, 0.18)';
   for (let y = 24; y < size; y += 42) {
     ctx.fillRect(0, y, size, 2);
   }
@@ -117,7 +117,7 @@ function createSidewalkMaps(
   const albedoSurface = createPbrCanvas(size);
   if (!albedoSurface) return {};
   const { canvas: albedo, ctx } = albedoSurface;
-  ctx.fillStyle = '#bfb7ab';
+  ctx.fillStyle = '#8b9dad';
   ctx.fillRect(0, 0, size, size);
   for (let y = 0; y < size; y += 16) {
     for (let x = 0; x < size; x += 16) {
@@ -126,7 +126,7 @@ function createSidewalkMaps(
       ctx.fillRect(x + 1, y + 1, 14, 14);
     }
   }
-  ctx.strokeStyle = 'rgba(90, 82, 72, 0.28)';
+  ctx.strokeStyle = 'rgba(35, 87, 137, 0.28)';
   ctx.lineWidth = 1;
   for (let i = 0; i <= size; i += 16) {
     ctx.beginPath();
@@ -149,11 +149,11 @@ function createSidewalkMaps(
   const heightSurface = createPbrCanvas(size);
   if (!heightSurface) return { map };
   const { canvas: height, ctx: hctx } = heightSurface;
-  hctx.fillStyle = '#a0a0a0';
+  hctx.fillStyle = '#8b9dad';
   hctx.fillRect(0, 0, size, size);
   for (let y = 0; y < size; y += 16) {
     for (let x = 0; x < size; x += 16) {
-      hctx.fillStyle = '#c8c8c8';
+      hctx.fillStyle = '#ede7d9';
       hctx.fillRect(x + 2, y + 2, 12, 12);
     }
   }
@@ -176,9 +176,9 @@ function createQuayMaps(registry: TextureRegistry, detail: PbrDetailLevel): Grou
   const albedoSurface = createPbrCanvas(size);
   if (!albedoSurface) return {};
   const { canvas: albedo, ctx } = albedoSurface;
-  ctx.fillStyle = '#a8b0bc';
+  ctx.fillStyle = '#8b9dad';
   ctx.fillRect(0, 0, size, size);
-  ctx.strokeStyle = 'rgba(70, 78, 88, 0.32)';
+  ctx.strokeStyle = 'rgba(35, 87, 137, 0.32)';
   ctx.lineWidth = 1;
   for (let x = 0; x <= size; x += 16) {
     ctx.beginPath();
@@ -195,7 +195,7 @@ function createQuayMaps(registry: TextureRegistry, detail: PbrDetailLevel): Grou
   for (let i = 0; i < 180; i++) {
     const x = pbrHashNoise(i, 4, 7) * size;
     const y = pbrHashNoise(i, 5, 8) * size;
-    ctx.fillStyle = `rgba(255,255,255,${0.02 + pbrHashNoise(i, 6, 9) * 0.05})`;
+    ctx.fillStyle = `rgba(237, 231, 217,${0.02 + pbrHashNoise(i, 6, 9) * 0.05})`;
     ctx.fillRect(x, y, 2, 1);
   }
 
@@ -209,11 +209,11 @@ function createQuayMaps(registry: TextureRegistry, detail: PbrDetailLevel): Grou
   const heightSurface = createPbrCanvas(size);
   if (!heightSurface) return { map };
   const { canvas: height, ctx: hctx } = heightSurface;
-  hctx.fillStyle = '#909090';
+  hctx.fillStyle = '#8b9dad';
   hctx.fillRect(0, 0, size, size);
   for (let y = 0; y < size; y += 16) {
     for (let x = 0; x < size; x += 16) {
-      hctx.fillStyle = '#b8b8b8';
+      hctx.fillStyle = '#8b9dad';
       hctx.fillRect(x + 1, y + 1, 14, 14);
     }
   }
@@ -239,7 +239,7 @@ function createEsplanadeMaps(
   const albedoSurface = createPbrCanvas(size);
   if (!albedoSurface) return {};
   const { canvas: albedo, ctx } = albedoSurface;
-  ctx.fillStyle = '#c8c0b4';
+  ctx.fillStyle = '#ede7d9';
   ctx.fillRect(0, 0, size, size);
   for (let y = 0; y < size; y += 32) {
     for (let x = 0; x < size; x += 32) {
@@ -248,7 +248,7 @@ function createEsplanadeMaps(
       ctx.fillRect(x + 2, y + 2, 28, 28);
     }
   }
-  ctx.strokeStyle = 'rgba(100, 92, 82, 0.25)';
+  ctx.strokeStyle = 'rgba(35, 87, 137, 0.25)';
   for (let i = 0; i <= size; i += 32) {
     ctx.beginPath();
     ctx.moveTo(i, 0);
@@ -270,11 +270,11 @@ function createEsplanadeMaps(
   const heightSurface = createPbrCanvas(size);
   if (!heightSurface) return { map };
   const { canvas: height, ctx: hctx } = heightSurface;
-  hctx.fillStyle = '#989898';
+  hctx.fillStyle = '#8b9dad';
   hctx.fillRect(0, 0, size, size);
   for (let y = 0; y < size; y += 32) {
     for (let x = 0; x < size; x += 32) {
-      hctx.fillStyle = '#c0c0c0';
+      hctx.fillStyle = '#ede7d9';
       hctx.fillRect(x + 3, y + 3, 26, 26);
     }
   }
@@ -297,11 +297,11 @@ function createCurbMaps(registry: TextureRegistry, detail: PbrDetailLevel): Grou
   const albedoSurface = createPbrCanvas(size);
   if (!albedoSurface) return {};
   const { canvas: albedo, ctx } = albedoSurface;
-  ctx.fillStyle = '#9aa3ad';
+  ctx.fillStyle = '#8b9dad';
   ctx.fillRect(0, 0, size, size);
   for (let x = 0; x < size; x++) {
     const n = pbrHashNoise(x, 0, 21);
-    ctx.fillStyle = `rgba(255,255,255,${0.02 + n * 0.04})`;
+    ctx.fillStyle = `rgba(237, 231, 217,${0.02 + n * 0.04})`;
     ctx.fillRect(x, 0, 1, size);
   }
 
@@ -315,11 +315,11 @@ function createCurbMaps(registry: TextureRegistry, detail: PbrDetailLevel): Grou
   const heightSurface = createPbrCanvas(size);
   if (!heightSurface) return { map };
   const { canvas: height, ctx: hctx } = heightSurface;
-  hctx.fillStyle = '#a8a8a8';
+  hctx.fillStyle = '#8b9dad';
   hctx.fillRect(0, 0, size, size);
   for (let i = 0; i < 40; i++) {
     const x = Math.floor(pbrHashNoise(i, 1, 31) * size);
-    hctx.fillStyle = '#c0c0c0';
+    hctx.fillStyle = '#ede7d9';
     hctx.fillRect(x, 0, 2, size);
   }
 

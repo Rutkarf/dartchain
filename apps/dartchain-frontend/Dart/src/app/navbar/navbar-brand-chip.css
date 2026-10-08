@@ -35,7 +35,7 @@
   min-height: var(--nv-brand-led-size, 5px);
   margin: 0;
   padding: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   flex-shrink: 0;
   transform-origin: center center;
 }

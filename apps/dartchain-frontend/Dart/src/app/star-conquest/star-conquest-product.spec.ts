@@ -40,7 +40,7 @@ import { starQuestById } from './star-conquest.mock';
 import { STAR_CONQUEST_OVERLAY } from './star-conquest-scale';
 import { starConquestDprCap } from './star-conquest-scale';
 
-describe('Star Conquest product modules', () => {
+describe('Conquête stellaire product modules', () => {
   beforeEach(() => {
     clearStarConquestDiag();
   });

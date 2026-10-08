@@ -17,7 +17,7 @@ export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
       },
       {
         title: 'Mécanisme de stabilité',
-        body: 'L’ancrage est d’abord un mécanisme d’affichage : le hub, le graphique et l’exchange panel synchronisent la cotation R4V3/CHF. Les tokens LaunchLab restent exprimés relativement au R4V3.',
+        body: 'L’ancrage est d’abord un mécanisme d’affichage : le hub, le graphique et l’exchange panel synchronisent la cotation R4V3/CHF. Les tokens Laboratoire restent exprimés relativement au R4V3.',
       },
       {
         title: 'Garanties affichées',
@@ -40,17 +40,17 @@ export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
       },
       {
         title: 'Débit',
-        body: 'Le réseau de démonstration supporte un flux continu d’opérations LaunchLab sans file d’attente perceptible pour l’utilisateur.',
+        body: 'Le réseau de démonstration supporte un flux continu d’opérations Laboratoire sans file d’attente perceptible pour l’utilisateur.',
       },
       {
         title: 'Cas d’usage',
-        body: 'Swap R4V3 ↔ LaunchLab, crédit faucet, navigation graphique + exchange : chaque action est pensée pour rester instantanée côté UX.',
+        body: 'Swap R4V3 ↔ Laboratoire, crédit faucet, navigation graphique + exchange : chaque action est pensée pour rester instantanée côté UX.',
       },
     ],
   },
   {
     id: 'utility',
-    label: 'Utility',
+    label: 'Utilité',
     detail: 'Monnaie native de l’écosystème DartChain',
     icon: '⚡',
     accent: 'magenta',
@@ -59,7 +59,7 @@ export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
     sections: [
       {
         title: 'À quoi sert-il ?',
-        body: 'Quote LaunchLab, swap, faucet, affichage des prix et synchronisation navbar ↔ graphique ↔ exchange panel.',
+        body: 'Quote Laboratoire, swap, faucet, affichage des prix et synchronisation navbar ↔ graphique ↔ exchange panel.',
       },
       {
         title: 'Où l’utiliser ?',
@@ -67,14 +67,14 @@ export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
       },
       {
         title: 'Dans l’écosystème',
-        body: 'Tous les tokens LaunchLab (PXD, NVFI, LAB3, ORB) sont cotés vs R4V3. C’est le pivot économique testnet.',
+        body: 'Tous les tokens Laboratoire (PXD, NVFI, LAB3, ORB) sont cotés vs R4V3. C’est le pivot économique testnet.',
       },
     ],
   },
   {
     id: 'transparent',
     label: 'Transparent',
-    detail: 'White paper, traçabilité et gouvernance documentée',
+    detail: 'Livre blanc, traçabilité et gouvernance documentée',
     icon: '◉',
     accent: 'gold',
     drawerTitle: 'Transparence & traçabilité',
@@ -82,7 +82,7 @@ export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
     sections: [
       {
         title: 'Documentation',
-        body: 'White paper téléchargeable, FAQ officielle et hub interactif — trois niveaux de profondeur pour le même sujet.',
+        body: 'Livre blanc téléchargeable, FAQ officielle et hub interactif — trois niveaux de profondeur pour le même sujet.',
       },
       {
         title: 'Traçabilité',
@@ -108,7 +108,7 @@ export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
         body: 'DartChain testnet isole les fonds de démonstration du mainnet. Les clés privées restent sous contrôle utilisateur via le wallet intégré.',
       },
       {
-        title: 'Wallet',
+        title: 'Portefeuille',
         body: 'Ne partagez jamais seed phrase ou clé privée. Utilisez des mots de passe forts pour votre compte application.',
       },
       {
@@ -120,14 +120,14 @@ export const R4V3_HUB_PILLARS: readonly R4v3HubPillar[] = [
   {
     id: 'ecosystem',
     label: 'Écosystème',
-    detail: 'LaunchLab, swap et hub connectés',
+    detail: 'Laboratoire, swap et hub connectés',
     icon: '◎',
     accent: 'blue',
     drawerTitle: 'R4V3 dans l’écosystème',
-    drawerSummary: 'Le token natif au centre de LaunchLab, du graphique et du swap.',
+    drawerSummary: 'Le token natif au centre de Laboratoire, du graphique et du swap.',
     sections: [
       {
-        title: 'LaunchLab',
+        title: 'Laboratoire',
         body: 'Création et cotation de tokens vs R4V3. Sélection navbar → sync graphique + paire exchange automatique.',
       },
       {

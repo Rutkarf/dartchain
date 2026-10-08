@@ -141,19 +141,19 @@ class QuestServiceTest {
     }
 
     @Test
-    void faucetQuestCompletionDoesNotDoubleMint() {
+    void faucetQuestCompletionLeavesRewardUnclaimed() {
         BigDecimal balanceBefore = blockchainService.getBalance(walletAddress);
 
         questService.completeFaucetClaimQuest(userId);
 
         var state = questService.getState(authHeader);
         assertThat(state.tasks().get("faucet-claim").progress()).isEqualTo(1);
-        assertThat(state.tasks().get("faucet-claim").claimed()).isTrue();
+        assertThat(state.tasks().get("faucet-claim").claimed()).isFalse();
         assertThat(blockchainService.getBalance(walletAddress)).isEqualByComparingTo(balanceBefore);
     }
 
     @Test
-    void flushPendingAutoClaimsMintsDailyLoginAfterWalletLink() throws Exception {
+    void walletLinkDoesNotAutoMintDailyLoginReward() throws Exception {
         authService.register(
                 new RegisterRequest("bob", "bob@dartchain.dev", "password123"),
                 AuthServiceTestSupport.LOCAL_IP
@@ -179,19 +179,27 @@ class QuestServiceTest {
         );
 
         var stateAfter = questService.getState(bobAuth);
-        assertThat(stateAfter.tasks().get("daily-login").claimed()).isTrue();
+        assertThat(stateAfter.tasks().get("daily-login").claimed()).isFalse();
+        assertThat(blockchainService.getBalance(bobWallet)).isEqualByComparingTo(BigDecimal.ZERO);
+
+        var claimed = questService.claimTask(bobAuth, "daily-login");
+        assertThat(claimed.tasks().get("daily-login").claimed()).isTrue();
         assertThat(blockchainService.getBalance(bobWallet)).isEqualByComparingTo("1.00");
     }
 
     @Test
-    void serverHookAutoClaimsFaucetQuestReward() {
+    void serverHookRecordsProgressWithoutAutoClaim() {
         BigDecimal balanceBefore = blockchainService.getBalance(walletAddress);
 
         questService.recordProgressForUserId(userId, "faucet-claim", 1);
 
         var state = questService.getState(authHeader);
         assertThat(state.tasks().get("faucet-claim").progress()).isEqualTo(1);
-        assertThat(state.tasks().get("faucet-claim").claimed()).isTrue();
+        assertThat(state.tasks().get("faucet-claim").claimed()).isFalse();
+        assertThat(blockchainService.getBalance(walletAddress)).isEqualByComparingTo(balanceBefore);
+
+        var claimed = questService.claimTask(authHeader, "faucet-claim");
+        assertThat(claimed.tasks().get("faucet-claim").claimed()).isTrue();
         assertThat(blockchainService.getBalance(walletAddress))
                 .isEqualByComparingTo(balanceBefore.add(new BigDecimal("1.00")));
     }

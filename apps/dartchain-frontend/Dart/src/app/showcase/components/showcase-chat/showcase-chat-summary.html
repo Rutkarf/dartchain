@@ -1,8 +1,7 @@
 <div
-  class="showcase-chat-bar__fill"
-  role="status"
-  aria-live="polite"
-  [attr.aria-label]="'Résumé du chat ' + roomLabel()"
+ class="showcase-chat-bar__fill"
+ role="status"
+ aria-live="polite"
 >
   <div class="showcase-chat-main showcase-chat-main--preview">
     <span
@@ -34,12 +33,12 @@
     @if (hasUnread()) {
       <span class="unread-badge-stack" [class.is-transitioning]="isMessageTransitioning()">
         @if (isMessageTransitioning() && previousUnreadCount()) {
-          <span class="unread-badge unread-badge--out" [attr.aria-label]="previousUnreadCount() + ' non lus'">
+          <span class="unread-badge unread-badge--out">
             {{ previousUnreadCount() > 99 ? '99+' : previousUnreadCount() }}
           </span>
         }
 
-        <span class="unread-badge" [class.unread-badge--in]="isMessageTransitioning()" [attr.aria-label]="unreadCount() + ' non lus'">
+        <span class="unread-badge" [class.unread-badge--in]="isMessageTransitioning()">
           {{ unreadCount() > 99 ? '99+' : unreadCount() }}
         </span>
       </span>

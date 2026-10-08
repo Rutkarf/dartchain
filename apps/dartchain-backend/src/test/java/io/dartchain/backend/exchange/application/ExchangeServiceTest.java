@@ -13,6 +13,9 @@ import io.dartchain.backend.blockchain.application.BlockchainService;
 import io.dartchain.backend.blockchain.application.PendingTransactionService;
 import io.dartchain.backend.exchange.application.CryptoRatesProxyService;
 import io.dartchain.backend.exchange.application.ExchangeService;
+import io.dartchain.backend.wallet.JsonWalletBalanceStore;
+import io.dartchain.backend.wallet.dto.WalletPortfolioResponse;
+import io.dartchain.backend.wallet.store.WalletBalanceStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -34,6 +37,7 @@ class ExchangeServiceTest {
     Path tempDir;
 
     private ExchangeLedgerStore ledgerStore;
+    private WalletBalanceStore walletBalanceStore;
     private BlockchainService blockchainService;
     private CryptoRatesProxyService cryptoRates;
     private PendingTransactionService pendingTransactionService;
@@ -45,10 +49,10 @@ class ExchangeServiceTest {
     @BeforeEach
     void setUp() {
         Path ledgerPath = tempDir.resolve("exchange-ledger.json");
-        ledgerStore = new JsonExchangeLedgerStore(
-                new com.fasterxml.jackson.databind.ObjectMapper(),
-                ledgerPath.toString()
-        );
+        Path balancesPath = tempDir.resolve("wallet-balances.json");
+        var objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        ledgerStore = new JsonExchangeLedgerStore(objectMapper, ledgerPath.toString());
+        walletBalanceStore = new JsonWalletBalanceStore(objectMapper, balancesPath.toString());
 
         blockchainService = mock(BlockchainService.class);
         cryptoRates = mock(CryptoRatesProxyService.class);
@@ -70,6 +74,7 @@ class ExchangeServiceTest {
                 blockchainService,
                 cryptoRates,
                 ledgerStore,
+                walletBalanceStore,
                 pendingTransactionService,
                 newsService,
                 launchLabService,
@@ -107,6 +112,14 @@ class ExchangeServiceTest {
                 .isEqualByComparingTo("90");
         assertThat(exchangeService.getPanel(wallet, "R4V3", "DART").toBalance())
                 .isGreaterThan(BigDecimal.ZERO);
+
+        WalletPortfolioResponse portfolio = exchangeService.getPortfolio(wallet);
+        assertThat(portfolio.holdings()).isNotEmpty();
+        assertThat(portfolio.holdings().get(0).token()).isEqualTo("R4V3");
+        assertThat(new BigDecimal(portfolio.holdings().get(0).balance())).isEqualByComparingTo("90");
+        assertThat(portfolio.otherTokenCount()).isGreaterThan(0);
+        assertThat(walletBalanceStore.find(wallet, "R4V3")).isPresent();
+        assertThat(walletBalanceStore.find(wallet, "DART")).isPresent();
 
         verify(newsService).publishSwapEvent(anyString(), any(ExchangeSwapResponse.class));
     }

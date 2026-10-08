@@ -1,5 +1,5 @@
 import {
-  MARSEILLE_COORDINATE_SYSTEM_VERSION,
+  METAVERSE_COORDINATE_SYSTEM_VERSION,
   toWorldCoordinate,
 } from './coordinate-system';
 import type {
@@ -136,7 +136,7 @@ function mapWorld(dto: PlacementWorldDto | undefined): ReturnType<typeof toWorld
   }
   if (
     dto.coordinateSystemVersion &&
-    dto.coordinateSystemVersion !== MARSEILLE_COORDINATE_SYSTEM_VERSION
+    dto.coordinateSystemVersion !== METAVERSE_COORDINATE_SYSTEM_VERSION
   ) {
     return null;
   }

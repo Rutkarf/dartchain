@@ -41,9 +41,9 @@ describe('building-facade.factory', () => {
   it('Phase 7 — PBR maps en high', () => {
     if (!canvas2dAvailable()) return;
     const mat = createHaussmannWallMaterial(42, undefined, {
-      baseColor: 0xcbbda6,
-      windowColor: '#d9ebf5',
-      accentColor: '#8d6f55',
+      baseColor: 0xede7d9,
+      windowColor: '#ede7d9',
+      accentColor: '#8b9dad',
       quality: 'high',
     });
     expect(mat.map).toBeDefined();

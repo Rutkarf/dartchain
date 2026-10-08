@@ -13,7 +13,7 @@
         aria-hidden="true"
       ></div>
 
-      @if (phase() === 'playing' && ageOk()) {
+      @if (phase() === 'playing') {
         <div
           class="arena-hud__cross"
           [class.arena-hud__cross--lock]="!!lockedTarget()"
@@ -34,12 +34,11 @@
         </div>
 
         <button
-          type="button"
-          class="arena-hud__fire"
-          aria-label="Tirer {{ weaponName }}"
-          (pointerdown)="fire($event)"
-          (click)="fire($event)"
-        >
+ type="button"
+ class="arena-hud__fire"
+ (pointerdown)="fire($event)"
+ (click)="fire($event)"
+ >
           FIRE
         </button>
       }
@@ -50,19 +49,9 @@
         </button>
       }
 
-      @if (!ageOk()) {
-        <div class="arena-hud__panel arena-hud__panel--age" role="dialog" aria-label="Age gate">
-          <h2>Arène BB — Kill-to-earn 16+</h2>
-          <p class="arena-hud__lead">
-            Arcade fictionnel. Loot = ledger faucet non claimé uniquement. Wallet jamais touché.
-          </p>
-          <button type="button" class="arena-hud__cta" (click)="acceptAge()">J’ai 16+ · Jouer</button>
-        </div>
-      }
-
       @if (phase() === 'rules') {
-        <div class="arena-hud__panel" role="dialog" aria-label="Règles Arène BB">
-          <h2>Kill-to-earn</h2>
+        <div class="arena-hud__panel" role="dialog">
+          <h2>MetaVerseBB</h2>
           <p class="arena-hud__lead">{{ kteTagline() }}</p>
           <ul>
             <li>KO bots / peers → ƒ ledger arène (streak = multi)</li>
@@ -84,29 +73,29 @@
 
           <p class="arena-hud__lead">Mode</p>
           <div class="arena-hud__row">
-            <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'ffa-bots'" (click)="setMode('ffa-bots')">FFA</button>
+            <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'ffa-bots'" (click)="setMode('ffa-bots')">Mêlée</button>
             <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'horde'" (click)="setMode('horde')">Horde</button>
             <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'duel-bots'" (click)="setMode('duel-bots')">Duel</button>
-            <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'ffa-peers'" (click)="setMode('ffa-peers')">Peers</button>
+            <button type="button" class="arena-hud__chip-btn" [class.is-on]="mode() === 'ffa-peers'" (click)="setMode('ffa-peers')">Pairs</button>
           </div>
 
-          <p class="arena-hud__lead">Skin</p>
+          <p class="arena-hud__lead">Apparence</p>
           <div class="arena-hud__row">
             <button type="button" class="arena-hud__chip-btn" [class.is-on]="skin() === 'cyan'" (click)="setSkin('cyan')">Cyan</button>
             <button type="button" class="arena-hud__chip-btn" [class.is-on]="skin() === 'r4v3'" (click)="setSkin('r4v3')">R4V3</button>
             <button type="button" class="arena-hud__chip-btn" [class.is-on]="skin() === 'pxd'" (click)="setSkin('pxd')">PXD</button>
           </div>
 
-          <p class="arena-hud__lead">Room WS</p>
+          <p class="arena-hud__lead">Salle</p>
           <div class="arena-hud__row">
             <input class="arena-hud__input" [value]="roomDraft()" (input)="onRoomInput($event)" aria-label="Room" />
-            <button type="button" class="arena-hud__chip-btn" (click)="applyRoom()">Set</button>
+            <button type="button" class="arena-hud__chip-btn" (click)="applyRoom()">Valider</button>
           </div>
           <p class="arena-hud__lead arena-hud__chip--dim">
             room={{ roomId() }} · {{ transportMode() }} · bots ×{{ targetCount() }} · peers {{ peerCount() }}
           </p>
 
-          <p class="arena-hud__lead">Top earners</p>
+          <p class="arena-hud__lead">Meilleurs gains</p>
           <ul class="arena-hud__lb">
             @for (row of leaderboard(); track row.name) {
               <li>{{ row.name }} · +{{ row.earned }}ƒ · {{ row.kills }}K</li>
@@ -123,16 +112,14 @@
 
     <!-- Barre stats plaquee tout en bas de page -->
     <div class="arena-hud__chrome">
-      <div class="arena-hud__strip" aria-label="Arène BB Kill-to-earn">
+      <div class="arena-hud__strip">
         <span class="arena-hud__brand">{{ title }}</span>
-        <span class="arena-hud__kte">{{ kteTag }}</span>
 
         @if (phase() === 'playing' && local(); as player) {
           <span class="arena-hud__hp" title="Santé">
             <span class="arena-hud__meter">
               <span [style.width.%]="healthPct()"></span>
             </span>
-            {{ healthPct() }}
           </span>
           <span class="arena-hud__chip">{{ player.kills }}/{{ player.deaths }}</span>
           @if (streak() > 0) {
@@ -157,7 +144,7 @@
           }
         } @else if (phase() === 'eliminated') {
           <span class="arena-hud__chip">KO</span>
-          <button type="button" class="arena-hud__mini" (click)="respawn()">↑</button>
+          <button type="button" class="arena-hud__mini arena-hud__mini--inline" (click)="respawn()">↑</button>
         }
 
         @if (paused()) {
@@ -170,7 +157,7 @@
       </div>
 
       @if (killCamActive()) {
-        <p class="arena-hud__toast arena-hud__toast--ko-big" role="status">KILL · EARN</p>
+        <p class="arena-hud__toast arena-hud__toast--ko-big" role="status">ÉLIMINÉ · GAIN</p>
       }
       @if (lastLoot(); as loot) {
         @if (loot.accepted && loot.lootAmount > 0 && phase() === 'playing') {

@@ -27,9 +27,13 @@ import {
 } from '@core/constants/exchange-launchpad.constants';
 import {
   MARKET_ASSETS,
+  MARKET_CATEGORY_RAIL,
+  MARKET_FILTER_OPTIONS,
   MarketAssetConfig,
   MarketFilter,
   MarketSortMode,
+  isMarketFilter,
+  marketOfferKindLabel,
 } from './market-panel.constants';
 import {
   MarketAssetRow,
@@ -37,6 +41,7 @@ import {
 } from './market-panel.model';
 import { MarketPanelService } from './market-panel.service';
 import { MarketTokenDrawerComponent } from './market-token-drawer';
+import { MarketCarousel3dComponent } from './market-carousel-3d';
 import {
   DOCK_REFRESH_EVENT,
   SHOWCASE_REFRESH_EVENT,
@@ -48,7 +53,7 @@ type StatusBannerTone = 'error' | 'warn' | 'info';
 @Component({
   selector: 'app-market-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, MarketTokenDrawerComponent],
+  imports: [CommonModule, FormsModule, MarketTokenDrawerComponent, MarketCarousel3dComponent],
   templateUrl: './market-panel.html',
   styleUrls: ['./market-panel.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,14 +67,8 @@ export class MarketPanelComponent implements OnDestroy {
   private readonly walletSession = inject(WalletSessionService);
   private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly filterOptions: ReadonlyArray<{ id: MarketFilter; label: string }> = [
-    { id: 'all', label: 'TOUS' },
-    { id: 'tradable', label: 'TRAD' },
-    { id: 'r4v3', label: 'R4V3' },
-    { id: 'fav', label: 'FAV' },
-    { id: 'gainers', label: '↑' },
-    { id: 'losers', label: '↓' },
-  ];
+  protected readonly filterOptions = MARKET_FILTER_OPTIONS;
+  protected readonly categoryRail = MARKET_CATEGORY_RAIL;
   protected readonly sortOptions: ReadonlyArray<{ id: MarketSortMode; label: string }> = [
     { id: 'fav', label: '★' },
     { id: 'change', label: 'Δ%' },
@@ -106,23 +105,37 @@ export class MarketPanelComponent implements OnDestroy {
     return MARKET_ASSETS.filter((config) => allowed.has(config.exchangeToken.toUpperCase()));
   });
 
-  protected readonly filteredRows = computed(() => {
+  protected readonly filteredRows = computed(() =>
+    this.rowsForCategory(this.filter(), this.searchQuery().trim())
+  );
+
+  /** Une lane 3D par catégorie du rail (swipe vertical). */
+  protected readonly carouselLanes = computed(() => {
     const query = this.searchQuery().trim();
+    return this.categoryRail.map((category) => ({
+      category,
+      items: this.rowsForCategory(category.id, query),
+    }));
+  });
 
-    return this.rows().filter((row) => {
-      if (!this.tradableAssets().some((asset) => asset.exchangeToken === row.config.exchangeToken)) {
-        return false;
-      }
+  protected readonly featuredDrop = computed(() => {
+    const rows = this.sortedRows();
+    const nft = rows.find((row) => row.config.offerKind === 'nft');
+    if (nft) {
+      return nft;
+    }
+    return rows.find((row) => row.config.native) ?? rows[0] ?? null;
+  });
 
-      if (this.liveFilter()) {
-        const status = row.launchProject?.status ?? row.metrics.statusLabel;
-        if (status !== 'LIVE' && !row.config.native) {
-          return false;
-        }
-      }
-
-      return this.matchesSearch(row, query);
-    });
+  protected readonly gridRows = computed(() => {
+    const featured = this.featuredDrop();
+    const rows = this.sortedRows();
+    if (!featured || this.filter() !== 'all') {
+      return rows;
+    }
+    return rows.filter(
+      (row) => row.config.exchangeToken !== featured.config.exchangeToken
+    );
   });
 
   protected readonly sortedRows = computed(() => {
@@ -172,15 +185,32 @@ export class MarketPanelComponent implements OnDestroy {
   });
 
   protected readonly emptyStateMessage = computed(() => {
-    if (this.liveFilter()) {
-      return 'Aucun token live pour le moment';
+    switch (this.filter()) {
+      case 'nft':
+      case 'drop':
+        return 'Aucun drop NFT pour le moment';
+      case 'service':
+        return 'Aucun service numérique disponible';
+      case 'asset':
+        return 'Aucun actif listé';
+      case 'fav':
+        return 'Aucun favori — étoilez un produit';
+      case 'live':
+        return 'Aucun token live pour le moment';
+      default:
+        break;
     }
 
     if (this.searchQuery().trim()) {
-      return 'Aucun actif ne correspond à la recherche';
+      return 'Aucun produit ne correspond à la recherche';
     }
 
-    return 'Aucun actif disponible';
+    return 'Aucun produit disponible';
+  });
+
+  protected readonly resultCountLabel = computed(() => {
+    const count = this.filteredRows().length;
+    return `${count} résultat${count > 1 ? 's' : ''}`;
   });
 
   protected readonly filteredTrades = computed(() => {
@@ -287,7 +317,24 @@ export class MarketPanelComponent implements OnDestroy {
 
   protected setFilter(next: MarketFilter): void {
     this.filter.set(next);
+    this.liveFilter.set(next === 'live');
     this.focusedRowIndex.set(0);
+  }
+
+  protected onCarouselCategoryChange(next: MarketFilter): void {
+    this.setFilter(next);
+  }
+
+  protected onCarouselItemFocus(row: MarketAssetRow | null): void {
+    if (!row) {
+      return;
+    }
+    const index = this.sortedRows().findIndex(
+      (entry) => entry.config.exchangeToken === row.config.exchangeToken
+    );
+    if (index >= 0) {
+      this.focusedRowIndex.set(index);
+    }
   }
 
   protected setSortMode(next: MarketSortMode): void {
@@ -302,12 +349,45 @@ export class MarketPanelComponent implements OnDestroy {
     this.setSortMode(order[(index + 1) % order.length] ?? 'fav');
   }
 
+  protected offerKindLabel(row: MarketAssetRow): string {
+    return marketOfferKindLabel(row.config.offerKind);
+  }
+
+  protected stockLabel(row: MarketAssetRow): string {
+    return row.config.stockLabel;
+  }
+
+  protected productPitch(row: MarketAssetRow): string {
+    return row.metrics.description || row.config.shortPitch;
+  }
+
+  protected primaryCtaLabel(row: MarketAssetRow): string {
+    if (row.config.offerKind === 'nft') {
+      return 'Acheter';
+    }
+    if (row.config.offerKind === 'service') {
+      return 'Commander';
+    }
+    return row.config.native ? 'Échanger' : 'Acheter';
+  }
+
+  protected isFilterActive(id: MarketFilter): boolean {
+    return this.filter() === id;
+  }
+
   protected openTokenDrawer(row: MarketAssetRow): void {
     this.selectFeatured(row);
     this.drawerRow.set(row);
     this.focusedRowIndex.set(this.sortedRows().findIndex(
       (entry) => entry.config.exchangeToken === row.config.exchangeToken
     ));
+  }
+
+  protected openFeaturedDrop(): void {
+    const drop = this.featuredDrop();
+    if (drop) {
+      this.openTokenDrawer(drop);
+    }
   }
 
   protected closeTokenDrawer(): void {
@@ -342,24 +422,6 @@ export class MarketPanelComponent implements OnDestroy {
     }
 
     this.toggleFavorite(row, { stopPropagation: () => undefined } as MouseEvent);
-  }
-
-  protected onDrawerAlertToggle(): void {
-    const row = this.drawerRow();
-    if (!row) {
-      return;
-    }
-
-    this.togglePriceAlert(row, { stopPropagation: () => undefined } as MouseEvent);
-  }
-
-  protected onDrawerExchangeOpen(): void {
-    const row = this.drawerRow();
-    if (!row) {
-      return;
-    }
-
-    this.openInExchange(row, { stopPropagation: () => undefined } as MouseEvent);
   }
 
   protected selectFeatured(row: MarketAssetRow): void {
@@ -430,7 +492,7 @@ export class MarketPanelComponent implements OnDestroy {
 
     this.brandCrypto.requestExchangeTrade(EXCHANGE_NATIVE_TOKEN, 'PXD');
     this.brandCrypto.select('R4V3');
-    this.showTradeHint('Swap R4V3 → token LaunchLab');
+    this.showTradeHint('Échange R4V3 → jeton du laboratoire');
     this.scrollToSwap();
   }
 
@@ -453,8 +515,8 @@ export class MarketPanelComponent implements OnDestroy {
     }
 
     return trimmed
-      .replace('LaunchLab', 'LL')
-      .replace('Peg CHF', 'Peg')
+      .replace('Laboratoire', 'Labo')
+      .replace('Parité CHF', 'Parité')
       .replace(/\s*R4V3\b/gi, '')
       .replace(/\s+/g, ' ')
       .trim();
@@ -568,9 +630,42 @@ export class MarketPanelComponent implements OnDestroy {
     return index === this.focusedRowIndex() ? 0 : -1;
   }
 
+  protected cardTabIndex(row: MarketAssetRow): number {
+    const index = this.sortedRows().findIndex(
+      (entry) => entry.config.exchangeToken === row.config.exchangeToken
+    );
+    return this.rowTabIndex(index);
+  }
+
+  protected isCardFocused(row: MarketAssetRow): boolean {
+    const focused = this.sortedRows()[this.focusedRowIndex()];
+    return focused?.config.exchangeToken === row.config.exchangeToken;
+  }
+
   @HostListener('keydown', ['$event'])
   protected onPanelKeydown(event: KeyboardEvent): void {
     if (this.drawerRow()) {
+      return;
+    }
+
+    const rail = this.categoryRail;
+    const filterIndex = rail.findIndex((entry) => entry.id === this.filter());
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      const next = rail[Math.min(filterIndex + 1, rail.length - 1)];
+      if (next) {
+        this.setFilter(next.id);
+      }
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      const prev = rail[Math.max(filterIndex - 1, 0)];
+      if (prev) {
+        this.setFilter(prev.id);
+      }
       return;
     }
 
@@ -579,14 +674,16 @@ export class MarketPanelComponent implements OnDestroy {
       return;
     }
 
-    if (event.key === 'ArrowDown') {
+    if (event.key === 'ArrowRight') {
       event.preventDefault();
       this.focusedRowIndex.update((value) => Math.min(value + 1, rows.length - 1));
+      return;
     }
 
-    if (event.key === 'ArrowUp') {
+    if (event.key === 'ArrowLeft') {
       event.preventDefault();
       this.focusedRowIndex.update((value) => Math.max(value - 1, 0));
+      return;
     }
 
     if (event.key === 'Enter') {
@@ -601,6 +698,53 @@ export class MarketPanelComponent implements OnDestroy {
       event.preventDefault();
       this.openFocusedTrade();
     }
+  }
+
+  private rowsForCategory(filter: MarketFilter, query: string): MarketAssetRow[] {
+    const favorites = this.favorites();
+    const tradable = new Set(
+      this.tradableAssets().map((asset) => asset.exchangeToken.toUpperCase())
+    );
+
+    const matched = this.rows().filter((row) => {
+      if (!tradable.has(row.config.exchangeToken.toUpperCase())) {
+        return false;
+      }
+
+      if (filter === 'fav' && !favorites.has(row.config.exchangeToken) && !row.favorite) {
+        return false;
+      }
+
+      if (filter === 'nft' || filter === 'service' || filter === 'asset') {
+        if (row.config.offerKind !== filter) {
+          return false;
+        }
+      }
+
+      if (filter === 'drop' && row.config.offerKind !== 'nft') {
+        return false;
+      }
+
+      if (filter === 'live') {
+        const status = row.launchProject?.status ?? row.metrics.statusLabel;
+        if (status !== 'LIVE' && !row.config.native) {
+          return false;
+        }
+      }
+
+      return this.matchesSearch(row, query);
+    });
+
+    const pinned = matched.filter((row) => row.config.native);
+    const others = matched
+      .filter((row) => !row.config.native)
+      .sort((left, right) => right.createdAtMs - left.createdAtMs);
+
+    return filter === 'all' || filter === 'asset' || filter === 'live' || filter === 'fav'
+      ? [...pinned, ...others]
+      : others.length
+        ? others
+        : matched;
   }
 
   private matchesSearch(row: MarketAssetRow, query: string): boolean {
@@ -645,6 +789,8 @@ export class MarketPanelComponent implements OnDestroy {
       row.config.displaySymbol.toLowerCase().includes(normalized) ||
       row.config.name.toLowerCase().includes(normalized) ||
       row.config.exchangeToken.toLowerCase().includes(normalized) ||
+      row.config.offerTag.toLowerCase().includes(normalized) ||
+      row.config.shortPitch.toLowerCase().includes(normalized) ||
       (row.config.unitLabel?.toLowerCase().includes(normalized) ?? false)
     );
   }
@@ -668,7 +814,7 @@ export class MarketPanelComponent implements OnDestroy {
       this.chartRange.set(session.chartRange);
     }
 
-    if (session.filter) {
+    if (session.filter && isMarketFilter(session.filter)) {
       this.filter.set(session.filter);
     }
 

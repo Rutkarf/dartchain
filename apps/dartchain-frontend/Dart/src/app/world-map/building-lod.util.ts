@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import type { BuildingLodLevel } from './marseille-twin/building-lod.model';
+import type { BuildingLodLevel } from './metaverse-twin/building-lod.model';
 import { IMPOSTOR_NAME, syncBuildingImpostor } from './building-impostor.util';
 
 const DETAIL_NAME =

@@ -24,7 +24,7 @@ export const QUEST_ORBIT_CONFIG = {
   restoreDurationMs: 550,
   minPolarAngle: 0.25,
   maxPolarAngle: 1.5,
-  /** Camera Z in Star Conquest world space (default pan view). */
+  /** Camera Z in Conquête stellaire world space (default pan view). */
   defaultCameraZ: STAR_CONQUEST_SCALE.cameraZ,
   overviewCameraZ: STAR_CONQUEST_SCALE.cameraZ + 15,
   nodeFocusCameraZ: STAR_CONQUEST_SCALE.cameraZ - 42,
@@ -33,18 +33,18 @@ export const QUEST_ORBIT_CONFIG = {
 
 /** Cyberpunk palette — debug colors per entity type. */
 export const KNOWLEDGE_GRAPH_COLORS = {
-  localNode: '#4fe0ec',
-  remoteNode: '#9b59ff',
-  aiAgentActive: '#ffe066',
-  peerSynced: '#3dff8a',
-  peerDegraded: '#ff9f43',
-  peerOffline: '#8899aa',
-  messageRejected: '#ff4757',
-  selectedNode: '#f8fcff',
-  questNode: '#52e6ed',
-  peerNode: '#7c6cf0',
-  clusterNode: '#ff6bcb',
-  systemNode: '#66ffcc',
+  localNode: '#8b9dad',
+  remoteNode: '#8b9dad',
+  aiAgentActive: '#d5a021',
+  peerSynced: '#09814a',
+  peerDegraded: '#7b0d1e',
+  peerOffline: '#8b9dad',
+  messageRejected: '#7b0d1e',
+  selectedNode: '#ede7d9',
+  questNode: '#8b9dad',
+  peerNode: '#8b9dad',
+  clusterNode: '#ede7d9',
+  systemNode: '#09814a',
 } as const;
 
 export const GRAPH_SYNC_LIMITS = {

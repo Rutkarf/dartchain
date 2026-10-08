@@ -3,9 +3,9 @@ import * as THREE from 'three';
 
 import { atmosphereFogExpDensity, resolveSkyAtmosphereColors } from './sky-atmosphere.config';
 import { buildSkyDome } from './sky-dome.util';
-import { activeAtmospherePreset } from './marseille-atmosphere.config';
+import { activeAtmospherePreset } from './metaverse-atmosphere.config';
 import { mapQualityTier } from './map-configuration';
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 
 describe('sky-atmosphere Phase 14', () => {
   it('résout des couleurs zenith / horizon distinctes', () => {

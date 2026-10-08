@@ -96,12 +96,12 @@ export class QuestsPanelComponent implements OnDestroy {
   });
 
   private readonly questAccentPalette = [
-    '#00d9ff',
-    '#ff6bcb',
-    '#00ff88',
-    '#ffb347',
-    '#b48cff',
-    '#ff5c7a',
+    '#8b9dad',
+    '#ede7d9',
+    '#09814a',
+    '#7b0d1e',
+    '#8b9dad',
+    '#7b0d1e',
   ] as const;
 
   protected readonly errorBanner = computed(() => {

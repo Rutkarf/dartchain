@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
 
 import { applyBuildingLodLevel, buildingLodDistanceFrom, tagBuildingLodCenter } from './building-lod.util';
-import { buildingLodAtDistance } from './marseille-twin/building-lod.model';
+import { buildingLodAtDistance } from './metaverse-twin/building-lod.model';
 import { mapQualityTier } from './map-configuration';
 
 describe('building-lod.util (Phase 3 finition)', () => {

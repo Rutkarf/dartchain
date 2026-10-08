@@ -14,7 +14,7 @@ const EDGE_BOUNCE = 48;
 const CENTER_SPRING = 1.2;
 
 /**
- * Univers Star Conquest — la structure reste fixe.
+ * Univers Conquête stellaire — la structure reste fixe.
  * Le joystick déplace uniquement le point de vue (caméra) en X/Y,
  * sans changer la profondeur ni transformer le contenu.
  */
@@ -26,6 +26,8 @@ export class StarConquestWorld {
   private viewY = 0;
   private targetViewX = 0;
   private targetViewY = 0;
+  /** Décalage monde pour centrer la galaxie dans la bande sous smart bars. */
+  private screenAnchorY = 0;
 
   private stickX = 0;
   private stickY = 0;
@@ -124,6 +126,26 @@ export class StarConquestWorld {
 
   getViewOffset(): { x: number; y: number } {
     return { x: this.viewX, y: this.viewY };
+  }
+
+  /**
+   * Décale la structure pour centrer la galaxie dans la bande jouable
+   * (sous les smart bars, au-dessus du floor — sans bouger MetaVerseBB).
+   */
+  setVerticalScreenAnchor(bandTopPx: number, bandBottomPx: number, viewportH: number): void {
+    const bandCenter = (bandTopPx + bandBottomPx) * 0.5;
+    const deltaPx = bandCenter - viewportH * 0.5;
+    const fovRad = (75 * Math.PI) / 180;
+    const worldPerPx = (2 * Math.tan(fovRad / 2) * CAMERA_Z) / Math.max(viewportH, 1);
+    // Screen Y down → world Y up
+    this.screenAnchorY = -deltaPx * worldPerPx;
+    this.content.position.set(0, this.screenAnchorY, 0);
+  }
+
+  /** Remet l’ancrage vertical (layout quests en coords écran sans double offset). */
+  clearVerticalScreenAnchor(): void {
+    this.screenAnchorY = 0;
+    this.content.position.set(0, 0, 0);
   }
 
   clearEdgeBounce(): void {
@@ -241,7 +263,7 @@ export class StarConquestWorld {
     this.viewX += (this.targetViewX - this.viewX) * follow;
     this.viewY += (this.targetViewY - this.viewY) * follow;
 
-    this.content.position.set(0, 0, 0);
+    this.content.position.set(0, this.screenAnchorY, 0);
     this.content.rotation.set(0, 0, 0);
   }
 

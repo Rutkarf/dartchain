@@ -18,20 +18,23 @@
 ):focus-visible {
   outline: none;
   box-shadow: var(
-    --shadow-focus,
-    0 0 0 2px rgba(5, 10, 18, 0.92),
-    0 0 0 3px rgba(46, 196, 214, 0.45)
+    --state-focus-ring,
+    var(
+      --shadow-focus,
+      0 0 0 2px rgba(10, 18, 32, 0.92),
+      0 0 0 3px rgba(139, 157, 173, 0.45)
+    )
   );
 }
 
 :where(input, textarea, select):focus-visible {
-  border-color: var(--ds-input-border-focus, rgba(46, 196, 214, 0.55));
+  border-color: var(--ds-input-border-focus, rgba(139, 157, 173, 0.55));
 }
 
 /* ── Disabled cohérent ── */
 :where(button, input, textarea, select):disabled,
 :where(button, input, textarea, select)[aria-disabled='true'] {
-  opacity: var(--cta-disabled-opacity, 0.48);
+  opacity: var(--state-disabled-opacity, var(--cta-disabled-opacity, 0.48));
   cursor: not-allowed;
   filter: grayscale(0.12);
 }
@@ -42,33 +45,33 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2, 6px);
-  padding: var(--space-3, 10px);
+  gap: var(--ds-gap-cluster);
+  padding: var(--ds-pad-card);
   text-align: center;
   min-width: 0;
 }
 
 .ds-empty__title {
   margin: 0;
-  font-size: var(--ds-text-label, 0.4375rem);
+  font-size: var(--fs-chat-msg);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ds-text-muted, #5c6b7e);
+  color: var(--ds-text-secondary, #8b9dad);
   line-height: 1.2;
 }
 
 .ds-empty__desc {
   margin: 0;
   max-width: 28ch;
-  font-size: var(--ds-text-caption, 0.5rem);
+  font-size: var(--fs-module);
   font-weight: 500;
-  color: var(--ds-text-secondary, #8b9bb0);
+  color: var(--ds-text-secondary, #8b9dad);
   line-height: 1.35;
 }
 
 .ds-empty__action {
-  margin-top: var(--space-1, 2px);
+  margin-top: var(--ds-gap-seam);
 }
 
 /* Showcase news empty → même langage */
@@ -79,14 +82,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1, 2px);
-  padding: var(--space-2, 6px);
+  gap: var(--ds-gap-seam);
+  padding: var(--ds-pad-panel);
   text-align: center;
-  color: var(--ds-text-secondary, #8b9bb0);
-  font-size: var(--ds-text-caption, 0.5rem);
+  color: var(--ds-text-secondary, #8b9dad);
+  font-size: var(--fs-module);
   line-height: 1.35;
-  border: 1px dashed var(--border-subtle, rgba(255, 255, 255, 0.06));
-  border-radius: var(--radius-sm, 8px);
+  border: var(--stroke-w-hairline) dashed var(--stroke-subtle);
+  border-radius: var(--radius-sm, 4px);
   background: rgba(var(--surface-rgb, 10, 18, 32), 0.35);
 }
 
@@ -106,39 +109,87 @@
 [class*='__skeleton']:not(.ds-skeleton) {
   background: linear-gradient(
     90deg,
-    var(--ds-skeleton-base, rgba(255, 255, 255, 0.04)) 0%,
-    var(--ds-skeleton-shine, rgba(255, 255, 255, 0.08)) 50%,
-    var(--ds-skeleton-base, rgba(255, 255, 255, 0.04)) 100%
+    var(--ds-skeleton-base, rgba(237, 231, 217, 0.04)) 0%,
+    var(--ds-skeleton-shine, rgba(237, 231, 217, 0.08)) 50%,
+    var(--ds-skeleton-base, rgba(237, 231, 217, 0.04)) 100%
   );
   background-size: 200% 100%;
   animation: ds-skeleton-shimmer 1.4s ease-in-out infinite;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-sm, 4px);
   box-shadow: none !important;
   text-shadow: none !important;
 }
 
-/* ── Icon buttons tertiaires ── */
+/* ── Icon buttons — DA : FORM 32 · HUD hit ≥ 24 (WCAG AA) ── */
 .ds-icon-btn,
 .cta.cta--icon-only,
-.wallet-display__icon-btn,
-.collapsed-bar-actions__btn,
-.panel-collapse-control,
-.showcase-meta__search-toggle,
-.showcase-meta__mark-read--icon {
-  min-width: var(--ds-icon-btn, 28px);
-  min-height: var(--ds-icon-btn, 26px);
+.wallet-display__icon-btn {
+  box-sizing: border-box;
+  min-width: var(--comp-btn-form-h, var(--ds-icon-btn, 32px));
+  min-height: var(--comp-btn-form-h, var(--ds-icon-btn, 32px));
 }
 
+/*
+ * HUD chrome @ compact : rester DANS la rangée 16px (smart-bar / tabs).
+ * Avant : hit 24×24 faisait déborder collapse/actions dans la barre voisine.
+ * Face utile = --comp-hud-h ; pas de gonflement WCAG qui casse le stack 250×550.
+ */
+html.vp-compact .ds-icon-btn.cta--hud,
+html.vp-compact .cta.cta--icon-only.cta--hud,
+html.vp-compact .collapsed-bar-actions__btn,
+html.vp-compact .panel-collapse-control,
+html.vp-compact .showcase-meta__search-toggle,
+html.vp-compact .showcase-meta__mark-read--icon,
+html.vp-compact .cta--hud.cta--icon-only {
+  box-sizing: border-box;
+  width: var(--comp-hud-h, 16px);
+  height: var(--comp-hud-h, 16px);
+  min-width: var(--comp-hud-h, 16px);
+  min-height: var(--comp-hud-h, 16px);
+  max-width: var(--comp-hud-h, 16px);
+  max-height: var(--comp-hud-h, 16px);
+  padding: 0;
+  border-radius: var(--comp-btn-hud-radius, 4px);
+}
+
+/* Hors compact : hit 24×24, face utile 16 (pad 4) — zones non micro. */
+html:not(.vp-compact) .cta--hud.cta--icon-only,
+html:not(.vp-compact) .collapsed-bar-actions__btn,
+html:not(.vp-compact) .panel-collapse-control,
+html:not(.vp-compact) .showcase-meta__search-toggle,
+html:not(.vp-compact) .showcase-meta__mark-read--icon {
+  box-sizing: border-box;
+  width: var(--comp-hit-min, 24px);
+  height: var(--comp-hit-min, 24px);
+  min-width: var(--comp-hit-min, 24px);
+  min-height: var(--comp-hit-min, 24px);
+  padding: 4px;
+  border-radius: var(--comp-btn-hud-radius, 4px);
+}
+
+/* Hit 24 hors smart-bars uniquement — pas dans les rangées 16px. */
 @media (max-width: 349px) {
-  .ds-icon-btn,
-  .cta.cta--icon-only,
-  .wallet-display__icon-btn,
-  .collapsed-bar-actions__btn,
-  .panel-collapse-control,
-  .showcase-meta__search-toggle,
-  .showcase-meta__mark-read--icon {
-    min-width: 24px;
-    min-height: 22px;
+  .ds-icon-btn:not(.cta--hud),
+  .cta.cta--icon-only:not(.cta--hud),
+  .wallet-display__icon-btn {
+    min-width: var(--comp-hit-min, 24px);
+    min-height: var(--comp-hit-min, 24px);
+  }
+
+  .collapsed-summary-bar .ds-icon-btn,
+  .collapsed-summary-bar .cta.cta--icon-only,
+  .collapsed-summary-bar .wallet-display__icon-btn,
+  .dock-summary-bar .ds-icon-btn,
+  .dock-summary-bar .cta.cta--icon-only,
+  .chart-summary-bar .ds-icon-btn,
+  .chart-summary-bar .cta.cta--icon-only {
+    min-width: 0;
+    min-height: 0;
+    width: var(--comp-hud-h, 16px);
+    height: var(--comp-hud-h, 16px);
+    max-width: var(--comp-hud-h, 16px);
+    max-height: var(--comp-hud-h, 16px);
+    padding: 0;
   }
 }
 
@@ -150,13 +201,14 @@
 /* ── Viewport MVP 250×550 — zero-scroll, gaps = band-air (2px) ── */
 html.vp-compact {
   --ds-shell-inline: 0px;
-  --ds-section-gap: var(--ds-band-gap, 2px);
-  --ds-panel-gap: var(--ds-band-gap, 2px);
-  --stack-section-gap: 2px;
+  --ds-section-gap: var(--ds-gap-seam);
+  --ds-panel-gap: var(--ds-gap-seam);
+  /* DA @ 250×550 : gaps de bands = 2px (pas 1dvh comme rythme de design) */
+  --stack-section-gap: var(--ds-gap-seam);
+  --navbar-hub-gap: var(--ds-gap-seam);
   --stack-section-gap-collapsed: 0px;
-  --floor-canvas-height: var(--ds-zone-floor-peek, 220px);
-  --floor-peek-height: var(--floor-canvas-height);
-  --graph-floor-gap: var(--ds-graph-floor-gap, 6px);
+  /* Floor élastique : hauteur portée par le lock portrait (app.css). */
+  --graph-floor-gap: var(--ds-graph-floor-gap);
 }
 
 html.vp-compact,
@@ -265,21 +317,146 @@ html.vp-compact .rate-panel--hub-graph {
 html.vp-compact .showcase-tabs,
 html.vp-compact .app-bottom-stack__tabs {
   overflow-x: hidden !important;
+  overflow-y: hidden !important;
   overscroll-behavior: none;
+}
+
+/* Portrait téléphone haut : labels 10px — autoriser le scroll horizontal des onglets. */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 600px) {
+  html.vp-compact .showcase-tabs,
+  html.vp-compact .app-bottom-stack__tabs,
+  html.vp-compact .showcase-header-tabs {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  html.vp-compact .showcase-tabs::-webkit-scrollbar,
+  html.vp-compact .app-bottom-stack__tabs::-webkit-scrollbar,
+  html.vp-compact .showcase-header-tabs::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+ * Smart-bars + headers @ 250×550 — containment strict.
+ * Les media « roomy » remettaient overflow:visible + hit 24px et
+ * faisaient déborder collapse / actions / nav dans la bande voisine.
+ */
+html.vp-compact .showcase-header,
+html.vp-compact .showcase-header.app-bottom-stack__header,
+html.vp-compact .app-hub-showcase-block .showcase-header,
+html.vp-compact .showcase-header-tabs,
+html.vp-compact .showcase-header-tabs app-showcase-tabs,
+html.vp-compact .app-showcase-band.is-collapsed,
+html.vp-compact .app-bottom-stack__band.is-collapsed,
+html.vp-compact .app-bottom-stack__band.is-smart-collapsed,
+html.vp-compact .app-dock-band.is-collapsed,
+html.vp-compact .dock-panel__handle.dock-summary-bar,
+html.vp-compact .collapsed-summary-bar,
+html.vp-compact .chart-summary-bar,
+html.vp-compact app-showcase-news-summary,
+html.vp-compact app-showcase-chat-summary,
+html.vp-compact app-showcase-dao-summary,
+html.vp-compact app-showcase-launch-summary,
+html.vp-compact app-showcase-r4v3-summary,
+html.vp-compact app-dock-market-summary,
+html.vp-compact app-dock-wallet-summary,
+html.vp-compact app-dock-faucet-summary,
+html.vp-compact app-dock-transactions-summary,
+html.vp-compact app-dock-chain-summary,
+html.vp-compact app-dock-quests-summary,
+html.vp-compact app-dock-peers-summary,
+html.vp-compact app-showcase-chart-summary {
+  overflow: hidden !important;
+}
+
+html.vp-compact .showcase-tab,
+html.vp-compact .showcase-tab.ds-surface,
+html.vp-compact .showcase-tab:has(.showcase-tab__unread-toast) {
+  overflow: hidden !important;
+}
+
+html.vp-compact .showcase-tab__unread-toast {
+  transform: translate(0, 0) !important;
+  top: 0 !important;
+  right: 0 !important;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Contrôles internes smart-bar : ≤ face HUD, jamais hit 24 */
+html.vp-compact .collapsed-summary-bar button,
+html.vp-compact .collapsed-summary-bar .cta,
+html.vp-compact .collapsed-summary-bar [class*='__btn'],
+html.vp-compact .collapsed-summary-bar [class*='__icon-btn'],
+html.vp-compact .collapsed-summary-bar [class*='__action-btn'],
+html.vp-compact .dock-summary-bar button,
+html.vp-compact .dock-summary-bar [class*='__btn'],
+html.vp-compact .dock-summary-bar [class*='__icon-btn'],
+html.vp-compact .news-summary-bar__action-btn,
+html.vp-compact .wallet-summary-bar__icon-btn,
+html.vp-compact .wallet-summary-bar__create,
+html.vp-compact .chart-summary-bar button {
+  box-sizing: border-box;
+  max-height: var(--comp-hud-h, 16px) !important;
+  min-height: 0 !important;
+  height: auto;
+  max-width: 100%;
+}
+
+html.vp-compact .news-summary-bar__action-btn {
+  width: var(--comp-hud-h, 16px) !important;
+  height: 100% !important;
+  max-height: var(--comp-hud-h, 16px) !important;
+  min-width: var(--comp-hud-h, 16px) !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+html.vp-compact .app-hub-showcase-block.is-showcase-collapsed .app-showcase-band.is-collapsed,
+html.vp-compact .app-bottom-stack.is-dock-collapsed .app-bottom-stack__band.is-smart-collapsed,
+html.vp-compact .app-dock-band.is-collapsed:has(.dock-summary-bar) {
+  flex: 0 0 var(--comp-smart-bar-h, 16px) !important;
+  height: var(--comp-smart-bar-h, 16px) !important;
+  min-height: var(--comp-smart-bar-h, 16px) !important;
+  max-height: var(--comp-smart-bar-h, 16px) !important;
+}
+
+/* Pad 2px du tab-panel mange 4px de la smart-bar (encapsulation Angular). */
+html.vp-compact .app-showcase-band.is-collapsed .showcase-tab-panel,
+html.vp-compact .app-hub-showcase-block.is-showcase-collapsed .showcase-tab-panel,
+html.vp-compact .app-bottom-stack.is-dock-collapsed .showcase-tab-panel {
+  padding: 0 !important;
+}
+
+html.vp-compact .dock-panel.is-collapsed .dock-panel__body,
+html.vp-compact .dock-panel__handle.dock-summary-bar {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+html.vp-compact .showcase-header,
+html.vp-compact .showcase-header.app-bottom-stack__header {
+  flex: 0 0 var(--showcase-hub-tab-h, 16px) !important;
+  height: var(--showcase-hub-tab-h, 16px) !important;
+  min-height: var(--showcase-hub-tab-h, 16px) !important;
+  max-height: var(--showcase-hub-tab-h, 16px) !important;
 }
 
 /* Meta controls : contraste secondaire */
 .showcase-meta__search-toggle {
-  border-color: var(--border-subtle, rgba(255, 255, 255, 0.06)) !important;
-  background: rgba(var(--surface-elevated-rgb, 13, 24, 40), 0.65) !important;
-  color: var(--ds-text-secondary, #8b9bb0) !important;
-  border-radius: var(--radius-sm, 8px) !important;
+  border-color: var(--border-subtle, rgba(237, 231, 217, 0.06)) !important;
+  background: rgba(var(--surface-elevated-rgb, 10, 18, 32), 0.65) !important;
+  color: var(--ds-text-secondary, #8b9dad) !important;
+  border-radius: var(--radius-sm, 4px) !important;
 }
 
 .showcase-meta__search-toggle:hover {
-  border-color: rgba(var(--accent-cyan-rgb, 46, 196, 214), 0.28) !important;
-  color: var(--ds-text-primary, #e8eef5) !important;
-  background: rgba(var(--surface-hover-rgb, 17, 31, 50), 0.8) !important;
+  border-color: rgba(var(--accent-cyan-rgb, 139, 157, 173), 0.28) !important;
+  color: var(--ds-text-primary, #ede7d9) !important;
+  background: rgba(var(--surface-hover-rgb, 10, 18, 32), 0.8) !important;
 }
 
 .showcase-meta__search-toggle:focus-visible {
@@ -302,36 +479,72 @@ html.vp-compact .app-bottom-stack__tabs {
   .showcase-news__skeleton-lines span,
   .exchange-panel__skeleton-row,
   [class*='__skeleton'] {
-    animation: none !important;
+    animation:  none !important;
   }
 }
 
 /* ── Contrast helpers ── */
 .ds-tech {
-  color: var(--ds-text-muted, #5c6b7e);
-  font-size: var(--ds-text-caption, 0.5rem);
-  font-family: var(--ds-font-mono, ui-monospace, monospace);
+  color: var(--ds-text-secondary, #8b9dad);
+  font-size: var(--fs-module);
+  font-family: var(--ds-font-mono, 'Inter', sans-serif);
   font-variant-numeric: tabular-nums;
 }
 
 .ds-status-dot {
   display: inline-block;
-  width: 5px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--ds-status-live, var(--success, #2ecc8a));
+  width: var(--comp-led-size, 4px);
+  height: var(--comp-led-size, 4px);
+  border-radius: var(--radius-circle);
+  background: var(--ds-status-live, var(--success, #09814a));
   box-shadow: none;
   flex-shrink: 0;
 }
 
 .ds-status-dot--warn {
-  background: var(--warning, #e6b84d);
+  background: var(--warning, #d5a021);
 }
 
 .ds-status-dot--danger {
-  background: var(--danger, #e85d75);
+  background: var(--danger, #7b0d1e);
 }
 
 .ds-status-dot--muted {
-  background: var(--ds-text-muted, #5c6b7e);
+  background: var(--ds-text-secondary, #8b9dad);
+}
+
+/* ── Inputs densités DA (HUD 16 / FORM 32) ── */
+.ds-input-hud,
+.ds-control-hud {
+  box-sizing: border-box;
+  height: var(--comp-input-hud-h, 16px);
+  min-height: var(--comp-input-hud-h, 16px);
+  padding: 0 var(--ds-input-padding-x, 4px);
+  border: var(--comp-input-border-w, 1px) solid var(--ds-input-border);
+  border-radius: var(--comp-input-hud-radius, 4px);
+  background: var(--ds-input-bg);
+  font-size: var(--ds-input-font, var(--fs-body));
+  color: var(--ds-text-primary);
+}
+
+.ds-input-form,
+.ds-control-form {
+  box-sizing: border-box;
+  height: var(--comp-input-form-h, 32px);
+  min-height: var(--comp-input-form-h, 32px);
+  padding: var(--comp-input-form-pad-y, 8px) var(--comp-input-form-pad-x, 12px);
+  border: var(--comp-input-border-w, 1px) solid var(--ds-input-border);
+  border-radius: var(--comp-input-form-radius, 8px);
+  background: var(--ds-input-bg);
+  font-size: var(--ds-input-font, var(--fs-body));
+  color: var(--ds-text-primary);
+}
+
+.ds-input-hud:focus-visible,
+.ds-input-form:focus-visible,
+.ds-control-hud:focus-visible,
+.ds-control-form:focus-visible {
+  outline: none;
+  border-color: var(--ds-input-border-focus);
+  box-shadow: var(--shadow-focus);
 }

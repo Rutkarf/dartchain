@@ -74,7 +74,7 @@ export class ShowcaseDaoComponent {
   readonly activeCountLabel = this.daoState.activeCountLabel;
   readonly filteredCards = computed(() => {
     const query = this.searchQuery().trim().toLowerCase();
-    const list = this.daoState.cards();
+    const list = this.ensureNativeR4v3Dao(this.daoState.cards());
     if (!query) {
       return list;
     }
@@ -83,6 +83,27 @@ export class ShowcaseDaoComponent {
       return haystack.includes(query);
     });
   });
+
+  private ensureNativeR4v3Dao(list: DaoShowcaseCard[]): DaoShowcaseCard[] {
+    if (list.some((c) => c.symbol.toUpperCase() === 'R4V3')) {
+      return list;
+    }
+    const native: DaoShowcaseCard = {
+      id: 'native-dao-r4v3',
+      symbol: 'R4V3',
+      name: 'R4V3 DAO',
+      description: 'Gouvernance du token natif DartChain.',
+      chain: 'DartChain',
+      launchStatus: 'LIVE',
+      status: 'active',
+      summary: 'Gouvernance et piliers du hub R4V3.',
+      objective: 'Aligner l’écosystème autour du peg CHF et des utilities.',
+      proposalsCount: 0,
+      votesCount: 0,
+      membersActive: 0,
+    };
+    return [native, ...list];
+  }
 
   readonly searchQuery = signal('');
 
@@ -156,15 +177,10 @@ export class ShowcaseDaoComponent {
       case 'active':
         return 'ON';
       case 'closed':
-        return 'OFF';
+        return 'HORS';
       default:
         return '…';
     }
-  }
-
-  protected cardInitials(card: DaoShowcaseCard): string {
-    const symbol = card.symbol?.trim() || card.name?.trim() || '?';
-    return symbol.slice(0, 2).toUpperCase();
   }
 
   protected openDao(card: DaoShowcaseCard): void {

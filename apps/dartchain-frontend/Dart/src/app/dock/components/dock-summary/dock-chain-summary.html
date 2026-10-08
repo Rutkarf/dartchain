@@ -1,19 +1,17 @@
 <div
-  class="chain-summary-bar"
-  role="status"
-  aria-live="polite"
-  [attr.aria-label]="barAriaLabel()"
+ class="chain-summary-bar"
+ role="status"
+ aria-live="polite"
 >
   <div class="chain-summary-bar__status">
     <span
-      class="dock-summary-status"
-      [ngClass]="statusClass(phase())"
-      [attr.aria-label]="'État : ' + statusLabel()"
-    >
+ class="dock-summary-status"
+ [ngClass]="statusClass(phase())"
+ >
       {{ statusLabel() }}
     </span>
     @if (blockCount() > 0) {
-      <span class="dock-summary-badge" [attr.aria-label]="blockCount() + ' blocs'">
+      <span class="dock-summary-badge">
         {{ blockCount() }}
       </span>
     }
@@ -41,23 +39,21 @@
 
   <div class="chain-summary-bar__actions">
     <button
-      type="button"
-      class="chain-summary-bar__btn chain-summary-bar__btn--tip"
-      (click)="onOpenTip($event)"
-      [disabled]="!latestBlock()"
-      aria-label="Ouvrir le bloc tip"
-      title="Tip"
-    >
+ type="button"
+ class="chain-summary-bar__btn chain-summary-bar__btn--tip"
+ (click)="onOpenTip($event)"
+ [disabled]="!latestBlock()"
+ title="Sommet"
+ >
       Tip
     </button>
     <button
-      type="button"
-      class="chain-summary-bar__btn chain-summary-bar__btn--copy"
-      (click)="onCopyHash($event)"
-      [disabled]="!tipHash()"
-      [attr.aria-label]="copied() ? 'Hash copié' : 'Copier le hash du tip'"
-      [attr.title]="copied() ? 'Copié' : 'Copy'"
-    >
+ type="button"
+ class="chain-summary-bar__btn chain-summary-bar__btn--copy"
+ (click)="onCopyHash($event)"
+ [disabled]="!tipHash()"
+ [attr.title]="copied() ? 'Copié' : 'Copy'"
+ >
       {{ copied() ? 'OK' : 'Copy' }}
     </button>
   </div>

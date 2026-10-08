@@ -1,5 +1,5 @@
 /**
- * Star Conquest — 5 familles de Quests + palette centralisée.
+ * Conquête stellaire — 5 familles de Quests + palette centralisée.
  * Teintes alignées sur Three legacy (cyan/magenta floor) et accents UI existants.
  */
 
@@ -26,16 +26,16 @@ export const STAR_QUEST_FAMILIES: Record<StarQuestFamily, StarQuestFamilyTheme> 
   interface: {
     id: 'interface',
     label: 'Interface',
-    // Floor cyan legacy #00F5FF → un cran adouci
-    hex: '#4FE0EC',
+    // Floor cyan legacy #8b9dad → un cran adouci
+    hex: '#8b9dad',
     rgb: [0.31, 0.88, 0.93],
     rgb255: [79, 224, 236],
   },
   three: {
     id: 'three',
     label: 'Three.js',
-    // Violet UI #c77dff / pillar violet
-    hex: '#B794FF',
+    // Violet UI #8b9dad / pillar violet
+    hex: '#8b9dad',
     rgb: [0.72, 0.58, 1],
     rgb255: [183, 148, 255],
   },
@@ -43,23 +43,23 @@ export const STAR_QUEST_FAMILIES: Record<StarQuestFamily, StarQuestFamilyTheme> 
     id: 'blockchain',
     label: 'M4T3R',
     // Amber chat / accent or
-    hex: '#E8B86D',
+    hex: '#7b0d1e',
     rgb: [0.91, 0.72, 0.43],
     rgb255: [232, 184, 109],
   },
   backend: {
     id: 'backend',
     label: 'Backend',
-    // Vert émeraude chat #5dffb1 → adouci
-    hex: '#56DCA8',
+    // Vert émeraude chat #09814a → adouci
+    hex: '#09814a',
     rgb: [0.34, 0.86, 0.66],
     rgb255: [86, 220, 168],
   },
   quality: {
     id: 'quality',
     label: 'Conquête',
-    // Floor magenta #FF2D9A → fuchsia contenu
-    hex: '#E85A9B',
+    // Floor magenta #8b9dad → fuchsia contenu
+    hex: '#7b0d1e',
     rgb: [0.91, 0.35, 0.61],
     rgb255: [232, 90, 155],
   },

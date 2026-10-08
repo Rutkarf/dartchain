@@ -97,6 +97,7 @@ import {
   isIntervalId,
 } from './chart-timeframe.constants';
 import { ChartSeriesPayload, transformSeriesForTimeframe } from './chart-timeframe.util';
+import { downsampleSeriesByStep } from './chart-tick-resolution.util';
 import {
   R4v3ChartView,
   buildR4v3DepthBars,
@@ -134,11 +135,33 @@ export interface HubPeriodPill {
   badge: string;
 }
 
+export type HubTickResolutionId =
+  | 'centieme'
+  | 'dixieme'
+  | 'seconde'
+  | 'minute'
+  | 'heure';
+
+export interface HubTickPill {
+  id: HubTickResolutionId;
+  label: string;
+  badge: string;
+  stepMs: number;
+}
+
 const HUB_PERIOD_PILLS: readonly HubPeriodPill[] = [
   { range: '1h', badge: '1H' },
   { range: '24h', badge: '24H' },
   { range: '7d', badge: '7D' },
   { range: '30d', badge: '30D' },
+];
+
+const HUB_TICK_PILLS: readonly HubTickPill[] = [
+  { id: 'centieme', label: '1 centième', badge: '1 centième', stepMs: 10 },
+  { id: 'dixieme', label: 'un dixième', badge: 'un dixième', stepMs: 100 },
+  { id: 'seconde', label: 'une seconde', badge: 'une seconde', stepMs: 1_000 },
+  { id: 'minute', label: '1 minute', badge: '1 minute', stepMs: 60_000 },
+  { id: 'heure', label: '1 heure', badge: '1 heure', stepMs: 3_600_000 },
 ];
 
 const R4V3_VIEW_PILLS: readonly { id: R4v3ChartView; badge: string; hint: string }[] = [
@@ -207,6 +230,7 @@ export class ShowcaseChartComponent {
 
   @ViewChild('chartSvg') chartSvg?: ElementRef<SVGSVGElement>;
   @ViewChild('timeframeMenu') timeframeMenu?: ElementRef<HTMLElement>;
+  @ViewChild('hubTickMenuRoot') hubTickMenuRoot?: ElementRef<HTMLElement>;
   @ViewChild('r4v3PeriodMenuRoot') r4v3PeriodMenuRoot?: ElementRef<HTMLElement>;
   @ViewChild('r4v3ViewMenuRoot') r4v3ViewMenuRoot?: ElementRef<HTMLElement>;
   @ViewChild(ChartTokenSearchComponent) chartTokenSearch?: ChartTokenSearchComponent;
@@ -222,6 +246,7 @@ export class ShowcaseChartComponent {
     ...RATE_PANEL_SYMBOLS.map((symbol) => ({ id: symbol, label: symbol })),
   ];
   readonly hubPeriodPills = HUB_PERIOD_PILLS;
+  readonly hubTickPills = HUB_TICK_PILLS;
   readonly compactPeriodPills: readonly HubPeriodPill[] = [
     { range: '1h', badge: '1H' },
     { range: '24h', badge: '24H' },
@@ -233,6 +258,7 @@ export class ShowcaseChartComponent {
   readonly error = signal(false);
   readonly activeRange = signal<ChartRange>('24h');
   readonly activeTimeframeId = signal<ChartTimeframeId>('24h');
+  readonly activeTickResolution = signal<HubTickResolutionId>('centieme');
   readonly timeframeMenuOpen = signal(false);
   readonly chartType = signal<ChartDisplayType>(this.loadChartType());
   readonly chartCurrency = signal<ChartCurrency>(this.loadCurrency());
@@ -249,6 +275,7 @@ export class ShowcaseChartComponent {
   readonly r4v3ViewMode = signal<R4v3ChartView>('auto');
   readonly r4v3ViewMenuOpen = signal(false);
   readonly r4v3PeriodMenuOpen = signal(false);
+  readonly hubTickMenuOpen = signal(false);
   readonly r4v3LivePulse = signal(false);
   readonly showLaunchCurve = signal(true);
   readonly showR4v3OverlayCurve = signal(true);
@@ -455,7 +482,7 @@ export class ShowcaseChartComponent {
     const status = this.activeLaunchProject()?.status;
     switch (status) {
       case 'LIVE':
-        return 'Live';
+        return 'Direct';
       case 'SOON':
         return 'Soon';
       case 'ENDED':
@@ -641,6 +668,11 @@ export class ShowcaseChartComponent {
     return HUB_PERIOD_PILLS.find((pill) => pill.range === range)?.badge ?? range.toUpperCase();
   });
 
+  readonly hubActiveTickBadge = computed(() => {
+    const id = this.activeTickResolution();
+    return HUB_TICK_PILLS.find((pill) => pill.id === id)?.badge ?? '1 centième';
+  });
+
   readonly r4v3AxisTitle = computed(() =>
     r4v3AxisHint(this.r4v3ViewMode(), this.r4v3Context())
   );
@@ -704,7 +736,7 @@ export class ShowcaseChartComponent {
       return [
         { label: 'Santé', value: `${this.r4v3HealthScore()}/100`, tone: 'up' },
         { label: 'Liq.', value: `${Math.round(this.r4v3LiquidityProxy())}%` },
-        { label: 'Swaps', value: String(flow.swaps) },
+        { label: 'Échanges', value: String(flow.swaps) },
       ];
     }
 
@@ -713,7 +745,7 @@ export class ShowcaseChartComponent {
     switch (view) {
       case 'flow':
         return [
-          { label: 'Net', value: flow.netLabel, tone: flow.buys >= flow.sells ? 'up' : 'down' },
+          { label: 'Réseau', value: flow.netLabel, tone: flow.buys >= flow.sells ? 'up' : 'down' },
           { label: 'Achats', value: flow.buys > 0 ? formatCompactMetric(flow.buys) : '0' },
           { label: 'Ventes', value: flow.sells > 0 ? formatCompactMetric(flow.sells) : '0' },
         ];
@@ -721,11 +753,11 @@ export class ShowcaseChartComponent {
         return [
           { label: 'Évén.', value: String(flow.swaps) },
           { label: 'Vol.', value: this.hubFooterVol() },
-          { label: 'Live', value: flow.swaps > 0 ? 'On' : '—', tone: flow.swaps > 0 ? 'up' : undefined },
+          { label: 'Direct', value: flow.swaps > 0 ? 'Actif' : '—', tone: flow.swaps > 0 ? 'up' : undefined },
         ];
       case 'fuel':
         return [
-          { label: 'Fuel', value: this.r4v3FuelTotal() },
+          { label: 'Carburant', value: this.r4v3FuelTotal() },
           { label: 'Cible', value: this.hubLaunchTarget() },
           { label: 'Levé', value: this.hubLaunchRaised() },
         ];
@@ -733,13 +765,13 @@ export class ShowcaseChartComponent {
         return [
           { label: 'Santé', value: `${this.r4v3HealthScore()}/100`, tone: 'up' },
           { label: 'Liq.', value: `${Math.round(this.r4v3LiquidityProxy())}%` },
-          { label: 'Swaps', value: String(flow.swaps) },
+          { label: 'Échanges', value: String(flow.swaps) },
         ];
       default:
         return [
           { label: 'Vol.', value: this.hubFooterVol() },
-          { label: 'Net', value: flow.netLabel, tone: flow.buys >= flow.sells ? 'up' : 'down' },
-          { label: 'Swaps', value: String(flow.swaps) },
+          { label: 'Réseau', value: flow.netLabel, tone: flow.buys >= flow.sells ? 'up' : 'down' },
+          { label: 'Échanges', value: String(flow.swaps) },
         ];
     }
   });
@@ -1186,10 +1218,35 @@ export class ShowcaseChartComponent {
     this.selectRange(pill.range);
   }
 
+  toggleHubTickMenu(event: Event): void {
+    event.stopPropagation();
+    this.hubTickMenuOpen.update((open) => !open);
+    if (this.hubTickMenuOpen()) {
+      this.r4v3PeriodMenuOpen.set(false);
+      this.r4v3ViewMenuOpen.set(false);
+    }
+  }
+
+  selectHubTick(pill: HubTickPill): void {
+    if (this.activeTickResolution() === pill.id) {
+      return;
+    }
+    this.triggerChartTransition();
+    this.activeTickResolution.set(pill.id);
+    this.refreshSeriesForTimeframe();
+  }
+
+  selectHubTickFromMenu(pill: HubTickPill, event?: Event): void {
+    event?.stopPropagation();
+    this.hubTickMenuOpen.set(false);
+    this.selectHubTick(pill);
+  }
+
   toggleR4v3PeriodMenu(event: Event): void {
     event.stopPropagation();
     this.r4v3PeriodMenuOpen.update((open) => !open);
     if (this.r4v3PeriodMenuOpen()) {
+      this.hubTickMenuOpen.set(false);
       this.r4v3ViewMenuOpen.set(false);
     }
   }
@@ -1212,6 +1269,7 @@ export class ShowcaseChartComponent {
     event.stopPropagation();
     this.r4v3ViewMenuOpen.update((open) => !open);
     if (this.r4v3ViewMenuOpen()) {
+      this.hubTickMenuOpen.set(false);
       this.r4v3PeriodMenuOpen.set(false);
     }
   }
@@ -1367,6 +1425,13 @@ export class ShowcaseChartComponent {
       }
     }
 
+    if (this.hubTickMenuOpen()) {
+      const tickRoot = this.hubTickMenuRoot?.nativeElement;
+      if (tickRoot && !tickRoot.contains(target)) {
+        this.hubTickMenuOpen.set(false);
+      }
+    }
+
     if (this.r4v3PeriodMenuOpen()) {
       const periodRoot = this.r4v3PeriodMenuRoot?.nativeElement;
       if (periodRoot && !periodRoot.contains(target)) {
@@ -1385,6 +1450,7 @@ export class ShowcaseChartComponent {
   @HostListener('document:keydown.escape')
   closeTimeframeMenu(): void {
     this.timeframeMenuOpen.set(false);
+    this.hubTickMenuOpen.set(false);
     this.r4v3PeriodMenuOpen.set(false);
     this.r4v3ViewMenuOpen.set(false);
   }
@@ -1502,7 +1568,7 @@ export class ShowcaseChartComponent {
       canvas.height = 640;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.fillStyle = '#0b0e14';
+        ctx.fillStyle = '#0a1220';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
         canvas.toBlob((blob) => {
@@ -2003,21 +2069,26 @@ export class ShowcaseChartComponent {
     }
 
     const chart = transformSeriesForTimeframe(base, this.activeTimeframeId(), this.activeRange());
-    const marketDelta = formatMarketDelta(chart.changePercent);
+    const tick = HUB_TICK_PILLS.find((pill) => pill.id === this.activeTickResolution());
+    const resolved =
+      tick && tick.id !== 'centieme'
+        ? downsampleSeriesByStep(chart, tick.stepMs)
+        : chart;
+    const marketDelta = formatMarketDelta(resolved.changePercent);
 
-    this.marketSummaryPrice.set(stripUsdFromMarketLabel(chart.currentPrice));
+    this.marketSummaryPrice.set(stripUsdFromMarketLabel(resolved.currentPrice));
     this.marketSummaryDelta.set(marketDelta);
-    this.marketSummaryPositive.set(chart.positive);
-    this.marketSummaryVolume.set(this.formatSummaryVolume(chart.volume));
+    this.marketSummaryPositive.set(resolved.positive);
+    this.marketSummaryVolume.set(this.formatSummaryVolume(resolved.volume));
 
-    this.chartPrice.set(chart.currentPrice);
+    this.chartPrice.set(resolved.currentPrice);
     this.chartDelta.set(marketDelta);
-    this.chartPositive.set(chart.positive);
-    this.seriesVolumeLabel.set(chart.volume);
-    this.chartPoints.set(chart.points);
-    this.volumeBars.set(chart.volumes);
-    this.rawPrices.set(chart.prices);
-    this.rawTimestamps.set(chart.timestamps);
+    this.chartPositive.set(resolved.positive);
+    this.seriesVolumeLabel.set(resolved.volume);
+    this.chartPoints.set(resolved.points);
+    this.volumeBars.set(resolved.volumes);
+    this.rawPrices.set(resolved.prices);
+    this.rawTimestamps.set(resolved.timestamps);
     this.checkAlertThreshold();
 
     if (this.isR4v3Chart()) {

@@ -3,19 +3,18 @@
     class="exchange-panel__rail exchange-panel__rail--skeleton"
     [class.exchange-panel__rail--collapsed]="exchangeCollapsed()"
     aria-hidden="true"
-    aria-label="Convertir vos tokens LaunchLab"
+    aria-label="Convertir vos jetons du laboratoire"
   >
     <span class="exchange-panel__skeleton-row"></span>
   </div>
 } @else {
   <div
-    class="exchange-panel__rail"
-    [class.exchange-panel__rail--collapsed]="exchangeCollapsed()"
-    [class.exchange-panel__rail--picking]="tokenMenuOpen()"
-    [formGroup]="amountForm"
-    role="group"
-    aria-label="Convertir vos tokens LaunchLab"
-  >
+ class="exchange-panel__rail"
+ [class.exchange-panel__rail--collapsed]="exchangeCollapsed()"
+ [class.exchange-panel__rail--picking]="tokenMenuOpen()"
+ [formGroup]="amountForm"
+ role="group"
+ >
     <span
       class="exchange-panel__sr-only"
       [id]="exchangeCollapsed() ? 'exchange-collapsed-hint' : 'exchange-convert-hint'"
@@ -49,18 +48,17 @@
         <span class="exchange-panel__pair-symbol">{{ nativeTokenLabel }}</span>
       </span>
 
-      <span class="exchange-panel__pair-arrow" aria-hidden="true">→</span>
+      <span class="exchange-panel__pair-arrow" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow-right"/></svg></span>
 
       <div class="exchange-panel__pair-to-select">
         <button
-          type="button"
-          class="exchange-panel__token-trigger"
-          [class.exchange-panel__token-trigger--open]="tokenMenuOpen()"
-          (click)="toggleTokenMenu($event)"
-          [attr.aria-expanded]="tokenMenuOpen()"
-          aria-haspopup="listbox"
-          [attr.aria-label]="'Token de destination · ' + tokenDisplayName(toToken())"
-        >
+ type="button"
+ class="exchange-panel__token-trigger"
+ [class.exchange-panel__token-trigger--open]="tokenMenuOpen()"
+ (click)="toggleTokenMenu($event)"
+ [attr.aria-expanded]="tokenMenuOpen()"
+ aria-haspopup="listbox"
+ >
           @if (tokenLogoUrl(toToken()); as toLogo) {
             <img
               class="exchange-panel__pair-icon exchange-panel__pair-icon--img"
@@ -109,11 +107,10 @@
 
       @if (showQuickAmounts()) {
         <button
-          type="button"
-          class="exchange-panel__max-btn"
-          (click)="setMaxAmount()"
-          [attr.aria-label]="maxButtonTitle()"
-        >
+ type="button"
+ class="exchange-panel__max-btn"
+ (click)="setMaxAmount()"
+ >
           Max
         </button>
       }
@@ -141,7 +138,7 @@
 
     <div class="exchange-panel__meta" aria-live="polite">
       @if (tokenMenuOpen()) {
-        <div class="exchange-panel__meta-tokens" role="listbox" aria-label="Choisir le token de destination">
+        <div class="exchange-panel__meta-tokens" role="listbox">
           @for (token of launchpadSwapTokens(); track token) {
             <button
               type="button"
@@ -164,7 +161,7 @@
           {{ metaStatusText() }}
         </span>
         @if (showSuccessToast()) {
-          <button type="button" class="exchange-panel__toast-dismiss" (click)="dismissSuccessToast()">×</button>
+          <button type="button" class="exchange-panel__toast-dismiss" (click)="dismissSuccessToast()"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-close"/></svg></button>
         }
       } @else {
         @if (showBalanceInline()) {
@@ -184,10 +181,7 @@
         }
         @if (quoteLockTimestampLabel()) {
           <span class="exchange-panel__quote-lock">
-            <svg class="exchange-panel__lock-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
-              <rect x="3" y="5.5" width="6" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/>
-              <path d="M4.2 5.5V4.1a1.8 1.8 0 0 1 3.6 0v1.4" fill="none" stroke="currentColor" stroke-width="1.2"/>
-            </svg>
+            <svg class="exchange-panel__lock-icon icon" aria-hidden="true" focusable="false"><use href="#icon-lock"/></svg>
             {{ quoteLockLabel }}
             <time class="exchange-panel__quote-time" [attr.datetime]="quoteLockIso()">
               {{ quoteLockTimestampLabel() }}

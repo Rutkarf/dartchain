@@ -26,8 +26,8 @@ export class WigleOsmFootprintManager {
   private quality: MapQuality = 'medium';
   private loading = false;
   private readonly sharedMaterial = new THREE.MeshStandardMaterial({
-    color: 0x1a1a2e,
-    emissive: 0x00f3ff,
+    color: 0x0d0630,
+    emissive: 0x8a95a5,
     emissiveIntensity: 0.28,
     roughness: 0.22,
     metalness: 0.78,
@@ -116,7 +116,7 @@ export class WigleOsmFootprintManager {
 
       if (entry.mesh.visible && this.quality === 'high') {
         const mat = entry.mesh.material as THREE.MeshStandardMaterial;
-        mat.emissiveIntensity = 0.22 + THREE.MathUtils.clamp((60 - distance) / 60, 0, 0.25);
+        mat.emissiveIntensity = 0.22 + THREE.MathUtils.clamp((60 - distance) / 613, 6, 48.25);
       }
 
       if (camera && entry.mesh.visible) {
@@ -141,7 +141,7 @@ export class WigleOsmFootprintManager {
     if (!this.root) return;
 
     const point = points.find((p) => p.id === match.wiglePointId);
-    const color = point ? colorForNetworkType(point.networkType) : 0x00f3ff;
+    const color = point ? colorForNetworkType(point.networkType) : 0x8a95a5;
     const material = this.sharedMaterial.clone();
     material.emissive.setHex(color);
     material.emissiveIntensity = 0.32;

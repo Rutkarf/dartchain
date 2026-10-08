@@ -1,15 +1,13 @@
 <section
-  class="transactions-dock transactions-dock--mempool ds-surface ds-surface--showcase-body"
-  aria-label="Mempool"
+ class="transactions-dock transactions-dock--mempool ds-surface ds-surface--showcase-body"
 >
   <header class="transactions-dock__head">
     @if (latestBlock(); as block) {
       <button
-        type="button"
-        class="transactions-dock__block"
-        (click)="openLatestBlock()"
-        [attr.aria-label]="'Ouvrir le bloc #' + block.index"
-      >
+ type="button"
+ class="transactions-dock__block"
+ (click)="openLatestBlock()"
+ >
         BLOCK #{{ block.index }}
       </button>
     } @else {

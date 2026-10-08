@@ -55,7 +55,7 @@ export class QuestsProgressService {
     return this.quests.exploreBlock(blockIndex).then((result) => {
       if (result.progressed) {
         this.notify(
-          `Explore Blocks : ${result.progress}/${result.target}`,
+          `Explorer les blocs : ${result.progress}/${result.target}`,
           'info'
         );
       } else if (result.duplicate) {

@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { GeoCoordinateService } from '../geo-coordinate.service';
 import { LocalOriginService } from '../local-origin.service';
 import { OSMBuildingProvider, type OSMBuildingFootprint } from '../osm-building.provider';
-import { MARSEILLE_GEO_ORIGIN } from '../geo-reference.config';
+import { METAVERSE_GEO_ORIGIN } from '../geo-reference.config';
 import { GeoMappingService } from './geo-mapping.service';
 
 describe('GeoMappingService', () => {
@@ -30,8 +30,8 @@ describe('GeoMappingService', () => {
         {
           provide: LocalOriginService,
           useValue: {
-            latitude: MARSEILLE_GEO_ORIGIN.latitude,
-            longitude: MARSEILLE_GEO_ORIGIN.longitude,
+            latitude: METAVERSE_GEO_ORIGIN.latitude,
+            longitude: METAVERSE_GEO_ORIGIN.longitude,
             altitude: 0,
             worldScale: 1,
           },
@@ -48,7 +48,7 @@ describe('GeoMappingService', () => {
   });
 
   it('geoToWorld matches equirectangular meter scale at Ombrière origin', () => {
-    const origin = service.geoToWorld(MARSEILLE_GEO_ORIGIN.latitude, MARSEILLE_GEO_ORIGIN.longitude, 0);
+    const origin = service.geoToWorld(METAVERSE_GEO_ORIGIN.latitude, METAVERSE_GEO_ORIGIN.longitude, 0);
     expect(origin.x).toBeCloseTo(0, 1);
     expect(origin.z).toBeCloseTo(0, 1);
   });

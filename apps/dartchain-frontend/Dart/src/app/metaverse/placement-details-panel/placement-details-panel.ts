@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FocusTrapDirective } from '../../core/directives/focus-trap.directive';
-import { OSM_ODBL_ATTRIBUTION } from '@world-map/marseille-twin/osm-attribution';
+import { OSM_ODBL_ATTRIBUTION } from '@world-map/metaverse-twin/osm-attribution';
 import { PlacementFacade } from '@world-map/placements/placement.facade';
 import type { PlacementInventoryStatus } from '@world-map/placements/placement.model';
 

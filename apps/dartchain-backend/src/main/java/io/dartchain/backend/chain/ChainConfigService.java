@@ -60,7 +60,7 @@ public class ChainConfigService {
 
         ChainAccountEntity entity = new ChainAccountEntity();
         entity.setAddress(address);
-        entity.setAddressScheme(AddressScheme.EVM.name().toLowerCase());
+        entity.setAddressScheme("evm-compatible");
         entity.setPublicKey(publicKeyBase64);
         entity.setNonce(0L);
         entity.setCreatedAt(System.currentTimeMillis());

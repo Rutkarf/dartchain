@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  MARSEILLE_LANDMARK_BUILDINGS,
+  METAVERSE_LANDMARK_BUILDINGS,
 } from './geo-reference.config';
 import {
   resolveBuildingHeightFromTags,
@@ -23,7 +23,7 @@ describe('building-height.util', () => {
   });
 
   it('conserve les hauteurs hardcodées des landmarks sans tags', () => {
-    for (const def of MARSEILLE_LANDMARK_BUILDINGS) {
+    for (const def of METAVERSE_LANDMARK_BUILDINGS) {
       const resolved = resolveGeoBuildingHeight(def);
       expect(resolved.heightSource).toBe('hardcoded');
       expect(resolved.heightMeters).toBe(def.heightMeters);
@@ -31,7 +31,7 @@ describe('building-height.util', () => {
   });
 
   it('remplace hardcoded si tags OSM explicites', () => {
-    const def = MARSEILLE_LANDMARK_BUILDINGS[0];
+    const def = METAVERSE_LANDMARK_BUILDINGS[0];
     const resolved = resolveGeoBuildingHeight(def, { height: '28' });
     expect(resolved.heightMeters).toBe(28);
     expect(resolved.heightSource).toBe('height');

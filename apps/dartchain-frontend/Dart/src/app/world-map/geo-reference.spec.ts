@@ -4,14 +4,14 @@ import * as THREE from 'three';
 import { GeoCoordinateService } from './geo-coordinate.service';
 import {
   GEO_REFERENCE_CONFIG,
-  MARSEILLE_GEO_ORIGIN,
-  MARSEILLE_LANDMARK_BUILDINGS,
-  MARSEILLE_VALIDATION_ANCHORS,
+  METAVERSE_GEO_ORIGIN,
+  METAVERSE_LANDMARK_BUILDINGS,
+  METAVERSE_VALIDATION_ANCHORS,
   metersToWorld,
   worldToMeters,
 } from './geo-reference.config';
 import { footprintCentroid } from './geo-building.util';
-import { MARSEILLE_START_POSITION, METRO_SPAWN_ANCHOR } from './map-configuration';
+import { METAVERSE_START_POSITION, METRO_SPAWN_ANCHOR } from './map-configuration';
 
 describe('geo-reference', () => {
   let geo: GeoCoordinateService;
@@ -22,18 +22,18 @@ describe('geo-reference', () => {
   });
 
   it('utilise l Ombrière comme origine géographique', () => {
-    expect(GEO_REFERENCE_CONFIG.originLatitude).toBe(MARSEILLE_GEO_ORIGIN.latitude);
-    expect(GEO_REFERENCE_CONFIG.originLongitude).toBe(MARSEILLE_GEO_ORIGIN.longitude);
+    expect(GEO_REFERENCE_CONFIG.originLatitude).toBe(METAVERSE_GEO_ORIGIN.latitude);
+    expect(GEO_REFERENCE_CONFIG.originLongitude).toBe(METAVERSE_GEO_ORIGIN.longitude);
     expect(GEO_REFERENCE_CONFIG.metersPerWorldUnit).toBe(1);
-    expect(GEO_REFERENCE_CONFIG.coordinateSystemVersion).toBe('marseille-local-v1');
+    expect(GEO_REFERENCE_CONFIG.coordinateSystemVersion).toBe('metaverse-local-v1');
     expect(GEO_REFERENCE_CONFIG.axisMapping.north).toBe('-z');
     expect(GEO_REFERENCE_CONFIG.axisMapping.east).toBe('x');
   });
 
   it('place le miroir à l origine monde', () => {
     const mirror = geo.geoToWorld(
-      MARSEILLE_GEO_ORIGIN.latitude,
-      MARSEILLE_GEO_ORIGIN.longitude,
+      METAVERSE_GEO_ORIGIN.latitude,
+      METAVERSE_GEO_ORIGIN.longitude,
       0
     );
     expect(mirror.x).toBeCloseTo(METRO_SPAWN_ANCHOR.mirror.x, 3);
@@ -56,14 +56,14 @@ describe('geo-reference', () => {
   });
 
   it('oriente le nord vers −Z', () => {
-    const origin = geo.geoToWorld(MARSEILLE_GEO_ORIGIN.latitude, MARSEILLE_GEO_ORIGIN.longitude, 0);
-    const north = geo.geoToWorld(MARSEILLE_GEO_ORIGIN.latitude + 0.001, MARSEILLE_GEO_ORIGIN.longitude, 0);
+    const origin = geo.geoToWorld(METAVERSE_GEO_ORIGIN.latitude, METAVERSE_GEO_ORIGIN.longitude, 0);
+    const north = geo.geoToWorld(METAVERSE_GEO_ORIGIN.latitude + 0.001, METAVERSE_GEO_ORIGIN.longitude, 0);
     expect(north.z).toBeLessThan(origin.z);
   });
 
-  it('aligne MARSEILLE_START_POSITION sur l origine', () => {
-    expect(MARSEILLE_START_POSITION.latitude).toBe(MARSEILLE_GEO_ORIGIN.latitude);
-    expect(MARSEILLE_START_POSITION.longitude).toBe(MARSEILLE_GEO_ORIGIN.longitude);
+  it('aligne METAVERSE_START_POSITION sur l origine', () => {
+    expect(METAVERSE_START_POSITION.latitude).toBe(METAVERSE_GEO_ORIGIN.latitude);
+    expect(METAVERSE_START_POSITION.longitude).toBe(METAVERSE_GEO_ORIGIN.longitude);
   });
 
   it('place les landmarks proches de positions OSM attendues (< 15 m)', () => {
@@ -74,7 +74,7 @@ describe('geo-reference', () => {
       'harbor-east-building': new THREE.Vector3(113.7, 0, -10.96),
     };
 
-    for (const def of MARSEILLE_LANDMARK_BUILDINGS) {
+    for (const def of METAVERSE_LANDMARK_BUILDINGS) {
       const center = footprintCentroid(def.footprint, geo);
       const exp = expected[def.id];
       expect(exp).toBeDefined();
@@ -84,8 +84,8 @@ describe('geo-reference', () => {
   });
 
   it('expose des ancres de validation avec tolérances', () => {
-    expect(MARSEILLE_VALIDATION_ANCHORS.length).toBeGreaterThan(3);
-    const mirrorAnchor = MARSEILLE_VALIDATION_ANCHORS.find((a) => a.id === 'ombriere-mirror');
+    expect(METAVERSE_VALIDATION_ANCHORS.length).toBeGreaterThan(3);
+    const mirrorAnchor = METAVERSE_VALIDATION_ANCHORS.find((a) => a.id === 'ombriere-mirror');
     expect(mirrorAnchor?.expectedWorldPosition.x).toBe(0);
     expect(mirrorAnchor?.expectedWorldPosition.z).toBe(0);
   });

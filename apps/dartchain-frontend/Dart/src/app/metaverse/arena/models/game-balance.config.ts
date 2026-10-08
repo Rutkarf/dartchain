@@ -19,7 +19,7 @@ export interface GameBalanceConfig {
   maxMoveSpeedMps: number;
 }
 
-/** Valeurs de départ DEV — Kill-to-earn lisible, non définitives. */
+/** Valeurs de départ DEV — Éliminer pour gagner lisible, non définitives. */
 export const DEFAULT_ARENA_BALANCE_CONFIG: GameBalanceConfig = {
   lootRate: 0.18,
   lootCapPerElimination: 40,
@@ -37,9 +37,9 @@ export const DEFAULT_ARENA_BALANCE_CONFIG: GameBalanceConfig = {
   maxMoveSpeedMps: 8,
 };
 
-export const ARENA_WEAPON_UI_NAME = 'BB Pulse Rifle';
+export const ARENA_WEAPON_UI_NAME = 'Fusil à impulsion BB';
 
 export const ARENA_FAUCET_DISCLAIMER =
-  'Kill-to-earn : seul le ledger arène (M4T3R faucet non claimé) bouge. Wallet blockchain = jamais.';
+  'Éliminer pour gagner : seul le registre de l’arène (M4T3R du robinet non réclamé) bouge. Le portefeuille de la chaîne ne bouge jamais.';
 
-export const ARENA_KTE_TAG = 'Kill-to-earn';
+export const ARENA_KTE_TAG = 'Éliminer pour gagner';

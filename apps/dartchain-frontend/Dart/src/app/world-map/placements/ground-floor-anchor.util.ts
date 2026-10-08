@@ -37,10 +37,10 @@ export type GeoToWorldFn = (
 ) => { x: number; y?: number; z: number };
 
 /**
- * Projection équirectangulaire figée `marseille-local-v1` (origine Ombrière).
+ * Projection équirectangulaire figée `metaverse-local-v1` (origine Ombrière).
  * Identique à GeoCoordinateService tant que l’origine runtime n’est pas déplacée.
  */
-export function projectGeoToMarseilleWorld(
+export function projectGeoToMetaverseWorld(
   latitude: number,
   longitude: number,
   altitude = 0
@@ -57,7 +57,7 @@ export function projectGeoToMarseilleWorld(
   };
 }
 
-export function projectMarseilleWorldToGeo(
+export function projectMetaverseWorldToGeo(
   x: number,
   y: number,
   z: number
@@ -133,7 +133,7 @@ export function groundFloorAnchorFromWorldRing(
 
 export function groundFloorAnchorFromGeoFootprint(
   footprint: readonly GeoFootprintPoint[],
-  geoToWorld: GeoToWorldFn = projectGeoToMarseilleWorld,
+  geoToWorld: GeoToWorldFn = projectGeoToMetaverseWorld,
   options: GroundFloorAnchorOptions = {}
 ): GroundFloorAnchor | null {
   const ring = footprint.map((point) => {

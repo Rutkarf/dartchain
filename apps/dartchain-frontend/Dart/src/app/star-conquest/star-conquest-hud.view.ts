@@ -15,7 +15,7 @@ export function buildStarConquestHudChip(
   if (!quest) {
     return {
       visible: true,
-      title: 'Star Conquest',
+      title: 'Conquête stellaire',
       meta: `${claimed}/${catalog}`,
     };
   }

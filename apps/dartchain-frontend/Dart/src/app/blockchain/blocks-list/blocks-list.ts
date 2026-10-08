@@ -241,6 +241,12 @@ export class BlocksListComponent implements OnInit {
     return block.transactions?.length ?? 0;
   }
 
+  /** 4-segment load meter for list mode (filled = min(txCount, 4)). */
+  txLoadTicks(block: Block): boolean[] {
+    const filled = Math.min(4, Math.max(0, this.blockTxCount(block)));
+    return [0, 1, 2, 3].map((i) => i < filled);
+  }
+
   shortHash(hash: string | null | undefined, size = 6): string {
     if (!hash) {
       return 'N/A';

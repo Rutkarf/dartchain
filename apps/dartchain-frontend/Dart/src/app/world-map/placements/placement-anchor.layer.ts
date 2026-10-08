@@ -110,7 +110,7 @@ export class PlacementAnchorLayer {
         PLACEMENTS_LAYER_CONFIG.hitDepth
       );
       this.ownedGeometries.push(geometry);
-      const color = PLACEMENT_STATUS_COLOR[placement.status] ?? 0x8f9bb3;
+      const color = PLACEMENT_STATUS_COLOR[placement.status] ?? 0x8a95a5;
       const material = new THREE.MeshBasicMaterial({
         color,
         transparent: true,

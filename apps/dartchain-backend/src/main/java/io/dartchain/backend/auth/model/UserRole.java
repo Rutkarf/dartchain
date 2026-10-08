@@ -1,7 +1,7 @@
 package io.dartchain.backend.auth.model;
 
 /**
- * Phase AB — rôles applicatifs (GUEST = non authentifié, pas persisté).
+ * Rôles persistés. L'absence d'authentification n'est pas une valeur de cette enum.
  */
 public enum UserRole {
     USER,
@@ -21,7 +21,7 @@ public enum UserRole {
         try {
             return UserRole.valueOf(value.trim().toUpperCase());
         } catch (IllegalArgumentException exception) {
-            return USER;
+            throw new IllegalArgumentException("Rôle inconnu : " + value.trim());
         }
     }
 }

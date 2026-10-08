@@ -1,11 +1,10 @@
 <div
-  class="quests-summary-bar"
-  role="status"
-  aria-live="polite"
-  [attr.aria-label]="barAriaLabel()"
+ class="quests-summary-bar"
+ role="status"
+ aria-live="polite"
 >
-  <span class="quests-summary-bar__mission" title="Network Guardian">
-    Network Guardian
+  <span class="quests-summary-bar__mission" title="Gardien du réseau">
+    Gardien du réseau
   </span>
 
   <span
@@ -18,14 +17,13 @@
 
   <div class="quests-summary-bar__actions">
     <button
-      type="button"
-      class="quests-summary-bar__claim"
-      [disabled]="claimDisabled()"
-      [class.is-ready]="canClaim()"
-      (click)="onClaimQuest($event)"
-      aria-label="Claim quest"
-      title="Claim Quest"
-    >
+ type="button"
+ class="quests-summary-bar__claim"
+ [disabled]="claimDisabled()"
+ [class.is-ready]="canClaim()"
+ (click)="onClaimQuest($event)"
+ title="Claim Quest"
+ >
       CLAIM QUEST
     </button>
   </div>

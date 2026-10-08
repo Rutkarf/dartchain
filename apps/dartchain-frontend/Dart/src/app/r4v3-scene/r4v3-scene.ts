@@ -13,15 +13,19 @@ import * as THREE from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import {
-  PALETTE_STOPS,
-  THREE_CORE_DEFAULT,
-  THREE_GLASS_MATERIAL,
-  THREE_RIM_DEFAULT,
-  THREE_SCENE_BG,
   THREE_SCENE_CLEAR_LIGHT,
   hexToThree,
-  threePaletteVariant,
 } from '../core/constants/palette';
+import {
+  LOGO_HOLO,
+  LOGO_HOLO_EMISSIVE_HEX,
+  LOGO_HOLO_SHEEN_HEX,
+  addLogoHoloLights,
+  createLogoHoloMaterial,
+  logoHoloPaletteVariant,
+  tickLogoHoloAppearance,
+  type LogoHoloCenterDarkUniforms,
+} from '../shared/logo-stl-viewer/logo-stl-holo';
 import {
   bindWebGlVisibilityPause,
   shouldAnimateWebGl,
@@ -53,13 +57,19 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
   private frontLight!: THREE.DirectionalLight;
   private rimLight!: THREE.PointLight;
   private coreLight!: THREE.PointLight;
+  private fillLight?: THREE.DirectionalLight;
+  private rimLightB?: THREE.PointLight;
+  private holoCenterDark?: LogoHoloCenterDarkUniforms;
+  private holoEmissiveStops: THREE.Color[] = [];
+  private holoSheenStops: THREE.Color[] = [];
+  private holoScratchA = new THREE.Color();
+  private holoScratchB = new THREE.Color();
+  private holoEdgeBright = new THREE.Color(LOGO_HOLO.edgeBright);
+  private holoEdgeGlow = new THREE.Color(LOGO_HOLO.edgeGlow);
+  private readonly holoClock = new THREE.Timer();
 
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
-
-  private readonly palettes = PALETTE_STOPS.map((_, index) =>
-    threePaletteVariant(index)
-  );
 
   private paletteIndex = 0;
   private animating = false;
@@ -108,6 +118,7 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
 
     this.scene?.clear();
     this.renderer?.dispose();
+    this.holoClock.dispose();
   }
 
   public randomizePalette(): void {
@@ -156,20 +167,16 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
   }
 
   private initLights(): void {
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 1.15);
-    this.scene.add(this.ambientLight);
-
-    this.frontLight = new THREE.DirectionalLight(0xffffff, 1.7);
-    this.frontLight.position.set(40, 30, 80);
-    this.scene.add(this.frontLight);
-
-    this.rimLight = new THREE.PointLight(THREE_RIM_DEFAULT, 1.6, 240);
-    this.rimLight.position.set(-22, 6, 45);
-    this.scene.add(this.rimLight);
-
-    this.coreLight = new THREE.PointLight(THREE_CORE_DEFAULT, 1.9, 220);
-    this.coreLight.position.set(12, 10, 36);
-    this.scene.add(this.coreLight);
+    const lights = addLogoHoloLights(THREE, this.scene, 28);
+    this.ambientLight = lights.ambient;
+    this.frontLight = lights.key;
+    this.fillLight = lights.fill;
+    this.rimLight = lights.rimA;
+    this.rimLightB = lights.rimB;
+    this.coreLight = lights.core;
+    this.holoEmissiveStops = LOGO_HOLO_EMISSIVE_HEX.map((hex) => new THREE.Color(hexToThree(hex)));
+    this.holoSheenStops = LOGO_HOLO_SHEEN_HEX.map((hex) => new THREE.Color(hexToThree(hex)));
+    this.holoClock.connect(document);
   }
 
   private initStars(): void {
@@ -186,7 +193,7 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
     const material = new THREE.PointsMaterial({
-      color: 0xffffff,
+      color: 0xede7d9,
       size: 0.38,
       transparent: true,
       opacity: 0.9,
@@ -239,13 +246,8 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
         const sphere = geometry.boundingSphere;
         if (!sphere) return;
 
-        const material = new THREE.MeshPhysicalMaterial({
-          color: this.palettes[0].color,
-          emissive: this.palettes[0].emissive,
-          ...THREE_GLASS_MATERIAL,
-          reflectivity: 0.85,
-          side: THREE.DoubleSide,
-        });
+        const { material, centerDark } = createLogoHoloMaterial(THREE, geometry);
+        this.holoCenterDark = centerDark;
 
         this.mesh = new THREE.Mesh(geometry, material);
         this.mesh.position.set(0, 0, 0);
@@ -257,6 +259,7 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
 
         this.mesh.scale.setScalar(scale);
         this.pivot.add(this.mesh);
+        this.applyPalette(logoHoloPaletteVariant(0), false);
 
         this.fitCameraToPivot();
       }
@@ -311,14 +314,28 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
   private changeLogoPalette(): void {
     if (!this.mesh) return;
 
-    this.paletteIndex = (this.paletteIndex + 1) % this.palettes.length;
-    const palette = this.palettes[this.paletteIndex];
+    this.paletteIndex = (this.paletteIndex + 1) % LOGO_HOLO_EMISSIVE_HEX.length;
+    this.applyPalette(logoHoloPaletteVariant(this.paletteIndex), true);
+  }
+
+  private applyPalette(
+    palette: ReturnType<typeof logoHoloPaletteVariant>,
+    electricBoost: boolean
+  ): void {
+    if (!this.mesh) return;
 
     this.mesh.material.color.setHex(palette.color);
     this.mesh.material.emissive.setHex(palette.emissive);
+    this.mesh.material.emissiveIntensity = electricBoost ? 1.15 : 0.7;
+    this.holoEdgeBright.setHex(palette.color);
+    this.holoEdgeGlow.setHex(palette.emissive);
     this.rimLight.color.setHex(palette.rim);
     this.coreLight.color.setHex(palette.core);
+    if (this.rimLightB) this.rimLightB.color.setHex(LOGO_HOLO.rimB);
     this.mesh.material.needsUpdate = true;
+
+    this.coreLight.intensity = electricBoost ? 3.6 : 2.55;
+    this.rimLight.intensity = electricBoost ? 2.8 : 2.15;
   }
 
   private kickLogoRotation(): void {
@@ -326,12 +343,12 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
     this.pivot.rotation.y += THREE.MathUtils.randFloat(0.08, 0.2);
     this.pivot.rotation.x += THREE.MathUtils.randFloat(-0.04, 0.04);
 
-    this.coreLight.intensity = 2.7;
-    this.rimLight.intensity = 2.0;
+    this.coreLight.intensity = 3.2;
+    this.rimLight.intensity = 2.6;
 
     setTimeout(() => {
-      this.coreLight.intensity = 1.9;
-      this.rimLight.intensity = 1.6;
+      this.coreLight.intensity = 2.55;
+      this.rimLight.intensity = 2.15;
     }, 180);
   }
 
@@ -354,12 +371,13 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private animate = (): void => {
+  private animate = (now = performance.now()): void => {
     if (!this.animating) {
       return;
     }
 
     this.frameId = requestAnimationFrame(this.animate);
+    this.holoClock.update(now);
 
     if (!shouldAnimateWebGl()) {
       return;
@@ -377,6 +395,21 @@ export class R4v3SceneComponent implements AfterViewInit, OnDestroy {
       y: this.pivot.rotation.y,
       z: this.pivot.rotation.z
     });
+
+    if (this.mesh) {
+      tickLogoHoloAppearance({
+        material: this.mesh.material,
+        centerDark: this.holoCenterDark,
+        emissiveStops: this.holoEmissiveStops,
+        sheenStops: this.holoSheenStops,
+        scratchA: this.holoScratchA,
+        scratchB: this.holoScratchB,
+        edgeBright: this.holoEdgeBright,
+        edgeGlow: this.holoEdgeGlow,
+        elapsed: this.holoClock.getElapsed(),
+        bright: 0.62,
+      });
+    }
 
     this.controls.update();
     this.renderer.render(this.scene, this.camera);

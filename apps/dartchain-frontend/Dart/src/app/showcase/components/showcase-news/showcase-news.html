@@ -1,7 +1,6 @@
 <div
-  class="showcase-view showcase-view--news"
-  role="region"
-  aria-label="Fil d'actualités"
+ class="showcase-view showcase-view--news"
+ role="region"
 >
   @if (isExpanded) {
     <header class="showcase-news__head">
@@ -9,12 +8,11 @@
         @if (chainBlockLabel(); as blockLabel) {
           @if (chainLiveClickable()) {
             <button
-              type="button"
-              class="showcase-news__chain-status showcase-news__chain-status--btn"
-              (click)="openLatestBlock()"
-              [attr.aria-label]="'Ouvrir le bloc ' + blockLabel"
-              [attr.title]="newsState.chainStatusTooltip()"
-            >
+ type="button"
+ class="showcase-news__chain-status showcase-news__chain-status--btn"
+ (click)="openLatestBlock()"
+ [attr.title]="newsState.chainStatusTooltip()"
+ >
               <span
                 class="showcase-news__chain-led"
                 [class]="newsState.chainLiveToneClass()"
@@ -60,10 +58,7 @@
         <label class="showcase-meta__search showcase-news__search-inline">
           <span class="sr-only">Rechercher dans les actualités</span>
           <span class="showcase-news__search-icon" aria-hidden="true">
-            <svg viewBox="0 0 16 16" focusable="false">
-              <circle cx="6.5" cy="6.5" r="4.2" fill="none" stroke="currentColor" stroke-width="1.5" />
-              <path d="M9.8 9.8 13.2 13.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-            </svg>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
           </span>
           <span
             class="showcase-news__search-hint"

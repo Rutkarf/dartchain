@@ -26,4 +26,8 @@ public interface UserAccountStore {
     UserAccount updatePassword(String userId, String passwordHash);
 
     UserAccount updateRole(String userId, UserRole role);
+
+    UserAccount markEmailVerified(String userId);
+
+    UserAccount updateTotp(String userId, String totpSecret, boolean totpEnabled);
 }

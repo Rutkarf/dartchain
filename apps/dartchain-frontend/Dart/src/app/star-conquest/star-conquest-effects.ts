@@ -1,4 +1,8 @@
 import * as THREE from 'three';
+import {
+  createFxLineMaterial,
+  STROKE,
+} from '../core/constants/stroke-bevel';
 import type { StarConquestEffectKind, StarConquestUniverseTheme } from './star-conquest-universe.types';
 import { createSoftDiscTexture } from './star-conquest-visuals';
 import { STAR_QUEST_FAMILIES, STAR_QUEST_FAMILY_ORDER } from './star-conquest-families';
@@ -106,14 +110,14 @@ export class StarConquestEffects {
       if (isStructure) {
         // Géométrie déjà biaisée — micro pulse d’opacité seulement
         const mat = ring.material as THREE.LineBasicMaterial;
-        mat.opacity = 0.2 + Math.sin(this.time * 0.4) * 0.045;
+        mat.opacity = STROKE.struct.opacity + Math.sin(this.time * 0.4) * 0.045;
         continue;
       }
       ring.rotation.z += deltaMs * 0.00006 * (1 + ri * 0.25);
       ring.rotation.x = Math.sin(this.time * 0.22) * 0.16;
       ring.rotation.y = Math.cos(this.time * 0.17) * 0.07;
       const mat = ring.material as THREE.LineBasicMaterial;
-      mat.opacity = 0.11 + Math.sin(this.time * 0.35 + ri) * 0.025;
+      mat.opacity = STROKE.dense.opacity + Math.sin(this.time * 0.35 + ri) * 0.025;
     }
 
     if (this.portalRing) {
@@ -191,13 +195,7 @@ export class StarConquestEffects {
       pts.push(new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r * 0.82, -22));
     }
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
-    const mat = new THREE.LineBasicMaterial({
-      color: 0x6ad4f0,
-      transparent: true,
-      opacity: 0.14,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const mat = createFxLineMaterial(STROKE.dense);
     this.galaxyBowl = new THREE.Line(geom, mat);
     this.galaxyBowl.name = 'sc-galaxy-bowl';
     this.galaxyBowl.raycast = () => {};
@@ -215,12 +213,9 @@ export class StarConquestEffects {
       );
       const geom = new THREE.BufferGeometry().setFromPoints(pts);
       const fam = STAR_QUEST_FAMILIES[cell.family];
-      const mat = new THREE.LineBasicMaterial({
+      const mat = createFxLineMaterial(STROKE.dense, {
         color: new THREE.Color(fam.rgb[0], fam.rgb[1], fam.rgb[2]),
-        transparent: true,
         opacity: mq.hiveOpacity,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
       });
       const line = new THREE.Line(geom, mat);
       line.name = `sc-hive-cell-${cell.family}`;
@@ -241,13 +236,7 @@ export class StarConquestEffects {
       pts.push(new THREE.Vector3(p.x, p.y, p.z));
     }
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
-    const mat = new THREE.LineBasicMaterial({
-      color: 0x7ad4f0,
-      transparent: true,
-      opacity: 0.22,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const mat = createFxLineMaterial(STROKE.struct);
     const ring = new THREE.Line(geom, mat);
     ring.name = 'sc-galaxy-structure-ring';
     ring.raycast = () => {};
@@ -282,13 +271,7 @@ export class StarConquestEffects {
         pts.push(new THREE.Vector3(Math.cos(a) * radii[i], Math.sin(a) * radii[i], -14 - i * 5));
       }
       const geom = new THREE.BufferGeometry().setFromPoints(pts);
-      const mat = new THREE.LineBasicMaterial({
-        color: i % 2 === 0 ? 0x52e6ed : 0xb078f0,
-        transparent: true,
-        opacity: 0.16 + i * 0.05,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      });
+      const mat = createFxLineMaterial(STROKE.dense);
       const ring = new THREE.Line(geom, mat);
       ring.name = `sc-orbit-ring-${i}`;
       ring.raycast = () => {};
@@ -309,13 +292,7 @@ export class StarConquestEffects {
     }
     const geom = new THREE.BufferGeometry();
     geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-    const mat = new THREE.LineBasicMaterial({
-      color: 0xe8b86d,
-      transparent: true,
-      opacity: 0.14,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const mat = createFxLineMaterial(STROKE.danger, { opacity: STROKE.dense.opacity });
     this.gridLines = new THREE.LineSegments(geom, mat);
     this.gridLines.name = 'sc-m4t3r-grid';
     this.gridLines.raycast = () => {};
@@ -331,13 +308,7 @@ export class StarConquestEffects {
       pts.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius * 0.55, -8));
     }
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
-    const mat = new THREE.LineBasicMaterial({
-      color: 0x66ffee,
-      transparent: true,
-      opacity: 0.35,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const mat = createFxLineMaterial(STROKE.ok, { opacity: 0.35 });
     this.portalRing = new THREE.Line(geom, mat);
     this.portalRing.name = 'sc-nexus-portal';
     this.portalRing.raycast = () => {};
@@ -401,13 +372,7 @@ export class StarConquestEffects {
     }
     const geom = new THREE.BufferGeometry();
     geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-    const mat = new THREE.LineBasicMaterial({
-      color: 0x9966ff,
-      transparent: true,
-      opacity: 0.2,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const mat = createFxLineMaterial(STROKE.struct);
     this.spiralArms = new THREE.LineSegments(geom, mat);
     this.spiralArms.name = 'sc-galaxy-spiral';
     this.spiralArms.raycast = () => {};
@@ -419,13 +384,7 @@ export class StarConquestEffects {
       new THREE.Vector3(0, -120, -45),
       new THREE.Vector3(0, 120, 45),
     ]);
-    const mat = new THREE.LineBasicMaterial({
-      color: 0x8899ff,
-      transparent: true,
-      opacity: 0.22,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
+    const mat = createFxLineMaterial(STROKE.struct);
     this.timelineAxis = new THREE.Line(geom, mat);
     this.timelineAxis.name = 'sc-timeline-axis';
     this.timelineAxis.raycast = () => {};
@@ -548,7 +507,7 @@ export class StarConquestEffects {
     const mat = new THREE.PointsMaterial({
       size: 1.4 * STAR_CONQUEST_SCALE.visual,
       map: this.discTexture,
-      color: 0x52e6ed,
+      color: 0x8a95a5,
       transparent: true,
       opacity: 0.05,
       blending: THREE.AdditiveBlending,

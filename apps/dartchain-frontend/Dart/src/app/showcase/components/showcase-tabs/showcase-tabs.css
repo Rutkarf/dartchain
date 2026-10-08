@@ -4,24 +4,34 @@
   height: 100%;
   min-width: 0;
   overflow: visible;
-  --showcase-tab-cyan: var(--tab-push-cyan, var(--ds-neon-cyan, var(--accent-cyan, #2ec4d6)));
-  --showcase-tab-cyan-rgb: var(--tab-push-cyan-rgb, var(--ds-neon-cyan-rgb, var(--accent-cyan-rgb, 46, 196, 214)));
+  --showcase-tab-cyan: var(--tab-push-cyan, var(--ds-neon-cyan, var(--accent-cyan, #8b9dad)));
+  --showcase-tab-cyan-rgb: var(--tab-push-cyan-rgb, var(--ds-neon-cyan-rgb, var(--accent-cyan-rgb, 139, 157, 173)));
+}
+
+.showcase-tabs__rail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+
+:host .showcase-tabs {
+  overflow: visible;
 }
 
 .showcase-tabs {
   display: flex;
   flex-flow: row nowrap;
   align-items: stretch;
-  justify-content: stretch;
-  gap: var(--tab-push-gap, 1px);
+  justify-content: flex-start;
+  gap: var(--tab-push-gap, 2px);
   width: 100%;
   height: 100%;
   min-width: 0;
   margin: 0;
-  padding: 1px;
+  padding: 2px;
   box-sizing: border-box;
-  overflow-x: hidden;
-  overflow-y: visible;
+  overflow: visible;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -32,29 +42,31 @@
 
 .showcase-tab {
   position: relative;
-  flex: 1 1 0;
+  flex: 0 0 calc((100% - 6 * var(--tab-push-gap, 1px)) / 7);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0;
+  width: calc((100% - 6 * var(--tab-push-gap, 1px)) / 7);
   min-height: 100%;
   min-width: 0;
-  max-width: none;
+  max-width: calc((100% - 6 * var(--tab-push-gap, 1px)) / 7);
   margin: 0;
   padding: 0;
   border: none;
   border-radius: var(--tab-push-radius, 0);
-  color: var(--tab-push-label-idle, rgba(168, 180, 196, 0.52));
+  color: var(--tab-push-label-idle, rgba(139, 157, 173, 0.52));
   font-family: inherit;
-  font-size: clamp(5px, 1.9vw, 7px);
+  font-size: var(--fs-label)!important;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.05em !important;
   line-height: 1.1;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: visible;
   text-overflow: unset;
   cursor: pointer;
+  user-select: none;
   appearance: none;
   -webkit-appearance: none;
   touch-action: manipulation;
@@ -73,21 +85,14 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: 'Open Sans', var(--font-body, system-ui, sans-serif);
+  font-family: 'Roboto', sans-serif;
+  font-size: var(--fs-label)!important;
   font-weight: 600;
   font-style: normal;
-  transform: skewX(-11deg);
+  letter-spacing: 0.04em !important;
+  line-height: 1.1 !important;
+  transform: skewX(-11deg) !important;
   transform-origin: center center;
-  transition:
-    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
-    font-weight 200ms ease;
-}
-
-.showcase-tab:hover .showcase-tab__label,
-.showcase-tab:active .showcase-tab__label,
-.showcase-tab.is-active .showcase-tab__label {
-  transform: skewX(0deg);
-  font-style: normal;
 }
 
 .showcase-tab.is-active .showcase-tab__label {
@@ -109,11 +114,11 @@
   height: fit-content;
   margin: 0;
   padding: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   line-height: 0;
   pointer-events: none;
   transform: translate(8%, -6%);
-  animation: showcase-tab-unread-toast-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: showcase-tab-unread-toast-in var(--motion-enter) var(--motion-ease-enter) both;
 }
 
 .showcase-tab:has(.showcase-tab__unread-toast) {
@@ -122,9 +127,7 @@
 }
 
 .showcase-tab__unread-toast--live {
-  animation:
-    showcase-tab-unread-toast-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    showcase-tab-badge-pulse 1.4s ease-out 1;
+  animation: showcase-tab-unread-toast-in var(--motion-enter) var(--motion-ease-enter) both, showcase-tab-badge-pulse 1.4s ease-out 1;
 }
 
 @keyframes showcase-tab-unread-toast-in {
@@ -156,13 +159,19 @@
 @media (prefers-reduced-motion: reduce) {
   .showcase-tab__unread-toast,
   .showcase-tab__unread-toast--live {
-    animation: none;
+    animation:  none;
   }
 }
 
-@media (max-width: 349px) {
+@media (max-width: 349px),
+       (orientation: portrait) and (max-width: 480px) {
   .showcase-tab {
-    font-size: 5px;
+    flex: 1 1 0;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    overflow: hidden;
+    font-size: var(--fs-label);
     letter-spacing: 0.03em;
   }
 }

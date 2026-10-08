@@ -42,7 +42,7 @@ export class DockPeersSummaryComponent implements OnInit, OnDestroy {
   readonly primaryPeerConnectedPeople = this.state.primaryPeerConnectedPeople;
 
   readonly emptyPeerLabel = computed(() =>
-    this.state.error() ? 'Peers indisponibles' : this.state.loading() ? 'Sync…' : 'Aucun peer'
+    this.state.error() ? 'Pairs indisponibles' : this.state.loading() ? 'Synchro…' : 'Aucun pair'
   );
 
   readonly peerTitle = computed(() => {

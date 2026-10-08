@@ -3,9 +3,9 @@ import * as THREE from 'three';
 
 import { GeoCoordinateService } from './geo-coordinate.service';
 import {
-  MARSEILLE_DISTRICTS,
+  METAVERSE_DISTRICTS,
   WORLD_SCALE,
-  type MarseilleDistrictId,
+  type MetaverseDistrictId,
 } from './map-configuration';
 import {
   streamingBuildingBudget,
@@ -42,7 +42,7 @@ export class WorldStreamingManager {
 
   private root: THREE.Group | null = null;
   private readonly loaded = new Map<string, LoadedChunk>();
-  private readonly districtWorld = new Map<MarseilleDistrictId, THREE.Vector3>();
+  private readonly districtWorld = new Map<MetaverseDistrictId, THREE.Vector3>();
   private groundMaterial: THREE.MeshStandardMaterial | null = null;
   private wallMaterials: THREE.MeshStandardMaterial[] = [];
   private neonMaterials: THREE.MeshBasicMaterial[] = [];
@@ -54,8 +54,8 @@ export class WorldStreamingManager {
   attach(root: THREE.Group): void {
     this.root = root;
     this.districtWorld.clear();
-    for (const [id, district] of Object.entries(MARSEILLE_DISTRICTS) as Array<
-      [MarseilleDistrictId, (typeof MARSEILLE_DISTRICTS)[MarseilleDistrictId]]
+    for (const [id, district] of Object.entries(METAVERSE_DISTRICTS) as Array<
+      [MetaverseDistrictId, (typeof METAVERSE_DISTRICTS)[MetaverseDistrictId]]
     >) {
       this.districtWorld.set(
         id,
@@ -110,42 +110,42 @@ export class WorldStreamingManager {
   private ensureSharedMaterials(): void {
     if (this.groundMaterial) return;
     this.groundMaterial = new THREE.MeshStandardMaterial({
-      color: 0x2c333c,
+      color: 0x18314f,
       roughness: 0.92,
       metalness: 0.04,
     });
     this.roofMaterial = new THREE.MeshStandardMaterial({
-      color: 0x4a515c,
+      color: 0x18314f,
       roughness: 0.86,
       metalness: 0.1,
     });
     this.hillMaterial = new THREE.MeshStandardMaterial({
-      color: 0x3d4a3a,
+      color: 0x18314f,
       roughness: 0.95,
       metalness: 0.02,
     });
     this.wallMaterials = [
-      new THREE.MeshStandardMaterial({ color: 0xcbb8a0, roughness: 0.84, metalness: 0.05 }),
-      new THREE.MeshStandardMaterial({ color: 0xd8c3a5, roughness: 0.82, metalness: 0.04 }),
-      new THREE.MeshStandardMaterial({ color: 0xbfa88c, roughness: 0.86, metalness: 0.03 }),
-      new THREE.MeshStandardMaterial({ color: 0xe08ab8, roughness: 0.7, metalness: 0.08 }),
-      new THREE.MeshStandardMaterial({ color: 0xd9c4a2, roughness: 0.8, metalness: 0.04 }),
+      new THREE.MeshStandardMaterial({ color: 0x8a95a5, roughness: 0.84, metalness: 0.05 }),
+      new THREE.MeshStandardMaterial({ color: 0xede7d9, roughness: 0.82, metalness: 0.04 }),
+      new THREE.MeshStandardMaterial({ color: 0x8a95a5, roughness: 0.86, metalness: 0.03 }),
+      new THREE.MeshStandardMaterial({ color: 0x7b0d1e, roughness: 0.7, metalness: 0.08 }),
+      new THREE.MeshStandardMaterial({ color: 0xede7d9, roughness: 0.8, metalness: 0.04 }),
       new THREE.MeshStandardMaterial({
-        color: MARSEILLE_DISTRICTS['le-panier'].palette,
+        color: METAVERSE_DISTRICTS['le-panier'].palette,
         roughness: 0.78,
         metalness: 0.04,
       }),
       new THREE.MeshStandardMaterial({
-        color: MARSEILLE_DISTRICTS.joliette.palette,
+        color: METAVERSE_DISTRICTS.joliette.palette,
         roughness: 0.42,
         metalness: 0.38,
       }),
     ];
     this.neonMaterials = [
-      new THREE.MeshBasicMaterial({ color: 0xff3ecf }),
-      new THREE.MeshBasicMaterial({ color: 0x40e0ff }),
-      new THREE.MeshBasicMaterial({ color: 0xffe600 }),
-      new THREE.MeshBasicMaterial({ color: 0x7a5cff }),
+      new THREE.MeshBasicMaterial({ color: 0x7b0d1e }),
+      new THREE.MeshBasicMaterial({ color: 0x8a95a5 }),
+      new THREE.MeshBasicMaterial({ color: 0xd5a021 }),
+      new THREE.MeshBasicMaterial({ color: 0x8a95a5 }),
     ];
   }
 
@@ -240,8 +240,8 @@ export class WorldStreamingManager {
     this.loaded.delete(id);
   }
 
-  private nearestDistrict(x: number, z: number): MarseilleDistrictId {
-    let best: MarseilleDistrictId = 'vieux-port';
+  private nearestDistrict(x: number, z: number): MetaverseDistrictId {
+    let best: MetaverseDistrictId = 'vieux-port';
     let bestDist = Number.POSITIVE_INFINITY;
     for (const [id, pos] of this.districtWorld) {
       const dist = Math.hypot(pos.x - x, pos.z - z);
@@ -253,7 +253,7 @@ export class WorldStreamingManager {
     return bestDist < 220 ? best : this.fallbackDistrict(x, z);
   }
 
-  private fallbackDistrict(x: number, z: number): MarseilleDistrictId {
+  private fallbackDistrict(x: number, z: number): MetaverseDistrictId {
     if (z < -80 && Math.abs(x) < 80) return 'canebiere';
     if (x > 80 && z < -40) return 'cours-julien';
     if (x > 80 && z > 20) return 'la-plaine';
@@ -268,7 +268,7 @@ export class WorldStreamingManager {
     geometries: THREE.BufferGeometry[],
     bounds: ReturnType<typeof chunkBounds>,
     seed: number,
-    district: MarseilleDistrictId,
+    district: MetaverseDistrictId,
     coreFade = 1
   ): number {
     const baseCount =
@@ -415,8 +415,8 @@ export class WorldStreamingManager {
     const spire = new THREE.Mesh(
       spireGeo,
       new THREE.MeshStandardMaterial({
-        color: 0xf2ece3,
-        emissive: 0x665533,
+        color: 0xede7d9,
+        emissive: 0x7b0d1e,
         emissiveIntensity: 0.18,
         roughness: 0.55,
         metalness: 0.12,
@@ -428,7 +428,7 @@ export class WorldStreamingManager {
     return 1;
   }
 
-  private wallForDistrict(district: MarseilleDistrictId, index: number): THREE.MeshStandardMaterial {
+  private wallForDistrict(district: MetaverseDistrictId, index: number): THREE.MeshStandardMaterial {
     if (district === 'le-panier') return this.wallMaterials[5] ?? this.wallMaterials[0];
     if (district === 'joliette') return this.wallMaterials[6] ?? this.wallMaterials[0];
     if (district === 'vieux-port' || district === 'canebiere') {
@@ -438,7 +438,7 @@ export class WorldStreamingManager {
     return this.wallMaterials[index % Math.min(5, this.wallMaterials.length)];
   }
 
-  private buildingType(district: MarseilleDistrictId, index: number): BuildingType {
+  private buildingType(district: MetaverseDistrictId, index: number): BuildingType {
     if (district === 'cours-julien') return index % 3 === 0 ? 'club' : 'apartment';
     if (district === 'canebiere') return index % 4 === 0 ? 'tower' : 'historic-block';
     if (district === 'la-plaine') return index % 2 === 0 ? 'market' : 'apartment';

@@ -51,11 +51,19 @@ export class M4t3rRewardRuntimeService {
       return;
     }
 
-    if (accepted.rewards?.length) {
-      for (const reward of accepted.rewards) {
+    // Dual feed faucet : toujours ADDITIF au ramassage (jamais un sync absolu).
+    // setClaimableFromAmount est réservé au loadState — sinon le tick +1/s
+    // déjà en avance fait ignorer chaque pickup authentifié.
+    const credited = (accepted.rewards ?? []).filter(
+      (reward) =>
+        reward.status === 'CREDITED_FAUCET_PENDING' ||
+        reward.status === 'CREDITED_OFFCHAIN'
+    );
+    if (credited.length > 0) {
+      for (const reward of credited) {
         this.faucet.creditM4t3rAmount(reward.amount);
       }
-    } else {
+    } else if (accepted.amount > 0) {
       this.faucet.creditM4t3rCollectCount(accepted.amount);
     }
 

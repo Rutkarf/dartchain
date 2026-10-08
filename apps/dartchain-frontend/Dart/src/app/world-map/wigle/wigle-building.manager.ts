@@ -35,9 +35,9 @@ export class WigleBuildingManager {
     this.iconGeometry = createWifiIconGeometry();
     this.circleGeometry = createWifiCircleGeometry();
 
-    this.wifiMesh = this.createTypeMesh(this.iconGeometry, 0x00f3ff, 'network-buildings-wifi');
-    this.cellMesh = this.createTypeMesh(this.iconGeometry, 0xff00ff, 'network-buildings-cell');
-    this.bleMesh = this.createTypeMesh(this.iconGeometry, 0x7b2cbf, 'network-buildings-ble');
+    this.wifiMesh = this.createTypeMesh(this.iconGeometry, 0x8a95a5, 'network-buildings-wifi');
+    this.cellMesh = this.createTypeMesh(this.iconGeometry, 0x8a95a5, 'network-buildings-cell');
+    this.bleMesh = this.createTypeMesh(this.iconGeometry, 0x8a95a5, 'network-buildings-ble');
     this.circleMesh = this.createCircleMesh(this.circleGeometry);
 
     this.root.add(this.wifiMesh, this.cellMesh, this.bleMesh, this.circleMesh);
@@ -120,8 +120,8 @@ export class WigleBuildingManager {
 
   private createCircleMesh(geometry: THREE.BufferGeometry): THREE.InstancedMesh {
     const material = new THREE.MeshStandardMaterial({
-      color: 0x00f3ff,
-      emissive: 0x00f3ff,
+      color: 0x8a95a5,
+      emissive: 0x8a95a5,
       emissiveIntensity: 0.85,
       metalness: 0.4,
       roughness: 0.35,
@@ -141,7 +141,7 @@ export class WigleBuildingManager {
     const size = WIGLE_GEO_CONFIG.buildingBaseSize;
     for (let i = 0; i < points.length; i++) {
       const point = points[i];
-      const signalBoost = THREE.MathUtils.clamp((point.signalStrength + 80) / 100, 0, 0.35);
+      const signalBoost = THREE.MathUtils.clamp((point.signalStrength + 80) / 1013, 6, 48.35);
       const scale = size * (0.85 + signalBoost * 0.4);
 
       this.scratchPos.set(point.worldX, point.worldY + 1.15, point.worldZ);
@@ -161,7 +161,7 @@ export class WigleBuildingManager {
     const size = WIGLE_GEO_CONFIG.buildingBaseSize;
     for (let i = 0; i < points.length; i++) {
       const point = points[i];
-      const signalBoost = THREE.MathUtils.clamp((point.signalStrength + 80) / 100, 0, 0.35);
+      const signalBoost = THREE.MathUtils.clamp((point.signalStrength + 80) / 1013, 6, 48.35);
       const scale = size * (1.05 + signalBoost * 0.35);
 
       this.scratchPos.set(point.worldX, point.worldY + 0.05, point.worldZ);

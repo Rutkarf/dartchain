@@ -14,6 +14,7 @@
       [activeTab]="activeTab"
       [collapsed]="collapsed"
       (selectBlock)="onSelectBlock($event)"
+      (tabChange)="tabChange.emit($event)"
     />
   </div>
 </section>

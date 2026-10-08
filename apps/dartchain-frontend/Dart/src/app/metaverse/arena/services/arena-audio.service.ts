@@ -3,7 +3,7 @@ import { Injectable, signal } from '@angular/core';
 type SfxKind = 'fire' | 'hit' | 'kill' | 'hurt' | 'power' | 'earn';
 
 /**
- * Audio Kill-to-earn — blips punchy, zéro asset externe.
+ * Audio Éliminer pour gagner — blips punchy, zéro asset externe.
  */
 @Injectable({ providedIn: 'root' })
 export class ArenaAudioService {
@@ -21,10 +21,17 @@ export class ArenaAudioService {
 
   play(kind: SfxKind): void {
     if (this.mutedSignal()) return;
+    // Uniquement pendant une interaction gameplay (geste déjà présent).
+    const shared = (
+      window as unknown as { __DARTCHAIN_AUDIO__?: { unlocked?: boolean } }
+    ).__DARTCHAIN_AUDIO__;
+    if (shared && !shared.unlocked) return;
     try {
       this.ctx ??= new AudioContext();
       const ctx = this.ctx;
-      if (ctx.state === 'suspended') void ctx.resume();
+      if (ctx.state === 'suspended') {
+        void ctx.resume().catch(() => undefined);
+      }
       const t0 = ctx.currentTime;
 
       const beep = (

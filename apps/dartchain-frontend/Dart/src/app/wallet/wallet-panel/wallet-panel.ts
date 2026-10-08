@@ -23,6 +23,7 @@ import { take } from 'rxjs/operators';
 import {
   BalanceResponse,
   BlockchainApiService,
+  WalletHoldingDto,
   WalletResponse,
 } from '@blockchain/services/blockchain-api.service';
 import { WalletSessionService } from '@wallet/services/wallet-session.service';
@@ -90,6 +91,9 @@ export class WalletPanelComponent implements OnInit {
   protected readonly lookedUpAddress = signal('');
   protected readonly lookedUpDisplay = signal('');
   protected readonly recentLookups = signal<RecentWalletLookup[]>(this.readRecentLookups());
+  /** Tokens non-R4V3 (swap) — disclosure compacte sous le solde natif. */
+  protected readonly otherHoldings = signal<WalletHoldingDto[]>([]);
+  protected readonly holdingsExpanded = signal(false);
 
   protected readonly creatingWallet = signal(false);
   protected readonly refreshingBalance = signal(false);
@@ -133,8 +137,16 @@ export class WalletPanelComponent implements OnInit {
     return Boolean(local?.address?.trim() && local?.privateKey?.trim());
   });
 
-  /** Affiche le CTA de création tant qu’il n’y a pas de clés locales. */
-  protected readonly needsWalletCreation = computed(() => !this.hasWallet());
+  /**
+   * CTA de création seulement sans wallet local ET sans wallet déjà lié au compte.
+   * Un second clic remplaçait l’adresse et faisait disparaître les m4t3r en attente.
+   */
+  protected readonly needsWalletCreation = computed(() => {
+    if (this.hasWallet()) {
+      return false;
+    }
+    return !this.auth.user()?.walletAddress?.trim();
+  });
 
   /** Création autorisée uniquement si connecté et sans wallet local. */
   protected readonly canCreateWallet = computed(
@@ -163,12 +175,14 @@ export class WalletPanelComponent implements OnInit {
   protected readonly balanceWholePart = computed(() => {
     const formatted = this.formattedTotalBalance();
     const sep = formatted.lastIndexOf(',');
-    return sep >= 0 ? formatted.slice(0, sep) : formatted;
+    return sep >= 0 ? formatted.slice(0, sep) : formatted || '0';
   });
+  /** Toujours exactement 26 chiffres décimaux (zéros inclus) sous la virgule. */
   protected readonly balanceFractionPart = computed(() => {
     const formatted = this.formattedTotalBalance();
     const sep = formatted.lastIndexOf(',');
-    return sep >= 0 ? formatted.slice(sep + 1) : '';
+    const frac = sep >= 0 ? formatted.slice(sep + 1) : '';
+    return `${frac}${'0'.repeat(R4V3_DECIMALS)}`.slice(0, R4V3_DECIMALS);
   });
   protected readonly formattedChfValue = computed(() => {
     const bal = Number.parseFloat(this.totalBalance()) || 0;
@@ -184,6 +198,20 @@ export class WalletPanelComponent implements OnInit {
 
   protected readonly nativeToken = computed(
     () => this.chainConfig.config()?.nativeToken ?? 'R4V3'
+  );
+
+  /** Aperçu chips : 3 premiers tokens non-natifs. */
+  protected readonly previewHoldings = computed(() => this.otherHoldings().slice(0, 3));
+
+  protected readonly extraHoldingsCount = computed(() =>
+    Math.max(0, this.otherHoldings().length - this.previewHoldings().length)
+  );
+
+  protected readonly otherHoldingsRows = computed(() =>
+    this.otherHoldings().map((holding) => ({
+      ...holding,
+      formattedBalance: this.formatHoldingAmount(holding.balance),
+    }))
   );
 
   protected readonly formattedTotalFiat = computed(() => {
@@ -323,6 +351,8 @@ export class WalletPanelComponent implements OnInit {
         if (this.wallet() !== null) {
           this.wallet.set(null);
         }
+        this.otherHoldings.set([]);
+        this.holdingsExpanded.set(false);
         return;
       }
 
@@ -423,8 +453,12 @@ export class WalletPanelComponent implements OnInit {
 
   protected createWallet(): void {
     if (!this.auth.isAuthenticated()) {
-      this.errorMessage.set('Connectez-vous pour créer un wallet.');
-      this.auth.promptLogin();
+      if (this.auth.challenge()) {
+        this.auth.promptLogin();
+        return;
+      }
+      this.errorMessage.set('Inscris-toi ou connecte-toi pour créer un wallet.');
+      this.auth.openDrawer('register');
       return;
     }
 
@@ -436,30 +470,34 @@ export class WalletPanelComponent implements OnInit {
     this.creatingWallet.set(true);
     this.privateKeyVisible.set(false);
 
-    void this.api
-      .createWalletClientSide()
-      .then((wallet) => {
-        this.walletSession.setWallet(wallet);
-        this.wallet.set(wallet);
-        this.publicKeyVisible.set(true);
-        this.privateKeyVisible.set(false);
-        this.balanceForm.patchValue(
-          { address: this.ownDisplayAddress(wallet.address) },
-          { emitEvent: false }
-        );
-        this.creatingWallet.set(false);
+    void this.createAndLinkWallet();
+  }
 
-        void this.auth.linkWallet(wallet.address, wallet.publicKey);
+  /** Lie le wallet avant de le publier, sinon faucet / exchange répondent 403. */
+  private async createAndLinkWallet(): Promise<void> {
+    try {
+      const wallet = await this.api.createWalletClientSide();
+      const linked = await this.auth.linkWallet(wallet.address, wallet.publicKey);
+      if (!linked) {
+        this.errorMessage.set(this.auth.error() ?? 'Impossible de lier le wallet au compte.');
+        return;
+      }
 
-        this.successMessage.set('Wallet créé localement (clé privée non envoyée au serveur).');
-        this.fetchBalance(wallet.address, true, false);
-      })
-      .catch((error: unknown) => {
-        this.errorMessage.set(
-          this.resolveErrorMessage(error, 'Création wallet impossible.')
-        );
-        this.creatingWallet.set(false);
-      });
+      this.walletSession.setWallet(wallet);
+      this.wallet.set(wallet);
+      this.publicKeyVisible.set(true);
+      this.privateKeyVisible.set(false);
+      this.balanceForm.patchValue(
+        { address: this.ownDisplayAddress(wallet.address) },
+        { emitEvent: false }
+      );
+      this.successMessage.set('Portefeuille créé et lié au compte.');
+      this.fetchBalance(wallet.address, true, false);
+    } catch (error: unknown) {
+      this.errorMessage.set(this.resolveErrorMessage(error, 'Création wallet impossible.'));
+    } finally {
+      this.creatingWallet.set(false);
+    }
   }
 
   protected refreshAll(): void {
@@ -805,6 +843,7 @@ export class WalletPanelComponent implements OnInit {
             this.lookedUpBalance.set(null);
             this.lookedUpAddress.set('');
             this.lookedUpDisplay.set('');
+            this.fetchPortfolio(normalizedAddress);
           } else {
             this.lookedUpBalance.set(normalized);
             this.lookedUpAddress.set(normalizedAddress);
@@ -812,6 +851,7 @@ export class WalletPanelComponent implements OnInit {
             const own = normalizeAddressForApi(this.displayWalletAddress());
             if (own && own === normalizedAddress) {
               this.balance.set(normalized);
+              this.fetchPortfolio(normalizedAddress);
             }
             this.pushRecentLookup(normalizedAddress, normalized, displayAddress);
           }
@@ -825,10 +865,13 @@ export class WalletPanelComponent implements OnInit {
           this.refreshingBalance.set(false);
         },
         error: (error: unknown) => {
+          this.refreshingBalance.set(false);
+          if (!announce && this.successMessage()) {
+            return;
+          }
           this.errorMessage.set(
             this.resolveErrorMessage(error, 'Lecture du solde impossible.')
           );
-          this.refreshingBalance.set(false);
         },
       });
   }
@@ -885,6 +928,77 @@ export class WalletPanelComponent implements OnInit {
   protected swapAction(): void {
     this.closeActionPanels();
     this.dockNav.requestQuestAction('swap');
+  }
+
+  protected toggleHoldingsExpanded(): void {
+    this.holdingsExpanded.update((open) => !open);
+  }
+
+  protected openSwapForToken(token: string): void {
+    const symbol = token.trim().toUpperCase();
+    if (!symbol || symbol === this.nativeToken()) {
+      this.swapAction();
+      return;
+    }
+    this.closeActionPanels();
+    this.dockNav.requestQuestAction('swap');
+    globalThis.dispatchEvent(
+      new CustomEvent('exchange-panel-select-token', { detail: { token: symbol } })
+    );
+  }
+
+  private formatHoldingAmount(raw: string): string {
+    const value = Number.parseFloat(raw);
+    if (!Number.isFinite(value)) {
+      return raw;
+    }
+    if (Math.abs(value) >= 1000) {
+      return value.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
+    }
+    if (Math.abs(value) >= 1) {
+      return value.toLocaleString('fr-FR', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 4,
+      });
+    }
+    return value.toLocaleString('fr-FR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 6,
+    });
+  }
+
+  private fetchPortfolio(address: string): void {
+    const normalizedAddress = normalizeAddressForApi(address);
+    if (!normalizedAddress) {
+      this.otherHoldings.set([]);
+      return;
+    }
+
+    this.api
+      .getWalletPortfolio(normalizedAddress)
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (portfolio) => {
+          const others = (portfolio.holdings ?? []).filter(
+            (holding) => !holding.nativeToken && Number.parseFloat(holding.balance) > 0
+          );
+          this.otherHoldings.set(others);
+          if (others.length === 0) {
+            this.holdingsExpanded.set(false);
+          }
+          const native = (portfolio.holdings ?? []).find((holding) => holding.nativeToken);
+          if (native?.balance != null) {
+            const normalized = normalizeR4v3Amount(native.balance);
+            const own = normalizeAddressForApi(this.balanceWatchAddress());
+            if (own && own === normalizedAddress) {
+              this.balance.set(normalized);
+            }
+          }
+        },
+        error: () => {
+          /* Solde R4V3 déjà géré par getBalance — holdings optionnels. */
+        },
+      });
   }
 
   protected nudgeSendAmount(delta: number): void {
@@ -981,13 +1095,13 @@ export class WalletPanelComponent implements OnInit {
 
     const sender = this.wallet();
     if (!sender) {
-      this.errorMessage.set('Wallet introuvable.');
+      this.errorMessage.set('Portefeuille introuvable.');
       return;
     }
 
     if (!sender.privateKey) {
       this.errorMessage.set('Clé privée locale requise pour signer la transaction.');
-      this.pushToast('Wallet sans clé privée locale', 'error');
+      this.pushToast('Portefeuille sans clé privée locale', 'error');
       return;
     }
 
@@ -1040,8 +1154,8 @@ export class WalletPanelComponent implements OnInit {
         width: 256,
         errorCorrectionLevel: 'M',
         color: {
-          dark: '#00e5ff',
-          light: '#021425',
+          dark: '#8b9dad',
+          light: '#0a1220',
         },
       });
       this.qrDataUrl.set(url);
@@ -1068,12 +1182,12 @@ export class WalletPanelComponent implements OnInit {
           (x < 3 && y > cells - 4);
         const bit = ((hash >> ((x * 3 + y) % 31)) & 1) === 1;
         if (corner || bit) {
-          rects += `<rect x="${x * cell}" y="${y * cell}" width="${cell}" height="${cell}" fill="#00e5ff"/>`;
+          rects += `<rect x="${x * cell}" y="${y * cell}" width="${cell}" height="${cell}" fill="#8b9dad"/>`;
         }
       }
     }
 
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="100%" height="100%" fill="#021425"/>${rects}</svg>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="100%" height="100%" fill="#0a1220"/>${rects}</svg>`;
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   }
 

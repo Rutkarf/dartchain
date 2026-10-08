@@ -8,13 +8,16 @@
 
 .navbar-brand-row > .navbar-hint-wrap:has(.logo-shell) {
   flex: 0 0 auto;
-  width: var(--nv-logo-h);
-  height: var(--nv-logo-h);
-  min-width: var(--nv-logo-h);
-  min-height: var(--nv-logo-h);
+  /* Haut aligné : le slot (> row) débordait en top négatif et était clipé par html/body. */
+  align-self: flex-start;
+  width: var(--nv-logo-slot, calc(var(--nv-logo-h) * 1.5));
+  height: var(--nv-logo-slot, calc(var(--nv-logo-h) * 1.5));
+  min-width: var(--nv-logo-slot, calc(var(--nv-logo-h) * 1.5));
+  min-height: var(--nv-logo-slot, calc(var(--nv-logo-h) * 1.5));
 }
 
 .navbar-auth-strip .navbar-hint-wrap,
+.navbar-end .navbar-hint-wrap,
 .navbar-node-panel .navbar-hint-wrap {
   flex: 0 0 auto;
   overflow: visible;
@@ -24,17 +27,17 @@
   position: absolute;
   left: 50%;
   bottom: calc(100% + 6px);
-  transform: translateX(-50%) translateY(4px);
+  transform: translateX(-50%) scale(0.985);
   z-index: 400;
   width: max-content;
   max-width: min(240px, 72vw);
   padding: 2px 4px;
-  border-radius: 6px;
-  border: 1px solid rgba(var(--nv-cyan-rgb, 0, 245, 255), 0.22);
-  background: rgba(8, 10, 16, 0.96);
-  color: var(--ds-text-primary, #e8ecf0);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(var(--nv-cyan-rgb, 139, 157, 173), 0.22);
+  background: rgba(10, 18, 32, 0.96);
+  color: var(--ds-text-primary, #ede7d9);
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: 0.4325rem;
+  font-size: var(--fs-label);
   font-weight: 500;
   line-height: 1.35;
   letter-spacing: 0.01em;
@@ -43,21 +46,21 @@
   opacity: 0;
   visibility: hidden;
   transition:
-    opacity 140ms ease,
-    transform 140ms ease,
-    visibility 140ms ease;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    opacity var(--motion-enter) var(--motion-ease-enter),
+    transform var(--motion-enter) var(--motion-ease-enter),
+    visibility var(--motion-enter) ease-out;
+  box-shadow: none;
 }
 
 .navbar-hint-wrap:hover .navbar-hint__tooltip,
 .navbar-hint-wrap:focus-within .navbar-hint__tooltip {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%) scale(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .navbar-hint__tooltip {
-    transition: none;
+    transition:  none;
   }
 }

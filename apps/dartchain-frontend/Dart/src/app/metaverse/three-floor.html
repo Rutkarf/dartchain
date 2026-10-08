@@ -1,5 +1,16 @@
 <div class="floor-wrapper" #floorWrapper>
   <canvas #floorCanvas class="floor-canvas"></canvas>
+
+  @if (introVeilOpacity() > 0.01) {
+    <div
+      class="metaverse-intro-veil"
+      [attr.data-phase]="introVeilPhase()"
+      [style.opacity]="introVeilOpacity()"
+      aria-hidden="true"
+    >
+      <div class="metaverse-intro-veil__vignette"></div>
+    </div>
+  }
 </div>
 
 <!-- CharacterAnon.stl via CharacterComponent + ville entrable -->
@@ -9,5 +20,8 @@
 <!-- Zones 250×550 : Move (bas-gauche) / View (bas-droite) -->
 <app-joystick-move />
 <app-joystick-view />
-<app-placement-details-panel />
+<!-- Placements bâtiments — désactivé en Arena slim (code intact). -->
+@if (!slimWorld()) {
+  <app-placement-details-panel />
+}
 <app-arena-hud />

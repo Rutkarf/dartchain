@@ -32,20 +32,16 @@
     }
 
     <span class="explorer-search__icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" focusable="false">
-        <circle cx="11" cy="11" r="7" />
-        <path d="M20 20l-3.5-3.5" />
-      </svg>
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
     </span>
   </div>
 
   @if (menuOpen()) {
     <ul
-      id="explorer-search-results"
-      class="explorer-search__menu token-select__menu"
-      role="listbox"
-      aria-label="Résultats de recherche"
-    >
+ id="explorer-search-results"
+ class="explorer-search__menu token-select__menu"
+ role="listbox"
+ >
       @if (errorMessage()) {
         <li class="explorer-search__empty">{{ errorMessage() }}</li>
       } @else if (results().length === 0 && !loading()) {

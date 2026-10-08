@@ -9,6 +9,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Code d'échange OAuth tenu dans le processus. Il n'est pas repris après un redémarrage.
+ */
 @Component
 public class InMemoryOAuthExchangeCodeStore {
 

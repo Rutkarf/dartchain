@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, HostListener, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, effect, inject, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { take } from 'rxjs';
+import { filter, take } from 'rxjs';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 
 import { Block } from '@blockchain/models/block.model';
 import {
@@ -47,6 +48,14 @@ import { AuthService } from '@auth/services/auth.service';
 import { ShowcaseNewsStateService } from '@showcase/services/showcase-news-state.service';
 import { ShowcaseHubUiService } from '@showcase/services/showcase-hub-ui.service';
 import { AuthDrawerComponent } from '@auth/auth-drawer/auth-drawer';
+import { IntroOverlay } from './shared/intro-overlay/intro-overlay';
+import { IntroService } from './shared/intro-overlay/intro.service';
+import { AgeCallGate } from './shared/age-call-gate/age-call-gate';
+import { AgeGateService } from './shared/age-call-gate/age-gate.service';
+import { AgeIntroHandoffService } from './shared/age-call-gate/age-intro-handoff.service';
+import { OnboardingTourOverlay } from './shared/onboarding-tour/onboarding-tour-overlay';
+import { OnboardingTourService } from './shared/onboarding-tour/onboarding-tour.service';
+import { LogoRelayService } from './shared/logo-relay/logo-relay.service';
 import { FaucetRuntimeService } from '@faucet/services/faucet-runtime.service';
 import { ChartSummaryStateService } from '@showcase/services/chart-summary-state.service';
 import { ShowcaseR4v3StateService } from '@showcase/services/showcase-r4v3-state.service';
@@ -69,6 +78,7 @@ import { MarketDataService } from '@showcase/services/market-data.service';
 import { QuestsDataService } from '@quests/services/quests-data.service';
 import { PeersDataService } from '@peers/services/peers-data.service';
 import { ShowcaseChatService } from '@showcase/services/showcase-chat.service';
+import { MarketCartDrawerComponent } from '@showcase/components/market-panel/market-cart-drawer';
 
 @Component({
   selector: 'app-root',
@@ -88,9 +98,14 @@ import { ShowcaseChatService } from '@showcase/services/showcase-chat.service';
     R4v3SceneComponent,
     BlockDetailDrawerComponent,
     LaunchFormDrawerComponent,
+    MarketCartDrawerComponent,
     ThreeFloor,
     CombinedPerfHudComponent,
     AuthDrawerComponent,
+    AgeCallGate,
+    IntroOverlay,
+    OnboardingTourOverlay,
+    RouterOutlet,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -98,11 +113,19 @@ import { ShowcaseChatService } from '@showcase/services/showcase-chat.service';
 export class AppComponent {
   private readonly faucetRuntime = inject(FaucetRuntimeService);
   private readonly destroyRef = inject(DestroyRef);
+  private hubBooted = false;
+  private hubBootQueued = false;
 
   readonly launchDrawer = inject(LaunchDrawerService);
   readonly locale = inject(LocaleService);
   readonly product = inject(ProductConfigService);
   readonly auth = inject(AuthService);
+  readonly ageGate = inject(AgeGateService);
+  /** Exposé au template : le floor 3D attend la fin de l’intro. */
+  protected readonly introSvc = inject(IntroService);
+  private readonly handoff = inject(AgeIntroHandoffService);
+  private readonly onboardingTour = inject(OnboardingTourService);
+  private readonly logoRelay = inject(LogoRelayService);
   private readonly nav = inject(ShowcaseNavigationService);
   private readonly dockNav = inject(DockNavigationService);
   private readonly questProgress = inject(QuestsProgressService);
@@ -127,6 +150,8 @@ export class AppComponent {
   private readonly questsData = inject(QuestsDataService);
   private readonly peersData = inject(PeersDataService);
   private readonly showcaseChat = inject(ShowcaseChatService);
+  private readonly router = inject(Router);
+  private routeSync = false;
 
   readonly activeShowcaseTab = signal<ShowcaseTab>('tours');
   readonly activeBottomTab = signal<BottomDockTab>('wallet');
@@ -147,15 +172,28 @@ export class AppComponent {
     const unbindViewport = bindViewportCompactClass();
     this.destroyRef.onDestroy(() => unbindViewport());
 
-    // Faucet toujours démarré — feature vedette, tous environnements.
-    this.faucetRuntime.start();
-
-    this.questProgress.recordDailyLogin();
-
     void this.auth.handleOAuthCallbackOnLoad();
 
-    // Précharge showcase + dock dès le boot — évite « Chargement… » au clic d’onglet.
-    this.bootstrapPanelData();
+    // Fetches du hub : après l’intro, pas pendant le vol ni l’attente Insert Coin.
+    effect(() => {
+      const ageDone = this.ageGate.passed() || !this.ageGate.shouldAsk();
+      const flying = this.handoff.flying();
+      const playing = this.introSvc.playing();
+      const finished = this.introSvc.finished();
+      if (!ageDone || this.hubBooted || this.hubBootQueued) return;
+      if (flying || (playing && !finished)) return;
+      this.hubBootQueued = true;
+      untracked(() => this.queueHubBoot());
+    });
+
+    // Tutoriel hub auto : après âge + intro (finish ou skipMark reduced-motion).
+    effect(() => {
+      const ageDone = this.ageGate.passed() || !this.ageGate.shouldAsk();
+      const finished = this.introSvc.finished();
+      if (!ageDone || !finished) return;
+      if (!this.onboardingTour.shouldStart()) return;
+      untracked(() => this.scheduleHubTourStart());
+    });
 
     this.nav.newsAction$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -168,6 +206,7 @@ export class AppComponent {
         this.syncShowcaseNewsCategory(normalized);
         this.activeShowcaseTab.set(normalized);
         this.showcaseCollapsed.set(false);
+        this.rememberShellPath(normalized);
       });
 
     this.dockNav.tabRequest$
@@ -177,6 +216,13 @@ export class AppComponent {
     this.dockNav.questAction$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((action) => this.handleQuestAction(action));
+
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((event) => this.applyShellPath(event.urlAfterRedirects));
 
     this.showcaseHubUi.expandRequested$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -232,6 +278,7 @@ export class AppComponent {
     this.syncShowcaseNewsCategory(tab);
     this.activeShowcaseTab.set(tab);
     this.showcaseCollapsed.set(false);
+    this.rememberShellPath(tab);
   }
 
   private syncShowcaseNewsCategory(tab: ShowcaseTab): void {
@@ -246,12 +293,52 @@ export class AppComponent {
     if (tab === 'pending' || tab === 'block') {
       this.dockNav.requestTab(tab);
       this.activeBottomTab.set('transactions');
+      this.dockCollapsed.set(false);
+      this.rememberShellPath('transactions');
       this.scrollToSelector('.app-bottom-stack__content');
       return;
     }
 
+    const alreadyOpen = this.activeBottomTab() === tab && !this.dockCollapsed();
     this.activeBottomTab.set(tab);
-    this.scrollToSelector('.app-bottom-stack__content');
+    this.dockCollapsed.set(false);
+    this.rememberShellPath(tab);
+    // Évite le scroll au re-clic (casse le dblclick repli/dépli sur l'onglet actif).
+    if (!alreadyOpen) {
+      this.scrollToSelector('.app-bottom-stack__content');
+    }
+  }
+
+  private applyShellPath(url: string): void {
+    const segment = url.split('?')[0].split('#')[0].replace(/^\//, '').split('/')[0];
+    const dockTabs: BottomDockTab[] = [
+      'wallet',
+      'faucet',
+      'transactions',
+      'chain',
+      'quests',
+      'peers',
+      'admin',
+    ];
+    const showcaseTabs: ShowcaseTab[] = ['rv23', 'daonews', 'dao', 'market', 'r4v3', 'tours'];
+    this.routeSync = true;
+    if (dockTabs.includes(segment as BottomDockTab)) {
+      this.onBottomTabChange(segment as BottomDockTab);
+    } else if (showcaseTabs.includes(segment as ShowcaseTab)) {
+      this.onShowcaseTabChange(segment as ShowcaseTab);
+    }
+    this.routeSync = false;
+  }
+
+  private rememberShellPath(segment: string): void {
+    if (this.routeSync) {
+      return;
+    }
+    const current = this.router.url.split('?')[0].replace(/^\//, '').split('/')[0];
+    if (current === segment) {
+      return;
+    }
+    void this.router.navigate(['/' + segment]);
   }
 
   openBlockchainPanel(panel: OverlayPanel = 'pending'): void {
@@ -260,6 +347,11 @@ export class AppComponent {
 
   toggleShowcaseCollapsed(): void {
     this.showcaseCollapsed.update((collapsed) => !collapsed);
+  }
+
+  /** Double-clic sur un onglet showcase : même repli / dépli que le chevron. */
+  onShowcaseTabDoubleClick(collapsed: boolean): void {
+    this.showcaseCollapsed.set(collapsed);
   }
 
   /** Clic smart-bar / bande : ouvrir uniquement (pas de toggle — évite expand+repli). */
@@ -283,8 +375,60 @@ export class AppComponent {
     this.dockCollapsed.update((collapsed) => !collapsed);
   }
 
+  /** Double-clic sur un onglet dock : même repli / dépli que le chevron. */
+  onDockTabDoubleClick(collapsed: boolean): void {
+    this.dockCollapsed.set(collapsed);
+  }
+
   expandDockFromSummary(): void {
     this.dockCollapsed.set(false);
+  }
+
+  /** Après l’âge : faucet, login quest, précharge panels. */
+  /** Démarre les fetches quand le thread n’est plus dans le traveling. */
+  private queueHubBoot(): void {
+    window.setTimeout(() => {
+      const start = () => {
+        if (this.hubBooted || this.handoff.flying()) return;
+        this.startPostAgeBoot();
+      };
+      const ric = window.requestIdleCallback;
+      if (typeof ric === 'function') ric(() => start(), { timeout: 1500 });
+      else start();
+    }, 720);
+  }
+
+  /**
+   * Lance le tutoriel dès que le shell hub est peint (filet skipMark + finish).
+   * Ne démarre jamais pendant l’appel d’âge.
+   */
+  private scheduleHubTourStart(): void {
+    const tryStart = (attempt: number): void => {
+      if (!this.onboardingTour.shouldStart()) return;
+      const hubReady =
+        typeof document !== 'undefined' &&
+        Boolean(
+          document.querySelector(
+            '.logo-shell, app-navbar, .app-hub-swap-stack, [data-tour="welcome"]',
+          ),
+        );
+      if (!hubReady && attempt < 24) {
+        window.setTimeout(() => tryStart(attempt + 1), 120);
+        return;
+      }
+      if (!this.onboardingTour.start()) {
+        this.logoRelay.releaseAfterIntro();
+      }
+    };
+    window.setTimeout(() => tryStart(0), 280);
+  }
+
+  private startPostAgeBoot(): void {
+    if (this.hubBooted) return;
+    this.hubBooted = true;
+    this.faucetRuntime.start();
+    this.questProgress.recordDailyLogin();
+    this.bootstrapPanelData();
   }
 
   /** Initialise les stores showcase/dock au lancement (tous les onglets). */

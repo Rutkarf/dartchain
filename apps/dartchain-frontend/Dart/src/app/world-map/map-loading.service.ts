@@ -3,14 +3,16 @@ import { BehaviorSubject } from 'rxjs';
 import * as THREE from 'three';
 
 import { MapConfigService } from './map-config.service';
-import { mapPerfProfile } from './marseille-perf.config';
-import { shouldRunSimTick } from './marseille-sim-throttle.util';
+import { mapPerfProfile } from './metaverse-perf.config';
+import { shouldRunSimTick } from './metaverse-sim-throttle.util';
 import { LegacyFloorMapProvider } from './legacy-floor-map.provider';
-import { MarseilleMapProvider } from './marseille-map.provider';
+import { MetaverseMapProvider } from './metaverse-map.provider';
 import { WigleVisualizationService } from './wigle/wigle-visualization.service';
 import { PlacementAnchorLayer } from './placements/placement-anchor.layer';
 import type { MapProvider } from './map-provider.interface';
 import type { MapProviderId } from './map-configuration';
+import { ProductConfigService } from '@core/config/product-config.service';
+import { isArenaSlimWorld } from './arena/metaverse-arena-profile';
 
 export interface MapLoadState {
   activeProviderId: MapProviderId;
@@ -20,15 +22,16 @@ export interface MapLoadState {
 
 /**
  * Résout le fournisseur de carte, gère le fallback legacy et l'état de chargement.
- * La couche réseau est attachée à la scène floor indépendamment du provider (Marseille ou legacy).
+ * La couche réseau est attachée à la scène floor indépendamment du provider (Metaverse ou legacy).
  */
 @Injectable({ providedIn: 'root' })
 export class MapLoadingService {
   private readonly config = inject(MapConfigService);
   private readonly legacyProvider = inject(LegacyFloorMapProvider);
-  private readonly marseilleProvider = inject(MarseilleMapProvider);
+  private readonly metaverseProvider = inject(MetaverseMapProvider);
   private readonly wigleVisualization = inject(WigleVisualizationService);
   private readonly placementLayer = inject(PlacementAnchorLayer);
+  private readonly product = inject(ProductConfigService);
 
   private activeProvider: MapProvider | null = null;
   private initialized = false;
@@ -55,6 +58,10 @@ export class MapLoadingService {
     return this.activeProvider;
   }
 
+  private isSlimWorld(): boolean {
+    return isArenaSlimWorld(this.product.metaverseArenaEnabled);
+  }
+
   /**
    * Initialise le fournisseur demandé. En cas d'échec, bascule automatiquement sur legacy-floor.
    */
@@ -72,18 +79,22 @@ export class MapLoadingService {
     }
 
     try {
-      await this.switchTo(this.marseilleProvider, false, null, scene, camera);
-      this.marseilleProvider.ensureCityMassing?.();
-      const massing = this.marseilleProvider.getCityMassingCount?.() ?? 0;
-      if (massing < 50) {
-        console.error(
-          '[MapLoadingService] Massing Marseille trop faible (',
-          massing,
-          ') — ensureCityMassing relancé.'
-        );
-        this.marseilleProvider.ensureCityMassing?.();
+      await this.switchTo(this.metaverseProvider, false, null, scene, camera);
+      if (!this.isSlimWorld()) {
+        this.metaverseProvider.ensureCityMassing?.();
+        const massing = this.metaverseProvider.getCityMassingCount?.() ?? 0;
+        if (massing < 50) {
+          console.error(
+            '[MapLoadingService] Massing Metaverse trop faible (',
+            massing,
+            ') — ensureCityMassing relancé.'
+          );
+          this.metaverseProvider.ensureCityMassing?.();
+        } else {
+          console.info('[MapLoadingService] Massing Metaverse OK:', massing, 'meshes');
+        }
       } else {
-        console.info('[MapLoadingService] Massing Marseille OK:', massing, 'meshes');
+        console.info('[MapLoadingService] Arena slim world — massing bâtiments désactivé');
       }
       this.attachNetworkLayer(scene, camera);
       void this.attachPlacementLayer(scene);
@@ -91,26 +102,39 @@ export class MapLoadingService {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.warn(
-        '[MapLoadingService] Échec Marseille — tentative recovery avant legacy.',
+        '[MapLoadingService] Échec Metaverse — tentative recovery avant legacy.',
         message
       );
       if (error instanceof Error) {
         console.warn('[MapLoadingService] stack:', error.stack);
       }
-      // Dernier essai Marseille (init partiel possible) avant fallback legacy.
+      // Dernier essai Metaverse (init partiel possible) avant fallback legacy.
       try {
-        this.marseilleProvider.ensureCityMassing?.();
-        if ((this.marseilleProvider.getCityMassingCount?.() ?? 0) >= 50) {
-          this.activeProvider = this.marseilleProvider;
+        if (!this.isSlimWorld()) {
+          this.metaverseProvider.ensureCityMassing?.();
+          if ((this.metaverseProvider.getCityMassingCount?.() ?? 0) >= 50) {
+            this.activeProvider = this.metaverseProvider;
+            this.stateSubject.next({
+              activeProviderId: 'metaverse-osm-three',
+              fallbackActive: false,
+              lastError: message,
+            });
+            this.attachNetworkLayer(scene, camera);
+            void this.attachPlacementLayer(scene);
+            this.initialized = true;
+            console.info('[MapLoadingService] Recovery Metaverse réussie malgré erreur init.');
+            return;
+          }
+        } else {
+          this.activeProvider = this.metaverseProvider;
           this.stateSubject.next({
-            activeProviderId: 'marseille-osm-three',
+            activeProviderId: 'metaverse-osm-three',
             fallbackActive: false,
             lastError: message,
           });
           this.attachNetworkLayer(scene, camera);
-          void this.attachPlacementLayer(scene);
           this.initialized = true;
-          console.info('[MapLoadingService] Recovery Marseille réussie malgré erreur init.');
+          console.info('[MapLoadingService] Recovery slim world malgré erreur init.');
           return;
         }
       } catch {
@@ -175,6 +199,11 @@ export class MapLoadingService {
 
   private attachNetworkLayer(scene: THREE.Scene, camera: THREE.Camera): void {
     if (this.networkRoot) return;
+    // Arena slim : WiGLE / points réseau désactivés (code intact).
+    if (this.isSlimWorld()) {
+      console.info('[MapLoadingService] Arena slim — couche WiGLE désactivée');
+      return;
+    }
     this.networkRoot = new THREE.Group();
     this.networkRoot.name = 'metaverse-network-layer';
     scene.add(this.networkRoot);
@@ -184,8 +213,9 @@ export class MapLoadingService {
   }
 
   private async attachPlacementLayer(scene: THREE.Scene): Promise<void> {
+    if (this.isSlimWorld()) return;
     const state = this.stateSubject.value;
-    if (state.activeProviderId !== 'marseille-osm-three' || state.fallbackActive) {
+    if (state.activeProviderId !== 'metaverse-osm-three' || state.fallbackActive) {
       return;
     }
     await this.placementLayer.attach(scene);

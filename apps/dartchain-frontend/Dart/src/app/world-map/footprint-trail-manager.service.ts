@@ -25,7 +25,7 @@ export class FootprintTrailManager {
     transparent: true,
     depthWrite: false,
     side: THREE.DoubleSide,
-    color: 0xffffff,
+    color: 0xede7d9,
     opacity: FOOTPRINT_CONFIG.opacity,
   });
 
@@ -256,23 +256,23 @@ export class FootprintTrailManager {
     // Halo externe — calé sur la largeur de traînée (0.8 m).
     const rOuter = canvas.width * 0.46;
     const outer = ctx.createRadialGradient(cx, cy, rOuter * 0.2, cx, cy, rOuter);
-    outer.addColorStop(0, 'rgba(64,224,255,0.0)');
-    outer.addColorStop(0.55, 'rgba(64,224,255,0.22)');
-    outer.addColorStop(0.85, 'rgba(255,62,207,0.08)');
-    outer.addColorStop(1, 'rgba(0,0,0,0)');
+    outer.addColorStop(0, 'rgba(139, 157, 173,0.0)');
+    outer.addColorStop(0.55, 'rgba(139, 157, 173,0.22)');
+    outer.addColorStop(0.85, 'rgba(123, 13, 30,0.08)');
+    outer.addColorStop(1, 'rgba(10, 18, 32,0)');
     ctx.fillStyle = outer;
     ctx.beginPath();
     ctx.arc(cx, cy, rOuter, 0, Math.PI * 2);
     ctx.fill();
 
     // Empreinte R4V3 : deux lobes + hex central.
-    ctx.fillStyle = 'rgba(8,18,32,0.38)';
+    ctx.fillStyle = 'rgba(10, 18, 32,0.38)';
     ctx.beginPath();
     ctx.ellipse(cx - 16, cy + 2, 20, 14, -0.12, 0, Math.PI * 2);
     ctx.ellipse(cx + 16, cy + 2, 20, 14, 0.12, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = 'rgba(64,224,255,0.55)';
+    ctx.strokeStyle = 'rgba(139, 157, 173,0.55)';
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {

@@ -3,22 +3,30 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CharacterNftService } from './character-nft.service';
 import { ThreeSceneService } from './three-scene.service';
+import { MetaverseIntroCameraService } from './metaverse-intro-camera.service';
 import { RUNNER_CONFIG } from './runner/runner.config';
 import {
   ORBIT_CONFIG,
   THIRD_PERSON_CAMERA_CONFIG,
   VIEUX_PORT_METRO_MIRROR_VIEW,
 } from '@world-map/map-configuration';
+import { ProductConfigService } from '@core/config/product-config.service';
+import { MapConfigService } from '@world-map/map-config.service';
+import { MapLoadingService } from '@world-map/map-loading.service';
 
 /**
  * Caméra 3ᵉ personne : orbite sphérique autour du personnage.
  * Joystick View (bas-droite) → yaw / pitch continus.
- * Framing rapproché Marseille uniquement (le runner conserve camDistance 10).
+ * Framing rapproché Metaverse uniquement (le runner conserve camDistance 10).
  */
 @Injectable({ providedIn: 'root' })
 export class CameraControlService {
   private readonly threeScene = inject(ThreeSceneService);
   private readonly character = inject(CharacterNftService);
+  private readonly intro = inject(MetaverseIntroCameraService);
+  private readonly product = inject(ProductConfigService);
+  private readonly mapConfig = inject(MapConfigService);
+  private readonly mapLoading = inject(MapLoadingService);
 
   /** Angle horizontal (radians), illimité. */
   private cameraAngleX = 0;
@@ -34,7 +42,7 @@ export class CameraControlService {
   private readonly runnerMinPitch = -Math.PI / 3;
   private readonly runnerMaxPitch = Math.PI / 2 - 0.12;
   private closeFraming = false;
-  /** Framing dédié Arène BB (peek bas de page) — additif, n’écrase pas resetOrbit. */
+  /** Framing dédié MetaVerseBB (peek bas de page) — additif, n’écrase pas resetOrbit. */
   private arenaPeekMode = false;
   private orbitDistance: number = RUNNER_CONFIG.camDistance;
   private lookAhead = 0;
@@ -127,18 +135,42 @@ export class CameraControlService {
   }
 
   updateFromJoystick(vector: { x: number; y: number }): void {
+    if (this.intro.isActive()) {
+      const mag = Math.hypot(vector.x, vector.y);
+      if (mag > 0.35) this.trySkipIntro();
+      this.stickX = 0;
+      this.stickY = 0;
+      return;
+    }
     this.stickX = THREE.MathUtils.clamp(vector.x, -1, 1);
     this.stickY = THREE.MathUtils.clamp(vector.y, -1, 1);
   }
 
   /** Incrément clavier / debug (rad). */
   nudge(dx: number, dy: number): void {
+    if (this.intro.isActive()) {
+      this.trySkipIntro();
+      return;
+    }
     this.cameraAngleX += dx;
     this.cameraAngleY = THREE.MathUtils.clamp(
       this.cameraAngleY + dy,
       this.pitchMin(),
       this.pitchMax()
     );
+  }
+
+  isIntroActive(): boolean {
+    return this.intro.isBlockingFollow();
+  }
+
+  /** Parque la caméra en plongée Ombrière dès l’init (avant perso). */
+  armMetaverseIntro(): void {
+    if (!this.expectsMetaverseIntro()) return;
+    const camera = this.threeScene.getCamera();
+    if (!camera) return;
+    this.intro.arm(camera);
+    this.setOrbitControlsEnabled(false);
   }
 
   attachOrbit(camera: THREE.PerspectiveCamera, domElement: HTMLElement): void {
@@ -164,6 +196,18 @@ export class CameraControlService {
     this.orbitControls = null;
   }
 
+  /** Skip intro si le joueur agit (après délai mini). */
+  trySkipIntro(): void {
+    if (!this.intro.isActive()) return;
+    this.intro.skip();
+    if (!this.intro.isActive()) {
+      const camera = this.threeScene.getCamera();
+      if (camera) camera.up.set(0, 1, 0);
+      // Soft handoff — pas de téléport POV.
+      this.setOrbitControlsEnabled(true);
+    }
+  }
+
   update(deltaSeconds: number): void {
     this.bindWheel();
     if (this.validationViewActive) {
@@ -171,11 +215,62 @@ export class CameraControlService {
       return;
     }
     const camera = this.threeScene.getCamera();
+    if (!camera) return;
+
     const state = this.character.getState();
-    if (!camera || !state.mesh || !state.isLoaded) return;
+    const charReady = !!state.mesh && state.isLoaded;
+
+    // Intro armée : rester en nadir ; démarrer le chrono dès que perso + map prêts.
+    if (this.intro.isArmed() && !this.intro.isActive()) {
+      if (this.canStartIntroMotion()) {
+        this.intro.tryStart({
+          yaw: this.cameraAngleX,
+          pitch: this.cameraAngleY,
+          distance: this.orbitDistance,
+          lookAhead: this.lookAhead,
+          arenaPeek: this.arenaPeekMode,
+        });
+        this.intro.applyStartFrame(camera);
+        this.setOrbitControlsEnabled(false);
+        // tombe dans le bloc isActive ci-dessous
+      } else {
+        this.intro.tickArmed(deltaSeconds, camera);
+        this.setOrbitControlsEnabled(false);
+        return;
+      }
+    }
+
+    if (!charReady) {
+      if (this.expectsMetaverseIntro()) {
+        this.intro.arm(camera);
+        this.setOrbitControlsEnabled(false);
+      }
+      return;
+    }
+
+    const mesh = state.mesh;
+    if (!mesh) {
+      return;
+    }
+
+    if (this.intro.isActive()) {
+      const still = this.intro.tick(deltaSeconds, camera, mesh.position, {
+        yaw: this.cameraAngleX,
+        pitch: this.cameraAngleY,
+        distance: this.orbitDistance,
+        lookAhead: this.lookAhead,
+        arenaPeek: this.arenaPeekMode,
+      });
+      if (!still) {
+        camera.up.set(0, 1, 0);
+        // Pas de snapToOrbit : la dernière frame intro = POV cible → follow soft ensuite.
+        this.setOrbitControlsEnabled(true);
+      }
+      return;
+    }
 
     if (this.closeFraming && this.orbitControls) {
-      this.updateOrbitControls(camera, state.mesh.position, deltaSeconds);
+      this.updateOrbitControls(camera, mesh.position, deltaSeconds);
       this.applyPeekFraming(camera);
       return;
     }
@@ -188,9 +283,9 @@ export class CameraControlService {
       this.pitchMax()
     );
 
-    this.computeDesired(state.mesh.position);
+    this.computeDesired(mesh.position);
     if (this.closeFraming && !this.orbitControls) {
-      this.applyCollision(state.mesh);
+      this.applyCollision(mesh);
     }
 
     const follow = 1 - Math.exp(-10 * deltaSeconds);
@@ -221,23 +316,76 @@ export class CameraControlService {
     this.stickX = 0;
     this.stickY = 0;
     this.validationViewActive = false;
-    this.snapToOrbit();
-    if (this.orbitControls) {
-      this.orbitControls.minDistance = this.closeFraming
-        ? ORBIT_CONFIG.minDistance
-        : 4;
-      this.orbitControls.maxDistance = this.closeFraming
-        ? ORBIT_CONFIG.maxDistance
-        : 24;
-      this.orbitControls.minPolarAngle = this.closeFraming
-        ? ORBIT_CONFIG.minPolarAngle
-        : 0.12;
-      this.orbitControls.maxPolarAngle = this.closeFraming
-        ? ORBIT_CONFIG.maxPolarAngle
-        : Math.PI / 2 - 0.08;
-      this.orbitControls.target.copy(this.lookTarget);
-      this.orbitControls.update();
+
+    const camera = this.threeScene.getCamera();
+
+    // Toujours parquer en nadir si intro MetaVerseBB prévue — jamais de snap POV avant.
+    if (this.expectsMetaverseIntro() || this.intro.isArmed()) {
+      if (camera) this.intro.arm(camera);
+      if (this.canStartIntroMotion()) {
+        this.intro.tryStart({
+          yaw: this.cameraAngleX,
+          pitch: this.cameraAngleY,
+          distance: this.orbitDistance,
+          lookAhead: this.lookAhead,
+          arenaPeek: this.arenaPeekMode,
+        });
+        if (camera) this.intro.applyStartFrame(camera);
+      }
+      this.setOrbitControlsEnabled(false);
+      this.syncOrbitControlsLimits();
+      return;
     }
+
+    this.snapToOrbit();
+    this.syncOrbitControlsLimits();
+  }
+
+  /** Intro MetaVerseBB prévue (même avant perso / map ready). */
+  private expectsMetaverseIntro(): boolean {
+    if (this.intro.isArmed() || this.intro.isActive()) return true;
+    if (this.intro.hasPlayedThisSession()) return false;
+    if (!this.product.metaverseArenaEnabled) return false;
+    if (this.mapConfig.effectiveProvider() !== 'metaverse-osm-three') return false;
+    const mapState = this.mapLoading.getState();
+    if (mapState.fallbackActive) return false;
+    if (
+      mapState.activeProviderId &&
+      mapState.activeProviderId !== 'metaverse-osm-three'
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  /** Chrono intro : perso + provider Metaverse actifs. */
+  private canStartIntroMotion(): boolean {
+    const state = this.character.getState();
+    if (!state.mesh || !state.isLoaded) return false;
+    if (!this.product.metaverseArenaEnabled) return false;
+    if (this.mapConfig.effectiveProvider() !== 'metaverse-osm-three') return false;
+    const mapState = this.mapLoading.getState();
+    return (
+      mapState.activeProviderId === 'metaverse-osm-three' && !mapState.fallbackActive
+    );
+  }
+
+  private syncOrbitControlsLimits(): void {
+    if (!this.orbitControls) return;
+    this.orbitControls.minDistance = this.closeFraming ? ORBIT_CONFIG.minDistance : 4;
+    this.orbitControls.maxDistance = this.closeFraming ? ORBIT_CONFIG.maxDistance : 24;
+    this.orbitControls.minPolarAngle = this.closeFraming ? ORBIT_CONFIG.minPolarAngle : 0.12;
+    this.orbitControls.maxPolarAngle = this.closeFraming
+      ? ORBIT_CONFIG.maxPolarAngle
+      : Math.PI / 2 - 0.08;
+    this.orbitControls.target.copy(this.lookTarget);
+    this.orbitControls.update();
+  }
+
+  private setOrbitControlsEnabled(enabled: boolean): void {
+    if (!this.orbitControls) return;
+    this.orbitControls.enableRotate = enabled;
+    this.orbitControls.enableZoom = enabled;
   }
 
   toggleValidationView(): boolean {

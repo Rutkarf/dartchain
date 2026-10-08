@@ -2,10 +2,10 @@ import { TestBed } from '@angular/core/testing';
 
 import {
   DEFAULT_MAP_CONFIGURATION,
-  MARSEILLE_BOUNDS,
-  MARSEILLE_HARBOR_WATER,
-  MARSEILLE_START_ORIENTATION,
-  MARSEILLE_START_POSITION,
+  METAVERSE_BOUNDS,
+  METAVERSE_HARBOR_WATER,
+  METAVERSE_START_ORIENTATION,
+  METAVERSE_START_POSITION,
   METRO_SPAWN_ANCHOR,
   MIRROR_SPAWN_SAFE_ZONE,
   isInsideMirrorSpawnSafeZone,
@@ -20,26 +20,26 @@ import {
 import { MapConfigService } from './map-config.service';
 
 describe('MapConfigService', () => {
-  it('expose la configuration par défaut Marseille', () => {
+  it('expose la configuration par défaut Metaverse', () => {
     const service = TestBed.inject(MapConfigService);
     const config = service.configuration;
 
     expect(config.enabled).toBe(true);
-    expect(config.provider).toBe('marseille-osm-three');
-    expect(config.latitudeOrigin).toBe(MARSEILLE_START_POSITION.latitude);
-    expect(config.longitudeOrigin).toBe(MARSEILLE_START_POSITION.longitude);
-    expect(config.bounds).toEqual(MARSEILLE_BOUNDS);
-    expect(config.startPosition).toEqual(MARSEILLE_START_POSITION);
-    expect(config.startOrientation).toEqual(MARSEILLE_START_ORIENTATION);
+    expect(config.provider).toBe('metaverse-osm-three');
+    expect(config.latitudeOrigin).toBe(METAVERSE_START_POSITION.latitude);
+    expect(config.longitudeOrigin).toBe(METAVERSE_START_POSITION.longitude);
+    expect(config.bounds).toEqual(METAVERSE_BOUNDS);
+    expect(config.startPosition).toEqual(METAVERSE_START_POSITION);
+    expect(config.startOrientation).toEqual(METAVERSE_START_ORIENTATION);
     expect(config.startOrientation.cameraPitch).toBeCloseTo(0.12);
     expect(config.startOrientation.cameraDistance).toBe(6.2);
     expect(config.startOrientation.cameraDistance).toBeLessThan(8);
     expect(config.startOrientation.cameraLookAhead).toBe(0.35);
   });
 
-  it('retourne marseille-osm-three comme provider effectif quand activé', () => {
+  it('retourne metaverse-osm-three comme provider effectif quand activé', () => {
     const service = TestBed.inject(MapConfigService);
-    expect(service.effectiveProvider()).toBe('marseille-osm-three');
+    expect(service.effectiveProvider()).toBe('metaverse-osm-three');
     expect(service.isLegacyProvider()).toBe(false);
   });
 
@@ -83,17 +83,19 @@ describe('MapConfigService', () => {
     expect(Math.hypot(spawnX - metroX, spawnZ - metroZ)).toBeLessThan(28);
     expect(Math.hypot(spawnX, spawnZ)).toBeLessThan(12);
     expect(spawnZ).toBeGreaterThan(0);
-    expect(spawnZ).toBeLessThan(MARSEILLE_HARBOR_WATER.waterMinZ);
+    expect(spawnZ).toBeLessThan(METAVERSE_HARBOR_WATER.waterMinZ);
     expect(VIEUX_PORT_METRO_MIRROR_VIEW.id).toBe('VIEUX_PORT_METRO_MIRROR_VIEW');
   });
 
-  it('définit une zone safe intouchable autour du spawn miroir', () => {
+  it('définit une zone SPAWN SAFE autour de l’ombrière', () => {
     const spawnX = METRO_SPAWN_ANCHOR.mirror.x + METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.x;
     const spawnZ = METRO_SPAWN_ANCHOR.mirror.z + METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.z;
     expect(isInsideMirrorSpawnSafeZone(spawnX, spawnZ)).toBe(true);
-    expect(isInsideMirrorSpawnSafeZone(0, 5)).toBe(true);
-    expect(isInsideMirrorSpawnSafeZone(0, 5 - MIRROR_SPAWN_SAFE_ZONE.radiusMeters - 1)).toBe(
-      false
+    expect(isInsideMirrorSpawnSafeZone(MIRROR_SPAWN_SAFE_ZONE.centerX, MIRROR_SPAWN_SAFE_ZONE.centerZ)).toBe(
+      true
     );
+    const outsideZ =
+      MIRROR_SPAWN_SAFE_ZONE.centerZ - MIRROR_SPAWN_SAFE_ZONE.radiusMeters - 1;
+    expect(isInsideMirrorSpawnSafeZone(MIRROR_SPAWN_SAFE_ZONE.centerX, outsideZ)).toBe(false);
   });
 });

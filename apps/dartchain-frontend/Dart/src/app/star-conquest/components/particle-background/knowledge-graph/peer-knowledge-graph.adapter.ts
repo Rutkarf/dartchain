@@ -61,7 +61,7 @@ export class PeerKnowledgeGraphAdapter {
     return [...this.peerStates.values()];
   }
 
-  /** Map Star Conquest quests into knowledge nodes (local, public). */
+  /** Map Conquête stellaire quests into knowledge nodes (local, public). */
   syncQuestCatalog(quests: readonly StarQuest[]): void {
     const now = Date.now();
     for (const quest of quests) {

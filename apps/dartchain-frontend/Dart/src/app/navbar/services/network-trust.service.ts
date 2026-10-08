@@ -15,7 +15,9 @@ export class NetworkTrustService {
   private readonly api = inject(BlockchainApiService);
 
   readonly loading = signal(false);
-  readonly apiOk = signal(true);
+  /** false jusqu’au premier /health (évite un flash vert/orange avant la mesure). */
+  readonly apiOk = signal(false);
+  private readonly hasChecked = signal(false);
   readonly serviceName = signal('dartchain-backend');
   readonly latencyMs = signal<number | null>(null);
   readonly lastCheckedAt = signal<number | null>(null);
@@ -23,7 +25,7 @@ export class NetworkTrustService {
   readonly errorMessage = signal<string | null>(null);
 
   readonly trustState = computed((): NetworkTrustState => {
-    if (this.loading()) {
+    if (this.loading() || !this.hasChecked()) {
       return 'checking';
     }
 
@@ -48,7 +50,7 @@ export class NetworkTrustService {
       case 'slow':
         return 'Lent';
       default:
-        return 'Live';
+        return 'Direct';
     }
   });
 
@@ -139,6 +141,7 @@ export class NetworkTrustService {
       this.lastCheckedAt.set(Date.now());
       this.errorMessage.set('Backend hors ligne — certaines actions peuvent échouer.');
     } finally {
+      this.hasChecked.set(true);
       this.loading.set(false);
     }
   }

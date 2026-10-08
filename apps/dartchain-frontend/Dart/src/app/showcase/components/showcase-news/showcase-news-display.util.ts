@@ -86,7 +86,7 @@ export function formatNewsDisplayTitle(item: NewsItem): string {
       if (/peer|nœud|node/i.test(item.title)) {
         return item.title;
       }
-      return 'Peers réseau mis à jour';
+      return 'Pairs du réseau mis à jour';
     case 'OPEN_FAUCET':
       return item.title.includes('faucet') ? item.title : 'Faucet disponible';
     case 'OPEN_SWAP':

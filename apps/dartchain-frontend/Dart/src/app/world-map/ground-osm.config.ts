@@ -1,4 +1,4 @@
-import { MARSEILLE_GEO_ORIGIN, VIEUX_PORT_CORE_BUILDING_RADIUS } from './geo-reference.config';
+import { METAVERSE_GEO_ORIGIN, VIEUX_PORT_CORE_BUILDING_RADIUS } from './geo-reference.config';
 import {
   METERS_PER_DEGREE_LATITUDE,
   metersPerDegreeLongitude,
@@ -6,8 +6,8 @@ import {
 
 /** Bbox Overpass routes — rayon cœur Vieux-Port (~420 m autour de l'Ombrière). */
 export const VIEUX_PORT_OSM_STREET_BOUNDS = (() => {
-  const lat = MARSEILLE_GEO_ORIGIN.latitude;
-  const lon = MARSEILLE_GEO_ORIGIN.longitude;
+  const lat = METAVERSE_GEO_ORIGIN.latitude;
+  const lon = METAVERSE_GEO_ORIGIN.longitude;
   const radius = VIEUX_PORT_CORE_BUILDING_RADIUS;
   const dLat = radius / METERS_PER_DEGREE_LATITUDE;
   const dLon = radius / metersPerDegreeLongitude(lat);

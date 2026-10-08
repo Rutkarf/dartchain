@@ -8,12 +8,12 @@
   line-height: 1;
 
   /* Alias legacy → design system Pass 1/2 */
-  --nv-cyan: var(--accent-cyan, var(--ds-neon-cyan, #2ec4d6));
-  --nv-cyan-rgb: var(--accent-cyan-rgb, var(--ds-neon-cyan-rgb, 46, 196, 214));
+  --nv-cyan: var(--accent-cyan, var(--ds-neon-cyan, #8b9dad));
+  --nv-cyan-rgb: var(--accent-cyan-rgb, var(--ds-neon-cyan-rgb, 139, 157, 173));
   --nv-cyan-soft: rgba(var(--nv-cyan-rgb), 0.28);
-  --nv-green: var(--success, #2ecc8a);
-  --nv-green-rgb: var(--success-rgb, 46, 204, 138);
-  --nv-shell-radius: var(--ds-navbar-shell-radius, clamp(8px, 2.4vw, 12px));
+  --nv-green: var(--success, #09814a);
+  --nv-green-rgb: var(--success-rgb, 9, 129, 74);
+  --nv-shell-radius: var(--ds-navbar-shell-radius, var(--radius-none, 0));
   --nv-shell-border: var(--ds-surface-border-bottom);
   --nv-shell-bg: transparent;
   --nv-margin-top: var(--ds-navbar-top-inset, max(clamp(6px, 1.6vh, 12px), env(safe-area-inset-top, 0px)));
@@ -32,14 +32,16 @@
   --nv-pad-top: var(--ds-navbar-pad-top, clamp(0px, 0.8vh, 2px));
   --nv-pad-y: var(--ds-navbar-pad-bottom, clamp(0px, 0.6vh, 1px));
   --nv-inner-gap: 0px;
-  --nv-ticker-row-h: 0.8125rem;
+  --nv-ticker-row-h: var(--comp-ticker-row-h, 16px);
   --nv-action-row-h: var(--nv-ticker-row-h);
-  --nv-action-btn: 24px;
+  --nv-action-btn: var(--comp-btn-hud-h, 16px);
   --nv-shell-min-h: calc(
     var(--nv-logo-h) + var(--nv-ticker-row-h) + var(--nv-pad-top) + var(--nv-pad-y)
   );
   --nv-logo: 32px;
-  --nv-logo-h: 22px;
+  --nv-logo-h: var(--comp-logo-row-h, 16px);
+  /* Triangle d’or : slot +½ vs rangée HUD — hit orbit / clic lisible. */
+  --nv-logo-slot: calc(var(--nv-logo-h) * 1.5);
   --nv-logo-scale: 1.36;
   --nv-logo-shift-y: 1px;
   --nv-brand-chip-h: calc(var(--nv-logo-h) - 0px);
@@ -47,9 +49,9 @@
   --nv-brand-chip-pad-right: 0.26rem;
   --nv-brand-chip-pad-left: 0.05rem;
   --nv-brand-chip-gap: 0.2rem;
-  --nv-brand-chip-font: 0.25rem;
+  --nv-brand-chip-font: var(--fs-shell);
   --nv-brand-chip-line: var(--nv-brand-chip-font);
-  --nv-brand-led-size: 5px;
+  --nv-brand-led-size: var(--comp-led-size, 4px);
   --nv-brand-sync-y: 0px;
   --nv-node-panel-max-w: min(42vw, 7rem);
   --nv-desktop-min: 1100px;
@@ -135,16 +137,27 @@
 }
 
 /* —— Auth (haut droite) —— */
-.navbar-auth-strip {
+.navbar-end {
   grid-area: auth;
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 1px;
+  gap: 4px;
+  flex: 0 0 auto;
+  align-self: start;
+  height: var(--nv-logo-h);
+  min-height: var(--nv-logo-h);
+  max-height: var(--nv-logo-h);
+}
+
+.navbar-auth-strip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
   flex: 0 0 auto;
   flex-shrink: 0;
   padding: 0;
-  align-self: start;
   height: var(--nv-logo-h);
   min-height: var(--nv-logo-h);
   max-height: var(--nv-logo-h);
@@ -158,8 +171,8 @@
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.14) 35%,
-    rgba(255, 255, 255, 0.14) 65%,
+    rgba(237, 231, 217, 0.14) 35%,
+    rgba(237, 231, 217, 0.14) 65%,
     transparent 100%
   );
   opacity: 0.85;
@@ -181,6 +194,12 @@
   max-width: min(36vw, 140px);
 }
 
+button.navbar-auth-user__name {
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
 .navbar-auth-user__name {
   display: inline-flex;
   align-items: center;
@@ -189,16 +208,16 @@
   max-width: min(34vw, 120px);
   height: var(--nv-logo-h);
   padding: 0 0.28rem 0 0.32rem;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.26);
+  border-radius: var(--radius-sm);
+  background: rgba(10, 18, 32, 0.26);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(237, 231, 217, 0.05),
     inset 2px 0 0 rgba(var(--nv-cyan-rgb), 0.55);
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--ds-text-sm, 0.5rem);
+  font-size: var(--fs-body);
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--ds-text-primary, #e8ecf0);
+  color: var(--ds-text-primary, #ede7d9);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -207,20 +226,18 @@
 
 .navbar-locale-btn {
   min-width: var(--ds-icon-btn, 32px);
-  height: var(--ds-icon-btn, 28px);
+  height: var(--ds-icon-btn, 32px);
   padding: 0 4px;
-  border-radius: var(--ds-radius-sm, 6px);
-  border: 1px solid var(--ds-border-default, rgba(255, 255, 255, 0.1));
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--ds-text-primary, #e8ecf0);
+  border-radius: var(--ds-radius-sm, var(--radius-sm, 4px));
+  border: 1px solid var(--ds-border-default, rgba(237, 231, 217, 0.1));
+  background: rgba(10, 18, 32, 0.25);
+  color: var(--ds-text-primary, #ede7d9);
   font-family: var(--ds-font-ui, var(--font-body));
-  font-size: var(--ds-text-sm, 0.5rem);
+  font-size: var(--fs-body);
   font-weight: 700;
   letter-spacing: 0.06em;
   cursor: pointer;
-  transition:
-    border-color 160ms ease,
-    background 160ms ease;
+  transition: border-color var(--motion-state) var(--motion-ease-state), background var(--motion-state) var(--motion-ease-state);
 }
 
 .navbar-locale-btn:hover {
@@ -241,45 +258,26 @@
   padding: 0;
   display: inline-grid;
   place-items: center;
-  border-radius: var(--ds-radius-sm, 6px);
-  border: 1px solid var(--ds-border-default, rgba(255, 255, 255, 0.1));
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--ds-text-primary, #e8ecf0);
+  border-radius: var(--ds-radius-sm, var(--radius-sm, 4px));
+  border: 1px solid var(--ds-border-default, rgba(237, 231, 217, 0.1));
+  background: rgba(10, 18, 32, 0.25);
+  color: var(--ds-text-primary, #ede7d9);
   cursor: pointer;
   flex: 0 0 auto;
   flex-shrink: 0;
-  transition:
-    border-color 160ms ease,
-    background 160ms ease,
-    color 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.navbar-auth-btn svg {
-  width: 15px;
-  height: 11px;
-}
-
-.navbar-auth-btn svg :is(path, circle, polyline, line) {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.75;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  transition: border-color var(--motion-state) var(--motion-ease-state), background var(--motion-state) var(--motion-ease-state), color var(--motion-state) var(--motion-ease-state);
 }
 
 .navbar-auth-btn:not(.navbar-auth-btn--login):not(.navbar-auth-btn--register):hover:not(:disabled) {
-  border-color: var(--ds-border-accent, rgba(var(--nv-cyan-rgb), 0.28));
-  background: rgba(var(--nv-cyan-rgb), 0.08);
-  color: var(--nv-cyan);
-  box-shadow: 0 2px 8px rgba(var(--nv-cyan-rgb), 0.1);
+  border-color: var(--state-hover-border);
+  background: var(--state-hover-fill);
+  color: var(--text-primary, #ede7d9);
+  box-shadow: var(--shadow-flat);
 }
 
 .navbar-auth-btn:focus-visible {
   outline: none;
-  box-shadow:
-    0 0 0 2px rgba(10, 6, 18, 0.95),
-    0 0 0 3px rgba(var(--nv-cyan-rgb), 0.35);
+  box-shadow: var(--state-focus-ring);
 }
 
 .navbar-auth-btn--login,
@@ -293,7 +291,7 @@
   border-color: rgba(var(--nv-cyan-rgb), 0.35);
   color: var(--nv-cyan);
   background: rgba(var(--nv-cyan-rgb), 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.04);
 }
 
 .navbar-auth-btn--login::before {
@@ -308,7 +306,7 @@
     transparent 54%
   );
   transform: translateX(-120%);
-  transition: transform 420ms ease;
+  transition: transform var(--motion-state) var(--motion-ease-state);
 }
 
 .navbar-auth-btn--login:hover:not(:disabled)::before {
@@ -316,10 +314,10 @@
 }
 
 .navbar-auth-btn--login:hover:not(:disabled) {
-  border-color: rgba(var(--nv-cyan-rgb), 0.55);
-  color: var(--ds-text-primary, #e8eef5);
-  background: rgba(var(--nv-cyan-rgb), 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border-color: var(--state-hover-border);
+  color: var(--text-primary, #ede7d9);
+  background: var(--state-hover-fill);
+  box-shadow: var(--shadow-flat);
 }
 
 .navbar-auth-btn--login:hover:not(:disabled) svg {
@@ -328,9 +326,9 @@
 
 .navbar-auth-btn--login.is-active {
   border-color: rgba(var(--nv-cyan-rgb), 0.55);
-  color: var(--ds-text-primary, #e8eef5);
+  color: var(--ds-text-primary, #ede7d9);
   background: rgba(var(--nv-cyan-rgb), 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.06);
 }
 
 .navbar-auth-btn--login.is-active svg {
@@ -338,10 +336,10 @@
 }
 
 .navbar-auth-btn--register {
-  border-color: rgba(255, 255, 255, 0.12);
-  color: var(--ds-text-secondary, #8b9bb0);
-  background: rgba(var(--surface-elevated-rgb, 13, 24, 40), 0.72);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border-color: rgba(237, 231, 217, 0.12);
+  color: var(--ds-text-secondary, #8b9dad);
+  background: rgba(var(--surface-elevated-rgb, 10, 18, 32), 0.72);
+  box-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.04);
 }
 
 .navbar-auth-btn--register::before {
@@ -356,7 +354,7 @@
     transparent 54%
   );
   transform: translateX(-120%);
-  transition: transform 420ms ease;
+  transition: transform var(--motion-state) var(--motion-ease-state);
 }
 
 .navbar-auth-btn--register:hover:not(:disabled)::before {
@@ -364,10 +362,10 @@
 }
 
 .navbar-auth-btn--register:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.18);
-  color: var(--ds-text-primary, #e8eef5);
-  background: rgba(var(--surface-hover-rgb, 17, 31, 50), 0.88);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border-color: var(--state-hover-border);
+  color: var(--text-primary, #ede7d9);
+  background: var(--state-hover-fill);
+  box-shadow: var(--shadow-flat);
 }
 
 .navbar-auth-btn--register:hover:not(:disabled) svg {
@@ -375,10 +373,10 @@
 }
 
 .navbar-auth-btn--register.is-active {
-  border-color: rgba(255, 255, 255, 0.18);
-  color: var(--ds-text-primary, #e8eef5);
-  background: rgba(var(--surface-hover-rgb, 17, 31, 50), 0.88);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border-color: rgba(237, 231, 217, 0.18);
+  color: var(--ds-text-primary, #ede7d9);
+  background: rgba(var(--surface-hover-rgb, 10, 18, 32), 0.88);
+  box-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.06);
 }
 
 .navbar-auth-btn--register.is-active svg {
@@ -409,14 +407,12 @@
 .navbar-auth-btn--login:focus-visible,
 .navbar-auth-btn--register:focus-visible {
   outline: none;
-  box-shadow:
-    0 0 0 2px rgba(10, 6, 18, 0.95),
-    0 0 0 3px rgba(var(--nv-cyan-rgb), 0.35);
+  box-shadow: var(--state-focus-ring);
 }
 
 .navbar-auth-btn--register:focus-visible {
   box-shadow:
-    0 0 0 2px rgba(10, 6, 18, 0.95),
+    0 0 0 2px rgba(10, 18, 32, 0.95),
     0 0 0 3px rgba(var(--nv-green-rgb), 0.35);
 }
 
@@ -469,7 +465,9 @@
   width: fit-content;
   max-width: 100%;
   min-width: 0;
-  overflow: hidden;
+  /* Ne pas couper le libellé R4V3 qui déborde légèrement sur la ligne ticker. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .navbar-brand-head:has(.navbar-brand-row__network.is-drawer-open),
@@ -564,7 +562,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
-  gap: clamp(0px, 1.2vw, 3px);
+  gap: clamp(0px, 1.2vw, 4px);
   flex: 0 0 auto;
   width: fit-content;
   max-width: 100%;
@@ -576,7 +574,8 @@
   padding: 0;
   margin-inline-start: 0;
   position: relative;
-  z-index: calc(var(--nv-layer-brand) + 1);
+  /* Au-dessus du ticker (sinon le bas de « R4V3 » est masqué). */
+  z-index: calc(var(--nv-layer-ticker) + 2);
 }
 
 /* R4V3 dropdown + LIVE + Market Pulse : une seule ligne, même axe */
@@ -594,6 +593,8 @@
   padding: 0;
   line-height: 1;
   overflow: visible;
+  position: relative;
+  z-index: 1;
   transform: translateY(var(--nv-brand-sync-y, 0px));
 }
 
@@ -617,6 +618,8 @@
   min-width: 0;
   max-width: 3.25rem;
   overflow: visible;
+  position: relative;
+  z-index: 2;
 }
 
 @media (max-width: 500px) {
@@ -722,12 +725,13 @@
 .logo-shell {
   position: relative;
   flex: 0 0 auto;
-  width: var(--nv-logo-h);
-  height: var(--nv-logo-h);
-  min-width: var(--nv-logo-h);
-  min-height: var(--nv-logo-h);
+  width: var(--nv-logo-slot);
+  height: var(--nv-logo-slot);
+  min-width: var(--nv-logo-slot);
+  min-height: var(--nv-logo-slot);
   padding: 0;
-  margin: 0;
+  /* Air haut/gauche : évite le mesh collé au clip (wrap overflow-x + root overflow). */
+  margin: 1px 0 0 2px;
   border: none;
   background: transparent;
   cursor: grab;
@@ -740,7 +744,7 @@
   content: '';
   position: absolute;
   inset: -22%;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   pointer-events: none;
   z-index: 0;
   background: radial-gradient(
@@ -758,7 +762,7 @@
 .logo-shell:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px rgba(var(--nv-cyan-rgb), 0.35);
-  border-radius: var(--ds-radius-sm, 6px);
+  border-radius: var(--ds-radius-sm, var(--radius-sm, 4px));
 }
 
 .logo-frame {
@@ -775,8 +779,9 @@
   height: 100% !important;
   margin: 0 !important;
   background: transparent !important;
-  transform: translateY(var(--nv-logo-shift-y)) scale(var(--nv-logo-scale));
-  transform-origin: center center;
+  /* Origin haut-centre : le scale ne remonte plus au-dessus du shell (clip root). */
+  transform: translateY(var(--nv-logo-shift-y, 0px)) scale(var(--nv-logo-scale, 1));
+  transform-origin: center top;
   filter: none;
 }
 
@@ -809,7 +814,13 @@
 
 .navbar-ticker ::ng-deep .bandeau-accueil__chip,
 .navbar-subtitle ::ng-deep .bandeau-accueil__chip {
-  cursor: pointer;
+  cursor: inherit;
+  touch-action: none;
+}
+
+.navbar-ticker ::ng-deep .bandeau-accueil--dragging .bandeau-accueil__chip,
+.navbar-subtitle ::ng-deep .bandeau-accueil--dragging .bandeau-accueil__chip {
+  cursor: grabbing;
 }
 
 .navbar-ticker ::ng-deep .bandeau-accueil__viewport,
@@ -845,9 +856,10 @@
     --nv-pad-x: 11px;
     --nv-pad-top: clamp(4px, 1.2vh, 7px);
     --nv-pad-y: 3px;
-    --nv-shell-radius: clamp(10px, 1vw, 14px);
+    --nv-shell-radius: var(--ds-navbar-shell-radius, var(--radius-none, 0));
     --nv-logo: 35px;
-    --nv-logo-h: 24px;
+    --nv-logo-h: var(--comp-logo-row-h, 16px);
+    --nv-logo-slot: calc(var(--nv-logo-h) * 1.5);
     --nv-logo-scale: 1.3;
     --nv-shell-min-h: 56px;
   }
@@ -892,12 +904,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .navbar-auth-btn {
-    transition: none;
+    transition:  none;
   }
 
   .navbar-auth-btn--login:hover:not(:disabled),
   .navbar-auth-btn--register:hover:not(:disabled) {
-    animation: none;
+    animation:  none;
     transform: none;
   }
 

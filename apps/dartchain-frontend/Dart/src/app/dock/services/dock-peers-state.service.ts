@@ -84,9 +84,9 @@ export class DockPeersStateService {
       case 'error':
         return 'Erreur';
       case 'loading':
-        return 'Sync…';
+        return 'Synchro…';
       case 'empty':
-        return 'Aucun peer';
+        return 'Aucun pair';
       case 'connected':
         return 'Réseau OK';
       default:

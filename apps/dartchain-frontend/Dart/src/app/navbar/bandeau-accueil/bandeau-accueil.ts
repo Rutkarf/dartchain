@@ -112,11 +112,16 @@ export class BandeauAccueilComponent
     this.dragStartClientX = event.clientX;
     this.dragStartOffsetPx = this.offsetPx;
 
-    viewport.setPointerCapture(event.pointerId);
-    event.preventDefault();
+    // Capture sur le viewport pour recevoir move/up même sur les chips.
+    try {
+      viewport.setPointerCapture(event.pointerId);
+    } catch {
+      /* ignore */
+    }
   }
 
   onChipClick(segmentId: string, event: MouseEvent): void {
+    // Un vrai drag gauche/droite ne doit pas ouvrir le tiroir.
     if (this.dragMoved) {
       event.preventDefault();
       event.stopPropagation();
@@ -131,10 +136,11 @@ export class BandeauAccueilComponent
     const dx = event.clientX - this.dragStartClientX;
     if (Math.abs(dx) > this.clickMoveThresholdPx) {
       this.dragMoved = true;
+      // Empêche sélection / scroll page seulement une fois le drag engagé.
+      event.preventDefault();
     }
     this.offsetPx = this.dragStartOffsetPx + dx;
     this.applyTransform();
-    event.preventDefault();
   }
 
   onPointerUp(event: PointerEvent): void {

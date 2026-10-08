@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 
 import { COLLAPSED_SUMMARY_BAR_CLASS } from '@dock/models/collapsed-summary.model';
 import { DockQuestsStateService } from '@dock/services/dock-quests-state.service';
+import { DockNavigationService } from '@dock/services/dock-navigation.service';
 import { QuestsPanelService } from '@quests/quests-panel/quests-panel.service';
 import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import { CURRENT_MISSION } from '@quests/quests-panel/quests-panel.constants';
@@ -34,6 +35,7 @@ export class DockQuestsSummaryComponent implements OnInit, OnDestroy {
   protected readonly state = inject(DockQuestsStateService);
   private readonly quests = inject(QuestsPanelService);
   private readonly walletSession = inject(WalletSessionService);
+  private readonly dockNav = inject(DockNavigationService);
   private readonly product = inject(ProductConfigService);
   private readonly arenaMeta = inject(ArenaMetaService);
   private readonly arenaSession = inject(ArenaSessionService);
@@ -166,6 +168,12 @@ export class DockQuestsSummaryComponent implements OnInit, OnDestroy {
     }
 
     const views = this.state.taskViews();
+    const pendingWallet = views.find((task) => task.pendingWallet);
+    if (pendingWallet) {
+      this.dockNav.requestTab('wallet');
+      return false;
+    }
+
     const current = this.displayedQuest();
     const preferred =
       current && current.claimable

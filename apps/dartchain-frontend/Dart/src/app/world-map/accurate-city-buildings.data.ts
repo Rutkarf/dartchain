@@ -1,5 +1,5 @@
 import {
-  MARSEILLE_GEO_ORIGIN,
+  METAVERSE_GEO_ORIGIN,
   rectangleFootprintMeters,
   type GeoBuilding,
 } from './geo-reference.config';
@@ -151,8 +151,8 @@ function buildFraterniteBlocks(): GeoBuilding[] {
   // Nord-est immédiat du miroir (côté Canebière / rue).
   for (let i = 0; i < 10; i++) {
     const p = offsetLatLon(
-      MARSEILLE_GEO_ORIGIN.latitude,
-      MARSEILLE_GEO_ORIGIN.longitude,
+      METAVERSE_GEO_ORIGIN.latitude,
+      METAVERSE_GEO_ORIGIN.longitude,
       38 + (i % 5) * 18,
       28 + Math.floor(i / 5) * 22
     );
@@ -161,8 +161,8 @@ function buildFraterniteBlocks(): GeoBuilding[] {
   // Sud-est (vers Rive Neuve / Cours Honoré d’Estienne d’Orves).
   for (let i = 0; i < 8; i++) {
     const p = offsetLatLon(
-      MARSEILLE_GEO_ORIGIN.latitude,
-      MARSEILLE_GEO_ORIGIN.longitude,
+      METAVERSE_GEO_ORIGIN.latitude,
+      METAVERSE_GEO_ORIGIN.longitude,
       42 + (i % 4) * 18,
       -24 - Math.floor(i / 4) * 20
     );
@@ -212,11 +212,11 @@ export function generateCanebiereSegment(
  */
 export function worldToCanebiereAlong(worldX: number, worldZ: number): number {
   const mouthEast =
-    (CANEBIERE_MOUTH.lon - MARSEILLE_GEO_ORIGIN.longitude) *
+    (CANEBIERE_MOUTH.lon - METAVERSE_GEO_ORIGIN.longitude) *
     METERS_PER_DEG_LAT *
-    Math.cos((MARSEILLE_GEO_ORIGIN.latitude * Math.PI) / 180);
+    Math.cos((METAVERSE_GEO_ORIGIN.latitude * Math.PI) / 180);
   const mouthNorth =
-    (CANEBIERE_MOUTH.lat - MARSEILLE_GEO_ORIGIN.latitude) * METERS_PER_DEG_LAT;
+    (CANEBIERE_MOUTH.lat - METAVERSE_GEO_ORIGIN.latitude) * METERS_PER_DEG_LAT;
   // Monde : x = east, z = −north
   const relEast = worldX - mouthEast;
   const relNorth = -worldZ - mouthNorth;

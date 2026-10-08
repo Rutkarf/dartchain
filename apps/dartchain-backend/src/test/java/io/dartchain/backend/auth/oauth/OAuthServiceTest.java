@@ -88,6 +88,30 @@ class OAuthServiceTest {
         assertThat(uri.toString()).contains("dev-mock:google");
     }
 
+    @Test
+    void withoutMockUnconfiguredProvidersStayDisabled() {
+        oauthProperties.setDevMockEnabled(false);
+        for (OAuthProvider provider : OAuthProvider.values()) {
+            disableRealProvider(provider);
+        }
+
+        var response = oauthService.listProviders();
+
+        assertThat(response.providers()).isNotEmpty();
+        assertThat(response.providers()).allMatch(provider -> !provider.enabled());
+    }
+
+    @Test
+    void withoutMockBuildRedirectRejectsUnconfiguredProvider() {
+        oauthProperties.setDevMockEnabled(false);
+        disableRealProvider(OAuthProvider.GITHUB);
+
+        org.junit.jupiter.api.Assertions.assertThrows(
+                io.dartchain.backend.auth.application.AuthException.class,
+                () -> oauthService.buildAuthorizationRedirect(OAuthProvider.GITHUB, "http://localhost:4200/")
+        );
+    }
+
     private void disableRealProvider(OAuthProvider provider) {
         switch (provider) {
             case GOOGLE -> {

@@ -1,12 +1,12 @@
 /*
- * HUD Arène BB — playfield plein peek, barre stats plaquee en bas de page.
+ * HUD MetaVerseBB — playfield plein peek, barre stats plaquee en bas de page.
  */
 :host {
-  --arena-chrome-h: 22px;
+  --arena-chrome-h: var(--comp-form-h, 32px);
   pointer-events: none;
   position: fixed;
-  left: 0;
-  right: 0;
+  left: var(--app-side-gutter, 5%);
+  right: var(--app-side-gutter, 5%);
   bottom: 0;
   height: var(--floor-peek-height, 220px);
   max-height: none;
@@ -38,7 +38,7 @@
   z-index: 2;
 }
 
-/* Barre Arène BB — tout en bas de page, hauteur minimale */
+/* Barre MetaVerseBB — tout en bas de page, hauteur minimale */
 .arena-hud__chrome {
   pointer-events: none;
   position: absolute;
@@ -58,16 +58,16 @@
   inset: 0;
   background: radial-gradient(
     circle at 50% 45%,
-    rgba(158, 240, 255, 0.28),
-    rgba(196, 107, 74, 0.08) 55%,
+    rgba(237, 231, 217, 0.28),
+    rgba(123, 13, 30, 0.08) 55%,
     transparent 70%
   );
   z-index: 0;
-  transition: opacity 40ms linear;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
 }
 
 .arena-hud--hit .arena-hud__strip {
-  box-shadow: inset 0 0 0 1px rgba(66, 220, 255, 0.7);
+  box-shadow: inset 0 0 0 1px rgba(139, 157, 173, 0.7);
 }
 
 .arena-hud__strip {
@@ -76,18 +76,18 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   width: 100%;
   height: 100%;
   min-height: 0;
   margin: 0;
   padding: 0 4px;
-  border-radius: 0;
+  border-radius: var(--radius-none);
   border: none;
-  border-top: 1px solid rgba(196, 165, 116, 0.4);
-  background: rgba(8, 10, 12, 0.92);
-  color: #e8e0d4;
-  font: 600 8px/1 "IBM Plex Mono", ui-monospace, monospace;
+  border-top: 1px solid rgba(213, 160, 33, 0.4);
+  background: rgba(10, 18, 32, 0.92);
+  color: #ede7d9;
+  font: 600 4.5px/1 Inter, sans-serif;
   overflow: hidden;
   z-index: 4;
   box-sizing: border-box;
@@ -95,48 +95,36 @@
 
 .arena-hud__brand {
   flex: 0 0 auto;
-  font: 700 8px/1 "IBM Plex Sans", sans-serif;
+  font: 700 4.5px/1 Roboto, sans-serif;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: #e8d4b0;
-  max-width: 48px;
+  color: #ede7d9;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.arena-hud__kte {
-  flex: 0 0 auto;
-  font: 700 6px/1 "IBM Plex Sans", sans-serif;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #9ef0ff;
-  padding: 0 2px;
-  border: 1px solid rgba(158, 240, 255, 0.3);
-  border-radius: 1px;
 }
 
 .arena-hud__hp {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   flex: 1 1 auto;
-  min-width: 0;
+  min-width: 48px;
+  max-width: none;
 }
 
 .arena-hud__meter {
-  width: 28px;
-  height: 2px;
-  flex: 0 0 auto;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 1px;
+  width: auto;
+  height: var(--comp-progress-h, 4px);
+  flex: 1 1 auto;
+  min-width: var(--comp-hud-h, 16px);
+  background: rgba(237, 231, 217, 0.12);
+  border-radius: var(--radius-none);
   overflow: hidden;
 }
 
 .arena-hud__meter > span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #c46b4a, #42dcff);
+  background: linear-gradient(90deg, #7b0d1e, #8b9dad);
 }
 
 .arena-hud__chip {
@@ -147,31 +135,31 @@
 
 .arena-hud__chip--dim {
   opacity: 0.55;
-  font-size: 7px;
+  font-size: var(--fs-label);
 }
 
 .arena-hud__chip--shot {
-  color: #9ef0ff;
+  color: #ede7d9;
   font-weight: 700;
 }
 
 .arena-hud__chip--streak {
-  color: #ffcc66;
+  color: #7b0d1e;
   font-weight: 700;
 }
 
 .arena-hud__chip--earn {
-  color: #a8ffc4;
+  color: #09814a;
   font-weight: 700;
 }
 
 .arena-hud__chip--peers {
-  color: #9eb8ff;
+  color: #8b9dad;
   font-weight: 700;
 }
 
 .arena-hud__chip--pause {
-  color: #ff8866;
+  color: #7b0d1e;
   font-weight: 700;
 }
 
@@ -181,8 +169,8 @@
 .arena-hud__chip-btn,
 .arena-hud__quest-claim {
   pointer-events: auto;
-  border-radius: 3px;
-  border: 1px solid rgba(232, 224, 212, 0.35);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(237, 231, 217, 0.35);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -192,11 +180,15 @@
   margin-left: auto;
   flex: 0 0 auto;
   min-width: 16px;
-  height: 14px;
+  height: var(--comp-hud-h, 16px);
   padding: 0;
-  font: 700 8px/1 "IBM Plex Sans", sans-serif;
-  color: #e8e0d4;
-  background: rgba(40, 32, 24, 0.9);
+  font: 700 4.5px/1 Roboto, sans-serif;
+  color: #ede7d9;
+  background: rgba(10, 18, 32, 0.9);
+}
+
+.arena-hud__mini--inline {
+  margin-left: 0;
 }
 
 .arena-hud__cross {
@@ -205,11 +197,11 @@
   left: 50%;
   top: 38%;
   width: 14px;
-  height: 14px;
+  height: var(--comp-hud-h, 16px);
   margin: -7px 0 0 -7px;
-  border: 1.5px solid rgba(180, 170, 160, 0.35);
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+  border: var(--stroke-w-hairline) solid var(--stroke-active);
+  border-radius: var(--radius-circle);
+  box-shadow: 0 0 0 1px rgba(10, 18, 32, 0.25);
   z-index: 1;
   opacity: 0.7;
 }
@@ -218,7 +210,7 @@
 .arena-hud__cross::after {
   content: "";
   position: absolute;
-  background: rgba(180, 170, 160, 0.45);
+  background: rgba(139, 157, 173, 0.45);
 }
 
 .arena-hud__cross::before {
@@ -238,8 +230,8 @@
 }
 
 .arena-hud__cross--lock {
-  border-color: rgba(255, 80, 170, 0.65);
-  box-shadow: 0 0 6px rgba(255, 45, 154, 0.35);
+  border-color: rgba(123, 13, 30, 0.65);
+  box-shadow: 0 0 6px rgba(139, 157, 173, 0.35);
   opacity: 1;
 }
 
@@ -248,11 +240,11 @@
   position: absolute;
   right: 6px;
   top: 6px;
-  width: 36px;
-  height: 36px;
-  border-radius: 3px;
-  background: rgba(8, 12, 16, 0.55);
-  border: 1px solid rgba(120, 110, 100, 0.25);
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-sm);
+  background: rgba(10, 18, 32, 0.55);
+  border: 1px solid rgba(139, 157, 173, 0.25);
   z-index: 2;
   opacity: 0.65;
 }
@@ -262,23 +254,23 @@
   width: 4px;
   height: 4px;
   margin: -2px 0 0 -2px;
-  border-radius: 50%;
-  background: #6a5048;
+  border-radius: var(--radius-circle);
+  background: #7b0d1e;
 }
 
 .arena-hud__dot--self {
-  background: #ff2d9a;
-  width: 5px;
-  height: 5px;
+  background: #8b9dad;
+  width: var(--comp-led-size, 4px);
+  height: var(--comp-led-size, 4px);
   margin: -2.5px 0 0 -2.5px;
 }
 
 .arena-hud__dot--power {
-  background: #6a6040;
+  background: #7b0d1e;
 }
 
 .arena-hud__dot--peer {
-  background: #3a4a68;
+  background: #235789;
 }
 
 /* FIRE au-dessus de la barre bas + au-dessus des sticks */
@@ -289,16 +281,37 @@
   transform: translateX(-50%);
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  font: 700 9px/1 "IBM Plex Sans", sans-serif;
+  border-radius: var(--radius-circle);
+  font: 700 4.5px/1 Roboto, sans-serif;
   letter-spacing: 0.04em;
-  color: #1a1410;
-  background: radial-gradient(circle at 35% 28%, #c8b8a0, #7a5040 68%, #4a3028);
+  color: #0a1220;
+  background: radial-gradient(circle at 35% 28%, #8b9dad, #7b0d1e 68%, #7b0d1e);
   box-shadow:
-    0 0 0 2px rgba(255, 45, 154, 0.2),
-    0 3px 10px rgba(0, 0, 0, 0.45);
+    0 0 0 2px rgba(139, 157, 173, 0.2),
+    0 3px 10px rgba(10, 18, 32, 0.45);
   z-index: 3;
   opacity: 0.85;
+}
+
+/* Portrait téléphone haut (ex. 436×653) : FIRE / HUD lisibles au doigt. */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 600px) {
+  .arena-hud__fire {
+    width: 56px;
+    height: 56px;
+    bottom: calc(var(--arena-chrome-h) + 64px);
+    font: 700 9px/1 Roboto, sans-serif;
+    letter-spacing: 0.06em;
+  }
+
+  .arena-hud__quest-claim {
+    font: 700 9px/1.2 Roboto, sans-serif;
+    padding: 6px 10px;
+  }
+
+  .arena-hud__toast {
+    font: 700 9px/1.2 Roboto, sans-serif;
+    padding: 3px 8px;
+  }
 }
 
 .arena-hud__fire:active {
@@ -311,10 +324,10 @@
   top: 8px;
   transform: translateX(-50%);
   z-index: 5;
-  padding: 3px 8px;
-  font: 700 9px/1.2 "IBM Plex Sans", sans-serif;
-  color: #102018;
-  background: linear-gradient(135deg, #a8ffc4, #42dcff);
+  padding: 4px 8px;
+  font: 700 4.5px/1.2 Roboto, sans-serif;
+  color: #0a1220;
+  background: linear-gradient(135deg, #09814a, #8b9dad);
   white-space: nowrap;
 }
 
@@ -326,10 +339,10 @@
   transform: translateX(-50%);
   margin: 0;
   padding: 2px 6px;
-  border-radius: 2px;
-  background: rgba(8, 20, 28, 0.92);
-  font: 700 9px/1.2 "IBM Plex Sans", sans-serif;
-  color: #9ef0ff;
+  border-radius: var(--radius-xs);
+  background: rgba(10, 18, 32, 0.92);
+  font: 700 4.5px/1.2 Roboto, sans-serif;
+  color: #ede7d9;
   white-space: nowrap;
   max-width: 92%;
   overflow: hidden;
@@ -338,12 +351,12 @@
 }
 
 .arena-hud__toast--earn {
-  color: #a8ffc4;
+  color: #09814a;
 }
 
 .arena-hud__toast--ko-big,
 .arena-hud__toast--ko {
-  color: #ffc9a8;
+  color: #7b0d1e;
 }
 
 .arena-hud__panel {
@@ -354,11 +367,11 @@
   top: 6px;
   bottom: calc(var(--arena-chrome-h) + 64px);
   overflow: auto;
-  background: linear-gradient(160deg, rgba(28, 22, 16, 0.97), rgba(10, 16, 22, 0.96));
-  border: 1px solid rgba(196, 165, 116, 0.4);
-  color: #e8e0d4;
-  padding: 8px 10px;
-  border-radius: 4px;
+  background: linear-gradient(160deg, rgba(10, 18, 32, 0.97), rgba(10, 18, 32, 0.96));
+  border: 1px solid rgba(213, 160, 33, 0.4);
+  color: #ede7d9;
+  padding: 8px 8px;
+  border-radius: var(--radius-sm);
   z-index: 8;
 }
 
@@ -369,27 +382,26 @@
 
 .arena-hud__panel h2 {
   margin: 0 0 4px;
-  font: 700 12px/1.2 "IBM Plex Sans", sans-serif;
+  font: 700 7px/1.2 Roboto, sans-serif;
 }
 
 .arena-hud__lead,
 .arena-hud__panel p,
 .arena-hud__panel li {
   margin: 0 0 4px;
-  font: 400 10px/1.35 "IBM Plex Sans", sans-serif;
+  font: 400 7px/1.35 Roboto, sans-serif;
   opacity: 0.92;
 }
 
 .arena-hud__panel ul {
   margin: 0 0 8px;
-  padding-left: 14px;
+  padding-left: 12px;
 }
 
 .arena-hud__lb {
   list-style: none;
   padding-left: 0 !important;
-  font: 600 9px/1.35 "IBM Plex Mono", monospace !important;
-}
+  font: 600 4.5px/1.35 Inter, sans-serif !important;}
 
 .arena-hud__row {
   display: flex;
@@ -404,27 +416,27 @@
 
 .arena-hud__chip-btn {
   padding: 4px 6px;
-  font: 600 9px/1 "IBM Plex Sans", sans-serif;
-  color: #e8e0d4;
-  background: rgba(40, 32, 24, 0.9);
+  font: 600 4.5px/1 Roboto, sans-serif;
+  color: #ede7d9;
+  background: rgba(10, 18, 32, 0.9);
 }
 
 .arena-hud__chip-btn.is-on {
-  color: #1a1410;
-  background: linear-gradient(135deg, #e8d4b0, #c46b4a);
+  color: #0a1220;
+  background: linear-gradient(135deg, #ede7d9, #7b0d1e);
   border-color: transparent;
 }
 
 .arena-hud__input {
   flex: 1 1 auto;
   min-width: 0;
-  height: 22px;
+  height: var(--comp-form-h, 32px);
   padding: 0 6px;
-  border-radius: 3px;
-  border: 1px solid rgba(232, 224, 212, 0.3);
-  background: rgba(8, 10, 12, 0.8);
-  color: #e8e0d4;
-  font: 600 10px/1 "IBM Plex Mono", monospace;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(237, 231, 217, 0.3);
+  background: rgba(10, 18, 32, 0.8);
+  color: #ede7d9;
+  font: 600 4.5px/1 Inter, sans-serif;
 }
 
 .arena-hud__cta {
@@ -432,23 +444,19 @@
   width: 100%;
   padding: 8px;
   margin-top: 4px;
-  font: 600 11px/1.2 "IBM Plex Sans", sans-serif;
-  color: #1a1410;
-  background: linear-gradient(135deg, #e8d4b0, #c46b4a);
+  font: 600 4.5px/1.2 Roboto, sans-serif;
+  color: #0a1220;
+  background: linear-gradient(135deg, #ede7d9, #7b0d1e);
 }
 
 .arena-hud__cta--ghost {
-  color: #e8e0d4;
-  background: rgba(40, 32, 24, 0.85);
+  color: #ede7d9;
+  background: rgba(10, 18, 32, 0.85);
   margin-bottom: 4px;
 }
 
 @media (min-width: 350px) {
   .arena-hud {
     max-width: min(420px, 100%);
-  }
-
-  .arena-hud__brand {
-    max-width: none;
   }
 }

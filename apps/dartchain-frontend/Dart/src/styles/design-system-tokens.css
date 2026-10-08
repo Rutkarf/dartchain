@@ -15,71 +15,198 @@
   /* ═══════════════════════════════════════════════════════════
    * Sémantique fintech (API publique Pass 1)
    * ═══════════════════════════════════════════════════════════ */
-  --bg-primary: #000000;
-  --bg-primary-rgb: 0, 0, 0;
-  --bg-secondary: #000000;
-  --bg-secondary-rgb: 0, 0, 0;
+  --bg-primary: #0a1220;
+  --bg-primary-rgb: 10, 18, 32;
+  --bg-secondary: #0a1220;
+  --bg-secondary-rgb: 10, 18, 32;
 
   --surface: #0a1220;
   --surface-rgb: 10, 18, 32;
+  /* Marches navy pour glass / rgba() — l’élévation shell reste les voiles Porcelain. */
   --surface-elevated: #0d1828;
   --surface-elevated-rgb: 13, 24, 40;
   --surface-hover: #111f32;
   --surface-hover-rgb: 17, 31, 50;
 
-  --text-primary-ds: #e8eef5;
-  --text-secondary-ds: #8b9bb0;
-  --text-muted-ds: #5c6b7e;
+  /* ÉLÉVATION — voiles sur l'encre navy #0a1220 (ex-violet #0d0630 retiré).
+     --bg-*-fill est un `background` opaque : voile + aplat.
+     Source : docs/directionArtistique/elevation et profondeur.txt */
+  --bg-0: var(--bg-primary);
+  --bg-1: rgba(237, 231, 217, 0.04);
+  --bg-2: rgba(237, 231, 217, 0.08);
+  --bg-hover-1: var(--bg-2);
+  --bg-hover-2: rgba(237, 231, 217, 0.12);
+  --bg-1-fill: linear-gradient(var(--bg-1), var(--bg-1)), var(--bg-0);
+  --bg-2-fill: linear-gradient(var(--bg-2), var(--bg-2)), var(--bg-0);
+  --bg-hover-1-fill: linear-gradient(var(--bg-hover-1), var(--bg-hover-1)), var(--bg-0);
+  --bg-hover-2-fill: linear-gradient(var(--bg-hover-2), var(--bg-hover-2)), var(--bg-0);
+  /* Couche valide dans une liste de box-shadow. `none` casserait la liste. */
+  --shadow-flat: 0 0 0 transparent;
 
-  --accent-cyan: #2ec4d6;
-  --accent-cyan-rgb: 46, 196, 214;
-  --accent-purple: #7b6cff;
-  --accent-purple-rgb: 123, 108, 255;
+  --text-primary-ds: #ede7d9;
+  --text-secondary-ds: #8b9dad;
+  /* Muted = Blanc cassé α 0.45. Le secondaire reste le Bleu gris opaque. */
+  --text-muted-ds: rgba(237, 231, 217, 0.45);
 
-  --success: #2ecc8a;
-  --success-rgb: 46, 204, 138;
-  --warning: #e6b84d;
-  --warning-rgb: 230, 184, 77;
-  --danger: #e85d75;
-  --danger-rgb: 232, 93, 117;
+  /* Accent UI = Bleu gris. --accent-cyan / --accent-purple sont des alias
+     (les noms néon restent pour ne pas casser les consumers). */
+  --accent-primary: #8b9dad;
+  --accent-primary-rgb: 139, 157, 173;
+  --accent-cyan: var(--accent-primary);
+  --accent-cyan-rgb: var(--accent-primary-rgb);
+  --accent-purple: var(--accent-primary);
+  --accent-purple-rgb: var(--accent-primary-rgb);
 
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default-ds: rgba(255, 255, 255, 0.1);
+  --success: #09814a;
+  --success-rgb: 9, 129, 74;
+  --warning: #d5a021;
+  --warning-rgb: 213, 160, 33;
+  --danger: #7b0d1e;
+  --danger-rgb: 123, 13, 30;
+
+  --border-subtle: rgba(237, 231, 217, 0.06);
+  --border-default-ds: rgba(237, 231, 217, 0.1);
   --border-active: rgba(var(--accent-cyan-rgb), 0.45);
 
-  --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 18px;
-  --radius-pill: 999px;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
+  /* ═══════════════════════════════════════════════════════════
+   * ÉCHELLE ESPACEMENT DA @ 250×550
+   * Unité de base = 2px. HUD autorisé : 0 · 2 · 4 · 6 · 8 · 12 · 16
+   * Overlay : 24 · 32. Source : docs/directionArtistique/espacement DA 250x550.txt
+   * ═══════════════════════════════════════════════════════════ */
+  --space-half: 2px;          /* couture / seam chrome */
+  --space-1: 4px;             /* micro-gap (chips, icônes, LED) */
+  --space-dense: 6px;         /* pad panel / exchange / mini-île */
+  --space-2: 8px;             /* cluster / card HUD / gap groupes */
+  --space-3: 12px;            /* drawer body / form confort */
+  --space-4: 16px;            /* grand pad HUD (rare) */
+  --space-6: 24px;            /* pad overlay */
+  --space-8: 32px;            /* gap blocs overlay */
+  /* Legacy hors vocabulaire HUD — ne pas utiliser dans le dock */
   --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
 
-  --shadow-soft: 0 3px 17px rgba(0, 0, 0, 0.28);
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.22);
+  /* ═══════════════════════════════════════════════════════════
+   * RADIUS & FORMES DA @ 250×550
+   * Soft : 2 · 4 · 8  |  Formes : 0 · pill · circle
+   * Source : docs/directionArtistique/radius et formes.txt
+   * ═══════════════════════════════════════════════════════════ */
+  --radius-xs: var(--space-half);   /* 2px — tag / micro */
+  --radius-sm: var(--space-1);      /* 4px — HUD control / nested card */
+  --radius-md: var(--space-2);      /* 8px — FORM / modal / drawer */
+  --radius-none: 0;                 /* host panel / flush chrome */
+  --radius-pill: 999px;             /* chip filtre / status */
+  --radius-circle: 50%;             /* avatar / LED */
+  /* Legacy aliases — ne plus utiliser comme API produit */
+  --radius-lg: var(--radius-md);    /* était 16 → 8 */
+  --radius-xl: var(--radius-md);    /* était 18 → 8 */
+
+  --shadow-soft: var(--shadow-flat);
+  --shadow-card: var(--shadow-flat);
   --shadow-focus:
     0 0 0 2px rgba(var(--bg-primary-rgb), 0.92),
     0 0 0 3px rgba(var(--accent-cyan-rgb), 0.45);
 
-  --font-ui: 'Inter', 'Roboto', system-ui, sans-serif;
-  --font-display: 'Orbit', 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
+  /* États interactifs — docs/directionArtistique/etats interactifs.txt
+     Hover drawer = plafond Blanc cassé α 0.12.
+     --danger et --state-error = Rouge boursier.
+     --warning = Jaune doré, encre ou trait. L'aplat or est le CTA. */
+  --state-hover-bg: var(--bg-hover-2);
+  --state-hover-fill: var(--bg-hover-2-fill);
+  --state-hover-border: var(--stroke-active);
+  --state-active-fill: var(--state-hover-fill);
+  --state-active-border: var(--state-hover-border);
+  --state-focus-ring: var(--shadow-focus);
+  --state-focus-border: var(--stroke-active);
+  --state-disabled-opacity: 0.48;
+  --state-loading-opacity: 0.72;
+  --state-error: #7b0d1e;
+  --state-error-rgb: 123, 13, 30;
+  --state-error-fg: var(--state-error);
+  --state-error-bg: rgba(var(--state-error-rgb), 0.1);
+  --state-error-border: rgba(var(--state-error-rgb), 0.28);
+  --state-success: var(--success);
+  --state-success-rgb: var(--success-rgb);
+  --state-success-fg: var(--state-success);
+  --state-success-bg: rgba(var(--state-success-rgb), 0.1);
+  --state-success-border: rgba(var(--state-success-rgb), 0.28);
 
-  --type-h1: 1.125rem;      /* 18px — rare @ 250 */
-  --type-h2: 0.8125rem;    /* 13px */
-  --type-h3: 0.6875rem;    /* 11px */
-  --type-body: 0.6875rem;  /* 11px */
-  --type-caption: 0.5625rem; /* 9px */
-  --type-label: 0.5rem;    /* 8px */
-  --type-metric: 0.9375rem; /* 15px — KPI values */
+  /* Motion — docs/directionArtistique/motion et transitions.txt
+     État = encre qui change. Présence = opacity + scale(0.985 → 1). */
+  --motion-state: 120ms;
+  --motion-enter: 160ms;
+  --motion-ease-state: ease;
+  --motion-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --cta-transition:  var(--motion-state) var(--motion-ease-state);
+
+  /* Z-index shell. Valeurs = ordre déjà rendu (ne pas renuméroter : les menus
+     du hub sont au-dessus de la navbar). Age-gate au-dessus du drawer. */
+  --z-base: 0;
+  --z-floor: 1;
+  --z-band: 2;
+  --z-navbar: 4;
+  --z-stack: 6;
+  --z-popover: 25;
+  --z-dropdown: 100;
+  --z-dropdown-raised: 110;
+  --z-navbar-open: 120;
+  --z-feedback: 120;
+  --z-banner: 125;
+  --z-toast: 130;
+  --z-overlay: 200;
+  --z-skip: 10000;
+  --z-drawer: 10050;
+  --z-agegate: 10060;
+  --z-joystick: 1000;
+
+  --font-ui: 'Roboto', sans-serif;
+  --font-display: 'Orbitron', sans-serif;
+  --font-mono: 'Inter', sans-serif;
+  --font-data: 'Inter', sans-serif;
+  --font-body: 'Roboto', sans-serif;
+  --font-fallback: 'Roboto', sans-serif;
+
+  /* Typo micro — 4 graisses, 3 interlignes, 3 approches.
+     Interdit : 600, 900, line-height 0 / 1.05 / 1.1 / 1.2, tracking 0.01–0.02 / 0.05. */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-bold: 700;
+  --fw-black: 800;
+  --lh-tight: 1;
+  --lh-snug: 1.15;
+  --lh-body: 1.35;
+  --ls-none: 0;
+  --ls-label: 0.04em;
+  --ls-display: 0.06em;
+
+  /* ═══════════════════════════════════════════════════════════
+   * ÉCHELLE TYPO — 14 tailles max (une par rôle DA)
+   * Source : docs/directionArtistique/taille unique par role.txt
+   * Chat message utilisateur fixé à 8px (pas d’échelle 8–72).
+   * ═══════════════════════════════════════════════════════════ */
+  --fs-hero: 188px;           /* 1 titres monumentaux / FX canvas */
+  --fs-title: 7px;            /* 2 titres panels / sections / drawers */
+  --fs-price: 5px;            /* 3 prix / montants / KPI dense */
+  --fs-label: 4.5px;          /* 4 labels / captions / badges / chips */
+  --fs-shell: 4px;            /* 5 navbar / tabs / dock chrome */
+  --fs-chart: 6px;            /* 6 chart hub */
+  --fs-chat-msg: 8px;         /* 7 messages chat (taille unique user) */
+  --fs-chat-chrome: 5.5px;    /* 8 chrome chat (hors message) */
+  --fs-module: 9px;           /* 9 showcase news/launch/DAO/R4V3/market */
+  --fs-chain: 6.5px;          /* 10 blockchain dock */
+  --fs-form: 0.72rem;         /* 11 wallet / auth / admin / onboarding ≈11.5px */
+  --fs-body: 0.6875rem;       /* 12 corps UI / CTA ≈11px */
+  --fs-debug: 10px;           /* 13 mono / code / debug HUD */
+  --fs-fallback: 0.8125rem;   /* 14 divers / fallback lisible ≈13px */
+
+  /* Alias legacy --type-* → échelle 14 rôles */
+  --type-h1: var(--fs-fallback);
+  --type-h2: var(--fs-fallback);
+  --type-h3: var(--fs-body);
+  --type-body: var(--fs-body);
+  --type-caption: var(--fs-module);
+  --type-label: var(--fs-chat-msg);
+  --type-metric: var(--fs-form);
 
   /* Glass subtil (cards premium, pas vitres néon) */
   --glass-fill-fintech: rgba(var(--surface-rgb), 0.75);
@@ -118,7 +245,7 @@
   );
   --ds-surface-metallic: linear-gradient(
     125deg,
-    rgba(255, 255, 255, 0.03) 0%,
+    rgba(237, 231, 217, 0.03) 0%,
     rgba(var(--surface-rgb), 0.02) 50%,
     rgba(var(--accent-cyan-rgb), 0.02) 100%
   );
@@ -136,7 +263,7 @@
 
   --ds-surface-metallic-sheen: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.04) 0%,
+    rgba(237, 231, 217, 0.04) 0%,
     transparent 22%,
     transparent 78%,
     rgba(var(--accent-cyan-rgb), 0.02) 100%
@@ -144,9 +271,9 @@
   --ds-surface-metallic-edge: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.02) 48%,
-    rgba(255, 255, 255, 0.03) 50%,
-    rgba(255, 255, 255, 0.015) 52%,
+    rgba(237, 231, 217, 0.02) 48%,
+    rgba(237, 231, 217, 0.03) 50%,
+    rgba(237, 231, 217, 0.015) 52%,
     transparent 100%
   );
   --ds-surface-micro-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
@@ -166,26 +293,22 @@
   --ds-surface-grid-size: var(--ds-surface-carbon-size);
 
   --ds-surface-blur: var(--ds-surface-backdrop);
-  --ds-surface-radius: var(--radius-lg);
+  --ds-surface-radius: var(--radius-none); /* host = sharp */
   --ds-surface-border: var(--border-subtle);
-  --ds-surface-border-top: rgba(255, 255, 255, 0.07);
+  --ds-surface-border-top: rgba(237, 231, 217, 0.07);
   --ds-surface-border-bottom: rgba(var(--accent-cyan-rgb), 0.08);
-  --ds-surface-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    var(--shadow-card);
-  --ds-surface-shadow-strip:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 2px 8px rgba(0, 0, 0, 0.18);
+  --ds-surface-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.04);
+  --ds-surface-shadow-strip: inset 0 1px 0 rgba(237, 231, 217, 0.04);
 
-  /* Card levels (Pass 1) */
-  --ds-card-standard-bg: var(--glass-fill-fintech);
-  --ds-card-elevated-bg: rgba(var(--surface-elevated-rgb), 0.82);
-  --ds-card-active-bg: rgba(var(--surface-hover-rgb), 0.88);
+  /* Card levels — host = bg0 ; élevé / actif = voile opaque */
+  --ds-card-standard-bg: var(--bg-0);
+  --ds-card-elevated-bg: var(--bg-2-fill);
+  --ds-card-active-bg: var(--bg-hover-2-fill);
   --ds-card-standard-border: var(--border-subtle);
   --ds-card-elevated-border: var(--border-default-ds);
   --ds-card-active-border: rgba(var(--accent-cyan-rgb), 0.28);
-  --ds-card-padding: var(--space-3);
-  --ds-card-radius: var(--radius-lg);
+  --ds-card-padding: var(--space-2); /* card HUD = 8px (DA) */
+  --ds-card-radius: var(--radius-sm); /* nested = 4px */
 
   /* Alias legacy → surface */
   --ds-glass-blur: var(--ds-surface-blur);
@@ -194,8 +317,8 @@
   /* Accents — noms « neon » conservés, valeurs teal sobres (pas gaming) */
   --ds-neon-cyan: var(--accent-cyan);
   --ds-neon-cyan-rgb: var(--accent-cyan-rgb);
-  --ds-neon-magenta: #c45b9f;
-  --ds-neon-magenta-rgb: 196, 91, 159;
+  --ds-neon-magenta: #8b9dad;
+  --ds-neon-magenta-rgb: 139, 157, 173;
   --ds-neon-violet: var(--accent-purple);
   --ds-neon-violet-rgb: var(--accent-purple-rgb);
 
@@ -204,7 +327,7 @@
   --ds-text-secondary: var(--text-secondary-ds);
   --ds-text-muted: var(--text-muted-ds);
   --ds-text-data: var(--accent-cyan);
-  --ds-text-label: var(--text-muted-ds);
+  --ds-text-label: var(--fs-chat-msg);
   --ds-text-value: var(--text-primary-ds);
 
   /* Bordures & séparateurs */
@@ -213,23 +336,44 @@
   --ds-border-accent: rgba(var(--accent-cyan-rgb), 0.22);
   --ds-border-accent-active: var(--border-active);
 
-  /* Rayons */
+  /* Rayons — DA radius & formes (FIGÉ) */
+  --ds-radius-xs: var(--radius-xs);
   --ds-radius-sm: var(--radius-sm);
   --ds-radius-md: var(--radius-md);
-  --ds-radius-lg: var(--radius-lg);
-  --ds-radius-xl: var(--radius-xl);
+  --ds-radius-lg: var(--radius-md); /* legacy → md */
+  --ds-radius-xl: var(--radius-md); /* legacy → md */
+  --ds-radius-none: var(--radius-none);
   --ds-radius-pill: var(--radius-pill);
-  --ds-radius-input: var(--radius-md);
-  --ds-radius-btn: 12px;
+  --ds-radius-circle: var(--radius-circle);
+  --ds-radius-input: var(--radius-sm); /* 4px HUD — redefined via --comp-* */
+  --ds-radius-btn: var(--radius-md);   /* 8px FORM — redefined via --comp-* */
+  --ds-drawer-radius: var(--radius-md);
+  --ds-modal-radius: var(--radius-md);
 
-  /* Espacement (grille 3px, viewport 250×550) */
+  /* Espacement DA — grille 2px @ viewport 250×550 */
+  --ds-space-half: var(--space-half);
   --ds-space-1: var(--space-1);
+  --ds-space-dense: var(--space-dense);
   --ds-space-2: var(--space-2);
   --ds-space-3: var(--space-3);
   --ds-space-4: var(--space-4);
   --ds-space-6: var(--space-6);
   --ds-space-8: var(--space-8);
+
+  /* Rôles sémantiques (consommer ceux-ci plutôt que des littéraux) */
+  --ds-gap-seam: var(--space-half);       /* 2px — couture chrome / bands */
+  --ds-gap-micro: var(--space-1);         /* 4px — chips / icônes / LED */
+  --ds-gap-cluster: var(--space-2);       /* 8px — siblings / groupes dans zone */
+  --ds-pad-chip: 0px var(--space-1);      /* 0 × 4 */
+  --ds-pad-panel: var(--space-dense);     /* 6px — panel / module HUD */
+  --ds-pad-card: var(--space-2);          /* 8px — card HUD élevée */
+  --ds-pad-drawer-x: var(--space-1);      /* 4px */
+  --ds-pad-drawer-y: var(--space-dense);  /* 6px */
+  --ds-pad-overlay: var(--space-6);       /* 24px */
+  --ds-gap-overlay: var(--space-8);       /* 32px */
+
   --ds-shell-inline: var(--space-2);
+  /* Section bands @ compact forcé à seam (2px) via html.vp-compact */
   --ds-section-gap: var(--space-2);
   --ds-panel-gap: var(--space-2);
 
@@ -237,13 +381,13 @@
   --ds-font-ui: var(--font-ui);
   --ds-font-display: var(--font-display);
   --ds-font-mono: var(--font-mono);
-  --ds-text-xs: var(--type-caption);
-  --ds-text-sm: var(--type-body);
-  --ds-text-md: var(--type-h2);
-  --ds-text-lg: 0.875rem;   /* 14px */
-  --ds-text-xl: var(--type-metric);
-  --ds-text-label: var(--type-label);
-  --ds-text-caption: var(--type-caption);
+  --ds-text-xs: var(--fs-module);
+  --ds-text-sm: var(--fs-body);
+  --ds-text-md: var(--fs-fallback);
+  --ds-text-lg: var(--fs-fallback);
+  --ds-text-xl: var(--fs-form);
+  --ds-text-label: var(--fs-chat-msg);
+  --ds-text-caption: var(--fs-module);
 
   /* Glow minimal — guide l’attention uniquement */
   --ds-glow-active: 0 0 0 1px rgba(var(--accent-cyan-rgb), 0.2);
@@ -277,34 +421,35 @@
     rgba(var(--accent-cyan-rgb), 0.28) 100%
   );
 
-  /* Tabs : niveau A (vue) vs B (filtre) — underline discret, pas halo */
-  --ds-tab-a-height: 23px;
+  /* Tabs — DA composants : hub = 16 (plus de A/B 23/19 morts) */
+  --ds-tab-a-height: var(--comp-tab-hub-h); /* alias legacy → hub 16 */
   --ds-tab-a-bg-active: rgba(var(--accent-cyan-rgb), 0.08);
   --ds-tab-a-border-active: var(--accent-cyan);
-  --ds-tab-a-underline: 2px solid var(--accent-cyan);
-  --ds-tab-b-height: 19px;
+  --ds-tab-a-underline: var(--comp-divider-accent) solid var(--accent-cyan);
+  --ds-tab-b-height: var(--comp-chip-h); /* filter pill = chip 16 */
   --ds-tab-b-bg: transparent;
   --ds-tab-b-border: var(--ds-border-default);
 
-  /* Inputs */
-  --ds-input-bg: rgba(var(--surface-elevated-rgb), 0.65);
-  --ds-input-bg-hover: rgba(var(--surface-hover-rgb), 0.72);
+  /* Inputs — DA : HUD 16 / FORM 32, border 1, radius 4|8 */
+  --ds-input-bg: var(--bg-0);
+  --ds-input-bg-hover: var(--bg-1-fill);
   --ds-input-border: var(--ds-border-default);
   --ds-input-border-focus: rgba(var(--accent-cyan-rgb), 0.55);
-  --ds-input-radius: var(--ds-radius-input);
-  --ds-input-padding-y: 5px;
-  --ds-input-padding-x: 9px;
-  --ds-input-font: var(--ds-text-sm);
+  --ds-input-radius: var(--comp-input-hud-radius);
+  --ds-input-padding-y: 0px;                /* HUD default */
+  --ds-input-padding-x: var(--space-1);     /* 4px HUD */
+  --ds-input-font: var(--fs-body);
   --ds-input-placeholder: var(--ds-text-muted);
+  --ds-input-height: var(--comp-input-hud-h);
 
   /* Badges / status */
-  --ds-badge-radius: var(--radius-pill);
-  --ds-badge-font: var(--type-label);
-  --ds-badge-padding: 0px 4px;
+  --ds-badge-radius: var(--comp-chip-radius);
+  --ds-badge-font: var(--fs-chat-msg);
+  --ds-badge-padding: var(--ds-pad-chip);
   --ds-status-live: var(--success);
   --ds-status-live-rgb: var(--success-rgb);
   --ds-status-secondary-fg: var(--ds-text-secondary);
-  --ds-status-secondary-bg: rgba(255, 255, 255, 0.04);
+  --ds-status-secondary-bg: rgba(237, 231, 217, 0.04);
 
   /* Recommendation / info contextuelle */
   --ds-recommend-bg: rgba(var(--accent-cyan-rgb), 0.06);
@@ -312,56 +457,169 @@
   --ds-recommend-fg: var(--ds-text-secondary);
 
   /* Skeleton loading */
-  --ds-skeleton-base: rgba(255, 255, 255, 0.04);
-  --ds-skeleton-shine: rgba(255, 255, 255, 0.08);
+  --ds-skeleton-base: rgba(237, 231, 217, 0.04);
+  --ds-skeleton-shine: rgba(237, 231, 217, 0.08);
 
-  /* —— Layout budgets @ 250×550 zero-scroll (tout déplié ≤ 550) —— */
+  /* —— Layout budgets @ 250×550 (tout déplié = 550, safe-area 0) ——
+   * 32+2+32+2+96+2+96+2+80+6+200 = 550
+   * Corps showcase / dock = 80 (5×16). Chart = 80. Floor ouvert = 200.
+   * Le floor vivant (≤349) est le reste du viewport, plancher résultat 200 à 550. */
   --ds-viewport-w: 250px;
   --ds-viewport-h: 550px;
+
+  /* Paliers nommés. Les @media recopient ces littéraux (var() interdit dans @media).
+     compact 0–349 · téléphone portrait ≤ 480 (même grille) · mid 350–699
+     · roomy 700–1099 · desktop ≥1100
+     phone-tall : portrait 360–480 × hauteur ≥ 600 (ex. 436×653) — hors lock micro */
+  --bp-compact-max: 349px;
+  --bp-phone-portrait-max: 480px;
+  --bp-phone-tall-min-h: 600px;
+  --bp-mid-min: 350px;
+  --bp-mid-max: 699px;
+  --bp-roomy-min: 700px;
+  --bp-roomy-max: 1099px;
+  --bp-desktop-min: 1100px;
+
+  --ds-gutter-compact: 2px;
+  --ds-gutter-mid: 4px;
+  --ds-gutter-roomy: 8px;
+  --ds-shell-gutter: var(--ds-gutter-compact);
+
+  /* Budgets mid : hauteurs déjà rendues ≥350, nommées pour sortir du magique. */
+  --ds-zone-chart-mid: 120px;
+  --ds-zone-showcase-body-mid: 106px;
+  --ds-zone-bottom-panel-mid: 116px;
+  --ds-zone-floor-peek-mid: 220px;
   --ds-zone-navbar: 32px;
   --ds-zone-exchange: 32px;
-  --ds-zone-chart: 120px;
-  --ds-zone-showcase-header: 14px;
-  --ds-zone-showcase-body: 108px;
-  --ds-zone-bottom-panel: 118px;
-  --ds-zone-bottom-dock: 14px;
-  /* Bande metaverse en pied de page — perso plein pied, UI au-dessus. */
-  --ds-zone-floor-peek: 220px;
-  --ds-graph-floor-gap: 6px;
-  --ds-band-gap: 2px;
-  --ds-band-inline-pad: 2px;
-  --ds-navbar-inline-overflow: 2px;
+  --ds-zone-chart: 80px;
+  --ds-zone-showcase-header: 16px;
+  --ds-zone-showcase-body: 80px;
+  --ds-zone-bottom-panel: 80px;
+  --ds-zone-bottom-dock: 16px;
+  /* Résultat floor tout déplié @ 550. La hauteur rendue en portrait est élastique. */
+  --ds-zone-floor-peek: 200px;
+  /* Compression écran court : pas de 16, plancher 3 lignes. Le canon 80 ne bouge pas. */
+  --ds-zone-chart-short: 64px;
+  --ds-zone-body-short: 64px;
+  --ds-zone-band-min: 48px;
+  --ds-graph-floor-gap: var(--space-dense);
+  --ds-band-gap: var(--ds-gap-seam);
+  --ds-band-inline-pad: var(--ds-gap-seam);
+  --ds-navbar-inline-overflow: var(--ds-gap-seam);
   --ds-navbar-top-inset: max(0px, env(safe-area-inset-top, 0px));
-  --ds-navbar-shell-radius: var(--radius-md);
+  --ds-safe-top: var(--ds-navbar-top-inset);
+  --ds-safe-bottom: max(0px, env(safe-area-inset-bottom, 0px));
+  --ds-safe-left: max(0px, env(safe-area-inset-left, 0px));
+  --ds-safe-right: max(0px, env(safe-area-inset-right, 0px));
+  --ds-navbar-shell-radius: var(--radius-none);
   --ds-navbar-pad-top: 0px;
   --ds-navbar-pad-bottom: 0px;
   --ds-navbar-inner-gap: 0px;
-  --ds-exchange-shell-radius: var(--radius-lg);
-  --ds-exchange-pad: 6px;
-  --ds-exchange-gap: 4px;
+  --ds-exchange-shell-radius: var(--radius-none);
+  --ds-exchange-pad: var(--ds-pad-panel);
+  --ds-exchange-gap: var(--ds-gap-micro);
   --ds-exchange-margin: 0px;
-  --ds-exchange-row-gap: 2px;
+  --ds-exchange-row-gap: var(--ds-gap-seam);
   --ds-exchange-shell-width: 100%;
-  --ds-exchange-font-min: 0.5rem;
+  --ds-exchange-font-min: var(--fs-chat-msg);
   --ds-zone-market: var(--ds-zone-chart);
 
   /* Hub column ratio 35/65 — conservé */
   --ds-hub-exchange-fr: 7;
   --ds-hub-chart-fr: 13;
 
-  /* Touch targets @ 250 — réalistes */
-  --ds-touch-min: 32px;
-  --ds-icon-btn: 28px;
+  /* Touch / densités — DA tailles éléments communs (FIGÉ 2026-10-06)
+   * HUD visible 16 + hit ≥ 24 · FORM 32 · tags 8 · icons 12/16/20/24 */
+  --comp-hud-h: 16px;
+  --comp-form-h: 32px;
+  --comp-hit-min: 24px;
+  --ds-touch-min: var(--comp-form-h);
+  --ds-icon-btn: var(--comp-form-h);
+
+  /* Boutons */
+  --comp-btn-hud-h: var(--comp-hud-h);
+  --comp-btn-hud-pad-x: var(--space-1); /* 4px */
+  --comp-btn-hud-radius: var(--radius-sm); /* 4px */
+  --comp-btn-form-h: var(--comp-form-h);
+  --comp-btn-form-pad-x: var(--space-3); /* 12px */
+  --comp-btn-form-radius: var(--radius-md); /* 8px */
+  --ds-radius-btn: var(--comp-btn-form-radius);
+
+  /* Inputs */
+  --comp-input-hud-h: var(--comp-hud-h);
+  --comp-input-form-h: var(--comp-form-h);
+  --comp-input-border-w: 1px;
+  --comp-input-hud-radius: var(--radius-sm); /* 4px */
+  --comp-input-form-radius: var(--radius-md); /* 8px */
+  --comp-input-form-pad-y: var(--space-2); /* 8px */
+  --comp-input-form-pad-x: var(--space-3); /* 12px */
+  --ds-radius-input: var(--comp-input-hud-radius);
+
+  /* Chips / tags / LED */
+  --comp-tag-h: 8px;
+  --comp-tag-radius: var(--radius-xs); /* 2px */
+  --comp-chip-h: var(--comp-hud-h);
+  --comp-chip-radius: var(--radius-pill);
+  --comp-led-size: 4px;
+
+  /* Icons (glyphes) — DA iconographie, étape 1
+   * Tailles déjà figées. Stroke = unités du viewBox 24 (pas des px écran) :
+   * 2 rendu à 12 px = 1 px optique, aligné sur --stroke-w-hairline.
+   * Les gaps ne se mélangent pas : 4 px glyphe↔mot, 2 px entre deux icônes. */
+  --comp-icon-sm: 12px;
+  --comp-icon-md: 16px;
+  --comp-icon-lg: 20px;
+  --comp-icon-xl: 24px;
+  --icon-stroke: 2;
+  --icon-gap-label: var(--space-1); /* 4px */
+  --icon-gap-cluster: var(--ds-gap-seam); /* 2px */
+
+  /* Avatars */
+  --comp-avatar-sm: 16px;
+  --comp-avatar-md: 24px;
+  --comp-avatar-lg: 32px;
+
+  /* Tabs / bars / navbar rows */
+  --comp-tab-hub-h: var(--comp-hud-h);
+  --comp-smart-bar-h: var(--comp-hud-h);
+  --comp-logo-row-h: var(--comp-hud-h);
+  --comp-ticker-row-h: var(--comp-hud-h);
+
+  /* Rows listes */
+  --comp-row-h: var(--comp-hud-h);
+  --comp-row-form-h: var(--comp-form-h);
+  --comp-title-row-h: var(--comp-hud-h);
+  --comp-rate-row-h: 8px; /* exception order-book ticker */
+
+  /* Dividers */
+  --comp-divider: 1px;
+  --comp-divider-accent: 2px;
+
+  /* STROKE DA — alias only (pas de 2ᵉ rgba). Voir stroke-bevel.ts */
+  --stroke-w-hairline: var(--comp-divider);
+  --stroke-w-accent: var(--comp-divider-accent);
+  --stroke-subtle: var(--border-subtle);
+  --stroke-default: var(--border-default-ds);
+  --stroke-struct: var(--ds-border-accent);
+  --stroke-active: var(--border-active);
+  /* Miroirs TS-only consommés par le dashed CSS (empty / mode). */
+  --stroke-dense: rgba(var(--accent-cyan-rgb), 0.14);
+  --stroke-danger: rgba(123, 13, 30, 0.85);
+
+  /* Décoratif dense (progress / skeleton / pastille) — DA pass 2 */
+  --comp-progress-h: 4px;          /* barres XP / meters / tracks */
+  --comp-skeleton-line-h: 4px;     /* lignes skeleton */
+  --comp-pastille: 4px;            /* dots / pastilles non-LED (=led) */
 
   /* ═══════════════════════════════════════════════════════════
    * Bridge theme.css (chargé avant) — remap sémantique sans suppression
    * ═══════════════════════════════════════════════════════════ */
-  --accent-primary: var(--accent-cyan);
-  --accent-primary-rgb: var(--accent-cyan-rgb);
+  /* --accent-primary est défini en tête de fichier (pas de boucle avec --accent-cyan). */
   --accent-secondary: var(--accent-purple);
   --accent-secondary-rgb: var(--accent-purple-rgb);
-  --accent-mid: #3d9fb0;
-  --accent-mid-rgb: 61, 159, 176;
+  --accent-mid: #8b9dad;
+  --accent-mid-rgb: 139, 157, 173;
 
   --ui-accent: var(--accent-cyan);
   --ui-accent-rgb: var(--accent-cyan-rgb);
@@ -370,8 +628,8 @@
   --ui-border: var(--border-subtle);
   --ui-border-hover: rgba(var(--accent-cyan-rgb), 0.28);
   --ui-border-active: var(--border-active);
-  --ui-glow: 0 1px 3px rgba(0, 0, 0, 0.35);
-  --ui-glow-strong: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --ui-glow: var(--shadow-flat);
+  --ui-glow-strong: var(--shadow-flat);
   --ui-glow-accent: 0 0 0 1px rgba(var(--accent-cyan-rgb), 0.18);
   --ui-glow-accent-strong: 0 0 0 1px rgba(var(--accent-cyan-rgb), 0.28);
   --ui-glow-magenta: 0 0 0 1px rgba(var(--ds-neon-magenta-rgb), 0.2);
@@ -391,28 +649,34 @@
   --bg-body-bottom: var(--bg-secondary);
 
   --text-primary: var(--text-primary-ds);
-  --text-primary-rgb: 232, 238, 245;
-  --text-bright: #ffffff;
-  --text-soft: #dce4ee;
-  --text-muted: var(--text-secondary-ds);
-  --text-muted-rgb: 139, 155, 176;
+  --text-primary-rgb: 237, 231, 217;
+  --text-secondary: var(--text-secondary-ds);
+  --text-secondary-rgb: 139, 157, 173;
+  --text-bright: #ede7d9;
+  --text-soft: #ede7d9;
+  --text-muted: var(--text-muted-ds);
+  --text-muted-rgb: 237, 231, 217;
   --text-dim: var(--text-muted-ds);
-  --text-dim-rgb: 92, 107, 126;
-  --text-muted-strong: #b8c4d4;
-  --text-faint: rgba(232, 238, 245, 0.72);
-  --text-ghost: rgba(232, 238, 245, 0.45);
+  --text-dim-rgb: 237, 231, 217;
+  --text-muted-strong: #ede7d9;
+  --text-faint: rgba(237, 231, 217, 0.72);
+  --text-ghost: rgba(237, 231, 217, 0.45);
   --text-placeholder: var(--text-muted-ds);
-  --text-disabled: rgba(232, 238, 245, 0.32);
+  --text-disabled: rgba(237, 231, 217, 0.32);
   --text-link: var(--accent-cyan);
+  /* Labels de drawer : secondaire lisible, pas le ghost muted. */
+  --drawer-muted: var(--text-secondary);
+  --drawer-muted-rgb: var(--text-secondary-rgb);
 
   --color-positive: var(--success);
   --color-positive-rgb: var(--success-rgb);
-  --color-positive-bright: #3ee09a;
+  --color-positive-bright: var(--success);
   --color-negative: var(--danger);
   --color-negative-rgb: var(--danger-rgb);
-  --color-negative-soft: #f08a9a;
+  --color-negative-soft: rgba(123, 13, 30, 0.45);
   --chart-trend-up: var(--success);
   --chart-trend-up-rgb: var(--success-rgb);
+  /* Baisse = négatif = --danger. Même hex, Rouge boursier. */
   --chart-trend-down: var(--danger);
   --chart-trend-down-rgb: var(--danger-rgb);
   --color-warning: var(--warning);
@@ -426,25 +690,24 @@
   --navbar-led-online-rgb: var(--success-rgb);
   --navbar-led-online-glow: rgba(var(--success-rgb), 0.35);
 
-  --border-faint: rgba(255, 255, 255, 0.04);
-  --border-soft: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(var(--accent-cyan-rgb), 0.35);
-  --border-accent-hover: rgba(var(--accent-cyan-rgb), 0.5);
+  /* Cruft α rabattu sur l’échelle courte — ne pas réintroduire 0.04 / 0.08 / 0.35 / 0.50 */
+  --border-faint: var(--stroke-subtle);
+  --border-soft: var(--stroke-default);
+  --border-accent: var(--stroke-active);
+  --border-accent-hover: var(--stroke-active);
 
   --surface-info-bg: rgba(var(--accent-cyan-rgb), 0.08);
   --surface-info-border: rgba(var(--accent-cyan-rgb), 0.22);
-  --surface-success-bg: rgba(var(--success-rgb), 0.1);
-  --surface-success-border: rgba(var(--success-rgb), 0.28);
+  --surface-success-bg: var(--state-success-bg);
+  --surface-success-border: var(--state-success-border);
   --surface-warning-bg: rgba(var(--warning-rgb), 0.1);
   --surface-warning-border: rgba(var(--warning-rgb), 0.28);
-  --surface-error-bg: rgba(var(--danger-rgb), 0.1);
-  --surface-error-border: rgba(var(--danger-rgb), 0.28);
+  --surface-error-bg: var(--state-error-bg);
+  --surface-error-border: var(--state-error-border);
   --surface-focus-ring: rgba(var(--accent-cyan-rgb), 0.4);
 
   --glass-blur: var(--glass-blur-fintech);
-  --glass-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    var(--shadow-card);
+  --glass-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.05);
 
   --tab-accent: var(--accent-cyan);
   --tab-accent-rgb: var(--accent-cyan-rgb);
@@ -454,44 +717,44 @@
   --glass-tab-border-active-color: rgba(var(--accent-cyan-rgb), 0.4);
   --glass-tab-glow: none;
 
-  --cta-radius-sm: var(--radius-sm);
-  --cta-radius-md: var(--radius-md);
-  --cta-radius-lg: 12px;
-  --cta-height-sm: 22px;
-  --cta-height-md: 28px;
-  --cta-height-lg: 34px;
-  --cta-font-sm: 0.4375rem;
-  --cta-font-md: 0.5625rem;
-  --cta-font-lg: 0.625rem;
-  --cta-disabled-opacity: 0.48;
-  --cta-focus-ring: var(--shadow-focus);
+  /* CTA — DA FIGÉ : une seule hauteur FORM 32 ; sm/md/lg = alias */
+  --cta-radius-sm: var(--comp-btn-form-radius);
+  --cta-radius-md: var(--comp-btn-form-radius);
+  --cta-radius-lg: var(--comp-btn-form-radius);
+  --cta-height-sm: var(--comp-btn-form-h);
+  --cta-height-md: var(--comp-btn-form-h);
+  --cta-height-lg: var(--comp-btn-form-h);
+  --cta-padding-sm: 0 var(--comp-btn-form-pad-x);
+  --cta-padding-md: 0 var(--comp-btn-form-pad-x);
+  --cta-padding-lg: 0 var(--comp-btn-form-pad-x);
+  --cta-font-sm: var(--fs-body);
+  --cta-font-md: var(--fs-body);
+  --cta-font-lg: var(--fs-body);
+  --cta-disabled-opacity: var(--state-disabled-opacity);
+  --cta-focus-ring: var(--state-focus-ring);
 
-  --cta-primary-text: #050a12;
-  --cta-primary-fill: var(--accent-cyan);
-  --cta-primary-fill-hover: #3dd4e6;
-  --cta-primary-border: rgba(var(--accent-cyan-rgb), 0.65);
+  --cta-primary-text: #0a1220;
+  --cta-primary-fill: var(--warning);
+  --cta-primary-fill-hover: var(--warning);
+  --cta-primary-border: rgba(var(--warning-rgb), 0.65);
   --cta-primary-bg: var(--cta-primary-fill);
   --cta-primary-bg-hover: var(--cta-primary-fill-hover);
-  --cta-primary-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 1px 4px rgba(0, 0, 0, 0.28);
-  --cta-primary-shadow-hover:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 2px 8px rgba(0, 0, 0, 0.32);
+  --cta-primary-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.18);
+  --cta-primary-shadow-hover: inset 0 1px 0 rgba(237, 231, 217, 0.22);
   --cta-primary-text-glow: none;
 
   --cta-secondary-text: var(--text-primary-ds);
-  --cta-secondary-fill: rgba(var(--surface-elevated-rgb), 0.92);
-  --cta-secondary-fill-hover: rgba(var(--surface-hover-rgb), 0.95);
+  --cta-secondary-fill: #235789;
+  --cta-secondary-fill-hover: #235789;
   --cta-secondary-border: var(--border-default-ds);
   --cta-secondary-bg: var(--cta-secondary-fill);
   --cta-secondary-bg-hover: var(--cta-secondary-fill-hover);
-  --cta-secondary-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  --cta-secondary-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --cta-secondary-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.04);
+  --cta-secondary-shadow-hover: inset 0 1px 0 rgba(237, 231, 217, 0.06);
 
   --cta-tertiary-text: var(--text-secondary-ds);
   --cta-tertiary-fill: transparent;
-  --cta-tertiary-fill-hover: rgba(255, 255, 255, 0.04);
+  --cta-tertiary-fill-hover: rgba(237, 231, 217, 0.04);
   --cta-tertiary-border: transparent;
   --cta-tertiary-bg: var(--cta-tertiary-fill);
   --cta-tertiary-bg-hover: var(--cta-tertiary-fill-hover);
@@ -512,14 +775,14 @@
   --cta-accent-border: rgba(var(--accent-purple-rgb), 0.35);
   --cta-accent-bg: var(--cta-accent-fill);
   --cta-accent-bg-hover: var(--cta-accent-fill-hover);
-  --cta-accent-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  --cta-accent-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --cta-accent-shadow: inset 0 1px 0 rgba(237, 231, 217, 0.12);
+  --cta-accent-shadow-hover: inset 0 1px 0 rgba(237, 231, 217, 0.16);
   --cta-accent-text-glow: none;
 
   --cta-danger-text: var(--text-primary-ds);
-  --cta-danger-fill: rgba(var(--danger-rgb), 0.85);
-  --cta-danger-fill-hover: rgba(var(--danger-rgb), 0.95);
-  --cta-danger-border: rgba(var(--danger-rgb), 0.45);
+  --cta-danger-fill: var(--danger);
+  --cta-danger-fill-hover: var(--danger);
+  --cta-danger-border: rgba(var(--danger-rgb), 0.85);
   --cta-danger-bg: var(--cta-danger-fill);
   --cta-danger-bg-hover: var(--cta-danger-fill-hover);
 

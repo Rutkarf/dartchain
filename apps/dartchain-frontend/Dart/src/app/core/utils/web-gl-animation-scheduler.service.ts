@@ -29,7 +29,7 @@ export interface WebGlFrameContext {
 
 export interface WebGlFrameSubscriber {
   id: string;
-  /** Ordre croissant — Star Conquest (10) avant MetaVerseBB floor (20). */
+  /** Ordre croissant — Conquête stellaire (10) avant MetaVerseBB floor (20). */
   order: number;
   onFrame: (ctx: WebGlFrameContext) => void;
   onPause?: () => void;

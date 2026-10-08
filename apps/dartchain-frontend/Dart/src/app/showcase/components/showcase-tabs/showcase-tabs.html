@@ -1,4 +1,18 @@
-<nav class="showcase-tabs" aria-label="Onglets showcase">
+<nav
+ class="showcase-tabs"
+ (pointerdown)="onTabPointerDown($event)"
+ (dblclick)="onTabDoubleClick($event)"
+>
+  <app-depth-rail
+    class="showcase-tabs__rail"
+    preset="compact"
+    mode="navigate"
+    [loop]="false"
+    [enabled]="false"
+    [activeIndex]="tabIndex()"
+    itemSelector=".showcase-tab"
+    (indexChange)="onRailIndex($event)"
+  >
   @for (tab of tabs; track tab.id) {
     <button
       type="button"
@@ -10,7 +24,6 @@
       [attr.tabindex]="isActive(tab.id) ? '0' : '-1'"
       [attr.aria-controls]="'showcase-panel-' + tab.id"
       [attr.id]="'showcase-tab-' + tab.id"
-      [attr.aria-label]="tabAriaLabel(tab)"
       (click)="selectTab(tab.id)"
     >
       <span class="showcase-tab__label">{{ tab.label }}</span>
@@ -25,4 +38,5 @@
       }
     </button>
   }
+  </app-depth-rail>
 </nav>

@@ -22,6 +22,8 @@ public class CorsConfig {
             "https://dartchain.pages.dev",
             "https://*.dartchain.pages.dev",
             "https://*.pages.dev",
+            "https://*.workers.dev",
+            "https://*.*.workers.dev",
             "https://dartzvz01-tagname.onrender.com",
             "https://*.onrender.com"
     );

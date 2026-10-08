@@ -6,6 +6,8 @@ public class FaucetClaimResponse {
     private String message;
     private String walletAddress;
     private String amount;
+    /** Nombre entier de m4t3r débités (1 m4t3r = 10^-26 R4V3). */
+    private String m4t3rCount;
     private String claimedAt;
     private String nextEligibleAt;
     private long cooldownSeconds;
@@ -44,6 +46,14 @@ public class FaucetClaimResponse {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getM4t3rCount() {
+        return m4t3rCount;
+    }
+
+    public void setM4t3rCount(String m4t3rCount) {
+        this.m4t3rCount = m4t3rCount;
     }
 
     public String getClaimedAt() {

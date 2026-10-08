@@ -13,15 +13,14 @@ export class ProductConfigService {
   readonly faucetEnabled = true;
   readonly showcaseEnabled = environment.showcaseEnabled ?? true;
   /**
-   * Master Star Conquest — canvas + overlays.
-   * Désactivé par défaut pour prioriser l’Arène BB floor ; code intact.
+   * Master Conquête stellaire — canvas + overlays au-dessus du floor MetaVerseBB.
    */
-  readonly starConquestEnabled = environment.starConquestEnabled ?? false;
+  readonly starConquestEnabled = environment.starConquestEnabled ?? true;
   readonly starConquestOverlayEnabled = environment.starConquestOverlayEnabled ?? true;
   readonly starConquestKpiDebug =
     environment.starConquestKpiDebug ?? !environment.production;
   /**
-   * Arène BB (ex-MetaVerseBB floor) — jouable automatiquement dans le peek bas de page.
+   * MetaVerseBB floor — jouable automatiquement dans le peek bas de page.
    * Désactivable via environment si besoin ; ne contrôle pas claim / wallet.
    */
   readonly metaverseArenaEnabled = environment.metaverseArenaEnabled ?? true;

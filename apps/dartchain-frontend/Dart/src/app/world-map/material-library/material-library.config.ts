@@ -1,5 +1,5 @@
 import type { MapQuality } from '../map-configuration';
-import { mapPerfProfile } from '../marseille-perf.config';
+import { mapPerfProfile } from '../metaverse-perf.config';
 
 /** Niveau de détail PBR — Phase 7 + 14 perf profile. */
 export type PbrDetailLevel = 'flat' | 'albedo' | 'full';

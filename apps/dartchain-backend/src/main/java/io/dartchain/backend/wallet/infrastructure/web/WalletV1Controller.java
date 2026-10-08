@@ -52,7 +52,7 @@ public class WalletV1Controller {
                 publicKey,
                 privateKey,
                 "client-ecdsa-evm",
-                "evm",
+                "evm-compatible",
                 chainConfigService.resolveChainId()
         );
     }

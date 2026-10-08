@@ -10,7 +10,7 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 
 import type { MapQuality } from './map-configuration';
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 import { mapQualityTier } from './map-configuration';
 import {
   districtColorGradeMix,
@@ -28,7 +28,7 @@ import {
   atmosphereBloomRadius,
   atmosphereBloomStrength,
   atmosphereBloomThreshold,
-} from './marseille-atmosphere.config';
+} from './metaverse-atmosphere.config';
 
 export interface MetaverseBbRenderPipelineOptions {
   quality: MapQuality;

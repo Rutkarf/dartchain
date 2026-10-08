@@ -33,8 +33,8 @@ public final class QuestCatalogUi {
 
         QuestMissionCatalogItem mission = new QuestMissionCatalogItem(
                 MISSION_ID,
-                "Network Guardian",
-                "Maintain network integrity by completing daily and weekly tasks.",
+                "Gardien du réseau",
+                "Maintiens l’intégrité du réseau en terminant les tâches quotidiennes et hebdomadaires.",
                 QuestCatalog.MISSION_REWARD_MTS,
                 QuestCatalog.MISSION_REWARD_XP,
                 100
@@ -55,21 +55,21 @@ public final class QuestCatalogUi {
 
     private static String titleFor(String taskId) {
         return switch (taskId) {
-            case "daily-login" -> "Daily Login";
-            case "faucet-claim" -> "Faucet Claim";
-            case "explore-blocks" -> "Explore Blocks";
-            case "swap-tokens" -> "Swap Tokens";
+            case "daily-login" -> "Connexion quotidienne";
+            case "faucet-claim" -> "Réclamation du robinet";
+            case "explore-blocks" -> "Explorer les blocs";
+            case "swap-tokens" -> "Échanger des jetons";
             default -> taskId;
         };
     }
 
     private static String descriptionFor(String taskId) {
         return switch (taskId) {
-            case "daily-login" -> "Log in to the app";
-            case "faucet-claim" -> "Claim from the faucet";
-            case "explore-blocks" -> "Ouvrir les détails d’un bloc via Explore Block";
+            case "daily-login" -> "Connecte-toi à l’application";
+            case "faucet-claim" -> "Réclame depuis le robinet";
+            case "explore-blocks" -> "Ouvrir le détail d’un bloc dans l’explorateur";
             case "swap-tokens" ->
-                    "Swapper un token LaunchLab (hors paires BTC/ETH standard) via le panneau Swap";
+                    "Échanger un jeton du laboratoire (hors paires BTC/ETH standard) via le panneau d’échange";
             default -> "";
         };
     }

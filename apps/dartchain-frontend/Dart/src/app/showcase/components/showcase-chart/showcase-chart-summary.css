@@ -13,18 +13,18 @@
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr) auto var(--panel-action-menu-w, 34px);
   align-items: center;
-  gap: clamp(1px, 1vw, 4px);
+  gap: clamp(2px, 1vw, 4px);
   position: relative;
   width: 100%;
   min-width: 0;
   height: 100%;
   /* Pas de padding vertical — la hauteur vient de la smart-bar */
-  padding: 0 0 0 clamp(1px, 0.5vw, 2px);
+  padding: 0 0 0 clamp(2px, 0.5vw, 2px);
   box-sizing: border-box;
 }
 
 .chart-summary-bar__actions {
-  --cba-h: var(--panel-action-menu-h, 7px);
+  --cba-h: var(--panel-action-menu-h, 16px);
   --cba-item-w: var(--panel-action-item-w, 14px);
   grid-column: 5;
   position: relative;
@@ -34,9 +34,9 @@
   width: var(--panel-action-menu-w, 34px);
   min-width: var(--panel-action-menu-w, 34px);
   max-width: var(--panel-action-menu-w, 34px);
-  height: var(--panel-action-menu-h, 7px);
-  min-height: var(--panel-action-menu-h, 7px);
-  max-height: var(--panel-action-menu-h, 7px);
+  height: var(--panel-action-menu-h, 16px);
+  min-height: var(--panel-action-menu-h, 16px);
+  max-height: var(--panel-action-menu-h, 16px);
   margin: 0;
   pointer-events: auto;
 }
@@ -50,23 +50,23 @@
 }
 
 .chart-summary-bar__symbol {
-  font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.4375rem, 2.4vw, 0.5625rem);
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-chart);
   font-weight: 800;
   letter-spacing: 0.04em;
-  color: #f4fbff;
+  color: #ede7d9;
   white-space: nowrap;
 }
 
 .chart-summary-bar__range {
   flex: 0 0 auto;
   padding: 0 2px;
-  border-radius: 999px;
-  border: 1px solid rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.2);
-  background: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.08);
-  color: rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.9);
-  font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.375rem, 2vw, 0.4375rem);
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(var(--chart-hub-cyan-rgb, 139, 157, 173), 0.2);
+  background: rgba(var(--chart-hub-cyan-rgb, 139, 157, 173), 0.08);
+  color: rgba(var(--chart-hub-cyan-rgb, 139, 157, 173), 0.9);
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-chart);
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
@@ -82,33 +82,33 @@
 }
 
 .chart-summary-bar__price {
-  font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.5rem, 2.6vw, 0.625rem);
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-chart);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  color: #f4fbff;
+  color: #ede7d9;
   line-height: 1;
 }
 
 .chart-summary-bar__price--muted {
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(237, 231, 217, 0.45);
   font-weight: 600;
 }
 
 .chart-summary-bar__delta {
-  font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.375rem, 2.1vw, 0.5rem);
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-chart);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
 .chart-summary-bar__delta.is-up {
-  color: var(--chart-trend-up, #00ff88);
+  color: var(--chart-trend-up, #09814a);
 }
 
 .chart-summary-bar__delta.is-down {
-  color: var(--chart-trend-down, #ff3366);
+  color: var(--chart-trend-down, #7b0d1e);
 }
 
 .chart-summary-bar__spark-wrap {
@@ -118,10 +118,10 @@
   height: 100%;
   min-height: 0;
   max-height: 100%;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(10, 18, 32, 0.22);
+  border: 1px solid rgba(237, 231, 217, 0.05);
 }
 
 .chart-summary-bar__spark {
@@ -145,33 +145,33 @@
 }
 
 .chart-summary-bar__spark-area.is-up {
-  fill: var(--chart-trend-up, #00ff88);
+  fill: var(--chart-trend-up, #09814a);
 }
 
 .chart-summary-bar__spark-area.is-down {
-  fill: var(--chart-trend-down, #ff3366);
+  fill: var(--chart-trend-down, #7b0d1e);
 }
 
 .chart-summary-bar__spark-head {
-  stroke: rgba(0, 0, 0, 0.35);
+  stroke: rgba(10, 18, 32, 0.35);
   stroke-width: 0.35;
   vector-effect: non-scaling-stroke;
 }
 
 .chart-summary-bar__spark-head.is-up {
-  fill: var(--chart-trend-up, #00ff88);
+  fill: var(--chart-trend-up, #09814a);
 }
 
 .chart-summary-bar__spark-head.is-down {
-  fill: var(--chart-trend-down, #ff3366);
+  fill: var(--chart-trend-down, #7b0d1e);
 }
 
 .chart-summary-bar__spark-seg.is-up {
-  stroke: var(--chart-trend-up, #00ff88);
+  stroke: var(--chart-trend-up, #09814a);
 }
 
 .chart-summary-bar__spark-seg.is-down {
-  stroke: var(--chart-trend-down, #ff3366);
+  stroke: var(--chart-trend-down, #7b0d1e);
 }
 
 .chart-summary-bar__spark-skeleton {
@@ -179,9 +179,9 @@
   height: 100%;
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.04) 0%,
-    rgba(var(--chart-hub-cyan-rgb, 0, 245, 255), 0.12) 50%,
-    rgba(255, 255, 255, 0.04) 100%
+    rgba(237, 231, 217, 0.04) 0%,
+    rgba(var(--chart-hub-cyan-rgb, 139, 157, 173), 0.12) 50%,
+    rgba(237, 231, 217, 0.04) 100%
   );
   background-size: 200% 100%;
   animation: chart-summary-spark-loading 900ms ease-in-out infinite;
@@ -206,15 +206,15 @@
 }
 
 .chart-summary-bar__metric {
-  font-family: var(--font-data, ui-monospace, Menlo, monospace);
-  font-size: clamp(0.3375rem, 1.9vw, 0.4375rem);
+  font-family: var(--font-data, 'Inter', sans-serif);
+  font-size: var(--fs-chart);
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.52);
+  color: rgba(237, 231, 217, 0.52);
   line-height: 1;
 }
 
 .chart-summary-bar__metric--hl {
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(237, 231, 217, 0.42);
 }
 
 @media (max-width: 420px) {
@@ -229,8 +229,8 @@
 
   .chart-summary-bar__actions {
     grid-column: 5;
-    height: var(--panel-action-menu-h, 7px);
-    max-height: var(--panel-action-menu-h, 7px);
+    height: var(--panel-action-menu-h, 16px);
+    max-height: var(--panel-action-menu-h, 16px);
   }
 }
 
@@ -242,6 +242,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .chart-summary-bar__spark-skeleton {
-    animation: none;
+    animation:  none;
   }
 }

@@ -131,7 +131,7 @@ export class BrandCryptoSelectComponent implements OnInit {
   launchStatusLabel(status: LaunchProject['status']): string {
     switch (status) {
       case 'LIVE':
-        return 'Live';
+        return 'Direct';
       case 'ENDED':
         return 'Ended';
       default:

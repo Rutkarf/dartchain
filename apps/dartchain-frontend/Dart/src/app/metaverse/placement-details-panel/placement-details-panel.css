@@ -13,51 +13,50 @@
   overflow: auto;
   pointer-events: auto;
   padding: 0.7rem 0.8rem 0.75rem;
-  border-radius: 10px;
-  color: #e8f7ff;
-  background: rgba(6, 12, 22, 0.94);
-  border: 1px solid rgba(64, 224, 255, 0.35);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
-  font: 12px/1.4 ui-sans-serif, system-ui, sans-serif;
-}
+  border-radius: var(--radius-md, 8px);
+  color: #ede7d9;
+  background: rgba(10, 18, 32, 0.94);
+  border: 1px solid rgba(139, 157, 173, 0.35);
+  box-shadow: 0 8px 28px rgba(10, 18, 32, 0.35);
+  font: 0.72rem/1.4 Roboto, sans-serif;}
 
 .placement-kicker,
 .placement-dev {
   margin: 0;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: 0.62rem;
-  color: #7adce8;
+  font-size: var(--fs-form);
+  color: #8b9dad;
 }
 
 .placement-panel h2 {
   margin: 0.2rem 0 0.15rem;
-  font-size: 0.92rem;
+  font-size: var(--fs-form);
 }
 
 .placement-status {
   margin: 0 0 0.35rem;
-  color: #8f9bb3;
+  color: #8b9dad;
 }
 
 .placement-status[data-status='available'] {
-  color: #40e0ff;
+  color: #8b9dad;
 }
 
 .placement-status[data-status='active'] {
-  color: #ffe600;
+  color: #d5a021;
 }
 
 .placement-status[data-status='reserved'] {
-  color: #ffb347;
+  color: #7b0d1e;
 }
 
 .placement-status[data-status='paused'] {
-  color: #ff3ecf;
+  color: #7b0d1e;
 }
 
 .placement-dev {
-  color: #ffb347;
+  color: #7b0d1e;
   margin-bottom: 0.4rem;
 }
 
@@ -75,7 +74,7 @@
 
 .placement-meta dt {
   margin: 0;
-  color: #8f9bb3;
+  color: #8b9dad;
 }
 
 .placement-meta dd {
@@ -91,16 +90,16 @@
 .placement-form label {
   display: grid;
   gap: 0.15rem;
-  color: #c5d4e8;
+  color: #ede7d9;
 }
 
 .placement-form input,
 .placement-form textarea {
   width: 100%;
   box-sizing: border-box;
-  border-radius: 6px;
-  border: 1px solid rgba(64, 224, 255, 0.25);
-  background: rgba(8, 16, 28, 0.9);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 157, 173, 0.25);
+  background: rgba(10, 18, 32, 0.9);
   color: inherit;
   padding: 0.35rem 0.45rem;
 }
@@ -111,10 +110,10 @@
 }
 
 .placement-actions button {
-  border-radius: 6px;
-  border: 1px solid rgba(64, 224, 255, 0.45);
-  background: #123044;
-  color: #e8f7ff;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(139, 157, 173, 0.45);
+  background: #235789;
+  color: #ede7d9;
   padding: 0.4rem 0.55rem;
   cursor: pointer;
 }
@@ -130,15 +129,15 @@
 
 .placement-feedback {
   margin: 0 0 0.35rem;
-  color: #7adce8;
+  color: #8b9dad;
 }
 
 .placement-feedback.is-error {
-  color: #ff8fab;
+  color: #7b0d1e;
 }
 
 .placement-osm {
   margin: 0.35rem 0 0;
-  font-size: 0.62rem;
-  color: #6b7c90;
+  font-size: var(--fs-form);
+  color: #8b9dad;
 }

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import * as THREE from 'three';
 
 import { GeoCoordinateService } from './geo-coordinate.service';
-import { MARSEILLE_LANDMARK_BUILDINGS } from './geo-reference.config';
+import { METAVERSE_LANDMARK_BUILDINGS } from './geo-reference.config';
 import {
   createBuildingFromGeoData,
   footprintBounds,
@@ -18,8 +18,8 @@ describe('building-placement', () => {
   });
 
   it('crée un bâtiment depuis une empreinte géographique', () => {
-    const def = MARSEILLE_LANDMARK_BUILDINGS[0];
-    const wall = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const def = METAVERSE_LANDMARK_BUILDINGS[0];
+    const wall = new THREE.MeshLambertMaterial({ color: 0xede7d9 });
     const built = createBuildingFromGeoData(def, geo, { wall });
     expect(built).not.toBeNull();
     expect(built!.group.name).toBe(def.id);
@@ -29,7 +29,7 @@ describe('building-placement', () => {
   });
 
   it('conserve les dimensions empreinte en bounds monde', () => {
-    const def = MARSEILLE_LANDMARK_BUILDINGS[1];
+    const def = METAVERSE_LANDMARK_BUILDINGS[1];
     const bounds = footprintBounds(def.footprint, geo);
     const width = bounds.maxX - bounds.minX;
     const depth = bounds.maxZ - bounds.minZ;
@@ -40,8 +40,8 @@ describe('building-placement', () => {
   });
 
   it('ne déplace pas le bâtiment avec le joueur (world space stable)', () => {
-    const def = MARSEILLE_LANDMARK_BUILDINGS[0];
-    const wall = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const def = METAVERSE_LANDMARK_BUILDINGS[0];
+    const wall = new THREE.MeshLambertMaterial({ color: 0xede7d9 });
     const built = createBuildingFromGeoData(def, geo, { wall });
     const before = built!.center.clone();
     built!.group.position.copy(new THREE.Vector3(999, 0, 999));

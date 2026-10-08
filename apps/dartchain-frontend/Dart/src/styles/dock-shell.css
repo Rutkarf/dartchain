@@ -17,13 +17,7 @@
   margin: 0 !important;
   padding: 0;
   gap: 0;
-  transition:
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 220ms ease;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
 }
 
 .app-bottom-stack.is-dock-collapsed {
@@ -35,6 +29,60 @@
   margin-bottom: 0 !important;
   padding-top: 0;
   padding-bottom: 0;
+}
+
+/* Grande fenêtre : onglets et panneau du dock grandissent. Pas le téléphone. */
+@media (min-width: 481px) and (min-height: 640px) {
+  .app-bottom-stack {
+    --dock-wide-tab: clamp(24px, 3vh, 32px);
+    --dock-wide-panel: clamp(180px, 26vh, 240px);
+    --showcase-hub-tab-h: var(--dock-wide-tab);
+    --dock-hub-tab-h: var(--dock-wide-tab);
+    --dock-smart-bar-h: var(--dock-wide-tab);
+    --bottom-stack-panel-height: var(--dock-wide-panel);
+    --dock-panel-height: var(--dock-wide-panel);
+    --bottom-stack-height-expanded: calc(var(--dock-wide-tab) + var(--dock-wide-panel));
+    --bottom-stack-height-collapsed: calc(var(--dock-wide-tab) * 2);
+    --bottom-stack-active-height: var(--bottom-stack-height-expanded);
+  }
+
+  .app-bottom-stack.is-dock-collapsed {
+    --bottom-stack-active-height: var(--bottom-stack-height-collapsed);
+    height: var(--bottom-stack-height-collapsed);
+    min-height: var(--bottom-stack-height-collapsed);
+    max-height: var(--bottom-stack-height-collapsed);
+  }
+}
+
+/* Téléphone portrait haut : dock suit les panneaux lisibles (≥600px, ex. 436×653). */
+@media (orientation: portrait) and (min-width: 360px) and (max-width: 480px) and (min-height: 600px) {
+  .app-bottom-stack {
+    --dock-tall-tab: 22px;
+    --dock-tall-panel: clamp(132px, 20vh, 190px);
+    --showcase-hub-tab-h: var(--dock-tall-tab);
+    --dock-hub-tab-h: var(--dock-tall-tab);
+    --dock-smart-bar-h: var(--dock-tall-tab);
+    --bottom-stack-panel-height: var(--dock-tall-panel);
+    --dock-panel-height: var(--dock-tall-panel);
+    --bottom-stack-height-expanded: calc(var(--dock-tall-tab) + var(--dock-tall-panel));
+    --bottom-stack-height-collapsed: calc(var(--dock-tall-tab) * 2);
+    --bottom-stack-active-height: var(--bottom-stack-height-expanded);
+  }
+
+  .app-bottom-stack.is-dock-collapsed {
+    --bottom-stack-active-height: var(--bottom-stack-height-collapsed);
+    height: var(--bottom-stack-height-collapsed);
+    min-height: var(--bottom-stack-height-collapsed);
+    max-height: var(--bottom-stack-height-collapsed);
+  }
+
+  .app-bottom-stack .showcase-header-tabs .showcase-tab__label,
+  .app-bottom-stack .dock-summary-bar,
+  .app-bottom-stack .dock-summary-status,
+  .app-bottom-stack .dock-summary-progress__text,
+  .app-bottom-stack .collapsed-summary-bar {
+    font-size: 10px !important;
+  }
 }
 
 .app-bottom-stack.is-dock-collapsed .showcase-block__shell,
@@ -79,14 +127,7 @@
   margin-block: 0;
   padding-block: 0;
   box-sizing: border-box;
-  transition:
-    flex-basis 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    min-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    margin 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 220ms ease;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
 }
 
 /* Remplit la bande — sinon trou semi-transparent sous le wallet (= faux gap dock→graph) */
@@ -114,9 +155,9 @@
 
 .app-bottom-stack.is-dock-collapsed .app-bottom-stack__content,
 .app-bottom-stack.is-dock-collapsed .app-bottom-stack__band {
-  height: var(--dock-smart-bar-h, 13.5px);
-  max-height: var(--dock-smart-bar-h, 13.5px);
-  min-height: var(--dock-smart-bar-h, 13.5px);
+  height: var(--dock-smart-bar-h, 16px);
+  max-height: var(--dock-smart-bar-h, 16px);
+  min-height: var(--dock-smart-bar-h, 16px);
   margin-top: 0;
   margin-bottom: 0;
   padding-top: 0;
@@ -128,7 +169,7 @@
   width: auto !important;
   min-width: 0 !important;
   max-width: none !important;
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tabs,
@@ -137,13 +178,13 @@
   flex-flow: row nowrap !important;
   align-items: stretch !important;
   justify-content: stretch !important;
-  gap: var(--tab-push-gap, 1px) !important;
+  gap: var(--tab-push-gap, 2px) !important;
   width: 100% !important;
   min-width: 0 !important;
   height: 100% !important;
   margin: 0 !important;
-  padding: 1px !important;
-  overflow: visible !important;
+  padding: 2px !important;
+  overflow: hidden !important;
   scrollbar-width: none !important;
   container-type: inline-size;
   container-name: dock-tabs;
@@ -162,16 +203,16 @@
   min-width: 0 !important;
   max-width: none !important;
   padding: 0 0px !important;
-  font-size: clamp(5px, 1.9vw, 7px) !important;
+  font-size: var(--fs-shell)!important;
   font-weight: 600 !important;
   letter-spacing: 0.05em !important;
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab--mempool {
   flex: 1.75 1 0 !important;
   min-width: 0 !important;
-  padding-inline: 3px !important;
+  padding-inline: 4px !important;
   letter-spacing: 0.02em !important;
   overflow: hidden !important;
 }
@@ -181,7 +222,7 @@
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab.ds-surface.ds-surface--showcase-tab {
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab__label {
@@ -193,24 +234,14 @@
   text-overflow: clip !important;
   white-space: nowrap !important;
   text-align: center !important;
-  font-family: 'Open Sans', var(--font-body, system-ui, sans-serif) !important;
-  font-size: clamp(5px, 1.9vw, 7px) !important;
+  font-family: 'Roboto', sans-serif;
+  font-size: var(--fs-label)!important;
   font-weight: 600 !important;
   font-style: normal !important;
   line-height: 1.1 !important;
   letter-spacing: 0.04em !important;
   transform: skewX(-11deg) !important;
   transform-origin: center center !important;
-  transition:
-    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
-    font-weight 200ms ease !important;
-}
-
-.app-bottom-stack .showcase-header-tabs .showcase-tab:hover .showcase-tab__label,
-.app-bottom-stack .showcase-header-tabs .showcase-tab:active .showcase-tab__label,
-.app-bottom-stack .showcase-header-tabs .showcase-tab.is-active .showcase-tab__label {
-  transform: skewX(0deg) !important;
-  font-style: normal !important;
 }
 
 .app-bottom-stack .showcase-header-tabs .showcase-tab.is-active,
@@ -226,7 +257,7 @@
   flex: 0 0 var(--showcase-hub-tab-h, 16px);
   height: var(--showcase-hub-tab-h, 16px);
   max-height: var(--showcase-hub-tab-h, 16px);
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 
 .app-bottom-stack .showcase-header-actions {
@@ -240,6 +271,13 @@
   z-index: 8 !important;
 }
 
+@media (max-width: 349px),
+       (orientation: portrait) and (max-width: 480px) {
+  .app-bottom-stack .showcase-header-tabs .showcase-tab__label {
+    text-overflow: ellipsis !important;
+  }
+}
+
 .app-bottom-stack .app-bottom-stack__panel .quests-panel.ds-surface,
 .app-bottom-stack .app-bottom-stack__panel .market-panel.ds-surface,
 .app-bottom-stack .app-bottom-stack__panel .peer-panel.ds-surface,
@@ -250,4 +288,15 @@
   --ds-surface-sheen-opacity: 0.3;
   background-color: rgba(var(--ds-surface-base-deep-rgb, 6, 7, 10), 0.62);
   background-image: var(--ds-surface-metallic), var(--ds-surface-bg), var(--ds-surface-veil);
+}
+
+/* Grande fenêtre : lettres du dock lisibles. Le téléphone ne passe pas ici. */
+@media (min-width: 481px) and (min-height: 640px) {
+  .app-bottom-stack .showcase-header-tabs .showcase-tab__label,
+  .app-bottom-stack .dock-summary-bar,
+  .app-bottom-stack .dock-summary-status,
+  .app-bottom-stack .dock-summary-progress__text,
+  .app-bottom-stack .collapsed-summary-bar {
+    font-size: clamp(12px, 1.5vh, 14px) !important;
+  }
 }

@@ -3,22 +3,22 @@ import * as THREE from 'three';
 /** Texture circulaire soft partagée (noyau / halo) — une seule allocation. */
 export function createSoftDiscTexture(size = 64): THREE.CanvasTexture {
   return createRadialDiscTexture(size, [
-    [0, 'rgba(255,255,255,1)'],
-    [0.35, 'rgba(255,255,255,0.85)'],
-    [0.65, 'rgba(255,255,255,0.25)'],
-    [1, 'rgba(255,255,255,0)'],
+    [0, 'rgba(237, 231, 217,1)'],
+    [0.35, 'rgba(237, 231, 217,0.85)'],
+    [0.65, 'rgba(237, 231, 217,0.25)'],
+    [1, 'rgba(237, 231, 217,0)'],
   ]);
 }
 
 /** Noyau d’étoile : verre obsidienne — cœur saturé + micro-spikes de diffraction. */
 export function createStarCoreTexture(size = 64): THREE.CanvasTexture {
   const tex = createRadialDiscTexture(size, [
-    [0, 'rgba(255,255,255,1)'],
-    [0.05, 'rgba(255,255,255,1)'],
-    [0.12, 'rgba(236,248,255,0.95)'],
-    [0.26, 'rgba(180,220,255,0.38)'],
-    [0.48, 'rgba(140,170,255,0.08)'],
-    [1, 'rgba(255,255,255,0)'],
+    [0, 'rgba(237, 231, 217,1)'],
+    [0.05, 'rgba(237, 231, 217,1)'],
+    [0.12, 'rgba(237, 231, 217,0.95)'],
+    [0.26, 'rgba(237, 231, 217,0.38)'],
+    [0.48, 'rgba(139, 157, 173,0.08)'],
+    [1, 'rgba(237, 231, 217,0)'],
   ]);
   paintStarCross(tex, size, 0.42);
   return tex;
@@ -27,11 +27,11 @@ export function createStarCoreTexture(size = 64): THREE.CanvasTexture {
 /** Bloom local (couronne additive serrée — pas de lait). */
 export function createStarBloomTexture(size = 96): THREE.CanvasTexture {
   return createRadialDiscTexture(size, [
-    [0, 'rgba(220,240,255,0.55)'],
-    [0.12, 'rgba(180,210,255,0.28)'],
-    [0.36, 'rgba(140,180,255,0.1)'],
-    [0.68, 'rgba(255,255,255,0.03)'],
-    [1, 'rgba(255,255,255,0)'],
+    [0, 'rgba(237, 231, 217,0.55)'],
+    [0.12, 'rgba(237, 231, 217,0.28)'],
+    [0.36, 'rgba(139, 157, 173,0.1)'],
+    [0.68, 'rgba(237, 231, 217,0.03)'],
+    [1, 'rgba(237, 231, 217,0)'],
   ]);
 }
 
@@ -76,7 +76,7 @@ function paintStarCross(tex: THREE.CanvasTexture, size: number, alpha: number): 
   const cx = size / 2;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
-  ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+  ctx.strokeStyle = `rgba(237, 231, 217,${alpha})`;
   ctx.lineWidth = Math.max(1, size * 0.022);
   ctx.lineCap = 'round';
   ctx.beginPath();
@@ -85,7 +85,7 @@ function paintStarCross(tex: THREE.CanvasTexture, size: number, alpha: number): 
   ctx.moveTo(size * 0.16, cx);
   ctx.lineTo(size * 0.84, cx);
   ctx.stroke();
-  ctx.strokeStyle = `rgba(210,230,255,${alpha * 0.38})`;
+  ctx.strokeStyle = `rgba(237, 231, 217,${alpha * 0.38})`;
   ctx.lineWidth = Math.max(1, size * 0.012);
   ctx.beginPath();
   ctx.moveTo(size * 0.28, size * 0.28);

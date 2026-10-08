@@ -1,5 +1,5 @@
 /**
- * Pont Star Conquest → surfaces produit DartChain (Dock / Showcase).
+ * Pont Conquête stellaire → surfaces produit DartChain (Dock / Showcase).
  * Une étoile live se conquiert par une action réelle, pas un clic magique.
  * Couverture commerciale = lignes de cette table, pas un nouveau graphe.
  */

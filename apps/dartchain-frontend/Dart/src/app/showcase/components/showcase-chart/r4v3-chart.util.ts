@@ -528,7 +528,7 @@ export function r4v3ViewLabel(view: R4v3ChartView): string {
     case 'pulse':
       return 'Pulse';
     case 'fuel':
-      return 'Fuel';
+      return 'Carburant';
     case 'health':
       return 'Santé';
     default:
@@ -546,7 +546,7 @@ export function r4v3ViewHint(view: R4v3ChartView): string {
     case 'pulse':
       return 'Pulse — swaps récents et événements on-chain du réseau.';
     case 'fuel':
-      return 'Fuel LaunchLab — volume et momentum des projets listés.';
+      return 'Carburant du laboratoire — volume et élan des projets listés.';
     case 'health':
       return 'Santé — niveau d’activité global quand le réseau est calme.';
     default:
@@ -569,7 +569,7 @@ export function r4v3AxisHint(view: R4v3ChartView, ctx: R4v3ChartContext): string
     case 'pulse':
       return 'Activité réseau';
     case 'fuel':
-      return 'R4V3 LaunchLab';
+      return 'R4V3 laboratoire';
     case 'health':
       return 'Indice santé';
     default:

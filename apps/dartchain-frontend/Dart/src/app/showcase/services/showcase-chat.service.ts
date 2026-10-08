@@ -1,4 +1,5 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, effect, inject, signal } from '@angular/core';
+import { AuthService } from '@auth/services/auth.service';
 import { catchError, firstValueFrom, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ChatMessage } from '@showcase/models/showcase.model';
@@ -27,9 +28,13 @@ type ChatWsEnvelope =
 export class ShowcaseChatService {
   private readonly api = inject(ShowcaseApiService);
   private readonly chatStyle = inject(ChatStylePreferencesService);
+  private readonly auth = inject(AuthService);
   private readonly wsUrl = environment.chatWsUrl.replace(/\/+$/, '');
 
   private socket: WebSocket | null = null;
+  /** Token utilisé à l’ouverture du WS (null = invité). */
+  private wsAuthToken: string | null | undefined = undefined;
+  private pendingLocalSendId: string | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private reconnectAttempt = 0;
   private shouldStayConnected = false;
@@ -42,6 +47,16 @@ export class ShowcaseChatService {
   readonly connected = this.connectedSignal.asReadonly();
   readonly sendError = this.sendErrorSignal.asReadonly();
   readonly refreshingHistory = this.refreshingHistorySignal.asReadonly();
+
+  constructor() {
+    effect(() => {
+      const token = this.auth.token();
+      if (!this.shouldStayConnected) {
+        return;
+      }
+      this.reconnectForAuth(token);
+    });
+  }
 
   getUsername(): string {
     const stored = localStorage.getItem(USERNAME_KEY)?.trim();
@@ -94,6 +109,7 @@ export class ShowcaseChatService {
     this.socket.onopen = () => {
       this.connectedSignal.set(true);
       this.reconnectAttempt = 0;
+      this.wsAuthToken = readStoredAuthToken() ?? null;
     };
 
     this.socket.onmessage = (event: MessageEvent<string>) => {
@@ -109,6 +125,10 @@ export class ShowcaseChatService {
 
       if (envelope.type === 'chat') {
         this.appendMessage(envelope.data);
+        if (envelope.data.clientId === this.getClientId()) {
+          this.pendingLocalSendId = null;
+          this.sendErrorSignal.set(null);
+        }
         return;
       }
 
@@ -118,6 +138,10 @@ export class ShowcaseChatService {
       }
 
       if (envelope.type === 'error') {
+        if (this.pendingLocalSendId) {
+          this.removeMessageById(this.pendingLocalSendId);
+          this.pendingLocalSendId = null;
+        }
         this.sendErrorSignal.set(envelope.message || "Impossible d'envoyer le message.");
       }
     };
@@ -226,10 +250,20 @@ export class ShowcaseChatService {
 
     const optimistic = this.buildLocalMessage(author, trimmed, format);
     this.appendMessage(optimistic);
+    this.pendingLocalSendId = optimistic.id;
 
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify(payload));
+    const token = readStoredAuthToken();
+    const wsOpen = this.socket?.readyState === WebSocket.OPEN;
+    const wsMatchesAuth =
+      !token || this.wsAuthToken === (token ?? null);
+
+    if (wsOpen && (!token || anonymous || wsMatchesAuth)) {
+      this.socket!.send(JSON.stringify(payload));
       return;
+    }
+
+    if (wsOpen && token && !anonymous && !wsMatchesAuth) {
+      this.reconnectForAuth(token);
     }
 
     this.api
@@ -243,14 +277,41 @@ export class ShowcaseChatService {
       })
       .subscribe({
         next: (message) => {
+          this.pendingLocalSendId = null;
           this.sendErrorSignal.set(null);
           this.appendMessage(message);
         },
         error: (error: unknown) => {
           this.removeMessageById(optimistic.id);
+          this.pendingLocalSendId = null;
           this.sendErrorSignal.set(this.resolveSendError(error));
         },
       });
+  }
+
+  /** Réouvre le WS avec le token courant (login / logout / refresh). */
+  private reconnectForAuth(token: string | null): void {
+    if (!this.shouldStayConnected) {
+      return;
+    }
+    const next = token ?? null;
+    if (
+      this.wsAuthToken === next &&
+      this.socket &&
+      (this.socket.readyState === WebSocket.OPEN ||
+        this.socket.readyState === WebSocket.CONNECTING)
+    ) {
+      return;
+    }
+
+    if (this.socket) {
+      this.socket.onclose = null;
+      this.socket.close();
+      this.socket = null;
+    }
+    this.connectedSignal.set(false);
+    this.wsAuthToken = undefined;
+    this.openSocket();
   }
 
   clearSendError(): void {

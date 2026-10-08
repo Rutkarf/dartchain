@@ -8,12 +8,12 @@
   flex-flow: row nowrap;
   align-items: stretch;
   justify-content: stretch;
-  gap: var(--tab-push-gap, 1px);
+  gap: var(--tab-push-gap, 2px);
   width: 100%;
   height: 100%;
   min-width: 0;
   margin: 0;
-  padding: 1px;
+  padding: 2px;
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: visible;
@@ -39,9 +39,9 @@
   padding: 0;
   border: none;
   border-radius: var(--tab-push-radius, 0);
-  color: var(--tab-push-label-idle, #5c6b7e);
+  color: var(--tab-push-label-idle, #8b9dad);
   font-family: inherit;
-  font-size: clamp(5px, 1.9vw, 7px);
+  font-size: var(--fs-label);
   font-weight: 600;
   letter-spacing: 0.05em;
   line-height: 1.1;
@@ -50,13 +50,14 @@
   overflow: visible;
   text-overflow: unset;
   cursor: pointer;
+  user-select: none;
   appearance: none;
   -webkit-appearance: none;
   touch-action: manipulation;
 }
 
 .showcase-tab:focus-visible {
-  outline: 1px solid rgba(var(--tab-push-cyan-rgb, 46, 196, 214), 0.9);
+  outline: 1px solid rgba(var(--tab-push-cyan-rgb, 139, 157, 173), 0.9);
   outline-offset: 1px;
 }
 
@@ -68,21 +69,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: 'Open Sans', var(--font-body, system-ui, sans-serif);
+  font-family: 'Roboto', sans-serif;
   font-weight: 600;
   font-style: normal;
   transform: skewX(-11deg);
   transform-origin: center center;
-  transition:
-    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
-    font-weight 200ms ease;
-}
-
-.showcase-tab:hover .showcase-tab__label,
-.showcase-tab:active .showcase-tab__label,
-.showcase-tab.is-active .showcase-tab__label {
-  transform: skewX(0deg);
-  font-style: normal;
 }
 
 .showcase-tab.is-active .showcase-tab__label {
@@ -112,7 +103,7 @@
   line-height: 0;
   pointer-events: none;
   transform: translate(8%, -6%);
-  animation: showcase-tab-unread-toast-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: showcase-tab-unread-toast-in var(--motion-enter) var(--motion-ease-enter) both;
 }
 
 .showcase-tab:has(.showcase-tab__unread-toast) {
@@ -121,9 +112,7 @@
 }
 
 .showcase-tab__unread-toast--live {
-  animation:
-    showcase-tab-unread-toast-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both,
-    showcase-tab-badge-pulse 1.4s ease-out 1;
+  animation: showcase-tab-unread-toast-in var(--motion-enter) var(--motion-ease-enter) both, showcase-tab-badge-pulse 1.4s ease-out 1;
 }
 
 @keyframes showcase-tab-unread-toast-in {
@@ -138,7 +127,7 @@
 }
 
 .showcase-tab__badge--live {
-  animation: none;
+  animation:  none;
 }
 
 @keyframes showcase-tab-badge-pulse {
@@ -159,13 +148,13 @@
 @media (prefers-reduced-motion: reduce) {
   .showcase-tab__unread-toast,
   .showcase-tab__unread-toast--live {
-    animation: none;
+    animation:  none;
   }
 }
 
 @media (max-width: 349px) {
   .showcase-tab {
-    font-size: 5px;
+    font-size: var(--fs-label);
     letter-spacing: 0.03em;
   }
 }

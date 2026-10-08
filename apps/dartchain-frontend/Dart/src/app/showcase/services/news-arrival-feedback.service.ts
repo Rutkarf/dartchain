@@ -19,7 +19,7 @@ export class NewsArrivalFeedbackService {
 
     const unlock = (): void => {
       this.audioUnlocked = true;
-      void this.getAudioContext()?.resume();
+      // Ne pas créer d’AudioContext ici — uniquement au play après geste.
     };
 
     document.addEventListener('pointerdown', unlock, { once: true, passive: true });

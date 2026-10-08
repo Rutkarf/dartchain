@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { activeAtmospherePreset } from './marseille-atmosphere.config';
+import { activeAtmospherePreset } from './metaverse-atmosphere.config';
 import {
   atmosphereFogRgb,
   harmonizedHorizonMaskImage,

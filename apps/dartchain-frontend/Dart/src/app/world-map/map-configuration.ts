@@ -1,7 +1,7 @@
 import { groundTopY } from './ground-surface.config';
 
 /** Identifiant du fournisseur de carte actif. */
-export type MapProviderId = 'legacy-floor' | 'marseille-osm-three';
+export type MapProviderId = 'legacy-floor' | 'metaverse-osm-three';
 
 /** Niveau de qualité pour le streaming terrain / bâtiments. */
 export type MapQuality = 'ultra-low' | 'low' | 'medium' | 'high';
@@ -61,18 +61,32 @@ export const METRO_SPAWN_ANCHOR = {
 } as const;
 
 /**
- * Zone intouchable autour du miroir / spawn Vieux-Port.
- * Tant que le joueur est dedans, les bots ne peuvent pas lui infliger de dégâts.
- * Alignée sur l’anneau walkable ±14 m (esplanade).
+ * Vert bouteille — UNIQUEMENT le cercle de sol spawn SAFE.
+ * Ne pas réutiliser ailleurs (map, UI, arena, matériaux).
+ */
+export const SPAWN_CIRCLE_GROUND_COLOR = 0x18314f as const;
+/** Variante plus sombre — bord / profondeur du même cercle uniquement. */
+export const SPAWN_CIRCLE_GROUND_DEEP_COLOR = 0x0d0630 as const;
+/** Filet / anneau du cercle spawn uniquement. */
+export const SPAWN_CIRCLE_GROUND_RING_COLOR = 0x09814a as const;
+
+/**
+ * Zone SPAWN SAFE autour de l’ombrière.
+ * Joueur dedans = intouchable (bots ne tirent pas).
+ * Centre = ombrière ; rayon couvre dalle verre + spawn sud.
  */
 export const MIRROR_SPAWN_SAFE_ZONE = {
-  id: 'vieux-port-mirror-safe',
-  centerX:
-    METRO_SPAWN_ANCHOR.mirror.x + METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.x,
-  centerZ:
-    METRO_SPAWN_ANCHOR.mirror.z + METRO_SPAWN_ANCHOR.spawnOffsetFromMirror.z,
-  /** Rayon monde (m) — couvre miroir + esplanade spawn. */
-  radiusMeters: 14,
+  id: 'ombriere-spawn-safe',
+  centerX: METRO_SPAWN_ANCHOR.mirror.x,
+  centerZ: METRO_SPAWN_ANCHOR.mirror.z,
+  /** Rayon monde (m) — esplanade glass + spawn. */
+  radiusMeters: 14.5,
+  /** Sol cercle spawn — vert bouteille exclusif (voir SPAWN_CIRCLE_*). */
+  fillColor: SPAWN_CIRCLE_GROUND_COLOR,
+  ringColor: SPAWN_CIRCLE_GROUND_RING_COLOR,
+  accentColor: SPAWN_CIRCLE_GROUND_RING_COLOR,
+  padDimColor: SPAWN_CIRCLE_GROUND_DEEP_COLOR,
+  padLitColor: SPAWN_CIRCLE_GROUND_COLOR,
 } as const;
 
 export function isInsideMirrorSpawnSafeZone(x: number, z: number): boolean {
@@ -100,16 +114,16 @@ export const MIRROR_SECOND_BUILDING_ID = 'mirror-adjacent-building-02';
 
 /** Origine géographique = Ombrière (OSM way/200273945). Voir geo-reference.config.ts. */
 export {
-  MARSEILLE_GEO_ORIGIN,
+  METAVERSE_GEO_ORIGIN,
   GEO_REFERENCE_CONFIG,
   GEOGRAPHIC_DATA_SOURCES,
 } from './geo-reference.config';
 
 export const SCENE_COPY = {
-  /** Affichage public du floor — MetaVerseBB devient Arène BB (alias produit). */
-  canopyTitle: 'Arène BB',
-  /** Alias historique conservé pour docs / audits. */
-  canopyTitleLegacy: 'MetaVerseBB',
+  /** Affichage public du floor MetaVerseBB. */
+  canopyTitle: 'METAVERSEBB',
+  /** Alias historique — même libellé produit. */
+  canopyTitleLegacy: 'METAVERSEBB',
   roadMarking: 'Hack The Planet x)',
   r4v3: 'R4V3',
   m4t3rPickup: '+1',
@@ -169,7 +183,7 @@ export const M4T3R_DENSITY_CONFIG = {
   maxVisibleInstances: 8192,
   /** Trottoir Phase 1 + offset visible (tokens / trail). */
   groundY: SIDEWALK_SURFACE_Y + M4T3R_ABOVE_SIDEWALK_OFFSET,
-  /** @deprecated Utiliser MARSEILLE_GROUND_EXCLUSION_ZONES — conservé pour compat tests. */
+  /** @deprecated Utiliser METAVERSE_GROUND_EXCLUSION_ZONES — conservé pour compat tests. */
   waterMinZ: 14,
 } as const;
 
@@ -186,7 +200,7 @@ export interface GroundExclusionZone {
  * 1 unité = 1 m, nord = −Z, est = +X.
  * Miroir à (0,0) : bassin ouest (−X) + bras sud (+Z) visible depuis l'esplanade.
  */
-export const MARSEILLE_HARBOR_WATER = {
+export const METAVERSE_HARBOR_WATER = {
   landMinZ: -420,
   landMaxZ: 8,
   /** Eau juste derrière le miroir (sud = +Z, face personnage nord −Z). */
@@ -211,11 +225,11 @@ export const MARSEILLE_HARBOR_WATER = {
   waterDeepY: -1.85,
   /** @deprecated Alias de waterSurfaceY. */
   surfaceY: -1.15,
-  surfaceColor: 0x3eb8c8,
-  deepColor: 0x0a4a62,
-  shallowColor: 0x7adce8,
-  foamColor: 0xe8f6fa,
-  glowColor: 0x5ee0f0,
+  surfaceColor: 0x8a95a5,
+  deepColor: 0x18314f,
+  shallowColor: 0x8a95a5,
+  foamColor: 0xede7d9,
+  glowColor: 0x8a95a5,
   /** Hauteur visible paroi quai → eau. */
   basinWallHeight: 1.35,
   quayZ: 4.8,
@@ -226,7 +240,7 @@ export const MARSEILLE_HARBOR_WATER = {
 /**
  * Vieux-Port : exclusion M4T3R via `isHarborWaterAt()` (vieux-port-layout.util).
  */
-export const MARSEILLE_GROUND_EXCLUSION_ZONES: GroundExclusionZone[] = [];
+export const METAVERSE_GROUND_EXCLUSION_ZONES: GroundExclusionZone[] = [];
 
 export const TRAIL_CONFIG = {
   width: 0.8,
@@ -277,9 +291,9 @@ export const MOVE_JOYSTICK_CONFIG = {
 
 /** Fusion horizon 3D ↔ ciel QUEST. 1 unité = 1 m. */
 export const WORLD_BACKGROUND_CONFIG = {
-  horizonColor: 0x111a38,
-  zenithColor: 0x02040f,
-  fogColor: 0x141932,
+  horizonColor: 0x0d0630,
+  zenithColor: 0x0d0630,
+  fogColor: 0x0d0630,
   fogNear: 16,
   fogFar: 152,
   horizonBlendStart: 0.38,
@@ -311,7 +325,7 @@ export const ORBIT_CONFIG = {
 export type QuestParticleMode = 'quest-field' | 'metaverse-starry-sky';
 export const QUEST_PARTICLE_MODE: QuestParticleMode = 'metaverse-starry-sky';
 
-/** Knowledge graph visualization layered on Star Conquest particles. */
+/** Knowledge graph visualization layered on Conquête stellaire particles. */
 export type QuestVisualizationMode =
   | 'legacy-particles'
   | 'knowledge-graph'
@@ -412,7 +426,7 @@ export const WORLD_SCALE = {
   tokenMaxVisibleInstances: 8192,
 } as const;
 
-export type MarseilleDistrictId =
+export type MetaverseDistrictId =
   | 'vieux-port'
   | 'canebiere'
   | 'cours-julien'
@@ -422,8 +436,8 @@ export type MarseilleDistrictId =
   | 'joliette';
 
 /** Centres de quartiers. Coordonnées geo approximatives, marquées estimated. */
-export const MARSEILLE_DISTRICTS: Record<
-  MarseilleDistrictId,
+export const METAVERSE_DISTRICTS: Record<
+  MetaverseDistrictId,
   GeoPosition & { estimated: boolean; palette: number }
 > = {
   'vieux-port': {
@@ -431,54 +445,54 @@ export const MARSEILLE_DISTRICTS: Record<
     longitude: 5.3698,
     altitude: 0,
     estimated: false,
-    palette: 0x40e0ff,
+    palette: 0x8a95a5,
   },
   canebiere: {
     latitude: 43.2979,
     longitude: 5.3804,
     altitude: 12,
     estimated: true,
-    palette: 0xffe600,
+    palette: 0xd5a021,
   },
   'cours-julien': {
     latitude: 43.3096,
     longitude: 5.3872,
     altitude: 28,
     estimated: true,
-    palette: 0xff3ecf,
+    palette: 0x7b0d1e,
   },
   'la-plaine': {
     latitude: 43.2931,
     longitude: 5.3859,
     altitude: 18,
     estimated: true,
-    palette: 0x7a5cff,
+    palette: 0x8a95a5,
   },
   'notre-dame': {
     latitude: 43.2841,
     longitude: 5.3712,
     altitude: 148,
     estimated: true,
-    palette: 0xf4f0e6,
+    palette: 0xede7d9,
   },
   'le-panier': {
     latitude: 43.2988,
     longitude: 5.3672,
     altitude: 22,
     estimated: true,
-    palette: 0xc4785a,
+    palette: 0x7b0d1e,
   },
   joliette: {
     latitude: 43.3018,
     longitude: 5.367,
     altitude: 8,
     estimated: true,
-    palette: 0x6a8ea8,
+    palette: 0x8a95a5,
   },
 };
 
 /**
- * Configuration globale de la carte Marseille.
+ * Configuration globale de la carte Metaverse.
  * Toutes les coordonnées géographiques sont centralisées ici.
  */
 export interface MapConfiguration {
@@ -499,8 +513,8 @@ export interface MapConfiguration {
   startOrientation: MapStartOrientation;
 }
 
-/** Bounding box configurable autour de Marseille. */
-export const MARSEILLE_BOUNDS: MapBounds = {
+/** Bounding box configurable autour de Metaverse. */
+export const METAVERSE_BOUNDS: MapBounds = {
   south: 43.2,
   north: 43.4,
   west: 5.2,
@@ -511,18 +525,18 @@ export const MARSEILLE_BOUNDS: MapBounds = {
  * Position initiale du personnage — géo de l'Ombrière (origine scène).
  * Le spawn gameplay ajoute METRO_SPAWN_ANCHOR.spawnOffsetFromMirror en world space.
  */
-export const MARSEILLE_START_POSITION: GeoPosition = {
+export const METAVERSE_START_POSITION: GeoPosition = {
   latitude: 43.2945995,
   longitude: 5.3741227,
   altitude: 20,
 };
 
 /**
- * Départ gameplay Marseille :
+ * Départ gameplay Metaverse :
  * - personnage face à la Canebière (−Z) : rotationY = π (atan2 mouvement)
  * - dos à la mer (+Z), caméra derrière l’épaule depuis le port
  */
-export const MARSEILLE_START_ORIENTATION: MapStartOrientation = {
+export const METAVERSE_START_ORIENTATION: MapStartOrientation = {
   characterRotationY: Math.PI,
   cameraYaw: 0,
   cameraPitch: 0.12,
@@ -642,12 +656,12 @@ export function mapQualityTier(quality: MapQuality): (typeof MAP_QUALITY_TIERS)[
   return MAP_QUALITY_TIERS[quality];
 }
 
-/** Valeurs par défaut — provider Marseille avec fallback legacy si échec. */
+/** Valeurs par défaut — provider Metaverse avec fallback legacy si échec. */
 export const DEFAULT_MAP_CONFIGURATION: MapConfiguration = {
   enabled: true,
-  provider: 'marseille-osm-three',
-  latitudeOrigin: MARSEILLE_START_POSITION.latitude,
-  longitudeOrigin: MARSEILLE_START_POSITION.longitude,
+  provider: 'metaverse-osm-three',
+  latitudeOrigin: METAVERSE_START_POSITION.latitude,
+  longitudeOrigin: METAVERSE_START_POSITION.longitude,
   altitudeOrigin: 0,
   worldScale: 1,
   tileRadius: 2,
@@ -656,7 +670,7 @@ export const DEFAULT_MAP_CONFIGURATION: MapConfiguration = {
   enableTerrain: true,
   enableDebug: false,
   quality: 'ultra-low',
-  bounds: MARSEILLE_BOUNDS,
-  startPosition: MARSEILLE_START_POSITION,
-  startOrientation: MARSEILLE_START_ORIENTATION,
+  bounds: METAVERSE_BOUNDS,
+  startPosition: METAVERSE_START_POSITION,
+  startOrientation: METAVERSE_START_ORIENTATION,
 };

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 import type { MapQuality } from './map-configuration';
-import { mapPerfProfile } from './marseille-perf.config';
+import { mapPerfProfile } from './metaverse-perf.config';
 import { resolveSkyAtmosphereColors } from './sky-atmosphere.config';
 import {
   applySkyDomeColors,

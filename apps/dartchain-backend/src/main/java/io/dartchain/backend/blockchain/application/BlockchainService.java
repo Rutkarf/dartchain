@@ -230,37 +230,75 @@ public class BlockchainService {
     }
 
     public synchronized Block minePendingTransactions(String minerAddress) {
+        requireMinerAddress(minerAddress);
+        return commitMinedBlock(transactionPoolService.getAll(), minerAddress, "pending");
+    }
+
+    public synchronized Block mineSinglePending(String pendingId, String minerAddress) {
+        requireMinerAddress(minerAddress);
+        PendingTransaction pending = transactionPoolService.findById(pendingId);
+        if (pending == null) {
+            throw new IllegalArgumentException("Transaction en attente introuvable : " + pendingId);
+        }
+        return commitMinedBlock(List.of(pending), minerAddress, "pending-one");
+    }
+
+    private void requireMinerAddress(String minerAddress) {
         if (minerAddress == null || minerAddress.isBlank()) {
             throw new RuntimeException("Adresse du mineur obligatoire");
         }
+    }
 
+    private Block commitMinedBlock(
+            List<PendingTransaction> source,
+            String minerAddress,
+            String metricLabel
+    ) {
         List<Transaction> blockTransactions = new ArrayList<>();
+        List<String> minedIds = new ArrayList<>();
+        boolean hasUserTransaction = false;
 
-        for (PendingTransaction pending : transactionPoolService.drainAll()) {
+        for (PendingTransaction pending : source) {
+            if (pending == null) {
+                continue;
+            }
             Transaction tx = TransactionPoolService.toTransaction(pending);
             tx.setStatus("CONFIRMED");
             blockTransactions.add(tx);
+            if (!isSystemCreditPending(pending)) {
+                hasUserTransaction = true;
+            }
+            if (pending.getId() != null && !pending.getId().isBlank()) {
+                minedIds.add(pending.getId());
+            }
         }
 
-        Transaction rewardTx = new Transaction();
-        rewardTx.setId(UUID.randomUUID().toString());
-        rewardTx.setSender("SYSTEM");
-        rewardTx.setRecipient(minerAddress);
-        rewardTx.setAmount(MINING_REWARD);
-        rewardTx.setTimestamp(System.currentTimeMillis());
-        rewardTx.setSignature("SYSTEM");
-        rewardTx.setSystemReward(true);
-        rewardTx.setStatus("CONFIRMED");
-        rewardTx.setPayload("MINING_REWARD");
-        rewardTx.setHash(HashUtils.sha256(
-                rewardTx.getId()
-                        + "|" + rewardTx.getSender()
-                        + "|" + rewardTx.getRecipient()
-                        + "|" + rewardTx.getAmount().toPlainString()
-                        + "|" + rewardTx.getTimestamp()
-        ));
+        if (blockTransactions.isEmpty()) {
+            throw new RuntimeException("Aucune transaction en attente à miner");
+        }
 
-        blockTransactions.add(rewardTx);
+        // Récompense mineur uniquement pour des tx utilisateur (P2P).
+        // Les crédits SYSTEM (faucet, etc.) ne doivent jamais verser +10 R4V3.
+        if (hasUserTransaction) {
+            Transaction rewardTx = new Transaction();
+            rewardTx.setId(UUID.randomUUID().toString());
+            rewardTx.setSender("SYSTEM");
+            rewardTx.setRecipient(minerAddress);
+            rewardTx.setAmount(MINING_REWARD);
+            rewardTx.setTimestamp(System.currentTimeMillis());
+            rewardTx.setSignature("SYSTEM");
+            rewardTx.setSystemReward(true);
+            rewardTx.setStatus("CONFIRMED");
+            rewardTx.setPayload("MINING_REWARD");
+            rewardTx.setHash(HashUtils.sha256(
+                    rewardTx.getId()
+                            + "|" + rewardTx.getSender()
+                            + "|" + rewardTx.getRecipient()
+                            + "|" + rewardTx.getAmount().toPlainString()
+                            + "|" + rewardTx.getTimestamp()
+            ));
+            blockTransactions.add(rewardTx);
+        }
 
         Block previousBlock = getLatestBlock();
 
@@ -283,7 +321,8 @@ public class BlockchainService {
         blockchain.add(newBlock);
         marketChartService.recordBlockMined();
         persistBlocks();
-        metricsCollector.recordBlockMined("pending index=" + newBlock.getIndex());
+        transactionPoolService.removeByIds(minedIds);
+        metricsCollector.recordBlockMined(metricLabel + " index=" + newBlock.getIndex());
 
         return newBlock;
     }
@@ -345,8 +384,20 @@ public class BlockchainService {
         return creditTx;
     }
 
+    private static boolean isSystemCreditPending(PendingTransaction pending) {
+        if (pending == null) {
+            return false;
+        }
+        if (Boolean.TRUE.equals(pending.getSystemReward())) {
+            return true;
+        }
+        String from = pending.getFromAddress();
+        return from != null && "SYSTEM".equalsIgnoreCase(from.trim());
+    }
+
     /**
      * Crédit SYSTEM placé dans le mempool (PENDING) — aucun bloc tant qu'on ne mine pas.
+     * La confirmation via mine ne verse pas de MINING_REWARD (crédits SYSTEM uniquement).
      */
     public synchronized Transaction enqueueSystemCredit(
             String recipientAddress,

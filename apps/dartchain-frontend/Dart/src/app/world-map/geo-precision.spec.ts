@@ -5,16 +5,16 @@ import { GeoCoordinateService } from './geo-coordinate.service';
 import {
   GEOGRAPHIC_DATA_SOURCES,
   GEO_REFERENCE_CONFIG,
-  MARSEILLE_GEO_ORIGIN,
+  METAVERSE_GEO_ORIGIN,
 } from './geo-reference.config';
 import {
   METERS_PER_DEGREE_LATITUDE,
   metersPerDegreeLongitude,
 } from './geo-projection.constants';
-import { MARSEILLE_COORDINATE_SYSTEM_VERSION } from './placements/coordinate-system';
+import { METAVERSE_COORDINATE_SYSTEM_VERSION } from './placements/coordinate-system';
 
 /**
- * GEO-PREC-1 — contrat interne centimétrique de `marseille-local-v1`.
+ * GEO-PREC-1 — contrat interne centimétrique de `metaverse-local-v1`.
  *
  * La projection équirectangulaire locale (1 unité = 1 mètre) est exacte
  * par définition près de l’Ombrière. Ce n’est pas une vérité cadastrale :
@@ -45,7 +45,7 @@ function wgs84MetersPerDegree(latitudeDeg: number): Wgs84MetersPerDegree {
   };
 }
 
-describe('geo-precision (GEO-PREC-1, marseille-local-v1)', () => {
+describe('geo-precision (GEO-PREC-1, metaverse-local-v1)', () => {
   let geo: GeoCoordinateService;
 
   beforeEach(() => {
@@ -56,7 +56,7 @@ describe('geo-precision (GEO-PREC-1, marseille-local-v1)', () => {
   it('fixe 1 unité monde = 1 mètre, pas 1 centimètre', () => {
     expect(GEO_REFERENCE_CONFIG.metersPerWorldUnit).toBe(1);
     expect(GEO_REFERENCE_CONFIG.coordinateSystemVersion).toBe(
-      MARSEILLE_COORDINATE_SYSTEM_VERSION
+      METAVERSE_COORDINATE_SYSTEM_VERSION
     );
     expect(geo.metersToWorldUnits(CENTIMETER_METERS)).toBeCloseTo(0.01, 6);
   });
@@ -64,26 +64,26 @@ describe('geo-precision (GEO-PREC-1, marseille-local-v1)', () => {
   it('projette un offset GPS de 1 cm à l origine vers 0,01 m ± 0,005 m', () => {
     const latOffset = CENTIMETER_METERS / METERS_PER_DEGREE_LATITUDE;
     const lonOffset =
-      CENTIMETER_METERS / metersPerDegreeLongitude(MARSEILLE_GEO_ORIGIN.latitude);
+      CENTIMETER_METERS / metersPerDegreeLongitude(METAVERSE_GEO_ORIGIN.latitude);
 
     const origin = geo.geoToWorld(
-      MARSEILLE_GEO_ORIGIN.latitude,
-      MARSEILLE_GEO_ORIGIN.longitude,
+      METAVERSE_GEO_ORIGIN.latitude,
+      METAVERSE_GEO_ORIGIN.longitude,
       0
     );
     const north = geo.geoToWorld(
-      MARSEILLE_GEO_ORIGIN.latitude + latOffset,
-      MARSEILLE_GEO_ORIGIN.longitude,
+      METAVERSE_GEO_ORIGIN.latitude + latOffset,
+      METAVERSE_GEO_ORIGIN.longitude,
       0
     );
     const east = geo.geoToWorld(
-      MARSEILLE_GEO_ORIGIN.latitude,
-      MARSEILLE_GEO_ORIGIN.longitude + lonOffset,
+      METAVERSE_GEO_ORIGIN.latitude,
+      METAVERSE_GEO_ORIGIN.longitude + lonOffset,
       0
     );
     const up = geo.geoToWorld(
-      MARSEILLE_GEO_ORIGIN.latitude,
-      MARSEILLE_GEO_ORIGIN.longitude,
+      METAVERSE_GEO_ORIGIN.latitude,
+      METAVERSE_GEO_ORIGIN.longitude,
       CENTIMETER_METERS
     );
 
@@ -136,25 +136,25 @@ describe('geo-precision (GEO-PREC-1, marseille-local-v1)', () => {
   });
 
   it('documente la dérive équirectangulaire vs ellipsoïde WGS84 (pas un nouveau CRS)', () => {
-    const wgsOrigin = wgs84MetersPerDegree(MARSEILLE_GEO_ORIGIN.latitude);
+    const wgsOrigin = wgs84MetersPerDegree(METAVERSE_GEO_ORIGIN.latitude);
     const distances = [100, 500, 2_000, 10_000] as const;
     const northDrifts: number[] = [];
     const eastDrifts: number[] = [];
 
     for (const distance of distances) {
       const northLat =
-        MARSEILLE_GEO_ORIGIN.latitude + distance / wgsOrigin.lat;
+        METAVERSE_GEO_ORIGIN.latitude + distance / wgsOrigin.lat;
       const northWorld = geo.geoToWorld(
         northLat,
-        MARSEILLE_GEO_ORIGIN.longitude,
+        METAVERSE_GEO_ORIGIN.longitude,
         0
       );
       northDrifts.push(Math.abs(-northWorld.z - distance));
 
       const eastLon =
-        MARSEILLE_GEO_ORIGIN.longitude + distance / wgsOrigin.lon;
+        METAVERSE_GEO_ORIGIN.longitude + distance / wgsOrigin.lon;
       const eastWorld = geo.geoToWorld(
-        MARSEILLE_GEO_ORIGIN.latitude,
+        METAVERSE_GEO_ORIGIN.latitude,
         eastLon,
         0
       );
@@ -174,7 +174,7 @@ describe('geo-precision (GEO-PREC-1, marseille-local-v1)', () => {
     expect(northDrifts[2]).toBeGreaterThan(2);
     expect(northDrifts[2]).toBeLessThan(6);
 
-    // 10 km : hors contrat cm — Marseille entière exige un CRS métrique.
+    // 10 km : hors contrat cm — Metaverse entière exige un CRS métrique.
     expect(northDrifts[3]).toBeGreaterThan(10);
     expect(northDrifts[3]).toBeLessThan(30);
     expect(eastDrifts[3]).toBeGreaterThan(8);
@@ -183,7 +183,7 @@ describe('geo-precision (GEO-PREC-1, marseille-local-v1)', () => {
 
   it('rappelle que la source OSM n est pas une vérité centimétrique', () => {
     const osm = GEOGRAPHIC_DATA_SOURCES.find(
-      (source) => source.id === 'osm-overpass-marseille-buildings'
+      (source) => source.id === 'osm-overpass-metaverse-buildings'
     );
     expect(osm?.isUsed).toBe(true);
     expect(osm?.accuracy).toContain('2–5 m');

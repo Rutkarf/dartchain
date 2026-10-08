@@ -7,7 +7,7 @@ import { environment } from '../../../environments/environment';
 import type { WIGLEBuildingAggregate, WigleAreaAggregate } from './wigle.types';
 import type { WiglePointsResponse } from './wigle-point.types';
 import { WIGLE_GEO_CONFIG, WIGLE_OSM_QUERY_BOUNDS } from './wigle-visual.config';
-import { MARSEILLE_GEO_ORIGIN, WIGLE_PROFESSIONAL_ANCHORS } from '../geo-reference.config';
+import { METAVERSE_GEO_ORIGIN, WIGLE_PROFESSIONAL_ANCHORS } from '../geo-reference.config';
 import { METRO_SPAWN_ANCHOR } from '../map-configuration';
 import { GeoCoordinateService } from '../geo-coordinate.service';
 
@@ -69,8 +69,8 @@ export class WigleApiService {
   }
 
   fetchGeoPoints(
-    lat = MARSEILLE_GEO_ORIGIN.latitude,
-    lon = MARSEILLE_GEO_ORIGIN.longitude,
+    lat = METAVERSE_GEO_ORIGIN.latitude,
+    lon = METAVERSE_GEO_ORIGIN.longitude,
     radiusMeters = WIGLE_GEO_CONFIG.loadRadiusMeters,
     limit: number = WIGLE_GEO_CONFIG.maxActivePoints
   ): Observable<WiglePointsResponse> {
@@ -90,8 +90,8 @@ export class WigleApiService {
   }
 
   async loadGeoPoints(
-    lat = MARSEILLE_GEO_ORIGIN.latitude,
-    lon = MARSEILLE_GEO_ORIGIN.longitude,
+    lat = METAVERSE_GEO_ORIGIN.latitude,
+    lon = METAVERSE_GEO_ORIGIN.longitude,
     radiusMeters = WIGLE_GEO_CONFIG.loadRadiusMeters,
     limit: number = WIGLE_GEO_CONFIG.maxActivePoints
   ): Promise<WiglePointsResponse> {
@@ -180,8 +180,8 @@ export class WigleApiService {
       areas: [
         {
           areaId: 'area-canebiere-local',
-          latitudeApprox: unmatched?.latitude ?? MARSEILLE_GEO_ORIGIN.latitude - 0.0004,
-          longitudeApprox: unmatched?.longitude ?? MARSEILLE_GEO_ORIGIN.longitude - 0.00055,
+          latitudeApprox: unmatched?.latitude ?? METAVERSE_GEO_ORIGIN.latitude - 0.0004,
+          longitudeApprox: unmatched?.longitude ?? METAVERSE_GEO_ORIGIN.longitude - 0.00055,
           observationCount: 2,
           signalAverage: -74,
           networkTypeCounts: { unknown: 2 },

@@ -1,4 +1,4 @@
-<div class="wallet-faucet" aria-label="Faucet">
+<div class="wallet-faucet">
   @if (runtime.toastMessage()) {
     <div
       class="wallet-faucet__toast"
@@ -20,16 +20,17 @@
           [style.transform]="'scale(' + valueFitScale() + ')'"
         >
           <span
-            #valueText
-            class="wallet-faucet__value"
-            [class.is-bumping]="runtime.bump()"
-            [class.is-capped]="runtime.atMaxClaim()"
-            [attr.aria-label]="runtime.displayLine()"
-            [attr.title]="runtime.displayLine()"
-          >
+ #valueText
+ class="wallet-faucet__value"
+ [class.is-bumping]="runtime.bump()"
+ [class.is-capped]="runtime.atMaxClaim()"
+ [attr.title]="runtime.displayLine()"
+ >
+            <span class="wallet-faucet__value-token">{{ runtime.nativeTokenLabel() }}</span>
             <span class="wallet-faucet__value-whole">{{ runtime.wholePartDisplay() }}</span>
             <span class="wallet-faucet__value-sep">,</span>
             <span class="wallet-faucet__value-decimal">{{ runtime.decimalDigits() }}</span>
+            <span class="wallet-faucet__value-unit">m4t3r</span>
           </span>
         </div>
       </div>
@@ -57,7 +58,7 @@
     >
       <span class="wallet-faucet__claim-glyph" aria-hidden="true">
         @if (runtime.claimSuccessActive()) {
-          <svg class="wallet-faucet__claim-svg" viewBox="0 0 24 24" focusable="false">
+          <svg class="wallet-faucet__claim-svg icon" viewBox="0 0 24 24" focusable="false">
             <circle cx="12" cy="12" r="9.2" class="wallet-faucet__claim-ring" />
             <path
               class="wallet-faucet__claim-check"
@@ -66,7 +67,7 @@
             />
           </svg>
         } @else {
-          <svg class="wallet-faucet__claim-svg" viewBox="0 0 24 24" focusable="false">
+          <svg class="wallet-faucet__claim-svg icon" viewBox="0 0 24 24" focusable="false">
             <path
               class="wallet-faucet__claim-arrow"
               d="M12 4.2v9.2"
@@ -90,10 +91,9 @@
     </button>
 
     <article
-      class="wallet-faucet__tile wallet-faucet__tile--cooldown"
-      [attr.aria-label]="'Temps restant ' + runtime.cooldownLabel()"
-      [attr.title]="runtime.cooldownLabel()"
-    >
+ class="wallet-faucet__tile wallet-faucet__tile--cooldown"
+ [attr.title]="runtime.cooldownLabel()"
+ >
       <div
         class="wallet-faucet__cooldown-ring"
         [style.--cooldown-progress]="runtime.cooldownProgress()"

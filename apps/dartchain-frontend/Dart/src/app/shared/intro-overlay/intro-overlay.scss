@@ -1,0 +1,1210 @@
+/* Pas de display:contents — casse les (click) Angular sur Chromium. */
+:host {
+  display: block;
+  position: fixed;
+  inset: 0;
+  height: 100svh;
+  z-index: 20000;
+  pointer-events: none;
+}
+
+:host:has(.intro:not(.intro--off)) {
+  pointer-events: auto;
+}
+
+/*
+ * Feed parked : laisse passer les clics vers Star Conquest (bandeau sous le token).
+ * Le HUD / bouton Feed restent cliquables via pointer-events: auto sur leurs enfants.
+ */
+:host:has(.intro--coin-parked:not(.intro--inserting):not(.intro--moon):not(.intro--bridging):not(.intro--off)) {
+  pointer-events: none;
+}
+
+/* Pendant le handoff tutoriel : laisse passer clics + token tour au-dessus. */
+:host:has(.intro--tour-handoff) {
+  pointer-events: none !important;
+}
+
+:host:has(.intro--tour-handoff.intro--exiting) {
+  z-index: 8900;
+}
+
+:host:has(.intro--off) {
+  pointer-events: none;
+}
+
+.intro {
+  /* Charte DartChain : black · Baltic · porcelain · info-grey · Orbit. */
+  --intro-ink: var(--brand-black, #0a1220);
+  --intro-ink-rgb: var(--brand-black-rgb, 10, 18, 32);
+  --intro-porcelain: var(--brand-porcelain, #ede7d9);
+  --intro-porcelain-rgb: var(--brand-porcelain-rgb, 237, 231, 217);
+  --intro-baltic: var(--brand-baltic-blue, #235789);
+  --intro-baltic-rgb: var(--brand-baltic-blue-rgb, 35, 87, 137);
+  --intro-mist: var(--brand-info-grey, #8b9dad);
+  --intro-mist-rgb: var(--brand-info-grey-rgb, 139, 157, 173);
+  --intro-mid: var(--palette-6, #8b9dad);
+  --intro-mid-rgb: var(--palette-6-rgb, 139, 157, 173);
+  --intro-soft: var(--palette-7, #6a95b8);
+  --intro-soft-rgb: var(--palette-7-rgb, 106, 149, 184);
+  --intro-glow: var(--palette-8, #8b9dad);
+  --intro-glow-rgb: var(--palette-8-rgb, 139, 157, 173);
+  --intro-deep: var(--palette-3, #0a1220);
+  --intro-font-display: var(--font-display, 'Orbitron', sans-serif);
+  --intro-font-mono: var(--font-mono, 'Inter', sans-serif);
+
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  /* Pas de full black — atmosphère type appel, CSS porte le fond. */
+  background: transparent;
+  color: var(--intro-porcelain);
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon):not(.intro--bridging) {
+  pointer-events: none;
+}
+
+/*
+ * HUD parked : laisse passer SC sous le token, mais garde site + insert/Feed actifs.
+ * (Ne pas mettre pointer-events:none sur .intro__insert — Chromium rate alors le hint.)
+ */
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon):not(.intro--bridging) .intro__launch,
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon):not(.intro--bridging) .intro__trustpilot,
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon):not(.intro--bridging) .intro__brand-block {
+  pointer-events: none !important;
+}
+
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon):not(.intro--bridging) .intro__site,
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon):not(.intro--bridging) .intro__insert,
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon):not(.intro--bridging) .intro__hint {
+  pointer-events: auto !important;
+}
+
+/* Fond type séquence d’appel (bleu Baltic), sous le GL. */
+.intro__atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(140% 90% at 50% -10%, rgba(139, 157, 173, 0.48), transparent 52%),
+    radial-gradient(90% 60% at 80% 90%, rgba(var(--intro-baltic-rgb), 0.3), transparent 55%),
+    linear-gradient(168deg, #235789 0%, #0a1220 42%, #0a1220 100%);
+}
+
+/* Cadrillage fintech showcase/dock — nettement plus estompé. */
+.intro__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.42;
+  background:
+    linear-gradient(180deg, rgba(237, 231, 217, 0.018) 0%, transparent 28%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 7px,
+      rgba(237, 231, 217, 0.0055) 7px 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 7px,
+      rgba(237, 231, 217, 0.0045) 7px 8px
+    );
+  mix-blend-mode: soft-light;
+}
+
+/*
+ * Pont appel → pad token : l’intro reste TOUJOURS opaque (jamais opacity 0).
+ * Seul le HUD apparaît en fondu — évite le flash token + fond noir.
+ */
+.intro--bridging {
+  opacity: 1 !important;
+  filter: none !important;
+  visibility: visible !important;
+}
+
+/*
+ * Vignette : absente au crossfade (match appel), puis fade-in une fois
+ * le traveling libéré — évite le saut d’assombrissement au handoff.
+ */
+.intro--bridging::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 0.55s cubic-bezier(0.33, 0.08, 0.2, 1);
+  background: radial-gradient(
+    ellipse 72% 58% at 50% 40%,
+    transparent 40%,
+    rgba(10, 18, 32, 0.5) 100%
+  );
+}
+
+.intro--bridging.intro--bridge-go::after {
+  opacity: 0.32;
+}
+
+.intro--bridging.intro--bridge-settle::after {
+  opacity: 0;
+}
+
+/* HUD arrive une fois le traveling libéré — pas pendant le hold crossfade. */
+.intro--bridging.intro--bridge-go .intro__hud {
+  transition:  none;
+  will-change: transform, opacity;
+  animation:  intro-bridge-hud 2s cubic-bezier(0.33, 0.08, 0.2, 1) both;
+}
+
+.intro--bridging:not(.intro--bridge-go) .intro__hud {
+  opacity: 0 !important;
+  transform: translateY(8px);
+  pointer-events: none;
+  animation:  none !important;
+}
+
+/* Glitch / box-shadow du bouton : après le vol, pas pendant le traveling. */
+.intro--bridging .intro__hint,
+.intro--bridging .intro__hint-ghost,
+.intro--bridging .intro__hint-text,
+.intro--bridging .intro__hint-scan,
+.intro--bridging .intro__hint-ring {
+  animation:  none !important;
+}
+
+/* Glitch du bouton après l’assise du token, pas sur la frame d’arrivée. */
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon) .intro__hint,
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon) .intro__hint-ghost,
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon) .intro__hint-text,
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon) .intro__hint-scan,
+.intro--coin-parked:not(.intro--inserting):not(.intro--moon) .intro__hint-ring {
+  animation-delay: 0.7s;
+}
+
+@keyframes intro-bridge-hud {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.intro--off {
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+.intro[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.intro--recede,
+.intro--to-header,
+.intro--tour-handoff,
+.intro--exiting {
+  background: transparent;
+  pointer-events: none;
+}
+
+.intro--recede .intro__hud,
+.intro--to-header .intro__hud,
+.intro--tour-handoff .intro__hud,
+.intro--exiting .intro__hud,
+.intro--recede .intro__grain,
+.intro--to-header .intro__grain,
+.intro--tour-handoff .intro__grain,
+.intro--exiting .intro__grain,
+.intro--recede .intro__atmosphere,
+.intro--to-header .intro__atmosphere,
+.intro--tour-handoff .intro__atmosphere,
+.intro--exiting .intro__atmosphere,
+.intro--recede .intro__grid,
+.intro--to-header .intro__grid,
+.intro--tour-handoff .intro__grid,
+.intro--exiting .intro__grid,
+.intro--recede .intro__curtain,
+.intro--to-header .intro__curtain,
+.intro--tour-handoff .intro__curtain,
+.intro--exiting .intro__curtain {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro--recede .intro__gl,
+.intro--to-header .intro__gl,
+.intro--tour-handoff .intro__gl,
+.intro--exiting .intro__gl {
+  opacity: 0;
+}
+
+.intro__traveler {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 6;
+  width: 240px;
+  height: 240px;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 28px rgba(35, 87, 137, 0.45));
+  will-change: transform, width, height, opacity;
+}
+
+.intro__traveler canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Recede : traveler invisible (pas de pop mid-écran). */
+.intro--recede .intro__traveler {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+/* to-header / handoff : l’opacity est pilotée en inline (fade d’entrée). */
+.intro--to-header .intro__traveler.is-live,
+.intro--tour-handoff .intro__traveler.is-live {
+  visibility: visible;
+}
+
+/* Crossfade : le token tutoriel prend le relais sous le traveler. */
+.intro--tour-handoff.intro--exiting .intro__traveler {
+  opacity: 0 !important;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
+  visibility: hidden;
+}
+
+.intro--exiting {
+  pointer-events: none;
+  animation:  intro-fade 0.45s ease forwards;
+}
+
+@keyframes intro-fade {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.intro__gl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  z-index: 1;
+  background: transparent;
+}
+
+.intro--bridging .intro__gl,
+.intro--bridging .intro__atmosphere {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+/* Pendant le settle pad : canvas voyageur hors jeu (évite le token fantôme). */
+.intro--bridging.intro--bridge-settle .intro__gl {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.intro__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.intro--bridging .intro__grain {
+  /* Couche figée : le bruit ne se recalcule pas à chaque frame du token. */
+  transform: translate3d(0, 0, 0);
+  contain: paint;
+  isolation: isolate;
+}
+
+.intro__curtain {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  /* Plus de rideau noir plein — voile Baltic léger. */
+  background:
+    radial-gradient(120% 80% at 50% 40%, rgba(var(--intro-baltic-rgb), 0.35), transparent 62%),
+    rgba(10, 18, 32, 0.72);
+  pointer-events: none;
+}
+
+/* Atmosphère déjà peinte — pas d’anim filter (coûteux avec WebGL). */
+.intro--bridging .intro__atmosphere {
+  opacity: 1 !important;
+}
+
+.intro--bridging .intro__grid {
+  opacity: 0.42;
+}
+
+.intro--power .intro__curtain {
+  display: block;
+  animation:  intro-power 1.55s ease-out forwards;
+}
+
+@keyframes intro-power {
+  0%,
+  12% {
+    opacity: 0.98;
+  }
+  22% {
+    opacity: 0.84;
+  }
+  28% {
+    opacity: 0.93;
+  }
+  50% {
+    opacity: 0.57;
+  }
+  56% {
+    opacity: 0.7;
+  }
+  78% {
+    opacity: 0.18;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.intro__hud {
+  /* Cadre 250×550, centré dans la zone sûre (encoche / barre d’accueil). */
+  position: absolute;
+  top: env(safe-area-inset-top, 0px);
+  right: env(safe-area-inset-right, 0px);
+  bottom: env(safe-area-inset-bottom, 0px);
+  left: env(safe-area-inset-left, 0px);
+  z-index: 2;
+  width: 250px;
+  height: 550px;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 12px 48px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--motion-state) var(--motion-ease-state), transform var(--motion-state) var(--motion-ease-state);
+  pointer-events: none;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.intro__hud > * {
+  pointer-events: auto;
+}
+
+.intro--fonts .intro__hud {
+  opacity: 1;
+  transform: none;
+}
+
+.intro--moon .intro__hud .intro__insert {
+  opacity: 1;
+  pointer-events: none;
+}
+
+.intro--moon .intro__hint {
+  animation:  none !important;
+  filter: saturate(1.1) brightness(1.06);
+  box-shadow:
+    0 0 0 1px rgba(var(--intro-baltic-rgb), 0.65),
+    0 0 22px rgba(var(--intro-baltic-rgb), 0.35),
+    inset 0 0 14px rgba(var(--intro-glow-rgb), 0.12);
+}
+
+.intro--moon .intro__hint-stack,
+.intro--moon .intro__hint-ghost,
+.intro--moon .intro__hint-scan,
+.intro--moon .intro__hint-ring {
+  opacity: 0.22 !important;
+  animation:  none !important;
+}
+
+/* Token pad : place pour le soulignage SC entre pointe et bouton Feed. */
+.intro__launch {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 4;
+  width: 220px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+  pointer-events: none;
+  flex: 0 0 auto;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+}
+
+.intro--launching {
+  overflow: visible;
+}
+
+.intro--launching .intro__hud {
+  overflow: visible;
+}
+
+.intro--launching .intro__launch {
+  /* Une seule course insert→moon : pas de reset transform entre phases. */
+  animation:  intro-pad-flight 2.17s cubic-bezier(0.33, 0.08, 0.2, 1) forwards;
+}
+
+@keyframes intro-pad-flight {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  42% {
+    transform: translate(-50%, -78%) scale(0.96);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -158%) scale(0.58);
+    opacity: 0;
+  }
+}
+
+.intro--recede .intro__hud,
+.intro--to-header .intro__hud,
+.intro--tour-handoff .intro__hud,
+.intro--power .intro__hud,
+.intro--exiting .intro__hud {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+/* Marque / lien : haut, centré. */
+.intro__brand-block {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100% - 1.4rem);
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  color: inherit;
+  pointer-events: none;
+}
+
+.intro__site {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  text-decoration: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.intro__site:focus-visible {
+  outline: 1px solid rgba(var(--intro-baltic-rgb), 0.75);
+  outline-offset: 3px;
+  border-radius: var(--radius-md);
+}
+
+.intro__site-kicker {
+  font-family: var(--intro-font-mono);
+  font-size: var(--fs-form);
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: rgba(var(--intro-soft-rgb), 0.9);
+}
+
+.intro__site-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 4px 6px 4px 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--intro-baltic-rgb), 0.42);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--intro-soft-rgb), 0.45),
+    0 0 12px rgba(var(--intro-baltic-rgb), 0.4);
+}
+
+.intro__site-globe {
+  width: 0.72rem;
+  height: 0.72rem;
+  flex: 0 0 auto;
+  color: rgba(var(--intro-glow-rgb), 0.95);
+}
+
+.intro__site-url {
+  font-family: var(--intro-font-mono);
+  font-size: var(--fs-form);
+  letter-spacing: 0.01em;
+  line-height: 1;
+  color: var(--intro-porcelain);
+}
+
+.intro__site-go {
+  font-size: var(--fs-form);
+  line-height: 1;
+  color: rgba(var(--intro-soft-rgb), 0.95);
+}
+
+.intro__site:hover .intro__site-bar,
+.intro__site:focus-visible .intro__site-bar {
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--intro-glow-rgb), 0.75),
+    0 0 14px rgba(var(--intro-baltic-rgb), 0.45);
+}
+
+.intro__trustpilot {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  z-index: 5;
+  transform: translateX(-50%);
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(var(--intro-ink-rgb), 0.35);
+  box-shadow: inset 0 0 0 1px rgba(var(--intro-soft-rgb), 0.18);
+}
+
+.intro__trustpilot-star {
+  width: 0.78rem;
+  height: 0.78rem;
+  flex: 0 0 auto;
+  display: block;
+  filter: drop-shadow(0 0 4px rgba(9, 129, 74, 0.45));
+}
+
+.intro__trustpilot-word {
+  font-family: var(--font-body, 'Roboto', sans-serif);
+  font-size: var(--fs-form);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--intro-porcelain);
+}
+
+.intro__title {
+  margin: 12px 0 0;
+  font-family: var(--intro-font-mono);
+  font-size: var(--fs-form);
+  letter-spacing: 0.22em;
+  background: linear-gradient(90deg, var(--intro-glow), var(--intro-mid), var(--intro-baltic));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.intro__insert {
+  position: relative;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 0;
+  padding-top: 0;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.intro__coin {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin: 0 auto;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  will-change: opacity, filter;
+  overflow: visible;
+  filter: drop-shadow(0 0 14px rgba(var(--intro-baltic-rgb), 0.55));
+}
+
+.intro__coin canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Token posé : handoff exclusif (traveler mort → pad seul). Pas d’anim opacity
+ * qui chevauche le GL — c’était la cause du dédoublement en fin de centrage. */
+.intro--bridging:not(.intro--bridge-settle) .intro__coin {
+  opacity: 0 !important;
+  animation: none !important;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.intro--bridging.intro--bridge-settle .intro__coin {
+  opacity: 1 !important;
+  animation: none !important;
+  pointer-events: none;
+  visibility: visible;
+  filter: drop-shadow(0 0 14px rgba(var(--intro-baltic-rgb), 0.55));
+}
+
+.intro--ready:not(.intro--bridging) .intro__coin,
+.intro--coin-parked:not(.intro--bridging) .intro__coin {
+  opacity: 1;
+  animation: none;
+  visibility: visible;
+}
+
+.intro--inserting .intro__coin,
+.intro--moon .intro__coin {
+  opacity: 1;
+  animation:  none;
+  filter: drop-shadow(0 0 22px rgba(var(--intro-soft-rgb), 0.65));
+}
+
+.intro--recede .intro__launch .intro__coin,
+.intro--to-header .intro__launch .intro__coin,
+.intro--tour-handoff .intro__launch .intro__coin,
+.intro--exiting .intro__launch .intro__coin {
+  opacity: 0;
+  transition: opacity var(--motion-state) var(--motion-ease-state);
+}
+
+.intro__hint {
+  display: grid;
+  place-items: center;
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  margin: 0 auto;
+  width: min(220px, 100%);
+  min-width: 0;
+  min-height: 3.25rem;
+  padding: 14px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: rgba(var(--intro-mist-rgb), 0.85);
+  font-family: var(--intro-font-display);
+  font-size: var(--fs-form);
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  z-index: 8;
+}
+
+.intro__hint::before {
+  content: '';
+  position: absolute;
+  inset: -10px -6px;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.intro__hint-stack,
+.intro__hint-ghost {
+  grid-area: 1 / 1;
+  pointer-events: none;
+}
+
+.intro__hint-text,
+.intro__hint-sub {
+  pointer-events: none;
+}
+
+.intro__hint-stack {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.intro__hint-text {
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.intro__hint-sub {
+  font-family: var(--intro-font-mono);
+  font-size: var(--fs-form);
+  letter-spacing: 0.08em;
+  word-spacing: -0.22em;
+  text-transform: uppercase;
+  color: rgba(var(--intro-mist-rgb), 0.82);
+  white-space: nowrap;
+}
+
+.intro__hint-ghost,
+.intro__hint-scan,
+.intro__hint-ring {
+  display: none;
+  pointer-events: none;
+}
+
+.intro--ready .intro__hint {
+  color: var(--intro-porcelain);
+  border-color: rgba(var(--intro-baltic-rgb), 0.65);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(var(--intro-baltic-rgb), 0.28),
+      rgba(var(--intro-ink-rgb), 0.55)
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 2px,
+      rgba(var(--intro-soft-rgb), 0.05) 2px 3px
+    );
+  box-shadow:
+    0 0 0 1px rgba(var(--intro-soft-rgb), 0.22),
+    0 0 18px rgba(var(--intro-baltic-rgb), 0.28),
+    inset 0 0 12px rgba(var(--intro-baltic-rgb), 0.12);
+  cursor: pointer;
+  animation: 
+    hint-breathe 1.8s ease-in-out infinite,
+    hint-micro 1.35s steps(1, end) infinite,
+    hint-burst 5.2s steps(1, end) infinite;
+}
+
+.intro--ready .intro__hint:hover:not(:disabled),
+.intro--ready .intro__hint.is-hover:not(:disabled) {
+  border-color: rgba(var(--intro-glow-rgb), 0.85);
+  background: rgba(var(--intro-baltic-rgb), 0.32);
+  box-shadow:
+    0 0 0 1px rgba(var(--intro-soft-rgb), 0.5),
+    0 0 28px rgba(var(--intro-baltic-rgb), 0.42);
+  cursor: pointer;
+}
+
+.intro--ready .intro__hint-ghost,
+.intro--ready .intro__hint-scan,
+.intro--ready .intro__hint-ring {
+  display: block;
+}
+
+.intro--ready .intro__hint-ghost {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  opacity: 0;
+}
+
+.intro--ready .intro__hint-ghost--cyan {
+  color: var(--intro-soft);
+  animation:  hint-rgb-cyan 5.2s infinite;
+}
+
+.intro--ready .intro__hint-ghost--mag {
+  color: var(--intro-mist);
+  animation:  hint-rgb-mag 5.2s infinite;
+}
+
+.intro--ready .intro__hint-text {
+  color: var(--intro-porcelain);
+  animation:  hint-slice 5.2s infinite;
+  text-shadow: 0 0 8px rgba(var(--intro-baltic-rgb), 0.35);
+}
+
+.intro--ready .intro__hint-sub {
+  color: rgba(var(--intro-glow-rgb), 0.9);
+  text-shadow: 0 0 6px rgba(var(--intro-baltic-rgb), 0.22);
+}
+
+.intro--ready .intro__hint-scan {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  top: 18%;
+  height: 7px;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--intro-soft-rgb), 0.4),
+    rgba(var(--intro-porcelain-rgb), 0.35),
+    transparent
+  );
+  opacity: 0;
+  animation:  hint-scan 5.2s infinite;
+}
+
+.intro--ready .intro__hint-ring {
+  position: absolute;
+  inset: -6px;
+  z-index: 1;
+  border: 1px solid rgba(var(--intro-baltic-rgb), 0.6);
+  border-radius: inherit;
+  animation:  hint-ring 2.4s ease-out infinite;
+}
+
+
+.intro--inserting .intro__hint {
+  animation:  intro-hint-press 0.92s ease-out both;
+  pointer-events: none;
+}
+
+.intro--inserting .intro__hint-ghost,
+.intro--inserting .intro__hint-scan,
+.intro--inserting .intro__hint-ring,
+.intro--inserting .intro__hint-text {
+  animation:  none;
+}
+
+@keyframes hint-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(var(--intro-soft-rgb), 0.2),
+      0 0 14px rgba(var(--intro-baltic-rgb), 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(var(--intro-glow-rgb), 0.4),
+      0 0 26px rgba(var(--intro-baltic-rgb), 0.35);
+  }
+}
+
+@keyframes hint-micro {
+  0%,
+  78%,
+  90%,
+  100% {
+    transform: none;
+  }
+  80%,
+  83% {
+    transform: translateX(1.5px);
+  }
+  85%,
+  87% {
+    transform: translateX(-2px);
+  }
+}
+
+/* Burst irrégulier : calme longtemps, puis déchirure — pattern d’appel */
+@keyframes hint-burst {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    filter: none;
+    transform: none;
+  }
+  8%,
+  11% {
+    filter: contrast(1.35) saturate(1.6);
+    transform: translateX(-3px) skewX(-8deg);
+  }
+  45%,
+  47% {
+    filter: contrast(1.5) hue-rotate(-18deg);
+    transform: translateX(4px) skewX(10deg);
+  }
+  70%,
+  73% {
+    filter: contrast(1.4) saturate(1.8);
+    transform: translate(-2px, 1px) skewX(-6deg);
+  }
+}
+
+@keyframes hint-rgb-cyan {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
+  8%,
+  10% {
+    opacity: 0.85;
+    transform: translate(-5px, 1px);
+    clip-path: inset(12% 0 48% 0);
+  }
+  45%,
+  48% {
+    opacity: 0.9;
+    transform: translate(-7px, -1px);
+    clip-path: inset(0 18% 0 0);
+  }
+  71%,
+  73% {
+    opacity: 0.75;
+    transform: translate(-4px, 2px);
+    clip-path: inset(55% 0 8% 0);
+  }
+}
+
+@keyframes hint-rgb-mag {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
+  8%,
+  10% {
+    opacity: 0.8;
+    transform: translate(6px, -1px);
+    clip-path: inset(40% 0 18% 0);
+  }
+  45%,
+  48% {
+    opacity: 0.85;
+    transform: translate(8px, 1px);
+    clip-path: inset(0 0 0 22%);
+  }
+  71%,
+  73% {
+    opacity: 0.7;
+    transform: translate(5px, -2px);
+    clip-path: inset(8% 0 52% 0);
+  }
+}
+
+@keyframes hint-slice {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    transform: none;
+    letter-spacing: 0.04em;
+    color: var(--intro-porcelain);
+    opacity: 1;
+  }
+  8% {
+    transform: translateX(2px);
+    letter-spacing: 0.08em;
+  }
+  10% {
+    transform: translateX(-2px);
+  }
+  46% {
+    transform: translate(2px, 0);
+  }
+  72% {
+    transform: translateX(-1px);
+  }
+}
+
+@keyframes hint-scan {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  68%,
+  76%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  8%,
+  11% {
+    opacity: 0.9;
+    transform: translateY(9px);
+  }
+  45%,
+  48% {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
+  70%,
+  73% {
+    opacity: 0.85;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes hint-ring {
+  0%,
+  18% {
+    opacity: 0.7;
+    transform: scale(1);
+    border-color: rgba(var(--intro-soft-rgb), 0.5);
+  }
+  32% {
+    opacity: 0.35;
+    border-color: rgba(var(--intro-baltic-rgb), 0.45);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.22);
+    border-color: rgba(var(--intro-baltic-rgb), 0);
+  }
+}
+
+@keyframes hint-slot-tick {
+  0%,
+  7%,
+  13%,
+  44%,
+  52%,
+  100% {
+    filter: none;
+    box-shadow: 0 0 10px rgba(var(--intro-baltic-rgb), 0.3);
+  }
+  8%,
+  11%,
+  45%,
+  48% {
+    filter: saturate(1.35) brightness(1.2);
+    box-shadow: 0 0 16px rgba(var(--intro-soft-rgb), 0.5);
+  }
+}
+
+@keyframes intro-hint-press {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: none;
+  }
+  22% {
+    transform: scale(0.96);
+    box-shadow: 0 0 22px rgba(var(--intro-baltic-rgb), 0.45);
+  }
+  55% {
+    transform: scale(0.98);
+    opacity: 0.72;
+  }
+  100% {
+    transform: scale(0.94);
+    opacity: 0.35;
+    filter: saturate(0.7);
+  }
+}
+
+.intro__hint:disabled {
+  cursor: default;
+}
+
+.intro__skip {
+  position: absolute;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(6px, env(safe-area-inset-right));
+  z-index: 6;
+  margin: 0;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: rgba(var(--intro-ink-rgb), 0.35);
+  color: rgba(var(--intro-mist-rgb), 0.9);
+  font-family: var(--intro-font-mono);
+  font-size: var(--fs-form);
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.intro__skip:hover,
+.intro__skip:focus-visible {
+  color: var(--brand-porcelain, #ede7d9);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro--bridging,
+  .intro--bridging .intro__hud,
+  .intro--bridging .intro__grid,
+  .intro--bridging .intro__atmosphere {
+    animation:  none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .intro--bridging::after {
+    display: none !important;
+  }
+
+  .intro--power .intro__curtain {
+    display: none;
+  }
+  .intro--ready .intro__hint,
+  .intro--ready .intro__hint-ghost,
+  .intro--ready .intro__hint-scan,
+  .intro--ready .intro__hint-ring,
+  .intro--ready .intro__hint-text,
+  .intro--ready .intro__coin,
+  .intro--coin-parked .intro__coin,
+  .intro--inserting .intro__coin,
+  .intro--inserting .intro__hint {
+    animation:  none;
+  }
+
+  .intro__hud {
+    transition: opacity var(--motion-state) var(--motion-ease-state);
+    transform: none;
+  }
+}

@@ -12,7 +12,7 @@ export interface SurfaceProvider {
   isWalkable(x: number, z: number, radius: number): boolean;
 }
 
-/** Contrat commun aux fournisseurs de carte (legacy floor, Marseille OSM, …). */
+/** Contrat commun aux fournisseurs de carte (legacy floor, Metaverse OSM, …). */
 export interface MapProvider {
   readonly id: MapProviderId;
 

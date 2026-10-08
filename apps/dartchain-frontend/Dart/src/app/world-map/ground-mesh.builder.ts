@@ -19,6 +19,7 @@ import {
   ringAreaMetersSq,
   type XzPoint,
 } from './highway-buffer.util';
+import { MIRROR_SPAWN_SAFE_ZONE } from './map-configuration';
 
 export interface GroundMeshBuildResult {
   group: THREE.Group;
@@ -188,6 +189,32 @@ function buildPlate(
   }
 }
 
+/**
+ * Disque sol opaque à l’intérieur du cercle spawn SAFE —
+ * vert bouteille exclusif, au-dessus de l’esplanade pour différencier la zone.
+ */
+function buildSpawnCircleGroundFill(
+  group: THREE.Group,
+  geometries: THREE.BufferGeometry[],
+  materials: GroundMaterialSet
+): void {
+  const geo = new THREE.CircleGeometry(MIRROR_SPAWN_SAFE_ZONE.radiusMeters, 64);
+  geometries.push(geo);
+  const disk = new THREE.Mesh(geo, materials.spawnCircleGround);
+  disk.name = 'ground-spawn-circle-fill';
+  disk.rotation.x = -Math.PI / 2;
+  // Légèrement au-dessus de l’esplanade pour peindre tout l’intérieur du cercle.
+  disk.position.set(
+    MIRROR_SPAWN_SAFE_ZONE.centerX,
+    groundTopY('esplanade') + 0.02,
+    MIRROR_SPAWN_SAFE_ZONE.centerZ
+  );
+  disk.receiveShadow = true;
+  disk.castShadow = false;
+  disk.renderOrder = 2;
+  group.add(disk);
+}
+
 export function createCrosswalkGroup(
   def: CrosswalkDef,
   materials: GroundMaterialSet,
@@ -217,7 +244,7 @@ export function createCrosswalkGroup(
   const glow = new THREE.Mesh(
     glowGeo,
     new THREE.MeshBasicMaterial({
-      color: 0x40e0ff,
+      color: 0x8a95a5,
       transparent: true,
       opacity: 0.18,
       depthWrite: false,
@@ -237,7 +264,7 @@ export function buildCityGroundMeshes(
   materials: GroundMaterialSet
 ): GroundMeshBuildResult {
   const group = new THREE.Group();
-  group.name = 'marseille-city-ground';
+  group.name = 'metaverse-city-ground';
   const geometries: THREE.BufferGeometry[] = [];
   const materialList: THREE.Material[] = Object.values(materials);
 
@@ -247,6 +274,7 @@ export function buildCityGroundMeshes(
   for (const plate of plates) {
     buildPlate(group, geometries, plate, materials);
   }
+  buildSpawnCircleGroundFill(group, geometries, materials);
   for (const crosswalk of crosswalks) {
     group.add(createCrosswalkGroup(crosswalk, materials, geometries));
   }

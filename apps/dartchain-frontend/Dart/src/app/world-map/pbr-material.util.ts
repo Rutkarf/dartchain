@@ -22,7 +22,7 @@ export function createQuaySurfaceMaterial(
   quality: MapQuality,
   options: QuaySurfaceMaterialOptions
 ): THREE.MeshStandardMaterial | THREE.MeshPhysicalMaterial {
-  const color = options.color ?? 0xa8b0bc;
+  const color = options.color ?? 0x8a95a5;
 
   if (!usesPhysicalPbrFeatures(quality)) {
     return new THREE.MeshStandardMaterial({
@@ -30,7 +30,7 @@ export function createQuaySurfaceMaterial(
       roughness: options.roughness,
       metalness: options.metalness,
       envMapIntensity: options.envMapIntensity,
-      emissive: new THREE.Color(0x182430),
+      emissive: new THREE.Color(0x0d0630),
       emissiveIntensity: quality === 'low' ? 0.02 : 0.05,
     });
   }
@@ -42,7 +42,7 @@ export function createQuaySurfaceMaterial(
     envMapIntensity: options.envMapIntensity,
     sheen: options.sheen ?? 0.08,
     sheenRoughness: 0.38,
-    sheenColor: options.sheenColor ?? new THREE.Color(0xc8e8ff),
+    sheenColor: options.sheenColor ?? new THREE.Color(0xede7d9),
   });
 }
 
@@ -68,7 +68,7 @@ export function createArchitecturalGlassMaterial(
       opacity: options.opacity ?? 0.42,
       envMapIntensity: options.envMapIntensity ?? 0.95,
       depthWrite: false,
-      emissive: new THREE.Color(0x1a3048),
+      emissive: new THREE.Color(0x18314f),
       emissiveIntensity: 0.08,
     });
   }

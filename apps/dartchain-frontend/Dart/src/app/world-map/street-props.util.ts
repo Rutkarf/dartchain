@@ -184,25 +184,25 @@ export function buildStreetPropsFromPlacements(
   _quality: MapQuality
 ): StreetPropsBuildResult {
   const group = new THREE.Group();
-  group.name = 'marseille-street-props';
+  group.name = 'metaverse-street-props';
 
   const treeGeo = createTreePropGeometry();
   const benchGeo = createBenchPropGeometry();
   const binGeo = createBinPropGeometry();
 
   const treeMat = new THREE.MeshStandardMaterial({
-    color: 0x3d6848,
+    color: 0x09814a,
     roughness: 0.84,
     metalness: 0.03,
   });
 
   const benchMat = new THREE.MeshStandardMaterial({
-    color: 0x4a4038,
+    color: 0x18314f,
     roughness: 0.62,
     metalness: 0.18,
   });
   const binMat = new THREE.MeshStandardMaterial({
-    color: 0x3a4858,
+    color: 0x18314f,
     roughness: 0.45,
     metalness: 0.55,
   });
@@ -216,7 +216,7 @@ export function buildStreetPropsFromPlacements(
 
   const treeCount = addInstancedKind(
     group,
-    'marseille-street-trees',
+    'metaverse-street-trees',
     treeGeo,
     treeMat,
     trees,
@@ -225,7 +225,7 @@ export function buildStreetPropsFromPlacements(
   );
   const benchCount = addInstancedKind(
     group,
-    'marseille-street-benches',
+    'metaverse-street-benches',
     benchGeo,
     benchMat,
     benches,
@@ -234,7 +234,7 @@ export function buildStreetPropsFromPlacements(
   );
   const binCount = addInstancedKind(
     group,
-    'marseille-street-bins',
+    'metaverse-street-bins',
     binGeo,
     binMat,
     bins,

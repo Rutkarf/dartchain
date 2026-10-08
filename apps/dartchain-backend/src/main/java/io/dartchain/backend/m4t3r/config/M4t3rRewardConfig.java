@@ -21,10 +21,10 @@ public class M4t3rRewardConfig {
     @Value("${m4t3r.reward.signing-key:change-me-m4t3r-reward-dev-only}")
     private String signingKey;
 
-    @Value("${m4t3r.reward.max-speed-mps:5.0}")
+    @Value("${m4t3r.reward.max-speed-mps:32.0}")
     private String maxSpeedMps;
 
-    @Value("${m4t3r.reward.world-id:marseille}")
+    @Value("${m4t3r.reward.world-id:metaverse}")
     private String worldId;
 
     @Value("${m4t3r.rewards.path:data/m4t3r-rewards.json}")

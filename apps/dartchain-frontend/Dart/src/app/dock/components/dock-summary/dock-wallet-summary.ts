@@ -43,8 +43,10 @@ export class DockWalletSummaryComponent implements OnInit, OnDestroy {
   readonly hasWallet = this.state.hasWallet;
   readonly isAuthenticated = this.auth.isAuthenticated;
 
-  /** CTA visible sans wallet ; cliquable uniquement si connecté. */
-  readonly showCreateWallet = computed(() => !this.hasWallet());
+  /** CTA visible seulement s’il n’y a ni clé locale ni wallet déjà lié au compte. */
+  readonly showCreateWallet = computed(
+    () => !this.hasWallet() && !this.auth.user()?.walletAddress?.trim()
+  );
   readonly canCreateWallet = computed(
     () => this.isAuthenticated() && !this.hasWallet()
   );

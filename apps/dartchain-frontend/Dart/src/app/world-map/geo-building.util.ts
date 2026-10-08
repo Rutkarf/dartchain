@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { ShapeUtils } from 'three';
+import { BEVEL, extrudeOptionsFromBevel } from '../core/constants/stroke-bevel';
 
 import {
   resolveGeoBuildingHeight,
@@ -72,14 +73,10 @@ export function extrudeFootprintGeometry(
 ): THREE.BufferGeometry | null {
   if (shapePoints.length < 3 || heightMeters <= 0) return null;
   const wound = ensureExtrudeShapeWinding(shapePoints);
-  const geometry = new THREE.ExtrudeGeometry(new THREE.Shape(wound), {
-    depth: heightMeters,
-    bevelEnabled: true,
-    bevelThickness: 0.045,
-    bevelSize: 0.035,
-    bevelSegments: 1,
-    steps: 1,
-  });
+  const geometry = new THREE.ExtrudeGeometry(
+    new THREE.Shape(wound),
+    extrudeOptionsFromBevel(BEVEL.urban, heightMeters)
+  );
   geometry.rotateX(-Math.PI / 2);
   geometry.computeVertexNormals();
   return geometry;

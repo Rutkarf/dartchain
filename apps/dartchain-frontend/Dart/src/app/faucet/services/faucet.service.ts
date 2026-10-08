@@ -23,6 +23,10 @@ export interface FaucetStateResponse {
   configCooldownSeconds: number;
   /** Solde faucet pending (off-chain) — lecture seule pour affichage arène (Q1=C). */
   pendingAmount?: string | null;
+  /** Pending en nombre entier de m4t3r. */
+  pendingM4t3r?: string | null;
+  /** Dernier claim en nombre entier de m4t3r. */
+  lastClaimM4t3r?: string | null;
 }
 
 export interface FaucetClaimRequest {
@@ -36,6 +40,8 @@ export interface FaucetClaimResponse {
   message: string;
   walletAddress: string;
   amount: string;
+  /** Nombre entier de m4t3r débités. */
+  m4t3rCount?: string | null;
   claimedAt: string;
   nextEligibleAt: string;
   cooldownSeconds: number;
@@ -46,6 +52,7 @@ export interface FaucetClaimRecord {
   id: string;
   walletAddress: string;
   amount: string | number;
+  m4t3rCount?: string | null;
   claimedAt: number;
   nextEligibleAt?: number;
   txHash?: string | null;

@@ -91,7 +91,7 @@ export class ShowcaseDaoSummaryComponent implements OnInit, OnDestroy {
       case 'active':
         return 'ON';
       case 'closed':
-        return 'OFF';
+        return 'HORS';
       default:
         return '…';
     }

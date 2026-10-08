@@ -7,7 +7,7 @@
 }
 
 :host(.is-collapsed) {
-  overflow: visible;
+  overflow: hidden;
   height: 100%;
 }
 
@@ -21,7 +21,7 @@
 }
 
 .showcase-panel.is-collapsed {
-  overflow: visible;
+  overflow: hidden;
   height: 100%;
 }
 
@@ -33,24 +33,24 @@
   width: 100%;
   min-height: clamp(10px, 3.2vw, 14px);
   padding: 0 6px;
-  border-bottom: 1px solid rgba(0, 229, 255, 0.12);
-  background: rgba(2, 6, 12, 0.92);
+  border-bottom: 1px solid rgba(139, 157, 173, 0.12);
+  background: rgba(10, 18, 32, 0.92);
 }
 
 .showcase-panel__accent {
   width: 2px;
   height: 8px;
-  border-radius: 1px;
-  background: #00e5ff;
+  border-radius: var(--radius-none);
+  background: #8b9dad;
   box-shadow: none;
 }
 
 .showcase-panel__title {
-  font-size: clamp(7px, 2.2vw, 9px);
+  font-size: var(--fs-title);
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(237, 231, 217, 0.88);
 }
 
 .showcase-panel__body {
@@ -70,7 +70,7 @@
   flex: 0 0 100%;
   align-items: center;
   justify-content: center;
-  overflow: visible;
+  overflow: hidden;
   min-height: 0;
   height: 100%;
 }

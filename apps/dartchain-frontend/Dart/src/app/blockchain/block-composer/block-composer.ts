@@ -95,7 +95,7 @@ export class BlockComposerComponent implements OnInit {
       return 'Connexion';
     }
 
-    return this.compact ? 'CRÉER TX' : 'Créer transaction';
+    return this.compact ? 'CRÉER' : 'Créer transaction';
   });
 
   readonly messagePlaceholder = computed(

@@ -2,6 +2,10 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { formatDockRelativeTime } from '@core/utils/dock-time.util';
 import { FaucetRuntimeService, FaucetLedTone } from '@faucet/services/faucet-runtime.service';
+import {
+  formatSmartbarAmount,
+  formatSpacedDecimalDigits,
+} from '@faucet/faucet/faucet.util';
 import { WalletSessionService } from '@wallet/services/wallet-session.service';
 
 export type DockFaucetPhase =
@@ -46,11 +50,17 @@ export class DockFaucetStateService {
       case 'ready':
         return 'Disponible';
       default:
-        return 'Cooldown';
+        return 'Délai';
     }
   });
 
-  readonly headline = computed(() => this.runtime.displayLine());
+  readonly headline = computed(() =>
+    formatSmartbarAmount(this.runtime.wholePartDisplay(), this.runtime.decimalDigits())
+  );
+  readonly wholePart = this.runtime.wholePartDisplay;
+  readonly decimalDigitsSpaced = computed(() =>
+    formatSpacedDecimalDigits(this.runtime.decimalDigits())
+  );
 
   readonly progressLabel = computed(() => {
     if (this.runtime.cooldownSeconds() > 0) {
@@ -58,7 +68,7 @@ export class DockFaucetStateService {
     }
 
     if (this.runtime.eligible()) {
-      return 'Claim disponible';
+      return 'Réclamation disponible';
     }
 
     return '';

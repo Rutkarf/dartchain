@@ -121,7 +121,7 @@ export class LadderClimbSceneComponent implements AfterViewInit, OnDestroy {
     const height = Math.max(280, Math.round(window.innerHeight * 0.42));
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x87b5d9);
+    this.scene.background = new THREE.Color(0x8a95a5);
 
     this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     this.camera.position.set(0, 5, 10);
@@ -137,10 +137,10 @@ export class LadderClimbSceneComponent implements AfterViewInit, OnDestroy {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    const ambient = new THREE.AmbientLight(0xede7d9, 0.5);
     this.scene.add(ambient);
 
-    const dir = new THREE.DirectionalLight(0xffffff, 1.0);
+    const dir = new THREE.DirectionalLight(0xede7d9, 1.0);
     dir.position.set(10, 20, 10);
     dir.castShadow = true;
     dir.shadow.mapSize.set(1024, 1024);
@@ -158,7 +158,7 @@ export class LadderClimbSceneComponent implements AfterViewInit, OnDestroy {
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(100, 100),
       new THREE.MeshStandardMaterial({
-        color: 0x999999,
+        color: 0x8a95a5,
         opacity: 1.0,
         transparent: false,
         roughness: 0.8,
@@ -191,7 +191,7 @@ export class LadderClimbSceneComponent implements AfterViewInit, OnDestroy {
     ];
 
     const mat = new THREE.MeshStandardMaterial({
-      color: 0x6688cc,
+      color: 0x8a95a5,
       roughness: 0.7,
       metalness: 0.15,
     });
@@ -219,7 +219,7 @@ export class LadderClimbSceneComponent implements AfterViewInit, OnDestroy {
     this.character = new THREE.Mesh(
       geometry,
       new THREE.MeshStandardMaterial({
-        color: 0xff6600,
+        color: 0x7b0d1e,
         roughness: 0.45,
         metalness: 0.2,
       })
@@ -232,7 +232,7 @@ export class LadderClimbSceneComponent implements AfterViewInit, OnDestroy {
 
   private createLadder(): void {
     const metal = new THREE.MeshStandardMaterial({
-      color: 0x888888,
+      color: 0x8a95a5,
       metalness: 0.7,
       roughness: 0.35,
     });
@@ -260,7 +260,7 @@ export class LadderClimbSceneComponent implements AfterViewInit, OnDestroy {
     // Platform
     const platform = new THREE.Mesh(
       new THREE.BoxGeometry(4, 0.3, 4),
-      new THREE.MeshStandardMaterial({ color: 0x666666, roughness: 0.7 })
+      new THREE.MeshStandardMaterial({ color: 0x8a95a5, roughness: 0.7 })
     );
     platform.position.set(0, 15, -40);
     platform.castShadow = true;
@@ -268,12 +268,12 @@ export class LadderClimbSceneComponent implements AfterViewInit, OnDestroy {
     this.scene.add(platform);
 
     const white = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
+      color: 0xede7d9,
       metalness: 0.3,
       roughness: 0.4,
     });
     const red = new THREE.MeshStandardMaterial({
-      color: 0xff0000,
+      color: 0x7b0d1e,
       metalness: 0.2,
       roughness: 0.45,
     });
@@ -304,8 +304,8 @@ export class LadderClimbSceneComponent implements AfterViewInit, OnDestroy {
     const windowMesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.22, 12, 12),
       new THREE.MeshStandardMaterial({
-        color: 0x88ccff,
-        emissive: 0x226688,
+        color: 0x8a95a5,
+        emissive: 0x09814a,
         emissiveIntensity: 0.4,
         metalness: 0.1,
         roughness: 0.2,

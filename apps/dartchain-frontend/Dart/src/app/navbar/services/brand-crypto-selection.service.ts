@@ -12,7 +12,7 @@ import {
 } from '@core/constants/exchange-launchpad.constants';
 import { RatePanelPreferencesService } from '@showcase/services/rate-panel-preferences.service';
 
-/** Tokens échangeables LaunchLab (fallback — liste réelle via API exchange-panel). */
+/** Tokens échangeables Laboratoire (fallback — liste réelle via API exchange-panel). */
 export const EXCHANGE_FROM_TOKENS = EXCHANGE_LAUNCHPAD_FALLBACK_TOKENS;
 
 export type ExchangeFromToken = (typeof EXCHANGE_FROM_TOKENS)[number];
@@ -32,7 +32,7 @@ export class BrandCryptoSelectionService {
   readonly selected = signal<BrandCryptoSymbol>(BRAND_DEFAULT_CRYPTO);
   /** Demande de synchronisation du token From du swap (rate panel, graphique, etc.). */
   readonly exchangeFromToken = signal<string | null>(null);
-  /** Paire swap explicite (market panel BUY/SELL, LaunchLab). */
+  /** Paire swap explicite (market panel BUY/SELL, Laboratoire). */
   readonly exchangeTradeRequest = signal<{
     from: string;
     to: string;
@@ -77,7 +77,7 @@ export class BrandCryptoSelectionService {
     });
   }
 
-  /** Token LaunchLab : sélection graphique + paire swap vers R4V3. */
+  /** Token Laboratoire : sélection graphique + paire swap vers R4V3. */
   selectLaunchToken(symbol: string, coinId?: string | null): void {
     const normalized = symbol.trim().toUpperCase();
     if (!normalized) {
@@ -89,7 +89,7 @@ export class BrandCryptoSelectionService {
     this.requestExchangeTrade(normalized, EXCHANGE_NATIVE_TOKEN);
   }
 
-  /** Met à jour le graphique pour un token LaunchLab sans toucher au swap. */
+  /** Met à jour le graphique pour un token Laboratoire sans toucher au swap. */
   selectLaunchChart(symbol: string, coinId?: string | null): void {
     const normalized = symbol.trim().toUpperCase();
     if (!normalized) {

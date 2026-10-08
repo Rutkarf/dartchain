@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 
+import { readStoredUser } from '@core/auth/auth-session.storage';
 import { QuestsApiService } from '@quests/services/quests-api.service';
 import { WalletSessionService } from '@wallet/services/wallet-session.service';
 import {
@@ -187,13 +188,6 @@ export class QuestsPanelService {
   }
 
   async claimTask(taskId: string): Promise<QuestClaimResult> {
-    if (this.getServerHookedIds().has(taskId)) {
-      return {
-        ok: false,
-        error: 'Cette quête est créditée automatiquement par le serveur.',
-      };
-    }
-
     if (this.hasAuthToken()) {
       try {
         const state = await firstValueFrom(this.questsApi.claimTask(taskId));
@@ -270,21 +264,22 @@ export class QuestsPanelService {
   }
 
   buildTaskViews(state = this.snapshot()): QuestTaskView[] {
+    const hasWallet = this.hasLinkedWallet();
     return this.getDailyQuests().map((quest) => {
       const task = state.tasks[quest.id] ?? { progress: 0, claimed: false };
       const complete = task.progress >= quest.target;
       const autoHooked = this.getServerHookedIds().has(quest.id);
-      const autoClaimed = autoHooked && task.claimed;
-      const pendingWallet = autoHooked && complete && !task.claimed;
+      const pendingWallet = complete && !task.claimed && !hasWallet;
+      const claimable = complete && !task.claimed && hasWallet;
 
       return {
         ...quest,
         progress: task.progress,
         complete,
-        claimable: complete && !task.claimed && !autoHooked,
+        claimable,
         progressLabel: `${Math.min(task.progress, quest.target)}/${quest.target}`,
         autoHooked,
-        autoClaimed,
+        autoClaimed: false,
         pendingWallet,
       };
     });
@@ -323,26 +318,7 @@ export class QuestsPanelService {
 
     current.progress = Math.min(definition.target, current.progress + increment);
     state.tasks[taskId] = current;
-    this.tryAutoClaimLocally(state, definition, current);
     this.persist(state);
-  }
-
-  private tryAutoClaimLocally(
-    state: QuestPersistedState,
-    definition: DailyQuestDefinition,
-    task: QuestTaskState
-  ): void {
-    if (task.claimed || task.progress < definition.target) {
-      return;
-    }
-
-    if (this.getServerHookedIds().has(definition.id)) {
-      return;
-    }
-
-    task.claimed = true;
-    state.pendingMts += definition.rewardMts;
-    state.totalXp += definition.rewardXp;
   }
 
   private claimTaskLocally(taskId: string): boolean {
@@ -540,6 +516,13 @@ export class QuestsPanelService {
       progress: afterProgress,
       target,
     };
+  }
+
+  private hasLinkedWallet(): boolean {
+    if (this.walletSession.address()?.trim()) {
+      return true;
+    }
+    return Boolean(readStoredUser()?.walletAddress?.trim());
   }
 
   private resolveTaskRewardMts(taskId: string): number {

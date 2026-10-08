@@ -118,7 +118,7 @@ export class ShowcaseLaunchSummaryComponent implements OnInit, OnDestroy {
   whitepaperAriaLabel(project: LaunchProject): string {
     return this.hasWhitepaper(project)
       ? `Ouvrir le whitepaper ${project.symbol}`
-      : `Whitepaper indisponible pour ${project.symbol}`;
+      : `Livre blanc indisponible pour ${project.symbol}`;
   }
 
   openWhitepaper(project: LaunchProject, event: MouseEvent): void {

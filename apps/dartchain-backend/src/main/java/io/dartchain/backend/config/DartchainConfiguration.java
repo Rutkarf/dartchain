@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
         OpsProperties.class,
         ProductProperties.class,
         AuthProperties.class,
+        MailProperties.class,
         ChainProperties.class,
         OAuthProperties.class,
         WigleProperties.class,

@@ -11,7 +11,10 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * Phase AB — résolution centralisée JWT + sessions legacy.
+ * Résout un compte depuis un JWT. Le chemin session legacy n'est lu que si
+ * {@code dartchain.auth.legacy-session-enabled} est vrai, et seulement pour un jeton
+ * qui n'a pas exactement deux points. Ce drapeau est faux dans la configuration livrée :
+ * le login n'écrit pas {@code auth_sessions}.
  */
 @Service
 public class AuthTokenResolver {
